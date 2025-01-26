@@ -13,6 +13,7 @@
     "require": {
         "php": "^8.2",
         "doctrine/orm": "^2.20",
+        "rekalogika/doctrine-advanced-group-by": "dev-main",
         "symfony/property-access": "^6.4 || ^7.0"
     },
     "autoload": {
