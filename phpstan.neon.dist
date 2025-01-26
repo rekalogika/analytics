@@ -1,0 +1,39 @@
+parameters:
+    level: max
+    checkBenevolentUnionTypes: true
+    checkExplicitMixedMissingReturn: true
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+    reportMaybesInPropertyPhpDocTypes: true
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    paths:
+        - packages
+        - tests
+    excludePaths:
+        - tests/var
+        - tests/src/App/Factory
+    ignoreErrors:
+        -
+            identifier: property.onlyRead
+            path: tests/src/App/Entity/*
+        -
+            identifier: property.unusedType
+            path: packages/analytics-core/src/Model/Hierarchy/*
+        -   '#Doctrine\\ORM\\Query but does not specify its types: TKey, TResult#'
+
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/bnf/phpstan-psr-container/extension.neon
+    - vendor/ekino/phpstan-banned-code/extension.neon
+    - vendor/phpat/phpat/extension.neon
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+
+services:
+    -
+        class: Rekalogika\Analytics\Tests\ArchitectureTests\ArchitectureTest
+        tags:
+            - phpat.test

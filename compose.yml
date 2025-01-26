@@ -1,0 +1,21 @@
+services:
+
+    database:
+        image: mirror.gcr.io/hbontempo/postgres-hll
+        restart: unless-stopped
+        shm_size: 1g
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: app
+            POSTGRES_PASSWORD: app
+            POSTGRES_USER: app
+            PGDATA: /var/lib/postgresql/data/pgdata
+        # volumes:
+        #     - ./tests/var/database-data:/var/lib/postgresql/data:rw
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-app}"]
+            interval: 15s
+            timeout: 5s
+            start_period: 600s
+            retries: 1

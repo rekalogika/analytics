@@ -1,0 +1,36 @@
+{
+    "name": "rekalogika/analytics-bundle",
+    "description": "TBD",
+    "homepage": "https://rekalogika.dev/analytics",
+    "license": "MIT",
+    "keywords": [
+        "analytics",
+        "symfony",
+        "symfony-ux"
+    ],
+    "authors": [
+        {
+            "name": "Priyadi Iman Nurcahyo",
+            "email": "priyadi@rekalogika.com"
+        }
+    ],
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "doctrine/doctrine-bundle": "^2.12",
+        "rekalogika/analytics-core": "dev-main",
+        "symfony/config": "^6.4 || ^7.0",
+        "symfony/console": "^6.4 || ^7.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/form": "^6.4 || ^7.0",
+        "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/stimulus-bundle": "^2.9",
+        "symfony/translation": "^6.4 || ^7.0"
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Rekalogika\\Analytics\\Symfony\\": "src/"
+        }
+    }
+}

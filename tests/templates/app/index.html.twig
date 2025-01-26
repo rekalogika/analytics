@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'app/summary_form.html.twig' %}
+
+{% block title %}Hello{% endblock %}
+
+{% block body %}
+    {{ form(form, {attr: {id : 'pivottable_form', 'data-turbo-frame': 'pivottable', 'data-turbo-action': 'advance'}}) }}
+
+    <div class="mt-5" style="min-height: 500px;">
+        <turbo-frame id="pivottable">
+            {% if result %}{{ result|raw }}{% endif %}
+        </turbo-frame>
+    </div>
+{% endblock %}

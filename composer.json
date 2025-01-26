@@ -1,0 +1,89 @@
+{
+    "name": "rekalogika/analytics",
+    "description": "TBD",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Priyadi Iman Nurcahyo",
+            "email": "priyadi@rekalogika.com"
+        }
+    ],
+    "homepage": "https://rekalogika.dev/analytics",
+    "require": {
+        "php": "^8.2",
+        "doctrine/doctrine-bundle": "^2.12",
+        "doctrine/orm": "^2.20",
+        "symfony/asset": "^6.4 || ^7.0",
+        "symfony/asset-mapper": "^6.4 || ^7.0",
+        "symfony/config": "^6.4 || ^7.0",
+        "symfony/console": "^6.4 || ^7.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/form": "^6.4 || ^7.0",
+        "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/stimulus-bundle": "^2.9",
+        "symfony/translation": "^6.4 || ^7.0",
+        "symfony/twig-pack": "^1.0"
+    },
+    "require-dev": {
+        "bnf/phpstan-psr-container": "^1.1",
+        "brick/money": "^0.10.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.5 || ^4.0",
+        "doctrine/persistence": "^3.1",
+        "ekino/phpstan-banned-code": "^1.0 || ^2.0",
+        "phpat/phpat": "^0.10.18",
+        "phpstan/phpstan": "^1.12",
+        "phpstan/phpstan-deprecation-rules": "^1.2",
+        "phpstan/phpstan-doctrine": "^1.5",
+        "phpstan/phpstan-phpunit": "^1.4",
+        "phpunit/phpunit": "^10.5",
+        "psalm/plugin-phpunit": "^0.18.4",
+        "psalm/plugin-symfony": "^5.2",
+        "psr/log": "^2.0 || ^3.0",
+        "rector/rector": "^1.2",
+        "symfony/debug-bundle": "^6.4 || ^7.0",
+        "symfony/doctrine-bridge": "^6.4 || ^7.0",
+        "symfony/dotenv": "^6.4 || ^7.0",
+        "symfony/error-handler": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/maker-bundle": "^1.55",
+        "symfony/monolog-bundle": "^3.0",
+        "symfony/runtime": "^6.4 || ^7.0",
+        "symfony/stopwatch": "^6.4 || ^7.0",
+        "symfony/twig-bundle": "^6.4 || ^7.0",
+        "symfony/uid": "^6.4 || ^7.0",
+        "symfony/ux-turbo": "^2.22",
+        "symfony/var-dumper": "^6.3 || ^7.0",
+        "symfony/var-exporter": "^6.4.1 || ^6.5 || ^7.0",
+        "symfony/web-profiler-bundle": "^6.4 || ^7.0",
+        "symfony/yaml": "^6.4 || ^7.0",
+        "symplify/monorepo-builder": "^11.2.20 || ^11.3",
+        "vimeo/psalm": "^5.26",
+        "zenstruck/foundry": "^2.0"
+    },
+    "replace": {
+        "rekalogika/analytics-bundle": "self.version",
+        "rekalogika/analytics-core": "self.version",
+        "rekalogika/doctrine-advanced-group-by": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
+            "Rekalogika\\Analytics\\Symfony\\": "packages/analytics-bundle/src/",
+            "Rekalogika\\DoctrineAdvancedGroupBy\\": "packages/doctrine-advanced-group-by/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rekalogika\\Analytics\\Tests\\": "tests/src/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/runtime": true,
+            "symfony/flex": false
+        }
+    }
+}

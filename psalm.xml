@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<psalm
+        errorLevel="1"
+        resolveFromConfigFile="true"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+        findUnusedBaselineEntry="true"
+        findUnusedCode="false">
+
+    <projectFiles>
+        <directory name="packages" />
+        <directory name="tests/src" />
+        <directory name="tests/config" />
+        <directory name="tests/bin" />
+        <ignoreFiles>
+            <directory name="vendor" />
+            <directory name="tests/src/App/Factory" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <MissingConstructor>
+            <errorLevel type="suppress">
+                <directory name="tests/src/App/Entity" />
+                <directory name="packages/analytics-core/src/Model/Hierarchy" />
+            </errorLevel>
+        </MissingConstructor>
+        <MoreSpecificReturnType>
+            <errorLevel type="suppress">
+                <file name="packages/analytics-core/src/Model/Partition/IntegerPartition.php" />
+            </errorLevel>
+        </MoreSpecificReturnType>
+        <TooManyArguments>
+            <errorLevel type="suppress">
+                <file name="packages/analytics-core/src/SummaryManager/Query/SummarizerQuery.php" />
+            </errorLevel>
+        </TooManyArguments>
+    </issueHandlers>
+
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin" />
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
+    </plugins>
+</psalm>

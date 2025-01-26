@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php: [ '8.2', '8.3', '8.4' ]
+        symfony: [ '6.*', '7.*' ]
+        orm: ['^2.19', '^3.0']
+        dep: [highest,lowest]
+
+    name: SF ${{ matrix.symfony }}, ${{ matrix.dep }} deps, ORM ${{ matrix.orm }}, PHP ${{ matrix.php }}, ${{ matrix.operating-system }}
+
+
+    services:
+      postgres:
+        image: mirror.gcr.io/hbontempo/postgres-hll
+        env:
+          POSTGRES_DB: app
+          POSTGRES_PASSWORD: app
+          POSTGRES_USER: app
+          PGDATA: /var/lib/postgresql/data/pgdata
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: intl
+        tools: flex, phive
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+    
+    - name: phive
+      run: phive install --trust-gpg-keys E82B2FB314E9906E
+
+    - name: Install dependencies
+      uses: ramsey/composer-install@v3
+      with:
+        dependency-versions: ${{ matrix.dep }}
+        composer-options: --prefer-dist --no-progress --no-scripts --ignore-platform-reqs --with=doctrine/orm:${{ matrix.orm }}
+      env:
+        SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+    - name: Run psalm
+      run: vendor/bin/psalm
+
+    - name: Run phpstan
+      run: vendor/bin/phpstan analyse
+
+    - name: Validate monorepo
+      run: git reset --hard ; vendor/bin/monorepo-builder validate
+
+    - name: Validate php-cs-fixer
+      run: |
+        PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer check --allow-risky=yes
+
+    - name: Create schema
+      run: php tests/bin/console doctrine:schema:create --no-interaction
+
+    - name: Load fixtures
+      run: php tests/bin/console doctrine:fixtures:load --no-interaction
+
+    - name: Refresh
+      run: |
+        php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+        php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
+
+    - name: Run phpunit
+      run: |
+        export SYMFONY_DEPRECATIONS_HELPER='max[direct]=0'
+        vendor/bin/phpunit

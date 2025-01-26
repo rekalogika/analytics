@@ -1,0 +1,25 @@
+{% block backedenum %}
+    {{ data.value }}
+{% endblock %}
+
+{% block boolean %}
+    {% if data %}
+        <span class="badge badge-success">Yes</span>
+    {% else %}
+        <span class="badge badge-danger">No</span>
+    {% endif %}
+{% endblock %}
+
+{% block translatable %}
+    {{ data|trans }}
+{% endblock %}
+
+{% block empty %}
+    <div class="alert alert-danger" role="alert">
+        {{ 'No data'|trans }}
+    </div>
+{% endblock %}
+
+{% block null %}
+    -
+{% endblock %}
