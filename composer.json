@@ -27,6 +27,7 @@
         "symfony/twig-pack": "^1.0"
     },
     "require-dev": {
+        "amphp/amp": "^3.0",
         "bnf/phpstan-psr-container": "^1.1",
         "brick/money": "^0.10.0",
         "doctrine/doctrine-fixtures-bundle": "^3.5 || ^4.0",
