@@ -25,13 +25,11 @@ use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RollUpRangeEndEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RollUpRangeStartEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LoggerInterface $logger,
-        private ?Stopwatch $stopWatch,
     ) {}
 
     #[\Override]
@@ -57,14 +55,10 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
             'endValue' => Printer::print($event->getInputEndValue()),
             'start' => Printer::print($event->getStart()),
         ]);
-
-        $this->stopWatch?->start($event->getEventId());
     }
 
     public function onRefreshEndEvent(RefreshEndEvent $event): void
     {
-        $this->stopWatch?->stop($event->getEventId());
-
         $this->logger->debug('Refresh end', [
             'class' => $event->getClass(),
             'startValue' => Printer::print($event->getInputStartValue()),
@@ -82,14 +76,10 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
             'start' => Printer::print($event->getStart()),
             'range' => Printer::print($event->getRange()),
         ]);
-
-        $this->stopWatch?->start($event->getEventId());
     }
 
     public function onEndEvent(AbstractEndEvent $event): void
     {
-        $this->stopWatch?->stop($event->getEventId());
-
         $this->logger->debug((string) $event, [
             'class' => $event->getClass(),
             'start' => Printer::print($event->getStart()),

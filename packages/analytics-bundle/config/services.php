@@ -75,7 +75,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(RefreshLoggerEventSubscriber::class)
         ->args([
             '$logger' => service(LoggerInterface::class),
-            '$stopWatch' => service('debug.stopwatch')->nullOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
     ;
