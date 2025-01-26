@@ -14,7 +14,7 @@
             "email": "priyadi@rekalogika.com"
         }
     ],
-    "type": "library",
+    "type": "symfony-bundle",
     "require": {
         "php": "^8.2",
         "doctrine/doctrine-bundle": "^2.12",
