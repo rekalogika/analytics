@@ -40,7 +40,7 @@ final class SqlFactory
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
-        string $summaryToSummaryRollUpClass = null,
+        ?string $summaryToSummaryRollUpClass = null,
     ) {
         $this->summaryToSummaryRollUpClass = $summaryToSummaryRollUpClass
             ?? RollUpSummaryToSummaryGroupAllStrategyQuery::class;
