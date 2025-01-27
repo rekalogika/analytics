@@ -78,18 +78,18 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
 
         if (!\is_array($bundlesMetadata)) {
-            return false;
+            throw new \LogicException('Kernel bundles metadata not found.');
         }
 
-        if (!isset($bundlesMetadata['FrameworkBundle'])) {
-            return false;
+        if (!isset($bundlesMetadata['FrameworkBundle']) || !\is_array($bundlesMetadata['FrameworkBundle'])) {
+            throw new \LogicException('FrameworkBundle metadata not found.');
         }
 
-        /**
-         * @psalm-suppress MixedArrayAccess
-         * @var string $dir
-         */
         $dir = $bundlesMetadata['FrameworkBundle']['path'] ?? throw new \LogicException('FrameworkBundle path not found.');
+
+        if (!\is_string($dir)) {
+            throw new \LogicException('FrameworkBundle path is not a string.');
+        }
 
         return is_file($dir . '/Resources/config/asset_mapper.php');
     }
