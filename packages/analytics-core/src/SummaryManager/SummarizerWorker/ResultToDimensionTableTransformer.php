@@ -132,6 +132,8 @@ final readonly class ResultToDimensionTableTransformer
                 $lastKey = $key;
             }
 
+            /** @var array<array-key,SummaryItem|SummaryLeafItem> $transformedRow */
+
             yield array_values($transformedRow);
 
             $previousRow = $row;

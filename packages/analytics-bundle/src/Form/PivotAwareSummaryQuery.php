@@ -41,12 +41,12 @@ final class PivotAwareSummaryQuery
     ) {}
 
     /**
-     * @var array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:?array<string,string|TranslatableInterface>,type?:'dimension'|'measure'|'values'}>|null
+     * @var array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:array<string,string|TranslatableInterface>|null,type?:'dimension'|'measure'|'values'}>|null
      */
     private ?array $allChoices = null;
 
     /**
-     * @return array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:?array<string,string|TranslatableInterface>,type?:'dimension'|'measure'|'values'}>
+     * @return array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:array<string,string|TranslatableInterface>|null,type?:'dimension'|'measure'|'values'}>
      */
     private function getAllChoices(): array
     {
@@ -62,6 +62,7 @@ final class PivotAwareSummaryQuery
             $result[$key]['choices'] = null;
 
             if (is_iterable($dimension)) {
+                /** @var iterable<string,string|TranslatableInterface> $dimension */
                 foreach ($dimension as $childKey => $child) {
                     $result[$key]['choices'][$childKey] = $child;
                 }

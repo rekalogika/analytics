@@ -26,11 +26,6 @@
                 <directory name="packages/analytics-core/src/Model/Hierarchy" />
             </errorLevel>
         </MissingConstructor>
-        <MoreSpecificReturnType>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/Model/Partition/IntegerPartition.php" />
-            </errorLevel>
-        </MoreSpecificReturnType>
         <TooManyArguments>
             <errorLevel type="suppress">
                 <file name="packages/analytics-core/src/SummaryManager/Query/SummarizerQuery.php" />
