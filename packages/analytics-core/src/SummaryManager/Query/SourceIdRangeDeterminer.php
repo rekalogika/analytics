@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\ReversibleValueResolver;
 use Rekalogika\Analytics\ValueRangeResolver;
@@ -32,7 +31,6 @@ final class SourceIdRangeDeterminer extends AbstractQuery
     public function __construct(
         string $class,
         private readonly EntityManagerInterface $entityManager,
-        private readonly ClassMetadataWrapper $doctrineMetadata,
         private readonly SummaryMetadata $summaryMetadata,
     ) {
         $queryBuilder = $this->entityManager
@@ -94,7 +92,10 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             return $valueResolver->getMinDQL($this->getQueryContext());
         }
 
-        return $this->getDefaultMinDQL();
+        return \sprintf(
+            'MIN(%s)',
+            $valueResolver->getDQL($this->getQueryContext()),
+        );
     }
 
     private function getMaxDQL(): string
@@ -105,22 +106,9 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             return $valueResolver->getMaxDQL($this->getQueryContext());
         }
 
-        return $this->getDefaultMaxDQL();
-    }
-
-    private function getDefaultMinDQL(): string
-    {
         return \sprintf(
-            'MIN(e.%s)',
-            $this->doctrineMetadata->getIdentifierFieldName(),
-        );
-    }
-
-    private function getDefaultMaxDQL(): string
-    {
-        return \sprintf(
-            'MAX(e.%s)',
-            $this->doctrineMetadata->getIdentifierFieldName(),
+            'MAX(%s)',
+            $valueResolver->getDQL($this->getQueryContext()),
         );
     }
 }

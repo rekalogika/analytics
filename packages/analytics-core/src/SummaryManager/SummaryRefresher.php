@@ -322,7 +322,6 @@ final readonly class SummaryRefresher
         return new SourceIdRangeDeterminer(
             class: $class,
             entityManager: $this->entityManager,
-            doctrineMetadata: $metadata,
             summaryMetadata: $this->metadata,
         );
     }
