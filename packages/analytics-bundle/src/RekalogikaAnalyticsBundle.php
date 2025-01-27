@@ -11,9 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Symfony;
+namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Symfony\DependencyInjection\DoctrineEntityPass;
+use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

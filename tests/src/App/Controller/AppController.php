@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
+use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
+use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
 use Rekalogika\Analytics\SummaryManagerRegistry;
-use Rekalogika\Analytics\Symfony\Form\PivotAwareSummaryQuery;
-use Rekalogika\Analytics\Symfony\Form\SummaryQueryType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Misc\PivotTableRenderer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

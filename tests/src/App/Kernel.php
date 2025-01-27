@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\App;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
-use Rekalogika\Analytics\Symfony\RekalogikaAnalyticsBundle;
+use Rekalogika\Analytics\Bundle\RekalogikaAnalyticsBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;

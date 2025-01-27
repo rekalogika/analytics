@@ -11,10 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Symfony\Command;
+namespace Rekalogika\Analytics\Bundle\Command;
 
+use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\SummaryManagerRegistry;
-use Rekalogika\Analytics\Symfony\EventListener\RefreshCommandOutputEventSubscriber;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
