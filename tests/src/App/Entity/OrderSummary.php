@@ -20,6 +20,7 @@ use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\AggregateFunction\Sum;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
+use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\ValueResolver\CustomDQLValueResolver;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
@@ -31,29 +32,15 @@ use Symfony\Component\Translation\TranslatableMessage;
     sourceClass: Order::class,
     label: new TranslatableMessage('Orders'),
 )]
-class OrderSummary
+class OrderSummary extends Summary
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     //
-    // partition & groupings
+    // partition
     //
 
     #[ORM\Embedded()]
     #[Analytics\Partition(new PropertyValueResolver('id'))]
     private TestIntegerPartition $partition;
-
-    #[ORM\Column]
-    #[Analytics\Groupings]
-    private string $groupings;
 
     //
     // dimensions
@@ -169,11 +156,6 @@ class OrderSummary
     public function getPartition(): Partition
     {
         return $this->partition;
-    }
-
-    public function getGroupings(): ?string
-    {
-        return $this->groupings;
     }
 
     public function getTime(): TimeDimensionHierarchy
