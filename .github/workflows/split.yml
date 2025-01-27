@@ -28,32 +28,25 @@ jobs:
 
             # no tag
             -
-                if: "!startsWith(github.ref, 'refs/tags/')"
+                if: '!startsWith(github.ref, "refs/tags/")'
                 uses: "danharrin/monorepo-split-github-action@v2.3.0"
                 with:
                     package_directory: 'packages/${{ matrix.name }}'
-
                     repository_organization: 'rekalogika'
                     repository_name: '${{ matrix.name }}'
-
                     repository_host: github.com
-
                     user_name: "Priyadi Iman Nurcahyo"
                     user_email: "1102197+priyadi@users.noreply.github.com"
 
             # with tag
             -
-                if: "startsWith(github.ref, 'refs/tags/')"
+                if: 'startsWith(github.ref, "refs/tags/")'
                 uses: "danharrin/monorepo-split-github-action@v2.3.0"
                 with:
                     tag: ${GITHUB_REF#refs/tags/}
-
                     package_directory: 'packages/${{ matrix.name }}'
-
                     repository_organization: 'rekalogika'
                     repository_name: '${{ matrix.name }}'
-
                     repository_host: github.com
-
                     user_name: "Priyadi Iman Nurcahyo"
                     user_email: "1102197+priyadi@users.noreply.github.com"
