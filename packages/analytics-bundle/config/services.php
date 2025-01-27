@@ -11,18 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Symfony;
+namespace Rekalogika\Analytics\Bundle;
 
 use Doctrine\ORM\Tools\ToolEvents;
 use Psr\Log\LoggerInterface;
+use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
+use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
+use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
 use Rekalogika\Analytics\SummaryManagerRegistry;
-use Rekalogika\Analytics\Symfony\Command\RefreshSummaryCommand;
-use Rekalogika\Analytics\Symfony\EventListener\RefreshCommandOutputEventSubscriber;
-use Rekalogika\Analytics\Symfony\EventListener\RefreshLoggerEventSubscriber;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

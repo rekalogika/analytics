@@ -69,7 +69,7 @@
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
-            "Rekalogika\\Analytics\\Symfony\\": "packages/analytics-bundle/src/",
+            "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/",
             "Rekalogika\\DoctrineAdvancedGroupBy\\": "packages/doctrine-advanced-group-by/src/"
         }
     },

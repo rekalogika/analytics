@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Symfony\EventListener;
+namespace Rekalogika\Analytics\Bundle\EventListener;
 
 use Rekalogika\Analytics\SummaryManager\Event\AbstractEndEvent;
 use Rekalogika\Analytics\SummaryManager\Event\AbstractStartEvent;
