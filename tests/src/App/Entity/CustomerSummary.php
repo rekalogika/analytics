@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
+use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
 use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -27,29 +28,15 @@ use Symfony\Component\Translation\TranslatableMessage;
     sourceClass: Customer::class,
     label: new TranslatableMessage('Customers'),
 )]
-class CustomerSummary
+class CustomerSummary extends Summary
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     //
-    // partition & groupings
+    // partition
     //
 
     #[ORM\Embedded()]
     #[Analytics\Partition(new UuidToTruncatedIntegerResolver('id'))]
     private UuidV7IntegerPartition $partition;
-
-    #[ORM\Column]
-    #[Analytics\Groupings]
-    private string $groupings;
 
     //
     // dimensions
@@ -90,11 +77,6 @@ class CustomerSummary
     public function getPartition(): UuidV7IntegerPartition
     {
         return $this->partition;
-    }
-
-    public function getGroupings(): ?string
-    {
-        return $this->groupings;
     }
 
     public function getCountry(): ?Country
