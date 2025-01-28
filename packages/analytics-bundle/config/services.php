@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
+use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
@@ -85,6 +86,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('kernel.event_subscriber')
         ->tag('kernel.reset', [
             'method' => 'reset',
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.life_cycle_listener')
+        ->class(SummaryEntityListener::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+        ->tag('doctrine.event_listener', [
+            'event' => 'prePersist',
+        ])
+        ->tag('doctrine.event_listener', [
+            'event' => 'preUpdate',
+        ])
+        ->tag('doctrine.event_listener', [
+            'event' => 'preRemove',
+        ])
+        ->tag('doctrine.event_listener', [
+            'event' => 'postLoad',
         ])
     ;
 };

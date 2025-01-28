@@ -31,6 +31,11 @@ interface SummaryMetadataFactory
     public function getSummaryClasses(): iterable;
 
     /**
+     * @param class-string $className
+     */
+    public function isSummary(string $className): bool;
+
+    /**
      * @param class-string $sourceClassName
      */
     public function getSourceMetadata(
