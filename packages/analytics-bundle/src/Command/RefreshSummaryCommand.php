@@ -79,19 +79,19 @@ final class RefreshSummaryCommand extends Command implements SignalableCommandIn
         $this->addArgument(
             name: 'start',
             mode: InputArgument::OPTIONAL,
-            description: 'Start ID',
+            description: 'Start key',
         );
 
         $this->addArgument(
             name: 'end',
             mode: InputArgument::OPTIONAL,
-            description: 'End ID',
+            description: 'End key',
         );
 
         $this->addOption(
             name: 'resume',
             mode: InputOption::VALUE_REQUIRED,
-            description: 'Resume ID',
+            description: 'Resume identifier',
         );
 
         $this->addOption(
