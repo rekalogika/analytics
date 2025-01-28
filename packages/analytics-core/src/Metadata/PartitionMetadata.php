@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\IdClassifier;
 use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\PartitionUtil;
 
 final readonly class PartitionMetadata
 {
     /**
-     * @param array<class-string,ReversibleValueResolver> $source
+     * @param array<class-string,PartitionValueResolver> $source
      * @param class-string<Partition> $partitionClass
      */
     public function __construct(
@@ -34,7 +34,7 @@ final readonly class PartitionMetadata
     ) {}
 
     /**
-     * @return array<class-string,ReversibleValueResolver>
+     * @return array<class-string,PartitionValueResolver>
      */
     public function getSource(): array
     {
@@ -119,10 +119,6 @@ final readonly class PartitionMetadata
 
         if ($valueResolver === false) {
             throw new \RuntimeException('Partition source is empty');
-        }
-
-        if (!$valueResolver instanceof ReversibleValueResolver) {
-            throw new \RuntimeException('Value resolver does not support reverse transformation');
         }
 
         return $valueResolver->reverseTransform($inputBound);

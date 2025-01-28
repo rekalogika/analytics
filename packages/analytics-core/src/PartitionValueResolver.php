@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics;
 
-interface ReversibleValueResolver extends ValueResolver
+interface PartitionValueResolver extends ValueResolver
 {
+    public function transform(mixed $value): mixed;
+
     /**
      * Transform a specific summary table value to source value.
      */

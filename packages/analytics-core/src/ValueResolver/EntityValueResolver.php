@@ -16,7 +16,8 @@ namespace Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\ValueResolver;
 
-final readonly class EntityValueResolver implements ValueResolver
+final readonly class EntityValueResolver implements
+    ValueResolver
 {
     public function __construct(
         private string $property,
@@ -35,18 +36,5 @@ final readonly class EntityValueResolver implements ValueResolver
             'IDENTITY(%s)',
             $context->resolvePath($this->property),
         );
-    }
-
-    /**
-     * @todo fix this by injecting context
-     */
-    #[\Override]
-    public function transform(mixed $value): mixed
-    {
-        if (\is_object($value) && method_exists($value, 'getId')) {
-            return $value->getId();
-        }
-
-        throw new \RuntimeException('Cannot resolve entity value');
     }
 }

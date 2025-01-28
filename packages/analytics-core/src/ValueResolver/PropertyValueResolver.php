@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
-final readonly class PropertyValueResolver implements ReversibleValueResolver
+final readonly class PropertyValueResolver implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
