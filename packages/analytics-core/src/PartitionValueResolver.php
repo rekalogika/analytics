@@ -15,10 +15,10 @@ namespace Rekalogika\Analytics;
 
 interface PartitionValueResolver extends ValueResolver
 {
-    public function transform(mixed $value): mixed;
+    public function transformSourceValueToSummaryValue(mixed $value): mixed;
 
     /**
      * Transform a specific summary table value to source value.
      */
-    public function reverseTransform(mixed $value): int|string;
+    public function transformSummaryValueToSourceValue(mixed $value): int|string;
 }

@@ -66,7 +66,7 @@ final readonly class UuidToTruncatedIntegerResolver implements
      * transform from source value to summary value (uuid to integer)
      */
     #[\Override]
-    public function transform(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
         if (!\is_string($value)) {
             throw new \InvalidArgumentException(\sprintf('Value must be a string, got %s', get_debug_type($value)));
@@ -86,7 +86,7 @@ final readonly class UuidToTruncatedIntegerResolver implements
      * Transform from summary value to source value (integer to uuid)
      */
     #[\Override]
-    public function reverseTransform(mixed $value): string
+    public function transformSummaryValueToSourceValue(mixed $value): string
     {
         if (!\is_int($value)) {
             throw new \InvalidArgumentException('Value must be an integer');

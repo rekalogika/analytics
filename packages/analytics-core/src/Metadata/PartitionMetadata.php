@@ -78,7 +78,7 @@ final readonly class PartitionMetadata
         }
 
         /** @var mixed */
-        $inputValue = $valueResolver->transform($sourceValue);
+        $inputValue = $valueResolver->transformSourceValueToSummaryValue($sourceValue);
 
         return $partitionClass::createFromSourceValue($inputValue, $level);
     }
@@ -121,7 +121,7 @@ final readonly class PartitionMetadata
             throw new \RuntimeException('Partition source is empty');
         }
 
-        return $valueResolver->reverseTransform($inputBound);
+        return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
 
     public function getKeyClassifier(): PartitionKeyClassifier

@@ -22,7 +22,7 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 interface PartitionKeyClassifier
 {
     public function getDQL(
-        ValueResolver $input,
+        PartitionValueResolver $input,
         int $level,
         QueryContext $context,
     ): string;

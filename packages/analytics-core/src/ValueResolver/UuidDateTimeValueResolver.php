@@ -40,7 +40,7 @@ final readonly class UuidDateTimeValueResolver implements PartitionValueResolver
     }
 
     #[\Override]
-    public function reverseTransform(mixed $value): string
+    public function transformSummaryValueToSourceValue(mixed $value): string
     {
         if (!$value instanceof \DateTimeInterface) {
             throw new \InvalidArgumentException('Value must be an instance of DateTimeInterface');
@@ -50,7 +50,7 @@ final readonly class UuidDateTimeValueResolver implements PartitionValueResolver
     }
 
     #[\Override]
-    public function transform(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
         if (!\is_string($value)) {
             throw new \InvalidArgumentException('Value must be a string');
