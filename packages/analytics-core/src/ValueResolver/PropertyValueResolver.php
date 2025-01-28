@@ -35,13 +35,13 @@ final readonly class PropertyValueResolver implements PartitionValueResolver
     }
 
     #[\Override]
-    public function transform(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
         return $value;
     }
 
     #[\Override]
-    public function reverseTransform(mixed $value): int|string
+    public function transformSummaryValueToSourceValue(mixed $value): int|string
     {
         if (!\is_int($value) && !\is_string($value)) {
             throw new \InvalidArgumentException('Value must be an integer or a string');

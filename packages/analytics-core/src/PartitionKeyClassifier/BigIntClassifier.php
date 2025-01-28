@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PartitionKeyClassifier;
 
 use Rekalogika\Analytics\PartitionKeyClassifier;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-use Rekalogika\Analytics\ValueResolver;
 
 final readonly class BigIntClassifier implements PartitionKeyClassifier
 {
     #[\Override]
     public function getDQL(
-        ValueResolver $input,
+        PartitionValueResolver $input,
         int $level,
         QueryContext $context,
     ): string {
