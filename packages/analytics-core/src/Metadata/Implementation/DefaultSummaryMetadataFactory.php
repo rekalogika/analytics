@@ -57,6 +57,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $this->involvedProperties = $this->createInvolvedProperties();
     }
 
+
     /**
      * Source class to the mapping of its properties to summary classes that
      * are affected by the change of the source property.
@@ -103,7 +104,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     /**
      * @param class-string $className
      */
-    private function isSummaryClass(string $className): bool
+    public function isSummary(string $className): bool
     {
         return AttributeUtil::classHasAttribute($className, Summary::class);
     }
@@ -133,7 +134,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             foreach ($metadata as $classMetadata) {
                 $class = $classMetadata->getName();
 
-                if (!$this->isSummaryClass($class)) {
+                if (!$this->isSummary($class)) {
                     continue;
                 }
 
