@@ -35,11 +35,11 @@ final readonly class InsertIntoSummaryQuery
 
         $partitionMetadata = $this->summaryMetadata->getPartition();
         $fieldName = $partitionMetadata->getSummaryProperty();
-        $partitionIdProperty = $partitionMetadata->getPartitionIdProperty();
+        $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
         $columns[] = $this->doctrineClassMetadata
-            ->getSQLFieldName(\sprintf('%s.%s', $fieldName, $partitionIdProperty));
+            ->getSQLFieldName(\sprintf('%s.%s', $fieldName, $partitionKeyProperty));
 
         $columns[] = $this->doctrineClassMetadata
             ->getSQLFieldName(\sprintf('%s.%s', $fieldName, $partitionLevelProperty));

@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\IdClassifier;
+use Rekalogika\Analytics\PartitionKeyClassifier;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class PartitionId
+final readonly class PartitionKey
 {
     public function __construct(
-        private IdClassifier $classifier,
+        private PartitionKeyClassifier $classifier,
     ) {}
 
-    public function getClassifier(): IdClassifier
+    public function getClassifier(): PartitionKeyClassifier
     {
         return $this->classifier;
     }

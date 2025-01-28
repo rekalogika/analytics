@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Model\Partition;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
-use Rekalogika\Analytics\Attribute\PartitionId;
+use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
-use Rekalogika\Analytics\IdClassifier\BigIntClassifier;
 use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\PartitionKeyClassifier\BigIntClassifier;
 
 /**
  * Partition for summarizing source entities with integer primary key.
@@ -40,7 +40,7 @@ abstract class IntegerPartition implements Partition, \Stringable
             '%s(%d,%d)',
             $shortClassName,
             $this->level,
-            $this->id,
+            $this->key,
         );
     }
 
@@ -49,10 +49,10 @@ abstract class IntegerPartition implements Partition, \Stringable
          * First number in the partition
          */
         #[Column(type: Types::BIGINT, nullable: false)]
-        #[PartitionId(
+        #[PartitionKey(
             classifier: new BigIntClassifier(),
         )]
-        protected int $id,
+        protected int $key,
         /**
          * Number of insignificant/zero bits of the integer stored in the `key`
          * field. The number of the significant bits is 64 - this value.
@@ -65,7 +65,7 @@ abstract class IntegerPartition implements Partition, \Stringable
     #[\Override]
     public function getKey(): int
     {
-        return $this->id;
+        return $this->key;
     }
 
     #[\Override]
@@ -102,13 +102,13 @@ abstract class IntegerPartition implements Partition, \Stringable
     #[\Override]
     public function getLowerBound(): int
     {
-        return $this->id & ~((1 << $this->level) - 1);
+        return $this->key & ~((1 << $this->level) - 1);
     }
 
     #[\Override]
     public function getUpperBound(): int
     {
-        return ($this->id | ((1 << $this->level) - 1)) + 1;
+        return ($this->key | ((1 << $this->level) - 1)) + 1;
     }
 
     #[\Override]

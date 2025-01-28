@@ -50,8 +50,8 @@ class PartitionMetadata {
     +summaryProperty: string
     +partitionClass: class-string
     +partitionLevelProperty: string
-    +partitionIdProperty: string
-    +idClassifier: IdClassifier
+    +partitionKeyProperty: string
+    +keyClassifier: PartitionKeyClassifier
 }
 
 PartitionMetadata *--- ReversibleValueResolver

@@ -34,7 +34,7 @@ final readonly class DeleteExistingSummaryQuery
         $summaryClassName = $this->summaryMetadata->getSummaryClass();
         $partitionMetadata = $this->summaryMetadata->getPartition();
         $partitionProperty = $partitionMetadata->getSummaryProperty();
-        $partitionIdProperty = $partitionMetadata->getPartitionIdProperty();
+        $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
         $level = $this->start->getLevel();
@@ -54,14 +54,14 @@ final readonly class DeleteExistingSummaryQuery
             ->andWhere(\sprintf(
                 'e.%s.%s >= %s',
                 $partitionProperty,
-                $partitionIdProperty,
+                $partitionKeyProperty,
                 $this->quoteVariable($start),
             ))
 
             ->andWhere(\sprintf(
                 'e.%s.%s < %s',
                 $partitionProperty,
-                $partitionIdProperty,
+                $partitionKeyProperty,
                 $this->quoteVariable($end),
             ))
 
