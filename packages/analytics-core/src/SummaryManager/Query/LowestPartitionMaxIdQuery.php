@@ -32,8 +32,8 @@ final readonly class LowestPartitionMaxIdQuery
         $partitionClass = $this->metadata->getPartition()
             ->getPartitionClass();
 
-        $partitionIdProperty = $this->metadata->getPartition()
-            ->getPartitionIdProperty();
+        $partitionKeyProperty = $this->metadata->getPartition()
+            ->getPartitionKeyProperty();
 
         $partitionLevelProperty = $this->metadata->getPartition()
             ->getPartitionLevelProperty();
@@ -46,14 +46,8 @@ final readonly class LowestPartitionMaxIdQuery
             ->select(\sprintf(
                 'MAX(s.%s.%s)',
                 $partitionSummaryProperty,
-                $partitionIdProperty,
+                $partitionKeyProperty,
             ))
-            // ->where(sprintf(
-            //     's.%s.%s = :partition',
-            //     $partitionSummaryProperty,
-            //     $partitionIdProperty
-            // ))
-            // ->setParameter('partition', $this->metadata->getPartition())
             ->andWhere(\sprintf(
                 's.%s.%s = :partitionLevel',
                 $partitionSummaryProperty,

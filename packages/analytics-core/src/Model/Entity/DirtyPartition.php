@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
@@ -24,6 +25,9 @@ class DirtyPartition
     #[ORM\Column(nullable: false)]
     private ?int $id = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+    private \DateTimeInterface $time;
+
     /**
      * @param class-string $class
      */
@@ -33,8 +37,10 @@ class DirtyPartition
         #[ORM\Column(nullable: false)]
         private int $level,
         #[ORM\Column(nullable: false)]
-        private int $key,
-    ) {}
+        private string $key,
+    ) {
+        $this->time = new \DateTimeImmutable();
+    }
 
     public function getId(): int
     {
@@ -58,8 +64,13 @@ class DirtyPartition
         return $this->level;
     }
 
-    public function getKey(): int
+    public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function getTime(): \DateTimeInterface
+    {
+        return $this->time;
     }
 }

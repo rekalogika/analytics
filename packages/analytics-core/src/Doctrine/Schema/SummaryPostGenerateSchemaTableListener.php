@@ -51,11 +51,11 @@ class SummaryPostGenerateSchemaTableListener
                 $partitionMetadata->getPartitionLevelProperty(),
             ));
 
-        $partitionIdColumnName = $classMetadata
+        $partitionKeyColumnName = $classMetadata
             ->getSQLFieldName(\sprintf(
                 '%s.%s',
                 $partitionMetadata->getSummaryProperty(),
-                $partitionMetadata->getPartitionIdProperty(),
+                $partitionMetadata->getPartitionKeyProperty(),
             ));
 
         $groupingsColumnName = $classMetadata
@@ -63,13 +63,13 @@ class SummaryPostGenerateSchemaTableListener
 
         $table->addIndex([
             $partitionLevelColumnName,
-            $partitionIdColumnName,
+            $partitionKeyColumnName,
         ]);
 
         $table->addIndex([
             $groupingsColumnName,
             $partitionLevelColumnName,
-            $partitionIdColumnName,
+            $partitionKeyColumnName,
         ]);
     }
 }

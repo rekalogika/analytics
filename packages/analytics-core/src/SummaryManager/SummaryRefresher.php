@@ -16,8 +16,9 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Model\Entity\DirtyPartition;
+use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
@@ -61,30 +62,7 @@ final readonly class SummaryRefresher
         }
     }
 
-    private function refreshRange(PartitionRange $range): void
-    {
-        $startEvent = new RefreshRangeStartEvent(
-            class: $this->metadata->getSummaryClass(),
-            range: $range,
-        );
-
-        $this->eventDispatcher?->dispatch($startEvent);
-
-        $this->getConnection()->beginTransaction();
-        $this->deleteSummaryRange($range);
-
-        if (PartitionUtil::isLowestLevel($range)) {
-            $this->rollUpSourceToSummary($range);
-        } else {
-            $this->rollUpSummaryToSummary($range);
-        }
-
-        $this->getConnection()->commit();
-
-        $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
-    }
-
-    public function updateBySourceValueRange(
+    public function refresh(
         int|string|null $start,
         int|string|null $end,
         int $batchSize,
@@ -251,6 +229,33 @@ final readonly class SummaryRefresher
         }
     }
 
+    //
+    // roll up methods
+    //
+
+    private function refreshRange(PartitionRange $range): void
+    {
+        $startEvent = new RefreshRangeStartEvent(
+            class: $this->metadata->getSummaryClass(),
+            range: $range,
+        );
+
+        $this->eventDispatcher?->dispatch($startEvent);
+
+        $this->getConnection()->beginTransaction();
+        $this->deleteSummaryRange($range);
+
+        if (PartitionUtil::isLowestLevel($range)) {
+            $this->rollUpSourceToSummary($range);
+        } else {
+            $this->rollUpSummaryToSummary($range);
+        }
+
+        $this->getConnection()->commit();
+
+        $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
+    }
+
     private function deleteSummaryRange(PartitionRange $range): void
     {
         $startEvent = new DeleteRangeStartEvent(
@@ -310,15 +315,15 @@ final readonly class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
+    //
+    // min-max determiner
+    //
+
     /**
      * @param class-string $class
      */
     private function createRangeDeterminer(string $class): SourceIdRangeDeterminer
     {
-        $metadata = new ClassMetadataWrapper(
-            $this->entityManager->getClassMetadata($class),
-        );
-
         return new SourceIdRangeDeterminer(
             class: $class,
             entityManager: $this->entityManager,
@@ -375,4 +380,36 @@ final readonly class SummaryRefresher
 
         return $min;
     }
+
+    //
+    // dirty partition
+    //
+
+    // private function getPartitionFromEntity(object $entity): Partition
+    // {
+    //     $partitionMetadata = $this->metadata->getPartition();
+    // }
+
+    // private function createDirtyPartitionEntity(Partition $partition): DirtyPartition
+    // {
+    //     return new DirtyPartition(
+    //         class: $this->metadata->getSummaryClass(),
+    //         level: $partition->getLevel(),
+    //         key: (string) $partition->getKey(),
+    //     );
+    // }
+
+    // private function clearDirtyPartitionEntity(Partition $partition): void
+    // {
+    //     $this->entityManager->createQueryBuilder()
+    //         ->delete(DirtyPartition::class, 'd')
+    //         ->where('d.class = :class')
+    //         ->andWhere('d.level = :level')
+    //         ->andWhere('d.key = :key')
+    //         ->setParameter('class', $this->metadata->getSummaryClass())
+    //         ->setParameter('level', $partition->getLevel())
+    //         ->setParameter('key', (string) $partition->getKey())
+    //         ->getQuery()
+    //         ->execute();
+    // }
 }

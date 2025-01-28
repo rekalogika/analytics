@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Attribute\Hierarchy;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\Attribute\Measure;
 use Rekalogika\Analytics\Attribute\Partition;
-use Rekalogika\Analytics\Attribute\PartitionId;
+use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Attribute\Summary;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
@@ -418,8 +418,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         // get partition level and partition id property names
 
         $partitionLevelPropertyName = null;
-        $partitionIdPropertyName = null;
-        $partitionIdClassifier = null;
+        $partitionKeyPropertyName = null;
+        $partitionKeyClassifier = null;
 
         $properties = AttributeUtil::getPropertiesOfClass($partitionClass);
 
@@ -430,10 +430,10 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 attributeClass: PartitionLevel::class,
             );
 
-            $partitionIdAttribute = AttributeUtil::getPropertyAttribute(
+            $partitionKeyAttribute = AttributeUtil::getPropertyAttribute(
                 class: $partitionClass,
                 property: $property,
-                attributeClass: PartitionId::class,
+                attributeClass: PartitionKey::class,
             );
 
             if ($partitionLevelAttribute !== null) {
@@ -444,13 +444,13 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 $partitionLevelPropertyName = $property;
             }
 
-            if ($partitionIdAttribute !== null) {
-                if ($partitionIdPropertyName !== null) {
+            if ($partitionKeyAttribute !== null) {
+                if ($partitionKeyPropertyName !== null) {
                     throw new \RuntimeException('Multiple partition id properties found');
                 }
 
-                $partitionIdPropertyName = $property;
-                $partitionIdClassifier = $partitionIdAttribute->getClassifier();
+                $partitionKeyPropertyName = $property;
+                $partitionKeyClassifier = $partitionKeyAttribute->getClassifier();
             }
         }
 
@@ -458,11 +458,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             throw new \RuntimeException('Partition level property not found');
         }
 
-        if ($partitionIdPropertyName === null) {
+        if ($partitionKeyPropertyName === null) {
             throw new \RuntimeException('Partition id property not found');
         }
 
-        if ($partitionIdClassifier === null) {
+        if ($partitionKeyClassifier === null) {
             throw new \RuntimeException('Partition id classifier not found');
         }
 
@@ -471,8 +471,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             summaryProperty: $summaryProperty,
             partitionClass: $partitionClass,
             partitionLevelProperty: $partitionLevelPropertyName,
-            partitionIdProperty: $partitionIdPropertyName,
-            idClassifier: $partitionIdClassifier,
+            partitionKeyProperty: $partitionKeyPropertyName,
+            partitionKeyClassifier: $partitionKeyClassifier,
         );
     }
 

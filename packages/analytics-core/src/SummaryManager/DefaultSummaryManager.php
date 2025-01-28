@@ -60,7 +60,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         int $batchSize = 1,
         ?string $resumeId = null,
     ): void {
-        $this->refresher->updateBySourceValueRange(
+        $this->refresher->refresh(
             start: $start,
             end: $end,
             batchSize: $batchSize,

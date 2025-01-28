@@ -84,12 +84,12 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     private function processPartition(): void
     {
         $partitionMetadata = $this->metadata->getPartition();
-        $classifier = $partitionMetadata->getIdClassifier();
+        $classifier = $partitionMetadata->getKeyClassifier();
 
         $valueResolver = new PropertyValueResolver(\sprintf(
             "%s.%s",
             $partitionMetadata->getSummaryProperty(),
-            $partitionMetadata->getPartitionIdProperty(),
+            $partitionMetadata->getPartitionKeyProperty(),
         ));
 
         $function = $classifier->getDQL(
@@ -276,7 +276,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
         $partitionMetadata = $this->metadata->getPartition();
         $partitionProperty = $partitionMetadata->getSummaryProperty();
-        $partitionIdProperty = $partitionMetadata->getPartitionIdProperty();
+        $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
         $groupingsProperty = $this->metadata->getGroupingsProperty();
 
@@ -293,13 +293,13 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
             ->andWhere(\sprintf(
                 'e.%s.%s >= %d',
                 $partitionProperty,
-                $partitionIdProperty,
+                $partitionKeyProperty,
                 $lowerBound,
             ))
             ->andWhere(\sprintf(
                 'e.%s.%s < %d',
                 $partitionProperty,
-                $partitionIdProperty,
+                $partitionKeyProperty,
                 $upperBound,
             ))
             ->andWhere(\sprintf(

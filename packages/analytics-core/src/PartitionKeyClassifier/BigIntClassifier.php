@@ -11,18 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\PartitionKeyClassifier;
 
+use Rekalogika\Analytics\PartitionKeyClassifier;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
+use Rekalogika\Analytics\ValueResolver;
 
-/**
- * Classifies entity ID into the corresponding partition ID in the summary table
- */
-interface IdClassifier
+final readonly class BigIntClassifier implements PartitionKeyClassifier
 {
+    #[\Override]
     public function getDQL(
         ValueResolver $input,
         int $level,
         QueryContext $context,
-    ): string;
+    ): string {
+        return \sprintf(
+            'REKALOGIKA_TRUNCATE_BIGINT(%s, %s)',
+            $input->getDQL($context),
+            $level,
+        );
+    }
 }

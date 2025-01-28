@@ -61,7 +61,7 @@ final class SummarizerQuery extends AbstractQuery
 
     private readonly string $partitionLevelProperty;
 
-    private readonly string $partitionIdProperty;
+    private readonly string $partitionKeyProperty;
 
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
@@ -79,8 +79,8 @@ final class SummarizerQuery extends AbstractQuery
         $this->partitionLevelProperty = $this->metadata->getPartition()
             ->getPartitionLevelProperty();
 
-        $this->partitionIdProperty = $this->metadata->getPartition()
-            ->getPartitionIdProperty();
+        $this->partitionKeyProperty = $this->metadata->getPartition()
+            ->getPartitionKeyProperty();
     }
 
     public function execute(): SummaryResult
@@ -201,10 +201,10 @@ final class SummarizerQuery extends AbstractQuery
             $this->partitionLevelProperty,
         );
 
-        $idProperty = \sprintf(
+        $keyProperty = \sprintf(
             'root.%s.%s',
             $this->summaryProperty,
-            $this->partitionIdProperty,
+            $this->partitionKeyProperty,
         );
 
         if ($higherPartition === null) {
@@ -216,7 +216,7 @@ final class SummarizerQuery extends AbstractQuery
                     $partition->getLevel(),
                 ),
                 $this->queryBuilder->expr()->lt(
-                    $idProperty,
+                    $keyProperty,
                     $partition->getUpperBound(),
                 ),
             );
@@ -237,11 +237,11 @@ final class SummarizerQuery extends AbstractQuery
                     $partition->getLevel(),
                 ),
                 $this->queryBuilder->expr()->gte(
-                    $idProperty,
+                    $keyProperty,
                     $higherPartition->getLowerBound(),
                 ),
                 $this->queryBuilder->expr()->lt(
-                    $idProperty,
+                    $keyProperty,
                     $partition->getUpperBound(),
                 ),
             );
