@@ -30,10 +30,4 @@ interface ValueResolver
      * @return list<string>
      */
     public function getInvolvedProperties(): array;
-
-    /**
-     * transform from source value to summary value
-     *
-     */
-    public function transform(mixed $value): mixed;
 }

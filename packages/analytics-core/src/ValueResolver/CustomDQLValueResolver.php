@@ -45,10 +45,4 @@ final readonly class CustomDQLValueResolver implements ValueResolver
 
         return \sprintf($this->dql, ...$resolvedParameters);
     }
-
-    #[\Override]
-    public function transform(mixed $value): mixed
-    {
-        throw new \RuntimeException('CustomDQLValueResolver does not support PHP transformation');
-    }
 }

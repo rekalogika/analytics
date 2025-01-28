@@ -45,7 +45,7 @@ class CustomerSummary extends Summary
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('country'),
+        source: 'country',
         label: new TranslatableMessage('Country'),
     )]
     // @phpstan-ignore property.onlyRead

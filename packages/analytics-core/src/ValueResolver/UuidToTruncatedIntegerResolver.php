@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 use Rekalogika\Analytics\ValueRangeResolver;
@@ -21,7 +21,9 @@ use Rekalogika\Analytics\ValueRangeResolver;
 /**
  * Truncate source value in UUID format to 64-bit integer.
  */
-final readonly class UuidToTruncatedIntegerResolver implements ReversibleValueResolver, ValueRangeResolver
+final readonly class UuidToTruncatedIntegerResolver implements
+    ValueRangeResolver,
+    PartitionValueResolver
 {
     public function __construct(
         private string $property,

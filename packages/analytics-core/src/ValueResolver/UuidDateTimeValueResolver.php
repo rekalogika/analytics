@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 use Symfony\Component\Uid\UuidV7;
 
-final readonly class UuidDateTimeValueResolver implements ReversibleValueResolver
+final readonly class UuidDateTimeValueResolver implements PartitionValueResolver
 {
     public function __construct(
         private string $property,

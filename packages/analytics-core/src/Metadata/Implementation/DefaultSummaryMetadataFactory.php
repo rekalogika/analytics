@@ -38,7 +38,7 @@ use Rekalogika\Analytics\Metadata\SourceMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
@@ -384,11 +384,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $newSourceProperty = [];
 
         foreach ($sourceProperty as $sourceClass => $curProperty) {
-            if ($curProperty instanceof ValueResolver) {
-                if (!$curProperty instanceof ReversibleValueResolver) {
-                    throw new \RuntimeException('Value resolver used in partition must be reversable');
-                }
-
+            if ($curProperty instanceof PartitionValueResolver) {
                 $newSourceProperty[$sourceClass] = $curProperty;
 
                 continue;

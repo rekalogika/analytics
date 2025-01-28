@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\ReversibleValueResolver;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\ValueRangeResolver;
 
 /**
@@ -23,7 +23,7 @@ use Rekalogika\Analytics\ValueRangeResolver;
  */
 final class SourceIdRangeDeterminer extends AbstractQuery
 {
-    private readonly ReversibleValueResolver $valueResolver;
+    private readonly PartitionValueResolver $valueResolver;
 
     /**
      * @param class-string $class
