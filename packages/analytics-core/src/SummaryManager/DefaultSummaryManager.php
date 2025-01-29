@@ -18,8 +18,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -32,23 +32,27 @@ final readonly class DefaultSummaryManager implements SummaryManager
 {
     private SummaryRefresher $refresher;
 
-    private SummaryMetadata $metadata;
-
     /**
      * @param class-string<T> $class
+     * @param EntityManagerInterface $entityManager
+     * @param SummaryMetadata $metadata
+     * @param PartitionManager $partitionManager
+     * @param PropertyAccessorInterface $propertyAccessor
+     * @param EventDispatcherInterface|null $eventDispatcher
      */
     public function __construct(
+        // @phpstan-ignore constructor.unusedParameter
         string $class,
         private EntityManagerInterface $entityManager,
-        SummaryMetadataFactory $metadataFactory,
+        private SummaryMetadata $metadata,
+        PartitionManager $partitionManager,
         private PropertyAccessorInterface $propertyAccessor,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
-        $this->metadata = $metadataFactory->getSummaryMetadata($class);
-
         $this->refresher = new SummaryRefresher(
             entityManager: $entityManager,
             metadata: $this->metadata,
+            partitionManager: $partitionManager,
             eventDispatcher: $this->eventDispatcher,
         );
     }

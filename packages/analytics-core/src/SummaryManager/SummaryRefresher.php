@@ -23,6 +23,7 @@ use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RollUpRangeStartEvent;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -34,11 +35,13 @@ final readonly class SummaryRefresher
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SummaryMetadata $metadata,
+        private PartitionManager $partitionManager,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->sqlFactory = new SqlFactory(
             entityManager: $this->entityManager,
             summaryMetadata: $this->metadata,
+            partitionManager: $this->partitionManager,
         );
     }
 
@@ -169,10 +172,10 @@ final readonly class SummaryRefresher
         mixed $start,
         mixed $end,
     ): iterable {
-        $end = $this->metadata
+        $end = $this->partitionManager
             ->createLowestPartitionFromSourceValue($end);
 
-        $start = $this->metadata
+        $start = $this->partitionManager
             ->createLowestPartitionFromSourceValue($start);
 
         if (PartitionUtil::isGreaterThan($start, $end)) {
@@ -385,10 +388,7 @@ final readonly class SummaryRefresher
     // dirty partition
     //
 
-    // private function getPartitionFromEntity(object $entity): Partition
-    // {
-    //     $partitionMetadata = $this->metadata->getPartition();
-    // }
+
 
     // private function createDirtyPartitionEntity(Partition $partition): DirtyPartition
     // {

@@ -18,6 +18,7 @@ use Rekalogika\Analytics\DimensionValueResolverContext;
 use Rekalogika\Analytics\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -40,6 +41,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     public function __construct(
         private readonly string $sourceClass,
         private readonly QueryBuilder $queryBuilder,
+        private readonly PartitionManager $partitionManager,
         private readonly SummaryMetadata $metadata,
         private readonly Partition $start,
         private readonly Partition $end,
@@ -236,10 +238,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $valueResolver = $partitionMetadata->getSource()[$this->sourceClass]
             ?? throw new \RuntimeException('Value resolver not found');
 
-        $start = $this->metadata
+        $start = $this->partitionManager
             ->calculateSourceBoundValueFromPartition($this->start, 'lower');
 
-        $end = $this->metadata
+        $end = $this->partitionManager
             ->calculateSourceBoundValueFromPartition($this->end, 'upper');
 
         // add constraints

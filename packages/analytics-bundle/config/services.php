@@ -23,6 +23,7 @@ use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -40,11 +41,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
+        ->set('rekalogika.analytics.partition_manager_registry')
+        ->class(PartitionManagerRegistry::class)
+        ->args([
+            '$metadataFactory' => service(SummaryMetadataFactory::class),
+            '$propertyAccessor' => service('property_accessor'),
+        ])
+    ;
+
+    $services
         ->set(SummaryManagerRegistry::class)
         ->class(DefaultSummaryManagerRegistry::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
+            '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
             '$propertyAccessor' => service('property_accessor'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
