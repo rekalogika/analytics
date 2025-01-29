@@ -34,11 +34,6 @@ final readonly class DefaultSummaryManager implements SummaryManager
 
     /**
      * @param class-string<T> $class
-     * @param EntityManagerInterface $entityManager
-     * @param SummaryMetadata $metadata
-     * @param PartitionManager $partitionManager
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param EventDispatcherInterface|null $eventDispatcher
      */
     public function __construct(
         // @phpstan-ignore constructor.unusedParameter
