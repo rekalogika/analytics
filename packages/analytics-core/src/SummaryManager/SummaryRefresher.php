@@ -17,8 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Model\Entity\DirtyPartition;
-use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
@@ -65,6 +64,10 @@ final readonly class SummaryRefresher
         }
     }
 
+    /**
+     * Refreshes the specified range. If start and end is not specified, it
+     * does the refresh for new entities, not previously processed.
+     */
     public function refresh(
         int|string|null $start,
         int|string|null $end,
@@ -162,6 +165,10 @@ final readonly class SummaryRefresher
             );
         }
 
+        // remove new entity signals
+
+        $this->removeNewEntitySignals($end);
+
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
@@ -247,6 +254,7 @@ final readonly class SummaryRefresher
 
         $this->getConnection()->beginTransaction();
         $this->deleteSummaryRange($range);
+        $this->removeDirtyPartitionSignals($range);
 
         if (PartitionUtil::isLowestLevel($range)) {
             $this->rollUpSourceToSummary($range);
@@ -318,6 +326,44 @@ final readonly class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
+    private function removeNewEntitySignals(int|string|null $end): void
+    {
+        $this->getConnection()->beginTransaction();
+
+        $this->entityManager->createQueryBuilder()
+            ->delete(SummarySignal::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level IS NULL')
+            ->andWhere('s.key IS NULL')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->getQuery()
+            ->execute();
+
+        $maxOfSource = $this->getMaxId();
+
+        if ($end === null || $end >= $maxOfSource) {
+            $this->getConnection()->commit();
+        } else {
+            $this->getConnection()->rollBack();
+        }
+    }
+
+    private function removeDirtyPartitionSignals(PartitionRange $range): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(SummarySignal::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level = :level')
+            ->andWhere('s.key >= :start')
+            ->andWhere('s.key < :end')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getLowerBound())
+            ->setParameter('end', $range->getUpperBound())
+            ->getQuery()
+            ->execute();
+    }
+
     //
     // min-max determiner
     //
@@ -383,33 +429,4 @@ final readonly class SummaryRefresher
 
         return $min;
     }
-
-    //
-    // dirty partition
-    //
-
-
-
-    // private function createDirtyPartitionEntity(Partition $partition): DirtyPartition
-    // {
-    //     return new DirtyPartition(
-    //         class: $this->metadata->getSummaryClass(),
-    //         level: $partition->getLevel(),
-    //         key: (string) $partition->getKey(),
-    //     );
-    // }
-
-    // private function clearDirtyPartitionEntity(Partition $partition): void
-    // {
-    //     $this->entityManager->createQueryBuilder()
-    //         ->delete(DirtyPartition::class, 'd')
-    //         ->where('d.class = :class')
-    //         ->andWhere('d.level = :level')
-    //         ->andWhere('d.key = :key')
-    //         ->setParameter('class', $this->metadata->getSummaryClass())
-    //         ->setParameter('level', $partition->getLevel())
-    //         ->setParameter('key', (string) $partition->getKey())
-    //         ->getQuery()
-    //         ->execute();
-    // }
 }

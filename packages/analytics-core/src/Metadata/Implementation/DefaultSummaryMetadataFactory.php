@@ -95,9 +95,27 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     #[\Override]
     public function getSourceMetadata(string $sourceClassName): SourceMetadata
     {
+        $allPropertiesToSummaryClasses = [];
+
+        $parents = class_parents($sourceClassName);
+
+        if ($parents === false) {
+            $parents = [];
+        }
+
+        $classes = [$sourceClassName, ...$parents];
+
+        foreach ($classes as $class) {
+            foreach ($this->involvedProperties[$class] ?? [] as $property => $summaryClasses) {
+                foreach ($summaryClasses as $summaryClass) {
+                    $allPropertiesToSummaryClasses[$property][] = $summaryClass;
+                }
+            }
+        }
+
         return new SourceMetadata(
             class: $sourceClassName,
-            propertyToSummaryClasses: $this->involvedProperties[$sourceClassName] ?? [],
+            propertyToSummaryClasses: $allPropertiesToSummaryClasses,
         );
     }
 

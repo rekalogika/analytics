@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Metadata\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -39,6 +40,10 @@ final readonly class PartitionManager
             ?? throw new \UnexpectedValueException('Source property not found');
 
         $sourceValue = $this->propertyAccessor->getValue($entity, $sourceProperty);
+
+        if ($sourceValue instanceof \Stringable) {
+            $sourceValue = $sourceValue->__toString();
+        }
 
         if (!\is_string($sourceValue) && !\is_int($sourceValue)) {
             throw new \UnexpectedValueException('Source value must be string or int');
@@ -107,4 +112,18 @@ final readonly class PartitionManager
 
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
+
+    // public function clearDirtyPartitionEntityFromDatabase(Partition $partition): void
+    // {
+    //     $this->entityManager->createQueryBuilder()
+    //         ->delete(SummarySignal::class, 'd')
+    //         ->where('d.class = :class')
+    //         ->andWhere('d.level = :level')
+    //         ->andWhere('d.key = :key')
+    //         ->setParameter('class', $this->metadata->getSummaryClass())
+    //         ->setParameter('level', $partition->getLevel())
+    //         ->setParameter('key', (string) $partition->getKey())
+    //         ->getQuery()
+    //         ->execute();
+    // }
 }
