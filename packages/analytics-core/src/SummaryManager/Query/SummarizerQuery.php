@@ -437,7 +437,11 @@ final class SummarizerQuery extends AbstractQuery
 
         if ($joinedEntityClass !== null) {
             $alias = 'e_' . hash('xxh128', $dimension);
-            $identity = $classMetadata->getSingleIdentifierFieldName();
+
+            $joinedClassMetadata = $this->entityManager
+                ->getClassMetadata($joinedEntityClass);
+
+            $identity = $joinedClassMetadata->getSingleIdentifierFieldName();
 
             $this->queryBuilder
                 ->leftJoin(
