@@ -15,6 +15,11 @@ namespace Rekalogika\Analytics;
 
 interface PartitionValueResolver extends ValueResolver
 {
+    /**
+     * @return list{string}
+     */
+    public function getInvolvedProperties(): array;
+
     public function transformSourceValueToSummaryValue(mixed $value): mixed;
 
     /**
