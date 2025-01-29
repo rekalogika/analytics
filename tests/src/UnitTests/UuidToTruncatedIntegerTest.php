@@ -28,6 +28,6 @@ class UuidToTruncatedIntegerTest extends TestCase
 
         $reversed = $resolver->transformSummaryValueToSourceValue($transformed);
 
-        $this->assertEquals('01943d05-942a-7000-8000-000000000000', $reversed);
+        $this->assertEquals('01943d05-942a-0000-0000-000000000000', $reversed);
     }
 }

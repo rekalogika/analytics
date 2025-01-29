@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Util;
 
-use Symfony\Component\Uid\UuidV7;
+use Symfony\Component\Uid\Uuid;
 
 final readonly class UuidV7Util
 {
@@ -26,11 +26,11 @@ final readonly class UuidV7Util
         $time = dechex($time);
 
         $str = substr_replace(\sprintf(
-            '%012s-7000-8000-000000000000',
+            '%012s-0000-0000-000000000000',
             $time,
         ), '-', 8, 0);
 
-        return (string) new UuidV7($str);
+        return (string) new Uuid($str, false);
     }
 
     public static function getMaxOfDateTime(\DateTimeInterface $time): string
@@ -40,11 +40,11 @@ final readonly class UuidV7Util
         $time = dechex($time);
 
         $str = substr_replace(\sprintf(
-            '%012s-7fff-8fff-ffffffffffff',
+            '%012s-ffff-ffff-ffffffffffff',
             $time,
         ), '-', 8, 0);
 
-        return (string) new UuidV7($str);
+        return (string) new Uuid($str, false);
     }
 
     public static function getNilOfInteger(int $input): string
@@ -52,11 +52,11 @@ final readonly class UuidV7Util
         $input >>= 16;
 
         $str = substr_replace(\sprintf(
-            '%012x-7000-8000-000000000000',
+            '%012x-0000-0000-000000000000',
             $input,
         ), '-', 8, 0);
 
-        return (string) new UuidV7($str);
+        return (string) new Uuid($str, false);
     }
 
     public static function getMaxOfInteger(int $input): string
@@ -64,10 +64,10 @@ final readonly class UuidV7Util
         $input >>= 16;
 
         $str = substr_replace(\sprintf(
-            '%012x-7fff-8fff-ffffffffffff',
+            '%012x-ffff-ffff-ffffffffffff',
             $input,
         ), '-', 8, 0);
 
-        return (string) new UuidV7($str);
+        return (string) new Uuid($str, false);
     }
 }
