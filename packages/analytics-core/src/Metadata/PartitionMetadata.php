@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Metadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\PartitionKeyClassifier;
 use Rekalogika\Analytics\PartitionValueResolver;
-use Rekalogika\Analytics\Util\PartitionUtil;
 
 final readonly class PartitionMetadata
 {
@@ -62,66 +61,6 @@ final readonly class PartitionMetadata
     public function getPartitionKeyProperty(): string
     {
         return $this->partitionKeyProperty;
-    }
-
-    public function createPartitionFromSourceValue(
-        mixed $sourceValue,
-        int $level,
-    ): Partition {
-        $partitionClass = $this->partitionClass;
-
-        $source = $this->source;
-        $valueResolver = reset($source);
-
-        if ($valueResolver === false) {
-            throw new \RuntimeException('Partition source is empty');
-        }
-
-        /** @var mixed */
-        $inputValue = $valueResolver->transformSourceValueToSummaryValue($sourceValue);
-
-        return $partitionClass::createFromSourceValue($inputValue, $level);
-    }
-
-    public function createLowestPartitionFromSourceValue(
-        mixed $sourceValue,
-    ): Partition {
-        $partitionClass = $this->partitionClass;
-        $lowestLevel = PartitionUtil::getLowestLevel($partitionClass);
-
-        return $this->createPartitionFromSourceValue($sourceValue, $lowestLevel);
-    }
-
-    public function createHighestPartitionFromSourceValue(
-        mixed $sourceValue,
-    ): Partition {
-        $partitionClass = $this->partitionClass;
-        $highestLevel = PartitionUtil::getHighestLevel($partitionClass);
-
-        return $this->createPartitionFromSourceValue($sourceValue, $highestLevel);
-    }
-
-    /**
-     * @param 'lower'|'upper' $type
-     */
-    public function calculateSourceBoundValueFromPartition(
-        Partition $partition,
-        string $type,
-    ): int|string {
-        if ($type === 'upper') {
-            $inputBound = $partition->getUpperBound();
-        } else {
-            $inputBound = $partition->getLowerBound();
-        }
-
-        $source = $this->source;
-        $valueResolver = reset($source);
-
-        if ($valueResolver === false) {
-            throw new \RuntimeException('Partition source is empty');
-        }
-
-        return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
 
     public function getKeyClassifier(): PartitionKeyClassifier

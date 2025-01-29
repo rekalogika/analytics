@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -26,6 +27,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
     public function __construct(
         private readonly ManagerRegistry $managerRegistry,
         private readonly SummaryMetadataFactory $metadataFactory,
+        private readonly PartitionManagerRegistry $partitionManagerRegistry,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
@@ -39,10 +41,14 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
             throw new \RuntimeException('Entity manager not found for class ' . $class);
         }
 
+        $summaryMetadata = $this->metadataFactory->getSummaryMetadata($class);
+        $partitionManager = $this->partitionManagerRegistry->createPartitionManager($class);
+
         return new DefaultSummaryManager(
             class: $class,
             entityManager: $entityManager,
-            metadataFactory: $this->metadataFactory,
+            metadata: $summaryMetadata,
+            partitionManager: $partitionManager,
             propertyAccessor: $this->propertyAccessor,
             eventDispatcher: $this->eventDispatcher,
         );

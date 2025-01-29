@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
-use Rekalogika\Analytics\Partition;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -139,39 +138,6 @@ final readonly class SummaryMetadata
     public function isDimension(string $fieldName): bool
     {
         return isset($this->dimensions[$fieldName]);
-    }
-
-    public function createPartitionFromSourceValue(
-        mixed $sourceValue,
-        int $level,
-    ): Partition {
-        return $this->partition
-            ->createPartitionFromSourceValue($sourceValue, $level);
-    }
-
-    public function createLowestPartitionFromSourceValue(
-        mixed $sourceValue,
-    ): Partition {
-        return $this->partition
-            ->createLowestPartitionFromSourceValue($sourceValue);
-    }
-
-    public function createHighestPartitionFromSourceValue(
-        mixed $sourceValue,
-    ): Partition {
-        return $this->partition
-            ->createHighestPartitionFromSourceValue($sourceValue);
-    }
-
-    /**
-     * @param 'lower'|'upper' $type
-     */
-    public function calculateSourceBoundValueFromPartition(
-        Partition $partition,
-        string $type,
-    ): int|string {
-        return $this->partition
-            ->calculateSourceBoundValueFromPartition($partition, $type);
     }
 
     public function getGroupingsProperty(): string

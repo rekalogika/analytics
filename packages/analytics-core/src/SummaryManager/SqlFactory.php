@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\Query\InsertIntoSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\Query\RollUpSourceToSummaryPerSourceQuery;
@@ -40,6 +41,7 @@ final class SqlFactory
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
+        private readonly PartitionManager $partitionManager,
         ?string $summaryToSummaryRollUpClass = null,
     ) {
         $this->summaryToSummaryRollUpClass = $summaryToSummaryRollUpClass
@@ -94,6 +96,7 @@ final class SqlFactory
         $query = new RollUpSourceToSummaryPerSourceQuery(
             sourceClass: $sourceClass,
             queryBuilder: $this->entityManager->createQueryBuilder(),
+            partitionManager: $this->partitionManager,
             metadata: $this->summaryMetadata,
             start: $start,
             end: $end,
