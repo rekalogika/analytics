@@ -16,13 +16,29 @@ namespace Rekalogika\Analytics\Metadata;
 final readonly class SourceMetadata
 {
     /**
+     * @var list<class-string>
+     */
+    private array $allInvolvedSummaryClasses;
+
+    /**
      * @param class-string $class
      * @param array<string,list<class-string>> $propertyToSummaryClasses
      */
     public function __construct(
         private string $class,
         private array $propertyToSummaryClasses,
-    ) {}
+    ) {
+        $allInvolvedSummaryClasses = [];
+
+        foreach ($propertyToSummaryClasses as $summaryClasses) {
+            $allInvolvedSummaryClasses = [
+                ...$allInvolvedSummaryClasses,
+                ...$summaryClasses,
+            ];
+        }
+
+        $this->allInvolvedSummaryClasses = array_values(array_unique($allInvolvedSummaryClasses));
+    }
 
     /**
      * @return class-string
@@ -42,10 +58,11 @@ final readonly class SourceMetadata
 
     /**
      * @param list<string> $changedProperties
-     * @return array<class-string>
+     * @return list<class-string>
      */
-    public function getInvolvedSummaryClasses(array $changedProperties): array
-    {
+    public function getInvolvedSummaryClassesByChangedProperties(
+        array $changedProperties,
+    ): array {
         $involvedSummaryClasses = [];
 
         foreach ($changedProperties as $changedProperty) {
@@ -57,6 +74,14 @@ final readonly class SourceMetadata
             }
         }
 
-        return array_unique($involvedSummaryClasses);
+        return array_values(array_unique($involvedSummaryClasses));
+    }
+
+    /**
+     * @return list<class-string>
+     */
+    public function getAllInvolvedSummaryClasses(): array
+    {
+        return $this->allInvolvedSummaryClasses;
     }
 }

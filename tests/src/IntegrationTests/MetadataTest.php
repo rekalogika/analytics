@@ -14,13 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
+use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class MetadataTest extends KernelTestCase
 {
-    public function testSourceMetadata(): void
+    public function testSourceMetadataForOrder(): void
     {
         $summaryMetadataFactory = static::getContainer()
             ->get(SummaryMetadataFactory::class);
@@ -31,17 +34,52 @@ class MetadataTest extends KernelTestCase
 
         $this->assertEquals(
             [OrderSummary::class],
-            $orderMetadata->getInvolvedSummaryClasses(['customer']),
+            $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer']),
         );
 
         $this->assertEquals(
             [OrderSummary::class],
-            $orderMetadata->getInvolvedSummaryClasses(['customer', 'item']),
+            $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer', 'item']),
         );
 
         $this->assertEquals(
             [],
-            $orderMetadata->getInvolvedSummaryClasses(['foo']),
+            $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['foo']),
+        );
+    }
+
+    public function testSourceMetadataForCustomer(): void
+    {
+        $summaryMetadataFactory = static::getContainer()
+            ->get(SummaryMetadataFactory::class);
+
+        $customerMetadata = $summaryMetadataFactory->getSourceMetadata(Customer::class);
+
+        $this->assertEquals(Customer::class, $customerMetadata->getClass());
+
+        $this->assertEquals(
+            [CustomerSummary::class],
+            $customerMetadata->getInvolvedSummaryClassesByChangedProperties(['country']),
+        );
+
+        $this->assertEquals(
+            [],
+            $customerMetadata->getInvolvedSummaryClassesByChangedProperties(['foo']),
+        );
+    }
+
+    public function testSourceMetadataForIndividualCustomer(): void
+    {
+        $summaryMetadataFactory = static::getContainer()
+            ->get(SummaryMetadataFactory::class);
+
+        $metadata = $summaryMetadataFactory->getSourceMetadata(IndividualCustomer::class);
+
+        $this->assertEquals(IndividualCustomer::class, $metadata->getClass());
+
+        $this->assertEquals(
+            [CustomerSummary::class],
+            $metadata->getInvolvedSummaryClassesByChangedProperties(['country']),
         );
     }
 }

@@ -80,14 +80,14 @@ final class RefreshCommandOutputEventSubscriber implements EventSubscriberInterf
         $this->io?->definitionList(
             [
                 'Input range' => \sprintf(
-                    'Input range: %s - %s',
+                    '%s - %s',
                     Printer::print($event->getInputStartValue()),
                     Printer::print($event->getInputEndValue()),
                 ),
             ],
             [
                 'Actual range' => \sprintf(
-                    'Actual range: %s - %s',
+                    '%s - %s',
                     Printer::print($event->getActualStartValue()),
                     Printer::print($event->getActualEndValue()),
                 ),
