@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager;
-use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -30,27 +28,16 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final readonly class DefaultSummaryManager implements SummaryManager
 {
-    private SummaryRefresher $refresher;
-
     /**
      * @param class-string<T> $class
      */
     public function __construct(
-        // @phpstan-ignore constructor.unusedParameter
-        string $class,
+        private string $class,
         private EntityManagerInterface $entityManager,
         private SummaryMetadata $metadata,
-        PartitionManager $partitionManager,
         private PropertyAccessorInterface $propertyAccessor,
-        private ?EventDispatcherInterface $eventDispatcher = null,
-    ) {
-        $this->refresher = new SummaryRefresher(
-            entityManager: $entityManager,
-            metadata: $this->metadata,
-            partitionManager: $partitionManager,
-            eventDispatcher: $this->eventDispatcher,
-        );
-    }
+        private SummaryRefresherFactory $refresherFactory,
+    ) {}
 
     #[\Override]
     public function updateBySourceRange(
@@ -59,12 +46,14 @@ final readonly class DefaultSummaryManager implements SummaryManager
         int $batchSize = 1,
         ?string $resumeId = null,
     ): void {
-        $this->refresher->refresh(
-            start: $start,
-            end: $end,
-            batchSize: $batchSize,
-            resumeId: $resumeId,
-        );
+        $this->refresherFactory
+            ->createSummaryRefresher($this->class)
+            ->refresh(
+                start: $start,
+                end: $end,
+                batchSize: $batchSize,
+                resumeId: $resumeId,
+            );
     }
 
     /**

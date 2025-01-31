@@ -85,7 +85,7 @@ final readonly class SummarySignalManager
     /**
      * @param class-string $class
      */
-    private function createDirtyPartitionSignal(
+    public function createDirtyPartitionSignal(
         string $class,
         Partition $partition,
     ): SummarySignal {
@@ -99,7 +99,7 @@ final readonly class SummarySignalManager
     /**
      * @param class-string $class
      */
-    private function createNewRecordsSignal(string $class): SummarySignal
+    public function createNewRecordsSignal(string $class): SummarySignal
     {
         return new SummarySignal(
             class: $class,
