@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
@@ -35,6 +36,7 @@ final readonly class SummaryRefresher
         private EntityManagerInterface $entityManager,
         private SummaryMetadata $metadata,
         private PartitionManager $partitionManager,
+        private SummarySignalManager $signalManager,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->sqlFactory = new SqlFactory(
@@ -170,6 +172,61 @@ final readonly class SummaryRefresher
         $this->removeNewEntitySignals($end);
 
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
+    }
+
+    public function refreshPartition(Partition $partition): void
+    {
+        $range = new PartitionRange($partition, $partition);
+
+        $this->refreshRange($range);
+    }
+
+    public function refreshNew(): void
+    {
+        $this->getConnection()->beginTransaction();
+
+        $this->removeNewSignals();
+        $maxOfSource = $this->getMaxId();
+
+        $maxOfSummary = $this->getSummaryPropertiesManager()
+            ->getMax($this->metadata->getSummaryClass());
+
+        $start = $this->partitionManager
+            ->createLowestPartitionFromSourceValue($maxOfSummary);
+
+        $end = $this->partitionManager
+            ->createLowestPartitionFromSourceValue($maxOfSource);
+
+        $range = new PartitionRange($start, $end);
+        $this->refreshRange($range);
+
+        $this->getSummaryPropertiesManager()->updateMax(
+            summaryClass: $this->metadata->getSummaryClass(),
+            max: $maxOfSource,
+        );
+
+        // special case for refresh new: only mark the upper partition as dirty
+        // if the current partition is at the end of the upper partition
+
+        foreach ($range as $partition) {
+            $upperLevel = $partition->getContaining();
+
+            if (
+                $upperLevel !== null
+                && $upperLevel->getUpperBound() === $partition->getUpperBound()
+            ) {
+                $signal = $this->signalManager->createDirtyPartitionSignal(
+                    class: $this->metadata->getSummaryClass(),
+                    partition: $upperLevel,
+                );
+
+                $this->entityManager->persist($signal);
+            }
+        }
+
+        $this->entityManager->flush();
+
+        $this->getConnection()->commit();
     }
 
     /**
@@ -360,6 +417,18 @@ final readonly class SummaryRefresher
             ->setParameter('level', $range->getLevel())
             ->setParameter('start', $range->getLowerBound())
             ->setParameter('end', $range->getUpperBound())
+            ->getQuery()
+            ->execute();
+    }
+
+    private function removeNewSignals(): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(SummarySignal::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level IS NULL')
+            ->andWhere('s.key IS NULL')
+            ->setParameter('class', $this->metadata->getSummaryClass())
             ->getQuery()
             ->execute();
     }

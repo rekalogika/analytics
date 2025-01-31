@@ -15,10 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager;
-use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -27,9 +25,8 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
     public function __construct(
         private readonly ManagerRegistry $managerRegistry,
         private readonly SummaryMetadataFactory $metadataFactory,
-        private readonly PartitionManagerRegistry $partitionManagerRegistry,
         private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly SummaryRefresherFactory $refresherFactory,
     ) {}
 
     #[\Override]
@@ -42,15 +39,13 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
         }
 
         $summaryMetadata = $this->metadataFactory->getSummaryMetadata($class);
-        $partitionManager = $this->partitionManagerRegistry->createPartitionManager($class);
 
         return new DefaultSummaryManager(
             class: $class,
             entityManager: $entityManager,
             metadata: $summaryMetadata,
-            partitionManager: $partitionManager,
             propertyAccessor: $this->propertyAccessor,
-            eventDispatcher: $this->eventDispatcher,
+            refresherFactory: $this->refresherFactory,
         );
     }
 }
