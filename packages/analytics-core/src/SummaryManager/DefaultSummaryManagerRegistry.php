@@ -15,10 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager;
-use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

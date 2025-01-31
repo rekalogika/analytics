@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
 final readonly class SummaryRefresherFactory
@@ -38,7 +37,7 @@ final readonly class SummaryRefresherFactory
         $entityManager = $this->managerRegistry->getManagerForClass($class);
 
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \RuntimeException(sprintf('No entity manager found for class %s', $class));
+            throw new \RuntimeException(\sprintf('No entity manager found for class %s', $class));
         }
 
         $metadata = $this->metadataFactory->getSummaryMetadata($class);

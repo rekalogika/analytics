@@ -217,7 +217,7 @@ final readonly class SummaryRefresher
             ) {
                 $signal = $this->signalManager->createDirtyPartitionSignal(
                     class: $this->metadata->getSummaryClass(),
-                    partition: $upperLevel
+                    partition: $upperLevel,
                 );
 
                 $this->entityManager->persist($signal);
