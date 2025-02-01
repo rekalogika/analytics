@@ -20,11 +20,13 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
+use Rekalogika\Analytics\EventListener\NewEntitySignalListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\NewEntitySignalConverter;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
@@ -85,6 +87,23 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
+        ->set('rekalogika.analytics.new_entity_signal_converter')
+        ->class(NewEntitySignalConverter::class)
+        ->args([
+            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+        ])
+    ;
+
+    // @todo tag as event listener
+    $services
+        ->set('rekalogika.analytics.new_entity_signal_listener')
+        ->class(NewEntitySignalListener::class)
+        ->args([
+            '$newEntitySignalConverter' => service('rekalogika.analytics.new_entity_signal_converter'),
+        ])
+    ;
+
+    $services
         ->set('rekalogika.analytics.command.refresh_summary')
         ->class(RefreshSummaryCommand::class)
         ->args([
@@ -110,6 +129,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(SourceEntityListener::class)
         ->args([
             '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
+            '$newEntitySignalListener' => service('rekalogika.analytics.new_entity_signal_listener'),
         ])
         ->tag('doctrine.event_listener', [
             'event' => Events::onFlush,

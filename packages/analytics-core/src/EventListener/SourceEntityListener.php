@@ -22,6 +22,7 @@ final readonly class SourceEntityListener
 {
     public function __construct(
         private SignalGenerator $signalGenerator,
+        private NewEntitySignalListener $newEntitySignalListener,
     ) {}
 
     public function onFlush(OnFlushEventArgs $event): void
@@ -70,6 +71,9 @@ final readonly class SourceEntityListener
 
             foreach ($newSignals as $signal) {
                 $signals[$signal->getSignature()] = $signal;
+
+                $this->newEntitySignalListener
+                    ->collectClassToProcess($signal->getClass());
             }
         }
 
