@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
-use Rekalogika\Analytics\EventListener\OnFlushListener;
+use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
@@ -107,7 +107,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set('rekalogika.analytics.doctrine.on_flush_listener')
-        ->class(OnFlushListener::class)
+        ->class(SourceEntityListener::class)
         ->args([
             '$summarySignalManager' => service('rekalogika.analytics.summary_signal_manager'),
         ])

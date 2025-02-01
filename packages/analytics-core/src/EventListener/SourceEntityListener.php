@@ -18,7 +18,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\SummaryManager\SummarySignalManager;
 
-final readonly class OnFlushListener
+final readonly class SourceEntityListener
 {
     public function __construct(
         private SummarySignalManager $summarySignalManager,

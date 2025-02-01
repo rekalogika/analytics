@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Metadata\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -31,10 +31,33 @@ final readonly class PartitionManager
         $this->partitionMetadata = $metadata->getPartition();
     }
 
+    private function resolvePartitionSource(object $entity): PartitionValueResolver
+    {
+        $source = $this->partitionMetadata->getSource();
+
+        $parents = class_parents($entity::class);
+
+        if ($parents === false) {
+            $parents = [];
+        }
+
+        $classes = [
+            $entity::class,
+            ...$parents,
+        ];
+
+        foreach ($classes as $class) {
+            if (isset($source[$class])) {
+                return $source[$class];
+            }
+        }
+
+        throw new \RuntimeException('Source not found');
+    }
+
     public function getLowestPartitionFromEntity(object $entity): Partition
     {
-        $source = $this->partitionMetadata->getSource()[$entity::class]
-            ?? throw new \RuntimeException('Source not found');
+        $source = $this->resolvePartitionSource($entity);
 
         $sourceProperty = $source->getInvolvedProperties()[0]
             ?? throw new \UnexpectedValueException('Source property not found');
@@ -112,18 +135,4 @@ final readonly class PartitionManager
 
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
-
-    // public function clearDirtyPartitionEntityFromDatabase(Partition $partition): void
-    // {
-    //     $this->entityManager->createQueryBuilder()
-    //         ->delete(SummarySignal::class, 'd')
-    //         ->where('d.class = :class')
-    //         ->andWhere('d.level = :level')
-    //         ->andWhere('d.key = :key')
-    //         ->setParameter('class', $this->metadata->getSummaryClass())
-    //         ->setParameter('level', $partition->getLevel())
-    //         ->setParameter('key', (string) $partition->getKey())
-    //         ->getQuery()
-    //         ->execute();
-    // }
 }
