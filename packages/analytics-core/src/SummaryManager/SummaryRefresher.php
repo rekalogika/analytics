@@ -557,15 +557,20 @@ final class SummaryRefresher
 
     //
     // converts empty 'new record' signals to 'dirty partition' signals
+    // @todo refactor: relocate to NewEntitySignalConverter?
     //
 
-    public function convertNewRecordsSignalsToDirtyPartitionSignals(): void
+    /**
+     * @return iterable<SummarySignal>
+     */
+    public function convertNewRecordsSignalsToDirtyPartitionSignals(): iterable
     {
         $this->getConnection()->beginTransaction();
         $this->removeNewSignals();
 
         foreach ($this->generateDirtyPartitionSignalsForNewEntities() as $signal) {
             $this->entityManager->persist($signal);
+            yield $signal;
         }
 
         $this->entityManager->flush();
