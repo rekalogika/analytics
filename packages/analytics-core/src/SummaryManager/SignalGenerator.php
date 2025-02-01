@@ -18,7 +18,10 @@ use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
-final readonly class SummarySignalManager
+/**
+ * Generates signals to indicate that a summary needs to be refreshed.
+ */
+final readonly class SignalGenerator
 {
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -28,7 +31,7 @@ final readonly class SummarySignalManager
     /**
      * @return iterable<SummarySignal>
      */
-    public function generateSignalsForSourceEntityCreation(object $entity): iterable
+    public function generateForEntityCreation(object $entity): iterable
     {
         $sourceMetadata = $this->summaryMetadataFactory
             ->getSourceMetadata($entity::class);
@@ -43,7 +46,7 @@ final readonly class SummarySignalManager
     /**
      * @return iterable<SummarySignal>
      */
-    public function generateSignalsForSourceEntityDeletion(object $entity): iterable
+    public function generateForEntityDeletion(object $entity): iterable
     {
         $sourceMetadata = $this->summaryMetadataFactory
             ->getSourceMetadata($entity::class);
@@ -63,7 +66,7 @@ final readonly class SummarySignalManager
      * @param list<string> $modifiedProperties
      * @return iterable<SummarySignal>
      */
-    public function generateSignalsForSourceEntityModification(
+    public function generateForEntityModification(
         object $entity,
         array $modifiedProperties,
     ): iterable {
@@ -99,7 +102,7 @@ final readonly class SummarySignalManager
     /**
      * @param class-string $class
      */
-    public function createNewRecordsSignal(string $class): SummarySignal
+    private function createNewRecordsSignal(string $class): SummarySignal
     {
         return new SummarySignal(
             class: $class,
