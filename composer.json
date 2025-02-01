@@ -14,6 +14,8 @@
         "php": "^8.2",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/orm": "^2.20",
+        "psr/clock": "^1.0",
+        "psr/simple-cache": "^3.0",
         "symfony/asset": "^6.4 || ^7.0",
         "symfony/asset-mapper": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
@@ -51,6 +53,7 @@
         "symfony/error-handler": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/maker-bundle": "^1.55",
+        "symfony/messenger": "^7.2",
         "symfony/monolog-bundle": "^3.0",
         "symfony/runtime": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
@@ -62,7 +65,8 @@
         "symfony/yaml": "^6.4 || ^7.0",
         "symplify/monorepo-builder": "^11.2.20 || ^11.3",
         "vimeo/psalm": "^6.0",
-        "zenstruck/foundry": "^2.0"
+        "zenstruck/foundry": "^2.0",
+        "zenstruck/messenger-test": "^1.11"
     },
     "replace": {
         "rekalogika/analytics-bundle": "self.version",

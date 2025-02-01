@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewSignalListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
@@ -34,6 +35,7 @@ use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -176,6 +178,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
             '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
         ])
+        ->tag('kernel.event_listener', [
+            'method' => 'onNewSignal',
+        ])
     ;
 
     $services
@@ -184,7 +189,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$adapter' => service('rekalogika.analytics.refresh_worker.refresh_framework_adapter')->nullOnInvalid(),
             '$runner' => service('rekalogika.analytics.refresh_worker.default_refresh_runner'),
-            '$propertiesResolver' => service('rekalogika.analytics.refresh_worker.refresh_class_properties_resolver'),
+            '$propertiesResolver' => service('rekalogika.analytics.refresh_worker.class_properties_resolver'),
         ])
     ;
 
@@ -199,6 +204,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh_worker.refresh_framework_adapter')
+        ->class(SymfonyRefreshFrameworkAdapter::class)
+        ->args([
+            '$lockFactory' => service('lock.factory'),
+            '$cache' => service('cache.app'),
+            '$messageBus' => service(MessageBusInterface::class),
         ])
     ;
 };
