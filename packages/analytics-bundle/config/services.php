@@ -26,8 +26,8 @@ use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
-use Rekalogika\Analytics\SummaryManager\SummarySignalManager;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -71,13 +71,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
-            '$signalManager' => service('rekalogika.analytics.summary_signal_manager'),
+            '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ]);
 
     $services
-        ->set('rekalogika.analytics.summary_signal_manager')
-        ->class(SummarySignalManager::class)
+        ->set('rekalogika.analytics.signal_generator')
+        ->class(SignalGenerator::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
@@ -106,10 +106,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.doctrine.on_flush_listener')
+        ->set('rekalogika.analytics.doctrine.source_entity_listener')
         ->class(SourceEntityListener::class)
         ->args([
-            '$summarySignalManager' => service('rekalogika.analytics.summary_signal_manager'),
+            '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
         ])
         ->tag('doctrine.event_listener', [
             'event' => Events::onFlush,
@@ -135,7 +135,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.life_cycle_listener')
+        ->set('rekalogika.analytics.summary_entity_listener')
         ->class(SummaryEntityListener::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),

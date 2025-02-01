@@ -25,7 +25,7 @@ final readonly class SummaryRefresherFactory
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $metadataFactory,
         private PartitionManagerRegistry $partitionManagerRegistry,
-        private SummarySignalManager $signalManager,
+        private SignalGenerator $signalGenerator,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
@@ -49,7 +49,7 @@ final readonly class SummaryRefresherFactory
             entityManager: $entityManager,
             metadata: $metadata,
             partitionManager: $partitionManager,
-            signalManager: $this->signalManager,
+            signalGenerator: $this->signalGenerator,
             eventDispatcher: $this->eventDispatcher,
         );
     }

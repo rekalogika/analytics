@@ -41,7 +41,7 @@ final class SummaryRefresher
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly PartitionManager $partitionManager,
-        private readonly SummarySignalManager $signalManager,
+        private readonly SignalGenerator $signalGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->sqlFactory = new SqlFactory(
@@ -229,7 +229,7 @@ final class SummaryRefresher
     //             $upperLevel !== null
     //             && $upperLevel->getUpperBound() === $partition->getUpperBound()
     //         ) {
-    //             $signal = $this->signalManager->createDirtyPartitionSignal(
+    //             $signal = $this->signalGenerator->createDirtyPartitionSignal(
     //                 class: $this->metadata->getSummaryClass(),
     //                 partition: $upperLevel,
     //             );
@@ -350,7 +350,7 @@ final class SummaryRefresher
                     continue;
                 }
 
-                $signal = $this->signalManager->createDirtyPartitionSignal(
+                $signal = $this->signalGenerator->createDirtyPartitionSignal(
                     class: $this->metadata->getSummaryClass(),
                     partition: $upperPartition,
                 );
@@ -608,7 +608,7 @@ final class SummaryRefresher
         $range = new PartitionRange($start, $end);
 
         foreach ($range as $partition) {
-            yield $this->signalManager->createDirtyPartitionSignal(
+            yield $this->signalGenerator->createDirtyPartitionSignal(
                 class: $this->metadata->getSummaryClass(),
                 partition: $partition,
             );

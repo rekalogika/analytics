@@ -16,12 +16,12 @@ namespace Rekalogika\Analytics\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Rekalogika\Analytics\Model\Entity\SummarySignal;
-use Rekalogika\Analytics\SummaryManager\SummarySignalManager;
+use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 
 final readonly class SourceEntityListener
 {
     public function __construct(
-        private SummarySignalManager $summarySignalManager,
+        private SignalGenerator $signalGenerator,
     ) {}
 
     public function onFlush(OnFlushEventArgs $event): void
@@ -38,8 +38,8 @@ final readonly class SourceEntityListener
         // process deletions
 
         foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
-            $newSignals = $this->summarySignalManager
-                ->generateSignalsForSourceEntityDeletion(entity: $entity);
+            $newSignals = $this->signalGenerator
+                ->generateForEntityDeletion(entity: $entity);
 
             foreach ($newSignals as $signal) {
                 $signals[$signal->getSignature()] = $signal;
@@ -51,8 +51,8 @@ final readonly class SourceEntityListener
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
             $changedProperties = array_keys($unitOfWork->getEntityChangeSet($entity));
 
-            $newSignals = $this->summarySignalManager
-                ->generateSignalsForSourceEntityModification(
+            $newSignals = $this->signalGenerator
+                ->generateForEntityModification(
                     entity: $entity,
                     modifiedProperties: $changedProperties,
                 );
@@ -65,8 +65,8 @@ final readonly class SourceEntityListener
         // process inserts
 
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            $newSignals = $this->summarySignalManager
-                ->generateSignalsForSourceEntityCreation(entity: $entity);
+            $newSignals = $this->signalGenerator
+                ->generateForEntityCreation(entity: $entity);
 
             foreach ($newSignals as $signal) {
                 $signals[$signal->getSignature()] = $signal;
@@ -87,8 +87,8 @@ final readonly class SourceEntityListener
             }
 
             foreach ($collection as $entity) {
-                $newSignals = $this->summarySignalManager
-                    ->generateSignalsForSourceEntityModification(
+                $newSignals = $this->signalGenerator
+                    ->generateForEntityModification(
                         entity: $entity,
                         modifiedProperties: [$backRefFieldName],
                     );
