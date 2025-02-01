@@ -84,19 +84,19 @@ dump:
 psql:
 	$(PSQL) postgresql://app:app@localhost:5432
 
-.PHONY: database-up
-database-up:
-	$(DOCKER) compose up -d --wait
+.PHONY: compose-up
+compose-up:
+	DUID="$$(id -u)" DGID="$$(id -g)" $(DOCKER) compose up -d --wait
 
-.PHONY: database-down
-database-down:
-	$(DOCKER) compose down
+.PHONY: compose-down
+compose-down:
+	DUID="$$(id -u)" DGID="$$(id -g)" $(DOCKER) compose down
 
-.PHONY: database-reset
-database-reset: database-down database-up
+.PHONY: compose-restart
+compose-restart: compose-down compose-up
 
 .PHONY: fixtures-load
-fixtures-load: database-up
+fixtures-load: compose-up
 	$(PHP) tests/bin/console doctrine:fixtures:load --no-interaction
 
 #
@@ -104,7 +104,8 @@ fixtures-load: database-up
 #
 
 .PHONY: doctrine-schema-create
-doctrine-schema-create: database-reset
+doctrine-schema-create: compose-restart
+	$(PHP) tests/bin/console doctrine:schema:drop --no-interaction --force --full-database
 	$(PHP) tests/bin/console doctrine:schema:create --no-interaction
 	make fixtures-load
 

@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\RefreshWorker;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Rekalogika\Analytics\RefreshWorker\RefreshCommand;
 use Rekalogika\Analytics\RefreshWorker\RefreshFrameworkAdapter;
 use Symfony\Component\Cache\Psr16Cache;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Envelope;
@@ -35,19 +37,14 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         private LockFactory $lockFactory,
         CacheItemPoolInterface $cache,
         private MessageBusInterface $messageBus,
+        private LoggerInterface $logger,
     ) {
         $this->cache = new Psr16Cache($cache);
     }
 
     private function normalizeKey(string $key): string
     {
-        $result = preg_replace('/[^a-zA-Z0-9]/', '', self::class . $key);
-
-        if (!\is_string($result)) {
-            throw new \RuntimeException('Invalid key name');
-        }
-
-        return $result;
+        return hash('xxh128', self::class . $key);
     }
 
     public function acquireLock(string $key, int $ttl): false|object
@@ -72,13 +69,33 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
 
     public function releaseLock(object $key): void
     {
-        $lock = $this->lockFactory->createLockFromKey($key);
+        $lock = $this->lockFactory->createLockFromKey(
+            key: $key,
+            autoRelease: false,
+        );
+
+        $result = $lock->acquire(blocking: false);
+
+        if ($result === false) {
+            throw new LockAcquiringException('Failed to refresh lock');
+        }
+
         $lock->release();
     }
 
     public function refreshLock(object $key, int $ttl): void
     {
-        $lock = $this->lockFactory->createLockFromKey($key);
+        $lock = $this->lockFactory->createLockFromKey(
+            key: $key,
+            autoRelease: false,
+        );
+
+        $result = $lock->acquire(blocking: false);
+
+        if ($result === false) {
+            throw new LockAcquiringException('Failed to refresh lock');
+        }
+
         $lock->refresh($ttl);
     }
 
@@ -99,6 +116,8 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
 
     public function scheduleWorker(RefreshCommand $command, int $delay): void
     {
+        $this->logger->info('Scheduling refresh worker', $command->getLoggingArray());
+
         $envelope = new Envelope($command, [
             new DelayStamp($delay * 1000),
         ]);
