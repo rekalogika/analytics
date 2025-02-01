@@ -28,16 +28,21 @@ use Rekalogika\Analytics\SummaryManager\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Util\PartitionUtil;
 
-final readonly class SummaryRefresher
+final class SummaryRefresher
 {
-    private SqlFactory $sqlFactory;
+    private readonly SqlFactory $sqlFactory;
+
+    private int|string|null $minIdOfSource = null;
+    private int|string|null $maxIdOfSource = null;
+    private int|string|null $maxIdOfSummary = null;
+
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SummaryMetadata $metadata,
-        private PartitionManager $partitionManager,
-        private SummarySignalManager $signalManager,
-        private ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly SummaryMetadata $metadata,
+        private readonly PartitionManager $partitionManager,
+        private readonly SummarySignalManager $signalManager,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->sqlFactory = new SqlFactory(
             entityManager: $this->entityManager,
@@ -70,7 +75,7 @@ final readonly class SummaryRefresher
      * Refreshes the specified range. If start and end is not specified, it
      * does the refresh for new entities, not previously processed.
      */
-    public function refresh(
+    public function manualRefresh(
         int|string|null $start,
         int|string|null $end,
         int $batchSize,
@@ -78,10 +83,9 @@ final readonly class SummaryRefresher
     ): void {
         $inputStart = $start;
         $inputEnd = $end;
-        $maxOfSource = $this->getMaxId();
 
-        $maxOfSummary = $this->getSummaryPropertiesManager()
-            ->getMax($this->metadata->getSummaryClass());
+        $maxOfSource = $this->getMaxIdOfSource();
+        $maxOfSummary = $this->getMaxIdOfSummary();
 
         // determine start
         // first check the stored max value, and start from there
@@ -99,7 +103,7 @@ final readonly class SummaryRefresher
         // if still null, then start from the lowest id of the source entity
 
         if ($start === null) {
-            $start = $this->getMinId();
+            $start = $this->getMinIdOfSource();
             $startIsExclusive = false; // not used yet
         }
 
@@ -146,7 +150,7 @@ final readonly class SummaryRefresher
             $doWork = true;
         }
 
-        foreach ($this->getRangesForUpdate($start, $end) as $range) {
+        foreach ($this->getRangesForManualRefresh($start, $end) as $range) {
             foreach ($range->batch($batchSize) as $batchRange) {
                 if ($batchRange->getSignature() === $resumeId) {
                     $doWork = true;
@@ -169,7 +173,17 @@ final readonly class SummaryRefresher
 
         // remove new entity signals
 
-        $this->removeNewEntitySignals($end);
+        $this->getConnection()->beginTransaction();
+        $this->removeNewSignals();
+        $maxOfSource = $this->getMaxIdOfSource();
+
+        if ($end === null || $end >= $maxOfSource) {
+            $this->getConnection()->commit();
+        } else {
+            $this->getConnection()->rollBack();
+        }
+
+        // dispatch end event
 
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
@@ -181,58 +195,58 @@ final readonly class SummaryRefresher
         $this->refreshRange($range);
     }
 
-    public function refreshNew(): void
-    {
-        $this->getConnection()->beginTransaction();
+    // public function refreshNew(): void
+    // {
+    //     $this->getConnection()->beginTransaction();
 
-        $this->removeNewSignals();
-        $maxOfSource = $this->getMaxId();
+    //     $this->removeNewSignals();
+    //     $maxOfSource = $this->getMaxIdOfSource();
 
-        $maxOfSummary = $this->getSummaryPropertiesManager()
-            ->getMax($this->metadata->getSummaryClass());
+    //     $maxOfSummary = $this->getSummaryPropertiesManager()
+    //         ->getMax($this->metadata->getSummaryClass());
 
-        $start = $this->partitionManager
-            ->createLowestPartitionFromSourceValue($maxOfSummary);
+    //     $start = $this->partitionManager
+    //         ->createLowestPartitionFromSourceValue($maxOfSummary);
 
-        $end = $this->partitionManager
-            ->createLowestPartitionFromSourceValue($maxOfSource);
+    //     $end = $this->partitionManager
+    //         ->createLowestPartitionFromSourceValue($maxOfSource);
 
-        $range = new PartitionRange($start, $end);
-        $this->refreshRange($range);
+    //     $range = new PartitionRange($start, $end);
+    //     $this->refreshRange($range);
 
-        $this->getSummaryPropertiesManager()->updateMax(
-            summaryClass: $this->metadata->getSummaryClass(),
-            max: $maxOfSource,
-        );
+    //     $this->getSummaryPropertiesManager()->updateMax(
+    //         summaryClass: $this->metadata->getSummaryClass(),
+    //         max: $maxOfSource,
+    //     );
 
-        // special case for refresh new: only mark the upper partition as dirty
-        // if the current partition is at the end of the upper partition
+    //     // special case for refresh new: only mark the upper partition as dirty
+    //     // if the current partition is at the end of the upper partition
 
-        foreach ($range as $partition) {
-            $upperLevel = $partition->getContaining();
+    //     foreach ($range as $partition) {
+    //         $upperLevel = $partition->getContaining();
 
-            if (
-                $upperLevel !== null
-                && $upperLevel->getUpperBound() === $partition->getUpperBound()
-            ) {
-                $signal = $this->signalManager->createDirtyPartitionSignal(
-                    class: $this->metadata->getSummaryClass(),
-                    partition: $upperLevel,
-                );
+    //         if (
+    //             $upperLevel !== null
+    //             && $upperLevel->getUpperBound() === $partition->getUpperBound()
+    //         ) {
+    //             $signal = $this->signalManager->createDirtyPartitionSignal(
+    //                 class: $this->metadata->getSummaryClass(),
+    //                 partition: $upperLevel,
+    //             );
 
-                $this->entityManager->persist($signal);
-            }
-        }
+    //             $this->entityManager->persist($signal);
+    //         }
+    //     }
 
-        $this->entityManager->flush();
+    //     $this->entityManager->flush();
 
-        $this->getConnection()->commit();
-    }
+    //     $this->getConnection()->commit();
+    // }
 
     /**
      * @return iterable<PartitionRange>
      */
-    private function getRangesForUpdate(
+    private function getRangesForManualRefresh(
         mixed $start,
         mixed $end,
     ): iterable {
@@ -309,6 +323,9 @@ final readonly class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
+        // get the max of the summary at the beginning
+        $maxOfSummary = $this->getMaxIdOfSummary();
+
         $this->getConnection()->beginTransaction();
         $this->deleteSummaryRange($range);
         $this->removeDirtyPartitionSignals($range);
@@ -319,9 +336,56 @@ final readonly class SummaryRefresher
             $this->rollUpSummaryToSummary($range);
         }
 
+        foreach ($range as $partition) {
+            $necessaryToMarkUpperAsDirty =
+                $this->isNecessaryToMarkUpperPartitionAsDirty(
+                    partition: $partition,
+                    maxOfSummary: $maxOfSummary,
+                );
+
+            if ($necessaryToMarkUpperAsDirty) {
+                $upperPartition = $partition->getContaining();
+
+                if ($upperPartition === null) {
+                    continue;
+                }
+
+                $signal = $this->signalManager->createDirtyPartitionSignal(
+                    class: $this->metadata->getSummaryClass(),
+                    partition: $upperPartition,
+                );
+
+                $this->entityManager->persist($signal);
+            }
+        }
+
         $this->getConnection()->commit();
 
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
+    }
+
+    private function isNecessaryToMarkUpperPartitionAsDirty(
+        Partition $partition,
+        int|string|null $maxOfSummary,
+    ): bool {
+        $isNew = $maxOfSummary === null || $partition->getUpperBound() > $maxOfSummary;
+        $upperPartition = $partition->getContaining();
+
+        if ($upperPartition === null) {
+            return false;
+        }
+
+        // special case for new partitions: only mark the upper partition as
+        // dirty if the current partition is at the end of the upper partition
+
+        if ($isNew) {
+            return $upperPartition->getUpperBound() === $partition->getUpperBound();
+        }
+
+        // if upper partition's upper bound is greater than max of summary, then
+        // it is not necessary to mark the upper partition as dirty
+
+        return $upperPartition->getUpperBound() <= $maxOfSummary;
     }
 
     private function deleteSummaryRange(PartitionRange $range): void
@@ -381,28 +445,6 @@ final readonly class SummaryRefresher
         $this->executeQueries($queries);
 
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
-    }
-
-    private function removeNewEntitySignals(int|string|null $end): void
-    {
-        $this->getConnection()->beginTransaction();
-
-        $this->entityManager->createQueryBuilder()
-            ->delete(SummarySignal::class, 's')
-            ->where('s.class = :class')
-            ->andWhere('s.level IS NULL')
-            ->andWhere('s.key IS NULL')
-            ->setParameter('class', $this->metadata->getSummaryClass())
-            ->getQuery()
-            ->execute();
-
-        $maxOfSource = $this->getMaxId();
-
-        if ($end === null || $end >= $maxOfSource) {
-            $this->getConnection()->commit();
-        } else {
-            $this->getConnection()->rollBack();
-        }
     }
 
     private function removeDirtyPartitionSignals(PartitionRange $range): void
@@ -465,8 +507,12 @@ final readonly class SummaryRefresher
         return $this->createRangeDeterminer($class)->getMinId();
     }
 
-    private function getMaxId(): int|string|null
+    private function getMaxIdOfSource(): int|string|null
     {
+        if ($this->maxIdOfSource !== null) {
+            return $this->maxIdOfSource;
+        }
+
         $classes = $this->metadata->getSourceClasses();
         $max = null;
 
@@ -479,11 +525,15 @@ final readonly class SummaryRefresher
             $max = max($max, $this->getMaxIdOfClass($class));
         }
 
-        return $max;
+        return $this->maxIdOfSource = $max;
     }
 
-    private function getMinId(): int|string|null
+    private function getMinIdOfSource(): int|string|null
     {
+        if ($this->minIdOfSource !== null) {
+            return $this->minIdOfSource;
+        }
+
         $classes = $this->metadata->getSourceClasses();
         $min = null;
 
@@ -496,6 +546,72 @@ final readonly class SummaryRefresher
             $min = min($min, $this->getMinIdOfClass($class));
         }
 
-        return $min;
+        return $this->minIdOfSource = $min;
+    }
+
+    private function getMaxIdOfSummary(): int|string|null
+    {
+        return $this->maxIdOfSummary ??= $this->getSummaryPropertiesManager()
+            ->getMax($this->metadata->getSummaryClass());
+    }
+
+    //
+    // converts empty 'new record' signals to 'dirty partition' signals
+    //
+
+    public function convertNewRecordsSignalsToDirtyPartitionSignals(): void
+    {
+        $this->getConnection()->beginTransaction();
+        $this->removeNewSignals();
+
+        foreach ($this->generateDirtyPartitionSignalsForNewEntities() as $signal) {
+            $this->entityManager->persist($signal);
+        }
+
+        $this->entityManager->flush();
+        $this->getConnection()->commit();
+    }
+
+    /**
+     * @return iterable<SummarySignal>
+     */
+    private function generateDirtyPartitionSignalsForNewEntities(): iterable
+    {
+        $maxOfSummary = $this->getMaxIdOfSummary();
+        $maxOfSource = $this->getMaxIdOfSource();
+
+        if ($maxOfSummary === null) {
+            $minOfSource = $this->getMinIdOfSource();
+
+            if ($minOfSource === null) {
+                return;
+            }
+
+            $start = $this->partitionManager
+                ->createLowestPartitionFromSourceValue($minOfSource);
+        } else {
+            $start = $this->partitionManager
+                ->createLowestPartitionFromSourceValue($maxOfSummary);
+        }
+
+        if ($maxOfSource === null) {
+            return;
+        }
+
+        $end = $this->partitionManager
+            ->createLowestPartitionFromSourceValue($maxOfSource);
+
+        if (PartitionUtil::isGreaterThan($start, $end)) {
+            return;
+        }
+
+        $range = new PartitionRange($start, $end);
+
+        foreach ($range as $partition) {
+            yield $this->signalManager->createDirtyPartitionSignal(
+                class: $this->metadata->getSummaryClass(),
+                partition: $partition,
+            );
+        }
     }
 }

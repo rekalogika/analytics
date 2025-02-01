@@ -21,8 +21,11 @@ use Rekalogika\Analytics\Tests\App\Repository\OrderRepository;
 #[ORM\Table(name: '`order`')]
 class Order
 {
+    /**
+     * Using 'IDENTITY' to make sure it is working with database id generation
+     */
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue('IDENTITY')]
     #[ORM\Column]
     private ?int $id = null;
 

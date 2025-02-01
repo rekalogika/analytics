@@ -33,15 +33,21 @@
         name="DATABASE_URL"
         value="postgresql://app:app@localhost:5432/app?serverVersion=15&amp;charset=utf8" />
   </php>
+  
   <testsuites>
     <testsuite name="default">
       <directory>tests/src/UnitTests</directory>
       <directory>tests/src/IntegrationTests</directory>
     </testsuite>
   </testsuites>
+
   <source>
     <include>
       <directory suffix=".php">src</directory>
     </include>
   </source>
+
+  <extensions>
+    <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
+  </extensions>
 </phpunit>

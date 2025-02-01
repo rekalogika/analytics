@@ -48,7 +48,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     ): void {
         $this->refresherFactory
             ->createSummaryRefresher($this->class)
-            ->refresh(
+            ->manualRefresh(
                 start: $start,
                 end: $end,
                 batchSize: $batchSize,

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App;
 
+use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Rekalogika\Analytics\Bundle\RekalogikaAnalyticsBundle;
@@ -63,6 +64,7 @@ class Kernel extends BaseKernel
         yield new StimulusBundle();
         yield new RekalogikaAnalyticsBundle();
         yield new TurboBundle();
+        yield new DAMADoctrineTestBundle();
     }
 
     #[\Override]

@@ -20,9 +20,9 @@ final readonly class RefreshClassProperties
      */
     public function __construct(
         private string $class,
-        private int $startDelay = 60,
-        private int $interval = 600,
-        private int $expectedMaximumProcessingTime = 300,
+        private int $startDelay,
+        private int $interval,
+        private int $expectedMaximumProcessingTime,
     ) {}
 
     /**
