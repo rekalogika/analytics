@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Model\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rekalogika\Analytics\Partition;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
 

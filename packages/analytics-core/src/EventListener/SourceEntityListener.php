@@ -22,7 +22,6 @@ final readonly class SourceEntityListener
 {
     public function __construct(
         private SignalGenerator $signalGenerator,
-        private NewEntitySignalListener $newEntitySignalListener,
     ) {}
 
     public function onFlush(OnFlushEventArgs $event): void
@@ -71,9 +70,6 @@ final readonly class SourceEntityListener
 
             foreach ($newSignals as $signal) {
                 $signals[$signal->getSignature()] = $signal;
-
-                $this->newEntitySignalListener
-                    ->collectClassToProcess($signal->getClass());
             }
         }
 
@@ -117,6 +113,8 @@ final readonly class SourceEntityListener
         foreach ($signals as $signal) {
             $entityManager->persist($signal);
             $unitOfWork->computeChangeSet($classMetadata, $signal);
+
+            // @todo convert signal to refreshcommand, and dispatch it
         }
     }
 }

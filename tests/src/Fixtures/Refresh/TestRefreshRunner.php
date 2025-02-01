@@ -42,7 +42,7 @@ class TestRefreshRunner implements RefreshRunner
         $this->processingTime = $processingTime;
     }
 
-    public function refresh(string $class, Partition $partition): void
+    public function refresh(string $class, ?Partition $partition): void
     {
         $this->runs[$this->runNumber] = $this->clock->now()->format('Y-m-d H:i:s');
         $this->clock->sleep($this->processingTime);

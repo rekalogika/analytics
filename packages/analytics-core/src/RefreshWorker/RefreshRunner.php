@@ -20,5 +20,5 @@ interface RefreshRunner
     /**
      * @param class-string $class
      */
-    public function refresh(string $class, Partition $partition): void;
+    public function refresh(string $class, ?Partition $partition): void;
 }
