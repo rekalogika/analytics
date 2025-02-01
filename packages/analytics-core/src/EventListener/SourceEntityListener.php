@@ -15,14 +15,29 @@ namespace Rekalogika\Analytics\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
 use Rekalogika\Analytics\SummaryManager\SignalGenerator;
+use Symfony\Contracts\Service\ResetInterface;
 
-final readonly class SourceEntityListener
+final class SourceEntityListener implements ResetInterface
 {
+    /**
+     * @var array<string,SummarySignal>
+     */
+    private array $signals = [];
+
     public function __construct(
-        private SignalGenerator $signalGenerator,
+        private readonly SignalGenerator $signalGenerator,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
+
+    public function reset()
+    {
+        $this->signals = [];
+    }
 
     public function onFlush(OnFlushEventArgs $event): void
     {
@@ -33,7 +48,6 @@ final readonly class SourceEntityListener
         }
 
         $unitOfWork = $entityManager->getUnitOfWork();
-        $signals = [];
 
         // process deletions
 
@@ -42,7 +56,7 @@ final readonly class SourceEntityListener
                 ->generateForEntityDeletion(entity: $entity);
 
             foreach ($newSignals as $signal) {
-                $signals[$signal->getSignature()] = $signal;
+                $this->signals[$signal->getSignature()] = $signal;
             }
         }
 
@@ -58,7 +72,7 @@ final readonly class SourceEntityListener
                 );
 
             foreach ($newSignals as $signal) {
-                $signals[$signal->getSignature()] = $signal;
+                $this->signals[$signal->getSignature()] = $signal;
             }
         }
 
@@ -69,7 +83,7 @@ final readonly class SourceEntityListener
                 ->generateForEntityCreation(entity: $entity);
 
             foreach ($newSignals as $signal) {
-                $signals[$signal->getSignature()] = $signal;
+                $this->signals[$signal->getSignature()] = $signal;
             }
         }
 
@@ -94,7 +108,7 @@ final readonly class SourceEntityListener
                     );
 
                 foreach ($newSignals as $signal) {
-                    $signals[$signal->getSignature()] = $signal;
+                    $this->signals[$signal->getSignature()] = $signal;
                 }
             }
         }
@@ -110,11 +124,23 @@ final readonly class SourceEntityListener
 
         $classMetadata = $entityManager->getClassMetadata(SummarySignal::class);
 
-        foreach ($signals as $signal) {
+        foreach ($this->signals as $signal) {
             $entityManager->persist($signal);
             $unitOfWork->computeChangeSet($classMetadata, $signal);
-
-            // @todo convert signal to refreshcommand, and dispatch it
         }
+    }
+
+    /**
+     * Dispatch signals in postFlush because the flush might fail and we don't
+     * want to dispatch the event if the flush fails.
+     */
+    public function postFlush(PostFlushEventArgs $doctrineEvent): void
+    {
+        foreach ($this->signals as $signal) {
+            $event = new NewSignalEvent($signal);
+            $this->eventDispatcher?->dispatch($event);
+        }
+
+        $this->signals = [];
     }
 }
