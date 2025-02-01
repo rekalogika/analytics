@@ -22,12 +22,14 @@ final readonly class RefreshCommand
 {
     /**
      * @param class-string $class
+     * @param ?Partition $partition Empty partition means to process new
+     * records.
      * @param L $lock
      */
     public function __construct(
         private bool $primary,
         private string $class,
-        private Partition $partition,
+        private ?Partition $partition,
         private object $lock,
     ) {}
 
@@ -44,7 +46,7 @@ final readonly class RefreshCommand
         return $this->class;
     }
 
-    public function getPartition(): Partition
+    public function getPartition(): ?Partition
     {
         return $this->partition;
     }

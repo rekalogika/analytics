@@ -563,24 +563,33 @@ final class SummaryRefresher
     /**
      * @return iterable<SummarySignal>
      */
-    public function convertNewRecordsSignalsToDirtyPartitionSignals(): iterable
+    public function convertNewRecordsToDirtyPartitionSignals(): iterable
     {
         $this->getConnection()->beginTransaction();
+
+        $range = $this->getNewEntitiesRange();
+
+        if ($range === null) {
+            $this->getConnection()->rollBack();
+            return;
+        }
+
         $this->removeNewSignals();
 
-        foreach ($this->generateDirtyPartitionSignalsForNewEntities() as $signal) {
+        foreach ($range as $partition) {
+            yield $signal = $this->signalGenerator->createDirtyPartitionSignal(
+                class: $this->metadata->getSummaryClass(),
+                partition: $partition,
+            );
+
             $this->entityManager->persist($signal);
-            yield $signal;
         }
 
         $this->entityManager->flush();
         $this->getConnection()->commit();
     }
 
-    /**
-     * @return iterable<SummarySignal>
-     */
-    private function generateDirtyPartitionSignalsForNewEntities(): iterable
+    private function getNewEntitiesRange(): ?PartitionRange
     {
         $maxOfSummary = $this->getMaxIdOfSummary();
         $maxOfSource = $this->getMaxIdOfSource();
@@ -589,7 +598,7 @@ final class SummaryRefresher
             $minOfSource = $this->getMinIdOfSource();
 
             if ($minOfSource === null) {
-                return;
+                return null;
             }
 
             $start = $this->partitionManager
@@ -600,23 +609,16 @@ final class SummaryRefresher
         }
 
         if ($maxOfSource === null) {
-            return;
+            return null;
         }
 
         $end = $this->partitionManager
             ->createLowestPartitionFromSourceValue($maxOfSource);
 
         if (PartitionUtil::isGreaterThan($start, $end)) {
-            return;
+            return null;
         }
 
-        $range = new PartitionRange($start, $end);
-
-        foreach ($range as $partition) {
-            yield $this->signalGenerator->createDirtyPartitionSignal(
-                class: $this->metadata->getSummaryClass(),
-                partition: $partition,
-            );
-        }
+        return new PartitionRange($start, $end);
     }
 }

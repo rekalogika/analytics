@@ -32,13 +32,13 @@ final readonly class RefreshScheduler
 
     private function createLockKey(
         string $class,
-        Partition $partition,
+        ?Partition $partition,
     ): string {
         return \sprintf(
             '%s:%s:%s',
             $class,
-            $partition->getLevel(),
-            $partition->getKey(),
+            $partition?->getLevel() ?? '-',
+            $partition?->getKey() ?? '-',
         );
     }
 
@@ -142,7 +142,7 @@ final readonly class RefreshScheduler
      */
     private function refresh(
         string $class,
-        Partition $partition,
+        ?Partition $partition,
     ): void {
         $this->runner->refresh($class, $partition);
     }

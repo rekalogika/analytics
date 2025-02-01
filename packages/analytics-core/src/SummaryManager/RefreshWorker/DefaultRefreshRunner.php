@@ -23,11 +23,20 @@ final readonly class DefaultRefreshRunner implements RefreshRunner
         private SummaryRefresherFactory $summaryRefresherFactory,
     ) {}
 
-    public function refresh(string $class, Partition $partition): void
+    public function refresh(string $class, ?Partition $partition): void
     {
         $summaryRefresher = $this->summaryRefresherFactory
             ->createSummaryRefresher($class);
 
-        $summaryRefresher->refreshPartition($partition);
+        if ($partition !== null) {
+            $summaryRefresher->refreshPartition($partition);
+        } else {
+            $signals = $summaryRefresher
+                ->convertNewRecordsToDirtyPartitionSignals();
+
+            foreach ($signals as $signal) {
+                // @todo convert signal to refreshcommand, and dispatch it
+            }
+        }
     }
 }
