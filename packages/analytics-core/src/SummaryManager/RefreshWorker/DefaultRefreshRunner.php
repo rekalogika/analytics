@@ -13,14 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\RefreshWorker;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
+use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 
 final readonly class DefaultRefreshRunner implements RefreshRunner
 {
     public function __construct(
         private SummaryRefresherFactory $summaryRefresherFactory,
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
     public function refresh(string $class, ?Partition $partition): void
@@ -35,7 +38,8 @@ final readonly class DefaultRefreshRunner implements RefreshRunner
                 ->convertNewRecordsToDirtyPartitionSignals();
 
             foreach ($signals as $signal) {
-                // @todo convert signal to refreshcommand, and dispatch it
+                $event = new NewSignalEvent($signal);
+                $this->eventDispatcher?->dispatch($event);
             }
         }
     }

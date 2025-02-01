@@ -71,21 +71,13 @@ class SummarySignal
         return $this->class;
     }
 
-    public function getLevel(): int
+    public function getLevel(): ?int
     {
-        if ($this->level === null) {
-            throw new \RuntimeException('Level is null');
-        }
-
         return $this->level;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
-        if ($this->key === null) {
-            throw new \RuntimeException('Key is null');
-        }
-
         return $this->key;
     }
 

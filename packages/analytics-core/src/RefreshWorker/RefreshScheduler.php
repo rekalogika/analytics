@@ -22,10 +22,10 @@ final readonly class RefreshScheduler
 {
     /**
      * @todo change the parameters to be configurable
-     * @param RefreshFrameworkAdapter<L> $adapter
+     * @param ?RefreshFrameworkAdapter<L> $adapter
      */
     public function __construct(
-        private RefreshFrameworkAdapter $adapter,
+        private ?RefreshFrameworkAdapter $adapter,
         private RefreshRunner $runner,
         private RefreshClassPropertiesResolver $propertiesResolver,
     ) {}
@@ -47,8 +47,12 @@ final readonly class RefreshScheduler
      */
     public function scheduleWorker(
         string $class,
-        Partition $partition,
+        ?Partition $partition,
     ): void {
+        if ($this->adapter === null) {
+            return;
+        }
+
         $identifier = $this->createLockKey($class, $partition);
         $properties = $this->propertiesResolver->getProperties($class);
 
@@ -82,6 +86,10 @@ final readonly class RefreshScheduler
      */
     public function runWorker(RefreshCommand $command): void
     {
+        if ($this->adapter === null) {
+            return;
+        }
+
         $isPrimary = $command->isPrimary();
         $class = $command->getClass();
         $partition = $command->getPartition();

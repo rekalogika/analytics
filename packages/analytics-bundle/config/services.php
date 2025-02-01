@@ -20,12 +20,16 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
+use Rekalogika\Analytics\EventListener\NewSignalListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
+use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\SummaryManagerRegistry;
@@ -110,9 +114,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(SourceEntityListener::class)
         ->args([
             '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
+            '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
         ->tag('doctrine.event_listener', [
             'event' => Events::onFlush,
+        ])
+        ->tag('doctrine.event_listener', [
+            'event' => Events::postFlush,
+        ])
+        ->tag('kernel.reset', [
+            'method' => 'reset',
         ])
     ;
 
@@ -151,6 +162,43 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
         ->tag('doctrine.event_listener', [
             'event' => 'postLoad',
+        ])
+    ;
+
+    //
+    // refresh worker framework
+    //
+
+    $services
+        ->set('rekalogika.analytics.new_signal_listener')
+        ->class(NewSignalListener::class)
+        ->args([
+            '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
+            '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh_worker.refresh_scheduler')
+        ->class(RefreshScheduler::class)
+        ->args([
+            '$adapter' => service('rekalogika.analytics.refresh_worker.refresh_framework_adapter')->nullOnInvalid(),
+            '$runner' => service('rekalogika.analytics.refresh_worker.default_refresh_runner'),
+            '$propertiesResolver' => service('rekalogika.analytics.refresh_worker.refresh_class_properties_resolver'),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh_worker.class_properties_resolver')
+        ->class(DefaultRefreshClassPropertiesResolver::class)
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh_worker.default_refresh_runner')
+        ->class(DefaultRefreshRunner::class)
+        ->args([
+            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+            '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
     ;
 };
