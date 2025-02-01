@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewSignalListener;
@@ -214,6 +215,17 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$lockFactory' => service('lock.factory'),
             '$cache' => service('cache.app'),
             '$messageBus' => service(MessageBusInterface::class),
+            '$logger' => service(LoggerInterface::class),
         ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh_worker.refresh_message_handler')
+        ->class(RefreshMessageHandler::class)
+        ->args([
+            '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
+            '$logger' => service(LoggerInterface::class),
+        ])
+        ->tag('messenger.message_handler')
     ;
 };

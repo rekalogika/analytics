@@ -33,6 +33,18 @@ final readonly class RefreshCommand
         private object $key,
     ) {}
 
+    /**
+     * @return array<string,scalar>
+     */
+    public function getLoggingArray(): array
+    {
+        return [
+            'primary' => $this->primary,
+            'class' => $this->class,
+            'partition' => (string) $this->partition,
+        ];
+    }
+
     public function isPrimary(): bool
     {
         return $this->primary;

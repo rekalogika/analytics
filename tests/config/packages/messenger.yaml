@@ -23,6 +23,7 @@ framework:
         routing:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
+            'Rekalogika\Analytics\RefreshWorker\RefreshCommand': async
 
 # when@test:
 #     framework:

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\EventListener;
 
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
 final readonly class NewSignalListener
@@ -28,8 +28,9 @@ final readonly class NewSignalListener
         private RefreshScheduler $refreshScheduler,
     ) {}
 
-    public function onNewSignal(SummarySignal $signal): void
+    public function onNewSignal(NewSignalEvent $event): void
     {
+        $signal = $event->getSignal();
         $class = $signal->getClass();
 
         $partitionManager = $this->partitionManagerRegistry
