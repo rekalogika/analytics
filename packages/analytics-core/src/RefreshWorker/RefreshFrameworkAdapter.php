@@ -24,31 +24,35 @@ interface RefreshFrameworkAdapter
      * @return false|L False if lock cannot be acquired, otherwise returns
      * an object representing the lock used by the framework.
      */
-    public function acquireLock(string $key, float $ttl): false|object;
+    public function acquireLock(string $key, int $ttl): false|object;
 
     /**
      * Release the lock.
      *
-     * @param L $lock The lock object returned by acquireLock.
+     * @param L $key The lock object returned by acquireLock.
      */
-    public function releaseLock(object $lock): void;
+    public function releaseLock(object $key): void;
 
     /**
-     * @param L $lock
+     * @param L $key
      */
-    public function refreshLock(object $lock, float $ttl): void;
+    public function refreshLock(object $key, int $ttl): void;
 
-    public function raiseFlag(string $flag): void;
+    public function raiseFlag(string $key, int $ttl): void;
 
-    public function removeFlag(string $flag): void;
+    public function removeFlag(string $key): void;
 
-    public function isFlagRaised(string $flag): bool;
+    public function isFlagRaised(string $key): bool;
 
     /**
+     * The framework must schedule the worker to run
+     * RefreshScheduler::runWorker() with the argument $command, after the
+     * given delay.
+     *
      * @param RefreshCommand<L> $command
      */
     public function scheduleWorker(
         RefreshCommand $command,
-        float $delay,
+        int $delay,
     ): void;
 }

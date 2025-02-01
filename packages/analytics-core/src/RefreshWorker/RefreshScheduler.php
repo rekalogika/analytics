@@ -71,13 +71,18 @@ final readonly class RefreshScheduler
                 primary: true,
                 class: $class,
                 partition: $partition,
-                lock: $lock,
+                key: $lock,
             );
 
             $this->adapter->scheduleWorker($command, $properties->getStartDelay());
         } else {
             // if lock not acquired, raise flag
-            $this->adapter->raiseFlag($identifier);
+            $this->adapter->raiseFlag(
+                key: $identifier,
+                ttl: $properties->getStartDelay()
+                    + $properties->getInterval()
+                    + $properties->getExpectedMaximumProcessingTime(),
+            );
         }
     }
 
@@ -93,7 +98,7 @@ final readonly class RefreshScheduler
         $isPrimary = $command->isPrimary();
         $class = $command->getClass();
         $partition = $command->getPartition();
-        $lock = $command->getLock();
+        $key = $command->getKey();
         $properties = $this->propertiesResolver->getProperties($class);
 
         $identifier = $this->createLockKey($class, $partition);
@@ -105,7 +110,7 @@ final readonly class RefreshScheduler
             !$isPrimary
             && !$this->adapter->isFlagRaised($identifier)
         ) {
-            $this->adapter->releaseLock($lock);
+            $this->adapter->releaseLock($key);
 
             return;
         }
@@ -113,7 +118,7 @@ final readonly class RefreshScheduler
         // refresh lock
 
         $this->adapter->refreshLock(
-            lock: $lock,
+            key: $key,
             ttl: $properties->getExpectedMaximumProcessingTime()
                 + 2 * $properties->getInterval(),
         );
@@ -129,7 +134,7 @@ final readonly class RefreshScheduler
         // refresh lock again
 
         $this->adapter->refreshLock(
-            lock: $lock,
+            key: $key,
             ttl: 2 * $properties->getInterval(),
         );
 
@@ -139,7 +144,7 @@ final readonly class RefreshScheduler
             primary: false,
             class: $class,
             partition: $partition,
-            lock: $lock,
+            key: $key,
         );
 
         $this->adapter->scheduleWorker($command, $properties->getInterval());

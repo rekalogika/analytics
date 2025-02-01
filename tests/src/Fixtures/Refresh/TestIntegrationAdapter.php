@@ -95,7 +95,7 @@ class TestIntegrationAdapter implements RefreshFrameworkAdapter
         }
     }
 
-    public function acquireLock(string $key, float $ttl): false|Lock
+    public function acquireLock(string $key, int $ttl): false|Lock
     {
         foreach ($this->locks as $lock) {
             if ($lock->getKey() === $key) {
@@ -116,12 +116,12 @@ class TestIntegrationAdapter implements RefreshFrameworkAdapter
         return $lock;
     }
 
-    public function releaseLock(object $lock): void
+    public function releaseLock(object $key): void
     {
         $locks = $this->locks;
 
         foreach ($locks as $i => $curlock) {
-            if ($lock === $curlock) {
+            if ($key === $curlock) {
                 unset($locks[$i]);
             }
         }
@@ -129,26 +129,26 @@ class TestIntegrationAdapter implements RefreshFrameworkAdapter
         $this->locks = array_values($locks);
     }
 
-    public function refreshLock(object $lock, float $ttl): void
+    public function refreshLock(object $key, int $ttl): void
     {
         foreach ($this->locks as $i => $curlock) {
-            if ($lock === $curlock) {
+            if ($key === $curlock) {
                 $this->locks[$i]->refresh($ttl);
             }
         }
     }
 
-    public function raiseFlag(string $flag): void
+    public function raiseFlag(string $key, int $ttl): void
     {
-        $this->flags[] = $flag;
+        $this->flags[] = $key;
     }
 
-    public function removeFlag(string $flag): void
+    public function removeFlag(string $key): void
     {
         $flags = $this->flags;
 
         foreach ($flags as $i => $f) {
-            if ($f === $flag) {
+            if ($f === $key) {
                 unset($flags[$i]);
             }
         }
@@ -156,14 +156,14 @@ class TestIntegrationAdapter implements RefreshFrameworkAdapter
         $this->flags = array_values($flags);
     }
 
-    public function isFlagRaised(string $flag): bool
+    public function isFlagRaised(string $key): bool
     {
-        return \in_array($flag, $this->flags, true);
+        return \in_array($key, $this->flags, true);
     }
 
     public function scheduleWorker(
         RefreshCommand $command,
-        float $delay,
+        int $delay,
     ): void {
         $now = $this->clock->now();
 

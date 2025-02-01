@@ -13,7 +13,7 @@
     "require": {
         "php": "^8.2",
         "doctrine/orm": "^2.20",
-        "psr/clock": "dev-main",
+        "psr/clock": "^1.0",
         "rekalogika/doctrine-advanced-group-by": "dev-main",
         "symfony/property-access": "^6.4 || ^7.0"
     },
