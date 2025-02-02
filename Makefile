@@ -9,7 +9,7 @@ ZSTD=zstd
 -include local.mk
 
 .PHONY: test 
-test: composer-dump monorepo-validate phpstan psalm doctrine-schema-create summary-refresh phpunit
+test: clean composer-dump lint monorepo-validate phpstan psalm doctrine-schema-create summary-refresh phpunit
 
 .PHONY: composer-dump
 composer-dump:

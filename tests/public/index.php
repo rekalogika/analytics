@@ -15,4 +15,8 @@ use Rekalogika\Analytics\Tests\App\Kernel;
 
 require_once __DIR__ . '/../../vendor/autoload_runtime.php';
 
-return fn(array $context): Kernel => new Kernel();
+return function (array $context) {
+    \assert(\is_string($context['APP_ENV'] ?? null), 'APP_ENV is not defined');
+    \assert(\is_string($context['APP_DEBUG'] ?? null), 'APP_DEBUG is not defined');
+    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+};
