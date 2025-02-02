@@ -38,8 +38,8 @@ class Kernel extends BaseKernel
     }
 
     public function __construct(
-        string $environment = 'test',
-        bool $debug = true,
+        string $environment,
+        bool $debug,
     ) {
         parent::__construct($environment, $debug);
         $this->environment = $environment;

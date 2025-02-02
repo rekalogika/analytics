@@ -31,7 +31,7 @@
         value="10.5" />
     <server
         name="DATABASE_URL"
-        value="postgresql://app:app@localhost:5432/app?serverVersion=15&amp;charset=utf8" />
+        value="postgresql://app:app@localhost:5432/app?serverVersion=17&amp;charset=utf8" />
   </php>
   
   <testsuites>
