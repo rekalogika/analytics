@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
 /**
- * Generates signals to indicate that a summary needs to be refreshed.
+ * Generates dirty flags to indicate that a summary needs to be refreshed.
  */
-final readonly class SignalGenerator
+final readonly class DirtyFlagGenerator
 {
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -29,7 +29,7 @@ final readonly class SignalGenerator
     ) {}
 
     /**
-     * @return iterable<SummarySignal>
+     * @return iterable<DirtyFlag>
      */
     public function generateForEntityCreation(object $entity): iterable
     {
@@ -39,12 +39,12 @@ final readonly class SignalGenerator
         $summaryClasses = $sourceMetadata->getAllInvolvedSummaryClasses();
 
         foreach ($summaryClasses as $summaryClass) {
-            yield $this->createNewRecordsSignal($summaryClass);
+            yield $this->createNewFlag($summaryClass);
         }
     }
 
     /**
-     * @return iterable<SummarySignal>
+     * @return iterable<DirtyFlag>
      */
     public function generateForEntityDeletion(object $entity): iterable
     {
@@ -58,13 +58,13 @@ final readonly class SignalGenerator
                 ->createPartitionManager($summaryClass);
 
             $partition = $partitionManager->getLowestPartitionFromEntity($entity);
-            yield $this->createDirtyPartitionSignal($summaryClass, $partition);
+            yield $this->createDirtyFlag($summaryClass, $partition);
         }
     }
 
     /**
      * @param list<string> $modifiedProperties
-     * @return iterable<SummarySignal>
+     * @return iterable<DirtyFlag>
      */
     public function generateForEntityModification(
         object $entity,
@@ -81,18 +81,18 @@ final readonly class SignalGenerator
                 ->createPartitionManager($summaryClass);
 
             $partition = $partitionManager->getLowestPartitionFromEntity($entity);
-            yield $this->createDirtyPartitionSignal($summaryClass, $partition);
+            yield $this->createDirtyFlag($summaryClass, $partition);
         }
     }
 
     /**
      * @param class-string $class
      */
-    public function createDirtyPartitionSignal(
+    public function createDirtyFlag(
         string $class,
         Partition $partition,
-    ): SummarySignal {
-        return new SummarySignal(
+    ): DirtyFlag {
+        return new DirtyFlag(
             class: $class,
             level: $partition->getLevel(),
             key: (string) $partition->getKey(),
@@ -102,9 +102,9 @@ final readonly class SignalGenerator
     /**
      * @param class-string $class
      */
-    private function createNewRecordsSignal(string $class): SummarySignal
+    private function createNewFlag(string $class): DirtyFlag
     {
-        return new SummarySignal(
+        return new DirtyFlag(
             class: $class,
             level: null,
             key: null,

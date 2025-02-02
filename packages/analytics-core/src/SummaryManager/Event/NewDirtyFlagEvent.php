@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Event;
 
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 
-final readonly class NewSignalEvent
+final readonly class NewDirtyFlagEvent
 {
     public function __construct(
-        private SummarySignal $signal,
+        private DirtyFlag $dirtyFlag,
     ) {}
 
-    public function getSignal(): SummarySignal
+    public function getDirtyFlag(): DirtyFlag
     {
-        return $this->signal;
+        return $this->dirtyFlag;
     }
 }

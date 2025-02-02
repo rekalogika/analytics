@@ -15,17 +15,16 @@ namespace Rekalogika\Analytics\Model\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Rekalogika\Analytics\Partition;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
 
 /**
- * Signal indicating that a partition in a summary table needs refreshing.
+ * A flag indicating that a partition in a summary table needs refreshing.
  */
 #[ORM\Entity()]
-#[ORM\Table(name: 'rekalogika_summary_signal')]
+#[ORM\Table(name: 'rekalogika_summary_dirty')]
 #[ORM\Index(fields: ['class', 'level', 'key'])]
-class SummarySignal
+class DirtyFlag
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::GUID, nullable: false)]

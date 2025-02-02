@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\EventListener;
 
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
-use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
+use Rekalogika\Analytics\SummaryManager\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
-final readonly class NewSignalListener
+final readonly class NewDirtyFlagListener
 {
     /**
      * @param PartitionManagerRegistry $partitionManagerRegistry
@@ -28,15 +28,15 @@ final readonly class NewSignalListener
         private RefreshScheduler $refreshScheduler,
     ) {}
 
-    public function onNewSignal(NewSignalEvent $event): void
+    public function onNewDirtyFlag(NewDirtyFlagEvent $event): void
     {
-        $signal = $event->getSignal();
-        $class = $signal->getClass();
+        $dirtyFlag = $event->getDirtyFlag();
+        $class = $dirtyFlag->getClass();
 
         $partitionManager = $this->partitionManagerRegistry
             ->createPartitionManager($class);
 
-        $partition = $partitionManager->convertSignalToPartition($signal);
+        $partition = $partitionManager->getPartitionFromDirtyFlag($dirtyFlag);
 
         $this->refreshScheduler->scheduleWorker($class, $partition);
     }

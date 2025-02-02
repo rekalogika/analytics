@@ -21,17 +21,17 @@ use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
-use Rekalogika\Analytics\EventListener\NewSignalListener;
+use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\DirtyFlagGenerator;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshRunner;
-use Rekalogika\Analytics\SummaryManager\SignalGenerator;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -77,13 +77,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
-            '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
+            '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ]);
 
     $services
-        ->set('rekalogika.analytics.signal_generator')
-        ->class(SignalGenerator::class)
+        ->set('rekalogika.analytics.dirty_flag_generator')
+        ->class(DirtyFlagGenerator::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
@@ -115,7 +115,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.doctrine.source_entity_listener')
         ->class(SourceEntityListener::class)
         ->args([
-            '$signalGenerator' => service('rekalogika.analytics.signal_generator'),
+            '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
         ->tag('doctrine.event_listener', [
@@ -175,14 +175,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set('rekalogika.analytics.new_signal_listener')
-        ->class(NewSignalListener::class)
+        ->set('rekalogika.analytics.new_dirty_flag_listener')
+        ->class(NewDirtyFlagListener::class)
         ->args([
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
             '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
         ])
         ->tag('kernel.event_listener', [
-            'method' => 'onNewSignal',
+            'method' => 'onNewDirtyFlag',
         ])
     ;
 
