@@ -112,8 +112,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 $lowestLevel,
             ));
 
-        $this->groupBy->addItem(new Field('p_key'));
-        $this->groupBy->addItem(new Field('p_level'));
+        $this->groupBy->add(new Field('p_key'));
+        $this->groupBy->add(new Field('p_level'));
     }
 
     private function processDimensions(): void
@@ -141,10 +141,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 foreach ($hierarchyMetadata->getProperties() as $property) {
                     $name = $property->getName();
                     $alias = $propertyToAlias[$name] ??= \sprintf('d%d_', $i++);
-                    $fieldSet->addField(new Field($alias));
+                    $fieldSet->add(new Field($alias));
                 }
 
-                $groupingSet->addItem($fieldSet);
+                $groupingSet->add($fieldSet);
 
                 // add rollup group by for each of the dimension paths
 
@@ -157,20 +157,20 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                         foreach ($levelMetadata as $propertyMetadata) {
                             $name = $propertyMetadata->getName();
                             $alias = $propertyToAlias[$name] ??= \sprintf('d%d_', $i++);
-                            $fieldSet->addField(new Field($alias));
+                            $fieldSet->add(new Field($alias));
                         }
 
                         if (\count($fieldSet) === 1) {
-                            $rollUp->addField($fieldSet->toArray()[0]);
+                            $rollUp->add($fieldSet->toArray()[0]);
                         } else {
-                            $rollUp->addField($fieldSet);
+                            $rollUp->add($fieldSet);
                         }
                     }
 
-                    $groupingSet->addItem($rollUp);
+                    $groupingSet->add($rollUp);
                 }
 
-                $this->groupBy->addItem($groupingSet);
+                $this->groupBy->add($groupingSet);
 
                 // add select for each of the properties
 
@@ -210,8 +210,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     ->addSelect(\sprintf('%s AS %s', $propertySqlField, $alias));
 
                 $cube = new Cube();
-                $cube->addField(new Field($alias));
-                $this->groupBy->addItem($cube);
+                $cube->add(new Field($alias));
+                $this->groupBy->add($cube);
 
                 $this->groupings[] = $propertySqlField;
             }

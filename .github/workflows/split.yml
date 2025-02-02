@@ -21,7 +21,6 @@ jobs:
                 name:
                     - analytics-bundle
                     - analytics-core
-                    - doctrine-advanced-group-by
     
         steps:
             -   uses: actions/checkout@v4

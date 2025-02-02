@@ -12,9 +12,9 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "doctrine/orm": "^2.20",
+        "doctrine/orm": "^2.20 || ^3.2",
         "psr/clock": "^1.0",
-        "rekalogika/doctrine-advanced-group-by": "dev-main",
+        "rekalogika/doctrine-advanced-group-by": "^2.0",
         "symfony/property-access": "^6.4 || ^7.0"
     },
     "autoload": {
