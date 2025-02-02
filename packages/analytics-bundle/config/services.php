@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
