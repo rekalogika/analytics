@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Metadata\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -137,12 +137,12 @@ final readonly class PartitionManager
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
 
-    public function convertSignalToPartition(SummarySignal $signal): ?Partition
+    public function getPartitionFromDirtyFlag(DirtyFlag $dirtyFlag): ?Partition
     {
         $partitionClass = $this->partitionMetadata->getPartitionClass();
 
-        $key = $signal->getKey();
-        $level = $signal->getLevel();
+        $key = $dirtyFlag->getKey();
+        $level = $dirtyFlag->getLevel();
 
         if ($key === null || $level === null) {
             return null;

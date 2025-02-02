@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\RefreshWorker;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
-use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
+use Rekalogika\Analytics\SummaryManager\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 
 final readonly class DefaultRefreshRunner implements RefreshRunner
@@ -34,11 +34,11 @@ final readonly class DefaultRefreshRunner implements RefreshRunner
         if ($partition !== null) {
             $summaryRefresher->refreshPartition($partition);
         } else {
-            $signals = $summaryRefresher
-                ->convertNewRecordsToDirtyPartitionSignals();
+            $dirtyFlags = $summaryRefresher
+                ->convertNewRecordsToDirtyFlags();
 
-            foreach ($signals as $signal) {
-                $event = new NewSignalEvent($signal);
+            foreach ($dirtyFlags as $dirtyFlag) {
+                $event = new NewDirtyFlagEvent($dirtyFlag);
                 $this->eventDispatcher?->dispatch($event);
             }
         }

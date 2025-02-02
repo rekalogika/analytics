@@ -23,6 +23,6 @@ doctrine:
                 REKALOGIKA_GROUPING_CONCAT: Rekalogika\Analytics\Doctrine\Function\GroupingConcatFunction
                 REKALOGIKA_NULL: Rekalogika\Analytics\Doctrine\Function\NullFunction
                 REKALOGIKA_CAST: Rekalogika\Analytics\Doctrine\Function\CastFunction
-                REKALOGIKA_TRUNCATE_UUID_TO_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction
             numeric_functions:
                 REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER: Rekalogika\Analytics\Doctrine\Function\DateTimeToIntegerFunction
+                REKALOGIKA_TRUNCATE_UUID_TO_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction

@@ -17,26 +17,26 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
-use Rekalogika\Analytics\SummaryManager\Event\NewSignalEvent;
-use Rekalogika\Analytics\SummaryManager\SignalGenerator;
+use Rekalogika\Analytics\Model\Entity\DirtyFlag;
+use Rekalogika\Analytics\SummaryManager\DirtyFlagGenerator;
+use Rekalogika\Analytics\SummaryManager\Event\NewDirtyFlagEvent;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SourceEntityListener implements ResetInterface
 {
     /**
-     * @var array<string,SummarySignal>
+     * @var array<string,DirtyFlag>
      */
-    private array $signals = [];
+    private array $dirtyFlags = [];
 
     public function __construct(
-        private readonly SignalGenerator $signalGenerator,
+        private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
     public function reset()
     {
-        $this->signals = [];
+        $this->dirtyFlags = [];
     }
 
     public function onFlush(OnFlushEventArgs $event): void
@@ -52,11 +52,11 @@ final class SourceEntityListener implements ResetInterface
         // process deletions
 
         foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
-            $newSignals = $this->signalGenerator
+            $newDirtyFlags = $this->dirtyFlagGenerator
                 ->generateForEntityDeletion(entity: $entity);
 
-            foreach ($newSignals as $signal) {
-                $this->signals[$signal->getSignature()] = $signal;
+            foreach ($newDirtyFlags as $dirtyFlag) {
+                $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
             }
         }
 
@@ -65,25 +65,25 @@ final class SourceEntityListener implements ResetInterface
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
             $changedProperties = array_keys($unitOfWork->getEntityChangeSet($entity));
 
-            $newSignals = $this->signalGenerator
+            $newDirtyFlags = $this->dirtyFlagGenerator
                 ->generateForEntityModification(
                     entity: $entity,
                     modifiedProperties: $changedProperties,
                 );
 
-            foreach ($newSignals as $signal) {
-                $this->signals[$signal->getSignature()] = $signal;
+            foreach ($newDirtyFlags as $dirtyFlag) {
+                $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
             }
         }
 
         // process inserts
 
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            $newSignals = $this->signalGenerator
+            $newDirtyFlags = $this->dirtyFlagGenerator
                 ->generateForEntityCreation(entity: $entity);
 
-            foreach ($newSignals as $signal) {
-                $this->signals[$signal->getSignature()] = $signal;
+            foreach ($newDirtyFlags as $dirtyFlag) {
+                $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
             }
         }
 
@@ -101,14 +101,14 @@ final class SourceEntityListener implements ResetInterface
             }
 
             foreach ($collection as $entity) {
-                $newSignals = $this->signalGenerator
+                $newDirtyFlags = $this->dirtyFlagGenerator
                     ->generateForEntityModification(
                         entity: $entity,
                         modifiedProperties: [$backRefFieldName],
                     );
 
-                foreach ($newSignals as $signal) {
-                    $this->signals[$signal->getSignature()] = $signal;
+                foreach ($newDirtyFlags as $dirtyFlag) {
+                    $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
                 }
             }
         }
@@ -122,25 +122,25 @@ final class SourceEntityListener implements ResetInterface
 
         // persist and compute changesets
 
-        $classMetadata = $entityManager->getClassMetadata(SummarySignal::class);
+        $classMetadata = $entityManager->getClassMetadata(DirtyFlag::class);
 
-        foreach ($this->signals as $signal) {
-            $entityManager->persist($signal);
-            $unitOfWork->computeChangeSet($classMetadata, $signal);
+        foreach ($this->dirtyFlags as $dirtyFlag) {
+            $entityManager->persist($dirtyFlag);
+            $unitOfWork->computeChangeSet($classMetadata, $dirtyFlag);
         }
     }
 
     /**
-     * Dispatch signals in postFlush because the flush might fail and we don't
-     * want to dispatch the event if the flush fails.
+     * Dispatch dirty flags in postFlush because the flush might fail and we
+     * don't want to dispatch the event if the flush fails.
      */
     public function postFlush(PostFlushEventArgs $doctrineEvent): void
     {
-        foreach ($this->signals as $signal) {
-            $event = new NewSignalEvent($signal);
+        foreach ($this->dirtyFlags as $dirtyFlag) {
+            $event = new NewDirtyFlagEvent($dirtyFlag);
             $this->eventDispatcher?->dispatch($event);
         }
 
-        $this->signals = [];
+        $this->dirtyFlags = [];
     }
 }

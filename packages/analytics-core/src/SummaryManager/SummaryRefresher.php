@@ -17,7 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Model\Entity\SummarySignal;
+use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
@@ -41,7 +41,7 @@ final class SummaryRefresher
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly PartitionManager $partitionManager,
-        private readonly SignalGenerator $signalGenerator,
+        private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->sqlFactory = new SqlFactory(
@@ -171,10 +171,10 @@ final class SummaryRefresher
             );
         }
 
-        // remove new entity signals
+        // remove new entity flags
 
         $this->getConnection()->beginTransaction();
-        $this->removeNewSignals();
+        $this->removeNewFlags();
         $maxOfSource = $this->getMaxIdOfSource();
 
         if ($end === null || $end >= $maxOfSource) {
@@ -199,7 +199,7 @@ final class SummaryRefresher
     // {
     //     $this->getConnection()->beginTransaction();
 
-    //     $this->removeNewSignals();
+    //     $this->removeNewFlags();
     //     $maxOfSource = $this->getMaxIdOfSource();
 
     //     $maxOfSummary = $this->getSummaryPropertiesManager()
@@ -229,12 +229,12 @@ final class SummaryRefresher
     //             $upperLevel !== null
     //             && $upperLevel->getUpperBound() === $partition->getUpperBound()
     //         ) {
-    //             $signal = $this->signalGenerator->createDirtyPartitionSignal(
+    //             $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
     //                 class: $this->metadata->getSummaryClass(),
     //                 partition: $upperLevel,
     //             );
 
-    //             $this->entityManager->persist($signal);
+    //             $this->entityManager->persist($dirtyFlag);
     //         }
     //     }
 
@@ -328,7 +328,7 @@ final class SummaryRefresher
 
         $this->getConnection()->beginTransaction();
         $this->deleteSummaryRange($range);
-        $this->removeDirtyPartitionSignals($range);
+        $this->removeDirtyFlags($range);
 
         if (PartitionUtil::isLowestLevel($range)) {
             $this->rollUpSourceToSummary($range);
@@ -350,12 +350,12 @@ final class SummaryRefresher
                     continue;
                 }
 
-                $signal = $this->signalGenerator->createDirtyPartitionSignal(
+                $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
                     class: $this->metadata->getSummaryClass(),
                     partition: $upperPartition,
                 );
 
-                $this->entityManager->persist($signal);
+                $this->entityManager->persist($dirtyFlag);
             }
         }
 
@@ -447,10 +447,10 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
-    private function removeDirtyPartitionSignals(PartitionRange $range): void
+    private function removeDirtyFlags(PartitionRange $range): void
     {
         $this->entityManager->createQueryBuilder()
-            ->delete(SummarySignal::class, 's')
+            ->delete(DirtyFlag::class, 's')
             ->where('s.class = :class')
             ->andWhere('s.level = :level')
             ->andWhere('s.key >= :start')
@@ -463,10 +463,10 @@ final class SummaryRefresher
             ->execute();
     }
 
-    private function removeNewSignals(): void
+    private function removeNewFlags(): void
     {
         $this->entityManager->createQueryBuilder()
-            ->delete(SummarySignal::class, 's')
+            ->delete(DirtyFlag::class, 's')
             ->where('s.class = :class')
             ->andWhere('s.level IS NULL')
             ->andWhere('s.key IS NULL')
@@ -555,15 +555,10 @@ final class SummaryRefresher
             ->getMax($this->metadata->getSummaryClass());
     }
 
-    //
-    // converts empty 'new record' signals to 'dirty partition' signals
-    // @todo refactor: relocate to NewEntitySignalConverter?
-    //
-
     /**
-     * @return iterable<SummarySignal>
+     * @return iterable<DirtyFlag>
      */
-    public function convertNewRecordsToDirtyPartitionSignals(): iterable
+    public function convertNewRecordsToDirtyFlags(): iterable
     {
         $this->getConnection()->beginTransaction();
 
@@ -574,15 +569,15 @@ final class SummaryRefresher
             return;
         }
 
-        $this->removeNewSignals();
+        $this->removeNewFlags();
 
         foreach ($range as $partition) {
-            yield $signal = $this->signalGenerator->createDirtyPartitionSignal(
+            yield $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
                 class: $this->metadata->getSummaryClass(),
                 partition: $partition,
             );
 
-            $this->entityManager->persist($signal);
+            $this->entityManager->persist($dirtyFlag);
         }
 
         $this->entityManager->flush();
