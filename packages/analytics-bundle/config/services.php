@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
@@ -134,9 +133,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.event_subscriber.refresh_logger')
         ->class(RefreshLoggerEventSubscriber::class)
         ->args([
-            '$logger' => service(LoggerInterface::class),
+            '$logger' => service('logger')->ignoreOnInvalid(),
         ])
         ->tag('kernel.event_subscriber')
+        ->tag('monolog.logger', [
+            'channel' => 'rekalogika.analytics',
+        ])
     ;
 
     $services
@@ -215,7 +217,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$lockFactory' => service('lock.factory'),
             '$cache' => service('cache.app'),
             '$messageBus' => service(MessageBusInterface::class),
-            '$logger' => service(LoggerInterface::class),
+            '$logger' => service('logger')->ignoreOnInvalid(),
+        ])
+        ->tag('monolog.logger', [
+            'channel' => 'rekalogika.analytics',
         ])
     ;
 
@@ -224,8 +229,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(RefreshMessageHandler::class)
         ->args([
             '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
-            '$logger' => service(LoggerInterface::class),
+            '$logger' => service('logger')->ignoreOnInvalid(),
         ])
         ->tag('messenger.message_handler')
+        ->tag('monolog.logger', [
+            'channel' => 'rekalogika.analytics',
+        ])
     ;
 };

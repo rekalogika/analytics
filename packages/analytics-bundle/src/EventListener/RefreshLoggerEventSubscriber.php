@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LoggerInterface $logger,
+        private ?LoggerInterface $logger = null,
     ) {}
 
     #[\Override]
@@ -49,7 +49,7 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
 
     public function onRefreshStartEvent(RefreshStartEvent $event): void
     {
-        $this->logger->debug('Refresh start', [
+        $this->logger?->debug('Refresh start', [
             'class' => $event->getClass(),
             'startValue' => Printer::print($event->getInputStartValue()),
             'endValue' => Printer::print($event->getInputEndValue()),
@@ -59,7 +59,7 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
 
     public function onRefreshEndEvent(RefreshEndEvent $event): void
     {
-        $this->logger->debug('Refresh end', [
+        $this->logger?->debug('Refresh end', [
             'class' => $event->getClass(),
             'startValue' => Printer::print($event->getInputStartValue()),
             'endValue' => Printer::print($event->getInputEndValue()),
@@ -71,7 +71,7 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
 
     public function onStartEvent(AbstractStartEvent $event): void
     {
-        $this->logger->debug((string) $event, [
+        $this->logger?->debug((string) $event, [
             'class' => $event->getClass(),
             'start' => Printer::print($event->getStart()),
             'range' => Printer::print($event->getRange()),
@@ -80,7 +80,7 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
 
     public function onEndEvent(AbstractEndEvent $event): void
     {
-        $this->logger->debug((string) $event, [
+        $this->logger?->debug((string) $event, [
             'class' => $event->getClass(),
             'start' => Printer::print($event->getStart()),
             'range' => Printer::print($event->getRange()),

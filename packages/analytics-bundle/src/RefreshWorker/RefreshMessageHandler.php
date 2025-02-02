@@ -24,7 +24,7 @@ final readonly class RefreshMessageHandler
      */
     public function __construct(
         private RefreshScheduler $refreshScheduler,
-        private LoggerInterface $logger,
+        private ?LoggerInterface $logger = null,
     ) {}
 
     /**
@@ -32,7 +32,7 @@ final readonly class RefreshMessageHandler
      */
     public function __invoke(RefreshCommand $command): void
     {
-        $this->logger->info('Running refresh worker', $command->getLoggingArray());
+        $this->logger?->info('Running refresh worker', $command->getLoggingArray());
 
         $this->refreshScheduler->runWorker($command);
     }
