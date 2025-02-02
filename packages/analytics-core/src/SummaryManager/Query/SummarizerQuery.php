@@ -514,11 +514,11 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($this->rollUpFields as $field) {
             // $this->queryBuilder->addGroupBy($field);
-            $rollUp->addField(new Field($field));
+            $rollUp->add(new Field($field));
         }
 
         $groupBy = new GroupBy();
-        $groupBy->addItem($rollUp);
+        $groupBy->add($rollUp);
 
         // create query & apply group by
 
