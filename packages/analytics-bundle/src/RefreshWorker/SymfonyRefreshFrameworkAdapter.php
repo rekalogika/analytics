@@ -37,7 +37,7 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         private LockFactory $lockFactory,
         CacheItemPoolInterface $cache,
         private MessageBusInterface $messageBus,
-        private LoggerInterface $logger,
+        private ?LoggerInterface $logger = null,
     ) {
         $this->cache = new Psr16Cache($cache);
     }
@@ -116,7 +116,7 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
 
     public function scheduleWorker(RefreshCommand $command, int $delay): void
     {
-        $this->logger->info('Scheduling refresh worker', $command->getLoggingArray());
+        $this->logger?->info('Scheduling refresh worker', $command->getLoggingArray());
 
         $envelope = new Envelope($command, [
             new DelayStamp($delay * 1000),
