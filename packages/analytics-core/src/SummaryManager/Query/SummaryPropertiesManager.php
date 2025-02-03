@@ -72,11 +72,9 @@ final readonly class SummaryPropertiesManager
             $lastIdColumn,
         );
 
-        $connection
-            ->prepare($sql)
-            ->executeStatement([
-                'summaryClass' => $summaryClass,
-                'lastId' => $max,
-            ]);
+        $statement = $connection->prepare($sql);
+        $statement->bindValue('summaryClass', $summaryClass);
+        $statement->bindValue('lastId', $max);
+        $statement->executeStatement();
     }
 }

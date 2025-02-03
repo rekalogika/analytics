@@ -93,10 +93,11 @@ final class SourceEntityListener implements ResetInterface
             // iterate of the collection, find the backRef to the owner. use the
             // relation as the 'changedProperties' argument
 
+            // @todo doctrine internal
             $mapping = $collection->getMapping();
             $backRefFieldName = $mapping['mappedBy'];
 
-            if ($backRefFieldName === null) {
+            if (!\is_string($backRefFieldName)) {
                 continue;
             }
 
