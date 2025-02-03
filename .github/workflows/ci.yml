@@ -73,11 +73,11 @@ jobs:
 
     - name: Run psalm
       run: vendor/bin/psalm
-      if: matrix.dep == 'highest' && matrix.symfony == '7.*'
+      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
     - name: Run phpstan
       run: vendor/bin/phpstan analyse
-      if: matrix.dep == 'highest' && matrix.symfony == '7.*'
+      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
     - name: Validate monorepo
       run: git reset --hard ; vendor/bin/monorepo-builder validate
