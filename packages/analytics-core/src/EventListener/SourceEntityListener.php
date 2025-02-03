@@ -97,7 +97,7 @@ final class SourceEntityListener implements ResetInterface
             $mapping = $collection->getMapping();
             $backRefFieldName = $mapping['mappedBy'];
 
-            if (!is_string($backRefFieldName)) {
+            if (!\is_string($backRefFieldName)) {
                 continue;
             }
 

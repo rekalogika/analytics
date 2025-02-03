@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Doctrine;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,7 +33,7 @@ final readonly class ClassMetadataWrapper
      */
     public static function get(
         EntityManagerInterface|ManagerRegistry $manager,
-        string $class
+        string $class,
     ): self {
         if ($manager instanceof ManagerRegistry) {
             $manager = $manager->getManagerForClass($class);
@@ -86,7 +85,7 @@ final readonly class ClassMetadataWrapper
     {
         $class = $this->classMetadata->embeddedClasses[$property]['class'] ?? null;
 
-        if (!is_string($class) || !class_exists($class)) {
+        if (!\is_string($class) || !class_exists($class)) {
             throw new \InvalidArgumentException(\sprintf('Embedded class for property "%s" not found', $property));
         }
 

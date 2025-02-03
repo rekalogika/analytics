@@ -426,7 +426,7 @@ final class SummarizerQuery extends AbstractQuery
 
         $classMetadata = ClassMetadataWrapper::get(
             manager: $this->entityManager,
-            class: $this->metadata->getSummaryClass()
+            class: $this->metadata->getSummaryClass(),
         );
 
         try {
@@ -443,7 +443,7 @@ final class SummarizerQuery extends AbstractQuery
 
             $joinedClassMetadata = ClassMetadataWrapper::get(
                 manager: $this->entityManager,
-                class: $joinedEntityClass
+                class: $joinedEntityClass,
             );
 
             $identity = $joinedClassMetadata->getIdentifierFieldName();
