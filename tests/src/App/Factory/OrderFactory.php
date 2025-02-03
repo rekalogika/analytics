@@ -45,7 +45,7 @@ final class OrderFactory extends PersistentProxyObjectFactory
         return [
             'customer' => CustomerFactory::random(),
             'item' => ItemFactory::random(),
-            'time' => self::faker()->dateTimeBetween('2023-01-01', '2024-12-31'),
+            'time' => \DateTimeImmutable::createFromInterface(self::faker()->dateTimeBetween('2023-01-01', '2024-12-31')),
         ];
     }
 
