@@ -26,11 +26,6 @@
                 <directory name="packages/analytics-core/src/Model/Hierarchy" />
             </errorLevel>
         </MissingConstructor>
-        <TooManyArguments>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/SummaryManager/Query/SummarizerQuery.php" />
-            </errorLevel>
-        </TooManyArguments>
     </issueHandlers>
 
     <plugins>

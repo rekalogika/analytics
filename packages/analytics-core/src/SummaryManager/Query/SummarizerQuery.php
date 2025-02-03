@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\SummaryResult;
@@ -423,13 +424,15 @@ final class SummarizerQuery extends AbstractQuery
     {
         $dimensionMetadata = $this->metadata->getDimensionMetadata($dimension);
 
-        $classMetadata = $this->entityManager
-            ->getClassMetadata($this->metadata->getSummaryClass());
+        $classMetadata = ClassMetadataWrapper::get(
+            manager: $this->entityManager,
+            class: $this->metadata->getSummaryClass()
+        );
 
         try {
             $joinedEntityClass = $classMetadata
-                ->getAssociationMapping($dimensionMetadata->getSummaryProperty())['targetEntity'];
-        } catch (MappingException) {
+                ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
+        } catch (MappingException|\InvalidArgumentException) {
             $joinedEntityClass = null;
         }
 
@@ -438,10 +441,12 @@ final class SummarizerQuery extends AbstractQuery
         if ($joinedEntityClass !== null) {
             $alias = 'e_' . hash('xxh128', $dimension);
 
-            $joinedClassMetadata = $this->entityManager
-                ->getClassMetadata($joinedEntityClass);
+            $joinedClassMetadata = ClassMetadataWrapper::get(
+                manager: $this->entityManager,
+                class: $joinedEntityClass
+            );
 
-            $identity = $joinedClassMetadata->getSingleIdentifierFieldName();
+            $identity = $joinedClassMetadata->getIdentifierFieldName();
 
             $this->queryBuilder
                 ->leftJoin(

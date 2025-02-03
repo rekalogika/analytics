@@ -16,7 +16,7 @@
         "doctrine/orm": "^2.20 || ^3.2",
         "psr/clock": "^1.0",
         "psr/simple-cache": "^3.0",
-        "rekalogika/doctrine-advanced-group-by": "^2.0",
+        "rekalogika/doctrine-advanced-group-by": "^2.0 || ^3.0",
         "symfony/asset": "^6.4 || ^7.0",
         "symfony/asset-mapper": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
