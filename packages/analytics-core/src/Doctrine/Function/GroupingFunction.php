@@ -21,7 +21,7 @@ use Doctrine\ORM\Query\TokenType;
 
 /**
  * REKALOGIKA_GROUPING
- * 
+ *
  * @deprecated
  */
 class GroupingFunction extends FunctionNode
