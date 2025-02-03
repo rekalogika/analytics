@@ -18,6 +18,9 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 use Symfony\Component\Uid\UuidV7;
 
+/**
+ * @deprecated
+ */
 final readonly class UuidDateTimeValueResolver implements PartitionValueResolver
 {
     public function __construct(
