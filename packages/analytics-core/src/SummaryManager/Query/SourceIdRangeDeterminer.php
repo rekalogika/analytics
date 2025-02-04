@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\ValueRangeResolver;
@@ -33,9 +34,15 @@ final class SourceIdRangeDeterminer extends AbstractQuery
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
     ) {
+        $summaryClass = $summaryMetadata->getSummaryClass();
+
         $queryBuilder = $this->entityManager
             ->createQueryBuilder()
             ->from($class, 'e');
+
+        if (is_a($summaryClass, HasQueryBuilderModifier::class, true)) {
+            $summaryClass::modifyQueryBuilder($queryBuilder);
+        }
 
         parent::__construct($queryBuilder);
 
