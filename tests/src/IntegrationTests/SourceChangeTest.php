@@ -45,7 +45,7 @@ class SourceChangeTest extends KernelTestCase
         $connection = static::getContainer()
             ->get(Connection::class);
 
-        $sql = "SELECT setval(pg_get_serial_sequence('order', 'id'), coalesce(max(id), 1), false) FROM \"order\"";
+        $sql = "SELECT setval(pg_get_serial_sequence('order', 'id'), 201) FROM \"order\"";
 
         $connection->executeStatement($sql);
     }
@@ -287,5 +287,77 @@ class SourceChangeTest extends KernelTestCase
         // we check the result
 
         $this->assertEquals(1, $this->getOrderCountIn2030());
+    }
+
+    public function testSourceDeletion(): void
+    {
+        $clock = self::mockTime();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        // get the current result
+
+        $this->assertEquals(200, $this->getOrderCount());
+
+        // get one order and remove it
+
+        $order = $entityManager
+            ->getRepository(Order::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Order not found');
+
+        $entityManager->remove($order);
+
+        // flush
+
+        $entityManager->flush();
+        $entityManager->clear();
+
+        // check dirty flag
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findAll();
+
+        $this->assertCount(1, $dirtyFlags);
+        $dirtyFlag = $dirtyFlags[0];
+        $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
+        $this->assertNotNull($dirtyFlag->getKey());
+        $this->assertNotNull($dirtyFlag->getLevel());
+
+        // check if NewDirtyFlagEvent is emitted
+
+        $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
+        $this->assertCount(1, $listener->getEvents());
+
+        // check messenger now, it should have one pending message
+
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
+
+        // check messenger in 59 seconds, should not consume the message
+
+        $clock->sleep(59);
+        $transport->process();
+        $transport->queue()->assertCount(1);
+
+        // in the exact 60th second it should process the message, and generates
+        // the corresponding secondary refresh command
+
+        $clock->sleep(1);
+
+        // i'm lazy so we just blindly process the messages here until it does
+        // not emit more messages.
+
+        while ($transport->queue()->messages()) {
+            $clock->sleep(60);
+            $transport->process();
+        }
+
+        // we check the result
+
+        $this->assertEquals(199, $this->getOrderCount());
     }
 }
