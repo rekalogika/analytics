@@ -116,7 +116,7 @@ class SourceChangeTest extends KernelTestCase
 
         // get the current result
 
-        $this->assertEquals(200, $this->getOrderCount());
+        $this->assertEquals(190, $this->getOrderCount());
 
         // create new order
 
@@ -198,7 +198,7 @@ class SourceChangeTest extends KernelTestCase
 
         // the count should be updated now
 
-        $this->assertEquals(201, $this->getOrderCount());
+        $this->assertEquals(191, $this->getOrderCount());
 
 
         // the second message will be processed after 240 seconds (300 - 60)
@@ -232,7 +232,7 @@ class SourceChangeTest extends KernelTestCase
 
         $order = $entityManager
             ->getRepository(Order::class)
-            ->findOneBy([])
+            ->find(50)
             ?? throw new \RuntimeException('Order not found');
 
         $order->setTime(new \DateTimeImmutable('2030-02-01 00:00:00'));
@@ -298,13 +298,13 @@ class SourceChangeTest extends KernelTestCase
 
         // get the current result
 
-        $this->assertEquals(200, $this->getOrderCount());
+        $this->assertEquals(190, $this->getOrderCount());
 
         // get one order and remove it
 
         $order = $entityManager
             ->getRepository(Order::class)
-            ->findOneBy([])
+            ->find(50)
             ?? throw new \RuntimeException('Order not found');
 
         $entityManager->remove($order);
@@ -358,6 +358,6 @@ class SourceChangeTest extends KernelTestCase
 
         // we check the result
 
-        $this->assertEquals(199, $this->getOrderCount());
+        $this->assertEquals(189, $this->getOrderCount());
     }
 }

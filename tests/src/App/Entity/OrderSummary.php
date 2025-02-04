@@ -16,9 +16,11 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 use Brick\Money\Money;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\AggregateFunction\Sum;
 use Rekalogika\Analytics\Attribute as Analytics;
+use Rekalogika\Analytics\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\Partition;
@@ -32,7 +34,7 @@ use Symfony\Component\Translation\TranslatableMessage;
     sourceClass: Order::class,
     label: new TranslatableMessage('Orders'),
 )]
-class OrderSummary extends Summary
+class OrderSummary extends Summary implements HasQueryBuilderModifier
 {
     //
     // partition
@@ -148,6 +150,13 @@ class OrderSummary extends Summary
         label: new TranslatableMessage('Count'),
     )]
     private ?int $count = null;
+
+    public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
+    {
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+
+        $queryBuilder->andWhere(\sprintf('%s.id > 10', $rootAlias));
+    }
 
     //
     // getters
