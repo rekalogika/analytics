@@ -115,7 +115,7 @@ class OrderSummary extends Summary
     )]
     private ?Gender $customerGender = null;
 
-    #[ORM\ManyToOne(inversedBy: 'items')]
+    #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
         source: new EntityValueResolver('item.category'),
