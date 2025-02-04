@@ -32,15 +32,14 @@ final readonly class DefaultRefreshRunner implements RefreshRunner
             ->createSummaryRefresher($class);
 
         if ($partition !== null) {
-            $summaryRefresher->refreshPartition($partition);
+            $dirtyFlags = $summaryRefresher->refreshPartition($partition);
         } else {
-            $dirtyFlags = $summaryRefresher
-                ->convertNewRecordsToDirtyFlags();
+            $dirtyFlags = $summaryRefresher->convertNewRecordsToDirtyFlags();
+        }
 
-            foreach ($dirtyFlags as $dirtyFlag) {
-                $event = new NewDirtyFlagEvent($dirtyFlag);
-                $this->eventDispatcher?->dispatch($event);
-            }
+        foreach ($dirtyFlags as $dirtyFlag) {
+            $event = new NewDirtyFlagEvent($dirtyFlag);
+            $this->eventDispatcher?->dispatch($event);
         }
     }
 }

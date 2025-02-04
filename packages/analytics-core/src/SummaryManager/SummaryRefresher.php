@@ -188,11 +188,15 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
-    public function refreshPartition(Partition $partition): void
+
+    /**
+     * @return iterable<DirtyFlag>
+     */
+    public function refreshPartition(Partition $partition): iterable
     {
         $range = new PartitionRange($partition, $partition);
 
-        $this->refreshRange($range);
+        return $this->refreshRange($range);
     }
 
     // public function refreshNew(): void
@@ -314,7 +318,10 @@ final class SummaryRefresher
     // roll up methods
     //
 
-    private function refreshRange(PartitionRange $range): void
+    /**
+     * @return iterable<DirtyFlag>
+     */
+    private function refreshRange(PartitionRange $range): iterable
     {
         $startEvent = new RefreshRangeStartEvent(
             class: $this->metadata->getSummaryClass(),
@@ -336,6 +343,8 @@ final class SummaryRefresher
             $this->rollUpSummaryToSummary($range);
         }
 
+        $dirtyFlags = [];
+
         foreach ($range as $partition) {
             $necessaryToMarkUpperAsDirty =
                 $this->isNecessaryToMarkUpperPartitionAsDirty(
@@ -356,12 +365,15 @@ final class SummaryRefresher
                 );
 
                 $this->entityManager->persist($dirtyFlag);
+
+                $dirtyFlags[] = $dirtyFlag;
             }
         }
 
         $this->getConnection()->commit();
-
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
+
+        return $dirtyFlags;
     }
 
     private function isNecessaryToMarkUpperPartitionAsDirty(

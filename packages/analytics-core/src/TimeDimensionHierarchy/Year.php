@@ -32,8 +32,8 @@ final class Year implements Interval
         $y = (int) substr($string, 0, 4);
 
         $start = \DateTimeImmutable::createFromFormat(
-            'Y',
-            \sprintf('%04d', $y),
+            'Y-m-d H:i:s',
+            \sprintf('%04d-01-01 00:00:00', $y),
             $timeZone,
         );
         Assert::isInstanceOf($start, \DateTimeImmutable::class);
