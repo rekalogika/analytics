@@ -161,17 +161,21 @@ final class SummaryQuery
         return $this->dimensions;
     }
 
-    public function groupBy(string ...$dimensions): void
+    public function groupBy(string ...$dimensions): self
     {
         $dimensions = array_values(array_unique($dimensions));
         $this->ensureItemsValid($dimensions, 'dimension');
 
         $this->dimensions = $dimensions;
+
+        return $this;
     }
 
-    public function addGroupBy(string ...$dimensions): void
+    public function addGroupBy(string ...$dimensions): self
     {
         $this->groupBy(...array_merge($this->dimensions, $dimensions));
+
+        return $this;
     }
 
     //
@@ -186,17 +190,21 @@ final class SummaryQuery
         return $this->measures;
     }
 
-    public function select(string ...$measures): void
+    public function select(string ...$measures): self
     {
         $measures = array_values(array_unique($measures));
         $this->ensureItemsValid($measures, 'measure');
 
         $this->measures = $measures;
+
+        return $this;
     }
 
-    public function addSelect(string ...$measures): void
+    public function addSelect(string ...$measures): self
     {
         $this->select(...array_merge($this->measures, $measures));
+
+        return $this;
     }
 
     //

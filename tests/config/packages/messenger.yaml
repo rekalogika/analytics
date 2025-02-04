@@ -29,6 +29,4 @@ when@test:
     framework:
         messenger:
             transports:
-                # replace with your transport name here (e.g., my_transport: 'in-memory://')
-                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
-                async: 'test://'
+                async: test://?support_delay_stamp=true

@@ -22,7 +22,8 @@ use Rekalogika\Analytics\Tests\App\Repository\OrderRepository;
 class Order
 {
     /**
-     * Using 'IDENTITY' to make sure it is working with database id generation
+     * Using 'IDENTITY' to make sure it is working with database id generation.
+     * It means the entity will not have an ID before flush()
      */
     #[ORM\Id]
     #[ORM\GeneratedValue('IDENTITY')]
@@ -37,7 +38,7 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?Customer $customer = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeInterface $time = null;
 
     public function getId(): ?int

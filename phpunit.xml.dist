@@ -32,6 +32,12 @@
     <server
         name="DATABASE_URL"
         value="postgresql://app:app@localhost:5432/app?serverVersion=17&amp;charset=utf8" />
+    <!-- <server
+        name="LOCK_DSN"
+        value="postgresql://app:app@localhost:5432/app?serverVersion=17&amp;charset=utf8" /> -->
+    <server
+        name="LOCK_DSN"
+        value="in-memory" />
   </php>
   
   <testsuites>

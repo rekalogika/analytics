@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\UX\StimulusBundle\StimulusBundle;
 use Symfony\UX\Turbo\TurboBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
+use Zenstruck\Messenger\Test\ZenstruckMessengerTestBundle;
 
 class Kernel extends BaseKernel
 {
@@ -65,6 +66,7 @@ class Kernel extends BaseKernel
         yield new RekalogikaAnalyticsBundle();
         yield new TurboBundle();
         yield new DAMADoctrineTestBundle();
+        yield new ZenstruckMessengerTestBundle();
     }
 
     #[\Override]
