@@ -80,7 +80,13 @@ jobs:
       if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
     - name: Validate monorepo
-      run: git reset --hard ; vendor/bin/monorepo-builder validate
+      run: vendor/bin/monorepo-builder validate
+
+    - name: Lint container
+      run: tests/bin/console lint:container
+
+    - name: Lint Doctrine
+      run: tests/bin/console doctrine:schema:validate --skip-sync
 
     - name: Validate php-cs-fixer
       run: |
