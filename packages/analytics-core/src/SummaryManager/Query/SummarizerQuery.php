@@ -301,6 +301,8 @@ final class SummarizerQuery extends AbstractQuery
         $groupingsProperty = $this->metadata->getGroupingsProperty();
         $groupingsString = '';
 
+        ksort($this->groupings);
+
         foreach ($this->groupings as $isGrouping) {
             $groupingsString .= $isGrouping ? '1' : '0';
         }

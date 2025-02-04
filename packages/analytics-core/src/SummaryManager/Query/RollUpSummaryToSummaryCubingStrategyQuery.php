@@ -35,7 +35,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     private readonly GroupBy $groupBy;
 
     /**
-     * @var list<string>
+     * @var array<string,string>
      */
     private array $groupings = [];
 
@@ -124,6 +124,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 ->hasAssociation($levelProperty);
 
             $hierarchyMetadata = $metadata->getHierarchy();
+            $summaryProperty = $metadata->getSummaryProperty();
 
             if ($hierarchyMetadata !== null) {
                 $dimensionProperty = $metadata->getSummaryProperty();
@@ -181,7 +182,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $this->groupings[] = \sprintf(
+                    $key = \sprintf('%s.%s', $summaryProperty, $name);
+                    $this->groupings[$key] = \sprintf(
                         'e.%s.%s',
                         $dimensionProperty,
                         $name,
@@ -201,7 +203,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[] = \sprintf(
+                $this->groupings[$summaryProperty] = \sprintf(
                     'IDENTITY(e.%s)',
                     $levelProperty,
                 );
@@ -219,7 +221,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[] = \sprintf(
+                $this->groupings[$summaryProperty] = \sprintf(
                     'e.%s',
                     $levelProperty,
                 );
@@ -318,6 +320,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
     private function processGroupings(): void
     {
+        ksort($this->groupings);
+
         $this->queryBuilder->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s)",
             implode(', ', $this->groupings),
