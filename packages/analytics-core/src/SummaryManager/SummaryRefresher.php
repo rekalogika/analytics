@@ -372,7 +372,7 @@ final class SummaryRefresher
 
         $this->getConnection()->commit();
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
-        
+
         return $dirtyFlags;
     }
 
