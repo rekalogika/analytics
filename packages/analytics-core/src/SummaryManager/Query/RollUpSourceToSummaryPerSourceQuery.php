@@ -31,7 +31,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     private readonly GroupBy $groupBy;
 
     /**
-     * @var list<string>
+     * @var array<string,string>
      */
     private array $groupings = [];
 
@@ -121,6 +121,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $i = 0;
 
         foreach ($this->metadata->getDimensionMetadatas() as $metadata) {
+            $summaryProperty = $metadata->getSummaryProperty();
             $hierarchyMetadata = $metadata->getHierarchy();
 
             $valueResolver = $metadata->getSource()[$this->sourceClass]
@@ -199,7 +200,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $this->groupings[] = $function;
+                    $key = \sprintf('%s.%s', $summaryProperty, $name);
+                    $this->groupings[$key] = $function;
                 }
             } else {
                 // if not hierarchical
@@ -213,7 +215,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[] = $propertySqlField;
+                $this->groupings[$summaryProperty] = $propertySqlField;
             }
         }
     }
@@ -278,6 +280,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processGroupings(): void
     {
+        ksort($this->groupings);
+
         $this->queryBuilder->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s)",
             implode(', ', $this->groupings),
