@@ -48,25 +48,25 @@ final readonly class DeleteExistingSummaryQuery
 
         $queryBuilder = $this->entityManager
             ->createQueryBuilder()
-            ->delete($summaryClassName, 'e');
+            ->delete($summaryClassName, 'root');
 
         $queryBuilder
             ->andWhere(\sprintf(
-                'e.%s.%s >= %s',
+                'root.%s.%s >= %s',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $this->quoteVariable($start),
             ))
 
             ->andWhere(\sprintf(
-                'e.%s.%s < %s',
+                'root.%s.%s < %s',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $this->quoteVariable($end),
             ))
 
             ->andWhere(\sprintf(
-                'e.%s.%s = %s',
+                'root.%s.%s = %s',
                 $partitionProperty,
                 $partitionLevelProperty,
                 $this->quoteVariable($level),

@@ -74,7 +74,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     private function initialize(): void
     {
         $this->queryBuilder
-            ->from($this->metadata->getSummaryClass(), 'e')
+            ->from($this->metadata->getSummaryClass(), 'root')
             ->addSelect(\sprintf(
                 "REKALOGIKA_NEXTVAL(%s)",
                 $this->metadata->getSummaryClass(),
@@ -176,7 +176,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
                     $this->queryBuilder
                         ->addSelect(\sprintf(
-                            'e.%s.%s AS %s',
+                            'root.%s.%s AS %s',
                             $dimensionProperty,
                             $name,
                             $alias,
@@ -184,7 +184,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
                     $key = \sprintf('%s.%s', $summaryProperty, $name);
                     $this->groupings[$key] = \sprintf(
-                        'e.%s.%s',
+                        'root.%s.%s',
                         $dimensionProperty,
                         $name,
                     );
@@ -194,7 +194,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
                 $this->queryBuilder
                     ->addSelect(\sprintf(
-                        'IDENTITY(e.%s) AS %s',
+                        'IDENTITY(root.%s) AS %s',
                         $levelProperty,
                         $alias,
                     ));
@@ -204,7 +204,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $this->groupBy->add($cube);
 
                 $this->groupings[$summaryProperty] = \sprintf(
-                    'IDENTITY(e.%s)',
+                    'IDENTITY(root.%s)',
                     $levelProperty,
                 );
             } else {
@@ -212,7 +212,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
                 $this->queryBuilder
                     ->addSelect(\sprintf(
-                        'e.%s AS %s',
+                        'root.%s AS %s',
                         $levelProperty,
                         $alias,
                     ));
@@ -222,7 +222,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $this->groupBy->add($cube);
 
                 $this->groupings[$summaryProperty] = \sprintf(
-                    'e.%s',
+                    'root.%s',
                     $levelProperty,
                 );
             }
@@ -243,7 +243,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
             $function = \sprintf(
                 $function,
-                \sprintf('e.%s', $field),
+                \sprintf('root.%s', $field),
             );
 
             $this->queryBuilder->addSelect($function);
@@ -293,25 +293,25 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
         $this->queryBuilder
             ->andWhere(\sprintf(
-                'e.%s.%s >= %d',
+                'root.%s.%s >= %d',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $lowerBound,
             ))
             ->andWhere(\sprintf(
-                'e.%s.%s < %d',
+                'root.%s.%s < %d',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $upperBound,
             ))
             ->andWhere(\sprintf(
-                'e.%s.%s = %d',
+                'root.%s.%s = %d',
                 $partitionProperty,
                 $partitionLevelProperty,
                 $lowerLevel,
             ))
             ->andWhere(\sprintf(
-                "e.%s = '%s'",
+                "root.%s = '%s'",
                 $groupingsProperty,
                 $groupingString,
             ))

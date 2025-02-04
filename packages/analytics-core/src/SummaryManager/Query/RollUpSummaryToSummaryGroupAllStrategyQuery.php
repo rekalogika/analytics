@@ -58,7 +58,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     private function initialize(): void
     {
         $this->queryBuilder
-            ->from($this->metadata->getSummaryClass(), 'e')
+            ->from($this->metadata->getSummaryClass(), 'root')
             ->addSelect(\sprintf(
                 "REKALOGIKA_NEXTVAL(%s)",
                 $this->metadata->getSummaryClass(),
@@ -120,7 +120,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
                     $this->queryBuilder
                         ->addSelect(\sprintf(
-                            'e.%s.%s AS %s',
+                            'root.%s.%s AS %s',
                             $dimensionProperty,
                             $name,
                             $alias,
@@ -133,7 +133,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
                 $this->queryBuilder
                     ->addSelect(\sprintf(
-                        'IDENTITY(e.%s) AS %s',
+                        'IDENTITY(root.%s) AS %s',
                         $levelProperty,
                         $alias,
                     ))
@@ -144,7 +144,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
                 $this->queryBuilder
                     ->addSelect(\sprintf(
-                        'e.%s AS %s',
+                        'root.%s AS %s',
                         $levelProperty,
                         $alias,
                     ))
@@ -168,7 +168,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
             $function = \sprintf(
                 $function,
-                \sprintf('e.%s', $field),
+                \sprintf('root.%s', $field),
             );
 
             $this->queryBuilder->addSelect($function);
@@ -193,19 +193,19 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
         $this->queryBuilder
             ->andWhere(\sprintf(
-                'e.%s.%s >= %d',
+                'root.%s.%s >= %d',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $lowerBound,
             ))
             ->andWhere(\sprintf(
-                'e.%s.%s < %d',
+                'root.%s.%s < %d',
                 $partitionProperty,
                 $partitionKeyProperty,
                 $upperBound,
             ))
             ->andWhere(\sprintf(
-                'e.%s.%s = %d',
+                'root.%s.%s = %d',
                 $partitionProperty,
                 $partitionLevelProperty,
                 $lowerLevel,
@@ -219,11 +219,11 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
         $this->queryBuilder
             ->addSelect(\sprintf(
-                "e.%s",
+                "root.%s",
                 $groupingsProperty,
             ))
             ->addGroupBy(\sprintf(
-                "e.%s",
+                "root.%s",
                 $groupingsProperty,
             ))
         ;

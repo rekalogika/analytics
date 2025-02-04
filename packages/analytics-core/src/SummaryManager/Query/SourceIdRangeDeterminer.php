@@ -38,7 +38,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
 
         $queryBuilder = $this->entityManager
             ->createQueryBuilder()
-            ->from($class, 'e');
+            ->from($class, 'root');
 
         if (is_a($summaryClass, HasQueryBuilderModifier::class, true)) {
             $summaryClass::modifyQueryBuilder($queryBuilder);

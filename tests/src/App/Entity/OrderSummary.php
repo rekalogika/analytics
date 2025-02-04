@@ -153,9 +153,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
-        $rootAlias = $queryBuilder->getRootAliases()[0];
-
-        $queryBuilder->andWhere(\sprintf('%s.id > 10', $rootAlias));
+        $queryBuilder->andWhere('root.id > 10');
     }
 
     //
