@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
+use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
@@ -46,12 +48,35 @@ class SourceChangeTest extends KernelTestCase
         $connection->executeStatement($sql);
     }
 
+    private function getOrderCount(): int
+    {
+        $summaryManager = static::getContainer()
+            ->get(SummaryManagerRegistry::class)
+            ->getManager(OrderSummary::class);
+
+        $result = $summaryManager->createQuery()
+            ->select('count')
+            ->getResult();
+
+        $child = $result->getChildren()[0]
+            ?? throw new \RuntimeException('No children found');
+        $this->assertInstanceOf(LeafNode::class, $child);
+        $count = $child->getValue();
+        $this->assertIsInt($count);
+
+        return $count;
+    }
+
     public function testSourceCreation(): void
     {
         $clock = self::mockTime();
 
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
+
+        // get the current result
+
+        $this->assertEquals(200, $this->getOrderCount());
 
         // create new order
 
@@ -95,22 +120,25 @@ class SourceChangeTest extends KernelTestCase
         $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
         $this->assertCount(1, $listener->getEvents());
 
-        // check messenger now
+        // check messenger now, it should have one pending message
 
         $transport = $this->transport('async');
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // check messenger in 59 seconds, should not generate any command
+        // check messenger in 59 seconds, should not consume the message
 
         $clock->sleep(59);
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // in the exact 60th second.
-        // processing the message should generate two refreshCommands:
-        // 1. primary refresh command for the new partition
-        // 2. secondary refresh command for the new summary
+        // in the exact 60th second it should process the message. the
+        // processing converts the "there are new entities" refresh command to
+        // the "refresh this partition" command. the message should generate two
+        // refreshCommands:
+        //
+        // 1. primary "refresh this partition" command, delayed 60s
+        // 2. secondary "there are new entities" command, delayed 300s
 
         $clock->sleep(1);
         $transport->process(1);
@@ -127,6 +155,11 @@ class SourceChangeTest extends KernelTestCase
         $clock->sleep(60);
         $transport->process();
         $transport->queue()->assertCount(2);
+
+        // the count should be updated now
+
+        $this->assertEquals(201, $this->getOrderCount());
+
 
         // the second message will be processed after 240 seconds (300 - 60)
 
