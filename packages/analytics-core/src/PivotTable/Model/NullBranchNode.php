@@ -51,7 +51,7 @@ final readonly class NullBranchNode implements BranchNode
     }
 
     #[\Override]
-    public function getChildren(): array
+    public function getChildren(): iterable
     {
         return [];
     }

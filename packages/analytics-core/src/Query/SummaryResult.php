@@ -27,21 +27,24 @@ class SummaryResult implements BranchNode
     #[\Override]
     public function getKey(): string
     {
-        return '';
+        return '@root';
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
-        return '';
+        return null;
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return '';
+        return null;
     }
 
+    /**
+     * @return list<SummaryItem|SummaryLeafItem>
+     */
     #[\Override]
     public function getChildren(): array
     {

@@ -45,6 +45,9 @@ class SummaryItem extends SummaryField implements BranchNode
         $item->setParent($this);
     }
 
+    /**
+     * @return list<SummaryItem|SummaryLeafItem>
+     */
     #[\Override]
     public function getChildren(): array
     {
