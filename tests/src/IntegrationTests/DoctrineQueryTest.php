@@ -36,6 +36,7 @@ class DoctrineQueryTest extends KernelTestCase
             ->findOneBy([], ['id' => 'ASC']);
 
         $this->assertInstanceOf(Customer::class, $customer);
+        $uuid = $customer->getId()->toRfc4122();
 
         /** @psalm-suppress QueryBuilderSetParameter */
         $queryBuilder = $entityManager->createQueryBuilder()
@@ -90,9 +91,9 @@ class DoctrineQueryTest extends KernelTestCase
 
         $this->assertEquals([
             0 => [1, 'integer'],
-            1 => ["0194d1fa-dc08-7077-973a-7918c39c1c8a", ParameterType::STRING],
+            1 => [$uuid, ParameterType::STRING],
             2 => [1, 'integer'],
-            3 => ["0194d1fa-dc08-7077-973a-7918c39c1c8a", ParameterType::STRING],
+            3 => [$uuid, ParameterType::STRING],
             4 => [new \DateTimeImmutable('2021-01-01 00:00:00'), 'datetime_immutable'],
         ], $bindValues);
     }
