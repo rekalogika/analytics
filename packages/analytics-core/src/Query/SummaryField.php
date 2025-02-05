@@ -17,12 +17,19 @@ use Rekalogika\Analytics\PivotTable\TreeNode;
 
 abstract class SummaryField implements TreeNode
 {
-    private ?SummaryItem $parent = null;
+    /**
+     * @var list<SummaryField>
+     */
+    private array $children = [];
+
+    private ?SummaryField $parent = null;
 
     protected function __construct(
         private readonly string $key,
         private readonly mixed $legend,
         private readonly mixed $item,
+        private readonly mixed $value,
+        private readonly int|float|null $rawValue,
     ) {}
 
     public function isEqual(self $other): bool
@@ -44,12 +51,12 @@ abstract class SummaryField implements TreeNode
         return $this->item;
     }
 
-    public function setParent(SummaryItem $parent): void
+    public function setParent(SummaryField $parent): void
     {
         $this->parent = $parent;
     }
 
-    public function getParent(): ?SummaryItem
+    public function getParent(): ?SummaryField
     {
         return $this->parent;
     }
@@ -58,5 +65,34 @@ abstract class SummaryField implements TreeNode
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function __clone()
+    {
+        $this->children = [];
+    }
+
+    public function addChild(SummaryField $item): void
+    {
+        $this->children[] = $item;
+        $item->setParent($this);
+    }
+
+    /**
+     * @return list<SummaryField>
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    public function getValue(): mixed
+    {
+        return $this->value;
+    }
+
+    public function getRawValue(): int|float|null
+    {
+        return $this->rawValue;
     }
 }

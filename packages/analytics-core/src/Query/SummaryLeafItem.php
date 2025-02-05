@@ -19,8 +19,8 @@ class SummaryLeafItem extends SummaryField implements LeafNode
 {
     public function __construct(
         string $key,
-        private readonly mixed $value,
-        private readonly int|float|null $rawValue,
+        mixed $value,
+        int|float|null $rawValue,
         mixed $legend,
         mixed $item,
     ) {
@@ -28,18 +28,8 @@ class SummaryLeafItem extends SummaryField implements LeafNode
             key: $key,
             legend: $legend,
             item: $item,
+            value: $value,
+            rawValue: $rawValue,
         );
-    }
-
-    #[\Override]
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    #[\Override]
-    public function getRawValue(): int|float|null
-    {
-        return $this->rawValue;
     }
 }

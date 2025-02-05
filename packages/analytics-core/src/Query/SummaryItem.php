@@ -17,11 +17,6 @@ use Rekalogika\Analytics\PivotTable\BranchNode;
 
 class SummaryItem extends SummaryField implements BranchNode
 {
-    /**
-     * @var list<SummaryItem|SummaryLeafItem>
-     */
-    private array $children = [];
-
     public function __construct(
         string $key,
         mixed $legend,
@@ -31,26 +26,8 @@ class SummaryItem extends SummaryField implements BranchNode
             key: $key,
             legend: $legend,
             item: $name,
+            value: null,
+            rawValue: null,
         );
-    }
-
-    public function __clone()
-    {
-        $this->children = [];
-    }
-
-    public function addChild(SummaryItem|SummaryLeafItem $item): void
-    {
-        $this->children[] = $item;
-        $item->setParent($this);
-    }
-
-    /**
-     * @return list<SummaryItem|SummaryLeafItem>
-     */
-    #[\Override]
-    public function getChildren(): array
-    {
-        return $this->children;
     }
 }
