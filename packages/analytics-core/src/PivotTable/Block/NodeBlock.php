@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Block;
 
-use Rekalogika\Analytics\PivotTable\BranchNode;
-use Rekalogika\Analytics\PivotTable\LeafNode;
 use Rekalogika\Analytics\PivotTable\TreeNode;
 
 abstract class NodeBlock extends Block
@@ -32,19 +30,19 @@ abstract class NodeBlock extends Block
         return $this->treeNode;
     }
 
-    final protected function getBranchNode(): BranchNode
+    final protected function getBranchNode(): TreeNode
     {
-        if (!$this->treeNode instanceof BranchNode) {
-            throw new \LogicException('Expected a BranchNode');
+        if ($this->treeNode->isLeaf()) {
+            throw new \LogicException('Expected a branch node');
         }
 
         return $this->treeNode;
     }
 
-    final protected function getLeafNode(): LeafNode
+    final protected function getLeafNode(): TreeNode
     {
-        if (!$this->treeNode instanceof LeafNode) {
-            throw new \LogicException('Expected a LeafNode');
+        if (!$this->treeNode->isLeaf()) {
+            throw new \LogicException('Expected a leaf node');
         }
 
         return $this->treeNode;

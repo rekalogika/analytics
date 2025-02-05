@@ -13,10 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable;
 
-interface BranchNode extends TreeNode
-{
-    /**
-     * @return list<TreeNode>
-     */
-    public function getChildren(): array;
-}
+interface BranchNode extends TreeNode {}

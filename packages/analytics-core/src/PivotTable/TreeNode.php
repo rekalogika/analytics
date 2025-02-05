@@ -15,9 +15,20 @@ namespace Rekalogika\Analytics\PivotTable;
 
 interface TreeNode
 {
+    public function isLeaf(): bool;
+
     public function getKey(): string;
 
     public function getLegend(): mixed;
 
     public function getItem(): mixed;
+
+    /**
+     * @return list<TreeNode>
+     */
+    public function getChildren(): array;
+
+    public function getValue(): mixed;
+
+    public function getRawValue(): int|float|null;
 }

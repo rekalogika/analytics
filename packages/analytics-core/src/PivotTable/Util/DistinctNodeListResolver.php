@@ -40,12 +40,12 @@ final readonly class DistinctNodeListResolver
             $childNulls = [];
 
             foreach ($children as $child) {
-                if ($child instanceof BranchNode) {
-                    $childNulls[] = NullBranchNode::fromInterface($child);
-                } elseif ($child instanceof LeafNode) {
+                if ($child->isLeaf()) {
+                    /** @var LeafNode $child */
                     $childNulls[] = NullLeafNode::fromInterface($child);
                 } else {
-                    throw new \LogicException('Unknown node type');
+                    /** @var BranchNode $child */
+                    $childNulls[] = NullBranchNode::fromInterface($child);
                 }
             }
 
@@ -79,12 +79,12 @@ final readonly class DistinctNodeListResolver
                         /** @psalm-suppress MixedAssignment */
                         $values[$level][] = $node->getItem();
 
-                        if ($node instanceof BranchNode) {
-                            $merged[$level][] = NullBranchNode::fromInterface($node);
-                        } elseif ($node instanceof LeafNode) {
+                        if ($node->isLeaf()) {
+                            /** @var LeafNode $node */
                             $merged[$level][] = NullLeafNode::fromInterface($node);
                         } else {
-                            throw new \LogicException('Unknown node type');
+                            /** @var BranchNode $node */
+                            $merged[$level][] = NullBranchNode::fromInterface($node);
                         }
                     }
                 }

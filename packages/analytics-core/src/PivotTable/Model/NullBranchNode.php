@@ -15,44 +15,19 @@ namespace Rekalogika\Analytics\PivotTable\Model;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
 
-final readonly class NullBranchNode implements BranchNode
+final readonly class NullBranchNode extends NullTreeNode implements BranchNode
 {
-    public function __construct(
-        private string $key,
-        private mixed $legend,
-        private mixed $item,
-    ) {}
-
-    public static function fromInterface(BranchNode $branchNode): self
+    public static function fromInterface(BranchNode $node): self
     {
         return new self(
-            key: $branchNode->getKey(),
-            legend: $branchNode->getLegend(),
-            item: $branchNode->getItem(),
+            key: $node->getKey(),
+            legend: $node->getLegend(),
+            item: $node->getItem(),
         );
     }
 
-    #[\Override]
-    public function getKey(): string
+    public function isLeaf(): bool
     {
-        return $this->key;
-    }
-
-    #[\Override]
-    public function getLegend(): mixed
-    {
-        return $this->legend;
-    }
-
-    #[\Override]
-    public function getItem(): mixed
-    {
-        return $this->item;
-    }
-
-    #[\Override]
-    public function getChildren(): array
-    {
-        return [];
+        return false;
     }
 }

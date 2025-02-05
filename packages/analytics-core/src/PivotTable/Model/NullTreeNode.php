@@ -11,46 +11,42 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\PivotTable\Model;
 
-use Rekalogika\Analytics\PivotTable\BranchNode;
+use Rekalogika\Analytics\PivotTable\TreeNode;
 
-class SummaryResult implements BranchNode
+abstract readonly class NullTreeNode implements TreeNode
 {
-    /**
-     * @param list<SummaryItem|SummaryLeafItem> $items
-     */
-    public function __construct(
-        private readonly array $items,
+    final public function __construct(
+        private string $key,
+        private mixed $legend,
+        private mixed $item,
     ) {}
 
-    public function isLeaf(): bool
-    {
-        return false;
-    }
+    abstract public function isLeaf(): bool;
 
     #[\Override]
     public function getKey(): string
     {
-        return '';
+        return $this->key;
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
-        return '';
+        return $this->legend;
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return '';
+        return $this->item;
     }
 
     #[\Override]
     public function getChildren(): array
     {
-        return $this->items;
+        return [];
     }
 
     public function getValue(): mixed

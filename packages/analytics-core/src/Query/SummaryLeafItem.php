@@ -31,6 +31,11 @@ class SummaryLeafItem extends SummaryField implements LeafNode
         );
     }
 
+    public function isLeaf(): bool
+    {
+        return true;
+    }
+
     #[\Override]
     public function getValue(): mixed
     {
@@ -41,5 +46,10 @@ class SummaryLeafItem extends SummaryField implements LeafNode
     public function getRawValue(): int|float|null
     {
         return $this->rawValue;
+    }
+
+    public function getChildren(): array
+    {
+        return [];
     }
 }

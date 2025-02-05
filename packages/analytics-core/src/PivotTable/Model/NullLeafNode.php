@@ -15,50 +15,19 @@ namespace Rekalogika\Analytics\PivotTable\Model;
 
 use Rekalogika\Analytics\PivotTable\LeafNode;
 
-final readonly class NullLeafNode implements LeafNode
+final readonly class NullLeafNode extends NullTreeNode implements LeafNode
 {
-    public function __construct(
-        private string $key,
-        private mixed $legend,
-        private mixed $item,
-    ) {}
-
-    public static function fromInterface(LeafNode $branchNode): self
+    public static function fromInterface(LeafNode $node): self
     {
         return new self(
-            key: $branchNode->getKey(),
-            legend: $branchNode->getLegend(),
-            item: $branchNode->getItem(),
+            key: $node->getKey(),
+            legend: $node->getLegend(),
+            item: $node->getItem(),
         );
     }
 
-    #[\Override]
-    public function getKey(): string
+    public function isLeaf(): bool
     {
-        return $this->key;
-    }
-
-    #[\Override]
-    public function getLegend(): mixed
-    {
-        return $this->legend;
-    }
-
-    #[\Override]
-    public function getItem(): mixed
-    {
-        return $this->item;
-    }
-
-    #[\Override]
-    public function getValue(): mixed
-    {
-        return null;
-    }
-
-    #[\Override]
-    public function getRawValue(): int|float|null
-    {
-        return null;
+        return true;
     }
 }

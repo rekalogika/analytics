@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Block;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
-use Rekalogika\Analytics\PivotTable\LeafNode;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 use Rekalogika\Analytics\PivotTable\Table\Table;
 use Rekalogika\Analytics\PivotTable\TreeNode;
@@ -36,23 +35,19 @@ abstract class Block
         int $level,
         BlockContext $context,
     ): Block {
-        if ($treeNode instanceof BranchNode) {
+        if ($treeNode->isLeaf()) {
+            if ($context->isPivoted($treeNode)) {
+                return new PivotLeafBlock($treeNode, $level, $context);
+            } else {
+                return new NormalLeafBlock($treeNode, $level, $context);
+            }
+        } else {
             if ($context->isPivoted($treeNode)) {
                 return new PivotBlock($treeNode, $level, $context);
             } else {
                 return new NormalBlock($treeNode, $level, $context);
             }
         }
-
-        if ($treeNode instanceof LeafNode) {
-            if ($context->isPivoted($treeNode)) {
-                return new PivotLeafBlock($treeNode, $level, $context);
-            } else {
-                return new NormalLeafBlock($treeNode, $level, $context);
-            }
-        }
-
-        throw new \LogicException('Unknown node type');
     }
 
     final protected function getLevel(): int
@@ -82,15 +77,23 @@ abstract class Block
         return new RootBlock($treeNode, $context);
     }
 
-    final public static function newWithoutRoot(BranchNode $treeNode, int $level): Block
+    final public static function newWithoutRoot(TreeNode $treeNode, int $level): Block
     {
+        if ($treeNode->isLeaf()) {
+            throw new \RuntimeException('Cannot create block without root for leaf node');
+        }
+
         $distinct = DistinctNodeListResolver::getDistinctNodes($treeNode);
 
         return self::createByType($treeNode, $level, new BlockContext($distinct));
     }
 
-    final public function createGroupBlock(BranchNode $parentNode, int $level): Block
+    final public function createGroupBlock(TreeNode $parentNode, int $level): Block
     {
+        if ($parentNode->isLeaf()) {
+            throw new \RuntimeException('Cannot create group block for leaf node');
+        }
+
         $firstChild = $parentNode->getChildren()[0] ?? null;
 
         if ($firstChild === null) {
@@ -102,8 +105,10 @@ abstract class Block
         }
 
         if ($this->context->isPivoted($firstChild)) {
+            /** @var BranchNode $parentNode */
             return new HorizontalBlockGroup($parentNode, $level, $this->getContext());
         } else {
+            /** @var BranchNode $parentNode */
             return new VerticalBlockGroup($parentNode, $level, $this->getContext());
         }
     }

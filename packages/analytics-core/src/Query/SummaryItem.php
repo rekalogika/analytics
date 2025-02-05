@@ -34,6 +34,11 @@ class SummaryItem extends SummaryField implements BranchNode
         );
     }
 
+    public function isLeaf(): bool
+    {
+        return false;
+    }
+
     public function __clone()
     {
         $this->children = [];
@@ -49,5 +54,15 @@ class SummaryItem extends SummaryField implements BranchNode
     public function getChildren(): array
     {
         return $this->children;
+    }
+
+    public function getValue(): mixed
+    {
+        return null;
+    }
+
+    public function getRawValue(): int|float|null
+    {
+        return null;
     }
 }
