@@ -16,8 +16,6 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Parser;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
-use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
-use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
