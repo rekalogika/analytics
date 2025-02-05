@@ -18,12 +18,12 @@ class SummaryItem extends SummaryField
     public function __construct(
         string $key,
         mixed $legend,
-        mixed $name,
+        mixed $item,
     ) {
         parent::__construct(
             key: $key,
             legend: $legend,
-            item: $name,
+            item: $item,
             value: null,
             rawValue: null,
         );

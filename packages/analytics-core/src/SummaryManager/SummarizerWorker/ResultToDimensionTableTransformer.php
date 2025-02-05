@@ -82,7 +82,7 @@ final readonly class ResultToDimensionTableTransformer
 
                     $transformedRow[$key] = new SummaryItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@values') {
@@ -90,7 +90,7 @@ final readonly class ResultToDimensionTableTransformer
 
                     $transformedRow[$key] = new SummaryItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@measure') {
@@ -124,7 +124,7 @@ final readonly class ResultToDimensionTableTransformer
 
                     $transformedRow[$key] = new SummaryItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 }
