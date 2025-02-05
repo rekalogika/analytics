@@ -37,7 +37,8 @@ class SourceChangeTest extends KernelTestCase
      * Sequences are not affected by transactions, so we need to reset them
      * manually
      */
-    public function tearDown(): void
+    #[\Override]
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -32,13 +32,14 @@ class RefreshTest extends TestCase
      * @var RefreshScheduler<Lock>
      */
     private RefreshScheduler $scheduler;
+
     private TestRefreshRunner $runner;
 
     private TestRefreshClassPropertiesResolver $propertiesResolver;
 
     private MockClock $clock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->clock = new MockClock('1970-01-01 00:00:00');
 
