@@ -23,12 +23,12 @@ final class SummaryItem
     private ?SummaryItem $parent = null;
 
     private function __construct(
-        private string $key,
-        private mixed $value,
-        private int|float|null $rawValue,
-        private mixed $legend,
-        private mixed $item,
-        private bool $leaf,
+        private readonly string $key,
+        private readonly mixed $value,
+        private readonly int|float|null $rawValue,
+        private readonly mixed $legend,
+        private readonly mixed $item,
+        private readonly bool $leaf,
     ) {}
 
     public static function createBranchItem(

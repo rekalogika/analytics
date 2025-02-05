@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-class SummaryResult
+final readonly class SummaryResult
 {
     /**
      * @param list<SummaryItem> $items
      */
     public function __construct(
-        private readonly array $items,
+        private array $items,
     ) {}
 
     /**
