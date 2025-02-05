@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
 use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
-use Rekalogika\Analytics\Query\PivotTableAdapter\PivotTableAdapter;
+use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Misc\PivotTableRenderer;

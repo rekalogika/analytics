@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query\PivotTableAdapter;
+namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
 use Rekalogika\Analytics\Query\SummaryResult;

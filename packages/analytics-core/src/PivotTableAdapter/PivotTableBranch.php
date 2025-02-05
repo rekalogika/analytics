@@ -11,43 +11,44 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query\PivotTableAdapter;
+namespace Rekalogika\Analytics\PivotTableAdapter;
 
-use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\Analytics\PivotTable\BranchNode;
 use Rekalogika\Analytics\Query\SummaryItem;
 
-final readonly class PivotTableLeaf implements LeafNode
+final readonly class PivotTableBranch implements BranchNode
 {
     public function __construct(
         private SummaryItem $item,
-    ) {
-        if (!$item->isLeaf()) {
-            throw new \InvalidArgumentException('Item must be a leaf');
-        }
-    }
+    ) {}
 
-    public function getValue(): mixed
-    {
-        return $this->item->getValue();
-    }
-
-    public function getRawValue(): int|float|null
-    {
-        return $this->item->getRawValue();
-    }
-
+    #[\Override]
     public function getKey(): string
     {
         return $this->item->getKey();
     }
 
+    #[\Override]
     public function getLegend(): mixed
     {
         return $this->item->getLegend();
     }
 
+    #[\Override]
     public function getItem(): mixed
     {
         return $this->item->getItem();
+    }
+
+    #[\Override]
+    public function getChildren(): iterable
+    {
+        foreach ($this->item->getChildren() as $item) {
+            if ($item->isLeaf()) {
+                yield new PivotTableLeaf($item);
+            } else {
+                yield new PivotTableBranch($item);
+            }
+        }
     }
 }
