@@ -106,6 +106,15 @@ final readonly class ResultToDimensionTableTransformer
                             throw new \RuntimeException(\sprintf('Invalid value: %s', get_debug_type($rawValue)));
                         }
 
+                        if (
+                            !\is_int($value)
+                            && !\is_float($value)
+                            && !\is_object($value)
+                            && $value !== null
+                        ) {
+                            throw new \RuntimeException(\sprintf('Invalid value: %s', get_debug_type($value)));
+                        }
+
                         \assert(\is_string($lastKey));
 
                         $transformedRow[$lastKey] = DefaultSummaryNode::createLeafItem(

@@ -18,6 +18,8 @@ use Rekalogika\Analytics\Query\SummaryResult;
 
 final readonly class DefaultSummaryResult implements SummaryResult
 {
+    use NodeTrait;
+
     /**
      * @param list<SummaryNode> $nodes
      */

@@ -19,4 +19,8 @@ interface SummaryResult
      * @return list<SummaryNode>
      */
     public function getChildren(): array;
+
+    public function getChild(mixed $item): ?SummaryNode;
+
+    public function getPath(mixed ...$items): ?SummaryNode;
 }

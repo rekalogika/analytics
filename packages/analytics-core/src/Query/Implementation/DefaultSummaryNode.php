@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query\Implementation;
 
 use Rekalogika\Analytics\Query\SummaryNode;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DefaultSummaryNode implements SummaryNode
 {
+    use NodeTrait;
+
     /**
      * @var list<DefaultSummaryNode>
      */
@@ -26,16 +29,16 @@ final class DefaultSummaryNode implements SummaryNode
 
     private function __construct(
         private readonly string $key,
-        private readonly mixed $value,
+        private readonly object|int|float|null $value,
         private readonly int|float|null $rawValue,
-        private readonly mixed $legend,
+        private readonly string|TranslatableInterface $legend,
         private readonly mixed $item,
         private readonly bool $leaf,
     ) {}
 
     public static function createBranchItem(
         string $key,
-        mixed $legend,
+        string|TranslatableInterface $legend,
         mixed $item,
     ): self {
         return new self(
@@ -50,9 +53,9 @@ final class DefaultSummaryNode implements SummaryNode
 
     public static function createLeafItem(
         string $key,
-        mixed $value,
+        object|int|float|null $value,
         int|float|null $rawValue,
-        mixed $legend,
+        string|TranslatableInterface $legend,
         mixed $item,
     ): self {
         return new self(
@@ -77,7 +80,7 @@ final class DefaultSummaryNode implements SummaryNode
         return $this->leaf;
     }
 
-    public function getLegend(): mixed
+    public function getLegend(): string|TranslatableInterface
     {
         return $this->legend;
     }
@@ -121,7 +124,7 @@ final class DefaultSummaryNode implements SummaryNode
         return $this->children;
     }
 
-    public function getValue(): mixed
+    public function getValue(): object|int|float|null
     {
         return $this->value;
     }
