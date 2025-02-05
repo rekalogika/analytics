@@ -42,14 +42,14 @@ final readonly class LowestPartitionMaxIdQuery
 
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder
-            ->from($this->metadata->getSummaryClass(), 's')
+            ->from($this->metadata->getSummaryClass(), 'root')
             ->select(\sprintf(
-                'MAX(s.%s.%s)',
+                'MAX(root.%s.%s)',
                 $partitionSummaryProperty,
                 $partitionKeyProperty,
             ))
             ->andWhere(\sprintf(
-                's.%s.%s = :partitionLevel',
+                'root.%s.%s = :partitionLevel',
                 $partitionSummaryProperty,
                 $partitionLevelProperty,
             ))

@@ -51,8 +51,14 @@ final class QueryContext
 
     private function getRootAlias(): string
     {
-        return $this->queryBuilder->getRootAliases()[0]
+        $alias = $this->queryBuilder->getRootAliases()[0]
             ?? throw new \RuntimeException('Root alias not found');
+
+        if ($alias !== 'root') {
+            throw new \RuntimeException('Root alias must be "root"');
+        }
+
+        return $alias;
     }
 
     /**
