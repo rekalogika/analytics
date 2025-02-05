@@ -13,20 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-final readonly class SummaryResult
+interface SummaryResult
 {
-    /**
-     * @param list<SummaryNode> $nodes
-     */
-    public function __construct(
-        private array $nodes,
-    ) {}
-
     /**
      * @return list<SummaryNode>
      */
-    public function getChildren(): array
-    {
-        return $this->nodes;
-    }
+    public function getChildren(): array;
 }

@@ -15,14 +15,14 @@ namespace Rekalogika\Analytics\Query\Implementation;
 
 use Rekalogika\Analytics\Query\SummaryNode;
 
-final class DefaultSummaryItem implements SummaryNode
+final class DefaultSummaryNode implements SummaryNode
 {
     /**
-     * @var list<DefaultSummaryItem>
+     * @var list<DefaultSummaryNode>
      */
     private array $children = [];
 
-    private ?DefaultSummaryItem $parent = null;
+    private ?DefaultSummaryNode $parent = null;
 
     private function __construct(
         private readonly string $key,
@@ -87,12 +87,12 @@ final class DefaultSummaryItem implements SummaryNode
         return $this->item;
     }
 
-    public function setParent(DefaultSummaryItem $parent): void
+    public function setParent(DefaultSummaryNode $parent): void
     {
         $this->parent = $parent;
     }
 
-    public function getParent(): ?DefaultSummaryItem
+    public function getParent(): ?DefaultSummaryNode
     {
         return $this->parent;
     }
@@ -107,14 +107,14 @@ final class DefaultSummaryItem implements SummaryNode
         $this->children = [];
     }
 
-    public function addChild(DefaultSummaryItem $item): void
+    public function addChild(DefaultSummaryNode $item): void
     {
         $this->children[] = $item;
         $item->setParent($this);
     }
 
     /**
-     * @return list<DefaultSummaryItem>
+     * @return list<DefaultSummaryNode>
      */
     public function getChildren(): array
     {

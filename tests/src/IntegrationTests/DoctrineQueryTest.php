@@ -56,6 +56,7 @@ class DoctrineQueryTest extends KernelTestCase
         $parser = new Parser($query);
         $parserResult = $parser->parse();
         $sqlExecutor = $parserResult->prepareSqlExecutor($query);
+        $resultSetMapping = $parserResult->getResultSetMapping();
         $sqlStatements = $sqlExecutor->getSqlStatements();
 
         if (\is_string($sqlStatements)) {

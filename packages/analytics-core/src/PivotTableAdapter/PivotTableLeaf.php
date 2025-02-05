@@ -31,11 +31,6 @@ final readonly class PivotTableLeaf implements LeafNode
         return $this->node->getValue();
     }
 
-    public function getRawValue(): int|float|null
-    {
-        return $this->node->getRawValue();
-    }
-
     public function getKey(): string
     {
         return $this->node->getKey();

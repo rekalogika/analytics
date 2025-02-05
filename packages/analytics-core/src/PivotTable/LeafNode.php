@@ -16,6 +16,4 @@ namespace Rekalogika\Analytics\PivotTable;
 interface LeafNode extends TreeNode
 {
     public function getValue(): mixed;
-
-    public function getRawValue(): int|float|null;
 }
