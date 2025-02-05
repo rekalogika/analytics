@@ -13,20 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-final readonly class SummaryResult
+interface SummaryNode
 {
-    /**
-     * @param list<SummaryNode> $nodes
-     */
-    public function __construct(
-        private array $nodes,
-    ) {}
+    public function getLegend(): mixed;
+
+    public function getItem(): mixed;
+
+    public function getKey(): string;
 
     /**
      * @return list<SummaryNode>
      */
-    public function getChildren(): array
-    {
-        return $this->nodes;
-    }
+    public function getChildren(): array;
+
+    public function getValue(): mixed;
+
+    public function getRawValue(): int|float|null;
+
+    public function isLeaf(): bool;
 }

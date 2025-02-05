@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Query\SummaryItem;
+use Rekalogika\Analytics\Query\Implementation\DefaultSummaryItem;
 
 final class ArrayToTreeTransformer
 {
     /**
-     * @var list<SummaryItem>
+     * @var list<DefaultSummaryItem>
      */
     private array $currentPath = [];
 
     /**
-     * @var list<SummaryItem>
+     * @var list<DefaultSummaryItem>
      */
     private array $tree = [];
 
-    private function addDimension(SummaryItem $item, int $columnNumber): void
+    private function addDimension(DefaultSummaryItem $item, int $columnNumber): void
     {
         $item = clone $item;
 
@@ -56,7 +56,7 @@ final class ArrayToTreeTransformer
         }
     }
 
-    private function addMeasure(SummaryItem $item): void
+    private function addMeasure(DefaultSummaryItem $item): void
     {
         if (!$item->isLeaf()) {
             throw new \UnexpectedValueException('Item must be a leaf');
@@ -64,7 +64,7 @@ final class ArrayToTreeTransformer
 
         $parent = end($this->currentPath);
 
-        if ($parent instanceof SummaryItem) {
+        if ($parent instanceof DefaultSummaryItem) {
             $parent->addChild($item);
         } else {
             $this->currentPath = [$item];
@@ -73,8 +73,8 @@ final class ArrayToTreeTransformer
     }
 
     /**
-     * @param iterable<list<SummaryItem>> $inputArray
-     * @return list<SummaryItem>
+     * @param iterable<list<DefaultSummaryItem>> $inputArray
+     * @return list<DefaultSummaryItem>
      */
     public function arrayToTree(iterable $inputArray): array
     {

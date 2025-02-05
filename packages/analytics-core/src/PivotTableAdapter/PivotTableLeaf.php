@@ -14,40 +14,40 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\LeafNode;
-use Rekalogika\Analytics\Query\SummaryItem;
+use Rekalogika\Analytics\Query\SummaryNode;
 
 final readonly class PivotTableLeaf implements LeafNode
 {
     public function __construct(
-        private SummaryItem $item,
+        private SummaryNode $node,
     ) {
-        if (!$item->isLeaf()) {
+        if (!$node->isLeaf()) {
             throw new \InvalidArgumentException('Item must be a leaf');
         }
     }
 
     public function getValue(): mixed
     {
-        return $this->item->getValue();
+        return $this->node->getValue();
     }
 
     public function getRawValue(): int|float|null
     {
-        return $this->item->getRawValue();
+        return $this->node->getRawValue();
     }
 
     public function getKey(): string
     {
-        return $this->item->getKey();
+        return $this->node->getKey();
     }
 
     public function getLegend(): mixed
     {
-        return $this->item->getLegend();
+        return $this->node->getLegend();
     }
 
     public function getItem(): mixed
     {
-        return $this->item->getItem();
+        return $this->node->getItem();
     }
 }

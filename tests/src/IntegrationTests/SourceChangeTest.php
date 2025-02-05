@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
-use Rekalogika\Analytics\Query\SummaryItem;
+use Rekalogika\Analytics\Query\SummaryNode;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
@@ -92,7 +92,7 @@ class SourceChangeTest extends KernelTestCase
             }
         }
 
-        if (!$subItem instanceof SummaryItem) {
+        if (!$subItem instanceof SummaryNode) {
             return 0;
         }
 

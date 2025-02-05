@@ -11,16 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Query\Implementation;
 
-final class SummaryItem
+use Rekalogika\Analytics\Query\SummaryNode;
+
+final class DefaultSummaryItem implements SummaryNode
 {
     /**
-     * @var list<SummaryItem>
+     * @var list<DefaultSummaryItem>
      */
     private array $children = [];
 
-    private ?SummaryItem $parent = null;
+    private ?DefaultSummaryItem $parent = null;
 
     private function __construct(
         private readonly string $key,
@@ -85,12 +87,12 @@ final class SummaryItem
         return $this->item;
     }
 
-    public function setParent(SummaryItem $parent): void
+    public function setParent(DefaultSummaryItem $parent): void
     {
         $this->parent = $parent;
     }
 
-    public function getParent(): ?SummaryItem
+    public function getParent(): ?DefaultSummaryItem
     {
         return $this->parent;
     }
@@ -105,14 +107,14 @@ final class SummaryItem
         $this->children = [];
     }
 
-    public function addChild(SummaryItem $item): void
+    public function addChild(DefaultSummaryItem $item): void
     {
         $this->children[] = $item;
         $item->setParent($this);
     }
 
     /**
-     * @return list<SummaryItem>
+     * @return list<DefaultSummaryItem>
      */
     public function getChildren(): array
     {
