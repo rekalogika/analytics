@@ -16,14 +16,14 @@ namespace Rekalogika\Analytics\Query;
 class SummaryResult
 {
     /**
-     * @param list<SummaryItem|SummaryLeafItem> $items
+     * @param list<SummaryItem> $items
      */
     public function __construct(
         private readonly array $items,
     ) {}
 
     /**
-     * @return list<SummaryItem|SummaryLeafItem>
+     * @return list<SummaryItem>
      */
     public function getChildren(): array
     {

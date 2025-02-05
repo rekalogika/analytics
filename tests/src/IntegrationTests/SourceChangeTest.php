@@ -17,7 +17,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Query\SummaryItem;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
@@ -62,7 +61,6 @@ class SourceChangeTest extends KernelTestCase
 
         $child = $result->getChildren()[0]
             ?? throw new \RuntimeException('No children found');
-        $this->assertInstanceOf(SummaryLeafItem::class, $child);
         $count = $child->getValue();
         $this->assertIsInt($count);
 
@@ -100,7 +98,6 @@ class SourceChangeTest extends KernelTestCase
 
         $child = $subItem->getChildren()[0]
             ?? throw new \RuntimeException('No children found');
-        $this->assertInstanceOf(SummaryLeafItem::class, $child);
         $count = $child->getValue();
         $this->assertIsInt($count);
 

@@ -14,13 +14,17 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\LeafNode;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
+use Rekalogika\Analytics\Query\SummaryItem;
 
 final readonly class PivotTableLeaf implements LeafNode
 {
     public function __construct(
-        private SummaryLeafItem $item,
-    ) {}
+        private SummaryItem $item,
+    ) {
+        if (!$item->isLeaf()) {
+            throw new \InvalidArgumentException('Item must be a leaf');
+        }
+    }
 
     public function getValue(): mixed
     {

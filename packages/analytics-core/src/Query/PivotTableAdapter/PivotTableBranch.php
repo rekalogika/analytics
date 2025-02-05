@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Query\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
 use Rekalogika\Analytics\Query\SummaryItem;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
 
 final readonly class PivotTableBranch implements BranchNode
 {
@@ -45,10 +44,10 @@ final readonly class PivotTableBranch implements BranchNode
     public function getChildren(): iterable
     {
         foreach ($this->item->getChildren() as $item) {
-            if ($item instanceof SummaryItem) {
-                yield new PivotTableBranch($item);
-            } elseif ($item instanceof SummaryLeafItem) {
+            if ($item->isLeaf()) {
                 yield new PivotTableLeaf($item);
+            } else {
+                yield new PivotTableBranch($item);
             }
         }
     }

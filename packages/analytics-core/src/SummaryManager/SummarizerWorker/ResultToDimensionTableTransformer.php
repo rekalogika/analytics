@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\SummaryItem;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
 use Symfony\Component\Translation\TranslatableMessage;
 
 final readonly class ResultToDimensionTableTransformer
@@ -26,7 +25,7 @@ final readonly class ResultToDimensionTableTransformer
 
     /**
      * @param iterable<array<string,array{mixed,mixed}>> $input
-     * @return iterable<list<SummaryItem|SummaryLeafItem>>
+     * @return iterable<list<SummaryItem>>
      */
     public function transformResultToDimensionTable(
         iterable $input,
@@ -80,7 +79,7 @@ final readonly class ResultToDimensionTableTransformer
                         ],
                     );
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = SummaryItem::createBranchItem(
                         key: $key,
                         item: $value,
                         legend: $name,
@@ -88,7 +87,7 @@ final readonly class ResultToDimensionTableTransformer
                 } elseif ($key === '@values') {
                     $name = $valuesMessage;
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = SummaryItem::createBranchItem(
                         key: $key,
                         item: $value,
                         legend: $name,
@@ -98,7 +97,6 @@ final readonly class ResultToDimensionTableTransformer
 
                     if (
                         $lastItem instanceof SummaryItem
-                        || $lastItem instanceof SummaryLeafItem
                     ) {
                         if (
                             !\is_int($rawValue)
@@ -110,7 +108,7 @@ final readonly class ResultToDimensionTableTransformer
 
                         \assert(\is_string($lastKey));
 
-                        $transformedRow[$lastKey] = new SummaryLeafItem(
+                        $transformedRow[$lastKey] = SummaryItem::createLeafItem(
                             key: $lastItem->getKey(),
                             item: $lastItem->getItem(),
                             value: $value,
@@ -122,7 +120,7 @@ final readonly class ResultToDimensionTableTransformer
                     $metadata = $this->metadata->getDimensionMetadata($key);
                     $name = $metadata->getLabel();
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = SummaryItem::createBranchItem(
                         key: $key,
                         item: $value,
                         legend: $name,
@@ -132,7 +130,7 @@ final readonly class ResultToDimensionTableTransformer
                 $lastKey = $key;
             }
 
-            /** @var array<array-key,SummaryItem|SummaryLeafItem> $transformedRow */
+            /** @var array<array-key,SummaryItem> $transformedRow */
 
             yield array_values($transformedRow);
 
