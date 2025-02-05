@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Rekalogika\Analytics\PivotTable\LeafNode;
-
-class SummaryLeafItem extends SummaryField implements LeafNode
+class SummaryLeafItem extends SummaryField
 {
     public function __construct(
         string $key,

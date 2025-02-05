@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Rekalogika\Analytics\PivotTable\BranchNode;
-
-class SummaryResult implements BranchNode
+class SummaryResult
 {
     /**
      * @param list<SummaryItem|SummaryLeafItem> $items
@@ -24,28 +22,9 @@ class SummaryResult implements BranchNode
         private readonly array $items,
     ) {}
 
-    #[\Override]
-    public function getKey(): string
-    {
-        return '@root';
-    }
-
-    #[\Override]
-    public function getLegend(): mixed
-    {
-        return null;
-    }
-
-    #[\Override]
-    public function getItem(): mixed
-    {
-        return null;
-    }
-
     /**
      * @return list<SummaryItem|SummaryLeafItem>
      */
-    #[\Override]
     public function getChildren(): array
     {
         return $this->items;

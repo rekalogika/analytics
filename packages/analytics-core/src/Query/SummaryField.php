@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Rekalogika\Analytics\PivotTable\TreeNode;
-
-abstract class SummaryField implements TreeNode
+abstract class SummaryField
 {
     /**
      * @var list<SummaryField>
@@ -39,13 +37,11 @@ abstract class SummaryField implements TreeNode
         ;
     }
 
-    #[\Override]
     public function getLegend(): mixed
     {
         return $this->legend;
     }
 
-    #[\Override]
     public function getItem(): mixed
     {
         return $this->item;
@@ -61,7 +57,6 @@ abstract class SummaryField implements TreeNode
         return $this->parent;
     }
 
-    #[\Override]
     public function getKey(): string
     {
         return $this->key;
