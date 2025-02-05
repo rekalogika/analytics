@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Util;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
-use Rekalogika\Analytics\PivotTable\LeafNode;
 use Rekalogika\Analytics\PivotTable\Model\NullBranchNode;
 use Rekalogika\Analytics\PivotTable\Model\NullLeafNode;
 use Rekalogika\Analytics\PivotTable\TreeNode;
@@ -41,7 +40,6 @@ final readonly class DistinctNodeListResolver
 
             foreach ($children as $child) {
                 if ($child->isLeaf()) {
-                    /** @var LeafNode $child */
                     $childNulls[] = NullLeafNode::fromInterface($child);
                 } else {
                     /** @var BranchNode $child */
@@ -80,7 +78,6 @@ final readonly class DistinctNodeListResolver
                         $values[$level][] = $node->getItem();
 
                         if ($node->isLeaf()) {
-                            /** @var LeafNode $node */
                             $merged[$level][] = NullLeafNode::fromInterface($node);
                         } else {
                             /** @var BranchNode $node */

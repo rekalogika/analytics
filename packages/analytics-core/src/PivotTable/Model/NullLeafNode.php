@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
-use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\Analytics\PivotTable\TreeNode;
 
-final readonly class NullLeafNode extends NullTreeNode implements LeafNode
+final readonly class NullLeafNode extends NullTreeNode
 {
-    public static function fromInterface(LeafNode $node): self
+    public static function fromInterface(TreeNode $node): self
     {
         return new self(
             key: $node->getKey(),
