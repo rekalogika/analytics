@@ -108,13 +108,13 @@ class QueryTest extends KernelTestCase
         $this->assertSame($node1, $node2);
 
         // single traverse with stringable check
-        $node3 = $result->traverse('2024', 'France', 'count');
+        $node3 = $result->traverse('2024', $country->getName(), 'count');
         $this->assertSame($node1, $node3);
 
         // multistep traverse with stringable check
         $node4 = $result
             ->traverse('2024')
-            ?->traverse('France')
+            ?->traverse($country->getName())
             ?->traverse('count');
 
         $this->assertSame($node1, $node4);
