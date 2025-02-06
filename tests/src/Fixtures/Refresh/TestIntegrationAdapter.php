@@ -46,7 +46,7 @@ class TestIntegrationAdapter implements RefreshFrameworkAdapter
     private ?RefreshScheduler $scheduler = null;
 
     public function __construct(
-        private ClockInterface $clock,
+        private readonly ClockInterface $clock,
     ) {}
 
     /**

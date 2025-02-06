@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Query\SummaryItem;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryNode;
 use Symfony\Component\Translation\TranslatableMessage;
 
 final readonly class ResultToDimensionTableTransformer
@@ -26,7 +25,7 @@ final readonly class ResultToDimensionTableTransformer
 
     /**
      * @param iterable<array<string,array{mixed,mixed}>> $input
-     * @return iterable<list<SummaryItem|SummaryLeafItem>>
+     * @return iterable<list<DefaultSummaryNode>>
      */
     public function transformResultToDimensionTable(
         iterable $input,
@@ -80,25 +79,31 @@ final readonly class ResultToDimensionTableTransformer
                         ],
                     );
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@values') {
+                    // @values represent the place of the value column in the
+                    // row. the value column is not always at the end of the row
+
                     $name = $valuesMessage;
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@measure') {
-                    $lastItem = $transformedRow[$lastKey] ?? null;
+                    // @measure contains the actual value of the measure, it
+                    // will be removed later, measure is always at the end of
+                    // the row
+
+                    $lastRow = $transformedRow[$lastKey] ?? null;
 
                     if (
-                        $lastItem instanceof SummaryItem
-                        || $lastItem instanceof SummaryLeafItem
+                        $lastRow instanceof DefaultSummaryNode
                     ) {
                         if (
                             !\is_int($rawValue)
@@ -108,23 +113,32 @@ final readonly class ResultToDimensionTableTransformer
                             throw new \RuntimeException(\sprintf('Invalid value: %s', get_debug_type($rawValue)));
                         }
 
+                        if (
+                            !\is_int($value)
+                            && !\is_float($value)
+                            && !\is_object($value)
+                            && $value !== null
+                        ) {
+                            throw new \RuntimeException(\sprintf('Invalid value: %s', get_debug_type($value)));
+                        }
+
                         \assert(\is_string($lastKey));
 
-                        $transformedRow[$lastKey] = new SummaryLeafItem(
-                            key: $lastItem->getKey(),
-                            item: $lastItem->getItem(),
+                        $transformedRow[$lastKey] = DefaultSummaryNode::createLeafItem(
+                            key: $lastRow->getKey(),
+                            item: $lastRow->getItem(),
                             value: $value,
                             rawValue: $rawValue,
-                            legend: $lastItem->getLegend(),
+                            legend: $lastRow->getLegend(),
                         );
                     }
                 } else {
                     $metadata = $this->metadata->getDimensionMetadata($key);
                     $name = $metadata->getLabel();
 
-                    $transformedRow[$key] = new SummaryItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
                         key: $key,
-                        name: $value,
+                        item: $value,
                         legend: $name,
                     );
                 }
@@ -132,7 +146,7 @@ final readonly class ResultToDimensionTableTransformer
                 $lastKey = $key;
             }
 
-            /** @var array<array-key,SummaryItem|SummaryLeafItem> $transformedRow */
+            /** @var array<array-key,DefaultSummaryNode> $transformedRow */
 
             yield array_values($transformedRow);
 

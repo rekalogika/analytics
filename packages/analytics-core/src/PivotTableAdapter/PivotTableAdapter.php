@@ -11,17 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
+use Rekalogika\Analytics\Query\Result;
 
-class SummaryResult implements BranchNode
+final readonly class PivotTableAdapter implements BranchNode
 {
-    /**
-     * @param list<SummaryItem|SummaryLeafItem> $items
-     */
     public function __construct(
-        private readonly array $items,
+        private Result $result,
     ) {}
 
     #[\Override]
@@ -33,18 +31,24 @@ class SummaryResult implements BranchNode
     #[\Override]
     public function getLegend(): mixed
     {
-        return '';
+        return null;
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return '';
+        return null;
     }
 
     #[\Override]
-    public function getChildren(): array
+    public function getChildren(): iterable
     {
-        return $this->items;
+        foreach ($this->result as $item) {
+            if ($item->isLeaf()) {
+                yield new PivotTableLeaf($item);
+            } else {
+                yield new PivotTableBranch($item);
+            }
+        }
     }
 }

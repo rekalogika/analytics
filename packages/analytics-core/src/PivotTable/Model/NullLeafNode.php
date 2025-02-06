@@ -55,10 +55,4 @@ final readonly class NullLeafNode implements LeafNode
     {
         return null;
     }
-
-    #[\Override]
-    public function getRawValue(): int|float|null
-    {
-        return null;
-    }
 }

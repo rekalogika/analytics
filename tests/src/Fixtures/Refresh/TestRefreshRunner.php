@@ -24,16 +24,16 @@ class TestRefreshRunner implements RefreshRunner
     /**
      * @var array<int,string>
      */
-    private $runs = [];
+    private array $runs = [];
 
     /**
      * @var array<int,string>
      */
-    private $runFinishes = [];
+    private array $runFinishes = [];
 
 
     public function __construct(
-        private ClockInterface $clock,
+        private readonly ClockInterface $clock,
         private int $processingTime,
     ) {}
 

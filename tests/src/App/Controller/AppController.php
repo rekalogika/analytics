@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
 use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
+use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Misc\PivotTableRenderer;
@@ -47,8 +48,9 @@ final class AppController extends AbstractController
         $result = null;
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $result = new PivotTableAdapter($query->getResult());
             $result = $this->pivotTableRenderer
-                ->render($query->getResult(), $query->getPivotedDimensions());
+                ->render($result, $query->getPivotedDimensions());
         }
 
         return $this->render('app/index.html.twig', [

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescriptionFactory;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 
 final class MeasureSorter
@@ -116,6 +117,11 @@ final class MeasureSorter
         }
 
         $label = $this->metadata->getMeasureMetadata($measure)->getLabel();
+
+        $label = MeasureDescriptionFactory::createMeasureDescription(
+            measurePropertyName: $measure,
+            label: $label,
+        );
 
         $row['@values'] = [$label, $label];
 

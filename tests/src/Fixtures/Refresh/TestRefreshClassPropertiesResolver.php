@@ -22,7 +22,7 @@ class TestRefreshClassPropertiesResolver implements RefreshClassPropertiesResolv
      * @param class-string $class
      */
     public function __construct(
-        private string $class,
+        private readonly string $class,
         private int $startDelay,
         private int $interval,
         private int $expectedMaximumProcessingTime,

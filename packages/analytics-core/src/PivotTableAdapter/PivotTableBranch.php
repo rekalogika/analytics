@@ -11,48 +11,44 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
+use Rekalogika\Analytics\Query\ResultNode;
 
-final readonly class NullBranchNode implements BranchNode
+final readonly class PivotTableBranch implements BranchNode
 {
     public function __construct(
-        private string $key,
-        private mixed $legend,
-        private mixed $item,
+        private ResultNode $node,
     ) {}
-
-    public static function fromInterface(BranchNode $branchNode): self
-    {
-        return new self(
-            key: $branchNode->getKey(),
-            legend: $branchNode->getLegend(),
-            item: $branchNode->getItem(),
-        );
-    }
 
     #[\Override]
     public function getKey(): string
     {
-        return $this->key;
+        return $this->node->getKey();
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
-        return $this->legend;
+        return $this->node->getLegend();
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return $this->item;
+        return $this->node->getItem();
     }
 
     #[\Override]
     public function getChildren(): iterable
     {
-        return [];
+        foreach ($this->node as $item) {
+            if ($item->isLeaf()) {
+                yield new PivotTableLeaf($item);
+            } else {
+                yield new PivotTableBranch($item);
+            }
+        }
     }
 }

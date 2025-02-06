@@ -31,7 +31,7 @@ phpunit:
 .PHONY: lint
 lint:
 	$(PHP) tests/bin/console lint:container
-	$(PHP) tests/bin/console doctrine:schema:validate
+	$(PHP) tests/bin/console doctrine:schema:validate --skip-sync
 
 .PHONY: rector
 rector:

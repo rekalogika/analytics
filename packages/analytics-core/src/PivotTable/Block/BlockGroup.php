@@ -36,7 +36,10 @@ abstract class BlockGroup extends Block
      */
     final protected function getChildren(): array
     {
-        return $this->parentNode->getChildren();
+        /** @var \Traversable<array-key,TreeNode> */
+        $children = $this->parentNode->getChildren();
+
+        return array_values(iterator_to_array($children));
     }
 
     /**

@@ -16,15 +16,12 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
-use Rekalogika\Analytics\PivotTable\LeafNode;
-use Rekalogika\Analytics\Query\SummaryItem;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\EventListener\TestNewDirtyFlagListener;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
@@ -38,7 +35,8 @@ class SourceChangeTest extends KernelTestCase
      * Sequences are not affected by transactions, so we need to reset them
      * manually
      */
-    public function tearDown(): void
+    #[\Override]
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -60,10 +58,7 @@ class SourceChangeTest extends KernelTestCase
             ->select('count')
             ->getResult();
 
-        $child = $result->getChildren()[0]
-            ?? throw new \RuntimeException('No children found');
-        $this->assertInstanceOf(LeafNode::class, $child);
-        $count = $child->getValue();
+        $count = $result->traverse('count')?->getValue();
         $this->assertIsInt($count);
 
         return $count;
@@ -80,28 +75,7 @@ class SourceChangeTest extends KernelTestCase
             ->select('count')
             ->getResult();
 
-        $children = $result->getChildren();
-
-        $subItem = null;
-
-        foreach ($children as $c) {
-            $item = $c->getItem();
-            $this->assertInstanceOf(Year::class, $item);
-
-            if ((string) $item === '2030') {
-                $subItem = $c;
-                break;
-            }
-        }
-
-        if (!$subItem instanceof SummaryItem) {
-            return 0;
-        }
-
-        $child = $subItem->getChildren()[0]
-            ?? throw new \RuntimeException('No children found');
-        $this->assertInstanceOf(LeafNode::class, $child);
-        $count = $child->getValue();
+        $count = $result->traverse('2030', 'count')?->getValue() ?? 0;
         $this->assertIsInt($count);
 
         return $count;

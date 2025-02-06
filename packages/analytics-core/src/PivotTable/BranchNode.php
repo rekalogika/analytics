@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\PivotTable;
 interface BranchNode extends TreeNode
 {
     /**
-     * @return list<TreeNode>
+     * @return iterable<TreeNode>
      */
-    public function getChildren(): array;
+    public function getChildren(): iterable;
 }

@@ -33,7 +33,9 @@ final class SummaryRefresher
     private readonly SqlFactory $sqlFactory;
 
     private int|string|null $minIdOfSource = null;
+
     private int|string|null $maxIdOfSource = null;
+
     private int|string|null $maxIdOfSummary = null;
 
 

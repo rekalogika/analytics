@@ -11,9 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-interface LeafNode extends TreeNode
+/**
+ * @internal
+ */
+interface MeasureDescription
 {
-    public function getValue(): mixed;
+    public function getMeasurePropertyName(): string;
 }

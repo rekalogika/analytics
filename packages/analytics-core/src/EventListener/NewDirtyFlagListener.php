@@ -20,7 +20,6 @@ use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistr
 final readonly class NewDirtyFlagListener
 {
     /**
-     * @param PartitionManagerRegistry $partitionManagerRegistry
      * @param RefreshScheduler<object> $refreshScheduler
      */
     public function __construct(

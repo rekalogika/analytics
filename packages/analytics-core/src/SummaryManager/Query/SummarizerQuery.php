@@ -21,9 +21,10 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\Query\SummaryResult;
+use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ArrayToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\MeasureSorter;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultToDimensionTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -84,7 +85,7 @@ final class SummarizerQuery extends AbstractQuery
             ->getPartitionKeyProperty();
     }
 
-    public function execute(): SummaryResult
+    public function execute(): Result
     {
         // add query builder parameters that are always used
         $this->initializeQueryBuilder();
@@ -104,8 +105,8 @@ final class SummarizerQuery extends AbstractQuery
 
         // check if select is empty
         if (empty($this->queryBuilder->getDQLPart('select'))) {
-            return new SummaryResult(
-                items: [],
+            return new DefaultSummaryResult(
+                children: [],
             );
         }
 
@@ -157,7 +158,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // wrap the result using our SummaryResult class
 
-        return new SummaryResult(items: $result);
+        return new DefaultSummaryResult(children: $result);
     }
 
     private function initializeQueryBuilder(): void

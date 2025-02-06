@@ -91,7 +91,11 @@ abstract class Block
 
     final public function createGroupBlock(BranchNode $parentNode, int $level): Block
     {
-        $firstChild = $parentNode->getChildren()[0] ?? null;
+        /** @var \Traversable<array-key,TreeNode> */
+        $children = $parentNode->getChildren();
+        $children = iterator_to_array($children);
+
+        $firstChild = $children[0] ?? null;
 
         if ($firstChild === null) {
             $firstChild = $this->getContext()->getDistinctNodesOfLevel($level)[0] ?? null;

@@ -13,23 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Query\SummaryField;
-use Rekalogika\Analytics\Query\SummaryItem;
-use Rekalogika\Analytics\Query\SummaryLeafItem;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryNode;
 
 final class ArrayToTreeTransformer
 {
     /**
-     * @var list<SummaryItem|SummaryLeafItem>
+     * @var list<DefaultSummaryNode>
      */
     private array $currentPath = [];
 
     /**
-     * @var list<SummaryItem|SummaryLeafItem>
+     * @var list<DefaultSummaryNode>
      */
     private array $tree = [];
 
-    private function addDimension(SummaryItem $item, int $columnNumber): void
+    private function addDimension(DefaultSummaryNode $item, int $columnNumber): void
     {
         $item = clone $item;
 
@@ -53,16 +51,20 @@ final class ArrayToTreeTransformer
 
         $this->currentPath = array_values($currentPath);
 
-        if ($parent instanceof SummaryItem) {
+        if (!$parent->isLeaf()) {
             $parent->addChild($item);
         }
     }
 
-    private function addMeasure(SummaryLeafItem $item): void
+    private function addMeasure(DefaultSummaryNode $item): void
     {
+        if (!$item->isLeaf()) {
+            throw new \UnexpectedValueException('Item must be a leaf');
+        }
+
         $parent = end($this->currentPath);
 
-        if ($parent instanceof SummaryItem) {
+        if ($parent instanceof DefaultSummaryNode) {
             $parent->addChild($item);
         } else {
             $this->currentPath = [$item];
@@ -71,8 +73,8 @@ final class ArrayToTreeTransformer
     }
 
     /**
-     * @param iterable<list<SummaryField>> $inputArray
-     * @return list<SummaryItem|SummaryLeafItem>
+     * @param iterable<list<DefaultSummaryNode>> $inputArray
+     * @return list<DefaultSummaryNode>
      */
     public function arrayToTree(iterable $inputArray): array
     {
@@ -81,12 +83,10 @@ final class ArrayToTreeTransformer
 
         foreach ($inputArray as $row) {
             foreach ($row as $columnNumber => $item) {
-                if ($item instanceof SummaryItem) {
-                    $this->addDimension($item, $columnNumber);
-                } elseif ($item instanceof SummaryLeafItem) {
+                if ($item->isLeaf()) {
                     $this->addMeasure($item);
                 } else {
-                    throw new \UnexpectedValueException('Item must be a dimension or a measure');
+                    $this->addDimension($item, $columnNumber);
                 }
             }
         }
