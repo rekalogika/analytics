@@ -124,7 +124,7 @@ final class Month implements Interval
 
         $year = $this->start->format('Y');
 
-        return sprintf('%s %s', $month, $year);
+        return \sprintf('%s %s', $month, $year);
     }
 
     #[\Override]
