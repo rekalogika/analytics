@@ -30,6 +30,11 @@ final readonly class DefaultSummaryResult implements Result, \IteratorAggregate
         private array $children,
     ) {}
 
+    public function count(): int
+    {
+        return count($this->children);
+    }
+
     public function getIterator(): \Traversable
     {
         foreach ($this->children as $child) {

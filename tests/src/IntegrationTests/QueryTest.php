@@ -30,8 +30,6 @@ class QueryTest extends KernelTestCase
     public function testEmptyQuery(): void
     {
         $result = $this->getQuery()->getResult();
-        $items = iterator_to_array($result);
-
-        $this->assertCount(0, $items);
+        $this->assertCount(0, $result);
     }
 }

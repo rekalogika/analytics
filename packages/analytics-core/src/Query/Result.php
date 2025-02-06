@@ -14,9 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
+ * Represents a query result.
+ * 
+ * For consumption only, do not implement. Methods may be added in the future.
+ * 
  * @extends \Traversable<mixed,ResultNode>
  */
-interface Result extends \Traversable
+interface Result extends \Traversable, \Countable
 {
     public function traverse(mixed ...$items): ?ResultNode;
 }

@@ -16,18 +16,21 @@ namespace Rekalogika\Analytics\Query;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
+ * Represent a node in the query result.
+ * 
+ * For consumption only, do not implement. Methods may be added in the future.
+ * 
  * @extends \Traversable<mixed,ResultNode>
  */
-interface ResultNode extends \Traversable
+interface ResultNode extends \Traversable, \Countable
 {
     /**
-     * Dimension or measure property name (e.g. country, time.hour, revenue)
+     * Dimension property name (e.g. country, time.hour)
      */
     public function getKey(): string;
 
     /**
-     * Description of the dimension or measure (e.g. Country, Hour of the day,
-     * Revenue)
+     * Description of the dimension (e.g. Country, Hour of the day)
      */
     public function getLegend(): string|TranslatableInterface;
 
