@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-final readonly class StringMeasureDescription implements MeasureDescription
+final readonly class StringMeasureDescription implements MeasureDescription, \Stringable
 {
     public function __construct(
         private string $measurePropertyName,

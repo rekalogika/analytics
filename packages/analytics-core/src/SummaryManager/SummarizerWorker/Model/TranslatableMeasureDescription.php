@@ -18,7 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class TranslatableMeasureDescription implements
     MeasureDescription,
-    TranslatableInterface
+    TranslatableInterface,
+    \Stringable
 {
     public function __construct(
         private string $measurePropertyName,

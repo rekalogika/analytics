@@ -48,7 +48,7 @@ trait NodeTrait
 
     public function getPath(mixed ...$items): ?SummaryNode
     {
-        if (\count($items) === 0) {
+        if ($items === []) {
             throw new \InvalidArgumentException('Invalid path');
         }
 
@@ -61,7 +61,7 @@ trait NodeTrait
             return null;
         }
 
-        if (\count($items) === 0) {
+        if ($items === []) {
             return $child;
         }
 
