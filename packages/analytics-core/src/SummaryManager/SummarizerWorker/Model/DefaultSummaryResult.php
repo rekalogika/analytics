@@ -16,22 +16,24 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\Query\ResultNode;
 
-final readonly class DefaultSummaryResult implements Result
+/**
+ * @implements \IteratorAggregate<mixed,ResultNode>
+ */
+final readonly class DefaultSummaryResult implements Result, \IteratorAggregate
 {
     use NodeTrait;
 
     /**
-     * @param list<ResultNode> $nodes
+     * @param list<ResultNode> $children
      */
     public function __construct(
-        private array $nodes,
+        private array $children,
     ) {}
 
-    /**
-     * @return list<ResultNode>
-     */
-    public function getChildren(): array
+    public function getIterator(): \Traversable
     {
-        return $this->nodes;
+        foreach ($this->children as $child) {
+            yield $child->getItem() => $child;
+        }
     }
 }

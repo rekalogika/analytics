@@ -17,12 +17,10 @@ use Rekalogika\Analytics\Query\ResultNode;
 
 trait NodeTrait
 {
-    public function getChild(mixed $item): ?ResultNode
+    private function getChild(mixed $item): ?ResultNode
     {
-        foreach ($this->getChildren() as $child) {
-            /** @psalm-suppress MixedAssignment */
-            $currentItem = $child->getItem();
-
+        /** @var mixed $currentItem */
+        foreach ($this as $currentItem => $child) {
             if (
                 $currentItem instanceof MeasureDescription
                 && $currentItem->getMeasurePropertyName() === $item
@@ -45,7 +43,7 @@ trait NodeTrait
         return null;
     }
 
-    public function getPath(mixed ...$items): ?ResultNode
+    public function traverse(mixed ...$items): ?ResultNode
     {
         if ($items === []) {
             throw new \InvalidArgumentException('Invalid path');
@@ -64,6 +62,6 @@ trait NodeTrait
             return $child;
         }
 
-        return $child->getPath(...$items);
+        return $child->traverse(...$items);
     }
 }

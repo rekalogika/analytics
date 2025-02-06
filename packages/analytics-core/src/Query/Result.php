@@ -13,14 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-interface Result
+/**
+ * @extends \Traversable<mixed,ResultNode>
+ */
+interface Result extends \Traversable
 {
-    /**
-     * @return list<ResultNode>
-     */
-    public function getChildren(): array;
-
-    public function getChild(mixed $item): ?ResultNode;
-
-    public function getPath(mixed ...$items): ?ResultNode;
+    public function traverse(mixed ...$items): ?ResultNode;
 }

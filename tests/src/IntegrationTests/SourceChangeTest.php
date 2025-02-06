@@ -58,7 +58,7 @@ class SourceChangeTest extends KernelTestCase
             ->select('count')
             ->getResult();
 
-        $count = $result->getPath('count')?->getValue();
+        $count = $result->traverse('count')?->getValue();
         $this->assertIsInt($count);
 
         return $count;
@@ -75,7 +75,7 @@ class SourceChangeTest extends KernelTestCase
             ->select('count')
             ->getResult();
 
-        $count = $result->getPath('2030', 'count')?->getValue() ?? 0;
+        $count = $result->traverse('2030', 'count')?->getValue() ?? 0;
         $this->assertIsInt($count);
 
         return $count;

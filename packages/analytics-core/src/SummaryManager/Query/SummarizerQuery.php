@@ -106,7 +106,7 @@ final class SummarizerQuery extends AbstractQuery
         // check if select is empty
         if (empty($this->queryBuilder->getDQLPart('select'))) {
             return new DefaultSummaryResult(
-                nodes: [],
+                children: [],
             );
         }
 
@@ -158,7 +158,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // wrap the result using our SummaryResult class
 
-        return new DefaultSummaryResult(nodes: $result);
+        return new DefaultSummaryResult(children: $result);
     }
 
     private function initializeQueryBuilder(): void

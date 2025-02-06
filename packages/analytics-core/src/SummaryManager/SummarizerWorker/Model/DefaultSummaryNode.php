@@ -16,7 +16,10 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 use Rekalogika\Analytics\Query\ResultNode;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class DefaultSummaryNode implements ResultNode
+/**
+ * @implements \IteratorAggregate<mixed,ResultNode>
+ */
+final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 {
     use NodeTrait;
 
@@ -36,6 +39,12 @@ final class DefaultSummaryNode implements ResultNode
         private readonly bool $leaf,
     ) {}
 
+    public function getIterator(): \Traversable
+    {
+        foreach ($this->children as $child) {
+            yield $child->getItem() => $child;
+        }
+    }
 
     public static function createBranchItem(
         string $key,
@@ -115,14 +124,6 @@ final class DefaultSummaryNode implements ResultNode
     {
         $this->children[] = $item;
         $item->setParent($this);
-    }
-
-    /**
-     * @return list<DefaultSummaryNode>
-     */
-    public function getChildren(): array
-    {
-        return $this->children;
     }
 
     public function getValue(): object|int|float|null

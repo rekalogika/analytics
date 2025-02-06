@@ -15,7 +15,10 @@ namespace Rekalogika\Analytics\Query;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface ResultNode
+/**
+ * @extends \Traversable<mixed,ResultNode>
+ */
+interface ResultNode extends \Traversable
 {
     /**
      * Dimension or measure property name (e.g. country, time.hour, revenue)
@@ -32,15 +35,6 @@ interface ResultNode
      * The item that this node represents. (e.g. France, 12:00).
      */
     public function getItem(): mixed;
-
-    /**
-     * The children of this node.
-     *
-     * @return iterable<ResultNode>
-     */
-    public function getChildren(): iterable;
-
-    public function getChild(mixed $item): ?ResultNode;
 
     /**
      * The canonical value. If not in leaf node, the value is null. Usually a
@@ -60,5 +54,5 @@ interface ResultNode
      */
     public function isLeaf(): bool;
 
-    public function getPath(mixed ...$items): ?ResultNode;
+    public function traverse(mixed ...$items): ?ResultNode;
 }

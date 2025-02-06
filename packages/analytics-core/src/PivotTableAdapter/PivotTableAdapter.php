@@ -43,7 +43,7 @@ final readonly class PivotTableAdapter implements BranchNode
     #[\Override]
     public function getChildren(): iterable
     {
-        foreach ($this->result->getChildren() as $item) {
+        foreach ($this->result as $item) {
             if ($item->isLeaf()) {
                 yield new PivotTableLeaf($item);
             } else {
