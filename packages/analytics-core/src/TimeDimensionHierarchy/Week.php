@@ -32,7 +32,8 @@ final class Week implements Interval
 
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($y, $w);
+            ->setISODate($y, $w)
+            ->setTime(0, 0, 0);
 
         $this->end = $this->start->modify('+1 week');
     }
