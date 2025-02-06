@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
+use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -77,10 +78,12 @@ class QueryTest extends KernelTestCase
 
     public function testTraversal(): void
     {
+        // get a valid country
         $country = static::getContainer()
             ->get(EntityManagerInterface::class)
-            ->getRepository(Country::class)
-            ->findOneBy(['code' => 'FR']);
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?->getCountry();
 
         $this->assertNotNull($country);
 
@@ -119,34 +122,61 @@ class QueryTest extends KernelTestCase
 
     public function testGroupByValueType(): void
     {
+        // get a valid country
+        $country = static::getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?->getCountry();
+
+        $this->assertNotNull($country);
+
         $result = $this->getQuery()
             ->groupBy('time.year', '@values', 'customerCountry')
             ->select('count', 'price')
             ->getResult();
 
-        $node = $result->traverse('2024', 'count', 'France');
+        $node = $result->traverse('2024', 'count', $country->getName());
         $this->assertIsInt($node?->getValue());
     }
 
     public function testGroupByValueTypeFirst(): void
     {
+        // get a valid country
+        $country = static::getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?->getCountry();
+
+        $this->assertNotNull($country);
+
         $result = $this->getQuery()
             ->groupBy('@values', 'time.year', 'customerCountry')
             ->select('count', 'price')
             ->getResult();
 
-        $node = $result->traverse('count', '2024', 'France');
+        $node = $result->traverse('count', '2024', $country->getName());
         $this->assertIsInt($node?->getValue());
     }
 
     public function testGroupByValueTypeLast(): void
     {
+        // get a valid country
+        $country = static::getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?->getCountry();
+
+        $this->assertNotNull($country);
+
         $result = $this->getQuery()
             ->groupBy('time.year', 'customerCountry', '@values')
             ->select('count', 'price')
             ->getResult();
 
-        $node = $result->traverse('2024', 'France', 'count');
+        $node = $result->traverse('2024', $country->getName(), 'count');
         $this->assertIsInt($node?->getValue());
     }
 }
