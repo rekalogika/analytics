@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Query;
 
 /**
  * Represents a query result.
- * 
+ *
  * For consumption only, do not implement. Methods may be added in the future.
- * 
+ *
  * @extends \Traversable<mixed,ResultNode>
  */
 interface Result extends \Traversable, \Countable

@@ -32,7 +32,7 @@ final readonly class DefaultSummaryResult implements Result, \IteratorAggregate
 
     public function count(): int
     {
-        return count($this->children);
+        return \count($this->children);
     }
 
     public function getIterator(): \Traversable

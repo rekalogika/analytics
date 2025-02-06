@@ -41,7 +41,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 
     public function count(): int
     {
-        return count($this->children);
+        return \count($this->children);
     }
 
     public function getIterator(): \Traversable
@@ -86,7 +86,8 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
     public function isEqual(self $other): bool
     {
         return $this->key === $other->key
-            && $this->item === $other->item;;
+            && $this->item === $other->item;
+        ;
     }
 
     public function isLeaf(): bool
