@@ -57,8 +57,9 @@ final readonly class UnpivotValuesTransformer
 
         foreach ($this->dimensions as $dimension) {
             if ($dimension === '@values') {
+                // temporary value, we book the place in the row, the value will
+                // be set in the next loop
                 $newRow['@values'] = true;
-                // temporary value
             } elseif (\array_key_exists($dimension, $row)) {
                 $newRow[$dimension] = $row[$dimension];
             } else {
@@ -67,8 +68,12 @@ final readonly class UnpivotValuesTransformer
         }
 
         foreach ($this->measures as $measure) {
-            // $measureLabel = $this->metadata->getMeasureMetadata($measure)->getLabel();
+            // @values represent the place of the value column in the
+            // row. the value column is not always at the end of the row
             $newRow['@values'] = $measure;
+
+            // @measure contains the actual value of the measure, it
+            // will be removed later
             $newRow['@measure'] = $row[$measure]
                 ?? throw new \RuntimeException(\sprintf('Measure %s not found in row', $measure));
 

@@ -85,6 +85,9 @@ final readonly class ResultToDimensionTableTransformer
                         legend: $name,
                     );
                 } elseif ($key === '@values') {
+                    // @values represent the place of the value column in the
+                    // row. the value column is not always at the end of the row
+
                     $name = $valuesMessage;
 
                     $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
@@ -93,6 +96,9 @@ final readonly class ResultToDimensionTableTransformer
                         legend: $name,
                     );
                 } elseif ($key === '@measure') {
+                    // @measure contains the actual value of the measure, it
+                    // will be removed later
+
                     $lastItem = $transformedRow[$lastKey] ?? null;
 
                     if (
