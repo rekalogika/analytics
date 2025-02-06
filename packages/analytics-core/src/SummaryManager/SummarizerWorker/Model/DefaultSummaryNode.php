@@ -143,8 +143,8 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 
     public function getMeasurePropertyName(): ?string
     {
-        if ($this->value instanceof MeasureDescription) {
-            return $this->value->getMeasurePropertyName();
+        if ($this->item instanceof MeasureDescription) {
+            return $this->item->getMeasurePropertyName();
         }
 
         return null;
