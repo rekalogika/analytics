@@ -33,7 +33,8 @@ final class WeekDate implements Interval
 
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($y, $w, $d);
+            ->setISODate($y, $w, $d)
+            ->setTime(0, 0, 0);
 
         $this->end = $this->start->modify('+1 day');
     }

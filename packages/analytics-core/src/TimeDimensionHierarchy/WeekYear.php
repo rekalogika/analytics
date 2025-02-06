@@ -27,7 +27,8 @@ final class WeekYear implements Interval
     ) {
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($databaseValue, 1);
+            ->setISODate($databaseValue, 1)
+            ->setTime(0, 0, 0);
 
         $this->end = $this->start->setISODate($databaseValue + 1, 1);
     }
