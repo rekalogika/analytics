@@ -33,8 +33,8 @@ final class Month implements Interval
         $m = (int) substr($string, 4, 2);
 
         $start = \DateTimeImmutable::createFromFormat(
-            'Y-m',
-            \sprintf('%04d-%02d', $y, $m),
+            'Y-m-d H:i:s',
+            \sprintf('%04d-%02d-01 00:00:00', $y, $m),
             $timeZone,
         );
         Assert::isInstanceOf($start, \DateTimeImmutable::class);
