@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-interface SummaryResult
+interface Result
 {
     /**
-     * @return list<SummaryNode>
+     * @return list<ResultNode>
      */
     public function getChildren(): array;
 
-    public function getChild(mixed $item): ?SummaryNode;
+    public function getChild(mixed $item): ?ResultNode;
 
-    public function getPath(mixed ...$items): ?SummaryNode;
+    public function getPath(mixed ...$items): ?ResultNode;
 }

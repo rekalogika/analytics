@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\BranchNode;
-use Rekalogika\Analytics\Query\SummaryNode;
+use Rekalogika\Analytics\Query\ResultNode;
 
 final readonly class PivotTableBranch implements BranchNode
 {
     public function __construct(
-        private SummaryNode $node,
+        private ResultNode $node,
     ) {}
 
     #[\Override]

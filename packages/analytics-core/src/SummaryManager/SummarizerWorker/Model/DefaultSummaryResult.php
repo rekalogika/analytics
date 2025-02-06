@@ -11,24 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query\Implementation;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\SummaryNode;
-use Rekalogika\Analytics\Query\SummaryResult;
+use Rekalogika\Analytics\Query\Result;
+use Rekalogika\Analytics\Query\ResultNode;
 
-final readonly class DefaultSummaryResult implements SummaryResult
+final readonly class DefaultSummaryResult implements Result
 {
     use NodeTrait;
 
     /**
-     * @param list<SummaryNode> $nodes
+     * @param list<ResultNode> $nodes
      */
     public function __construct(
         private array $nodes,
     ) {}
 
     /**
-     * @return list<SummaryNode>
+     * @return list<ResultNode>
      */
     public function getChildren(): array
     {

@@ -11,13 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query\Implementation;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\SummaryNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
+use Rekalogika\Analytics\Query\ResultNode;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class DefaultSummaryNode implements SummaryNode
+final class DefaultSummaryNode implements ResultNode
 {
     use NodeTrait;
 

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Query\Implementation\DefaultSummaryNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryNode;
 use Symfony\Component\Translation\TranslatableMessage;
 
 final readonly class ResultToDimensionTableTransformer

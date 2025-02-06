@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Query;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface SummaryNode
+interface ResultNode
 {
     /**
      * Dimension or measure property name (e.g. country, time.hour, revenue)
@@ -36,11 +36,11 @@ interface SummaryNode
     /**
      * The children of this node.
      *
-     * @return iterable<SummaryNode>
+     * @return iterable<ResultNode>
      */
     public function getChildren(): iterable;
 
-    public function getChild(mixed $item): ?SummaryNode;
+    public function getChild(mixed $item): ?ResultNode;
 
     /**
      * The canonical value. If not in leaf node, the value is null. Usually a
@@ -60,5 +60,5 @@ interface SummaryNode
      */
     public function isLeaf(): bool;
 
-    public function getPath(mixed ...$items): ?SummaryNode;
+    public function getPath(mixed ...$items): ?ResultNode;
 }

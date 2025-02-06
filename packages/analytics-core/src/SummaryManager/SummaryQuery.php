@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Query\SummaryResult;
+use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Filter\Filter;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -56,7 +56,7 @@ final class SummaryQuery
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {}
 
-    public function getResult(): SummaryResult
+    public function getResult(): Result
     {
         $summarizer = new SummarizerQuery(
             queryBuilder: $this->entityManager->createQueryBuilder(),

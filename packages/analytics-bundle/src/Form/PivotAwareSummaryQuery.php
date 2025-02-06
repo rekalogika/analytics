@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Form;
 
-use Rekalogika\Analytics\Query\SummaryResult;
+use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Item;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -213,7 +213,7 @@ final class PivotAwareSummaryQuery
         return $this->summaryQuery->getMeasureChoices();
     }
 
-    public function getResult(): SummaryResult
+    public function getResult(): Result
     {
         return $this->summaryQuery->getResult();
     }

@@ -11,14 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query\Implementation;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\SummaryNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
+use Rekalogika\Analytics\Query\ResultNode;
 
 trait NodeTrait
 {
-    public function getChild(mixed $item): ?SummaryNode
+    public function getChild(mixed $item): ?ResultNode
     {
         foreach ($this->getChildren() as $child) {
             /** @psalm-suppress MixedAssignment */
@@ -46,7 +45,7 @@ trait NodeTrait
         return null;
     }
 
-    public function getPath(mixed ...$items): ?SummaryNode
+    public function getPath(mixed ...$items): ?ResultNode
     {
         if ($items === []) {
             throw new \InvalidArgumentException('Invalid path');

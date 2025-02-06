@@ -21,10 +21,10 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\Query\Implementation\DefaultSummaryResult;
-use Rekalogika\Analytics\Query\SummaryResult;
+use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ArrayToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\MeasureSorter;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultToDimensionTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -85,7 +85,7 @@ final class SummarizerQuery extends AbstractQuery
             ->getPartitionKeyProperty();
     }
 
-    public function execute(): SummaryResult
+    public function execute(): Result
     {
         // add query builder parameters that are always used
         $this->initializeQueryBuilder();
