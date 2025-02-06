@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query\Implementation;
 
 use Rekalogika\Analytics\Query\SummaryNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DefaultSummaryNode implements SummaryNode
@@ -35,6 +36,7 @@ final class DefaultSummaryNode implements SummaryNode
         private readonly mixed $item,
         private readonly bool $leaf,
     ) {}
+
 
     public static function createBranchItem(
         string $key,
@@ -132,5 +134,14 @@ final class DefaultSummaryNode implements SummaryNode
     public function getRawValue(): int|float|null
     {
         return $this->rawValue;
+    }
+
+    public function getMeasurePropertyName(): ?string
+    {
+        if ($this->value instanceof MeasureDescription) {
+            return $this->value->getMeasurePropertyName();
+        }
+
+        return null;
     }
 }

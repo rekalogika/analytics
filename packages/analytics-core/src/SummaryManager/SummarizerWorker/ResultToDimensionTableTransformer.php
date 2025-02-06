@@ -97,12 +97,13 @@ final readonly class ResultToDimensionTableTransformer
                     );
                 } elseif ($key === '@measure') {
                     // @measure contains the actual value of the measure, it
-                    // will be removed later
+                    // will be removed later, measure is always at the end of
+                    // the row
 
-                    $lastItem = $transformedRow[$lastKey] ?? null;
+                    $lastRow = $transformedRow[$lastKey] ?? null;
 
                     if (
-                        $lastItem instanceof DefaultSummaryNode
+                        $lastRow instanceof DefaultSummaryNode
                     ) {
                         if (
                             !\is_int($rawValue)
@@ -124,11 +125,11 @@ final readonly class ResultToDimensionTableTransformer
                         \assert(\is_string($lastKey));
 
                         $transformedRow[$lastKey] = DefaultSummaryNode::createLeafItem(
-                            key: $lastItem->getKey(),
-                            item: $lastItem->getItem(),
+                            key: $lastRow->getKey(),
+                            item: $lastRow->getItem(),
                             value: $value,
                             rawValue: $rawValue,
-                            legend: $lastItem->getLegend(),
+                            legend: $lastRow->getLegend(),
                         );
                     }
                 } else {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query\Implementation;
 
 use Rekalogika\Analytics\Query\SummaryNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 
 trait NodeTrait
 {
@@ -22,6 +23,13 @@ trait NodeTrait
         foreach ($this->getChildren() as $child) {
             /** @psalm-suppress MixedAssignment */
             $currentItem = $child->getItem();
+
+            if (
+                $currentItem instanceof MeasureDescription
+                && $currentItem->getMeasurePropertyName() === $item
+            ) {
+                return $child;
+            }
 
             if ($currentItem === $item) {
                 return $child;
