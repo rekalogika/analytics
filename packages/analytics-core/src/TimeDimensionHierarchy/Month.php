@@ -72,6 +72,41 @@ final class Month implements Interval
     #[\Override]
     public function __toString(): string
     {
+        $dateTime = new \DateTimeImmutable(
+            $this->start->format('Y-m-d'),
+            $this->start->getTimezone(),
+        );
+
+        try {
+            $locale = setlocale(LC_TIME, '0');
+
+            if ($locale === false) {
+                $locale = 'C';
+            }
+
+            $intlDateFormatter = new \IntlDateFormatter(
+                $locale,
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::FULL,
+                $this->start->getTimezone(),
+                \IntlDateFormatter::GREGORIAN,
+                'MMMM YYYY',
+            );
+
+            $formatted = $intlDateFormatter->format($dateTime);
+
+            if (!\is_string($formatted)) {
+                return $this->getBasicString();
+            }
+
+            return $formatted;
+        } catch (\Error) {
+            return $this->getBasicString();
+        }
+    }
+
+    private function getBasicString(): string
+    {
         $month = match ($this->start->format('m')) {
             '01' => 'January',
             '02' => 'February',
@@ -87,33 +122,9 @@ final class Month implements Interval
             '12' => 'December',
         };
 
-        $dateTime = new \DateTimeImmutable(
-            $this->start->format('Y-m-d'),
-            $this->start->getTimezone(),
-        );
+        $year = $this->start->format('Y');
 
-        $locale = setlocale(LC_TIME, '0');
-
-        if ($locale === false) {
-            $locale = 'C';
-        }
-
-        $intlDateFormatter = new \IntlDateFormatter(
-            $locale,
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::FULL,
-            $this->start->getTimezone(),
-            \IntlDateFormatter::GREGORIAN,
-            'MMMM YYYY',
-        );
-
-        $formatted = $intlDateFormatter->format($dateTime);
-
-        if (!\is_string($formatted)) {
-            $formatted = $month;
-        }
-
-        return $formatted;
+        return sprintf('%s %s', $month, $year);
     }
 
     #[\Override]
