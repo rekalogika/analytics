@@ -51,7 +51,7 @@ class TimeDimensionHierarchyTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<Interval>,\DateTimeInterface,\DateTimeInterface}>
+     * @return iterable<array-key,array{int,class-string<Interval>,\DateTimeInterface,\DateTimeInterface,string}>
      */
     public static function intervalProvider(): iterable
     {
