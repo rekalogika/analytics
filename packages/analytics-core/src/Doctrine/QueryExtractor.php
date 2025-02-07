@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Doctrine;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
@@ -34,9 +33,9 @@ final readonly class QueryExtractor
     private ResultSetMapping $resultSetMapping;
 
     /**
-     * @var array<int,array{mixed,mixed}>
+     * @var array<int,array{mixed,int|string|ParameterType|ArrayParameterType}>
      */
-    private array $bindValues;
+    private array $parameters;
 
     public function __construct(Query $query)
     {
@@ -83,8 +82,6 @@ final readonly class QueryExtractor
                 throw new \LogicException('Invalid type');
             }
 
-            // @todo check type here
-
             foreach ($positions as $position) {
                 $bindValues[$position] = [$processedValue, $type];
             }
@@ -92,7 +89,7 @@ final readonly class QueryExtractor
 
         ksort($bindValues);
 
-        $this->bindValues = $bindValues;
+        $this->parameters = $bindValues;
     }
 
     /**
@@ -118,10 +115,10 @@ final readonly class QueryExtractor
     }
 
     /**
-     * @return array<int,array{mixed,mixed}>
+     * @return array<int,array{mixed,int|string|ParameterType|ArrayParameterType}>
      */
-    public function getBindValues(): array
+    public function getParameters(): array
     {
-        return $this->bindValues;
+        return $this->parameters;
     }
 }
