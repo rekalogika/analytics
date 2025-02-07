@@ -27,7 +27,7 @@ final readonly class Printer
         } elseif ($value instanceof \Stringable) {
             return $value->__toString();
         } elseif ($value instanceof \DateTimeInterface) {
-            return $value->format(\DateTime::ATOM);
+            return $value->format(\DateTimeInterface::ATOM);
         } elseif ($value instanceof \DateInterval) {
             return (string) (
                 $value->days * 86400

@@ -33,7 +33,7 @@ use Rekalogika\Analytics\TimeDimensionHierarchy\QuarterOfYear;
 use Rekalogika\Analytics\TimeDimensionHierarchy\WeekDate;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
-use Symfony\Component\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatableMessage;
 
 #[Embeddable]
 #[Hierarchy([
