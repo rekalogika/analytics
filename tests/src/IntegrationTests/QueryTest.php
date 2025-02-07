@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
+use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class QueryTest extends KernelTestCase
@@ -178,5 +181,65 @@ class QueryTest extends KernelTestCase
 
         $node = $result->traverse('2024', $country->getName(), 'count');
         $this->assertIsInt($node?->getValue());
+    }
+
+    public function testWhere(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.year')
+            ->select('count')
+            ->where(Criteria::expr()->eq('time.year', 2024))
+            ->getResult();
+
+        $this->assertCount(1, $result);
+    }
+
+    // public function testWhereMonthObject(): void
+    // {
+    //     $month = Month::createFromDatabaseValue(202410, new \DateTimeZone('UTC'));
+
+    //     $result = $this->getQuery()
+    //         ->groupBy('time.year')
+    //         ->select('count')
+    //         ->where(Criteria::expr()->eq('time.month', ...))
+    //         ->getResult();
+
+    //     $this->assertCount(1, $result);
+    // }
+
+    public function testWhereWithOr(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.year')
+            ->select('count')
+            ->where(Criteria::expr()->orX(
+                Criteria::expr()->eq('time.year', 2024),
+                Criteria::expr()->eq('time.year', 2023),
+            ))
+            ->getResult();
+
+        $this->assertCount(2, $result);
+    }
+
+    public function testWhereWithDimensionNotInGroupBy(): void
+    {
+        $all = $this->getQuery()
+            ->select('count')
+            ->getResult()
+            ->traverse('count')
+            ?->getValue();
+
+        $this->assertNotNull($all);
+
+        $withWhere = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->eq('time.year', 2024))
+            ->getResult()
+            ->traverse('count')
+            ?->getValue();
+
+        $this->assertNotNull($withWhere);
+
+        $this->assertLessThan($all, $withWhere);
     }
 }

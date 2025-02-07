@@ -93,12 +93,11 @@ final class SummarizerQuery extends AbstractQuery
         // add query parameters involving dimensions to the query builder
         $this->processAllDimensions();
 
-        // apply filter
-        // @todo restore functionality
-        // $this->applyFilter();
-
         // add partition where clause
         $this->addPartitionWhere();
+
+        // add where clause supplied by the user
+        $this->addUserSuppliedWhere();
 
         // add grouping where clause
         $this->addGroupingWhere();
@@ -172,24 +171,6 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    // private function applyFilter(): void
-    // {
-    //     $filters = $this->query->getFilters();
-    //     $dimensionIds = array_keys($this->metadata->getDimensionMetadatas());
-    //     $i = 1;
-    //     foreach ($filters as $filter) {
-    //         $filterDimension = $filter->getDimension();
-    //         $filterEqualTo = $filter->getEqualTo();
-    //         if (!\in_array($filterDimension, $dimensionIds, true)) {
-    //             throw new \InvalidArgumentException(\sprintf('Invalid dimension "%s"', $filterDimension));
-    //         }
-    //         $this->queryBuilder
-    //             ->andWhere(\sprintf('root.%s = :filterValue%d', $filterDimension, $i))
-    //             ->setParameter(\sprintf('filterValue%d', $i), $filterEqualTo);
-    //         $this->groupings[$filterDimension] = false;
-    //         $i++;
-    //     }
-    // }
     /**
      * @return iterable<Comparison|Andx>
      */
@@ -272,19 +253,6 @@ final class SummarizerQuery extends AbstractQuery
         $orX = $this->queryBuilder->expr()->orX(...$conditions);
 
         $this->queryBuilder->andWhere($orX);
-
-        // $partitionClass = $this->metadata->getPartition()->getPartitionClass();
-        // $highestLevel = PartitionUtil::getHighestLevel($partitionClass);
-
-        // $partitionMetadata = $this->metadata->getPartition();
-        // $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
-
-        // $this->queryBuilder
-        //     ->andWhere(\sprintf(
-        //         'root.partition.%s = %d',
-        //         $partitionLevelProperty,
-        //         $highestLevel,
-        //     ));
     }
 
     private function getLowestPartitionMaxId(): int|string|null
@@ -313,31 +281,79 @@ final class SummarizerQuery extends AbstractQuery
                 "root.%s = '%s'",
                 $groupingsProperty,
                 $groupingsString,
-            ));
+            ))
+        ;
+    }
+
+    private function addUserSuppliedWhere(): void
+    {
+        $where = $this->query->getWhere();
+
+        $validDimensions = array_values(array_filter(
+            $this->metadata->getDimensionPropertyNames(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        ));
+
+        $visitor = new SummaryExpressionVisitor(
+            queryBuilder: $this->queryBuilder,
+            validFields: $validDimensions,
+            queryContext: $this->getQueryContext(),
+        );
+
+        foreach ($where as $whereExpression) {
+            /** @psalm-suppress MixedAssignment */
+            $expression = $visitor->dispatch($whereExpression);
+
+            // @phpstan-ignore argument.type
+            $this->queryBuilder->andWhere($expression);
+        }
+
+        // add dimensions not in the query to the group by clause
+
+        $involvedDimensions = $visitor->getInvolvedDimensions();
+        $dimensionsInQuery = array_filter(
+            $this->query->getGroupBy(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        );
+        $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
+
+        foreach ($involvedDimensionNotInQuery as $dimension) {
+            $this->processDimension($dimension, true);
+        }
     }
 
     private function processAllDimensions(): void
     {
         $dimensionsInQuery = $this->query->getGroupBy();
 
-        // add @values if not present
+        // add @values to the end of the dimensions if not present
         if (!\in_array('@values', $dimensionsInQuery, true)) {
             $dimensionsInQuery[] = '@values';
         }
 
         foreach ($dimensionsInQuery as $dimension) {
-            if ($dimension === '@values') {
-                $this->addValuesToQueryBuilder($this->query->getSelect());
-            } elseif (str_contains($dimension, '.')) {
-                $this->addHierarchicalDimensionToQueryBuilder($dimension);
-            } else {
-                $this->addNonHierarchicalDimensionToQueryBuilder($dimension);
+            $this->processDimension($dimension, false);
+        }
+    }
+
+    private function processDimension(string $dimension, bool $hidden): void
+    {
+        if ($dimension === '@values') {
+            if ($hidden) {
+                throw new \InvalidArgumentException('Cannot hide @values');
             }
+
+            $this->addValuesToQueryBuilder($this->query->getSelect());
+        } elseif (str_contains($dimension, '.')) {
+            $this->addHierarchicalDimensionToQueryBuilder($dimension, $hidden);
+        } else {
+            $this->addNonHierarchicalDimensionToQueryBuilder($dimension, $hidden);
         }
     }
 
     private function addHierarchicalDimensionToQueryBuilder(
         string $dimension,
+        bool $hidden,
     ): void {
         [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
@@ -376,9 +392,10 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->addSelect(\sprintf(
-                "root.%s.%s AS %s",
+                "root.%s.%s AS %s %s",
                 $dimensionProperty,
                 $hierarchyProperty,
+                $hidden ? 'HIDDEN' : '',
                 $alias,
             ))
             ->addOrderBy(\sprintf(
@@ -423,8 +440,10 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    private function addNonHierarchicalDimensionToQueryBuilder(string $dimension): void
-    {
+    private function addNonHierarchicalDimensionToQueryBuilder(
+        string $dimension,
+        bool $hidden,
+    ): void {
         $dimensionMetadata = $this->metadata->getDimensionMetadata($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
@@ -435,7 +454,7 @@ final class SummarizerQuery extends AbstractQuery
         try {
             $joinedEntityClass = $classMetadata
                 ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
-        } catch (MappingException|\InvalidArgumentException) {
+        } catch (MappingException | \InvalidArgumentException) {
             $joinedEntityClass = null;
         }
 
@@ -463,9 +482,10 @@ final class SummarizerQuery extends AbstractQuery
                     ),
                 )
                 ->addSelect(\sprintf(
-                    '%s.%s AS %s',
+                    '%s.%s AS %s %s',
                     $alias,
                     $identity,
+                    $hidden ? 'HIDDEN' : '',
                     $dimension,
                 ))
                 ->addOrderBy(\sprintf(
@@ -487,8 +507,9 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->addSelect(\sprintf(
-                'root.%s AS %s',
+                'root.%s AS %s %s',
                 $dimensionMetadata->getSummaryProperty(),
+                $hidden ? 'HIDDEN' : '',
                 $dimension,
             ))
             ->addOrderBy(\sprintf(

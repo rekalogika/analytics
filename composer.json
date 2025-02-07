@@ -12,6 +12,7 @@
     "homepage": "https://rekalogika.dev/analytics",
     "require": {
         "php": "^8.2",
+        "doctrine/collections": "^2.2",
         "doctrine/dbal": "^3 || ^4",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/orm": "^2.20 || ^3.2",

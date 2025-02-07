@@ -12,8 +12,9 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "doctrine/orm": "^2.20 || ^3.2",
+        "doctrine/collections": "^2.2",
         "doctrine/dbal": "^3 || ^4",
+        "doctrine/orm": "^2.20 || ^3.2",
         "doctrine/persistence": "^3.1",
         "psr/clock": "^1.0",
         "psr/event-dispatcher": "^1.0",

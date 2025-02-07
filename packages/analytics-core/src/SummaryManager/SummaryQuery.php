@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\Filter\Filter;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -38,9 +38,9 @@ final class SummaryQuery
     private array $measures = [];
 
     /**
-     * @var array<string,Filter>
+     * @var list<Expression>
      */
-    private array $filters = [];
+    private array $where = [];
 
     /**
      * @param non-empty-array<string,Item> $dimensionChoices
@@ -212,28 +212,25 @@ final class SummaryQuery
     //
 
     /**
-     * @return array<string,Filter>
+     * @return list<Expression>
      */
     public function getWhere(): array
     {
-        return $this->filters;
+        return $this->where;
     }
 
-    public function where(string $dimension, Filter $filter): void
+    public function where(Expression $expression): self
     {
-        $this->filters = [];
+        $this->where = [];
+        $this->andWhere($expression);
 
-        $this->andWhere($dimension, $filter);
+        return $this;
     }
 
-    public function andWhere(string $dimension, ?Filter $filter): void
+    public function andWhere(Expression $expression): self
     {
-        if ($filter === null) {
-            unset($this->filters[$dimension]);
-        } elseif (isset($this->filters[$dimension])) {
-            throw new \InvalidArgumentException(\sprintf('Filter for dimension "%s" already exists', $dimension));
-        } else {
-            $this->filters[$dimension] = $filter;
-        }
+        $this->where[] = $expression;
+
+        return $this;
     }
 }
