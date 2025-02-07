@@ -297,6 +297,7 @@ final class SummarizerQuery extends AbstractQuery
         $visitor = new SummaryExpressionVisitor(
             queryBuilder: $this->queryBuilder,
             validFields: $validDimensions,
+            queryContext: $this->getQueryContext(),
         );
 
         foreach ($where as $whereExpression) {

@@ -32,6 +32,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly array $validFields,
+        private readonly QueryContext $queryContext,
     ) {
         $this->rootAlias = $this->queryBuilder->getRootAliases()[0]
             ?? throw new \InvalidArgumentException('No root alias found');
@@ -66,7 +67,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
 
     public function walkValue(Value $value): mixed
     {
-        return $this->queryBuilder
+        return $this->queryContext
             ->createNamedParameter($value->getValue());
     }
 

@@ -20,6 +20,7 @@ use Rekalogika\Analytics\SummaryManager\Query\Path\PathResolver;
 final class QueryContext
 {
     private ?PathResolver $pathResolver = null;
+    private int $boundCounter = 0;
 
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
@@ -70,5 +71,17 @@ final class QueryContext
     public function resolvePath(string $path): string
     {
         return $this->getPathResolver()->resolvePath(new Path($path));
+    }
+
+    /**
+     * Doctrine 2 does not have createNamedParameter method in QueryBuilder,
+     * so we do it manually here.
+     */
+    public function createNamedParameter(mixed $value): string
+    {
+        $name = 'querycontext' . $this->boundCounter++;
+        $this->queryBuilder->setParameter($name, $value);
+
+        return ':' . $name;
     }
 }
