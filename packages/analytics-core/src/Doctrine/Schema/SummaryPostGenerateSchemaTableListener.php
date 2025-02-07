@@ -13,14 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Doctrine\Schema;
 
-use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
-use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 
-#[AsDoctrineListener(ToolEvents::postGenerateSchemaTable)]
 class SummaryPostGenerateSchemaTableListener
 {
     public function __construct(

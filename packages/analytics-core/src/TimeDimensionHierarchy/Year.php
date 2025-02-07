@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
-use Webmozart\Assert\Assert;
-
 final class Year implements Interval
 {
     use CacheTrait;
@@ -36,7 +34,10 @@ final class Year implements Interval
             \sprintf('%04d-01-01 00:00:00', $y),
             $timeZone,
         );
-        Assert::isInstanceOf($start, \DateTimeImmutable::class);
+
+        if ($start === false) {
+            throw new \InvalidArgumentException('Invalid database value');
+        }
 
         $this->start = $start;
 

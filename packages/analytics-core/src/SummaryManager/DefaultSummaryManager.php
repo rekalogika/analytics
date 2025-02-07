@@ -18,8 +18,8 @@ use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager;
+use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
