@@ -27,6 +27,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     private string $rootAlias;
 
     /**
+     * @var array<string,true>
+     */
+    private array $involvedDimensions = [];
+
+    /**
      * @param list<string> $validFields
      */
     public function __construct(
@@ -38,6 +43,14 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             ?? throw new \InvalidArgumentException('No root alias found');
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getInvolvedDimensions(): array
+    {
+        return array_keys($this->involvedDimensions);
+    }
+
     public function walkComparison(Comparison $comparison): mixed
     {
         $field = $comparison->getField();
@@ -46,6 +59,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             throw new \InvalidArgumentException("Invalid dimension: $field");
         }
 
+        $this->involvedDimensions[$field] = true;
         $field = $this->rootAlias . '.' . $field;
 
         /** @psalm-suppress MixedAssignment */

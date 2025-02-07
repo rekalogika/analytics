@@ -96,11 +96,11 @@ final class SummarizerQuery extends AbstractQuery
         // add partition where clause
         $this->addPartitionWhere();
 
-        // add grouping where clause
-        $this->addGroupingWhere();
-
         // add where clause supplied by the user
         $this->addUserSuppliedWhere();
+
+        // add grouping where clause
+        $this->addGroupingWhere();
 
         // check if select is empty
         if (empty($this->queryBuilder->getDQLPart('select'))) {
@@ -278,10 +278,10 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->andWhere(\sprintf(
-                "root.%s = :groupingstring",
+                "root.%s = '%s'",
                 $groupingsProperty,
+                $groupingsString,
             ))
-            ->setParameter('groupingstring', $groupingsString)
         ;
     }
 
@@ -307,6 +307,19 @@ final class SummarizerQuery extends AbstractQuery
             // @phpstan-ignore argument.type
             $this->queryBuilder->andWhere($expression);
         }
+
+        // add dimensions not in the query to the group by clause
+
+        $involvedDimensions = $visitor->getInvolvedDimensions();
+        $dimensionsInQuery = array_filter(
+            $this->query->getGroupBy(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        );
+        $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
+
+        foreach ($involvedDimensionNotInQuery as $dimension) {
+            $this->processDimension($dimension, true);
+        }
     }
 
     private function processAllDimensions(): void
@@ -319,18 +332,28 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         foreach ($dimensionsInQuery as $dimension) {
-            if ($dimension === '@values') {
-                $this->addValuesToQueryBuilder($this->query->getSelect());
-            } elseif (str_contains($dimension, '.')) {
-                $this->addHierarchicalDimensionToQueryBuilder($dimension);
-            } else {
-                $this->addNonHierarchicalDimensionToQueryBuilder($dimension);
+            $this->processDimension($dimension, false);
+        }
+    }
+
+    private function processDimension(string $dimension, bool $hidden): void
+    {
+        if ($dimension === '@values') {
+            if ($hidden) {
+                throw new \InvalidArgumentException('Cannot hide @values');
             }
+
+            $this->addValuesToQueryBuilder($this->query->getSelect());
+        } elseif (str_contains($dimension, '.')) {
+            $this->addHierarchicalDimensionToQueryBuilder($dimension, $hidden);
+        } else {
+            $this->addNonHierarchicalDimensionToQueryBuilder($dimension, $hidden);
         }
     }
 
     private function addHierarchicalDimensionToQueryBuilder(
         string $dimension,
+        bool $hidden,
     ): void {
         [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
@@ -369,9 +392,10 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->addSelect(\sprintf(
-                "root.%s.%s AS %s",
+                "root.%s.%s AS %s %s",
                 $dimensionProperty,
                 $hierarchyProperty,
+                $hidden ? 'HIDDEN' : '',
                 $alias,
             ))
             ->addOrderBy(\sprintf(
@@ -416,8 +440,10 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    private function addNonHierarchicalDimensionToQueryBuilder(string $dimension): void
-    {
+    private function addNonHierarchicalDimensionToQueryBuilder(
+        string $dimension,
+        bool $hidden,
+    ): void {
         $dimensionMetadata = $this->metadata->getDimensionMetadata($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
@@ -456,9 +482,10 @@ final class SummarizerQuery extends AbstractQuery
                     ),
                 )
                 ->addSelect(\sprintf(
-                    '%s.%s AS %s',
+                    '%s.%s AS %s %s',
                     $alias,
                     $identity,
+                    $hidden ? 'HIDDEN' : '',
                     $dimension,
                 ))
                 ->addOrderBy(\sprintf(
@@ -480,8 +507,9 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->addSelect(\sprintf(
-                'root.%s AS %s',
+                'root.%s AS %s %s',
                 $dimensionMetadata->getSummaryProperty(),
+                $hidden ? 'HIDDEN' : '',
                 $dimension,
             ))
             ->addOrderBy(\sprintf(

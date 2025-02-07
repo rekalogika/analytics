@@ -220,4 +220,26 @@ class QueryTest extends KernelTestCase
 
         $this->assertCount(2, $result);
     }
+
+    public function testWhereWithDimensionNotInGroupBy(): void
+    {
+        $all = $this->getQuery()
+            ->select('count')
+            ->getResult()
+            ->traverse('count')
+            ?->getValue();
+
+        $this->assertNotNull($all);
+
+        $withWhere = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->eq('time.year', 2024))
+            ->getResult()
+            ->traverse('count')
+            ?->getValue();
+
+        $this->assertNotNull($withWhere);
+
+        $this->assertLessThan($all, $withWhere);
+    }
 }
