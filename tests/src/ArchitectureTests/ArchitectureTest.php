@@ -30,33 +30,45 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
+                // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
                 Selector::inNamespace('Doctrine\Persistence'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
                 Selector::inNamespace('Psr\EventDispatcher'),
                 Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
                 Selector::inNamespace('Symfony\Component\PropertyAccess'),
                 Selector::inNamespace('Symfony\Component\Uid'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
-                Selector::classname(\Override::class),
+
+                // datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
                 Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateInterval::class),
-                Selector::classname(\IntlDateFormatter::class),
-                Selector::classname(\Stringable::class),
+
+                // collections
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\Traversable::class),
                 Selector::classname(\Countable::class),
-                Selector::classname(\BackedEnum::class),
                 Selector::classname(\ArrayIterator::class),
+
+                // misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\BackedEnum::class),
+                Selector::classname(\Override::class),
                 Selector::classname(\Attribute::class),
+                Selector::classname(\IntlDateFormatter::class),
+
+                // reflections
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\ReflectionAttribute::class),
                 Selector::classname(\ReflectionObject::class),
                 Selector::classname(\ReflectionProperty::class),
                 Selector::classname(\ReflectionException::class),
+
+                // exceptions
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),

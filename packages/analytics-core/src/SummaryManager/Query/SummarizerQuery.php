@@ -93,15 +93,14 @@ final class SummarizerQuery extends AbstractQuery
         // add query parameters involving dimensions to the query builder
         $this->processAllDimensions();
 
-        // apply filter
-        // @todo restore functionality
-        // $this->applyFilter();
-
         // add partition where clause
         $this->addPartitionWhere();
 
         // add grouping where clause
         $this->addGroupingWhere();
+
+        // add where clause supplied by the user
+        $this->addUserSuppliedWhere();
 
         // check if select is empty
         if (empty($this->queryBuilder->getDQLPart('select'))) {
@@ -172,24 +171,6 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    // private function applyFilter(): void
-    // {
-    //     $filters = $this->query->getFilters();
-    //     $dimensionIds = array_keys($this->metadata->getDimensionMetadatas());
-    //     $i = 1;
-    //     foreach ($filters as $filter) {
-    //         $filterDimension = $filter->getDimension();
-    //         $filterEqualTo = $filter->getEqualTo();
-    //         if (!\in_array($filterDimension, $dimensionIds, true)) {
-    //             throw new \InvalidArgumentException(\sprintf('Invalid dimension "%s"', $filterDimension));
-    //         }
-    //         $this->queryBuilder
-    //             ->andWhere(\sprintf('root.%s = :filterValue%d', $filterDimension, $i))
-    //             ->setParameter(\sprintf('filterValue%d', $i), $filterEqualTo);
-    //         $this->groupings[$filterDimension] = false;
-    //         $i++;
-    //     }
-    // }
     /**
      * @return iterable<Comparison|Andx>
      */
@@ -272,19 +253,6 @@ final class SummarizerQuery extends AbstractQuery
         $orX = $this->queryBuilder->expr()->orX(...$conditions);
 
         $this->queryBuilder->andWhere($orX);
-
-        // $partitionClass = $this->metadata->getPartition()->getPartitionClass();
-        // $highestLevel = PartitionUtil::getHighestLevel($partitionClass);
-
-        // $partitionMetadata = $this->metadata->getPartition();
-        // $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
-
-        // $this->queryBuilder
-        //     ->andWhere(\sprintf(
-        //         'root.partition.%s = %d',
-        //         $partitionLevelProperty,
-        //         $highestLevel,
-        //     ));
     }
 
     private function getLowestPartitionMaxId(): int|string|null
@@ -310,17 +278,41 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->queryBuilder
             ->andWhere(\sprintf(
-                "root.%s = '%s'",
+                "root.%s = :groupingstring",
                 $groupingsProperty,
-                $groupingsString,
-            ));
+            ))
+            ->setParameter('groupingstring', $groupingsString)
+        ;
+    }
+
+    private function addUserSuppliedWhere(): void
+    {
+        $where = $this->query->getWhere();
+
+        $validDimensions = array_values(array_filter(
+            $this->metadata->getDimensionPropertyNames(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        ));
+
+        $visitor = new SummaryExpressionVisitor(
+            queryBuilder: $this->queryBuilder,
+            validFields: $validDimensions,
+        );
+
+        foreach ($where as $whereExpression) {
+            /** @psalm-suppress MixedAssignment */
+            $expression = $visitor->dispatch($whereExpression);
+
+            // @phpstan-ignore argument.type
+            $this->queryBuilder->andWhere($expression);
+        }
     }
 
     private function processAllDimensions(): void
     {
         $dimensionsInQuery = $this->query->getGroupBy();
 
-        // add @values if not present
+        // add @values to the end of the dimensions if not present
         if (!\in_array('@values', $dimensionsInQuery, true)) {
             $dimensionsInQuery[] = '@values';
         }
@@ -435,7 +427,7 @@ final class SummarizerQuery extends AbstractQuery
         try {
             $joinedEntityClass = $classMetadata
                 ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
-        } catch (MappingException|\InvalidArgumentException) {
+        } catch (MappingException | \InvalidArgumentException) {
             $joinedEntityClass = null;
         }
 
