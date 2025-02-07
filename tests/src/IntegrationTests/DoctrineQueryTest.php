@@ -18,6 +18,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
+use Rekalogika\Analytics\Doctrine\QueryExtractor;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
@@ -26,7 +27,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class DoctrineQueryTest extends KernelTestCase
 {
     /**
-     * @todo WIP
      * @see Query::_doExecute
      */
     public function testQueryBuilderToSql(): void
@@ -137,5 +137,62 @@ class DoctrineQueryTest extends KernelTestCase
             4 => [new \DateTimeImmutable('2021-01-01 00:00:00'), 'datetime_immutable'],
             5 => [$itemIds, ArrayParameterType::INTEGER],
         ], $bindValues);
+    }
+
+    public function testQueryExtractor(): void
+    {
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([], ['id' => 'ASC']);
+
+        $items = $entityManager
+            ->getRepository(Item::class)
+            ->findBy([], [], 3);
+
+        $itemIds = array_map(
+            static fn(Item $item) => $item->getId(),
+            $items,
+        );
+
+        $this->assertInstanceOf(Customer::class, $customer);
+        $uuid = $customer->getId()->toRfc4122();
+
+        /** @psalm-suppress QueryBuilderSetParameter */
+        $queryBuilder = $entityManager->createQueryBuilder()
+            ->select('o')
+            ->from(Order::class, 'o')
+            ->where('o.id = :id')
+            ->andWhere('o.customer = :customer')
+            ->andWhere('o.id = :id')
+            ->andWhere('o.customer = :customer')
+            ->andWhere('o.time = :time')
+            ->andWhere('o.item IN (:items)')
+            ->setParameter('id', 1)
+            ->setParameter('customer', $customer)
+            ->setParameter('time', new \DateTimeImmutable('2021-01-01 00:00:00'))
+            ->setParameter('items', $items);
+
+        $query = $queryBuilder->getQuery();
+
+        $queryExtractor = new QueryExtractor($query);
+
+        $this->assertTrue($queryExtractor->getResultSetMapping()->isSelect);
+        $sqlStatement = $queryExtractor->getSqlStatement();
+
+        $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.item_id AS item_id_2, o0_.customer_id AS customer_id_3 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sqlStatement);
+
+        $parameters = $queryExtractor->getParameters();
+
+        $this->assertEquals([
+            0 => [1, 'integer'],
+            1 => [$uuid, ParameterType::STRING],
+            2 => [1, 'integer'],
+            3 => [$uuid, ParameterType::STRING],
+            4 => [new \DateTimeImmutable('2021-01-01 00:00:00'), 'datetime_immutable'],
+            5 => [$itemIds, ArrayParameterType::INTEGER],
+        ], $parameters);
     }
 }
