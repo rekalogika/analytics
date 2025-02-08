@@ -32,7 +32,7 @@ final class DayOfWeek implements RecurringInterval
 
     public function trans(
         TranslatorInterface $translator,
-        ?string $locale = null
+        ?string $locale = null,
     ): string {
         $dayOfWeek = match ($this->databaseValue) {
             1 => 'Monday',
