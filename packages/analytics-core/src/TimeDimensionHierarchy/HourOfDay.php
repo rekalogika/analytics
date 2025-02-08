@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class HourOfDay implements RecurringInterval
 {
     use CacheTrait;
@@ -26,6 +28,13 @@ final class HourOfDay implements RecurringInterval
     #[\Override]
     public function __toString(): string
     {
+        return (string) $this->databaseValue;
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         return \sprintf(
             '%02d:00-%02d:59',
             $this->databaseValue,

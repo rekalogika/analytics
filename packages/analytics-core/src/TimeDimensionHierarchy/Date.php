@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class Date implements Interval
 {
     use CacheTrait;
@@ -38,6 +40,7 @@ final class Date implements Interval
 
         $this->end = $this->start->modify('+1 day');
     }
+
 
     public function getHierarchyLevel(): int
     {
@@ -68,6 +71,20 @@ final class Date implements Interval
     public function __toString(): string
     {
         return $this->start->format('Y-m-d');
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
+        return $translator->trans(
+            id: '{date, date}',
+            parameters: [
+                'date' => $this->getStart(),
+            ],
+            domain: 'rekalogika_analytics+intl-icu',
+            locale: $locale,
+        );
     }
 
     #[\Override]

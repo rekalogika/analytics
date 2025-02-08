@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class DayOfMonth implements RecurringInterval
 {
     use CacheTrait;
@@ -26,6 +28,13 @@ final class DayOfMonth implements RecurringInterval
     #[\Override]
     public function __toString(): string
     {
+        return (string) $this->databaseValue;
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         return (string) $this->databaseValue;
     }
 }

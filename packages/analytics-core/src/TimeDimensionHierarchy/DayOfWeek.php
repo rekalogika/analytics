@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class DayOfWeek implements RecurringInterval
 {
     use CacheTrait;
@@ -25,14 +27,21 @@ final class DayOfWeek implements RecurringInterval
     #[\Override]
     public function __toString(): string
     {
+        return (string) $this->databaseValue;
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         $dayOfWeek = match ($this->databaseValue) {
-            1 => 'Sunday',
-            2 => 'Monday',
-            3 => 'Tuesday',
-            4 => 'Wednesday',
-            5 => 'Thursday',
-            6 => 'Friday',
-            7 => 'Saturday',
+            1 => 'Monday',
+            2 => 'Tuesday',
+            3 => 'Wednesday',
+            4 => 'Thursday',
+            5 => 'Friday',
+            6 => 'Saturday',
+            7 => 'Sunday',
             default => throw new \InvalidArgumentException(
                 \sprintf('Invalid day of week: %d', $this->databaseValue),
             ),

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class Month implements Interval
 {
     use CacheTrait;
@@ -74,6 +76,13 @@ final class Month implements Interval
     #[\Override]
     public function __toString(): string
     {
+        return $this->start->format('Y-m');
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         $dateTime = new \DateTimeImmutable(
             $this->start->format('Y-m-d'),
             $this->start->getTimezone(),

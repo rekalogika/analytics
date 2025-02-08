@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
-interface Interval extends \Stringable
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+interface Interval extends \Stringable, TranslatableInterface
 {
     public static function createFromDatabaseValue(
         int $databaseValue,
