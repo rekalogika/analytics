@@ -388,7 +388,7 @@ final class SummarizerQuery extends AbstractQuery
             $this->groupings[$key] = $groupings[$property->getName()];
         }
 
-        // add select and order by clause
+        // add select
 
         $this->queryBuilder
             ->addSelect(\sprintf(
@@ -398,12 +398,26 @@ final class SummarizerQuery extends AbstractQuery
                 $hidden ? 'HIDDEN' : '',
                 $alias,
             ))
-            ->addOrderBy(\sprintf(
+        ;
+
+        // add orderby
+
+        $orderBy = $dimensionMetadata->getOrderBy();
+
+        if (\is_array($orderBy)) {
+            throw new \InvalidArgumentException('orderBy cannot be an array for hierarchical dimension');
+        }
+
+        $this->queryBuilder->addOrderBy(
+            \sprintf(
                 'root.%s.%s',
                 $dimensionProperty,
                 $hierarchyProperty,
-            ))
-        ;
+            ),
+            $orderBy->value,
+        );
+
+        // add group by and grouping fields
 
         $this->rollUpFields[] = $alias;
 
@@ -461,7 +475,8 @@ final class SummarizerQuery extends AbstractQuery
         $this->groupings[$dimension] = false;
 
         if ($joinedEntityClass !== null) {
-            $alias = 'e_' . hash('xxh128', $dimension);
+            // grouping by a related entity is not always possible, so we group
+            // by its identifier instead
 
             $joinedClassMetadata = ClassMetadataWrapper::get(
                 manager: $this->entityManager,
@@ -470,39 +485,63 @@ final class SummarizerQuery extends AbstractQuery
 
             $identity = $joinedClassMetadata->getIdentifierFieldName();
 
+            $dqlField = $this->getQueryContext()->resolvePath(\sprintf(
+                '%s.%s',
+                $dimension,
+                $identity,
+            ));
+
+            // select
+
             $this->queryBuilder
-                ->leftJoin(
-                    $joinedEntityClass,
-                    $alias,
-                    'WITH',
-                    \sprintf(
-                        'root.%s = %s',
-                        $dimensionMetadata->getSummaryProperty(),
-                        $alias,
-                    ),
-                )
                 ->addSelect(\sprintf(
-                    '%s.%s AS %s %s',
-                    $alias,
-                    $identity,
+                    '%s AS %s %s',
+                    $dqlField,
                     $hidden ? 'HIDDEN' : '',
                     $dimension,
-                ))
-                ->addOrderBy(\sprintf(
-                    '%s.%s',
-                    $alias,
-                    $identity,
-                ))
-            ;
+                ));
+
+            // order by
+
+            $orderBy = $dimensionMetadata->getOrderBy();
+
+            if (!\is_array($orderBy)) {
+                $this->queryBuilder->addOrderBy($dqlField, $orderBy->value);
+            } else {
+                foreach ($orderBy as $orderField => $order) {
+                    $dqlOrderField = $this->getQueryContext()
+                        ->resolvePath(\sprintf(
+                            '%s.%s',
+                            $dimension,
+                            $orderField,
+                        ));
+
+                    $alias = $dimension . '_' . $orderField;
+
+                    $this->queryBuilder
+                        ->addSelect(\sprintf(
+                            'MIN(%s) AS HIDDEN %s',
+                            $dqlOrderField,
+                            $alias,
+                        ))
+                        ->addOrderBy($alias, $order->value);
+                }
+            }
+
+            // group by and grouping fields
 
             $this->rollUpFields[] = $dimension;
-            $this->groupingFields[] = \sprintf(
-                '%s.%s',
-                $alias,
-                $identity,
-            );
+            $this->groupingFields[] = $dqlField;
 
             return;
+        }
+
+        // not joined
+
+        $orderBy = $dimensionMetadata->getOrderBy();
+
+        if (\is_array($orderBy)) {
+            throw new \InvalidArgumentException('orderBy cannot be an array for non-hierarchical dimension');
         }
 
         $this->queryBuilder
@@ -512,10 +551,13 @@ final class SummarizerQuery extends AbstractQuery
                 $hidden ? 'HIDDEN' : '',
                 $dimension,
             ))
-            ->addOrderBy(\sprintf(
-                'root.%s',
-                $dimensionMetadata->getSummaryProperty(),
-            ))
+            ->addOrderBy(
+                \sprintf(
+                    'root.%s',
+                    $dimensionMetadata->getSummaryProperty(),
+                ),
+                $orderBy->value,
+            )
         ;
 
         $this->rollUpFields[] = $dimension;

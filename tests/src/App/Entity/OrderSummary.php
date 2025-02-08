@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Brick\Money\Money;
+use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\QueryBuilder;
@@ -54,6 +55,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         label: new TranslatableMessage('Placed Time'),
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        orderBy: DoctrineOrder::Ascending,
     )]
     private TimeDimensionHierarchy $time;
 
@@ -62,6 +64,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new EntityValueResolver('customer.country'),
         label: new TranslatableMessage('Customer country'),
+        orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     // @phpstan-ignore property.onlyRead
     private ?Country $customerCountry = null;
@@ -71,6 +74,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new EntityValueResolver('customer.country.region'),
         label: new TranslatableMessage('Customer Region'),
+        orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Region $customerRegion = null;
 

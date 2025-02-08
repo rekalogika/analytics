@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
+use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\ValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -21,12 +22,14 @@ final readonly class Dimension
 {
     /**
      * @param null|string|ValueResolver|array<class-string,string|ValueResolver> $source
+     * @param Order|array<string,Order> $orderBy
      */
     public function __construct(
         private null|string|ValueResolver|array $source = null,
         private null|string|TranslatableInterface $label = null,
         private \DateTimeZone $sourceTimeZone = new \DateTimeZone('UTC'),
         private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
+        private Order|array $orderBy = Order::Ascending,
     ) {}
 
     /**
@@ -50,5 +53,13 @@ final readonly class Dimension
     public function getSummaryTimeZone(): \DateTimeZone
     {
         return $this->summaryTimeZone;
+    }
+
+    /**
+     * @return Order|array<string,Order>
+     */
+    public function getOrderBy(): Order|array
+    {
+        return $this->orderBy;
     }
 }
