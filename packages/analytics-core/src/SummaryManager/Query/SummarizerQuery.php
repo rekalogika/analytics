@@ -343,7 +343,7 @@ final class SummarizerQuery extends AbstractQuery
                 throw new \InvalidArgumentException('Cannot hide @values');
             }
 
-            $this->addValuesToQueryBuilder($this->query->getSelect());
+            $this->addMeasuresToQueryBuilder();
         } elseif (str_contains($dimension, '.')) {
             $this->addHierarchicalDimensionToQueryBuilder($dimension, $hidden);
         } else {
@@ -428,14 +428,11 @@ final class SummarizerQuery extends AbstractQuery
         );
     }
 
-    /**
-     * @param list<string> $values
-     */
-    private function addValuesToQueryBuilder(
-        array $values,
-    ): void {
-        foreach ($values as $value) {
-            $measureMetadata = $this->metadata->getMeasureMetadata($value);
+    private function addMeasuresToQueryBuilder(): void
+    {
+        $measureMetadatas = $this->metadata->getMeasureMetadatas();
+
+        foreach ($measureMetadatas as $value => $measureMetadata) {
             $functions = $measureMetadata->getFunction();
             $function = reset($functions);
 
@@ -598,6 +595,8 @@ final class SummarizerQuery extends AbstractQuery
         if (\count($groupBy) > 0) {
             $groupBy->apply($query);
         }
+
+        // get result
 
         /** @var list<array<string,mixed>> */
         $result = $query->getArrayResult();
