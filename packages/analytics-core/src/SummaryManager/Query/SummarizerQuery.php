@@ -27,6 +27,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\MeasureSorter;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultToDimensionTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\SummaryObjectHydrator;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -112,13 +113,20 @@ final class SummarizerQuery extends AbstractQuery
         // execute doctrine query
         $result = $this->getResult();
 
+        // hydrate into summary object
+        $hydrator = new SummaryObjectHydrator(
+            metadata: $this->metadata,
+            entityManager: $this->entityManager,
+        );
+
+        $result = $hydrator->hydrateObjects($result);
+
         // resolve result, convert id to entity, and use user-provided getters in
         // the summary entity to normalize the result
 
         $resultResolver = new ResultResolver(
+            query: $this->query,
             propertyAccessor: $this->propertyAccessor,
-            metadata: $this->metadata,
-            entityManager: $this->entityManager,
         );
 
         $result = $resultResolver->resolveResult($result);
@@ -473,7 +481,8 @@ final class SummarizerQuery extends AbstractQuery
 
         if ($joinedEntityClass !== null) {
             // grouping by a related entity is not always possible, so we group
-            // by its identifier instead
+            // by its identifier instead, then we convert back to the object in
+            // post
 
             $joinedClassMetadata = ClassMetadataWrapper::get(
                 manager: $this->entityManager,
