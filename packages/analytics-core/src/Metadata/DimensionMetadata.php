@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\ValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -22,6 +23,7 @@ final readonly class DimensionMetadata
 
     /**
      * @param array<class-string,ValueResolver> $source
+     * @param Order|array<string,Order> $orderBy
      */
     public function __construct(
         private array $source,
@@ -30,8 +32,13 @@ final readonly class DimensionMetadata
         private \DateTimeZone $sourceTimeZone,
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
+        private Order|array $orderBy,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {
+        if ($hierarchy !== null && \is_array($orderBy)) {
+            throw new \InvalidArgumentException('orderBy cannot be an array for hierarchical dimension');
+        }
+
         $this->hierarchy = $hierarchy?->withDimensionMetadata($this);
     }
 
@@ -44,6 +51,7 @@ final readonly class DimensionMetadata
             sourceTimeZone: $this->sourceTimeZone,
             summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
+            orderBy: $this->orderBy,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -115,5 +123,13 @@ final readonly class DimensionMetadata
         }
 
         return $uniqueProperties;
+    }
+
+    /**
+     * @return Order|array<string,Order>
+     */
+    public function getOrderBy(): Order|array
+    {
+        return $this->orderBy;
     }
 }

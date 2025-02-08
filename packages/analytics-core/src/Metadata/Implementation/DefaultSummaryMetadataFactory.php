@@ -362,6 +362,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             sourceTimeZone: $dimensionAttribute->getSourceTimeZone(),
             summaryTimeZone: $dimensionAttribute->getSummaryTimeZone(),
             hierarchy: $dimensionHierarchy,
+            orderBy: $dimensionAttribute->getOrderBy(),
         );
     }
 
