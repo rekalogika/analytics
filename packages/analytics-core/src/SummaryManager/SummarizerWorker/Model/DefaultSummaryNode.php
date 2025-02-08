@@ -35,7 +35,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         private readonly object|int|float|null $value,
         private readonly int|float|null $rawValue,
         private readonly string|TranslatableInterface $legend,
-        private readonly mixed $item,
+        private readonly mixed $member,
         private readonly bool $leaf,
     ) {}
 
@@ -47,36 +47,36 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->children as $child) {
-            yield $child->getItem() => $child;
+            yield $child->getMember() => $child;
         }
     }
 
-    public static function createBranchItem(
+    public static function createBranchNode(
         string $key,
         string|TranslatableInterface $legend,
-        mixed $item,
+        mixed $member,
     ): self {
         return new self(
             key: $key,
             legend: $legend,
-            item: $item,
+            member: $member,
             value: null,
             rawValue: null,
             leaf: false,
         );
     }
 
-    public static function createLeafItem(
+    public static function createLeafNode(
         string $key,
         object|int|float|null $value,
         int|float|null $rawValue,
         string|TranslatableInterface $legend,
-        mixed $item,
+        mixed $member,
     ): self {
         return new self(
             key: $key,
             legend: $legend,
-            item: $item,
+            member: $member,
             value: $value,
             rawValue: $rawValue,
             leaf: true,
@@ -86,7 +86,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
     public function isEqual(self $other): bool
     {
         return $this->key === $other->key
-            && $this->item === $other->item;
+            && $this->member === $other->member;
         ;
     }
 
@@ -100,9 +100,9 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         return $this->legend;
     }
 
-    public function getItem(): mixed
+    public function getMember(): mixed
     {
-        return $this->item;
+        return $this->member;
     }
 
     public function setParent(DefaultSummaryNode $parent): void
@@ -125,10 +125,10 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         $this->children = [];
     }
 
-    public function addChild(DefaultSummaryNode $item): void
+    public function addChild(DefaultSummaryNode $node): void
     {
-        $this->children[] = $item;
-        $item->setParent($this);
+        $this->children[] = $node;
+        $node->setParent($this);
     }
 
     public function getValue(): object|int|float|null
@@ -143,8 +143,8 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 
     public function getMeasurePropertyName(): ?string
     {
-        if ($this->item instanceof MeasureDescription) {
-            return $this->item->getMeasurePropertyName();
+        if ($this->member instanceof MeasureDescription) {
+            return $this->member->getMeasurePropertyName();
         }
 
         return null;

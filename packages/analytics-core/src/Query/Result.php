@@ -22,5 +22,5 @@ namespace Rekalogika\Analytics\Query;
  */
 interface Result extends \Traversable, \Countable
 {
-    public function traverse(mixed ...$items): ?ResultNode;
+    public function traverse(mixed ...$members): ?ResultNode;
 }

@@ -27,19 +27,19 @@ final class ArrayToTreeTransformer
      */
     private array $tree = [];
 
-    private function addDimension(DefaultSummaryNode $item, int $columnNumber): void
+    private function addDimension(DefaultSummaryNode $node, int $columnNumber): void
     {
-        $item = clone $item;
+        $node = clone $node;
 
         $current = $this->currentPath[$columnNumber] ?? null;
 
-        if ($current !== null && $current->isEqual($item)) {
+        if ($current !== null && $current->isEqual($node)) {
             return;
         }
 
         if ($columnNumber === 0) {
-            $this->currentPath = [$item];
-            $this->tree[] = $item;
+            $this->currentPath = [$node];
+            $this->tree[] = $node;
 
             return;
         }
@@ -47,28 +47,28 @@ final class ArrayToTreeTransformer
         $parent = $this->currentPath[$columnNumber - 1];
 
         $currentPath = \array_slice($this->currentPath, 0, $columnNumber);
-        $currentPath[$columnNumber] = $item;
+        $currentPath[$columnNumber] = $node;
 
         $this->currentPath = array_values($currentPath);
 
         if (!$parent->isLeaf()) {
-            $parent->addChild($item);
+            $parent->addChild($node);
         }
     }
 
-    private function addMeasure(DefaultSummaryNode $item): void
+    private function addMeasure(DefaultSummaryNode $node): void
     {
-        if (!$item->isLeaf()) {
-            throw new \UnexpectedValueException('Item must be a leaf');
+        if (!$node->isLeaf()) {
+            throw new \UnexpectedValueException('Node must be a leaf');
         }
 
         $parent = end($this->currentPath);
 
         if ($parent instanceof DefaultSummaryNode) {
-            $parent->addChild($item);
+            $parent->addChild($node);
         } else {
-            $this->currentPath = [$item];
-            $this->tree[] = $item;
+            $this->currentPath = [$node];
+            $this->tree[] = $node;
         }
     }
 
@@ -82,11 +82,11 @@ final class ArrayToTreeTransformer
         $this->tree = [];
 
         foreach ($inputArray as $row) {
-            foreach ($row as $columnNumber => $item) {
-                if ($item->isLeaf()) {
-                    $this->addMeasure($item);
+            foreach ($row as $columnNumber => $node) {
+                if ($node->isLeaf()) {
+                    $this->addMeasure($node);
                 } else {
-                    $this->addDimension($item, $columnNumber);
+                    $this->addDimension($node, $columnNumber);
                 }
             }
         }

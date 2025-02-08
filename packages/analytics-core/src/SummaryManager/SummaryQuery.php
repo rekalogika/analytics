@@ -43,8 +43,8 @@ final class SummaryQuery
     private array $where = [];
 
     /**
-     * @param non-empty-array<string,Item> $dimensionChoices
-     * @param array<string,Item> $measureChoices
+     * @param non-empty-array<string,Field> $dimensionChoices
+     * @param array<string,Field> $measureChoices
      * @param non-empty-array<string,string|TranslatableInterface|\Stringable|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices
      */
     public function __construct(
@@ -73,7 +73,7 @@ final class SummaryQuery
     //
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     public function getDimensionChoices(): array
     {
@@ -91,7 +91,7 @@ final class SummaryQuery
     }
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     public function getMeasureChoices(): array
     {
@@ -127,10 +127,10 @@ final class SummaryQuery
     //
 
     /**
-     * @param list<string> $items
+     * @param list<string> $fields
      * @param 'dimension'|'measure' $type
      */
-    private function ensureItemsValid(array $items, string $type): void
+    private function ensureFieldValid(array $fields, string $type): void
     {
         $invalid = [];
         $type = match ($type) {
@@ -138,9 +138,9 @@ final class SummaryQuery
             'measure' => $this->measureChoices,
         };
 
-        foreach ($items as $item) {
-            if (!\array_key_exists($item, $type)) {
-                $invalid[] = $item;
+        foreach ($fields as $field) {
+            if (!\array_key_exists($field, $type)) {
+                $invalid[] = $field;
             }
         }
 
@@ -164,7 +164,7 @@ final class SummaryQuery
     public function groupBy(string ...$dimensions): self
     {
         $dimensions = array_values(array_unique($dimensions));
-        $this->ensureItemsValid($dimensions, 'dimension');
+        $this->ensureFieldValid($dimensions, 'dimension');
 
         $this->dimensions = $dimensions;
 
@@ -193,7 +193,7 @@ final class SummaryQuery
     public function select(string ...$measures): self
     {
         $measures = array_values(array_unique($measures));
-        $this->ensureItemsValid($measures, 'measure');
+        $this->ensureFieldValid($measures, 'measure');
 
         $this->measures = $measures;
 

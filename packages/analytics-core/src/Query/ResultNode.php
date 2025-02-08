@@ -35,9 +35,9 @@ interface ResultNode extends \Traversable, \Countable
     public function getLegend(): string|TranslatableInterface;
 
     /**
-     * The item that this node represents. (e.g. France, 12:00).
+     * The member that this node represents. (e.g. France, 12:00).
      */
-    public function getItem(): mixed;
+    public function getMember(): mixed;
 
     /**
      * The canonical value. If not in leaf node, the value is null. Usually a
@@ -57,5 +57,5 @@ interface ResultNode extends \Traversable, \Countable
      */
     public function isLeaf(): bool;
 
-    public function traverse(mixed ...$items): ?ResultNode;
+    public function traverse(mixed ...$members): ?ResultNode;
 }

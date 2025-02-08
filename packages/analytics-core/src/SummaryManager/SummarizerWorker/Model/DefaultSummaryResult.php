@@ -38,7 +38,7 @@ final readonly class DefaultSummaryResult implements Result, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->children as $child) {
-            yield $child->getItem() => $child;
+            yield $child->getMember() => $child;
         }
     }
 }
