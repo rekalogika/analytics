@@ -27,6 +27,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\MeasureSorter;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultToDimensionTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\SummaryObjectHydrator;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -112,13 +113,20 @@ final class SummarizerQuery extends AbstractQuery
         // execute doctrine query
         $result = $this->getResult();
 
+        // hydrate into summary object
+        $hydrator = new SummaryObjectHydrator(
+            metadata: $this->metadata,
+            entityManager: $this->entityManager,
+        );
+
+        $result = $hydrator->hydrateObjects($result);
+
         // resolve result, convert id to entity, and use user-provided getters in
         // the summary entity to normalize the result
 
         $resultResolver = new ResultResolver(
+            query: $this->query,
             propertyAccessor: $this->propertyAccessor,
-            metadata: $this->metadata,
-            entityManager: $this->entityManager,
         );
 
         $result = $resultResolver->resolveResult($result);
@@ -343,7 +351,7 @@ final class SummarizerQuery extends AbstractQuery
                 throw new \InvalidArgumentException('Cannot hide @values');
             }
 
-            $this->addValuesToQueryBuilder($this->query->getSelect());
+            $this->addMeasuresToQueryBuilder();
         } elseif (str_contains($dimension, '.')) {
             $this->addHierarchicalDimensionToQueryBuilder($dimension, $hidden);
         } else {
@@ -428,14 +436,11 @@ final class SummarizerQuery extends AbstractQuery
         );
     }
 
-    /**
-     * @param list<string> $values
-     */
-    private function addValuesToQueryBuilder(
-        array $values,
-    ): void {
-        foreach ($values as $value) {
-            $measureMetadata = $this->metadata->getMeasureMetadata($value);
+    private function addMeasuresToQueryBuilder(): void
+    {
+        $measureMetadatas = $this->metadata->getMeasureMetadatas();
+
+        foreach ($measureMetadatas as $value => $measureMetadata) {
             $functions = $measureMetadata->getFunction();
             $function = reset($functions);
 
@@ -476,7 +481,8 @@ final class SummarizerQuery extends AbstractQuery
 
         if ($joinedEntityClass !== null) {
             // grouping by a related entity is not always possible, so we group
-            // by its identifier instead
+            // by its identifier instead, then we convert back to the object in
+            // post
 
             $joinedClassMetadata = ClassMetadataWrapper::get(
                 manager: $this->entityManager,
@@ -598,6 +604,8 @@ final class SummarizerQuery extends AbstractQuery
         if (\count($groupBy) > 0) {
             $groupBy->apply($query);
         }
+
+        // get result
 
         /** @var list<array<string,mixed>> */
         $result = $query->getArrayResult();
