@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
-interface RecurringInterval extends \Stringable
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+interface RecurringInterval extends \Stringable, TranslatableInterface
 {
     public static function createFromDatabaseValue(
         int $databaseValue,

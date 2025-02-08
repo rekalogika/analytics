@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class Quarter implements Interval
 {
     use CacheTrait;
@@ -76,6 +78,18 @@ final class Quarter implements Interval
     #[\Override]
     public function __toString(): string
     {
+        return
+            \sprintf(
+                '%s-Q%d',
+                $this->start->format('Y'),
+                self::monthToQuarter((int) $this->start->format('m')),
+            );
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         return
             \sprintf(
                 '%s Q%d',

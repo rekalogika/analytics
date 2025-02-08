@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class WeekDate implements Interval
 {
     use CacheTrait;
@@ -66,6 +68,13 @@ final class WeekDate implements Interval
     #[\Override]
     public function __toString(): string
     {
+        return $this->start->format('o-\WW-N');
+    }
+
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
         return $this->start->format('o-\WW-N');
     }
 

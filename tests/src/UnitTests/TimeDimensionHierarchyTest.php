@@ -23,6 +23,8 @@ use Rekalogika\Analytics\TimeDimensionHierarchy\Week;
 use Rekalogika\Analytics\TimeDimensionHierarchy\WeekDate;
 use Rekalogika\Analytics\TimeDimensionHierarchy\WeekYear;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
+use Symfony\Component\Translation\Translator;
 
 class TimeDimensionHierarchyTest extends TestCase
 {
@@ -36,7 +38,11 @@ class TimeDimensionHierarchyTest extends TestCase
         \DateTimeInterface $expectedStart,
         \DateTimeInterface $expectedEnd,
         string $expectedToString,
+        string $expectedTranslated,
     ): void {
+        $messageFormatter = new MessageFormatter();
+        $translator = new Translator('en', $messageFormatter);
+
         $interval = $class::createFromDatabaseValue(
             databaseValue: $databaseInput,
             timeZone: new \DateTimeZone('UTC'),
@@ -48,10 +54,11 @@ class TimeDimensionHierarchyTest extends TestCase
         $this->assertEquals($expectedStart, $start);
         $this->assertEquals($expectedEnd, $end);
         $this->assertEquals($expectedToString, (string) $interval);
+        $this->assertEquals($expectedTranslated, $interval->trans($translator, 'en'));
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<Interval>,\DateTimeInterface,\DateTimeInterface,string}>
+     * @return iterable<array-key,array{int,class-string<Interval>,\DateTimeInterface,\DateTimeInterface,string,string}>
      */
     public static function intervalProvider(): iterable
     {
@@ -61,6 +68,7 @@ class TimeDimensionHierarchyTest extends TestCase
             new \DateTimeImmutable('2022-01-01T00:00:00+00:00'),
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             '2022',
+            '2022',
         ];
 
         yield [
@@ -68,6 +76,7 @@ class TimeDimensionHierarchyTest extends TestCase
             Quarter::class,
             new \DateTimeImmutable('2022-04-01T00:00:00+00:00'),
             new \DateTimeImmutable('2022-07-01T00:00:00+00:00'),
+            '2022-Q2',
             '2022 Q2',
         ];
 
@@ -76,6 +85,7 @@ class TimeDimensionHierarchyTest extends TestCase
             Month::class,
             new \DateTimeImmutable('2022-02-01T00:00:00+00:00'),
             new \DateTimeImmutable('2022-03-01T00:00:00+00:00'),
+            '2022-02',
             'February 2022',
         ];
 
@@ -85,6 +95,7 @@ class TimeDimensionHierarchyTest extends TestCase
             new \DateTimeImmutable('2022-02-01T00:00:00+00:00'),
             new \DateTimeImmutable('2022-02-02T00:00:00+00:00'),
             '2022-02-01',
+            'Feb 1, 2022',
         ];
 
         yield [
@@ -92,6 +103,7 @@ class TimeDimensionHierarchyTest extends TestCase
             Hour::class,
             new \DateTimeImmutable('2022-02-01T03:00:00+00:00'),
             new \DateTimeImmutable('2022-02-01T04:00:00+00:00'),
+            '2022-02-01 03:00',
             '2022-02-01 03:00',
         ];
 
@@ -101,6 +113,7 @@ class TimeDimensionHierarchyTest extends TestCase
             new \DateTimeImmutable('2022-01-03T00:00:00+00:00'),
             new \DateTimeImmutable('2023-01-02T00:00:00+00:00'),
             '2022',
+            '2022',
         ];
 
         yield [
@@ -108,7 +121,8 @@ class TimeDimensionHierarchyTest extends TestCase
             Week::class,
             new \DateTimeImmutable('2022-03-21T00:00:00+00:00'),
             new \DateTimeImmutable('2022-03-28T00:00:00+00:00'),
-            '2022-03-21 - 2022-03-27',
+            '2022-W12',
+            'Mar 21, 2022 - Mar 27, 2022',
         ];
 
         yield [
@@ -116,6 +130,7 @@ class TimeDimensionHierarchyTest extends TestCase
             WeekDate::class,
             new \DateTimeImmutable('2022-03-23T00:00:00+00:00'),
             new \DateTimeImmutable('2022-03-24T00:00:00+00:00'),
+            '2022-W12-3',
             '2022-W12-3',
         ];
 

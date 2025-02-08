@@ -21,7 +21,6 @@ use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class QueryTest extends KernelTestCase
@@ -194,18 +193,18 @@ class QueryTest extends KernelTestCase
         $this->assertCount(1, $result);
     }
 
-    // public function testWhereMonthObject(): void
-    // {
-    //     $month = Month::createFromDatabaseValue(202410, new \DateTimeZone('UTC'));
+    public function testWhereMonthObject(): void
+    {
+        $month = Month::createFromDatabaseValue(202410, new \DateTimeZone('UTC'));
 
-    //     $result = $this->getQuery()
-    //         ->groupBy('time.year')
-    //         ->select('count')
-    //         ->where(Criteria::expr()->eq('time.month', ...))
-    //         ->getResult();
+        $result = $this->getQuery()
+            ->groupBy('time.month')
+            ->select('count')
+            ->where(Criteria::expr()->eq('time.month', $month->getStartDatabaseValue()))
+            ->getResult();
 
-    //     $this->assertCount(1, $result);
-    // }
+        $this->assertCount(1, $result);
+    }
 
     public function testWhereWithOr(): void
     {
