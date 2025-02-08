@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\HydratorResult;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -33,19 +31,23 @@ final readonly class ResultResolver
     public function resolveResult(iterable $hydratorResults): iterable
     {
         foreach ($hydratorResults as $hydratorResult) {
-            yield $this->mapArrayToSummaryObjectAndBackAgain($hydratorResult);
+            if ($hydratorResult->isSubtotal()) {
+                continue;
+            }
+
+            yield $this->getResult($hydratorResult);
         }
     }
 
     /**
      * @return array<string,array{mixed,mixed}>
      */
-    private function mapArrayToSummaryObjectAndBackAgain(
-        HydratorResult $hydratorResult
+    private function getResult(
+        HydratorResult $hydratorResult,
     ): array {
         $keys = array_filter(
             [...$this->query->getGroupBy(), ...$this->query->getSelect()],
-            fn (string $key) => $key !== '@values',
+            fn(string $key) => $key !== '@values',
         );
 
         $object = $hydratorResult->getObject();

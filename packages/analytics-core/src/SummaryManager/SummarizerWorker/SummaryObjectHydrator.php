@@ -48,13 +48,15 @@ final readonly class SummaryObjectHydrator
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
         $groupingProperty = $this->metadata->getGroupingsProperty();
         $rawValues = [];
+        $groupings = null;
 
-        // map the array to the object
         /**
          * @var mixed $value
          */
         foreach ($input as $key => $value) {
             if ($key === '__grouping') {
+                /** @var string */
+                $groupings = $value;
                 $targetProperty = $groupingProperty;
             } else {
                 $targetProperty = $key;
@@ -82,7 +84,15 @@ final readonly class SummaryObjectHydrator
             );
         }
 
-        return new HydratorResult($summaryObject, $rawValues);
+        if ($groupings === null) {
+            throw new \LogicException('Groupings not found');
+        }
+
+        return new HydratorResult(
+            object: $summaryObject,
+            rawValues: $rawValues,
+            groupings: $groupings,
+        );
     }
 
     /**
@@ -144,7 +154,7 @@ final readonly class SummaryObjectHydrator
         $parent = $reflectionClass->getParentClass();
 
         if ($parent === false) {
-            throw new \LogicException(sprintf('Property "%s" not found in class "%s"', $propertyName, $reflectionClass->getName()));
+            throw new \LogicException(\sprintf('Property "%s" not found in class "%s"', $propertyName, $reflectionClass->getName()));
         }
 
         return $this->getReflectionProperty($parent, $propertyName);

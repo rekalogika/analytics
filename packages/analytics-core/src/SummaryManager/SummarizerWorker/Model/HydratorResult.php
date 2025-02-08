@@ -24,6 +24,7 @@ class HydratorResult
     public function __construct(
         private readonly object $object,
         private readonly array $rawValues,
+        private readonly string $groupings,
     ) {}
 
     public function getObject(): object
@@ -42,5 +43,10 @@ class HydratorResult
     public function getRawValue(string $key): mixed
     {
         return $this->rawValues[$key] ?? null;
+    }
+
+    public function isSubtotal(): bool
+    {
+        return substr_count($this->groupings, '1') !== 0;
     }
 }
