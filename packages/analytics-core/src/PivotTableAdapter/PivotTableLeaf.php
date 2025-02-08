@@ -43,6 +43,6 @@ final readonly class PivotTableLeaf implements LeafNode
 
     public function getItem(): mixed
     {
-        return $this->node->getItem();
+        return $this->node->getMember();
     }
 }

@@ -112,7 +112,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     }
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     private function getDimensionChoices(): array
     {
@@ -124,13 +124,13 @@ final readonly class DefaultSummaryManager implements SummaryManager
             // if not hierarchical
 
             if ($hierarchy === null) {
-                $item = new Item(
+                $field = new Field(
                     key: $dimensionMetadata->getSummaryProperty(),
                     label: $dimensionMetadata->getLabel(),
                     subLabel: null,
                 );
 
-                $choices[$item->getKey()] = $item;
+                $choices[$field->getKey()] = $field;
 
                 continue;
             }
@@ -144,13 +144,13 @@ final readonly class DefaultSummaryManager implements SummaryManager
                     $property->getName(),
                 );
 
-                $item = new Item(
+                $field = new Field(
                     key: $fullProperty,
                     label: $dimensionMetadata->getLabel(),
                     subLabel: $property->getLabel(),
                 );
 
-                $choices[$item->getKey()] = $item;
+                $choices[$field->getKey()] = $field;
             }
         }
 
@@ -158,20 +158,20 @@ final readonly class DefaultSummaryManager implements SummaryManager
     }
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     private function getMeasureChoices(): array
     {
         $choices = [];
 
         foreach ($this->getMeasureMetadatas() as $measureMetadata) {
-            $item = new Item(
+            $field = new Field(
                 key: $measureMetadata->getSummaryProperty(),
                 label: $measureMetadata->getLabel(),
                 subLabel: null,
             );
 
-            $choices[$item->getKey()] = $item;
+            $choices[$field->getKey()] = $field;
         }
 
         return $choices;
@@ -183,7 +183,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     {
         $dimensionChoices = [
             ...$this->getDimensionChoices(),
-            '@values' => new Item(
+            '@values' => new Field(
                 key: '@values',
                 label: new TranslatableMessage('Values'),
                 subLabel: null,

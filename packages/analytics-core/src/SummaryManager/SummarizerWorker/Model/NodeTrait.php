@@ -17,24 +17,24 @@ use Rekalogika\Analytics\Query\ResultNode;
 
 trait NodeTrait
 {
-    private function getChild(mixed $item): ?ResultNode
+    private function getChild(mixed $member): ?ResultNode
     {
-        /** @var mixed $currentItem */
-        foreach ($this as $currentItem => $child) {
+        /** @var mixed $currentMember */
+        foreach ($this as $currentMember => $child) {
             if (
-                $currentItem instanceof MeasureDescription
-                && $currentItem->getMeasurePropertyName() === $item
+                $currentMember instanceof MeasureDescription
+                && $currentMember->getMeasurePropertyName() === $member
             ) {
                 return $child;
             }
 
-            if ($currentItem === $item) {
+            if ($currentMember === $member) {
                 return $child;
             }
 
             if (
-                $currentItem instanceof \Stringable
-                && $currentItem->__toString() === $item
+                $currentMember instanceof \Stringable
+                && $currentMember->__toString() === $member
             ) {
                 return $child;
             }
@@ -43,14 +43,14 @@ trait NodeTrait
         return null;
     }
 
-    public function traverse(mixed ...$items): ?ResultNode
+    public function traverse(mixed ...$members): ?ResultNode
     {
-        if ($items === []) {
+        if ($members === []) {
             throw new \InvalidArgumentException('Invalid path');
         }
 
         /** @psalm-suppress MixedAssignment */
-        $first = array_shift($items);
+        $first = array_shift($members);
 
         $child = $this->getChild($first);
 
@@ -58,10 +58,10 @@ trait NodeTrait
             return null;
         }
 
-        if ($items === []) {
+        if ($members === []) {
             return $child;
         }
 
-        return $child->traverse(...$items);
+        return $child->traverse(...$members);
     }
 }

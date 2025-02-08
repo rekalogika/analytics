@@ -16,7 +16,10 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class Item implements \Stringable, TranslatableInterface
+/**
+ * Represent a field (a dimension or measure) in a summary table
+ */
+final readonly class Field implements \Stringable, TranslatableInterface
 {
     public function __construct(
         private string $key,

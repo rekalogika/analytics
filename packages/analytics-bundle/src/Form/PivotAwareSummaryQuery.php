@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Form;
 
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\Item;
+use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -198,7 +198,7 @@ final class PivotAwareSummaryQuery
     //
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     public function getDimensionChoices(): array
     {
@@ -206,7 +206,7 @@ final class PivotAwareSummaryQuery
     }
 
     /**
-     * @return array<string,Item>
+     * @return array<string,Field>
      */
     public function getMeasureChoices(): array
     {

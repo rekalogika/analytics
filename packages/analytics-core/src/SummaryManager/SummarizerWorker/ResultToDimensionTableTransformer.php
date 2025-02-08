@@ -79,9 +79,9 @@ final readonly class ResultToDimensionTableTransformer
                         ],
                     );
 
-                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchNode(
                         key: $key,
-                        item: $value,
+                        member: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@values') {
@@ -90,9 +90,9 @@ final readonly class ResultToDimensionTableTransformer
 
                     $name = $valuesMessage;
 
-                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchNode(
                         key: $key,
-                        item: $value,
+                        member: $value,
                         legend: $name,
                     );
                 } elseif ($key === '@measure') {
@@ -124,9 +124,9 @@ final readonly class ResultToDimensionTableTransformer
 
                         \assert(\is_string($lastKey));
 
-                        $transformedRow[$lastKey] = DefaultSummaryNode::createLeafItem(
+                        $transformedRow[$lastKey] = DefaultSummaryNode::createLeafNode(
                             key: $lastRow->getKey(),
-                            item: $lastRow->getItem(),
+                            member: $lastRow->getMember(),
                             value: $value,
                             rawValue: $rawValue,
                             legend: $lastRow->getLegend(),
@@ -136,9 +136,9 @@ final readonly class ResultToDimensionTableTransformer
                     $metadata = $this->metadata->getDimensionMetadata($key);
                     $name = $metadata->getLabel();
 
-                    $transformedRow[$key] = DefaultSummaryNode::createBranchItem(
+                    $transformedRow[$key] = DefaultSummaryNode::createBranchNode(
                         key: $key,
-                        item: $value,
+                        member: $value,
                         legend: $name,
                     );
                 }
