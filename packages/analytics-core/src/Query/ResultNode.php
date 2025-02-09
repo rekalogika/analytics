@@ -43,7 +43,7 @@ interface ResultNode extends \Traversable, \Countable
      * The canonical value. If not in leaf node, the value is null. Usually a
      * number, but can also be an object that represents the value, e.g. Money
      */
-    public function getValue(): object|int|float|null;
+    public function getValue(): mixed;
 
     /**
      * The raw value. If not in leaf node, the value is null.

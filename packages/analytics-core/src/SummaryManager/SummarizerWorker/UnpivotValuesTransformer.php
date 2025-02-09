@@ -13,45 +13,89 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescriptionFactory;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Util\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class UnpivotValuesTransformer
+final class UnpivotValuesTransformer
 {
     /**
      * @var list<string>
      */
-    private array $dimensions;
+    private readonly array $dimensions;
 
     /**
      * @var list<string>
      */
-    private array $measures;
+    private readonly array $measures;
+
+    /**
+     * @var array<string,TranslatableInterface|string>
+     */
+    private array $measureLabelCache = [];
+
+    private MeasureDescriptionFactory $measureDescriptionFactory;
 
     public function __construct(
         SummaryQuery $summaryQuery,
+        private readonly SummaryMetadata $metadata,
+        private readonly TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ) {
-        $this->dimensions = $summaryQuery->getGroupBy();
+        $dimensions = $summaryQuery->getGroupBy();
+
+        if (!\in_array('@values', $dimensions, true)) {
+            $dimensions[] = '@values';
+        }
+
+        $this->dimensions = $dimensions;
         $this->measures = $summaryQuery->getSelect();
+
+        $this->measureDescriptionFactory = new MeasureDescriptionFactory();
     }
 
     /**
-     * @param iterable<array<string,array{mixed,mixed}>> $input
-     * @return iterable<array<string,array{mixed,mixed}|string>>
+     * @param iterable<ResultRow> $input
+     * @return iterable<ResultUnpivotRow>
      */
-    public function unpivot(iterable $input): iterable
+    public function transform(iterable $input): iterable
     {
+        $rows = [];
+
         foreach ($input as $row) {
+            if ($row->isSubtotal()) {
+                continue;
+            }
+
             foreach ($this->unpivotRow($row) as $row2) {
-                yield $row2;
+                $rows[] = $row2;
             }
         }
+
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        usort($rows, $this->getMeasureSorterCallable());
+
+        return $rows;
+    }
+
+    private function getMeasureSorterCallable(): callable
+    {
+        $measures = array_flip($this->measures);
+
+        return function (ResultUnpivotRow $row1, ResultUnpivotRow $row2) use ($measures): int {
+            return ResultUnpivotRow::compare($row1, $row2, $measures);
+        };
     }
 
     /**
-     * @param array<string,array{mixed,mixed}> $row
-     * @return iterable<array<string,array{mixed,mixed}|string>>
+     * @return iterable<ResultUnpivotRow>
      */
-    private function unpivotRow(array $row): iterable
+    private function unpivotRow(ResultRow $row): iterable
     {
         $newRow = [];
 
@@ -60,26 +104,47 @@ final readonly class UnpivotValuesTransformer
                 // temporary value, we book the place in the row, the value will
                 // be set in the next loop
                 $newRow['@values'] = true;
-            } elseif (\array_key_exists($dimension, $row)) {
-                $newRow[$dimension] = $row[$dimension];
             } else {
-                throw new \RuntimeException(\sprintf('Dimension %s not found in row', $dimension));
+                /** @psalm-suppress MixedAssignment */
+                $newRow[$dimension] = $row->getDimensionMember($dimension);
             }
+        }
+
+        if ($newRow === []) {
+            throw new \RuntimeException('No dimensions found in row');
         }
 
         foreach ($this->measures as $measure) {
             // @values represent the place of the value column in the
             // row. the value column is not always at the end of the row
-            $newRow['@values'] = $measure;
 
-            // @measure contains the actual value of the measure, it
-            // will be removed later
-            $newRow['@measure'] = $row[$measure]
-                ?? throw new \RuntimeException(\sprintf('Measure %s not found in row', $measure));
+            $measureLabel = $this->getMeasureDescription($measure);
 
-            /** @var array<string,array{mixed,mixed}|string> $newRow */
+            $newRow['@values'] = new ResultValue(
+                field: '@values',
+                rawValue: $measureLabel,
+                value: $measureLabel,
+                label: $this->valuesLabel,
+            );
 
-            yield $newRow;
+            /** @var non-empty-array<string,ResultValue> $newRow */
+
+            yield new ResultUnpivotRow(
+                object: $row->getObject(),
+                dimensions: $newRow,
+                measure: $row->getMeasure($measure),
+            );
         }
+    }
+
+    private function getMeasureDescription(string $measure): MeasureDescription
+    {
+        $label = $this->measureLabelCache[$measure]
+            ??= $this->metadata->getMeasureMetadata($measure)->getLabel();
+
+        return $this->measureDescriptionFactory->createMeasureDescription(
+            measurePropertyName: $measure,
+            label: $label,
+        );
     }
 }

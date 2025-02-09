@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 
-final class ArrayToTreeTransformer
+final class UnpivotTableToTreeTransformer
 {
     /**
      * @var list<DefaultSummaryNode>
@@ -27,9 +29,13 @@ final class ArrayToTreeTransformer
      */
     private array $tree = [];
 
-    private function addDimension(DefaultSummaryNode $node, int $columnNumber): void
+    private function addDimension(ResultValue $resultValue, int $columnNumber): void
     {
-        $node = clone $node;
+        $node = DefaultSummaryNode::createBranchNode(
+            key: $resultValue->getField(),
+            legend: $resultValue->getLabel(),
+            member: $resultValue->getValue(),
+        );
 
         $current = $this->currentPath[$columnNumber] ?? null;
 
@@ -56,11 +62,23 @@ final class ArrayToTreeTransformer
         }
     }
 
-    private function addMeasure(DefaultSummaryNode $node): void
-    {
-        if (!$node->isLeaf()) {
-            throw new \UnexpectedValueException('Node must be a leaf');
+    private function addMeasure(
+        ResultValue $lastResultValue,
+        ResultValue $resultValue,
+    ): void {
+        $rawValue = $resultValue->getRawValue();
+
+        if (!\is_int($rawValue) && !\is_float($rawValue)) {
+            throw new \UnexpectedValueException('Value must be an integer or float');
         }
+
+        $node = DefaultSummaryNode::createLeafNode(
+            key: $lastResultValue->getField(),
+            legend: $lastResultValue->getLabel(),
+            member: $lastResultValue->getValue(),
+            value: $resultValue->getValue(),
+            rawValue: $rawValue,
+        );
 
         $parent = end($this->currentPath);
 
@@ -73,22 +91,31 @@ final class ArrayToTreeTransformer
     }
 
     /**
-     * @param iterable<list<DefaultSummaryNode>> $inputArray
+     * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultSummaryNode>
      */
-    public function arrayToTree(iterable $inputArray): array
+    public function transform(iterable $rows): array
     {
         $this->currentPath = [];
         $this->tree = [];
 
-        foreach ($inputArray as $row) {
-            foreach ($row as $columnNumber => $node) {
-                if ($node->isLeaf()) {
-                    $this->addMeasure($node);
-                } else {
-                    $this->addDimension($node, $columnNumber);
+        foreach ($rows as $row) {
+            $dimensions = $row->getDimensions();
+            $columnNumber = 0;
+
+            foreach ($dimensions as $resultValue) {
+                // if last dimension
+                if ($columnNumber === \count($dimensions) - 1) {
+                    $this->addMeasure($resultValue, $row->getMeasure());
+
+                    break;
                 }
+
+                $this->addDimension($resultValue, $columnNumber);
+
+                $columnNumber++;
             }
+
         }
 
         return $this->tree;

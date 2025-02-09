@@ -115,7 +115,7 @@ final readonly class SummaryMetadata
         return $this->measures[$measureName] ?? throw new \RuntimeException('Measure not found');
     }
 
-    public function getFieldByName(string $fieldName): DimensionMetadata|MeasureMetadata
+    public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata
     {
         return $this->dimensions[$fieldName]
             ?? $this->measures[$fieldName]
