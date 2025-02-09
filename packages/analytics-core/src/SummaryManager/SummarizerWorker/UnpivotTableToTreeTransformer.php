@@ -57,14 +57,13 @@ final class UnpivotTableToTreeTransformer
 
         $this->currentPath = array_values($currentPath);
 
-        if (!$parent->isLeaf()) {
-            $parent->addChild($node);
-        }
+        $parent->addChild($node);
     }
 
     private function addMeasure(
         ResultValue $lastResultValue,
         ResultValue $resultValue,
+        int $columnNumber,
     ): void {
         $rawValue = $resultValue->getRawValue();
 
@@ -79,6 +78,13 @@ final class UnpivotTableToTreeTransformer
             value: $resultValue->getValue(),
             rawValue: $rawValue,
         );
+
+        if ($columnNumber === 0) {
+            $this->currentPath = [$node];
+            $this->tree[] = $node;
+
+            return;
+        }
 
         $parent = end($this->currentPath);
 
@@ -106,7 +112,7 @@ final class UnpivotTableToTreeTransformer
             foreach ($dimensions as $resultValue) {
                 // if last dimension
                 if ($columnNumber === \count($dimensions) - 1) {
-                    $this->addMeasure($resultValue, $row->getMeasure());
+                    $this->addMeasure($resultValue, $row->getMeasure(), $columnNumber);
 
                     break;
                 }
@@ -115,7 +121,6 @@ final class UnpivotTableToTreeTransformer
 
                 $columnNumber++;
             }
-
         }
 
         return $this->tree;
