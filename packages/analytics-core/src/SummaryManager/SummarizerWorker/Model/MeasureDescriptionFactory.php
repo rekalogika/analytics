@@ -17,37 +17,35 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class MeasureDescriptionFactory
 {
-    private function __construct() {}
-
     /**
      * @var array<string,MeasureDescription>
      */
-    private static array $cache = [];
+    private array $cache = [];
 
-    public static function createMeasureDescription(
+    public function createMeasureDescription(
         string $measurePropertyName,
         string|TranslatableInterface $label,
     ): MeasureDescription {
-        $cacheKey = self::getCacheKey($measurePropertyName, $label);
+        $cacheKey = $this->getCacheKey($measurePropertyName, $label);
 
-        if (\array_key_exists($cacheKey, self::$cache)) {
-            return self::$cache[$cacheKey];
+        if (\array_key_exists($cacheKey, $this->cache)) {
+            return $this->cache[$cacheKey];
         }
 
         if ($label instanceof TranslatableInterface) {
-            return self::$cache[$cacheKey] = new TranslatableMeasureDescription(
+            return $this->cache[$cacheKey] = new TranslatableMeasureDescription(
                 measurePropertyName: $measurePropertyName,
                 label: $label,
             );
         } else {
-            return self::$cache[$cacheKey] = new StringMeasureDescription(
+            return $this->cache[$cacheKey] = new StringMeasureDescription(
                 measurePropertyName: $measurePropertyName,
                 label: $label,
             );
         }
     }
 
-    private static function getCacheKey(
+    private function getCacheKey(
         string $measurePropertyName,
         string|TranslatableInterface $label,
     ): string {

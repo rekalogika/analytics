@@ -15,83 +15,103 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\HydratorResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
+use Rekalogika\Analytics\Util\TranslatableMessage;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class SummaryObjectHydrator
+final readonly class QueryResultToRowTransformer
 {
     public function __construct(
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
+        private readonly PropertyAccessorInterface $propertyAccessor,
     ) {}
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return iterable<HydratorResult>
+     * @return iterable<ResultRow>
      */
-    public function hydrateObjects(array $input): iterable
+    public function transform(array $input): iterable
     {
         foreach ($input as $item) {
-            yield $this->hydrateObject($item);
+            yield $this->transformOne($item);
         }
     }
 
     /**
      * @param array<string,mixed> $input
-     * @return HydratorResult
+     * @return ResultRow
      */
-    public function hydrateObject(array $input): object
+    public function transformOne(array $input): object
     {
         // create the object
         $summaryClassName = $this->metadata->getSummaryClass();
         $reflectionClass = new \ReflectionClass($summaryClassName);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
-        $groupingProperty = $this->metadata->getGroupingsProperty();
-        $rawValues = [];
+
         $groupings = null;
+        $measureValues = [];
+        $dimensionValues = [];
 
         /**
-         * @var mixed $value
+         * @var mixed $rawValue
          */
-        foreach ($input as $key => $value) {
+        foreach ($input as $key => $rawValue) {
             if ($key === '__grouping') {
                 /** @var string */
-                $groupings = $value;
-                $targetProperty = $groupingProperty;
-            } else {
-                $targetProperty = $key;
+                $groupings = $rawValue;
+                continue;
             }
 
+            $isMeasure = $this->isMeasure($key);
+
             /** @psalm-suppress MixedAssignment */
-            $value = $this->resolveValue(
+            $rawValue = $this->resolveValue(
                 reflectionClass: $reflectionClass,
-                propertyName: $targetProperty,
-                value: $value,
+                propertyName: $key,
+                value: $rawValue,
             );
 
-            if ($this->isMeasure($key)) {
-                $value = $this->castToNumber($value);
+            if ($isMeasure) {
+                $rawValue = $this->castToNumber($rawValue);
             }
-
-            /** @psalm-suppress MixedAssignment */
-            $rawValues[$key] = $value;
 
             $this->injectValueToObject(
                 object: $summaryObject,
                 reflectionClass: $reflectionClass,
-                propertyName: $targetProperty,
-                value: $value,
+                propertyName: $key,
+                value: $rawValue,
             );
+
+            /** @psalm-suppress MixedAssignment */
+            $value = $this->propertyAccessor->getValue($summaryObject, $key);
+
+            $resultValue = new ResultValue(
+                field: $key,
+                rawValue: $rawValue,
+                value: $value,
+                label: $this->getLabel($key),
+            );
+
+            if ($isMeasure) {
+                $measureValues[$key] = $resultValue;
+            } else {
+                $dimensionValues[$key] = $resultValue;
+            }
         }
 
         if ($groupings === null) {
             throw new \LogicException('Groupings not found');
         }
 
-        return new HydratorResult(
+        return new ResultRow(
             object: $summaryObject,
-            rawValues: $rawValues,
             groupings: $groupings,
+            dimensions: $dimensionValues,
+            measures: $measureValues,
         );
     }
 
@@ -328,5 +348,33 @@ final readonly class SummaryObjectHydrator
     private function isMeasure(string $key): bool
     {
         return $this->metadata->isMeasure($key);
+    }
+
+    private function getLabel(string $field): TranslatableInterface|string
+    {
+        if (!str_contains($field, '.')) {
+            $metadata = $this->metadata->getFieldMetadata($field);
+
+            return $metadata->getLabel();
+        }
+
+        [$dimensionName, $propertyName] = explode('.', $field);
+        $metadata = $this->metadata->getDimensionMetadata($dimensionName);
+
+        $hierarchyMetadata = $metadata->getHierarchy();
+
+        if ($hierarchyMetadata === null) {
+            throw new \RuntimeException(\sprintf('Hierarchy not found: %s', $dimensionName));
+        }
+
+        return new TranslatableMessage(
+            '{property} - {dimension}',
+            [
+                '{property}' => $metadata->getLabel(),
+                '{dimension}' => $hierarchyMetadata
+                    ->getProperty($propertyName)
+                    ->getLabel(),
+            ],
+        );
     }
 }

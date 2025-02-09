@@ -16,33 +16,34 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 /**
  * @internal
  */
-class HydratorResult
+class ResultRow
 {
     /**
-     * @param array<string,mixed> $rawValues
+     * @param array<string,ResultValue> $dimensions
+     * @param array<string,ResultValue> $measures
      */
     public function __construct(
         private readonly object $object,
-        private readonly array $rawValues,
+        private array $dimensions,
+        private array $measures,
         private readonly string $groupings,
     ) {}
+
+    public function getMeasure(string $measure): ResultValue
+    {
+        return $this->measures[$measure]
+            ?? throw new \RuntimeException('Measure ' . $measure . ' not found in row');
+    }
+
+    public function getDimensionMember(string $dimension): ResultValue
+    {
+        return $this->dimensions[$dimension]
+            ?? throw new \RuntimeException('Dimension ' . $dimension . ' not found in row');
+    }
 
     public function getObject(): object
     {
         return $this->object;
-    }
-
-    /**
-     * @return array<string,mixed>
-     */
-    public function getRawValues(): array
-    {
-        return $this->rawValues;
-    }
-
-    public function getRawValue(string $key): mixed
-    {
-        return $this->rawValues[$key] ?? null;
     }
 
     public function isSubtotal(): bool

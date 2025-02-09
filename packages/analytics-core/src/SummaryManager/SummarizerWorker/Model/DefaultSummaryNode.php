@@ -32,7 +32,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 
     private function __construct(
         private readonly string $key,
-        private readonly object|int|float|null $value,
+        private readonly mixed $value,
         private readonly int|float|null $rawValue,
         private readonly string|TranslatableInterface $legend,
         private readonly mixed $member,
@@ -68,7 +68,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
 
     public static function createLeafNode(
         string $key,
-        object|int|float|null $value,
+        mixed $value,
         int|float|null $rawValue,
         string|TranslatableInterface $legend,
         mixed $member,
@@ -131,7 +131,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         $node->setParent($this);
     }
 
-    public function getValue(): object|int|float|null
+    public function getValue(): mixed
     {
         return $this->value;
     }

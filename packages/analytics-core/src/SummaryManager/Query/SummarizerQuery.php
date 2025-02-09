@@ -18,16 +18,14 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Attribute\Dimension;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ArrayToTreeTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\MeasureSorter;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultResolver;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ResultToDimensionTableTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\SummaryObjectHydrator;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -84,6 +82,12 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->partitionKeyProperty = $this->metadata->getPartition()
             ->getPartitionKeyProperty();
+
+        $dimensionsInQuery = $this->query->getGroupBy();
+
+        if (!\in_array('@values', $dimensionsInQuery, true)) {
+            $dimensionsInQuery[] = '@values';
+        }
     }
 
     public function execute(): Result
@@ -104,7 +108,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->addGroupingWhere();
 
         // check if select is empty
-        if (empty($this->queryBuilder->getDQLPart('select'))) {
+        if ($this->query->getSelect() === []) {
             return new DefaultSummaryResult(
                 children: [],
             );
@@ -114,57 +118,27 @@ final class SummarizerQuery extends AbstractQuery
         $result = $this->getResult();
 
         // hydrate into summary object
-        $hydrator = new SummaryObjectHydrator(
+        $queryResultToRowTransformer = new QueryResultToRowTransformer(
             metadata: $this->metadata,
             entityManager: $this->entityManager,
-        );
-
-        $result = $hydrator->hydrateObjects($result);
-
-        // resolve result, convert id to entity, and use user-provided getters in
-        // the summary entity to normalize the result
-
-        $resultResolver = new ResultResolver(
-            query: $this->query,
             propertyAccessor: $this->propertyAccessor,
         );
 
-        $result = $resultResolver->resolveResult($result);
+        $result = $queryResultToRowTransformer->transform($result);
 
         // unpivot result
-
         $unpivotTransformer = new UnpivotValuesTransformer(
-            summaryQuery: $this->query,
-        );
-
-        $result = $unpivotTransformer->unpivot($result);
-
-        // sort measures
-
-        $measureSorter = new MeasureSorter(
             summaryQuery: $this->query,
             metadata: $this->metadata,
         );
 
-        $result = $measureSorter->sortMeasures($result);
+        $result = $unpivotTransformer->transform($result);
 
-        // wrap resulting values using our dimension and measure classes
-
-        $resultToDimensionTableTransformer =
-            new ResultToDimensionTableTransformer(
-                metadata: $this->metadata,
-            );
-
-        $result = $resultToDimensionTableTransformer
-            ->transformResultToDimensionTable($result);
-
-        // convert the tabular format to a tree format
-
-        $arrayToTreeTransformer = new ArrayToTreeTransformer();
-        $result = $arrayToTreeTransformer->arrayToTree($result);
+        // convert to tree
+        $toTreeTransformer = new UnpivotTableToTreeTransformer();
+        $result = $toTreeTransformer->transform($result);
 
         // wrap the result using our SummaryResult class
-
         return new DefaultSummaryResult(children: $result);
     }
 
