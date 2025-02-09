@@ -135,7 +135,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         source: new EntityValueResolver('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
     )]
-    private Country $itemCountryOfOrigin;
+    private ?Country $itemCountryOfOrigin = null;
 
     //
     // measures
