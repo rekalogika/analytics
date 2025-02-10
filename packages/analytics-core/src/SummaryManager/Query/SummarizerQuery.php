@@ -107,6 +107,9 @@ final class SummarizerQuery extends AbstractQuery
         // add grouping where clause
         $this->addGroupingWhere();
 
+        // add order by clause supplied by the user
+        $this->addUserSuppliedOrderBy();
+
         // check if select is empty
         if ($this->query->getSelect() === []) {
             return new DefaultSummaryResult(
@@ -134,12 +137,35 @@ final class SummarizerQuery extends AbstractQuery
 
         $result = $unpivotTransformer->transform($result);
 
-        // convert to tree
+        // convert to tree or table
         $toTreeTransformer = new UnpivotTableToTreeTransformer();
-        $result = $toTreeTransformer->transform($result);
+
+        if ($this->hasTieredOrder()) {
+            $result = $toTreeTransformer->transformToTree($result);
+        } else {
+            $result = $toTreeTransformer->transformToTable($result);
+        }
 
         // wrap the result using our SummaryResult class
         return new DefaultSummaryResult(children: $result);
+    }
+
+    private function hasTieredOrder(): bool
+    {
+        $orderBy = $this->query->getOrderBy();
+
+        if (\count($orderBy) === 0) {
+            return true;
+        }
+
+        $orderFields = array_keys($orderBy);
+
+        $dimensionWithoutValues = array_filter(
+            $this->metadata->getDimensionPropertyNames(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        );
+
+        return $orderFields === $dimensionWithoutValues;
     }
 
     private function initializeQueryBuilder(): void
@@ -415,13 +441,7 @@ final class SummarizerQuery extends AbstractQuery
         $measureMetadatas = $this->metadata->getMeasureMetadatas();
 
         foreach ($measureMetadatas as $value => $measureMetadata) {
-            $functions = $measureMetadata->getFunction();
-            $function = reset($functions);
-
-            if ($function === false) {
-                throw new \InvalidArgumentException(\sprintf('Measure %s has no function', $value));
-            }
-
+            $function = $measureMetadata->getFirstFunction();
             $dql = $function->getSummaryToSummaryDQLFunction();
 
             $this->queryBuilder
@@ -545,6 +565,40 @@ final class SummarizerQuery extends AbstractQuery
             'root.%s',
             $dimensionMetadata->getSummaryProperty(),
         );
+    }
+
+    private function addUserSuppliedOrderBy(): void
+    {
+        $orderBy = $this->query->getOrderBy();
+
+        if ($orderBy === []) {
+            return;
+        }
+
+        $i = 0;
+
+        foreach ($orderBy as $field => $order) {
+            if ($this->metadata->isMeasure($field)) {
+                $measureMetadata = $this->metadata->getMeasureMetadata($field);
+                $function = $measureMetadata->getFirstFunction();
+                $dql = $function->getSummaryToSummaryDQLFunction();
+
+                $fieldString = \sprintf(
+                    $dql,
+                    'root.' . $measureMetadata->getSummaryProperty(),
+                );
+            } else {
+                $fieldString = $this->getQueryContext()->resolvePath($field);
+            }
+
+            if ($i === 0) {
+                $this->queryBuilder->orderBy($fieldString, $order->value);
+            } else {
+                $this->queryBuilder->addOrderBy($fieldString, $order->value);
+            }
+
+            $i++;
+        }
     }
 
     /**

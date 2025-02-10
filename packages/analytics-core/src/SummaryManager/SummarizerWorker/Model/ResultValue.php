@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @internal
  */
-class ResultValue
+final readonly class ResultValue
 {
     public function __construct(
         private readonly TranslatableInterface|string $label,
@@ -30,7 +30,6 @@ class ResultValue
     public function isSame(self $other): bool
     {
         return $this->field === $other->field
-            && $this->value === $other->value
             && $this->rawValue === $other->rawValue;
     }
 

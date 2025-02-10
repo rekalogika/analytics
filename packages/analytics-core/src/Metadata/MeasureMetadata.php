@@ -35,6 +35,13 @@ final readonly class MeasureMetadata
         return $this->function;
     }
 
+    public function getFirstFunction(): AggregateFunction
+    {
+        $function = $this->function;
+
+        return reset($function);
+    }
+
     public function getSummaryProperty(): string
     {
         return $this->summaryProperty;
