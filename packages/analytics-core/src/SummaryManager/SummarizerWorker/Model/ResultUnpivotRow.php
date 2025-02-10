@@ -18,6 +18,8 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
  */
 final readonly class ResultUnpivotRow
 {
+    private ResultTuple $tuple;
+
     /**
      * @param non-empty-array<string,ResultValue> $dimensions
      */
@@ -25,7 +27,9 @@ final readonly class ResultUnpivotRow
         private readonly object $object,
         private array $dimensions,
         private ResultValue $measure,
-    ) {}
+    ) {
+        $this->tuple = new ResultTuple($dimensions);
+    }
 
     /**
      * @param array<string,int<0,max>> $measures
@@ -55,6 +59,16 @@ final readonly class ResultUnpivotRow
             ?? throw new \RuntimeException('Measure not found');
 
         return $measure1Order <=> $measure2Order;
+    }
+
+    public function hasSameTuple(self $other): bool
+    {
+        return $this->tuple->isSame($other->tuple);
+    }
+
+    public function getTuple(): ResultTuple
+    {
+        return $this->tuple;
     }
 
     public function getObject(): object

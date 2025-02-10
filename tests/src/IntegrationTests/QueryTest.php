@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\OrderBy;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
@@ -240,5 +242,52 @@ class QueryTest extends KernelTestCase
         $this->assertNotNull($withWhere);
 
         $this->assertLessThan($all, $withWhere);
+    }
+
+    public function testOrderByDimension(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.month')
+            ->select('count')
+            ->orderBy('time.month', Order::Descending)
+            ->getResult();
+
+        $months = [];
+
+        foreach ($result as $node) {
+            /** @psalm-suppress MixedAssignment */
+            $month = $node->getMember();
+
+            $this->assertInstanceOf(Month::class, $month);
+            $months[] = (string) $month;
+        }
+
+        // assert that the months are sorted in descending order
+        $sorted = $months;
+        rsort($sorted);
+
+        $this->assertEquals($months, $sorted);
+    }
+
+    public function testOrderByMeasure(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.month')
+            ->select('count')
+            ->orderBy('count', Order::Descending)
+            ->getResult();
+
+        $counts = [];
+
+        foreach ($result as $node) {
+            /** @psalm-suppress MixedAssignment */
+            $counts[] = $node->traverse('count')?->getValue();
+        }
+
+        // assert that the counts are sorted in descending order
+        $sorted = $counts;
+        rsort($sorted);
+
+        $this->assertEquals($counts, $sorted);
     }
 }

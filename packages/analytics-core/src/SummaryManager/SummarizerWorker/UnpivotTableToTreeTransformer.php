@@ -29,8 +29,11 @@ final class UnpivotTableToTreeTransformer
      */
     private array $tree = [];
 
-    private function addDimension(ResultValue $resultValue, int $columnNumber): void
-    {
+    private function addDimension(
+        ResultValue $resultValue,
+        int $columnNumber,
+        bool $forceCreate,
+    ): void {
         $node = DefaultSummaryNode::createBranchNode(
             key: $resultValue->getField(),
             legend: $resultValue->getLabel(),
@@ -39,7 +42,7 @@ final class UnpivotTableToTreeTransformer
 
         $current = $this->currentPath[$columnNumber] ?? null;
 
-        if ($current !== null && $current->isEqual($node)) {
+        if ($current !== null && $current->isEqual($node) && !$forceCreate) {
             return;
         }
 
@@ -100,7 +103,7 @@ final class UnpivotTableToTreeTransformer
      * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultSummaryNode>
      */
-    public function transform(iterable $rows): array
+    public function transformToTree(iterable $rows): array
     {
         $this->currentPath = [];
         $this->tree = [];
@@ -117,10 +120,46 @@ final class UnpivotTableToTreeTransformer
                     break;
                 }
 
-                $this->addDimension($resultValue, $columnNumber);
+                $this->addDimension($resultValue, $columnNumber, false);
 
                 $columnNumber++;
             }
+        }
+
+        return $this->tree;
+    }
+
+    /**
+     * @param iterable<ResultUnpivotRow> $rows
+     * @return list<DefaultSummaryNode>
+     */
+    public function transformToTable(iterable $rows): array
+    {
+        $this->currentPath = [];
+        $this->tree = [];
+        $previousRow = null;
+
+        foreach ($rows as $row) {
+            $dimensions = $row->getDimensions();
+            $columnNumber = 0;
+            $sameAsPrevious = $previousRow !== null && $previousRow->hasSameTuple($row);
+
+            foreach ($dimensions as $resultValue) {
+                // if last dimension
+                if ($columnNumber === \count($dimensions) - 1) {
+                    $this->addMeasure($resultValue, $row->getMeasure(), $columnNumber);
+
+                    break;
+                }
+
+                if (!$sameAsPrevious) {
+                    $this->addDimension($resultValue, $columnNumber, true);
+                }
+
+                $columnNumber++;
+            }
+
+            $previousRow = $row;
         }
 
         return $this->tree;

@@ -18,6 +18,8 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
  */
 class ResultRow
 {
+    private ResultTuple $tuple;
+
     /**
      * @param array<string,ResultValue> $dimensions
      * @param array<string,ResultValue> $measures
@@ -27,7 +29,9 @@ class ResultRow
         private array $dimensions,
         private array $measures,
         private readonly string $groupings,
-    ) {}
+    ) {
+        $this->tuple = new ResultTuple($dimensions);
+    }
 
     public function getMeasure(string $measure): ResultValue
     {
@@ -49,5 +53,15 @@ class ResultRow
     public function isSubtotal(): bool
     {
         return substr_count($this->groupings, '1') !== 0;
+    }
+
+    public function getTuple(): ResultTuple
+    {
+        return $this->tuple;
+    }
+
+    public function isSame(self $other): bool
+    {
+        return $this->tuple->isSame($other->tuple);
     }
 }

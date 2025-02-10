@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\Result;
@@ -41,6 +42,11 @@ final class SummaryQuery
      * @var list<Expression>
      */
     private array $where = [];
+
+    /**
+     * @var array<string,Order>
+     */
+    private array $orderBy = [];
 
     /**
      * @param non-empty-array<string,Field> $dimensionChoices
@@ -128,7 +134,7 @@ final class SummaryQuery
 
     /**
      * @param list<string> $fields
-     * @param 'dimension'|'measure' $type
+     * @param 'dimension'|'measure'|'both' $type
      */
     private function ensureFieldValid(array $fields, string $type): void
     {
@@ -136,6 +142,7 @@ final class SummaryQuery
         $type = match ($type) {
             'dimension' => $this->dimensionChoices,
             'measure' => $this->measureChoices,
+            'both' => array_merge($this->dimensionChoices, $this->measureChoices),
         };
 
         foreach ($fields as $field) {
@@ -145,7 +152,7 @@ final class SummaryQuery
         }
 
         if ($invalid !== []) {
-            throw new \InvalidArgumentException(\sprintf('Invalid dimensions: %s', implode(', ', $invalid)));
+            throw new \InvalidArgumentException(\sprintf('Invalid field: %s', implode(', ', $invalid)));
         }
     }
 
@@ -230,6 +237,39 @@ final class SummaryQuery
     public function andWhere(Expression $expression): self
     {
         $this->where[] = $expression;
+
+        return $this;
+    }
+
+    //
+    // order
+    //
+
+    /**
+     * @return array<string,Order>
+     */
+    public function getOrderBy(): array
+    {
+        return $this->orderBy;
+    }
+
+    public function orderBy(string $field, Order $direction = Order::Ascending): self
+    {
+        $this->orderBy = [];
+        $this->addOrderBy($field, $direction);
+
+        return $this;
+    }
+
+    public function addOrderBy(string $field, Order $direction = Order::Ascending): self
+    {
+        $this->ensureFieldValid([$field], 'both');
+
+        if ($field === '@values') {
+            throw new \InvalidArgumentException('Cannot order by @values');
+        }
+
+        $this->orderBy[$field] = $direction;
 
         return $this;
     }

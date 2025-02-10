@@ -134,6 +134,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new EntityValueResolver('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
+        orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Country $itemCountryOfOrigin = null;
 
