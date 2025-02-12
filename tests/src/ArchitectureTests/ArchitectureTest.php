@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
+use Doctrine\Persistence\ManagerRegistry;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 
 final class ArchitectureTest
@@ -57,6 +59,7 @@ final class ArchitectureTest
                 // misc
                 Selector::classname(\Stringable::class),
                 Selector::classname(\BackedEnum::class),
+                Selector::classname(\UnitEnum::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\Attribute::class),
                 Selector::classname(\IntlDateFormatter::class),
@@ -120,6 +123,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\Translation'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
+                Selector::classname(ManagerRegistry::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\InvalidArgumentException::class),
                 Selector::classname(\LogicException::class),
@@ -128,6 +132,7 @@ final class ArchitectureTest
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\Stringable::class),
                 Selector::classname(AssetMapperInterface::class),
+                Selector::classname(ContainerInterface::class),
             );
     }
 }

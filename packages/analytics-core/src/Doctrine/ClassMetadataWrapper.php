@@ -62,6 +62,11 @@ final readonly class ClassMetadataWrapper
         return $class;
     }
 
+    public function hasProperty(string $property): bool
+    {
+        return $this->isPropertyField($property) || $this->isPropertyEntity($property);
+    }
+
     public function isPropertyEntity(string $property): bool
     {
         return $this->classMetadata->hasAssociation($property);
@@ -130,5 +135,26 @@ final readonly class ClassMetadataWrapper
         }
 
         return $targetClass;
+    }
+
+    /**
+     * @return class-string<\UnitEnum>|null
+     */
+    public function getEnumType(string $property): ?string
+    {
+        $fieldMapping = $this->classMetadata->getFieldMapping($property);
+
+        $enumType = $fieldMapping['enumType'] ?? null;
+
+        if ($enumType === null) {
+            return null;
+        }
+
+        if (!\is_string($enumType) || !enum_exists($enumType)) {
+            throw new \InvalidArgumentException(\sprintf('Enum type "%s" not found', get_debug_type($enumType)));
+        }
+
+        /** @var class-string<\UnitEnum> */
+        return $enumType;
     }
 }
