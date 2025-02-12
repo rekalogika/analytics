@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
+use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -33,6 +35,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         parent::build($container);
 
         $container->addCompilerPass(new DoctrineEntityPass());
+        $container->addCompilerPass(new DistinctValuesResolverPass());
     }
 
     /**
@@ -45,6 +48,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerBuilder $builder,
     ): void {
         $container->import('../config/services.php');
+
+        $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
+            ->addTag('rekalogika.analytics.distinct_values_resolver');
     }
 
     /**

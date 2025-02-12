@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
 use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
@@ -57,5 +58,13 @@ final class AppController extends AbstractController
             'form' => $form,
             'result' => $result,
         ]);
+    }
+
+    /**
+     * Dummy controller to prevent services in arguments from being removed
+     */
+    public function dummy(DistinctValuesResolver $distinctValuesResolver): Response
+    {
+        return new Response();
     }
 }

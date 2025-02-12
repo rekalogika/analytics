@@ -16,10 +16,13 @@ namespace Rekalogika\Analytics\Bundle;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
+use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
@@ -236,4 +239,20 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             'channel' => 'rekalogika.analytics',
         ])
     ;
+
+    //
+    // distinct values resolver
+    //
+
+    $services
+        ->set(DistinctValuesResolver::class)
+        ->class(ChainDistinctValuesResolver::class);
+
+    $services
+        ->set(DoctrineDistinctValuesResolver::class)
+        ->args([
+            '$managerRegistry' => service('doctrine'),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+        ->tag('rekalogika.analytics.distinct_values_resolver');
 };
