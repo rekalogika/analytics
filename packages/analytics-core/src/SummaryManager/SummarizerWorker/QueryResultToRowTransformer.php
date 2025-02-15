@@ -45,7 +45,7 @@ final readonly class QueryResultToRowTransformer
      * @param array<string,mixed> $input
      * @return ResultRow
      */
-    public function transformOne(array $input): object
+    private function transformOne(array $input): object
     {
         // create the object
         $summaryClassName = $this->metadata->getSummaryClass();
