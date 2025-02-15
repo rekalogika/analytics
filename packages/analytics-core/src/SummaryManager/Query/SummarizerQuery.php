@@ -62,6 +62,7 @@ final class SummarizerQuery extends AbstractQuery
         private readonly QueryBuilder $queryBuilder,
         private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
+        private int $safeguardLimit = 50000,
     ) {
         parent::__construct($queryBuilder);
 
@@ -167,7 +168,10 @@ final class SummarizerQuery extends AbstractQuery
     {
         $summaryClass = $this->metadata->getSummaryClass();
 
-        $this->queryBuilder->from($summaryClass, 'root');
+        $this->queryBuilder
+            ->from($summaryClass, 'root')
+            ->setMaxResults($this->safeguardLimit + 1) // safeguard
+        ;
 
         foreach ($this->metadata->getDimensionPropertyNames() as $propertyName) {
             $this->groupings[$propertyName] = true;
