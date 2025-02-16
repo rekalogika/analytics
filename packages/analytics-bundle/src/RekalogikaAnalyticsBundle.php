@@ -61,6 +61,12 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerConfigurator $container,
         ContainerBuilder $builder,
     ): void {
+        $builder->prependExtensionConfig('twig', [
+            'paths' => [
+                __DIR__ . '/../templates' => 'RekalogikaAnalytics',
+            ],
+        ]);
+
         if (!$this->isAssetMapperAvailable($builder)) {
             return;
         }

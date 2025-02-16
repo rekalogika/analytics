@@ -1,8 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
+import { visit } from '@hotwired/turbo'
 import Sortable from 'sortablejs'
 
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
+    static values = {
+        urlParameter: String,
+    }
+
     #animation = 150
     #group
 
@@ -97,48 +102,41 @@ export default class extends Controller {
     }
 
     #submit() {
-        this.#removeAllHiddenInputs()
+        let data = {}
 
-        this.element.querySelectorAll('ul').forEach((ul, index) => {
-            let ultype = ul.dataset.type
+        let uls = this.element.querySelectorAll('ul')
 
-            if (!['rows', 'columns', 'values', 'filters'].includes(ultype)) {
-                return
+        for (const ul of uls) {
+            let type = ul.dataset.type
+
+            if (!['rows', 'columns', 'values', 'filters'].includes(type)) {
+                continue
             }
 
-            ul.querySelectorAll('li').forEach((li, index) => {
-                let input = document.createElement('input')
-                input.type = 'hidden'
-                input.name = ultype + '[' + index + ']'
-                let value = li.dataset.value
+            let lis = ul.querySelectorAll('li')
 
+            for (const [index, li] of lis.entries()) {
+                let value = li.dataset.value
                 let select = li.querySelector('select')
 
                 if (select) {
                     value += '.' + select.value
                 }
 
-                input.value = value
+                // data[type + '[' + index + ']'] = value
 
-                this.element.appendChild(input)
-            })
-        })
+                if (!data[type]) {
+                    data[type] = []
+                }
 
-        // this.#removeAllSelectInputs()
-        this.element.requestSubmit()
-    }
+                data[type][index] = value
+            }
+        }
 
-    #removeAllHiddenInputs() {
-        let formElements = this.element.querySelectorAll('input[type="hidden"]')
-        formElements.forEach((formElement) => {
-            formElement.remove()
-        })
-    }
-
-    #removeAllSelectInputs() {
-        let formElements = this.element.querySelectorAll('select')
-        formElements.forEach((formElement) => {
-            formElement.remove()
-        })
+        if (this.urlParameterValue) {
+            const url = new URL(window.location)
+            url.searchParams.set(this.urlParameterValue, JSON.stringify(data))
+            visit(url.toString(), {'frame': 'pivottable'})
+        }
     }
 }

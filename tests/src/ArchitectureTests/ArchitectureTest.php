@@ -19,6 +19,10 @@ use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\Extension\RuntimeExtensionInterface;
+use Twig\TwigFunction;
 
 final class ArchitectureTest
 {
@@ -115,7 +119,6 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\Console'),
                 Selector::inNamespace('Symfony\Component\DependencyInjection'),
                 Selector::inNamespace('Symfony\Component\EventDispatcher'),
-                Selector::inNamespace('Symfony\Component\Form'),
                 Selector::inNamespace('Symfony\Component\HttpKernel'),
                 Selector::inNamespace('Symfony\Component\Lock'),
                 Selector::inNamespace('Symfony\Component\Messenger'),
@@ -137,6 +140,12 @@ final class ArchitectureTest
                 Selector::classname(\Traversable::class),
                 Selector::classname(AssetMapperInterface::class),
                 Selector::classname(ContainerInterface::class),
+
+                // twig
+                Selector::classname(Environment::class),
+                Selector::classname(RuntimeExtensionInterface::class),
+                Selector::classname(TwigFunction::class),
+                Selector::classname(AbstractExtension::class),
             );
     }
 }

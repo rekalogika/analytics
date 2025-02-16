@@ -19,10 +19,10 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
-use Rekalogika\Analytics\Bundle\Form\Type\EqualFilterType;
-use Rekalogika\Analytics\Bundle\Form\Type\FilterExpressionsType;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
+use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
@@ -263,16 +263,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set(FilterExpressionsType::class)
-        ->tag('form.type')
+        ->set(AnalyticsRuntime::class)
+        ->tag('twig.runtime')
         ->args([
-            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
+            '$twig' => service('twig'),
         ]);
 
     $services
-        ->set(EqualFilterType::class)
-        ->tag('form.type')
-        ->args([
-            '$translator' => service('translator'),
-        ]);
+        ->set(AnalyticsExtension::class)
+        ->tag('twig.extension');
 };

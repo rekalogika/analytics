@@ -1,3 +1,6 @@
+function _createForOfIteratorHelperLoose(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (t) return (t = t.call(r)).next.bind(t); if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var o = 0; return function () { return o >= r.length ? { done: !0 } : { done: !1, value: r[o++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _callSuper(t, o, e) { return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e)); }
 function _possibleConstructorReturn(t, e) { if (e && ("object" == typeof e || "function" == typeof e)) return e; if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined"); return _assertThisInitialized(t); }
 function _assertThisInitialized(e) { if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); return e; }
@@ -9,6 +12,7 @@ function _classPrivateFieldLooseBase(e, t) { if (!{}.hasOwnProperty.call(e, t)) 
 var id = 0;
 function _classPrivateFieldLooseKey(e) { return "__private_" + id++ + "_" + e; }
 import { Controller } from '@hotwired/stimulus';
+import { visit } from '@hotwired/turbo';
 import Sortable from 'sortablejs';
 
 /* stimulusFetch: 'lazy' */
@@ -17,8 +21,6 @@ var _group = /*#__PURE__*/_classPrivateFieldLooseKey("group");
 var _onEnd = /*#__PURE__*/_classPrivateFieldLooseKey("onEnd");
 var _onMove = /*#__PURE__*/_classPrivateFieldLooseKey("onMove");
 var _submit = /*#__PURE__*/_classPrivateFieldLooseKey("submit");
-var _removeAllHiddenInputs = /*#__PURE__*/_classPrivateFieldLooseKey("removeAllHiddenInputs");
-var _removeAllSelectInputs = /*#__PURE__*/_classPrivateFieldLooseKey("removeAllSelectInputs");
 var _default = /*#__PURE__*/function (_Controller) {
   function _default() {
     var _this;
@@ -26,12 +28,6 @@ var _default = /*#__PURE__*/function (_Controller) {
       args[_key] = arguments[_key];
     }
     _this = _callSuper(this, _default, [].concat(args));
-    Object.defineProperty(_this, _removeAllSelectInputs, {
-      value: _removeAllSelectInputs2
-    });
-    Object.defineProperty(_this, _removeAllHiddenInputs, {
-      value: _removeAllHiddenInputs2
-    });
     Object.defineProperty(_this, _submit, {
       value: _submit2
     });
@@ -132,40 +128,43 @@ function _onMove2(event, originalEvent) {
   return false;
 }
 function _submit2() {
-  var _this3 = this;
-  _classPrivateFieldLooseBase(this, _removeAllHiddenInputs)[_removeAllHiddenInputs]();
-  this.element.querySelectorAll('ul').forEach(function (ul, index) {
-    var ultype = ul.dataset.type;
-    if (!['rows', 'columns', 'values', 'filters'].includes(ultype)) {
-      return;
+  var data = {};
+  var uls = this.element.querySelectorAll('ul');
+  for (var _iterator = _createForOfIteratorHelperLoose(uls), _step; !(_step = _iterator()).done;) {
+    var ul = _step.value;
+    var type = ul.dataset.type;
+    if (!['rows', 'columns', 'values', 'filters'].includes(type)) {
+      continue;
     }
-    ul.querySelectorAll('li').forEach(function (li, index) {
-      var input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = ultype + '[' + index + ']';
+    var lis = ul.querySelectorAll('li');
+    for (var _iterator2 = _createForOfIteratorHelperLoose(lis.entries()), _step2; !(_step2 = _iterator2()).done;) {
+      var _step2$value = _step2.value,
+        index = _step2$value[0],
+        li = _step2$value[1];
       var value = li.dataset.value;
       var select = li.querySelector('select');
       if (select) {
         value += '.' + select.value;
       }
-      input.value = value;
-      _this3.element.appendChild(input);
-    });
-  });
 
-  // this.#removeAllSelectInputs()
-  this.element.requestSubmit();
+      // data[type + '[' + index + ']'] = value
+
+      if (!data[type]) {
+        data[type] = [];
+      }
+      data[type][index] = value;
+    }
+  }
+  if (this.urlParameterValue) {
+    var url = new URL(window.location);
+    url.searchParams.set(this.urlParameterValue, JSON.stringify(data));
+    // window.location.href = url
+    visit(url.toString(), {
+      'frame': 'pivottable'
+    });
+  }
 }
-function _removeAllHiddenInputs2() {
-  var formElements = this.element.querySelectorAll('input[type="hidden"]');
-  formElements.forEach(function (formElement) {
-    formElement.remove();
-  });
-}
-function _removeAllSelectInputs2() {
-  var formElements = this.element.querySelectorAll('select');
-  formElements.forEach(function (formElement) {
-    formElement.remove();
-  });
-}
+_default.values = {
+  urlParameter: String
+};
 export { _default as default };

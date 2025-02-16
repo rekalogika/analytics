@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Form\Model;
+namespace Rekalogika\Analytics\Bundle\UI\Model;
 
 /**
  * @implements \IteratorAggregate<string,EqualFilter>
