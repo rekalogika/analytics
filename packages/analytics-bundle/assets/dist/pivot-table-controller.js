@@ -102,6 +102,36 @@ var _default = /*#__PURE__*/function (_Controller) {
     this.sortableValues.destroy();
     this.sortableFilters.destroy();
   };
+  _proto.getData = function getData() {
+    var data = {};
+    var uls = this.element.querySelectorAll('ul');
+    for (var _iterator = _createForOfIteratorHelperLoose(uls), _step; !(_step = _iterator()).done;) {
+      var ul = _step.value;
+      var type = ul.dataset.type;
+      if (!['rows', 'columns', 'values', 'filters'].includes(type)) {
+        continue;
+      }
+      var lis = ul.querySelectorAll('li');
+      for (var _iterator2 = _createForOfIteratorHelperLoose(lis.entries()), _step2; !(_step2 = _iterator2()).done;) {
+        var _step2$value = _step2.value,
+          index = _step2$value[0],
+          li = _step2$value[1];
+        var value = li.dataset.value;
+        var select = li.querySelector('select');
+        if (select) {
+          value += '.' + select.value;
+        }
+
+        // data[type + '[' + index + ']'] = value
+
+        if (!data[type]) {
+          data[type] = [];
+        }
+        data[type][index] = value;
+      }
+    }
+    return data;
+  };
   return _default;
 }(Controller);
 function _onEnd2(event) {
@@ -128,43 +158,17 @@ function _onMove2(event, originalEvent) {
   return false;
 }
 function _submit2() {
-  var data = {};
-  var uls = this.element.querySelectorAll('ul');
-  for (var _iterator = _createForOfIteratorHelperLoose(uls), _step; !(_step = _iterator()).done;) {
-    var ul = _step.value;
-    var type = ul.dataset.type;
-    if (!['rows', 'columns', 'values', 'filters'].includes(type)) {
-      continue;
-    }
-    var lis = ul.querySelectorAll('li');
-    for (var _iterator2 = _createForOfIteratorHelperLoose(lis.entries()), _step2; !(_step2 = _iterator2()).done;) {
-      var _step2$value = _step2.value,
-        index = _step2$value[0],
-        li = _step2$value[1];
-      var value = li.dataset.value;
-      var select = li.querySelector('select');
-      if (select) {
-        value += '.' + select.value;
-      }
-
-      // data[type + '[' + index + ']'] = value
-
-      if (!data[type]) {
-        data[type] = [];
-      }
-      data[type][index] = value;
-    }
-  }
-  if (this.urlParameterValue) {
+  if (this.urlParameterValue && this.frameValue) {
     var url = new URL(window.location);
-    url.searchParams.set(this.urlParameterValue, JSON.stringify(data));
-    // window.location.href = url
+    url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()));
     visit(url.toString(), {
-      'frame': 'pivottable'
+      'frame': this.frameValue,
+      'action': 'advance'
     });
   }
 }
 _default.values = {
-  urlParameter: String
+  urlParameter: String,
+  frame: String
 };
 export { _default as default };

@@ -2,7 +2,8 @@
     {% set id = random() %}
 
     <div data-controller="rekalogika--analytics-bundle--pivot-table"
-         data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="parameters">
+         {% if frame %}data-rekalogika--analytics-bundle--pivot-table-frame-value="{{ frame }}"{% endif %}
+         {% if urlParameter %} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {% endif %}>
         {{ block("tab_group") }}
         {{ block("tab_pane_group") }}
     </div>

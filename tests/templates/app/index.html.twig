@@ -1,13 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello{% endblock title %}
-
 {% block body %}
-    {{ analytics_render_control(query) }}
+    {{ analytics_render_control(query, frame: 'pivottable', urlParameter: 'parameters') }}
 
     <div class="mt-5" style="min-height: 500px;">
         <turbo-frame id="pivottable">
-        {% if result %}{{ result|raw }}{% endif %}
+        {{ result|raw }}
         </turbo-frame>
     </div>
 {% endblock %}
