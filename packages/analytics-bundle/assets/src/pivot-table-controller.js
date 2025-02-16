@@ -43,12 +43,12 @@ export default class extends Controller {
             onEnd: this.#onEnd.bind(this)
         })
 
-        // this.sortableFilters = Sortable.create(this.filtersElement, {
-        //     group: this.#group,
-        //     animation: this.#animation,
-        //     onMove: this.#onMove.bind(this),
-        //     onEnd: this.#onEnd.bind(this)
-        // })
+        this.sortableFilters = Sortable.create(this.filtersElement, {
+            group: this.#group,
+            animation: this.#animation,
+            onMove: this.#onMove.bind(this),
+            onEnd: this.#onEnd.bind(this)
+        })
 
         this.element.querySelectorAll('select').forEach((select) => {
             select.addEventListener('change', () => {

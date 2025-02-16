@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
-use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
-use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
+use Rekalogika\Analytics\Bundle\Form\Model\PivotAwareSummaryQuery;
+use Rekalogika\Analytics\Bundle\Form\Type\SummaryQueryType;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;

@@ -11,8 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Form;
+namespace Rekalogika\Analytics\Bundle\Form\Type;
 
+use Rekalogika\Analytics\Bundle\Form\Model\PivotAwareSummaryQuery;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -56,6 +57,10 @@ class SummaryQueryType extends AbstractType
                     'size' => 12,
                 ],
             ])
+            ->addEventListener(
+                FormEvents::POST_SUBMIT,
+                $this->onPostSubmit(...),
+            )
             ->addEventListener(
                 FormEvents::PRE_SET_DATA,
                 $this->onPreSetData(...),
@@ -126,6 +131,22 @@ class SummaryQueryType extends AbstractType
                 'attr' => [
                     'size' => 12,
                 ],
-            ]);
+            ])
+            ->add('filterExpressions', FilterExpressionsType::class);
+    }
+
+    private function onPostSubmit(FormEvent $event): void
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if (!$data instanceof PivotAwareSummaryQuery) {
+            throw new \InvalidArgumentException('Data must be an instance of PivotAwareSummaryQuery');
+        }
+
+        foreach ($data->getFilterExpressions() as $key => $filter) {
+
+        }
+
     }
 }

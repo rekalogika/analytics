@@ -19,6 +19,8 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\Form\Type\EqualFilterType;
+use Rekalogika\Analytics\Bundle\Form\Type\FilterExpressionsType;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -255,4 +257,22 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.distinct_values_resolver');
+
+    //
+    // frontend
+    //
+
+    $services
+        ->set(FilterExpressionsType::class)
+        ->tag('form.type')
+        ->args([
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
+        ]);
+
+    $services
+        ->set(EqualFilterType::class)
+        ->tag('form.type')
+        ->args([
+            '$translator' => service('translator'),
+        ]);
 };

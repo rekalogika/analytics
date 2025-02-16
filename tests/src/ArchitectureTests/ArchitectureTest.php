@@ -131,6 +131,10 @@ final class ArchitectureTest
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\Stringable::class),
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayAccess::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Traversable::class),
                 Selector::classname(AssetMapperInterface::class),
                 Selector::classname(ContainerInterface::class),
             );

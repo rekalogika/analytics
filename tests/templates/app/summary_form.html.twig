@@ -2,12 +2,12 @@
     {% set id = random() %}
 
     {{ form_start(form, {attr: {'data-controller': 'rekalogika--analytics-bundle--pivot-table' }}) }}
+        {{ block("tab_group") }}
+        {{ block("tab_pane_group") }}
+
         {% set var %}
             {{ form_rest(form) }}
         {% endset %}
-
-        {# {{ block("tab_group") }} #}
-        {{ block("tab_pane_group") }}
 
     {{ form_end(form) }}
 {% endblock %}
@@ -89,10 +89,10 @@
                     {{ block("item_block") }}
                 </div>
 
-                {# <div class="col">
+                <div class="col">
                     {% set type = "filters" %}
                     {{ block("item_block") }}
-                </div> #}
+                </div>
             </div>
         </div>
     </div>
@@ -171,5 +171,9 @@
 {% endblock %}
 
 {% block filters %}
-foo
+    {% for filterExpression in form.filterExpressions %}
+        {% if filterExpression.vars.key in data.filters %}
+            {{ form(filterExpression) }}
+        {% endif %}
+    {% endfor %}
 {% endblock %}

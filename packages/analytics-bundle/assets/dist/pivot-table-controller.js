@@ -85,14 +85,12 @@ var _default = /*#__PURE__*/function (_Controller) {
       onMove: _classPrivateFieldLooseBase(this, _onMove)[_onMove].bind(this),
       onEnd: _classPrivateFieldLooseBase(this, _onEnd)[_onEnd].bind(this)
     });
-
-    // this.sortableFilters = Sortable.create(this.filtersElement, {
-    //     group: this.#group,
-    //     animation: this.#animation,
-    //     onMove: this.#onMove.bind(this),
-    //     onEnd: this.#onEnd.bind(this)
-    // })
-
+    this.sortableFilters = Sortable.create(this.filtersElement, {
+      group: _classPrivateFieldLooseBase(this, _group)[_group],
+      animation: _classPrivateFieldLooseBase(this, _animation)[_animation],
+      onMove: _classPrivateFieldLooseBase(this, _onMove)[_onMove].bind(this),
+      onEnd: _classPrivateFieldLooseBase(this, _onEnd)[_onEnd].bind(this)
+    });
     this.element.querySelectorAll('select').forEach(function (select) {
       select.addEventListener('change', function () {
         _classPrivateFieldLooseBase(_this2, _submit)[_submit]();

@@ -117,9 +117,16 @@ final readonly class SummaryMetadata
 
     public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata
     {
-        return $this->dimensions[$fieldName]
-            ?? $this->measures[$fieldName]
-            ?? throw new \RuntimeException('Field not found');
+        if (!str_contains($fieldName, '.')) {
+            return $this->dimensions[$fieldName]
+                ?? $this->measures[$fieldName]
+                ?? throw new \RuntimeException('Field not found');
+        }
+
+        /** @psalm-suppress PossiblyUndefinedArrayOffset */
+        [$dimensionName, $propertyName] = explode('.', $fieldName, 2);
+
+        return $this->dimensions[$dimensionName] ?? throw new \RuntimeException('Field not found');
     }
 
     /**

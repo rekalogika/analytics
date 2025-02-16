@@ -61,7 +61,15 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getDimensionMetadata($dimension);
+        $dimensionMetadata = $summaryMetadata->getFieldMetadata($dimension);
+
+        if (!$dimensionMetadata instanceof DimensionMetadata) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The field "%s" in class "%s" is not a dimension',
+                $dimension,
+                $class,
+            ));
+        }
 
         // if it is a relation, we get the unique values from the source entity
 
@@ -69,9 +77,9 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
             $relatedClass = $metadata->getAssociationTargetClass($dimension);
 
             return $this->getRelationDistinctValues(
-                $relatedClass,
-                $dimensionMetadata,
-                $limit,
+                class: $relatedClass,
+                dimensionMetadata: $dimensionMetadata,
+                limit: $limit,
             );
         }
 
@@ -85,6 +93,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         return $this->getDistinctValuesFromSummary(
             class: $class,
+            dimension: $dimension,
             dimensionMetadata: $dimensionMetadata,
             limit: $limit,
         );
@@ -123,6 +132,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
      */
     private function getDistinctValuesFromSummary(
         string $class,
+        string $dimension,
         DimensionMetadata $dimensionMetadata,
         int $limit,
     ): iterable {
@@ -133,7 +143,6 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         }
 
         $queryBuilder = $manager->createQueryBuilder();
-        $dimension = $dimensionMetadata->getSummaryProperty();
 
         $orderBy = $dimensionMetadata->getOrderBy();
 
@@ -144,6 +153,6 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
             ->setMaxResults($limit);
 
         /** @var list<object> */
-        return $queryBuilder->getQuery()->getArrayResult();
+        return $queryBuilder->getQuery()->getSingleColumnResult();
     }
 }
