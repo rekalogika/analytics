@@ -26,6 +26,11 @@
                 <directory name="packages/analytics-core/src/Model/Hierarchy" />
             </errorLevel>
         </MissingConstructor>
+        <ClassMustBeFinal>
+            <errorLevel type="suppress">
+                <directory name="tests/src/App/Entity" />
+            </errorLevel>
+        </ClassMustBeFinal>
     </issueHandlers>
 
     <plugins>

@@ -31,7 +31,7 @@ use Doctrine\ORM\Query\TokenType;
  * * summary time zone
  * * output format (same as the values of TimeGranularity)
  */
-class DateTimeToIntegerFunction extends FunctionNode
+final class DateTimeToIntegerFunction extends FunctionNode
 {
     public null|Node|string $sourceDatetime = null;
 

@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DoctrineListenerTest extends KernelTestCase
+final class DoctrineListenerTest extends KernelTestCase
 {
     public function testPersist(): void
     {

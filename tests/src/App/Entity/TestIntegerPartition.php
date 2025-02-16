@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\Model\Partition\IntegerPartition;
 
 #[ORM\Embeddable]
-class TestIntegerPartition extends IntegerPartition
+final class TestIntegerPartition extends IntegerPartition
 {
     #[\Override]
     public static function getAllLevels(): array

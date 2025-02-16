@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Exception;
 
-class SummaryNotFound extends NotFoundException
+final class SummaryNotFound extends NotFoundException
 {
     public function __construct(string $summary)
     {

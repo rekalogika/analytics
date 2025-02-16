@@ -22,7 +22,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_GROUPING_CONCAT
  */
-class GroupingConcatFunction extends FunctionNode
+final class GroupingConcatFunction extends FunctionNode
 {
     /**
      * @var list<Node>

@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class QueryTest extends KernelTestCase
+final class QueryTest extends KernelTestCase
 {
     private function getQuery(): SummaryQuery
     {

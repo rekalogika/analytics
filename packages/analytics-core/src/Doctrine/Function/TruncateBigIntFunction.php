@@ -23,7 +23,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_TRUNCATE_BIGINT
  */
-class TruncateBigIntFunction extends FunctionNode
+final class TruncateBigIntFunction extends FunctionNode
 {
     public null|Node|string $variable = null;
 

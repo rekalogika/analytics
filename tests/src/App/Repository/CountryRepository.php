@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Country;
 /**
  * @extends ServiceEntityRepository<Country>
  */
-class CountryRepository extends ServiceEntityRepository
+final class CountryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DoctrineQueryTest extends KernelTestCase
+final class DoctrineQueryTest extends KernelTestCase
 {
     /**
      * @see Query::_doExecute

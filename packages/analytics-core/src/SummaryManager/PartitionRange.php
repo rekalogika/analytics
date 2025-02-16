@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Util\PartitionUtil;
 /**
  * @implements \IteratorAggregate<Partition>
  */
-class PartitionRange implements \IteratorAggregate, \Countable
+final class PartitionRange implements \IteratorAggregate, \Countable
 {
     public function __construct(
         private readonly Partition $start,

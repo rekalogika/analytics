@@ -18,7 +18,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Rekalogika\Analytics\Tests\App\Factory\ItemFactory;
 
-class ItemFixtures extends Fixture implements DependentFixtureInterface
+final class ItemFixtures extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function getDependencies(): array

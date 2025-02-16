@@ -32,7 +32,7 @@ use Symfony\UX\Turbo\TurboBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 use Zenstruck\Messenger\Test\ZenstruckMessengerTestBundle;
 
-class Kernel extends BaseKernel
+final class Kernel extends BaseKernel
 {
     use MicroKernelTrait {
         registerContainerConfiguration as private baseRegisterContainerConfiguration;

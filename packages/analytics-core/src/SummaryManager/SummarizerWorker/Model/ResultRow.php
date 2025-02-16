@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 /**
  * @internal
  */
-class ResultRow
+final class ResultRow
 {
     private ResultTuple $tuple;
 

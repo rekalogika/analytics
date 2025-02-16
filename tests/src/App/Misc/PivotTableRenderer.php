@@ -17,7 +17,7 @@ use Rekalogika\Analytics\PivotTable\TableRenderer;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Twig\Environment;
 
-class PivotTableRenderer extends TableRenderer
+final class PivotTableRenderer extends TableRenderer
 {
     public function __construct(
         private readonly Environment $twig,

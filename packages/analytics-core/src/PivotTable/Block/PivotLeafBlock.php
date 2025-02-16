@@ -18,7 +18,7 @@ use Rekalogika\Analytics\PivotTable\Table\HeaderCell;
 use Rekalogika\Analytics\PivotTable\Table\Row;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 
-class PivotLeafBlock extends NodeBlock
+final class PivotLeafBlock extends NodeBlock
 {
     #[\Override]
     protected function createHeaderRows(): Rows
