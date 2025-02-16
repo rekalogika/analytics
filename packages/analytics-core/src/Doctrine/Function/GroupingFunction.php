@@ -24,7 +24,7 @@ use Doctrine\ORM\Query\TokenType;
  *
  * @deprecated
  */
-class GroupingFunction extends FunctionNode
+final class GroupingFunction extends FunctionNode
 {
     public null|Node|string $variable = null;
 

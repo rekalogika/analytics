@@ -18,10 +18,10 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 
-class SummaryPostGenerateSchemaTableListener
+final readonly class SummaryPostGenerateSchemaTableListener
 {
     public function __construct(
-        private readonly SummaryMetadataFactory $summaryMetadataFactory,
+        private SummaryMetadataFactory $summaryMetadataFactory,
     ) {}
 
     /**

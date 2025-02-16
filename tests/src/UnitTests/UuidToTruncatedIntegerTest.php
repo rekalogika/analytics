@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
 
-class UuidToTruncatedIntegerTest extends TestCase
+final class UuidToTruncatedIntegerTest extends TestCase
 {
     public function testTransform(): void
     {

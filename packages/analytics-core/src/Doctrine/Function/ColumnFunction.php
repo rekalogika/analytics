@@ -23,7 +23,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_COLUMN
  */
-class ColumnFunction extends FunctionNode
+final class ColumnFunction extends FunctionNode
 {
     public null|Node|string $path = null;
 

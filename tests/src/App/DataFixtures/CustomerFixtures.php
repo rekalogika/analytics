@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Tests\App\Factory\OrganizationalCustomerFactory;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 
-class CustomerFixtures extends Fixture implements DependentFixtureInterface
+final class CustomerFixtures extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function getDependencies(): array

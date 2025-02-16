@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Tests\App\Factory\OrderFactory;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 
-class OrderFixtures extends Fixture implements DependentFixtureInterface
+final class OrderFixtures extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function getDependencies(): array

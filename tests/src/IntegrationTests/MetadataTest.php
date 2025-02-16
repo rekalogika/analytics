@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class MetadataTest extends KernelTestCase
+final class MetadataTest extends KernelTestCase
 {
     public function testSourceMetadataForOrder(): void
     {

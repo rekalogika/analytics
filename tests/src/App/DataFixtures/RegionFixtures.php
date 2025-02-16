@@ -17,7 +17,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Rekalogika\Analytics\Tests\App\Factory\RegionFactory;
 
-class RegionFixtures extends Fixture
+final class RegionFixtures extends Fixture
 {
     #[\Override]
     public function load(ObjectManager $manager): void

@@ -30,7 +30,7 @@ use Doctrine\ORM\Query\TokenType;
  * * summary time zone
  * * output format (same as the values of TimeGranularity)
  */
-class NextValFunction extends FunctionNode
+final class NextValFunction extends FunctionNode
 {
     public null|Node|string $class = null;
 

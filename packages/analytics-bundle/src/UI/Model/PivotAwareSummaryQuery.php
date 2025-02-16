@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Form;
+namespace Rekalogika\Analytics\Bundle\UI\Model;
 
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
@@ -36,9 +36,52 @@ final class PivotAwareSummaryQuery
      */
     private array $filters = [];
 
+    private FilterExpressions $filterExpressions;
+
+    /**
+     * @param array<string,mixed> $parameters
+     */
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
-    ) {}
+        array $parameters = [],
+    ) {
+        $this->filterExpressions = new FilterExpressions(
+            summaryClass: $summaryQuery->getClass(),
+            dimensions: array_keys($this->getDimensionChoices()),
+        );
+
+        if (isset($parameters['rows'])) {
+            /**
+             * @psalm-suppress MixedArgument
+             * @phpstan-ignore argument.type
+             */
+            $this->setRows($parameters['rows']);
+        }
+
+        if (isset($parameters['columns'])) {
+            /**
+             * @psalm-suppress MixedArgument
+             * @phpstan-ignore argument.type
+             */
+            $this->setColumns($parameters['columns']);
+        }
+
+        if (isset($parameters['values'])) {
+            /**
+             * @psalm-suppress MixedArgument
+             * @phpstan-ignore argument.type
+             */
+            $this->setValues($parameters['values']);
+        }
+
+        if (isset($parameters['filters'])) {
+            /**
+             * @psalm-suppress MixedArgument
+             * @phpstan-ignore argument.type
+             */
+            $this->setFilters($parameters['filters']);
+        }
+    }
 
     /**
      * @var array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:array<string,string|TranslatableInterface>|null,type?:'dimension'|'measure'|'values'}>|null
@@ -191,6 +234,15 @@ final class PivotAwareSummaryQuery
     public function setFilters(array $filters): void
     {
         $this->filters = $filters;
+    }
+
+    //
+    // filter expressions
+    //
+
+    public function getFilterExpressions(): FilterExpressions
+    {
+        return $this->filterExpressions;
     }
 
     //

@@ -74,6 +74,14 @@ final class SummaryQuery
         return $summarizer->execute();
     }
 
+    /**
+     * @return class-string
+     */
+    public function getClass(): string
+    {
+        return $this->metadata->getSummaryClass();
+    }
+
     //
     // available choices
     //

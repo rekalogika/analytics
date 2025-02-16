@@ -19,7 +19,7 @@ use Doctrine\Persistence\ObjectManager;
 use Rekalogika\Analytics\Tests\App\Factory\CountryFactory;
 use Rekalogika\Analytics\Tests\App\Factory\RegionFactory;
 
-class CountryFixtures extends Fixture implements DependentFixtureInterface
+final class CountryFixtures extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function getDependencies(): array

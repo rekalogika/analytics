@@ -26,7 +26,7 @@ use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 
-class TimeDimensionHierarchyTest extends TestCase
+final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
      * @dataProvider intervalProvider

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\PivotTable\Block;
 use Rekalogika\Analytics\PivotTable\Table\DataCell;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 
-class PivotBlock extends NodeBlock
+final class PivotBlock extends NodeBlock
 {
     #[\Override]
     protected function createHeaderRows(): Rows

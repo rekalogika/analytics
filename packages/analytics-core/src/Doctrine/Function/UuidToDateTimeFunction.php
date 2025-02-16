@@ -28,7 +28,7 @@ use Doctrine\ORM\Query\TokenType;
  *
  * @deprecated
  */
-class UuidToDateTimeFunction extends FunctionNode implements TypedExpression
+final class UuidToDateTimeFunction extends FunctionNode implements TypedExpression
 {
     public null|Node|string $variable = null;
 

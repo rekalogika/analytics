@@ -28,7 +28,7 @@ use Doctrine\ORM\Query\TokenType;
  *
  * @deprecated
  */
-class TruncateUuidFunction extends FunctionNode implements TypedExpression
+final class TruncateUuidFunction extends FunctionNode implements TypedExpression
 {
     public null|Node|string $variable = null;
 

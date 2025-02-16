@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
-use Rekalogika\Analytics\Bundle\Form\PivotAwareSummaryQuery;
-use Rekalogika\Analytics\Bundle\Form\SummaryQueryType;
+use Rekalogika\Analytics\Bundle\UI\Model\PivotAwareSummaryQuery;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Misc\PivotTableRenderer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class AppController extends AbstractController
@@ -34,28 +33,36 @@ final class AppController extends AbstractController
 
 
     #[Route('/app', name: 'app_app')]
-    public function index(Request $request): Response
-    {
+    public function index(
+        #[MapQueryParameter()]
+        ?string $parameters,
+    ): Response {
+
+        if ($parameters === null) {
+            $parameters = [];
+        } else {
+            /** @psalm-suppress MixedAssignment */
+            $parameters = json_decode($parameters, true);
+        }
+
+        if (!\is_array($parameters)) {
+            $parameters = [];
+        }
+
+        /** @var array<string,mixed> $parameters */
+
         $summaryTableManager = $this->summaryManagerRegistry
             ->getManager(OrderSummary::class);
 
         $query = $summaryTableManager->createQuery();
-        $query = new PivotAwareSummaryQuery($query);
+        $query = new PivotAwareSummaryQuery($query, $parameters);
 
-        $form = $this->createForm(SummaryQueryType::class, $query);
-
-        $form->handleRequest($request);
-
-        $result = null;
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $result = new PivotTableAdapter($query->getResult());
-            $result = $this->pivotTableRenderer
-                ->render($result, $query->getPivotedDimensions());
-        }
+        $result = new PivotTableAdapter($query->getResult());
+        $result = $this->pivotTableRenderer
+            ->render($result, $query->getPivotedDimensions());
 
         return $this->render('app/index.html.twig', [
-            'form' => $form,
+            'query' => $query,
             'result' => $result,
         ]);
     }

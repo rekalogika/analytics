@@ -1,15 +1,11 @@
-{% block form %}
+{% block control %}
     {% set id = random() %}
 
-    {{ form_start(form, {attr: {'data-controller': 'rekalogika--analytics-bundle--pivot-table' }}) }}
+    <div data-controller="rekalogika--analytics-bundle--pivot-table"
+         data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="parameters">
         {{ block("tab_group") }}
         {{ block("tab_pane_group") }}
-
-        {% set var %}
-            {{ form_rest(form) }}
-        {% endset %}
-
-    {{ form_end(form) }}
+    </div>
 {% endblock %}
 
 {% block tab_group %}
@@ -100,23 +96,23 @@
 
 {% block item_block %}
     {% if type == 'available' %}
-        {% set items = data.availableWithoutSubitems %}
+        {% set items = query.availableWithoutSubitems %}
         {% set icon = "fa-solid fa-list" %}
         {% set description = 'Available Fields'|trans %}
     {% elseif type == 'rows' %}
-        {% set items = data.rowsWithoutSubitems %}
+        {% set items = query.rowsWithoutSubitems %}
         {% set icon = "fa-solid fa-table-list" %}
         {% set description = 'Rows'|trans %}
     {% elseif type == 'columns' %}
-        {% set items = data.columnsWithoutSubitems %}
+        {% set items = query.columnsWithoutSubitems %}
         {% set icon = "fa-solid fa-table-columns" %}
         {% set description = 'Columns'|trans %}
     {% elseif type == 'values' %}
-        {% set items = data.valuesWithoutSubitems %}
+        {% set items = query.valuesWithoutSubitems %}
         {% set icon = "fa-solid fa-gauge" %}
         {% set description = 'Values'|trans %}
     {% elseif type == 'filters' %}
-        {% set items = data.filtersWithoutSubitems %}
+        {% set items = query.filtersWithoutSubitems %}
         {% set icon = "fa-solid fa-filter" %}
         {% set description = 'Filters'|trans %}
     {% endif %}
@@ -135,7 +131,7 @@
 {% endblock %}
 
 {% block item %}
-    {% set item = data.resolve(item) %}
+    {% set item = query.resolve(item) %}
 
     {%- set color_class -%}
         {%- if item.type == 'dimension' -%}
@@ -156,7 +152,7 @@
                 <span>{{ item.label|trans }}</span>
             </div>
             {% if item.choices %}
-                {% set selected = data.resolve(item.key) %}
+                {% set selected = query.resolve(item.key) %}
                 <div class="col-auto ">
                     <select class="form-select form-select-sm py-0">
                         {% for key, choice in item.choices %}
@@ -170,10 +166,4 @@
     </li>
 {% endblock %}
 
-{% block filters %}
-    {% for filterExpression in form.filterExpressions %}
-        {% if filterExpression.vars.key in data.filters %}
-            {{ form(filterExpression) }}
-        {% endif %}
-    {% endfor %}
-{% endblock %}
+{% block filters %}{% endblock %}

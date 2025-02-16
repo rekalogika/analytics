@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
 
-class PartitionTest extends TestCase
+final class PartitionTest extends TestCase
 {
     /**
      * @dataProvider partitionProvider

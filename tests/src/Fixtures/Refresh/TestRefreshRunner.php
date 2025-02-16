@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
 use Symfony\Component\Clock\ClockInterface;
 
-class TestRefreshRunner implements RefreshRunner
+final class TestRefreshRunner implements RefreshRunner
 {
     private int $runNumber = 0;
 

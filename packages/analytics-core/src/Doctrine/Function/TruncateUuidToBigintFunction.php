@@ -26,7 +26,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_TRUNCATE_UUID_TO_BIGINT
  */
-class TruncateUuidToBigintFunction extends FunctionNode implements TypedExpression
+final class TruncateUuidToBigintFunction extends FunctionNode implements TypedExpression
 {
     public null|Node|string $variable = null;
 

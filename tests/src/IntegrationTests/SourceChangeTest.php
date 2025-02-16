@@ -26,7 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
-class SourceChangeTest extends KernelTestCase
+final class SourceChangeTest extends KernelTestCase
 {
     use InteractsWithMessenger;
     use ClockSensitiveTrait;

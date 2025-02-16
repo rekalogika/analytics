@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Tests\Fixtures\Refresh\TestRefreshRunner;
 use Symfony\Component\Clock\MockClock;
 
 /** @psalm-suppress MissingConstructor */
-class RefreshTest extends TestCase
+final class RefreshTest extends TestCase
 {
     private TestIntegrationAdapter $adapter;
 

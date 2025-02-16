@@ -39,7 +39,7 @@ use Rekalogika\Analytics\Util\TranslatableMessage;
 #[Hierarchy([
     [600, 500, 400, 200, 100],
 ])]
-class SimpleTimeDimensionHierarchy implements TimeZoneAwareDimensionHierarchy
+final class SimpleTimeDimensionHierarchy implements TimeZoneAwareDimensionHierarchy
 {
     private \DateTimeZone $timeZone;
 

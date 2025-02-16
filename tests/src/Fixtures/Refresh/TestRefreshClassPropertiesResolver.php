@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\Fixtures\Refresh;
 use Rekalogika\Analytics\RefreshWorker\RefreshClassProperties;
 use Rekalogika\Analytics\RefreshWorker\RefreshClassPropertiesResolver;
 
-class TestRefreshClassPropertiesResolver implements RefreshClassPropertiesResolver
+final class TestRefreshClassPropertiesResolver implements RefreshClassPropertiesResolver
 {
     /**
      * @param class-string $class

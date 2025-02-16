@@ -22,7 +22,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_TRUE
  */
-class TrueFunction extends FunctionNode
+final class TrueFunction extends FunctionNode
 {
     public null|Node|string $class = null;
 

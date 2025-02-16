@@ -23,7 +23,7 @@ use Doctrine\ORM\Query\TokenType;
 /**
  * REKALOGIKA_CAST
  */
-class CastFunction extends FunctionNode
+final class CastFunction extends FunctionNode
 {
     private ?ArithmeticExpression $expr1 = null;
 

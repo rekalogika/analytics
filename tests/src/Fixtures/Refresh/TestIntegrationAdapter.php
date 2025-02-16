@@ -21,7 +21,7 @@ use Symfony\Component\Clock\ClockInterface;
 /**
  * @implements RefreshFrameworkAdapter<Lock>
  */
-class TestIntegrationAdapter implements RefreshFrameworkAdapter
+final class TestIntegrationAdapter implements RefreshFrameworkAdapter
 {
     /**
      * @var list<Lock>

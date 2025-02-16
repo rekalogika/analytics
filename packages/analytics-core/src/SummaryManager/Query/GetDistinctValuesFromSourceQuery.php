@@ -64,6 +64,10 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
      */
     public function getResult(): array
     {
-        return array_values($this->queryBuilder->getQuery()->getArrayResult());
+        /**
+         * @psalm-suppress MixedReturnStatement
+         * @phpstan-ignore return.type
+         */
+        return $this->queryBuilder->getQuery()->getResult();
     }
 }

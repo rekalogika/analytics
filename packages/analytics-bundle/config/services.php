@@ -21,6 +21,8 @@ use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscribe
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
+use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
@@ -255,4 +257,19 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.distinct_values_resolver');
+
+    //
+    // frontend
+    //
+
+    $services
+        ->set(AnalyticsRuntime::class)
+        ->tag('twig.runtime')
+        ->args([
+            '$twig' => service('twig'),
+        ]);
+
+    $services
+        ->set(AnalyticsExtension::class)
+        ->tag('twig.extension');
 };

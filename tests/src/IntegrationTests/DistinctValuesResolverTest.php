@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DistinctValuesResolverTest extends KernelTestCase
+final class DistinctValuesResolverTest extends KernelTestCase
 {
     public function testDoctrineEntity(): void
     {
