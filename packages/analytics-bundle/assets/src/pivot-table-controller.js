@@ -6,6 +6,7 @@ import Sortable from 'sortablejs'
 export default class extends Controller {
     static values = {
         urlParameter: String,
+        frame: String,
     }
 
     #animation = 150
@@ -72,36 +73,7 @@ export default class extends Controller {
         this.sortableFilters.destroy()
     }
 
-    #onEnd(event) {
-        this.#submit()
-    }
-
-    #onMove(event, originalEvent) {
-        let itemType = event.dragged.dataset.type
-        let targetType = event.to.dataset.type
-
-        if (itemType === 'values') {
-            if (['rows', 'columns'].includes(targetType)) {
-                return true
-            }
-        }
-
-        if (itemType === 'dimension') {
-            if (['available', 'rows', 'columns', 'filters'].includes(targetType)) {
-                return true
-            }
-        }
-
-        if (itemType === 'measure') {
-            if (['available', 'values'].includes(targetType)) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-    #submit() {
+    getData() {
         let data = {}
 
         let uls = this.element.querySelectorAll('ul')
@@ -133,10 +105,43 @@ export default class extends Controller {
             }
         }
 
-        if (this.urlParameterValue) {
+        return data
+    }
+
+    #onEnd(event) {
+        this.#submit()
+    }
+
+    #onMove(event, originalEvent) {
+        let itemType = event.dragged.dataset.type
+        let targetType = event.to.dataset.type
+
+        if (itemType === 'values') {
+            if (['rows', 'columns'].includes(targetType)) {
+                return true
+            }
+        }
+
+        if (itemType === 'dimension') {
+            if (['available', 'rows', 'columns', 'filters'].includes(targetType)) {
+                return true
+            }
+        }
+
+        if (itemType === 'measure') {
+            if (['available', 'values'].includes(targetType)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    #submit() {
+        if (this.urlParameterValue && this.frameValue) {
             const url = new URL(window.location)
-            url.searchParams.set(this.urlParameterValue, JSON.stringify(data))
-            visit(url.toString(), {'frame': 'pivottable'})
+            url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()))
+            visit(url.toString(), {'frame': this.frameValue, 'action': 'advance'})
         }
     }
 }

@@ -21,12 +21,17 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
 {
     public function __construct(private Environment $twig) {}
 
-    public function renderControl(PivotAwareSummaryQuery $query): string
-    {
+    public function renderControl(
+        PivotAwareSummaryQuery $query,
+        ?string $urlParameter = null,
+        ?string $frame = null,
+    ): string {
         return $this->twig
             ->load('@RekalogikaAnalytics/pivot_table_control.html.twig')
             ->renderBlock('control', [
                 'query' => $query,
+                'urlParameter' => $urlParameter,
+                'frame' => $frame,
             ]);
     }
 }
