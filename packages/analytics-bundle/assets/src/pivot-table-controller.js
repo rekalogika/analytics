@@ -1,6 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { visit } from '@hotwired/turbo'
 import Sortable from 'sortablejs'
+import TomSelect from 'tom-select'
+import 'tom-select/dist/css/tom-select.default.min.css'
 
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -62,6 +64,12 @@ export default class extends Controller {
             })
         })
 
+        this.element.querySelectorAll('select.equalfilter').forEach((select) => {
+            new TomSelect(select, {
+                maxItems: 10,
+            })
+        })
+
         // this.#submit()
     }
 
@@ -109,6 +117,13 @@ export default class extends Controller {
     }
 
     #onEnd(event) {
+        let sourceType = event.from.dataset.type
+        let targetType = event.to.dataset.type
+
+        if (targetType === 'filters' || sourceType === 'filters') {
+            this.filterChanged = true
+        }
+
         this.#submit()
     }
 
@@ -134,6 +149,7 @@ export default class extends Controller {
             }
         }
 
+
         return false
     }
 
@@ -141,7 +157,15 @@ export default class extends Controller {
         if (this.urlParameterValue && this.frameValue) {
             const url = new URL(window.location)
             url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()))
-            visit(url.toString(), {'frame': this.frameValue, 'action': 'advance'})
+            // visit(url.toString())
+            // visit(url.toString(), {'action': 'advance'})
+
+            if (this.filterChanged) {
+                visit(url.toString())
+                this.filterChanged = false
+            } else {
+                visit(url.toString(), { 'frame': this.frameValue, 'action': 'advance' })
+            }
         }
     }
 }

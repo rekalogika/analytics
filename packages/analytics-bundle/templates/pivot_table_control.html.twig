@@ -168,17 +168,18 @@
 {% endblock %}
 
 {% block filters %}
+    <turbo-frame id="filters">
     {% for dimension, filterExpression in query.filterExpressions %}
         {% set choices = query.getChoices(dimension) %}
         <div class="mb-3">
             <label for="{{ dimension }}-{{ id }}" class="form-label">{{ choices|trans }}</label>
             <select name="{{ dimension }}"
                     id="{{ dimension }}-{{ id }}"
-                    class="form-control">
-                {% for choice in choices %}
-                    <option value="{{ choice.id }}">{{ choice|trans }}</option>
-                {% endfor %}
+                    class="equalfilter"
+                    multiple>
+                {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
             </select>
         </div>
     {% endfor %}
+    </turbo-frame>
 {% endblock %}

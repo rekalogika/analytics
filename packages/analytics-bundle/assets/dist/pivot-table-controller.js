@@ -14,6 +14,8 @@ function _classPrivateFieldLooseKey(e) { return "__private_" + id++ + "_" + e; }
 import { Controller } from '@hotwired/stimulus';
 import { visit } from '@hotwired/turbo';
 import Sortable from 'sortablejs';
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.default.min.css';
 
 /* stimulusFetch: 'lazy' */
 var _animation = /*#__PURE__*/_classPrivateFieldLooseKey("animation");
@@ -92,6 +94,11 @@ var _default = /*#__PURE__*/function (_Controller) {
         _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
       });
     });
+    this.element.querySelectorAll('select.equalfilter').forEach(function (select) {
+      new TomSelect(select, {
+        maxItems: 10
+      });
+    });
 
     // this.#submit()
   };
@@ -135,6 +142,11 @@ var _default = /*#__PURE__*/function (_Controller) {
   return _default;
 }(Controller);
 function _onEnd2(event) {
+  var sourceType = event.from.dataset.type;
+  var targetType = event.to.dataset.type;
+  if (targetType === 'filters' || sourceType === 'filters') {
+    this.filterChanged = true;
+  }
   _classPrivateFieldLooseBase(this, _submit)[_submit]();
 }
 function _onMove2(event, originalEvent) {
@@ -161,10 +173,18 @@ function _submit2() {
   if (this.urlParameterValue && this.frameValue) {
     var url = new URL(window.location);
     url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()));
-    visit(url.toString(), {
-      'frame': this.frameValue,
-      'action': 'advance'
-    });
+    // visit(url.toString())
+    // visit(url.toString(), {'action': 'advance'})
+
+    if (this.filterChanged) {
+      visit(url.toString());
+      this.filterChanged = false;
+    } else {
+      visit(url.toString(), {
+        'frame': this.frameValue,
+        'action': 'advance'
+      });
+    }
   }
 }
 _default.values = {

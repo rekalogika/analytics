@@ -18,6 +18,7 @@ use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PivotAwareSummaryQuery
 {
@@ -43,7 +44,8 @@ final class PivotAwareSummaryQuery
      */
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
-        array $parameters = [],
+        array $parameters,
+        private readonly TranslatorInterface $translator,
     ) {
         if (isset($parameters['rows'])) {
             /**
@@ -423,10 +425,10 @@ final class PivotAwareSummaryQuery
             ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
     }
 
-    public function getChoiceLabel(mixed $choice): string|TranslatableInterface
+    public function getChoiceLabel(mixed $choice): string
     {
         if ($choice instanceof TranslatableInterface) {
-            return $choice;
+            return $choice->trans($this->translator);
         }
 
         if (
@@ -438,12 +440,22 @@ final class PivotAwareSummaryQuery
             return (string) $choice;
         }
 
+        if ($choice instanceof \BackedEnum) {
+            return (string) $choice->value;
+        }
+
+        if ($choice instanceof \UnitEnum) {
+            return $choice->name;
+        }
+
         if (\is_object($choice)) {
             return \sprintf('%s:%s', $choice::class, spl_object_id($choice));
         }
 
         if (\is_bool($choice)) {
-            return $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
+            $choice = $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
+
+            return $choice->trans($this->translator);
         }
 
         return get_debug_type($choice);
