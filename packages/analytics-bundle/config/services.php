@@ -72,6 +72,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
         ])
     ;
 
@@ -255,6 +256,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$propertyAccessor' => service('property_accessor'),
         ])
         ->tag('rekalogika.analytics.distinct_values_resolver');
 

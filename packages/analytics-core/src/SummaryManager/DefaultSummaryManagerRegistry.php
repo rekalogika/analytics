@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager;
 use Rekalogika\Analytics\SummaryManagerRegistry;
@@ -23,10 +24,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegistry
 {
     public function __construct(
-        private readonly ManagerRegistry $managerRegistry,
-        private readonly SummaryMetadataFactory $metadataFactory,
-        private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly SummaryRefresherFactory $refresherFactory,
+        private ManagerRegistry $managerRegistry,
+        private SummaryMetadataFactory $metadataFactory,
+        private PropertyAccessorInterface $propertyAccessor,
+        private SummaryRefresherFactory $refresherFactory,
+        private DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
     #[\Override]
@@ -46,6 +48,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
             metadata: $summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
             refresherFactory: $this->refresherFactory,
+            distinctValuesResolver: $this->distinctValuesResolver,
         );
     }
 }

@@ -31,11 +31,22 @@ interface DistinctValuesResolver
      *
      * @param class-string $class The summary entity class name.
      * @param string $dimension The name of the dimension property
-     * @return iterable<mixed>
+     * @return iterable<string,mixed>
      */
     public function getDistinctValues(
         string $class,
         string $dimension,
         int $limit,
     ): null|iterable;
+
+    /**
+     * @param class-string $class The summary entity class name.
+     * @param string $dimension
+     * @param string $id
+     */
+    public function getValueFromId(
+        string $class,
+        string $dimension,
+        string $id,
+    ): mixed;
 }

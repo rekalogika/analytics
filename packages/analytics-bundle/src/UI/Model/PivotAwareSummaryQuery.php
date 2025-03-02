@@ -16,8 +16,10 @@ namespace Rekalogika\Analytics\Bundle\UI\Model;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Symfony\Component\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatableMessage as UtilTranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PivotAwareSummaryQuery
 {
@@ -374,5 +376,71 @@ final class PivotAwareSummaryQuery
         }
 
         return $items;
+    }
+
+    //
+    // distinct values
+    //
+
+    /**
+     * @param string $dimension
+     * @return null|iterable<Choice>
+     */
+    public function getChoices(string $dimension): null|iterable
+    {
+        if ($dimension === '@values') {
+            return null;
+        }
+
+        $choices = $this->summaryQuery
+            ->getDistinctValues($this->summaryQuery->getClass(), $dimension);
+
+        if ($choices === null) {
+            return null;
+        }
+
+        return (function() use ($choices) {
+            /** @var mixed $value */
+            foreach ($choices as $id => $value) {
+
+                yield new Choice(
+                    id: $id,
+                    value: $value,
+                    label: $this->getChoiceLabel($value),
+                );
+            }
+        })();
+    }
+
+    public function getIdToChoice(string $dimension, string $id): mixed
+    {
+        return $this->summaryQuery
+            ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
+    }
+
+    public function getChoiceLabel(mixed $choice): string|TranslatableInterface
+    {
+        if ($choice instanceof TranslatableInterface) {
+            return $choice;
+        }
+
+        if (
+            $choice instanceof \Stringable
+            || \is_string($choice)
+            || \is_int($choice)
+            || \is_float($choice)
+        ) {
+            return (string) $choice;
+        }
+
+        if (is_object($choice)) {
+            return \sprintf('%s:%s', $choice::class, spl_object_id($choice));
+        }
+
+        if (\is_bool($choice)) {
+            return $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
+        }
+
+        return \get_debug_type($choice);
     }
 }

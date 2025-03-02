@@ -64,4 +64,32 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
 
         return null;
     }
+
+    public function getValueFromId(
+        string $class,
+        string $dimension,
+        string $id
+    ): mixed {
+        $key = \sprintf('%s::%s', $class, $dimension);
+
+        if ($this->specificResolverLocator->has($key)) {
+            $specificResolver = $this->specificResolverLocator->get($key);
+
+            if (!$specificResolver instanceof DistinctValuesResolver) {
+                throw new \InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+            }
+
+            return $specificResolver->getValueFromId($class, $dimension, $id);
+        }
+
+        foreach ($this->nonSpecificResolvers as $resolver) {
+            $value = $resolver->getValueFromId($class, $dimension, $id);
+
+            if ($value !== null) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
 }
