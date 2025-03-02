@@ -156,6 +156,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private ?int $count = null;
 
+    #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
         $queryBuilder->andWhere('root.id > 10');

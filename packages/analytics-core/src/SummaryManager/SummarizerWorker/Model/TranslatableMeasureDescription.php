@@ -26,16 +26,19 @@ final readonly class TranslatableMeasureDescription implements
         private TranslatableInterface $label,
     ) {}
 
+    #[\Override]
     public function getMeasurePropertyName(): string
     {
         return $this->measurePropertyName;
     }
 
+    #[\Override]
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return $this->label->trans($translator, $locale);
     }
 
+    #[\Override]
     public function __toString(): string
     {
         if ($this->label instanceof \Stringable) {

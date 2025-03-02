@@ -169,17 +169,16 @@
 
 {% block filters %}
     {% for dimension, filterExpression in query.filterExpressions %}
-        {{ dump(query.resolve(dimension) , dimension, filterExpression) }}
+        {% set choices = query.getChoices(dimension) %}
         <div class="mb-3">
-            <label for="{{ dimension }}-{{ id }}" class="form-label">Example label</label>
+            <label for="{{ dimension }}-{{ id }}" class="form-label">{{ choices|trans }}</label>
             <select name="{{ dimension }}"
                     id="{{ dimension }}-{{ id }}"
                     class="form-control">
-                {% for key, choice in query.getChoices(dimension) %}
-                    <option value="{{ key }}">{{ choice|trans }}</option>
+                {% for choice in choices %}
+                    <option value="{{ choice.id }}">{{ choice|trans }}</option>
                 {% endfor %}
             </select>
         </div>
-
     {% endfor %}
 {% endblock %}

@@ -18,6 +18,7 @@ use Twig\TwigFunction;
 
 final class AnalyticsExtension extends AbstractExtension
 {
+    #[\Override]
     public function getFunctions()
     {
         return [

@@ -20,11 +20,13 @@ final readonly class StringMeasureDescription implements MeasureDescription, \St
         private string $label,
     ) {}
 
+    #[\Override]
     public function getMeasurePropertyName(): string
     {
         return $this->measurePropertyName;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->label;

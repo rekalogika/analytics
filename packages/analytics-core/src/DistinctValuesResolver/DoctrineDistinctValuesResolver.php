@@ -113,7 +113,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
     public function getValueFromId(
         string $class,
         string $dimension,
-        string $id
+        string $id,
     ): mixed {
         $manager = $this->managerRegistry->getManagerForClass($class);
 
@@ -240,28 +240,29 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $idReflection = $metadata->getIdReflectionProperty();
 
         $result = $queryBuilder->getQuery()->getArrayResult();
-        dump($result);
 
         /** @var array{id:string|int,value:mixed} $row */
         foreach ($result as $row) {
             /** @var mixed */
             $value = $row['value'];
 
-            if (is_object($value)) {
+            if (\is_object($value)) {
                 $id = $idReflection->getValue($value);
             } else {
-                /** @var mixed */
+                /** @psalm-suppress MixedAssignment */
                 $id = $value;
             }
 
-            if ($id instanceof \Stringable || is_int($id)) {
+            if ($id instanceof \Stringable || \is_int($id)) {
                 $id = (string) $id;
+            } elseif ($id === null) {
+                $id = '';
             }
 
-            if (!is_string($id)) {
+            if (!\is_string($id)) {
                 throw new \InvalidArgumentException(\sprintf(
-                    'The iD "%s" is not a string',
-                    $id,
+                    'The ID "%s" is not a string',
+                    get_debug_type($id),
                 ));
             }
 

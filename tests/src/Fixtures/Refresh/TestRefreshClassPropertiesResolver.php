@@ -28,6 +28,7 @@ final class TestRefreshClassPropertiesResolver implements RefreshClassProperties
         private int $expectedMaximumProcessingTime,
     ) {}
 
+    #[\Override]
     public function getProperties(string $class): RefreshClassProperties
     {
         return new RefreshClassProperties(

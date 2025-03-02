@@ -26,11 +26,13 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
         private iterable $nonSpecificResolvers,
     ) {}
 
+    #[\Override]
     public static function getApplicableDimensions(): ?iterable
     {
         return null;
     }
 
+    #[\Override]
     public function getDistinctValues(
         string $class,
         string $dimension,
@@ -65,10 +67,11 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
         return null;
     }
 
+    #[\Override]
     public function getValueFromId(
         string $class,
         string $dimension,
-        string $id
+        string $id,
     ): mixed {
         $key = \sprintf('%s::%s', $class, $dimension);
 

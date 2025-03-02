@@ -86,6 +86,7 @@ final class Quarter implements Interval
             );
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

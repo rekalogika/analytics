@@ -35,26 +35,31 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
      */
     private array $expressions = [];
 
+    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->expressions[$offset]);
     }
 
+    #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->expressions[$offset] ?? null;
     }
 
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new \LogicException('Use setFilters() to set filters');
     }
 
+    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         throw new \LogicException('Use setFilters() to set filters');
     }
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->expressions);

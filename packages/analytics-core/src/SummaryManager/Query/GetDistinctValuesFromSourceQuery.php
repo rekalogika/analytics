@@ -62,9 +62,9 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
     }
 
     /**
-     * @return array<string,object>
+     * @return iterable<string,object>
      */
-    public function getResult(): array
+    public function getResult(): iterable
     {
         /** @var list<object> */
         $result = $this->queryBuilder->getQuery()->getResult();
@@ -73,12 +73,10 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
             ->getClassMetadata($this->queryBuilder->getRootEntities()[0])
             ->getSingleIdentifierFieldName();
 
-        $values = [];
-
         foreach ($result as $item) {
             $id = $this->propertyAccessor->getValue($item, $idField);
 
-            if (!is_string($id) && !is_int($id)) {
+            if (!\is_string($id) && !\is_int($id)) {
                 throw new \InvalidArgumentException(\sprintf(
                     'The identifier field "%s" in class "%s" is not a string or integer',
                     $idField,
@@ -88,9 +86,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 
             $id = (string) $id;
 
-            $values[$id] = $item;
+            yield $id => $item;
         }
-
-        return $values;
     }
 }

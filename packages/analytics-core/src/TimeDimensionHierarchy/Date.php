@@ -73,6 +73,7 @@ final class Date implements Interval
         return $this->start->format('Y-m-d');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

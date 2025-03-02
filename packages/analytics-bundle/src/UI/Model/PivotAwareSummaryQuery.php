@@ -16,10 +16,8 @@ namespace Rekalogika\Analytics\Bundle\UI\Model;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Rekalogika\Analytics\Util\TranslatableMessage as UtilTranslatableMessage;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PivotAwareSummaryQuery
 {
@@ -47,11 +45,6 @@ final class PivotAwareSummaryQuery
         private readonly SummaryQuery $summaryQuery,
         array $parameters = [],
     ) {
-        $this->filterExpressions = new FilterExpressions(
-            summaryClass: $summaryQuery->getClass(),
-            dimensions: array_keys($this->getDimensionChoices()),
-        );
-
         if (isset($parameters['rows'])) {
             /**
              * @psalm-suppress MixedArgument
@@ -83,6 +76,11 @@ final class PivotAwareSummaryQuery
              */
             $this->setFilters($parameters['filters']);
         }
+
+        $this->filterExpressions = new FilterExpressions(
+            summaryClass: $summaryQuery->getClass(),
+            dimensions: $this->getFilters(),
+        );
     }
 
     /**
@@ -392,6 +390,9 @@ final class PivotAwareSummaryQuery
             return null;
         }
 
+        $dimensionField = $this->summaryQuery->getDimensionChoices()[$dimension]
+            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $dimension));
+
         $choices = $this->summaryQuery
             ->getDistinctValues($this->summaryQuery->getClass(), $dimension);
 
@@ -399,17 +400,21 @@ final class PivotAwareSummaryQuery
             return null;
         }
 
-        return (function() use ($choices) {
-            /** @var mixed $value */
-            foreach ($choices as $id => $value) {
+        $choices2 = [];
 
-                yield new Choice(
-                    id: $id,
-                    value: $value,
-                    label: $this->getChoiceLabel($value),
-                );
-            }
-        })();
+        /** @psalm-suppress MixedAssignment */
+        foreach ($choices as $id => $value) {
+            $choices2[] = new Choice(
+                id: $id,
+                value: $value,
+                label: $this->getChoiceLabel($value),
+            );
+        }
+
+        return new Choices(
+            label: $dimensionField,
+            choices: $choices2,
+        );
     }
 
     public function getIdToChoice(string $dimension, string $id): mixed
@@ -433,7 +438,7 @@ final class PivotAwareSummaryQuery
             return (string) $choice;
         }
 
-        if (is_object($choice)) {
+        if (\is_object($choice)) {
             return \sprintf('%s:%s', $choice::class, spl_object_id($choice));
         }
 
@@ -441,6 +446,6 @@ final class PivotAwareSummaryQuery
             return $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
         }
 
-        return \get_debug_type($choice);
+        return get_debug_type($choice);
     }
 }

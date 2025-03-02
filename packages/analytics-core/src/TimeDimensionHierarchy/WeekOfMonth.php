@@ -31,6 +31,7 @@ final class WeekOfMonth implements RecurringInterval
         return (string) $this->databaseValue;
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

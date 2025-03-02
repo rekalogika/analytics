@@ -63,6 +63,7 @@ final class WeekYear implements Interval
         return $this->start->format('o');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

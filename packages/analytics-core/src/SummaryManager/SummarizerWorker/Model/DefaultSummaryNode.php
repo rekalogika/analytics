@@ -39,11 +39,13 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         private readonly bool $leaf,
     ) {}
 
+    #[\Override]
     public function count(): int
     {
         return \count($this->children);
     }
 
+    #[\Override]
     public function getIterator(): \Traversable
     {
         foreach ($this->children as $child) {
@@ -90,16 +92,19 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         ;
     }
 
+    #[\Override]
     public function isLeaf(): bool
     {
         return $this->leaf;
     }
 
+    #[\Override]
     public function getLegend(): string|TranslatableInterface
     {
         return $this->legend;
     }
 
+    #[\Override]
     public function getMember(): mixed
     {
         return $this->member;
@@ -115,6 +120,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         return $this->parent;
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return $this->key;
@@ -131,16 +137,19 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         $node->setParent($this);
     }
 
+    #[\Override]
     public function getValue(): mixed
     {
         return $this->value;
     }
 
+    #[\Override]
     public function getRawValue(): int|float|null
     {
         return $this->rawValue;
     }
 
+    #[\Override]
     public function getMeasurePropertyName(): ?string
     {
         if ($this->member instanceof MeasureDescription) {

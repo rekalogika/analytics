@@ -124,7 +124,7 @@ final class SummaryQuery
      */
     public function getDistinctValues(
         string $class,
-        string $dimension
+        string $dimension,
     ): ?iterable {
         return $this->distinctValuesResolver->getDistinctValues(
             class: $class,
@@ -139,7 +139,7 @@ final class SummaryQuery
     public function getValueFromId(
         string $class,
         string $dimension,
-        string $id
+        string $id,
     ): mixed {
         return $this->distinctValuesResolver->getValueFromId(
             class: $class,

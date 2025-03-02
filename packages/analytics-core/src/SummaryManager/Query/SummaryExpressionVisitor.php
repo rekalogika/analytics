@@ -51,6 +51,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         return array_keys($this->involvedDimensions);
     }
 
+    #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
         $field = $comparison->getField();
@@ -79,12 +80,14 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         };
     }
 
+    #[\Override]
     public function walkValue(Value $value): mixed
     {
         return $this->queryContext
             ->createNamedParameter($value->getValue());
     }
 
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         /**

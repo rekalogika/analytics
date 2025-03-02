@@ -95,6 +95,7 @@ final class TestIntegrationAdapter implements RefreshFrameworkAdapter
         }
     }
 
+    #[\Override]
     public function acquireLock(string $key, int $ttl): false|Lock
     {
         foreach ($this->locks as $lock) {
@@ -116,6 +117,7 @@ final class TestIntegrationAdapter implements RefreshFrameworkAdapter
         return $lock;
     }
 
+    #[\Override]
     public function releaseLock(object $key): void
     {
         $locks = $this->locks;
@@ -129,6 +131,7 @@ final class TestIntegrationAdapter implements RefreshFrameworkAdapter
         $this->locks = array_values($locks);
     }
 
+    #[\Override]
     public function refreshLock(object $key, int $ttl): void
     {
         foreach ($this->locks as $i => $curlock) {
@@ -138,11 +141,13 @@ final class TestIntegrationAdapter implements RefreshFrameworkAdapter
         }
     }
 
+    #[\Override]
     public function raiseFlag(string $key, int $ttl): void
     {
         $this->flags[] = $key;
     }
 
+    #[\Override]
     public function removeFlag(string $key): void
     {
         $flags = $this->flags;
@@ -156,11 +161,13 @@ final class TestIntegrationAdapter implements RefreshFrameworkAdapter
         $this->flags = array_values($flags);
     }
 
+    #[\Override]
     public function isFlagRaised(string $key): bool
     {
         return \in_array($key, $this->flags, true);
     }
 
+    #[\Override]
     public function scheduleWorker(
         RefreshCommand $command,
         int $delay,

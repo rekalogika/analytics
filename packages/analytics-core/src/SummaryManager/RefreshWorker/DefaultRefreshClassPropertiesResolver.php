@@ -21,6 +21,7 @@ final readonly class DefaultRefreshClassPropertiesResolver implements RefreshCla
     /**
      * @todo properly implement this method
      */
+    #[\Override]
     public function getProperties(string $class): RefreshClassProperties
     {
         return new RefreshClassProperties(

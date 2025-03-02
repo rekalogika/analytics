@@ -16,12 +16,17 @@ namespace Rekalogika\Analytics\Bundle\UI\Model;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Choice implements TranslatableInterface
+/**
+ * @implements \IteratorAggregate<Choice>
+ */
+final class Choices implements TranslatableInterface, \IteratorAggregate
 {
+    /**
+     * @param iterable<Choice> $choices
+     */
     public function __construct(
-        private string $id,
-        private mixed $value,
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
+        private iterable $choices,
     ) {}
 
     #[\Override]
@@ -29,25 +34,15 @@ final class Choice implements TranslatableInterface
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        if ($this->label instanceof TranslatableInterface) {
-            return $this->label->trans($translator, $locale);
-        }
-
-        return $this->label;
+        return $this->label->trans($translator, $locale);
     }
 
-    public function getId(): string
+    /**
+     * @return \Traversable<Choice>
+     */
+    #[\Override]
+    public function getIterator(): \Traversable
     {
-        return $this->id;
-    }
-
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    public function getLabel(): TranslatableInterface|string
-    {
-        return $this->label;
+        yield from $this->choices;
     }
 }

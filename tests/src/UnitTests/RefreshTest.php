@@ -39,6 +39,7 @@ final class RefreshTest extends TestCase
 
     private MockClock $clock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clock = new MockClock('1970-01-01 00:00:00');
