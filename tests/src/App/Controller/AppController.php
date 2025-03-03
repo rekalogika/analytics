@@ -50,6 +50,8 @@ final class AppController extends AbstractController
             $parameters = [];
         }
 
+        // dump($parameters);
+
         /** @var array<string,mixed> $parameters */
 
         $summaryTableManager = $this->summaryManagerRegistry

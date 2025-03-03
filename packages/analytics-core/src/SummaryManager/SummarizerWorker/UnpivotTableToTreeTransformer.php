@@ -68,10 +68,11 @@ final class UnpivotTableToTreeTransformer
         ResultValue $resultValue,
         int $columnNumber,
     ): void {
+        /** @psalm-suppress MixedAssignment */
         $rawValue = $resultValue->getRawValue();
 
         if (!\is_int($rawValue) && !\is_float($rawValue)) {
-            throw new \UnexpectedValueException('Value must be an integer or float');
+            $rawValue = 0;
         }
 
         $node = DefaultSummaryNode::createLeafNode(

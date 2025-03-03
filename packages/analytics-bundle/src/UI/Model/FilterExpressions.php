@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
+use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+
 /**
  * @implements \IteratorAggregate<string,EqualFilter>
  * @implements \ArrayAccess<string,EqualFilter>
@@ -22,10 +24,13 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
     /**
      * @param class-string $summaryClass
      * @param list<string> $dimensions
+     * @param array<string,array<array-key,string>> $arrayExpressions
      */
     public function __construct(
         private string $summaryClass,
         array $dimensions,
+        private array $arrayExpressions,
+        private SummaryQuery $query,
     ) {
         $this->setFilters($dimensions);
     }
@@ -71,7 +76,20 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
     private function setFilters(array $filters): void
     {
         foreach ($filters as $filter) {
-            $this->expressions[$filter] = new EqualFilter();
+            $values = $this->arrayExpressions[$filter] ?? [];
+
+            $values2 = [];
+
+            /** @psalm-suppress MixedAssignment */
+            foreach ($values as $v) {
+                $values2[] = $this->query->getValueFromId(
+                    class: $this->summaryClass,
+                    dimension: $filter,
+                    id: $v,
+                );
+            }
+
+            $this->expressions[$filter] = new EqualFilter($values2);
         }
     }
 

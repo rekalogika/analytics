@@ -326,7 +326,7 @@ final class SummarizerQuery extends AbstractQuery
         $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
 
         foreach ($involvedDimensionNotInQuery as $dimension) {
-            $this->processDimension($dimension, true);
+            $this->groupings[$dimension] = false;
         }
     }
 

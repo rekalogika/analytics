@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
@@ -79,10 +80,22 @@ final class PivotAwareSummaryQuery
             $this->setFilters($parameters['filters']);
         }
 
+        /**
+         * @psalm-suppress MixedArgument
+         */
         $this->filterExpressions = new FilterExpressions(
             summaryClass: $summaryQuery->getClass(),
             dimensions: $this->getFilters(),
+            // @phpstan-ignore argument.type
+            arrayExpressions: $parameters['filterExpressions'] ?? [],
+            query: $summaryQuery,
         );
+
+        foreach ($this->filterExpressions as $dimension => $filter) {
+            /** @psalm-suppress ImpureMethodCall */
+            $this->summaryQuery
+                ->andWhere(Criteria::expr()->in($dimension, $filter->getValues()));
+        }
     }
 
     /**
@@ -183,7 +196,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $rows
      */
-    public function setRows(array $rows): void
+    private function setRows(array $rows): void
     {
         $this->rows = $rows;
         $this->syncRowsAndColumns();
@@ -200,7 +213,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $columns
      */
-    public function setColumns(array $columns): void
+    private function setColumns(array $columns): void
     {
         $this->columns = $columns;
         $this->syncRowsAndColumns();
@@ -217,7 +230,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $values
      */
-    public function setValues(array $values): void
+    private function setValues(array $values): void
     {
         $this->summaryQuery->select(...$values);
     }
@@ -233,7 +246,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $filters
      */
-    public function setFilters(array $filters): void
+    private function setFilters(array $filters): void
     {
         $this->filters = $filters;
     }

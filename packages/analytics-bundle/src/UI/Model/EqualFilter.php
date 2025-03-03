@@ -16,9 +16,11 @@ namespace Rekalogika\Analytics\Bundle\UI\Model;
 final class EqualFilter
 {
     /**
-     * @var list<mixed>
+     * @param list<mixed> $values
      */
-    private array $values = [];
+    public function __construct(
+        private array $values,
+    ) {}
 
     /**
      * @param list<mixed> $values
