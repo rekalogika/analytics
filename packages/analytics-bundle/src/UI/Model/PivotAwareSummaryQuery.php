@@ -321,6 +321,7 @@ final class PivotAwareSummaryQuery
             $this->rows,
             $columns,
             $this->getValues(),
+            $this->filters,
         ));
     }
 

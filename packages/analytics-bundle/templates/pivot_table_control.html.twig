@@ -168,7 +168,7 @@
 {% endblock %}
 
 {% block filters %}
-    <turbo-frame id="filters">
+    <turbo-frame id="__filters">
     {% for dimension, filterExpression in query.filterExpressions %}
         {% set choices = query.getChoices(dimension) %}
         <div class="mb-3">
@@ -176,9 +176,16 @@
             <select name="{{ dimension }}"
                     id="{{ dimension }}-{{ id }}"
                     class="equalfilter"
-                    multiple>
+                    multiple
+                    data-controller="rekalogika--analytics-bundle--filter"
+                    data-action="rekalogika--analytics-bundle--filter:change->rekalogika--analytics-bundle--pivot-table#filter">
+                    ">
                 {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
             </select>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            {{ 'No filter selected'|trans }}
         </div>
     {% endfor %}
     </turbo-frame>

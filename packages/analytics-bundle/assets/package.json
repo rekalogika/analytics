@@ -9,7 +9,13 @@
                 "main": "dist/pivot-table-controller.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "filter": {
+                "main": "dist/filter-controller.js",
+                "fetch": "eager",
+                "enabled": true
             }
+
         },
         "importmap": {
             "@hotwired/stimulus": "^3.0",
