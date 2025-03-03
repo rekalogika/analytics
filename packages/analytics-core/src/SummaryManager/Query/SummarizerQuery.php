@@ -326,6 +326,32 @@ final class SummarizerQuery extends AbstractQuery
         $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
 
         foreach ($involvedDimensionNotInQuery as $dimension) {
+            if (str_contains($dimension, '.')) {
+                [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
+
+                $dimensionMetadata = $this->metadata
+                    ->getDimensionMetadata($dimensionProperty);
+
+                $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
+
+                if ($dimensionHierarchyMetadata === null) {
+                    throw new \InvalidArgumentException(\sprintf('Dimension %s is not hierarchical', $dimensionProperty));
+                }
+
+                $groupings = $dimensionHierarchyMetadata
+                    ->getGroupingsByPropertyForSelect($hierarchyProperty);
+
+                foreach ($groupings as $property => $isGrouping) {
+                    if ($isGrouping !== false) {
+                        continue;
+                    }
+
+                    $this->groupings[\sprintf('%s.%s', $dimensionProperty, $property)] = false;
+                }
+
+                continue;
+            }
+
             $this->groupings[$dimension] = false;
         }
     }
