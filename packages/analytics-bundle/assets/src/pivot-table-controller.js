@@ -60,6 +60,10 @@ export default class extends Controller {
 
         this.element.querySelectorAll('select').forEach((select) => {
             select.addEventListener('change', () => {
+                if (select.closest('.filters')) {
+                    this.filterChanged = true
+                }
+
                 this.#submit()
             })
         })
@@ -67,6 +71,9 @@ export default class extends Controller {
         this.element.querySelectorAll('select.equalfilter').forEach((select) => {
             new TomSelect(select, {
                 maxItems: 10,
+                plugins: {
+                    remove_button: {}
+                },
             })
         })
 
@@ -84,7 +91,7 @@ export default class extends Controller {
     getData() {
         let data = {}
 
-        let uls = this.element.querySelectorAll('ul')
+        const uls = this.element.querySelectorAll('ul')
 
         for (const ul of uls) {
             let type = ul.dataset.type
@@ -111,6 +118,19 @@ export default class extends Controller {
 
                 data[type][index] = value
             }
+        }
+
+        const equalfilters = this.element.querySelectorAll('select.equalfilter')
+
+        for (const select of equalfilters) {
+            let name = select.name
+            let values = Array.from(select.selectedOptions).map(({ value }) => value)
+
+            if (!data['filterExpressions']) {
+                data['filterExpressions'] = {}
+            }
+
+            data['filterExpressions'][name] = values
         }
 
         return data
