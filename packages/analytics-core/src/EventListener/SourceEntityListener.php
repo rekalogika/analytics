@@ -34,6 +34,7 @@ final class SourceEntityListener implements ResetInterface
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
+    #[\Override]
     public function reset(): void
     {
         $this->dirtyFlags = [];

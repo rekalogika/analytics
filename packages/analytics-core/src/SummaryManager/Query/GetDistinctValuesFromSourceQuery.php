@@ -15,12 +15,14 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 {
     public function __construct(
         DimensionMetadata $dimensionMetadata,
         private readonly QueryBuilder $queryBuilder,
+        private readonly PropertyAccessorInterface $propertyAccessor,
         int $limit,
     ) {
         $summaryMetadata = $dimensionMetadata->getSummaryMetadata();
@@ -60,14 +62,31 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
     }
 
     /**
-     * @return list<mixed>
+     * @return iterable<string,object>
      */
-    public function getResult(): array
+    public function getResult(): iterable
     {
-        /**
-         * @psalm-suppress MixedReturnStatement
-         * @phpstan-ignore return.type
-         */
-        return $this->queryBuilder->getQuery()->getResult();
+        /** @var list<object> */
+        $result = $this->queryBuilder->getQuery()->getResult();
+
+        $idField = $this->queryBuilder->getEntityManager()
+            ->getClassMetadata($this->queryBuilder->getRootEntities()[0])
+            ->getSingleIdentifierFieldName();
+
+        foreach ($result as $item) {
+            $id = $this->propertyAccessor->getValue($item, $idField);
+
+            if (!\is_string($id) && !\is_int($id)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'The identifier field "%s" in class "%s" is not a string or integer',
+                    $idField,
+                    $this->queryBuilder->getRootEntities()[0],
+                ));
+            }
+
+            $id = (string) $id;
+
+            yield $id => $item;
+        }
     }
 }

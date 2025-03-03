@@ -122,6 +122,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     /**
      * @param class-string $className
      */
+    #[\Override]
     public function isSummary(string $className): bool
     {
         return AttributeUtil::classHasAttribute($className, Summary::class);

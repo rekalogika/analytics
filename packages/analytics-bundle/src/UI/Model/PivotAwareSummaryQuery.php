@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Symfony\Component\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PivotAwareSummaryQuery
 {
@@ -43,13 +45,9 @@ final class PivotAwareSummaryQuery
      */
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
-        array $parameters = [],
+        array $parameters,
+        private readonly TranslatorInterface $translator,
     ) {
-        $this->filterExpressions = new FilterExpressions(
-            summaryClass: $summaryQuery->getClass(),
-            dimensions: array_keys($this->getDimensionChoices()),
-        );
-
         if (isset($parameters['rows'])) {
             /**
              * @psalm-suppress MixedArgument
@@ -80,6 +78,23 @@ final class PivotAwareSummaryQuery
              * @phpstan-ignore argument.type
              */
             $this->setFilters($parameters['filters']);
+        }
+
+        /**
+         * @psalm-suppress MixedArgument
+         */
+        $this->filterExpressions = new FilterExpressions(
+            summaryClass: $summaryQuery->getClass(),
+            dimensions: $this->getFilters(),
+            // @phpstan-ignore argument.type
+            arrayExpressions: $parameters['filterExpressions'] ?? [],
+            query: $summaryQuery,
+        );
+
+        foreach ($this->filterExpressions as $dimension => $filter) {
+            /** @psalm-suppress ImpureMethodCall */
+            $this->summaryQuery
+                ->andWhere(Criteria::expr()->in($dimension, $filter->getValues()));
         }
     }
 
@@ -181,7 +196,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $rows
      */
-    public function setRows(array $rows): void
+    private function setRows(array $rows): void
     {
         $this->rows = $rows;
         $this->syncRowsAndColumns();
@@ -198,7 +213,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $columns
      */
-    public function setColumns(array $columns): void
+    private function setColumns(array $columns): void
     {
         $this->columns = $columns;
         $this->syncRowsAndColumns();
@@ -215,7 +230,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $values
      */
-    public function setValues(array $values): void
+    private function setValues(array $values): void
     {
         $this->summaryQuery->select(...$values);
     }
@@ -231,7 +246,7 @@ final class PivotAwareSummaryQuery
     /**
      * @param list<string> $filters
      */
-    public function setFilters(array $filters): void
+    private function setFilters(array $filters): void
     {
         $this->filters = $filters;
     }
@@ -306,6 +321,7 @@ final class PivotAwareSummaryQuery
             $this->rows,
             $columns,
             $this->getValues(),
+            $this->filters,
         ));
     }
 
@@ -374,5 +390,88 @@ final class PivotAwareSummaryQuery
         }
 
         return $items;
+    }
+
+    //
+    // distinct values
+    //
+
+    /**
+     * @param string $dimension
+     * @return null|iterable<Choice>
+     */
+    public function getChoices(string $dimension): null|iterable
+    {
+        if ($dimension === '@values') {
+            return null;
+        }
+
+        $dimensionField = $this->summaryQuery->getDimensionChoices()[$dimension]
+            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $dimension));
+
+        $choices = $this->summaryQuery
+            ->getDistinctValues($this->summaryQuery->getClass(), $dimension);
+
+        if ($choices === null) {
+            return null;
+        }
+
+        $choices2 = [];
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($choices as $id => $value) {
+            $choices2[] = new Choice(
+                id: $id,
+                value: $value,
+                label: $this->getChoiceLabel($value),
+            );
+        }
+
+        return new Choices(
+            label: $dimensionField,
+            choices: $choices2,
+        );
+    }
+
+    public function getIdToChoice(string $dimension, string $id): mixed
+    {
+        return $this->summaryQuery
+            ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
+    }
+
+    public function getChoiceLabel(mixed $choice): string
+    {
+        if ($choice instanceof TranslatableInterface) {
+            return $choice->trans($this->translator);
+        }
+
+        if (
+            $choice instanceof \Stringable
+            || \is_string($choice)
+            || \is_int($choice)
+            || \is_float($choice)
+        ) {
+            return (string) $choice;
+        }
+
+        if ($choice instanceof \BackedEnum) {
+            return (string) $choice->value;
+        }
+
+        if ($choice instanceof \UnitEnum) {
+            return $choice->name;
+        }
+
+        if (\is_object($choice)) {
+            return \sprintf('%s:%s', $choice::class, spl_object_id($choice));
+        }
+
+        if (\is_bool($choice)) {
+            $choice = $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
+
+            return $choice->trans($this->translator);
+        }
+
+        return get_debug_type($choice);
     }
 }

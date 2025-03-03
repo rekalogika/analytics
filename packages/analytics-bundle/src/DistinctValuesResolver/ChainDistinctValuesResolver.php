@@ -26,11 +26,13 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
         private iterable $nonSpecificResolvers,
     ) {}
 
+    #[\Override]
     public static function getApplicableDimensions(): ?iterable
     {
         return null;
     }
 
+    #[\Override]
     public function getDistinctValues(
         string $class,
         string $dimension,
@@ -59,6 +61,35 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
 
             if ($values !== null) {
                 return $values;
+            }
+        }
+
+        return null;
+    }
+
+    #[\Override]
+    public function getValueFromId(
+        string $class,
+        string $dimension,
+        string $id,
+    ): mixed {
+        $key = \sprintf('%s::%s', $class, $dimension);
+
+        if ($this->specificResolverLocator->has($key)) {
+            $specificResolver = $this->specificResolverLocator->get($key);
+
+            if (!$specificResolver instanceof DistinctValuesResolver) {
+                throw new \InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+            }
+
+            return $specificResolver->getValueFromId($class, $dimension, $id);
+        }
+
+        foreach ($this->nonSpecificResolvers as $resolver) {
+            $value = $resolver->getValueFromId($class, $dimension, $id);
+
+            if ($value !== null) {
+                return $value;
             }
         }
 

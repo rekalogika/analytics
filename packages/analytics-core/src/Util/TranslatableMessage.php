@@ -38,6 +38,7 @@ final class TranslatableMessage implements TranslatableInterface
         return $this->message;
     }
 
+    #[\Override]
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return $translator->trans($this->message, array_map(

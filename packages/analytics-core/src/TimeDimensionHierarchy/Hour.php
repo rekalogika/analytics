@@ -76,6 +76,7 @@ final class Hour implements Interval
         return $this->start->format('Y-m-d H:00');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

@@ -47,6 +47,7 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         return hash('xxh128', self::class . $key);
     }
 
+    #[\Override]
     public function acquireLock(string $key, int $ttl): false|object
     {
         $key = new Key($this->normalizeKey($key));
@@ -67,6 +68,7 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         return $key;
     }
 
+    #[\Override]
     public function releaseLock(object $key): void
     {
         $lock = $this->lockFactory->createLockFromKey(
@@ -83,6 +85,7 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         $lock->release();
     }
 
+    #[\Override]
     public function refreshLock(object $key, int $ttl): void
     {
         $lock = $this->lockFactory->createLockFromKey(
@@ -99,21 +102,25 @@ final readonly class SymfonyRefreshFrameworkAdapter implements RefreshFrameworkA
         $lock->refresh($ttl);
     }
 
+    #[\Override]
     public function raiseFlag(string $key, int $ttl): void
     {
         $this->cache->set($this->normalizeKey($key), true, $ttl);
     }
 
+    #[\Override]
     public function removeFlag(string $key): void
     {
         $this->cache->delete($this->normalizeKey($key));
     }
 
+    #[\Override]
     public function isFlagRaised(string $key): bool
     {
         return $this->cache->has($this->normalizeKey($key));
     }
 
+    #[\Override]
     public function scheduleWorker(RefreshCommand $command, int $delay): void
     {
         $this->logger?->info('Scheduling refresh worker', $command->getLoggingArray());

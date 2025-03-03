@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
@@ -60,6 +61,7 @@ final class SummaryQuery
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
     public function getResult(): Result
@@ -110,6 +112,40 @@ final class SummaryQuery
     public function getMeasureChoices(): array
     {
         return $this->measureChoices;
+    }
+
+    //
+    // distinct values resolver
+    //
+
+    /**
+     * @param class-string $class
+     * @return null|iterable<string,mixed>
+     */
+    public function getDistinctValues(
+        string $class,
+        string $dimension,
+    ): ?iterable {
+        return $this->distinctValuesResolver->getDistinctValues(
+            class: $class,
+            dimension: $dimension,
+            limit: 100,
+        );
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function getValueFromId(
+        string $class,
+        string $dimension,
+        string $id,
+    ): mixed {
+        return $this->distinctValuesResolver->getValueFromId(
+            class: $class,
+            dimension: $dimension,
+            id: $id,
+        );
     }
 
     //

@@ -9,12 +9,19 @@
                 "main": "dist/pivot-table-controller.js",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "filter": {
+                "main": "dist/filter-controller.js",
+                "fetch": "eager",
+                "enabled": true
             }
+
         },
         "importmap": {
             "@hotwired/stimulus": "^3.0",
             "@hotwired/turbo": "^7.0",
-            "sortablejs": "^1.14.0"
+            "sortablejs": "^1.14.0",
+            "tom-select": "^2.4.3"
         }
     },
     "scripts": {
@@ -22,7 +29,8 @@
     },
     "peerDependencies": {
         "@hotwired/stimulus": "^3.0.0",
-        "sortablejs": "^1.14.0"
+        "sortablejs": "^1.14.0",
+        "tom-select": "^2.4.3"
     },
     "devDependencies": {
         "@babel/cli": "^7.26",

@@ -34,7 +34,7 @@ final readonly class Printer
                 + $value->h * 3600
                 + $value->i * 60
                 + $value->s
-                + $value->f
+                + (int) $value->f
             );
         } elseif ($value instanceof PartitionRange) {
             return PartitionUtil::printRange($value);

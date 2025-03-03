@@ -58,6 +58,10 @@ export default class extends Controller {
 
         this.element.querySelectorAll('select').forEach((select) => {
             select.addEventListener('change', () => {
+                if (select.closest('.filters')) {
+                    this.filterChanged = true
+                }
+
                 this.#submit()
             })
         })
@@ -76,7 +80,7 @@ export default class extends Controller {
     getData() {
         let data = {}
 
-        let uls = this.element.querySelectorAll('ul')
+        const uls = this.element.querySelectorAll('ul')
 
         for (const ul of uls) {
             let type = ul.dataset.type
@@ -105,10 +109,34 @@ export default class extends Controller {
             }
         }
 
+        const equalfilters = this.element.querySelectorAll('select.equalfilter')
+
+        for (const select of equalfilters) {
+            let name = select.name
+            let values = Array.from(select.selectedOptions).map(({ value }) => value)
+
+            if (!data['filterExpressions']) {
+                data['filterExpressions'] = {}
+            }
+
+            data['filterExpressions'][name] = values
+        }
+
         return data
     }
 
+    filter() {
+        this.#submit()
+    }
+
     #onEnd(event) {
+        let sourceType = event.from.dataset.type
+        let targetType = event.to.dataset.type
+
+        if (targetType === 'filters' || sourceType === 'filters') {
+            this.filterChanged = true
+        }
+
         this.#submit()
     }
 
@@ -134,6 +162,7 @@ export default class extends Controller {
             }
         }
 
+
         return false
     }
 
@@ -141,7 +170,13 @@ export default class extends Controller {
         if (this.urlParameterValue && this.frameValue) {
             const url = new URL(window.location)
             url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()))
-            visit(url.toString(), {'frame': this.frameValue, 'action': 'advance'})
+
+            if (this.filterChanged) {
+                visit(url.toString(), { 'frame': '__filters', 'action': 'replace' })
+                this.filterChanged = false
+            }
+
+            visit(url.toString(), { 'frame': this.frameValue, 'action': 'advance' })
         }
     }
 }

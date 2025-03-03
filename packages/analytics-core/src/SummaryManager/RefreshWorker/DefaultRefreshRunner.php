@@ -26,6 +26,7 @@ final readonly class DefaultRefreshRunner implements RefreshRunner
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
+    #[\Override]
     public function refresh(string $class, ?Partition $partition): void
     {
         $summaryRefresher = $this->summaryRefresherFactory

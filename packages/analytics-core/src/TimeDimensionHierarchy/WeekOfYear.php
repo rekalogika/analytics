@@ -31,6 +31,7 @@ final class WeekOfYear implements RecurringInterval
         return 'W' . $this->databaseValue;
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

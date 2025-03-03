@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
@@ -146,6 +147,9 @@ final class ArchitectureTest
                 Selector::classname(RuntimeExtensionInterface::class),
                 Selector::classname(TwigFunction::class),
                 Selector::classname(AbstractExtension::class),
+
+                // doctrine
+                Selector::classname(Criteria::class),
             );
     }
 }

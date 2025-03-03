@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
@@ -37,6 +38,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private SummaryMetadata $metadata,
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
+        private DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
     #[\Override]
@@ -197,6 +199,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
             entityManager: $this->entityManager,
             metadata: $this->metadata,
             propertyAccessor: $this->propertyAccessor,
+            distinctValuesResolver: $this->distinctValuesResolver,
         );
     }
 }

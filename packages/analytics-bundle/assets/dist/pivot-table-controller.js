@@ -89,6 +89,9 @@ var _default = /*#__PURE__*/function (_Controller) {
     });
     this.element.querySelectorAll('select').forEach(function (select) {
       select.addEventListener('change', function () {
+        if (select.closest('.filters')) {
+          _this2.filterChanged = true;
+        }
         _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
       });
     });
@@ -112,10 +115,10 @@ var _default = /*#__PURE__*/function (_Controller) {
         continue;
       }
       var lis = ul.querySelectorAll('li');
-      for (var _iterator2 = _createForOfIteratorHelperLoose(lis.entries()), _step2; !(_step2 = _iterator2()).done;) {
-        var _step2$value = _step2.value,
-          index = _step2$value[0],
-          li = _step2$value[1];
+      for (var _iterator3 = _createForOfIteratorHelperLoose(lis.entries()), _step3; !(_step3 = _iterator3()).done;) {
+        var _step3$value = _step3.value,
+          index = _step3$value[0],
+          li = _step3$value[1];
         var value = li.dataset.value;
         var select = li.querySelector('select');
         if (select) {
@@ -130,11 +133,32 @@ var _default = /*#__PURE__*/function (_Controller) {
         data[type][index] = value;
       }
     }
+    var equalfilters = this.element.querySelectorAll('select.equalfilter');
+    for (var _iterator2 = _createForOfIteratorHelperLoose(equalfilters), _step2; !(_step2 = _iterator2()).done;) {
+      var _select = _step2.value;
+      var name = _select.name;
+      var values = Array.from(_select.selectedOptions).map(function (_ref) {
+        var value = _ref.value;
+        return value;
+      });
+      if (!data['filterExpressions']) {
+        data['filterExpressions'] = {};
+      }
+      data['filterExpressions'][name] = values;
+    }
     return data;
+  };
+  _proto.filter = function filter() {
+    _classPrivateFieldLooseBase(this, _submit)[_submit]();
   };
   return _default;
 }(Controller);
 function _onEnd2(event) {
+  var sourceType = event.from.dataset.type;
+  var targetType = event.to.dataset.type;
+  if (targetType === 'filters' || sourceType === 'filters') {
+    this.filterChanged = true;
+  }
   _classPrivateFieldLooseBase(this, _submit)[_submit]();
 }
 function _onMove2(event, originalEvent) {
@@ -161,6 +185,13 @@ function _submit2() {
   if (this.urlParameterValue && this.frameValue) {
     var url = new URL(window.location);
     url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()));
+    if (this.filterChanged) {
+      visit(url.toString(), {
+        'frame': '__filters',
+        'action': 'replace'
+      });
+      this.filterChanged = false;
+    }
     visit(url.toString(), {
       'frame': this.frameValue,
       'action': 'advance'

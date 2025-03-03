@@ -31,6 +31,7 @@ final class QuarterOfYear implements RecurringInterval
         return 'Q' . $this->databaseValue;
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

@@ -339,6 +339,7 @@ final readonly class QueryResultToRowTransformer
         }
 
         if (is_numeric($value)) {
+            /** @psalm-suppress InvalidOperand */
             return $value + 0;
         }
 

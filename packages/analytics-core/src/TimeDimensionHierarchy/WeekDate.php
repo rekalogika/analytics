@@ -71,6 +71,7 @@ final class WeekDate implements Interval
         return $this->start->format('o-\WW-N');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

@@ -52,8 +52,8 @@ final class DistinctValuesResolverTest extends KernelTestCase
         /** @psalm-suppress InvalidArgument */
         $values = iterator_to_array($values);
         $this->assertEquals([
-            CustomerType::Individual,
-            CustomerType::Organizational,
+            'individual' => CustomerType::Individual,
+            'organizational' => CustomerType::Organizational,
         ], $values);
     }
 }

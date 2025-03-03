@@ -30,6 +30,7 @@ final class MonthOfYear implements RecurringInterval
         return \sprintf('%02d', $this->databaseValue);
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

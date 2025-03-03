@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscribe
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -72,6 +73,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
         ])
     ;
 
@@ -255,6 +257,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$propertyAccessor' => service('property_accessor'),
         ])
         ->tag('rekalogika.analytics.distinct_values_resolver');
 
@@ -272,4 +275,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(AnalyticsExtension::class)
         ->tag('twig.extension');
+
+    $services
+        ->set(PivotAwareSummaryQueryFactory::class)
+        ->args([
+            '$translator' => service('translator'),
+        ])
+    ;
 };

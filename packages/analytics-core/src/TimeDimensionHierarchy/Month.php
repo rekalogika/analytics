@@ -79,6 +79,7 @@ final class Month implements Interval
         return $this->start->format('Y-m');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

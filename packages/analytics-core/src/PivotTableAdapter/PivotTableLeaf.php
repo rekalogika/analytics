@@ -26,21 +26,25 @@ final readonly class PivotTableLeaf implements LeafNode
         }
     }
 
+    #[\Override]
     public function getValue(): mixed
     {
         return $this->node->getValue();
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return $this->node->getKey();
     }
 
+    #[\Override]
     public function getLegend(): mixed
     {
         return $this->node->getLegend();
     }
 
+    #[\Override]
     public function getItem(): mixed
     {
         return $this->node->getMember();

@@ -76,6 +76,7 @@ final class Year implements Interval
         return $this->start->format('Y');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,

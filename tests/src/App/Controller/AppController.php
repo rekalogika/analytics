@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
-use Rekalogika\Analytics\Bundle\UI\Model\PivotAwareSummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
@@ -36,6 +36,7 @@ final class AppController extends AbstractController
     public function index(
         #[MapQueryParameter()]
         ?string $parameters,
+        PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
     ): Response {
 
         if ($parameters === null) {
@@ -49,13 +50,15 @@ final class AppController extends AbstractController
             $parameters = [];
         }
 
+        // dump($parameters);
+
         /** @var array<string,mixed> $parameters */
 
         $summaryTableManager = $this->summaryManagerRegistry
             ->getManager(OrderSummary::class);
 
         $query = $summaryTableManager->createQuery();
-        $query = new PivotAwareSummaryQuery($query, $parameters);
+        $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
 
         $result = new PivotTableAdapter($query->getResult());
         $result = $this->pivotTableRenderer

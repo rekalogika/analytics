@@ -70,6 +70,7 @@ final class Week implements Interval
         return $this->start->format('o-\WW');
     }
 
+    #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
