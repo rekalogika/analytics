@@ -25,8 +25,6 @@ use Doctrine\ORM\Query\TokenType;
 
 /**
  * REKALOGIKA_UUID_TO_DATETIME
- *
- * @deprecated
  */
 final class UuidToDateTimeFunction extends FunctionNode implements TypedExpression
 {
