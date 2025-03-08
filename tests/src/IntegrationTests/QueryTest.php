@@ -35,7 +35,7 @@ final class QueryTest extends KernelTestCase
 
     public function testEmptyQuery(): void
     {
-        $result = $this->getQuery()->getResult();
+        $result = $this->getQuery()->getResult()->getTree();
         $this->assertCount(0, $result);
     }
 
@@ -43,7 +43,8 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.year')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(0, $result);
     }
@@ -52,7 +53,8 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->select('count')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(1, $result);
 
@@ -68,7 +70,8 @@ final class QueryTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
             ->groupBy('invalid')
-            ->getResult();
+            ->getResult()
+            ->getTree();
     }
 
     public function testInvalidMeasure(): void
@@ -76,7 +79,8 @@ final class QueryTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
             ->select('invalid')
-            ->getResult();
+            ->getResult()
+            ->getTree();
     }
 
     public function testTraversal(): void
@@ -93,7 +97,8 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('time.year', 'customerCountry')
             ->select('count', 'price')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(2, $result);
 
@@ -137,7 +142,8 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('time.year', '@values', 'customerCountry')
             ->select('count', 'price')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $node = $result->traverse('2024', 'count', $country->getName());
         $this->assertIsInt($node?->getValue());
@@ -157,7 +163,8 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('@values', 'time.year', 'customerCountry')
             ->select('count', 'price')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $node = $result->traverse('count', '2024', $country->getName());
         $this->assertIsInt($node?->getValue());
@@ -177,7 +184,8 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('time.year', 'customerCountry', '@values')
             ->select('count', 'price')
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $node = $result->traverse('2024', $country->getName(), 'count');
         $this->assertIsInt($node?->getValue());
@@ -189,7 +197,8 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.year')
             ->select('count')
             ->where(Criteria::expr()->eq('time.year', 2024))
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(1, $result);
     }
@@ -202,7 +211,8 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.month')
             ->select('count')
             ->where(Criteria::expr()->eq('time.month', $month->getStartDatabaseValue()))
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(1, $result);
     }
@@ -216,7 +226,8 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->eq('time.year', 2024),
                 Criteria::expr()->eq('time.year', 2023),
             ))
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $this->assertCount(2, $result);
     }
@@ -226,6 +237,7 @@ final class QueryTest extends KernelTestCase
         $all = $this->getQuery()
             ->select('count')
             ->getResult()
+            ->getTree()
             ->traverse('count')
             ?->getValue();
 
@@ -235,6 +247,7 @@ final class QueryTest extends KernelTestCase
             ->select('count')
             ->where(Criteria::expr()->eq('time.year', 2024))
             ->getResult()
+            ->getTree()
             ->traverse('count')
             ?->getValue();
 
@@ -249,7 +262,8 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.month')
             ->select('count')
             ->orderBy('time.month', Order::Descending)
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $months = [];
 
@@ -274,7 +288,8 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.month')
             ->select('count')
             ->orderBy('count', Order::Descending)
-            ->getResult();
+            ->getResult()
+            ->getTree();
 
         $counts = [];
 

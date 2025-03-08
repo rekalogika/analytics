@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\Query\ResultNode;
+use Rekalogika\Analytics\Query\TreeNode;
+use Rekalogika\Analytics\Query\TreeResult;
 
 /**
- * @implements \IteratorAggregate<mixed,ResultNode>
+ * @implements \IteratorAggregate<mixed,TreeNode>
  */
-final readonly class DefaultSummaryResult implements Result, \IteratorAggregate
+final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
 {
     use NodeTrait;
 
     /**
-     * @param list<ResultNode> $children
+     * @param list<TreeNode> $children
      */
     public function __construct(
         private array $children,

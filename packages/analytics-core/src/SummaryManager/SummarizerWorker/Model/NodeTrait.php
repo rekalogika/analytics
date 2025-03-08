@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\ResultNode;
+use Rekalogika\Analytics\Query\TreeNode;
 
 trait NodeTrait
 {
-    private function getChild(mixed $member): ?ResultNode
+    private function getChild(mixed $member): ?TreeNode
     {
         /** @var mixed $currentMember */
         foreach ($this as $currentMember => $child) {
@@ -43,7 +43,7 @@ trait NodeTrait
         return null;
     }
 
-    public function traverse(mixed ...$members): ?ResultNode
+    public function traverse(mixed ...$members): ?TreeNode
     {
         if ($members === []) {
             throw new \InvalidArgumentException('Invalid path');

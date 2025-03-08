@@ -49,6 +49,8 @@ final class SummaryQuery
      */
     private array $orderBy = [];
 
+    private ?Result $result = null;
+
     /**
      * @param non-empty-array<string,Field> $dimensionChoices
      * @param array<string,Field> $measureChoices
@@ -66,6 +68,10 @@ final class SummaryQuery
 
     public function getResult(): Result
     {
+        if ($this->result !== null) {
+            return $this->result;
+        }
+
         $summarizer = new SummarizerQuery(
             queryBuilder: $this->entityManager->createQueryBuilder(),
             query: $this,
@@ -73,7 +79,7 @@ final class SummaryQuery
             propertyAccessor: $this->propertyAccessor,
         );
 
-        return $summarizer->execute();
+        return $this->result = $summarizer->execute();
     }
 
     /**
@@ -159,6 +165,7 @@ final class SummaryQuery
 
     public function setLowerBound(mixed $lowerBound): void
     {
+        $this->result = null;
         $this->lowerBound = $lowerBound;
     }
 
@@ -169,6 +176,7 @@ final class SummaryQuery
 
     public function setUpperBound(mixed $upperBound): void
     {
+        $this->result = null;
         $this->upperBound = $upperBound;
     }
 
@@ -214,6 +222,8 @@ final class SummaryQuery
 
     public function groupBy(string ...$dimensions): self
     {
+        $this->result = null;
+
         $dimensions = array_values(array_unique($dimensions));
         $this->ensureFieldValid($dimensions, 'dimension');
 
@@ -243,6 +253,8 @@ final class SummaryQuery
 
     public function select(string ...$measures): self
     {
+        $this->result = null;
+
         $measures = array_values(array_unique($measures));
         $this->ensureFieldValid($measures, 'measure');
 
@@ -280,6 +292,7 @@ final class SummaryQuery
 
     public function andWhere(Expression $expression): self
     {
+        $this->result = null;
         $this->where[] = $expression;
 
         return $this;
@@ -299,6 +312,8 @@ final class SummaryQuery
 
     public function orderBy(string $field, Order $direction = Order::Ascending): self
     {
+        $this->result = null;
+
         $this->orderBy = [];
         $this->addOrderBy($field, $direction);
 
@@ -313,6 +328,7 @@ final class SummaryQuery
             throw new \InvalidArgumentException('Cannot order by @values');
         }
 
+        $this->result = null;
         $this->orderBy[$field] = $direction;
 
         return $this;

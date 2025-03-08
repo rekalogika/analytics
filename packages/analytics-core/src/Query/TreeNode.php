@@ -20,9 +20,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<mixed,ResultNode>
+ * @extends \Traversable<mixed,TreeNode>
  */
-interface ResultNode extends \Traversable, \Countable
+interface TreeNode extends \Traversable, \Countable
 {
     /**
      * Dimension property name (e.g. country, time.hour)
@@ -57,5 +57,5 @@ interface ResultNode extends \Traversable, \Countable
      */
     public function isLeaf(): bool;
 
-    public function traverse(mixed ...$members): ?ResultNode;
+    public function traverse(mixed ...$members): ?TreeNode;
 }

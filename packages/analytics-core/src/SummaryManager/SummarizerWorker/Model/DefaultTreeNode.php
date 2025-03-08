@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
 
-use Rekalogika\Analytics\Query\ResultNode;
+use Rekalogika\Analytics\Query\TreeNode;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @implements \IteratorAggregate<mixed,ResultNode>
+ * @implements \IteratorAggregate<mixed,TreeNode>
  */
-final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
+final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 {
     use NodeTrait;
 
     /**
-     * @var list<DefaultSummaryNode>
+     * @var list<DefaultTreeNode>
      */
     private array $children = [];
 
-    private ?DefaultSummaryNode $parent = null;
+    private ?DefaultTreeNode $parent = null;
 
     private function __construct(
         private readonly string $key,
@@ -110,12 +110,12 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         return $this->member;
     }
 
-    public function setParent(DefaultSummaryNode $parent): void
+    public function setParent(DefaultTreeNode $parent): void
     {
         $this->parent = $parent;
     }
 
-    public function getParent(): ?DefaultSummaryNode
+    public function getParent(): ?DefaultTreeNode
     {
         return $this->parent;
     }
@@ -131,7 +131,7 @@ final class DefaultSummaryNode implements ResultNode, \IteratorAggregate
         $this->children = [];
     }
 
-    public function addChild(DefaultSummaryNode $node): void
+    public function addChild(DefaultTreeNode $node): void
     {
         $this->children[] = $node;
         $node->setParent($this);

@@ -23,7 +23,8 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultTreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -112,9 +113,9 @@ final class SummarizerQuery extends AbstractQuery
 
         // check if select is empty
         if ($this->query->getSelect() === []) {
-            return new DefaultSummaryResult(
-                children: [],
-            );
+            $treeResult = new DefaultTreeResult(children: []);
+
+            return new DefaultResult(treeResult: $treeResult);
         }
 
         // execute doctrine query
@@ -147,7 +148,9 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         // wrap the result using our SummaryResult class
-        return new DefaultSummaryResult(children: $result);
+        $treeResult = new DefaultTreeResult(children: $result);
+
+        return new DefaultResult(treeResult: $treeResult);
     }
 
     private function hasTieredOrder(): bool

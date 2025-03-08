@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Twig;
 
-use Rekalogika\Analytics\Bundle\UI\Model\PivotAwareSummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQuery;
 use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
 

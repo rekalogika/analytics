@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Bundle\UI\Model\PivotAwareSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

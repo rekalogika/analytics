@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultSummaryNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultTreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 
 final class UnpivotTableToTreeTransformer
 {
     /**
-     * @var list<DefaultSummaryNode>
+     * @var list<DefaultTreeNode>
      */
     private array $currentPath = [];
 
     /**
-     * @var list<DefaultSummaryNode>
+     * @var list<DefaultTreeNode>
      */
     private array $tree = [];
 
@@ -34,7 +34,7 @@ final class UnpivotTableToTreeTransformer
         int $columnNumber,
         bool $forceCreate,
     ): void {
-        $node = DefaultSummaryNode::createBranchNode(
+        $node = DefaultTreeNode::createBranchNode(
             key: $resultValue->getField(),
             legend: $resultValue->getLabel(),
             member: $resultValue->getValue(),
@@ -75,7 +75,7 @@ final class UnpivotTableToTreeTransformer
             $rawValue = 0;
         }
 
-        $node = DefaultSummaryNode::createLeafNode(
+        $node = DefaultTreeNode::createLeafNode(
             key: $lastResultValue->getField(),
             legend: $lastResultValue->getLabel(),
             member: $lastResultValue->getValue(),
@@ -92,7 +92,7 @@ final class UnpivotTableToTreeTransformer
 
         $parent = end($this->currentPath);
 
-        if ($parent instanceof DefaultSummaryNode) {
+        if ($parent instanceof DefaultTreeNode) {
             $parent->addChild($node);
         } else {
             $this->currentPath = [$node];
@@ -102,7 +102,7 @@ final class UnpivotTableToTreeTransformer
 
     /**
      * @param iterable<ResultUnpivotRow> $rows
-     * @return list<DefaultSummaryNode>
+     * @return list<DefaultTreeNode>
      */
     public function transformToTree(iterable $rows): array
     {
@@ -132,7 +132,7 @@ final class UnpivotTableToTreeTransformer
 
     /**
      * @param iterable<ResultUnpivotRow> $rows
-     * @return list<DefaultSummaryNode>
+     * @return list<DefaultTreeNode>
      */
     public function transformToTable(iterable $rows): array
     {
