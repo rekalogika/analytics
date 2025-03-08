@@ -17,8 +17,10 @@ namespace Rekalogika\Analytics\Query;
  * Represents a query result.
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<mixed,TreeNode>
  */
-interface Result
+interface TreeResult extends \Traversable, \Countable
 {
-    public function getTree(): TreeResult;
+    public function traverse(mixed ...$members): ?TreeNode;
 }

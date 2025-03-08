@@ -11,9 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI;
 
 use Doctrine\Common\Collections\Criteria;
+use Rekalogika\Analytics\Bundle\UI\Model\Choice;
+use Rekalogika\Analytics\Bundle\UI\Model\Choices;
+use Rekalogika\Analytics\Bundle\UI\Model\FilterExpressions;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;

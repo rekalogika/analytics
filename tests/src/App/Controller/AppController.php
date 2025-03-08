@@ -60,7 +60,7 @@ final class AppController extends AbstractController
         $query = $summaryTableManager->createQuery();
         $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
 
-        $result = new PivotTableAdapter($query->getResult());
+        $result = new PivotTableAdapter($query->getResult()->getTree());
         $result = $this->pivotTableRenderer
             ->render($result, $query->getPivotedDimensions());
 
