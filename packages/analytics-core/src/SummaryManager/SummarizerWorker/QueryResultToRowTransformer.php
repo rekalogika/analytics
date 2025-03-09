@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class QueryResultToRowTransformer
 {
-    public function __construct(
+    private function __construct(
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
@@ -34,7 +34,22 @@ final readonly class QueryResultToRowTransformer
      * @param list<array<string,mixed>> $input
      * @return iterable<ResultRow>
      */
-    public function transform(array $input): iterable
+    public static function transform(
+        SummaryMetadata $metadata,
+        EntityManagerInterface $entityManager,
+        PropertyAccessorInterface $propertyAccessor,
+        array $input,
+    ): iterable {
+        $transformer = new self($metadata, $entityManager, $propertyAccessor);
+
+        return $transformer->doTransform($input);
+    }
+
+    /**
+     * @param list<array<string,mixed>> $input
+     * @return iterable<ResultRow>
+     */
+    private function doTransform(array $input): iterable
     {
         foreach ($input as $item) {
             yield $this->transformOne($item);

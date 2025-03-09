@@ -122,30 +122,25 @@ final class SummarizerQuery extends AbstractQuery
         $result = $this->getResult();
 
         // hydrate into summary object
-        $queryResultToRowTransformer = new QueryResultToRowTransformer(
+        $result = QueryResultToRowTransformer::transform(
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
+            input: $result,
         );
-
-        $result = $queryResultToRowTransformer->transform($result);
 
         // unpivot result
-        $unpivotTransformer = new UnpivotValuesTransformer(
+        $result = UnpivotValuesTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
+            input: $result,
         );
 
-        $result = $unpivotTransformer->transform($result);
-
         // convert to tree or table
-        $toTreeTransformer = new UnpivotTableToTreeTransformer();
-
-        if ($this->hasTieredOrder()) {
-            $result = $toTreeTransformer->transformToTree($result);
-        } else {
-            $result = $toTreeTransformer->transformToTable($result);
-        }
+        $result = UnpivotTableToTreeTransformer::transform(
+            rows: $result,
+            type: $this->hasTieredOrder() ? 'tree' : 'table',
+        );
 
         // wrap the result using our SummaryResult class
         $treeResult = new DefaultTreeResult(children: $result);
