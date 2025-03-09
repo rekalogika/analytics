@@ -20,6 +20,23 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 final class UnpivotTableToTreeTransformer
 {
     /**
+     * @param iterable<ResultUnpivotRow> $rows
+     * @param 'tree'|'table' $type
+     * @return list<DefaultTreeNode>
+     */
+    public static function transform(
+        iterable $rows,
+        string $type,
+    ): array {
+        $transformer = new self();
+
+        return match ($type) {
+            'tree' => $transformer->transformToTree($rows),
+            'table' => $transformer->transformToTable($rows),
+        };
+    }
+
+    /**
      * @var list<DefaultTreeNode>
      */
     private array $currentPath = [];
@@ -104,7 +121,7 @@ final class UnpivotTableToTreeTransformer
      * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultTreeNode>
      */
-    public function transformToTree(iterable $rows): array
+    private function transformToTree(iterable $rows): array
     {
         $this->currentPath = [];
         $this->tree = [];
@@ -134,7 +151,7 @@ final class UnpivotTableToTreeTransformer
      * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultTreeNode>
      */
-    public function transformToTable(iterable $rows): array
+    private function transformToTable(iterable $rows): array
     {
         $this->currentPath = [];
         $this->tree = [];

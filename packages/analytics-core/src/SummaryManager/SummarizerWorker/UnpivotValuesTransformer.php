@@ -42,7 +42,7 @@ final class UnpivotValuesTransformer
 
     private MeasureDescriptionFactory $measureDescriptionFactory;
 
-    public function __construct(
+    private function __construct(
         SummaryQuery $summaryQuery,
         private readonly SummaryMetadata $metadata,
         private readonly TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
@@ -63,7 +63,26 @@ final class UnpivotValuesTransformer
      * @param iterable<ResultRow> $input
      * @return iterable<ResultUnpivotRow>
      */
-    public function transform(iterable $input): iterable
+    public static function transform(
+        SummaryQuery $summaryQuery,
+        iterable $input,
+        SummaryMetadata $metadata,
+        TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
+    ): iterable {
+        $transformer = new self(
+            summaryQuery: $summaryQuery,
+            metadata: $metadata,
+            valuesLabel: $valuesLabel,
+        );
+
+        return $transformer->doTransform($input);
+    }
+
+    /**
+     * @param iterable<ResultRow> $input
+     * @return iterable<ResultUnpivotRow>
+     */
+    private function doTransform(iterable $input): iterable
     {
         $rows = [];
 
