@@ -13,14 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 /**
- * Represents a query result.
+ * Represent a tuple
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Result
+interface Tuple
 {
-    public function getTree(): TreeResult;
+    /**
+     * @return array<string,TranslatableInterface|string>
+     */
+    public function getLabels(): array;
 
-    public function getTable(): Table;
+    /**
+     * @return array<string,mixed>
+     */
+    public function getMembers(): array;
 }

@@ -18,12 +18,13 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Query\Query;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class SummaryQuery
+final class SummaryQuery implements Query
 {
     private mixed $lowerBound = null;
 
@@ -215,6 +216,7 @@ final class SummaryQuery
     /**
      * @return list<string>
      */
+    #[\Override]
     public function getGroupBy(): array
     {
         return $this->dimensions;
@@ -246,6 +248,7 @@ final class SummaryQuery
     /**
      * @return list<string>
      */
+    #[\Override]
     public function getSelect(): array
     {
         return $this->measures;
@@ -277,6 +280,7 @@ final class SummaryQuery
     /**
      * @return list<Expression>
      */
+    #[\Override]
     public function getWhere(): array
     {
         return $this->where;
@@ -305,6 +309,7 @@ final class SummaryQuery
     /**
      * @return array<string,Order>
      */
+    #[\Override]
     public function getOrderBy(): array
     {
         return $this->orderBy;

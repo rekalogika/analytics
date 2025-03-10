@@ -20,6 +20,8 @@ use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\RuntimeExtensionInterface;
@@ -150,6 +152,10 @@ final class ArchitectureTest
 
                 // doctrine
                 Selector::classname(Criteria::class),
+
+                // Chartjs
+                Selector::classname(ChartBuilderInterface::class),
+                Selector::classname(Chart::class),
             );
     }
 }

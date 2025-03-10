@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultTreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
 
 final class UnpivotTableToTreeTransformer
 {

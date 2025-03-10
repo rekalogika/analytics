@@ -11,13 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\TreeNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @implements \IteratorAggregate<mixed,TreeNode>
+ * @internal
  */
 final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 {

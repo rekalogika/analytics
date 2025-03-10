@@ -41,7 +41,8 @@
         "symfony/translation": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3",
         "symfony/twig-pack": "^1.0",
-        "symfony/uid": "^6.4 || ^7.0"
+        "symfony/uid": "^6.4 || ^7.0",
+        "symfony/ux-chartjs": "^2.23"
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.1",

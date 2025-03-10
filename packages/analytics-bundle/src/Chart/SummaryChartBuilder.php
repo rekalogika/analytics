@@ -11,16 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Bundle\Chart;
 
-/**
- * Represents a query result.
- *
- * For consumption only, do not implement. Methods may be added in the future.
- */
-interface Result
+use Rekalogika\Analytics\Query\Result;
+use Symfony\UX\Chartjs\Model\Chart;
+
+interface SummaryChartBuilder
 {
-    public function getTree(): TreeResult;
-
-    public function getTable(): Table;
+    public function createChart(Result $result): Chart;
 }

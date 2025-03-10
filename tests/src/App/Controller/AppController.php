@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
+use Rekalogika\Analytics\Bundle\Chart\SummaryChartBuilder;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
@@ -37,6 +38,7 @@ final class AppController extends AbstractController
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
+        SummaryChartBuilder $summaryChartBuilder,
     ): Response {
 
         if ($parameters === null) {
@@ -59,14 +61,26 @@ final class AppController extends AbstractController
 
         $query = $summaryTableManager->createQuery();
         $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
+        $treeResult = $query->getResult()->getTree();
 
-        $result = new PivotTableAdapter($query->getResult()->getTree());
-        $result = $this->pivotTableRenderer
-            ->render($result, $query->getPivotedDimensions());
+        // create pivot table
+        $pivotTable = new PivotTableAdapter($treeResult);
+        $renderedPivotTable = $this->pivotTableRenderer->render(
+            treeNode: $pivotTable,
+            pivotedNodes: $query->getPivotedDimensions(),
+        );
+
+        // create chart
+        try {
+            $chart = $summaryChartBuilder->createChart($query->getResult());
+        } catch (\Throwable $e) {
+            $chart = null;
+        }
 
         return $this->render('app/index.html.twig', [
             'query' => $query,
-            'result' => $result,
+            'pivotTable' => $renderedPivotTable,
+            'chart' => $chart,
         ]);
     }
 

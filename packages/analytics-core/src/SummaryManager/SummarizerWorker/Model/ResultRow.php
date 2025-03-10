@@ -39,6 +39,14 @@ final class ResultRow
             ?? throw new \RuntimeException('Measure ' . $measure . ' not found in row');
     }
 
+    /**
+     * @return array<string,ResultValue>
+     */
+    public function getMeasures(): array
+    {
+        return $this->measures;
+    }
+
     public function getDimensionMember(string $dimension): ResultValue
     {
         return $this->dimensions[$dimension]

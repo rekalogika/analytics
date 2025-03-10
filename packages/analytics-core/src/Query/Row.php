@@ -14,13 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * Represents a query result.
+ * Represent a row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Result
+interface Row
 {
-    public function getTree(): TreeResult;
+    public function getTuple(): Tuple;
 
-    public function getTable(): Table;
+    /**
+     * @return array<string,Measure>
+     */
+    public function getMeasures(): array;
 }

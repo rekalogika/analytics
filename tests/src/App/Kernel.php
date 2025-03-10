@@ -27,6 +27,7 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Symfony\UX\Chartjs\ChartjsBundle;
 use Symfony\UX\StimulusBundle\StimulusBundle;
 use Symfony\UX\Turbo\TurboBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
@@ -67,6 +68,7 @@ final class Kernel extends BaseKernel
         yield new TurboBundle();
         yield new DAMADoctrineTestBundle();
         yield new ZenstruckMessengerTestBundle();
+        yield new ChartjsBundle();
     }
 
     #[\Override]

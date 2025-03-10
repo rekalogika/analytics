@@ -5,7 +5,11 @@
 
     <div class="mt-5" style="min-height: 500px;">
         <turbo-frame id="pivottable">
-        {{ result|raw }}
+        <div class="mb-5">
+            {% if chart %}{{ render_chart(chart) }}{% endif %}
+        </div>
+
+        <div>{{ pivotTable|raw }}</div>
         </turbo-frame>
     </div>
 {% endblock %}
