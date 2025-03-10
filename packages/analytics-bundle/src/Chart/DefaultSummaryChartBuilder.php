@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-class DefaultSummaryChartBuilder implements SummaryChartBuilder
+final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 {
     public function __construct(
         private TranslatorInterface $translator,
