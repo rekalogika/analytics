@@ -39,7 +39,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $members = $row->getTuple()->getMembers();
 
             if (\count($members) !== 1) {
-                throw new \InvalidArgumentException('Expected only one member');
+                throw new UnsupportedData('Expected only one member');
             }
 
             /** @psalm-suppress MixedAssignment */
@@ -50,7 +50,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $measure = array_shift($measures);
 
             if ($measure === null) {
-                throw new \InvalidArgumentException('Measure not found');
+                throw new UnsupportedData('Measure not found');
             }
 
             $label = $this->stringifier->toString($measure->getLabel());
