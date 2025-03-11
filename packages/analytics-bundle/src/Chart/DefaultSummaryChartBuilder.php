@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\Util\TranslatableMessage;
-use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
 final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private LocaleSwitcher $localeSwitcher,
         private ChartBuilderInterface $chartBuilder,
+        private Stringifier $stringifier,
     ) {}
 
     #[\Override]
@@ -44,7 +44,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
             /** @psalm-suppress MixedAssignment */
             $member = array_shift($members);
-            $labels[] = $this->stringify($member);
+            $labels[] = $this->stringifier->toString($member);
 
             $measures = $row->getMeasures();
             $measure = array_shift($measures);
@@ -53,7 +53,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                 throw new \InvalidArgumentException('Measure not found');
             }
 
-            $label = $this->stringify($measure->getLabel());
+            $label = $this->stringifier->toString($measure->getLabel());
 
             $data[] = $measure->getNumericValue();
         }
@@ -72,7 +72,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         $chart->setOptions([
             'responsive' => true,
-            'locale' => $this->translator->getLocale(),
+            'locale' => $this->localeSwitcher->getLocale(),
             'plugins' => [
                 'legend' => [
                     'display' => true,
@@ -86,51 +86,5 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         ]);
 
         return $chart;
-    }
-
-    private function stringify(mixed $input): string
-    {
-        if ($input instanceof TranslatableInterface) {
-            return $input->trans($this->translator);
-        }
-
-        if ($input instanceof \Stringable) {
-            return (string) $input;
-        }
-
-        if (\is_string($input)) {
-            return $input;
-        }
-
-        if (\is_int($input)) {
-            return (string) $input;
-        }
-
-        if (\is_float($input)) {
-            return (string) $input;
-        }
-
-        if ($input instanceof \BackedEnum) {
-            return (string) $input->value;
-        }
-
-        if ($input instanceof \UnitEnum) {
-            return $input->name;
-        }
-
-        if (\is_bool($input)) {
-            return $input ?
-                (new TranslatableMessage('True'))->trans($this->translator) : (new TranslatableMessage('False'))->trans($this->translator);
-        }
-
-        if (\is_object($input)) {
-            return \sprintf('%s:%s', $input::class, spl_object_id($input));
-        }
-
-        if ($input === null) {
-            return '-';
-        }
-
-        return get_debug_type($input);
     }
 }
