@@ -25,6 +25,7 @@ final readonly class DefaultMeasure implements Measure
         private mixed $value,
         private mixed $rawValue,
         private int|float $numericValue,
+        private ?string $unit,
     ) {}
 
     public static function createFromResultValue(ResultValue $resultValue): self
@@ -35,6 +36,7 @@ final readonly class DefaultMeasure implements Measure
             value: $resultValue->getValue(),
             rawValue: $resultValue->getRawValue(),
             numericValue: $resultValue->getNumericValue(),
+            unit: $resultValue->getUnit(),
         );
     }
 
@@ -66,5 +68,11 @@ final readonly class DefaultMeasure implements Measure
     public function getNumericValue(): int|float
     {
         return $this->numericValue;
+    }
+
+    #[\Override]
+    public function getUnit(): ?string
+    {
+        return $this->unit;
     }
 }

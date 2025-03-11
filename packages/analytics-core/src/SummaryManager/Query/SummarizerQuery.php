@@ -129,6 +129,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // hydrate into summary object
         $result = QueryResultToRowTransformer::transform(
+            query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,

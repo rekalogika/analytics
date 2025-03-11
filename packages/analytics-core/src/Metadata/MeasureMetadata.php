@@ -27,6 +27,7 @@ final readonly class MeasureMetadata
         private string $summaryProperty,
         private string|TranslatableInterface $label,
         private NumericValueResolver $numericValueResolver,
+        private ?string $unit,
     ) {}
 
     /**
@@ -57,6 +58,11 @@ final readonly class MeasureMetadata
     public function getNumericValueResolver(): NumericValueResolver
     {
         return $this->numericValueResolver;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
     }
 
     /**

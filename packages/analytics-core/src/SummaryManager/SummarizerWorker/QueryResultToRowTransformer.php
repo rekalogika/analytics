@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\NumericValueResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -26,6 +27,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class QueryResultToRowTransformer
 {
     private function __construct(
+        private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
@@ -36,12 +38,18 @@ final readonly class QueryResultToRowTransformer
      * @return iterable<ResultRow>
      */
     public static function transform(
+        SummaryQuery $query,
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
         array $input,
     ): iterable {
-        $transformer = new self($metadata, $entityManager, $propertyAccessor);
+        $transformer = new self(
+            query: $query,
+            metadata: $metadata,
+            entityManager: $entityManager,
+            propertyAccessor: $propertyAccessor,
+        );
 
         return $transformer->doTransform($input);
     }
@@ -67,6 +75,7 @@ final readonly class QueryResultToRowTransformer
         $summaryClassName = $this->metadata->getSummaryClass();
         $reflectionClass = new \ReflectionClass($summaryClassName);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
+        $measures = $this->query->getSelect();
 
         $groupings = null;
         $measureValues = [];
@@ -83,6 +92,10 @@ final readonly class QueryResultToRowTransformer
             }
 
             $isMeasure = $this->isMeasure($key);
+
+            if ($isMeasure && !\in_array($key, $measures, true)) {
+                continue;
+            }
 
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->resolveValue(
@@ -104,10 +117,15 @@ final readonly class QueryResultToRowTransformer
             /** @todo separate ResultValue for measure & dimension */
             if ($isMeasure) {
                 $numericValueResolver = $this->getNumericValueResolver($key);
+
                 $numericValue = $numericValueResolver->resolveNumericValue(
                     value: $value,
                     rawValue: $rawValue,
                 );
+
+                $unit = $this->metadata
+                    ->getMeasureMetadata($key)
+                    ->getUnit();
 
                 $resultValue = new ResultValue(
                     field: $key,
@@ -115,6 +133,7 @@ final readonly class QueryResultToRowTransformer
                     value: $value,
                     label: $this->getLabel($key),
                     numericValue: $numericValue,
+                    unit: $unit,
                 );
 
                 $measureValues[$key] = $resultValue;
@@ -125,6 +144,7 @@ final readonly class QueryResultToRowTransformer
                     value: $value,
                     label: $this->getLabel($key),
                     numericValue: 0,
+                    unit: null,
                 );
 
                 $dimensionValues[$key] = $resultValue;
