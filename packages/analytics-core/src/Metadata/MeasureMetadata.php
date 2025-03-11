@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\AggregateFunction;
+use Rekalogika\Analytics\NumericValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata
@@ -25,6 +26,7 @@ final readonly class MeasureMetadata
         private array $function,
         private string $summaryProperty,
         private string|TranslatableInterface $label,
+        private NumericValueResolver $numericValueResolver,
     ) {}
 
     /**
@@ -50,6 +52,11 @@ final readonly class MeasureMetadata
     public function getLabel(): string|TranslatableInterface
     {
         return $this->label;
+    }
+
+    public function getNumericValueResolver(): NumericValueResolver
+    {
+        return $this->numericValueResolver;
     }
 
     /**

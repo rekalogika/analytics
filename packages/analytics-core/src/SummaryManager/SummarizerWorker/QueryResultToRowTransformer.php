@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\NumericValueResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
@@ -90,10 +91,6 @@ final readonly class QueryResultToRowTransformer
                 value: $rawValue,
             );
 
-            if ($isMeasure) {
-                $rawValue = $this->castToNumber($rawValue);
-            }
-
             $this->injectValueToObject(
                 object: $summaryObject,
                 reflectionClass: $reflectionClass,
@@ -104,16 +101,32 @@ final readonly class QueryResultToRowTransformer
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
-            $resultValue = new ResultValue(
-                field: $key,
-                rawValue: $rawValue,
-                value: $value,
-                label: $this->getLabel($key),
-            );
-
+            /** @todo separate ResultValue for measure & dimension */
             if ($isMeasure) {
+                $numericValueResolver = $this->getNumericValueResolver($key);
+                $numericValue = $numericValueResolver->resolveNumericValue(
+                    value: $value,
+                    rawValue: $rawValue,
+                );
+
+                $resultValue = new ResultValue(
+                    field: $key,
+                    rawValue: $rawValue,
+                    value: $value,
+                    label: $this->getLabel($key),
+                    numericValue: $numericValue,
+                );
+
                 $measureValues[$key] = $resultValue;
             } else {
+                $resultValue = new ResultValue(
+                    field: $key,
+                    rawValue: $rawValue,
+                    value: $value,
+                    label: $this->getLabel($key),
+                    numericValue: 0,
+                );
+
                 $dimensionValues[$key] = $resultValue;
             }
         }
@@ -347,20 +360,6 @@ final readonly class QueryResultToRowTransformer
         return $class;
     }
 
-    private function castToNumber(mixed $value): int|float|null
-    {
-        if (\is_int($value) || \is_float($value)) {
-            return $value;
-        }
-
-        if (is_numeric($value)) {
-            /** @psalm-suppress InvalidOperand */
-            return $value + 0;
-        }
-
-        return null;
-    }
-
     private function isMeasure(string $key): bool
     {
         return $this->metadata->isMeasure($key);
@@ -392,5 +391,12 @@ final readonly class QueryResultToRowTransformer
                     ->getLabel(),
             ],
         );
+    }
+
+    private function getNumericValueResolver(string $key): NumericValueResolver
+    {
+        $metadata = $this->metadata->getMeasureMetadata($key);
+
+        return $metadata->getNumericValueResolver();
     }
 }

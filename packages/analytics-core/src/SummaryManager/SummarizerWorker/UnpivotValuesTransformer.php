@@ -139,11 +139,13 @@ final class UnpivotValuesTransformer
 
             $measureLabel = $this->getMeasureDescription($measure);
 
+            /** @todo change to dedicated class for values */
             $newRow['@values'] = new ResultValue(
                 field: '@values',
                 rawValue: $measureLabel,
                 value: $measureLabel,
                 label: $this->valuesLabel,
+                numericValue: 0,
             );
 
             /** @var non-empty-array<string,ResultValue> $newRow */

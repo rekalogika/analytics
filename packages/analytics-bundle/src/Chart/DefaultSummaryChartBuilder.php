@@ -54,7 +54,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
             $label = $this->stringify($measure->getLabel());
 
-            $data[] = $measure->getRawValue();
+            $data[] = $measure->getNumericValue();
         }
 
         $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
