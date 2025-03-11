@@ -506,6 +506,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     ): MeasureMetadata {
         $function = $measureAttribute->getFunction();
         $numericValueResolver = $measureAttribute->getNumericValueResolver();
+        $unit = $measureAttribute->getUnit();
 
         if (!\is_array($function)) {
             $newFunction = [];
@@ -534,6 +535,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             summaryProperty: $property,
             label: $measureAttribute->getLabel() ?? $property,
             numericValueResolver: $numericValueResolver,
+            unit: $unit,
         );
     }
 

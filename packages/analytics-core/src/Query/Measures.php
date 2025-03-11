@@ -14,13 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * Represent a row in a table
+ * Collection of measures
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<string,Measure>
  */
-interface Row
+interface Measures extends \Traversable, \Countable
 {
-    public function getTuple(): Tuple;
-
-    public function getMeasures(): Measures;
+    /**
+     * @throws \InvalidArgumentException
+     */
+    public function get(string $key): Measure;
 }

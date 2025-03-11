@@ -31,4 +31,6 @@ interface Measure
     public function getRawValue(): mixed;
 
     public function getNumericValue(): int|float;
+
+    public function getUnit(): ?string;
 }

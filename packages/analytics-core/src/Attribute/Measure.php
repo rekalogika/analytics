@@ -28,6 +28,7 @@ final readonly class Measure
         private AggregateFunction|array $function,
         private null|string|TranslatableInterface $label = null,
         private NumericValueResolver $numericValueResolver = new Identity(),
+        private ?string $unit = null,
     ) {
         // if function is array, make sure all values are of the same class
 
@@ -60,5 +61,10 @@ final readonly class Measure
     public function getNumericValueResolver(): NumericValueResolver
     {
         return $this->numericValueResolver;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
     }
 }

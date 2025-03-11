@@ -27,6 +27,7 @@ final readonly class ResultValue
         private mixed $value,
         private mixed $rawValue,
         private int|float $numericValue,
+        private ?string $unit,
     ) {}
 
     public function isSame(self $other): bool
@@ -58,5 +59,10 @@ final readonly class ResultValue
     public function getNumericValue(): int|float
     {
         return $this->numericValue;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
     }
 }
