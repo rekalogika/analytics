@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Chart;
 
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\Util\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -89,7 +90,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
     private function stringify(mixed $input): string
     {
-        if ($input instanceof TranslatableMessage) {
+        if ($input instanceof TranslatableInterface) {
             return $input->trans($this->translator);
         }
 
