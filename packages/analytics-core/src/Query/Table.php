@@ -14,13 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * Represents a query result.
+ * A query result in tabular format
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<int,Row>
  */
-interface Result
-{
-    public function getTree(): TreeResult;
-
-    public function getTable(): Table;
-}
+interface Table extends \Traversable {}

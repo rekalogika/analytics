@@ -23,8 +23,10 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultResult;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\DefaultTreeResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -114,8 +116,12 @@ final class SummarizerQuery extends AbstractQuery
         // check if select is empty
         if ($this->query->getSelect() === []) {
             $treeResult = new DefaultTreeResult(children: []);
+            $table = new DefaultTable([]);
 
-            return new DefaultResult(treeResult: $treeResult);
+            return new DefaultResult(
+                treeResult: $treeResult,
+                table: $table,
+            );
         }
 
         // execute doctrine query
@@ -128,6 +134,17 @@ final class SummarizerQuery extends AbstractQuery
             propertyAccessor: $this->propertyAccessor,
             input: $result,
         );
+
+
+        // create table result
+
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var list<ResultRow>
+         * */
+        $result = array_values(iterator_to_array($result));
+
+        $table = DefaultTable::fromResultRows($result);
 
         // unpivot result
         $result = UnpivotValuesTransformer::transform(
@@ -145,7 +162,10 @@ final class SummarizerQuery extends AbstractQuery
         // wrap the result using our SummaryResult class
         $treeResult = new DefaultTreeResult(children: $result);
 
-        return new DefaultResult(treeResult: $treeResult);
+        return new DefaultResult(
+            treeResult: $treeResult,
+            table: $table,
+        );
     }
 
     private function hasTieredOrder(): bool

@@ -11,20 +11,31 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\Result;
+use Rekalogika\Analytics\Query\Table;
 use Rekalogika\Analytics\Query\TreeResult;
 
+/**
+ * @internal
+ */
 final readonly class DefaultResult implements Result
 {
     public function __construct(
-        private readonly TreeResult $treeResult,
+        private readonly DefaultTreeResult $treeResult,
+        private readonly DefaultTable $table,
     ) {}
 
     #[\Override]
     public function getTree(): TreeResult
     {
         return $this->treeResult;
+    }
+
+    #[\Override]
+    public function getTable(): Table
+    {
+        return $this->table;
     }
 }

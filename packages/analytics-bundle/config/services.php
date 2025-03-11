@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
+use Rekalogika\Analytics\Bundle\Chart\DefaultSummaryChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\SummaryChartBuilder;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
@@ -42,6 +44,7 @@ use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -280,6 +283,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(PivotAwareSummaryQueryFactory::class)
         ->args([
             '$translator' => service('translator'),
+        ])
+    ;
+
+    $services
+        ->set(SummaryChartBuilder::class)
+        ->class(DefaultSummaryChartBuilder::class)
+        ->args([
+            '$translator' => service('translator'),
+            '$chartBuilder' => service(ChartBuilderInterface::class),
         ])
     ;
 };
