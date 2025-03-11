@@ -17,14 +17,16 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @internal
+ * @todo deprecate, split into one for each of measure, dimension & values
  */
 final readonly class ResultValue
 {
     public function __construct(
-        private readonly TranslatableInterface|string $label,
-        private readonly string $field,
-        private readonly mixed $value,
-        private readonly mixed $rawValue,
+        private TranslatableInterface|string $label,
+        private string $field,
+        private mixed $value,
+        private mixed $rawValue,
+        private int|float $numericValue,
     ) {}
 
     public function isSame(self $other): bool
@@ -51,5 +53,10 @@ final readonly class ResultValue
     public function getRawValue(): mixed
     {
         return $this->rawValue;
+    }
+
+    public function getNumericValue(): int|float
+    {
+        return $this->numericValue;
     }
 }

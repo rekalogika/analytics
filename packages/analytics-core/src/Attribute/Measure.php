@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Attribute;
 
 use Rekalogika\Analytics\AggregateFunction;
+use Rekalogika\Analytics\NumericValueResolver;
+use Rekalogika\Analytics\NumericValueResolver\Identity;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -25,6 +27,7 @@ final readonly class Measure
     public function __construct(
         private AggregateFunction|array $function,
         private null|string|TranslatableInterface $label = null,
+        private NumericValueResolver $numericValueResolver = new Identity(),
     ) {
         // if function is array, make sure all values are of the same class
 
@@ -52,5 +55,10 @@ final readonly class Measure
     public function getLabel(): null|string|TranslatableInterface
     {
         return $this->label;
+    }
+
+    public function getNumericValueResolver(): NumericValueResolver
+    {
+        return $this->numericValueResolver;
     }
 }

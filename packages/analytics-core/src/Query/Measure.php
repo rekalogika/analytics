@@ -28,5 +28,7 @@ interface Measure
 
     public function getValue(): mixed;
 
-    public function getRawValue(): int|float;
+    public function getRawValue(): mixed;
+
+    public function getNumericValue(): int|float;
 }

@@ -23,7 +23,8 @@ final readonly class DefaultMeasure implements Measure
         private string|TranslatableInterface $label,
         private string $key,
         private mixed $value,
-        private int|float $rawValue,
+        private mixed $rawValue,
+        private int|float $numericValue,
     ) {}
 
     public static function createFromResultValue(ResultValue $resultValue): self
@@ -39,6 +40,7 @@ final readonly class DefaultMeasure implements Measure
             key: $resultValue->getField(),
             value: $resultValue->getValue(),
             rawValue: $rawValue,
+            numericValue: $resultValue->getNumericValue(),
         );
     }
 
@@ -61,8 +63,14 @@ final readonly class DefaultMeasure implements Measure
     }
 
     #[\Override]
-    public function getRawValue(): int|float
+    public function getRawValue(): mixed
     {
         return $this->rawValue;
+    }
+
+    #[\Override]
+    public function getNumericValue(): int|float
+    {
+        return $this->numericValue;
     }
 }
