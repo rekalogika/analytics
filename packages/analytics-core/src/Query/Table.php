@@ -20,4 +20,7 @@ namespace Rekalogika\Analytics\Query;
  *
  * @extends \Traversable<int,Row>
  */
-interface Table extends \Traversable {}
+interface Table extends \Traversable, \Countable
+{
+    public function getFirstRow(): ?Row;
+}

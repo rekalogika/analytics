@@ -75,27 +75,21 @@ final readonly class QueryResultToRowTransformer
         $summaryClassName = $this->metadata->getSummaryClass();
         $reflectionClass = new \ReflectionClass($summaryClassName);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
+
+        //
+        // process measures
+        //
+
         $measures = $this->query->getSelect();
-
-        $groupings = null;
         $measureValues = [];
-        $dimensionValues = [];
 
-        /**
-         * @var mixed $rawValue
-         */
-        foreach ($input as $key => $rawValue) {
-            if ($key === '__grouping') {
-                /** @var string */
-                $groupings = $rawValue;
-                continue;
+        foreach ($measures as $key) {
+            if (!\array_key_exists($key, $input)) {
+                throw new \LogicException(\sprintf('Measure "%s" not found', $key));
             }
 
-            $isMeasure = $this->isMeasure($key);
-
-            if ($isMeasure && !\in_array($key, $measures, true)) {
-                continue;
-            }
+            /** @psalm-suppress MixedAssignment */
+            $rawValue = $input[$key];
 
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->resolveValue(
@@ -114,45 +108,86 @@ final readonly class QueryResultToRowTransformer
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
-            /** @todo separate ResultValue for measure & dimension */
-            if ($isMeasure) {
-                $numericValueResolver = $this->getNumericValueResolver($key);
+            $numericValueResolver = $this->getNumericValueResolver($key);
 
-                $numericValue = $numericValueResolver->resolveNumericValue(
-                    value: $value,
-                    rawValue: $rawValue,
-                );
+            $numericValue = $numericValueResolver->resolveNumericValue(
+                value: $value,
+                rawValue: $rawValue,
+            );
 
-                $unit = $this->metadata
-                    ->getMeasureMetadata($key)
-                    ->getUnit();
+            $unit = $this->metadata
+                ->getMeasureMetadata($key)
+                ->getUnit();
 
-                $resultValue = new ResultValue(
-                    field: $key,
-                    rawValue: $rawValue,
-                    value: $value,
-                    label: $this->getLabel($key),
-                    numericValue: $numericValue,
-                    unit: $unit,
-                );
+            $resultValue = new ResultValue(
+                field: $key,
+                rawValue: $rawValue,
+                value: $value,
+                label: $this->getLabel($key),
+                numericValue: $numericValue,
+                unit: $unit,
+            );
 
-                $measureValues[$key] = $resultValue;
-            } else {
-                $resultValue = new ResultValue(
-                    field: $key,
-                    rawValue: $rawValue,
-                    value: $value,
-                    label: $this->getLabel($key),
-                    numericValue: 0,
-                    unit: null,
-                );
-
-                $dimensionValues[$key] = $resultValue;
-            }
+            $measureValues[$key] = $resultValue;
         }
 
-        if ($groupings === null) {
-            throw new \LogicException('Groupings not found');
+        //
+        // process grouping
+        //
+
+        /** @psalm-suppress MixedAssignment */
+        $groupings = $input['__grouping'] ?? throw new \LogicException('Grouping not found');
+
+        if (!\is_string($groupings)) {
+            throw new \LogicException('Grouping is not a string');
+        }
+
+        //
+        // process dimensions
+        //
+
+        $dimensionValues = [];
+        $dimensions = $this->query->getGroupBy();
+
+        foreach ($dimensions as $key) {
+            if ($key === '@values') {
+                continue;
+            }
+
+            if (!\array_key_exists($key, $input)) {
+                throw new \LogicException(\sprintf('Dimension "%s" not found', $key));
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            $rawValue = $input[$key];
+
+            /** @psalm-suppress MixedAssignment */
+            $rawValue = $this->resolveValue(
+                reflectionClass: $reflectionClass,
+                propertyName: $key,
+                value: $rawValue,
+            );
+
+            $this->injectValueToObject(
+                object: $summaryObject,
+                reflectionClass: $reflectionClass,
+                propertyName: $key,
+                value: $rawValue,
+            );
+
+            /** @psalm-suppress MixedAssignment */
+            $value = $this->propertyAccessor->getValue($summaryObject, $key);
+
+            $resultValue = new ResultValue(
+                field: $key,
+                rawValue: $rawValue,
+                value: $value,
+                label: $this->getLabel($key),
+                numericValue: 0,
+                unit: null,
+            );
+
+            $dimensionValues[$key] = $resultValue;
         }
 
         return new ResultRow(
@@ -378,11 +413,6 @@ final readonly class QueryResultToRowTransformer
         }
 
         return $class;
-    }
-
-    private function isMeasure(string $key): bool
-    {
-        return $this->metadata->isMeasure($key);
     }
 
     private function getLabel(string $field): TranslatableInterface|string
