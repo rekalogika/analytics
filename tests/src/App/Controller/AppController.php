@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Rekalogika\Analytics\Bundle\Chart\SummaryChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
@@ -73,7 +74,7 @@ final class AppController extends AbstractController
         // create chart
         try {
             $chart = $summaryChartBuilder->createChart($query->getResult());
-        } catch (\Throwable $e) {
+        } catch (UnsupportedData $e) {
             $chart = null;
         }
 

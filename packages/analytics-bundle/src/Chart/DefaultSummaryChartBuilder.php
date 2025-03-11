@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
+use Colors\RandomColor;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Query\Measures;
 use Rekalogika\Analytics\Query\Result;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -31,9 +33,29 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
     public function createChart(
         Result $result,
     ): Chart {
+        $measures = $result->getTable()->getFirstRow()?->getMeasures();
+
+        if ($measures === null) {
+            throw new UnsupportedData('Measures not found');
+        }
+
+        $selectedMeasures = $this->selectMeasures($measures);
+
         $labels = [];
-        $data = [];
+        $dataSets = [];
         $label = null;
+
+        // populate labels
+
+        foreach ($selectedMeasures as $key) {
+            $measure = $measures->get($key);
+
+            $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
+            $dataSets[$key]['data'] = [];
+            $dataSets[$key]['backgroundColor'] = $this->dispenseColor();
+        }
+
+        // populate data
 
         foreach ($result->getTable() as $row) {
             $members = $row->getTuple()->getMembers();
@@ -47,27 +69,19 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $labels[] = $this->stringifier->toString($member);
 
             $measures = $row->getMeasures();
-            $measure = array_shift($measures);
 
-            if ($measure === null) {
-                throw new UnsupportedData('Measure not found');
+            foreach ($selectedMeasures as $key) {
+                $measure = $measures->get($key);
+
+                $dataSets[$key]['data'][] = $measure->getNumericValue();
             }
-
-            $label = $this->stringifier->toString($measure->getLabel());
-
-            $data[] = $measure->getNumericValue();
         }
 
         $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
 
         $chart->setData([
             'labels' => $labels,
-            'datasets' => [
-                [
-                    'label' => $label,
-                    'data' => $data,
-                ],
-            ],
+            'datasets' => array_values($dataSets),
         ]);
 
         $chart->setOptions([
@@ -79,12 +93,53 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                     'position' => 'top',
                 ],
                 'title' => [
-                    'display' => true,
-                    'text' => $label,
+                    'display' => false,
                 ],
             ],
         ]);
 
         return $chart;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function selectMeasures(Measures $measures): array
+    {
+        $selectedMeasures = [];
+        $selectedUnit = null;
+
+        foreach ($measures as $measure) {
+            $unit = $measure->getUnit();
+
+            if ($selectedMeasures === [] && $unit === null) {
+                return [$measure->getKey()];
+            }
+
+            if ($selectedUnit === null) {
+                $selectedUnit = $unit;
+            }
+
+            if ($selectedUnit === $unit) {
+                $selectedMeasures[] = $measure->getKey();
+            } else {
+                break;
+            }
+        }
+
+        return $selectedMeasures;
+    }
+
+    private function dispenseColor(): string
+    {
+        $color = RandomColor::one([
+            'alpha' => 0.5,
+        ]);
+
+        if (!\is_string($color)) {
+            throw new \LogicException('Failed to generate color');
+        }
+
+        return $color;
     }
 }

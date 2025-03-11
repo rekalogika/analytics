@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Query\Row;
 use Rekalogika\Analytics\Query\Table;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
 
@@ -51,6 +52,18 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         return new self(
             rows: $rows,
         );
+    }
+
+    #[\Override]
+    public function getFirstRow(): ?Row
+    {
+        return $this->rows[0] ?? null;
+    }
+
+    #[\Override]
+    public function count(): int
+    {
+        return \count($this->rows);
     }
 
     #[\Override]
