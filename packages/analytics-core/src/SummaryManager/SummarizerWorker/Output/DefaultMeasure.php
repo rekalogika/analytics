@@ -29,17 +29,11 @@ final readonly class DefaultMeasure implements Measure
 
     public static function createFromResultValue(ResultValue $resultValue): self
     {
-        $rawValue = $resultValue->getRawValue();
-
-        if (!\is_int($rawValue) && !\is_float($rawValue)) {
-            throw new \InvalidArgumentException('Raw value must be an integer or float');
-        }
-
         return new self(
             label: $resultValue->getLabel(),
             key: $resultValue->getField(),
             value: $resultValue->getValue(),
-            rawValue: $rawValue,
+            rawValue: $resultValue->getRawValue(),
             numericValue: $resultValue->getNumericValue(),
         );
     }
