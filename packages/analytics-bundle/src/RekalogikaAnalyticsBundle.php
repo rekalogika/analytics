@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -51,6 +52,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
             ->addTag('rekalogika.analytics.distinct_values_resolver');
+
+        $builder->registerForAutoconfiguration(Stringifier::class)
+            ->addTag('rekalogika.analytics.stringifier');
     }
 
     /**

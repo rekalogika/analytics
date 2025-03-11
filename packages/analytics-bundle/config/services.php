@@ -21,6 +21,10 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\Formatter\ChainStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\DefaultStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
@@ -47,6 +51,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
@@ -290,8 +295,38 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(SummaryChartBuilder::class)
         ->class(DefaultSummaryChartBuilder::class)
         ->args([
-            '$translator' => service('translator'),
+            '$localeSwitcher' => service('translation.locale_switcher'),
             '$chartBuilder' => service(ChartBuilderInterface::class),
+            '$stringifier' => service(Stringifier::class),
+        ])
+    ;
+
+    //
+    // stringifier
+    //
+
+    $services
+        ->set(DefaultStringifier::class)
+        ->tag('rekalogika.analytics.stringifier', [
+            'priority' => -1000,
+        ])
+    ;
+
+    $services
+        ->set(TranslatableStringifier::class)
+        ->args([
+            '$translator' => service('translator'),
+        ])
+        ->tag('rekalogika.analytics.stringifier', [
+            'priority' => -900,
+        ])
+    ;
+
+    $services
+        ->set(Stringifier::class)
+        ->class(ChainStringifier::class)
+        ->args([
+            '$stringifiers' => tagged_iterator('rekalogika.analytics.stringifier'),
         ])
     ;
 };
