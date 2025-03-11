@@ -17,13 +17,17 @@ use Rekalogika\Analytics\NumericValueResolver;
 
 final readonly class DivideBy implements NumericValueResolver
 {
+    private float $divider;
+
     /**
-     * @param int|float $divider
+     * @param numeric $divider
      */
     public function __construct(
-        private int|float $divider,
+        int|float|string $divider,
     ) {
-        if (0 === $this->divider || 0.0 === $this->divider) {
+        $this->divider = (float) $divider;
+
+        if ($this->divider === 0.0) {
             throw new \InvalidArgumentException('Divider cannot be zero.');
         }
     }
@@ -32,11 +36,11 @@ final readonly class DivideBy implements NumericValueResolver
     public function resolveNumericValue(mixed $value, mixed $rawValue): int|float
     {
         if (is_numeric($value)) {
-            return (float) $value / (float) $this->divider;
+            return (float) $value / $this->divider;
         }
 
         if (is_numeric($rawValue)) {
-            return (float) $rawValue / (float) $this->divider;
+            return (float) $rawValue / $this->divider;
         }
 
         return 0;

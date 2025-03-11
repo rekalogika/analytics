@@ -17,19 +17,23 @@ use Rekalogika\Analytics\NumericValueResolver;
 
 final readonly class MultiplyBy implements NumericValueResolver
 {
+    private float $multiplier;
+
     public function __construct(
-        private int|float $multiplier,
-    ) {}
+        int|float|string $multiplier,
+    ) {
+        $this->multiplier = (float) $multiplier;
+    }
 
     #[\Override]
     public function resolveNumericValue(mixed $value, mixed $rawValue): int|float
     {
         if (is_numeric($value)) {
-            return (float) $value * (float) $this->multiplier;
+            return (float) $value * $this->multiplier;
         }
 
         if (is_numeric($rawValue)) {
-            return (float) $rawValue * (float) $this->multiplier;
+            return (float) $rawValue * $this->multiplier;
         }
 
         return 0;
