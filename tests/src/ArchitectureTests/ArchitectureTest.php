@@ -132,6 +132,7 @@ final class ArchitectureTest
                 Selector::classname(ManagerRegistry::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\Exception::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\ReflectionClass::class),
