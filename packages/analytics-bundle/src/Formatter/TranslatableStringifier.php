@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Formatter;
 
 use Rekalogika\Analytics\Util\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class TranslatableStringifier implements Stringifier
@@ -25,7 +26,7 @@ final readonly class TranslatableStringifier implements Stringifier
     #[\Override]
     public function toString(mixed $input): ?string
     {
-        if ($input instanceof TranslatableMessage) {
+        if ($input instanceof TranslatableInterface) {
             return $input->trans($this->translator);
         }
 
