@@ -147,6 +147,7 @@ final class UnpivotValuesTransformer
                 label: $this->valuesLabel,
                 numericValue: 0,
                 unit: null,
+                unitSignature: null,
             );
 
             /** @var non-empty-array<string,ResultValue> $newRow */
