@@ -14,20 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * Collection of measures
+ * Represent a normalized row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
- *
- * @extends \Traversable<string,Measure>
  */
-interface Measures extends \Traversable, \Countable
+interface NormalRow
 {
-    /**
-     * @throws \InvalidArgumentException
-     */
-    public function get(string $key): Measure;
+    public function getTuple(): Tuple;
 
-    public function first(): ?Measure;
-
-    public function has(string $key): bool;
+    public function getMeasure(): Measure;
 }

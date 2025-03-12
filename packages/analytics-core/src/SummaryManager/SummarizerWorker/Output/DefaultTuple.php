@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Query\Dimensions;
 use Rekalogika\Analytics\Query\Tuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**
  * @implements \IteratorAggregate<string,Dimension>
@@ -62,6 +63,12 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
+    public function has(string $key): bool
+    {
+        return $this->dimensions->has($key);
+    }
+
+    #[\Override]
     public function count(): int
     {
         return $this->dimensions->count();
@@ -77,5 +84,23 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     public function first(): ?Dimension
     {
         return $this->dimensions->first();
+    }
+
+    #[\Override]
+    public function isSame(Tuple $other): bool
+    {
+        foreach ($this->dimensions as $key => $dimension) {
+            if (!$other->has($key)) {
+                return false;
+            }
+
+            $otherDimension = $other->get($key);
+
+            if (!DimensionUtil::isSame($dimension, $otherDimension)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

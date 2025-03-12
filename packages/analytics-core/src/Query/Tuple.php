@@ -24,4 +24,6 @@ interface Tuple extends Dimensions
      * @return array<string,mixed>
      */
     public function getMembers(): array;
+
+    public function isSame(self $other): bool;
 }

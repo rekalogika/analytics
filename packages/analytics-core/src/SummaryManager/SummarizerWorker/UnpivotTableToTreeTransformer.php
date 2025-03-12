@@ -13,28 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\Query\Dimension;
+use Rekalogika\Analytics\Query\Measure;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 
 final class UnpivotTableToTreeTransformer
 {
     /**
-     * @param iterable<ResultUnpivotRow> $rows
      * @param 'tree'|'table' $type
-     * @return list<DefaultTreeNode>
      */
     public static function transform(
-        iterable $rows,
+        DefaultNormalTable $normalTable,
         string $type,
-    ): array {
+    ): DefaultTreeResult {
         $transformer = new self();
 
-        return match ($type) {
-            'tree' => $transformer->transformToTree($rows),
-            'table' => $transformer->transformToTable($rows),
+        $rootNodes = match ($type) {
+            'tree' => $transformer->transformToTree($normalTable),
+            'table' => $transformer->transformToTable($normalTable),
         };
+
+        return new DefaultTreeResult(children: $rootNodes);
     }
 
     /**
@@ -48,15 +49,15 @@ final class UnpivotTableToTreeTransformer
     private array $tree = [];
 
     private function addDimension(
-        ResultValue $resultValue,
+        Dimension $dimension,
         int $columnNumber,
         bool $forceCreate,
     ): void {
         $node = DefaultTreeNode::createBranchNode(
-            key: $resultValue->getField(),
-            label: $resultValue->getLabel(),
-            member: $resultValue->getValue(),
-            rawMember: $resultValue->getRawValue(),
+            key: $dimension->getKey(),
+            label: $dimension->getLabel(),
+            member: $dimension->getMember(),
+            rawMember: $dimension->getRawMember(),
         );
 
         $current = $this->currentPath[$columnNumber] ?? null;
@@ -83,26 +84,26 @@ final class UnpivotTableToTreeTransformer
     }
 
     private function addMeasure(
-        ResultValue $lastResultValue,
-        ResultValue $resultValue,
+        Dimension $lastDimension,
+        Measure $measure,
         int $columnNumber,
     ): void {
         /** @psalm-suppress MixedAssignment */
-        $rawValue = $resultValue->getRawValue();
+        $rawValue = $measure->getRawValue();
 
         if (!\is_int($rawValue) && !\is_float($rawValue)) {
             $rawValue = 0;
         }
 
         $node = DefaultTreeNode::createLeafNode(
-            key: $lastResultValue->getField(),
-            label: $lastResultValue->getLabel(),
-            member: $lastResultValue->getValue(),
-            rawMember: $lastResultValue->getRawValue(),
-            value: $resultValue->getValue(),
+            key: $lastDimension->getKey(),
+            label: $lastDimension->getLabel(),
+            member: $lastDimension->getMember(),
+            rawMember: $lastDimension->getRawMember(),
+            value: $measure->getValue(),
             rawValue: $rawValue,
-            numericValue: $resultValue->getNumericValue(),
-            unit: DefaultUnit::createFromResultValue($resultValue),
+            numericValue: $measure->getNumericValue(),
+            unit: $measure->getUnit(),
         );
 
         if ($columnNumber === 0) {
@@ -123,27 +124,26 @@ final class UnpivotTableToTreeTransformer
     }
 
     /**
-     * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultTreeNode>
      */
-    private function transformToTree(iterable $rows): array
+    private function transformToTree(DefaultNormalTable $normalTable): array
     {
         $this->currentPath = [];
         $this->tree = [];
 
-        foreach ($rows as $row) {
-            $dimensions = $row->getDimensions();
+        foreach ($normalTable as $row) {
+            $dimensions = $row->getTuple();
             $columnNumber = 0;
 
-            foreach ($dimensions as $resultValue) {
+            foreach ($dimensions as $dimension) {
                 // if last dimension
                 if ($columnNumber === \count($dimensions) - 1) {
-                    $this->addMeasure($resultValue, $row->getMeasure(), $columnNumber);
+                    $this->addMeasure($dimension, $row->getMeasure(), $columnNumber);
 
                     break;
                 }
 
-                $this->addDimension($resultValue, $columnNumber, false);
+                $this->addDimension($dimension, $columnNumber, false);
 
                 $columnNumber++;
             }
@@ -153,30 +153,30 @@ final class UnpivotTableToTreeTransformer
     }
 
     /**
-     * @param iterable<ResultUnpivotRow> $rows
      * @return list<DefaultTreeNode>
      */
-    private function transformToTable(iterable $rows): array
+    private function transformToTable(DefaultNormalTable $normalTable): array
     {
         $this->currentPath = [];
         $this->tree = [];
         $previousRow = null;
 
-        foreach ($rows as $row) {
-            $dimensions = $row->getDimensions();
+        foreach ($normalTable as $row) {
+            $dimensions = $row->getTuple();
+
             $columnNumber = 0;
             $sameAsPrevious = $previousRow !== null && $previousRow->hasSameTuple($row);
 
-            foreach ($dimensions as $resultValue) {
+            foreach ($dimensions as $dimension) {
                 // if last dimension
                 if ($columnNumber === \count($dimensions) - 1) {
-                    $this->addMeasure($resultValue, $row->getMeasure(), $columnNumber);
+                    $this->addMeasure($dimension, $row->getMeasure(), $columnNumber);
 
                     break;
                 }
 
                 if (!$sameAsPrevious) {
-                    $this->addDimension($resultValue, $columnNumber, true);
+                    $this->addDimension($dimension, $columnNumber, true);
                 }
 
                 $columnNumber++;

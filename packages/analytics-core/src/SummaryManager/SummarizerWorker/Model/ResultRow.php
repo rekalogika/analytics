@@ -72,4 +72,9 @@ final class ResultRow
     {
         return $this->tuple->isSame($other->tuple);
     }
+
+    public function getGroupings(): string
+    {
+        return $this->groupings;
+    }
 }

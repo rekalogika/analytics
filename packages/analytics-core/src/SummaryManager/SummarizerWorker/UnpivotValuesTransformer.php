@@ -14,11 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Query\Dimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescriptionFactory;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\ValueDimension;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -59,16 +64,12 @@ final class UnpivotValuesTransformer
         $this->measureDescriptionFactory = new MeasureDescriptionFactory();
     }
 
-    /**
-     * @param iterable<ResultRow> $input
-     * @return iterable<ResultUnpivotRow>
-     */
     public static function transform(
         SummaryQuery $summaryQuery,
-        iterable $input,
+        DefaultTable $input,
         SummaryMetadata $metadata,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
-    ): iterable {
+    ): DefaultNormalTable {
         $transformer = new self(
             summaryQuery: $summaryQuery,
             metadata: $metadata,
@@ -78,11 +79,7 @@ final class UnpivotValuesTransformer
         return $transformer->doTransform($input);
     }
 
-    /**
-     * @param iterable<ResultRow> $input
-     * @return iterable<ResultUnpivotRow>
-     */
-    private function doTransform(iterable $input): iterable
+    private function doTransform(DefaultTable $input): DefaultNormalTable
     {
         $rows = [];
 
@@ -99,22 +96,22 @@ final class UnpivotValuesTransformer
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
-        return $rows;
+        return new DefaultNormalTable($rows);
     }
 
     private function getMeasureSorterCallable(): callable
     {
         $measures = array_flip($this->measures);
 
-        return function (ResultUnpivotRow $row1, ResultUnpivotRow $row2) use ($measures): int {
-            return ResultUnpivotRow::compare($row1, $row2, $measures);
+        return function (DefaultNormalRow $row1, DefaultNormalRow $row2) use ($measures): int {
+            return DefaultNormalRow::compare($row1, $row2, $measures);
         };
     }
 
     /**
-     * @return iterable<ResultUnpivotRow>
+     * @return iterable<DefaultNormalRow>
      */
-    private function unpivotRow(ResultRow $row): iterable
+    private function unpivotRow(DefaultRow $row): iterable
     {
         $newRow = [];
 
@@ -124,8 +121,7 @@ final class UnpivotValuesTransformer
                 // be set in the next loop
                 $newRow['@values'] = true;
             } else {
-                /** @psalm-suppress MixedAssignment */
-                $newRow[$dimension] = $row->getDimensionMember($dimension);
+                $newRow[$dimension] = $row->getTuple()->get($dimension);
             }
         }
 
@@ -139,23 +135,19 @@ final class UnpivotValuesTransformer
 
             $measureLabel = $this->getMeasureDescription($measure);
 
-            /** @todo change to dedicated class for values */
-            $newRow['@values'] = new ResultValue(
-                field: '@values',
-                rawValue: $measureLabel,
-                value: $measureLabel,
-                label: $this->valuesLabel,
-                numericValue: 0,
-                unit: null,
-                unitSignature: null,
+            $newRow['@values'] = new ValueDimension(
+                valuesLabel: $this->valuesLabel,
+                measureLabel: $measureLabel,
             );
 
-            /** @var non-empty-array<string,ResultValue> $newRow */
+            /** @var array<string,Dimension> $newRow */
+            $dimensions = new DefaultDimensions($newRow);
+            $tuple = new DefaultTuple($dimensions);
 
-            yield new ResultUnpivotRow(
-                object: $row->getObject(),
-                dimensions: $newRow,
-                measure: $row->getMeasure($measure),
+            yield new DefaultNormalRow(
+                tuple: $tuple,
+                measure: $row->getMeasures()->get($measure),
+                groupings: $row->getGroupings(),
             );
         }
     }

@@ -57,6 +57,12 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
+    public function has(string $key): bool
+    {
+        return isset($this->measures[$key]);
+    }
+
+    #[\Override]
     public function count(): int
     {
         return \count($this->measures);

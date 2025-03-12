@@ -25,6 +25,7 @@ final readonly class DefaultRow implements Row
     public function __construct(
         private Tuple $tuple,
         private Measures $measures,
+        private string $groupings,
     ) {}
 
     public static function createFromResultRow(ResultRow $resultRow): self
@@ -41,6 +42,7 @@ final readonly class DefaultRow implements Row
         return new self(
             tuple: $tuple,
             measures: $measures,
+            groupings: $resultRow->getGroupings(),
         );
     }
 
@@ -54,5 +56,15 @@ final readonly class DefaultRow implements Row
     public function getMeasures(): Measures
     {
         return $this->measures;
+    }
+
+    public function getGroupings(): string
+    {
+        return $this->groupings;
+    }
+
+    public function isSubtotal(): bool
+    {
+        return substr_count($this->groupings, '1') !== 0;
     }
 }

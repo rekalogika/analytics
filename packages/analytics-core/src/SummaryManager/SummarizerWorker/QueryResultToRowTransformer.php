@@ -16,8 +16,14 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\NumericValueResolver;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
@@ -35,7 +41,6 @@ final readonly class QueryResultToRowTransformer
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return iterable<ResultRow>
      */
     public static function transform(
         SummaryQuery $query,
@@ -43,7 +48,7 @@ final readonly class QueryResultToRowTransformer
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
         array $input,
-    ): iterable {
+    ): DefaultTable {
         $transformer = new self(
             query: $query,
             metadata: $metadata,
@@ -51,25 +56,36 @@ final readonly class QueryResultToRowTransformer
             propertyAccessor: $propertyAccessor,
         );
 
-        return $transformer->doTransform($input);
+        $rows = $transformer->doTransform($input);
+
+        return new DefaultTable($rows);
     }
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return iterable<ResultRow>
+     * @return list<DefaultRow>
      */
-    private function doTransform(array $input): iterable
+    private function doTransform(array $input): array
     {
+        $rows = [];
+
         foreach ($input as $item) {
-            yield $this->transformOne($item);
+            $row = $this->transformOne($item);
+
+            if ($row->isSubtotal()) {
+                continue;
+            }
+
+            $rows[] = $row;
         }
+
+        return $rows;
     }
 
     /**
      * @param array<string,mixed> $input
-     * @return ResultRow
      */
-    public function transformOne(array $input): object
+    public function transformOne(array $input): DefaultRow
     {
         // create the object
         $summaryClassName = $this->metadata->getSummaryClass();
@@ -107,7 +123,6 @@ final readonly class QueryResultToRowTransformer
 
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
-
             $numericValueResolver = $this->getNumericValueResolver($key);
 
             $numericValue = $numericValueResolver->resolveNumericValue(
@@ -123,17 +138,21 @@ final readonly class QueryResultToRowTransformer
                 ->getMeasureMetadata($key)
                 ->getUnitSignature();
 
-            $resultValue = new ResultValue(
-                field: $key,
-                rawValue: $rawValue,
-                value: $value,
-                label: $this->getLabel($key),
-                numericValue: $numericValue,
-                unit: $unit,
-                unitSignature: $unitSignature,
+            $unit = DefaultUnit::create(
+                label: $unit,
+                signature: $unitSignature,
             );
 
-            $measureValues[$key] = $resultValue;
+            $measure = new DefaultMeasure(
+                label: $this->getLabel($key),
+                key: $key,
+                value: $value,
+                rawValue: $rawValue,
+                numericValue: $numericValue,
+                unit: $unit,
+            );
+
+            $measureValues[$key] = $measure;
         }
 
         //
@@ -183,24 +202,24 @@ final readonly class QueryResultToRowTransformer
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
-            $resultValue = new ResultValue(
-                field: $key,
-                rawValue: $rawValue,
-                value: $value,
+            $dimension = new DefaultDimension(
                 label: $this->getLabel($key),
-                numericValue: 0,
-                unit: null,
-                unitSignature: null,
+                key: $key,
+                member: $value,
+                rawMember: $rawValue,
             );
 
-            $dimensionValues[$key] = $resultValue;
+            $dimensionValues[$key] = $dimension;
         }
 
-        return new ResultRow(
-            object: $summaryObject,
+        $dimensions = new DefaultDimensions($dimensionValues);
+        $tuple = new DefaultTuple($dimensions);
+        $measures = new DefaultMeasures($measureValues);
+
+        return new DefaultRow(
+            tuple: $tuple,
+            measures: $measures,
             groupings: $groupings,
-            dimensions: $dimensionValues,
-            measures: $measureValues,
         );
     }
 

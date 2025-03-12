@@ -25,6 +25,20 @@ final readonly class DefaultUnit implements Unit
         private string $signature,
     ) {}
 
+    public static function create(
+        null|string|TranslatableInterface $label,
+        null|string $signature,
+    ): ?self {
+        if ($label === null || $signature === null) {
+            return null;
+        }
+
+        return new self(
+            label: $label,
+            signature: $signature,
+        );
+    }
+
     public static function createFromResultValue(ResultValue $resultValue): ?self
     {
         if ($resultValue->getUnit() === null) {
