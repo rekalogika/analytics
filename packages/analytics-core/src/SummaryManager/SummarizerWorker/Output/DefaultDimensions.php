@@ -41,15 +41,6 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
         $this->dimensions = $dimensionsArray;
     }
 
-
-    /**
-     * @param iterable<Dimension> $dimensions
-     */
-    public static function fromDimensions(iterable $dimensions): self
-    {
-        return new self($dimensions);
-    }
-
     #[\Override]
     public function first(): ?Dimension
     {

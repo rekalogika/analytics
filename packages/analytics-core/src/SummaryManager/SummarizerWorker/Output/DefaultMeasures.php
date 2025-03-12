@@ -41,14 +41,6 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
         $this->measures = $measuresArray;
     }
 
-    /**
-     * @param iterable<Measure> $measures
-     */
-    public static function fromMeasures(iterable $measures): self
-    {
-        return new self($measures);
-    }
-
     #[\Override]
     public function get(string $key): Measure
     {

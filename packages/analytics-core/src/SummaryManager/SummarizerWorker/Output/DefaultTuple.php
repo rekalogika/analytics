@@ -16,8 +16,6 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Query\Dimension;
 use Rekalogika\Analytics\Query\Dimensions;
 use Rekalogika\Analytics\Query\Tuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultTuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**
@@ -28,20 +26,6 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     public function __construct(
         private Dimensions $dimensions,
     ) {}
-
-    public static function fromResultTuple(ResultTuple $resultTuple): self
-    {
-        $dimensions = array_map(
-            static fn(ResultValue $value): mixed => DefaultDimension::createFromResultValue($value),
-            $resultTuple->getDimensions(),
-        );
-
-        $dimensions = new DefaultDimensions(
-            dimensions: $dimensions,
-        );
-
-        return new self($dimensions);
-    }
 
     #[\Override]
     public function getMembers(): array

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\Dimension;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultDimension implements Dimension
@@ -25,16 +24,6 @@ final readonly class DefaultDimension implements Dimension
         private mixed $member,
         private mixed $rawMember,
     ) {}
-
-    public static function createFromResultValue(ResultValue $resultValue): self
-    {
-        return new self(
-            label: $resultValue->getLabel(),
-            key: $resultValue->getField(),
-            member: $resultValue->getValue(),
-            rawMember: $resultValue->getRawValue(),
-        );
-    }
 
     #[\Override]
     public function getLabel(): string|TranslatableInterface

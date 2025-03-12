@@ -14,13 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\Unit;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DefaultUnit implements Unit
 {
-    public function __construct(
+    private function __construct(
         private string|TranslatableInterface $label,
         private string $signature,
     ) {}
@@ -36,19 +35,6 @@ final readonly class DefaultUnit implements Unit
         return new self(
             label: $label,
             signature: $signature,
-        );
-    }
-
-    public static function createFromResultValue(ResultValue $resultValue): ?self
-    {
-        if ($resultValue->getUnit() === null) {
-            return null;
-        }
-
-        return new self(
-            label: $resultValue->getUnit(),
-            signature: $resultValue->getUnitSignature()
-                ?? throw new \LogicException('Unit signature is required'),
         );
     }
 
