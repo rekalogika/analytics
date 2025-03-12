@@ -18,11 +18,9 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Attribute\Dimension;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
@@ -60,12 +58,6 @@ final class SummarizerQuery extends AbstractQuery
      */
     private array $dimensionAliases = [];
 
-    private readonly string $summaryProperty;
-
-    private readonly string $partitionLevelProperty;
-
-    private readonly string $partitionKeyProperty;
-
     /**
      * @var list<array<string, mixed>>|null
      */
@@ -86,15 +78,6 @@ final class SummarizerQuery extends AbstractQuery
         parent::__construct($queryBuilder);
 
         $this->entityManager = $this->queryBuilder->getEntityManager();
-
-        $this->summaryProperty = $this->metadata->getPartition()
-            ->getSummaryProperty();
-
-        $this->partitionLevelProperty = $this->metadata->getPartition()
-            ->getPartitionLevelProperty();
-
-        $this->partitionKeyProperty = $this->metadata->getPartition()
-            ->getPartitionKeyProperty();
 
         $dimensionsInQuery = $this->query->getGroupBy();
 
@@ -265,18 +248,30 @@ final class SummarizerQuery extends AbstractQuery
      */
     private function getRangeConditions(Partition $partition): iterable
     {
+        $summaryProperty = $this->metadata
+            ->getPartition()
+            ->getSummaryProperty();
+
+        $partitionLevelProperty = $this->metadata
+            ->getPartition()
+            ->getPartitionLevelProperty();
+
+        $partitionKeyProperty = $this->metadata
+            ->getPartition()
+            ->getPartitionKeyProperty();
+
         $higherPartition = $partition->getContaining();
 
         $levelProperty = \sprintf(
             'root.%s.%s',
-            $this->summaryProperty,
-            $this->partitionLevelProperty,
+            $summaryProperty,
+            $partitionLevelProperty,
         );
 
         $keyProperty = \sprintf(
             'root.%s.%s',
-            $this->summaryProperty,
-            $this->partitionKeyProperty,
+            $summaryProperty,
+            $partitionKeyProperty,
         );
 
         if ($higherPartition === null) {
