@@ -17,42 +17,32 @@ use Rekalogika\Analytics\Query\NormalTable;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\Query\Table;
 use Rekalogika\Analytics\Query\TreeResult;
+use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 
 /**
  * @internal
  */
-final readonly class DefaultResult implements Result
+final class DefaultResult implements Result
 {
     public function __construct(
-        private readonly DefaultTreeResult $treeResult,
-        private readonly DefaultTable $table,
-        private readonly DefaultNormalTable $normalTable,
+        private SummarizerQuery $query,
     ) {}
-
-    public static function createEmpty(): self
-    {
-        return new self(
-            treeResult: new DefaultTreeResult([]),
-            table: new DefaultTable([]),
-            normalTable: new DefaultNormalTable([]),
-        );
-    }
 
     #[\Override]
     public function getTree(): TreeResult
     {
-        return $this->treeResult;
+        return $this->query->getTree();
     }
 
     #[\Override]
     public function getTable(): Table
     {
-        return $this->table;
+        return $this->query->getTable();
     }
 
     #[\Override]
     public function getNormalTable(): NormalTable
     {
-        return $this->normalTable;
+        return $this->query->getNormalTable();
     }
 }

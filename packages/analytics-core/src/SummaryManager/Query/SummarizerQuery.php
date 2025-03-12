@@ -23,7 +23,9 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -64,6 +66,17 @@ final class SummarizerQuery extends AbstractQuery
 
     private readonly string $partitionKeyProperty;
 
+    /**
+     * @var list<array<string, mixed>>|null
+     */
+    private ?array $queryResult = null;
+
+    private ?DefaultTable $table = null;
+
+    private ?DefaultNormalTable $normalTable = null;
+
+    private ?DefaultTreeResult $tree = null;
+
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly SummaryQuery $query,
@@ -90,8 +103,20 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    public function execute(): Result
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function getQueryResult(): array
     {
+        if ($this->queryResult !== null) {
+            return $this->queryResult;
+        }
+
+        // check if select is empty
+        if ($this->query->getSelect() === []) {
+            return [];
+        }
+
         // add query builder parameters that are always used
         $this->initializeQueryBuilder();
 
@@ -110,40 +135,99 @@ final class SummarizerQuery extends AbstractQuery
         // add order by clause supplied by the user
         $this->addUserSuppliedOrderBy();
 
-        // check if select is empty
-        if ($this->query->getSelect() === []) {
-            return DefaultResult::createEmpty();
+        // create grouping field
+
+        $this->queryBuilder->addSelect(\sprintf(
+            "REKALOGIKA_GROUPING_CONCAT(%s) AS __grouping",
+            implode(', ', $this->groupingFields),
+        ));
+
+        // create group by
+
+        $rollUp = new RollUp();
+
+        foreach ($this->rollUpFields as $field) {
+            // $this->queryBuilder->addGroupBy($field);
+            $rollUp->add(new Field($field));
         }
 
-        // execute doctrine query
-        $result = $this->getResult();
+        $groupBy = new GroupBy();
+        $groupBy->add($rollUp);
 
-        // hydrate into summary object
-        $table = QueryResultToRowTransformer::transform(
+        // create query & apply group by
+
+        $query = $this->queryBuilder->getQuery();
+
+        if (\count($groupBy) > 0) {
+            $groupBy->apply($query);
+        }
+
+        // get result
+
+        /** @var list<array<string,mixed>> */
+        $result = $query->getArrayResult();
+
+        // change alias to dimension name
+
+        $newResult = [];
+
+        foreach ($result as $row) {
+            $newRow = [];
+
+            /** @var mixed $value */
+            foreach ($row as $key => $value) {
+                if (\array_key_exists($key, $this->dimensionAliases)) {
+                    /** @psalm-suppress MixedAssignment */
+                    $newRow[$this->dimensionAliases[$key]] = $value;
+                } else {
+                    /** @psalm-suppress MixedAssignment */
+                    $newRow[$key] = $value;
+                }
+            }
+
+            $newResult[] = $newRow;
+        }
+
+        return $this->queryResult = $newResult;
+    }
+
+    public function getTable(): DefaultTable
+    {
+        if ($this->table !== null) {
+            return $this->table;
+        }
+
+        return $this->table = QueryResultToRowTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
-            input: $result,
+            input: $this->getQueryResult(),
         );
+    }
 
-        // unpivot result
-        $normalTable = UnpivotValuesTransformer::transform(
+    public function getNormalTable(): DefaultNormalTable
+    {
+        if ($this->normalTable !== null) {
+            return $this->normalTable;
+        }
+
+        return $this->normalTable = UnpivotValuesTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
-            input: $table,
+            input: $this->getTable(),
         );
+    }
 
-        // convert to tree or table
-        $tree = UnpivotTableToTreeTransformer::transform(
-            normalTable: $normalTable,
+    public function getTree(): DefaultTreeResult
+    {
+        if ($this->tree !== null) {
+            return $this->tree;
+        }
+
+        return $this->tree = UnpivotTableToTreeTransformer::transform(
+            normalTable: $this->getNormalTable(),
             type: $this->hasTieredOrder() ? 'tree' : 'table',
-        );
-
-        return new DefaultResult(
-            treeResult: $tree,
-            table: $table,
-            normalTable: $normalTable,
         );
     }
 
@@ -613,66 +697,5 @@ final class SummarizerQuery extends AbstractQuery
 
             $i++;
         }
-    }
-
-    /**
-     * @return list<array<string,mixed>>
-     */
-    private function getResult(): array
-    {
-        // create grouping field
-
-        $this->queryBuilder->addSelect(\sprintf(
-            "REKALOGIKA_GROUPING_CONCAT(%s) AS __grouping",
-            implode(', ', $this->groupingFields),
-        ));
-
-        // create group by
-
-        $rollUp = new RollUp();
-
-        foreach ($this->rollUpFields as $field) {
-            // $this->queryBuilder->addGroupBy($field);
-            $rollUp->add(new Field($field));
-        }
-
-        $groupBy = new GroupBy();
-        $groupBy->add($rollUp);
-
-        // create query & apply group by
-
-        $query = $this->queryBuilder->getQuery();
-
-        if (\count($groupBy) > 0) {
-            $groupBy->apply($query);
-        }
-
-        // get result
-
-        /** @var list<array<string,mixed>> */
-        $result = $query->getArrayResult();
-
-        // change alias to dimension name
-
-        $newResult = [];
-
-        foreach ($result as $row) {
-            $newRow = [];
-
-            /** @var mixed $value */
-            foreach ($row as $key => $value) {
-                if (\array_key_exists($key, $this->dimensionAliases)) {
-                    /** @psalm-suppress MixedAssignment */
-                    $newRow[$this->dimensionAliases[$key]] = $value;
-                } else {
-                    /** @psalm-suppress MixedAssignment */
-                    $newRow[$key] = $value;
-                }
-            }
-
-            $newResult[] = $newRow;
-        }
-
-        return $newResult;
     }
 }

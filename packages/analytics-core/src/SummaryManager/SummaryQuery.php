@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\Query;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -80,7 +81,7 @@ final class SummaryQuery implements Query
             propertyAccessor: $this->propertyAccessor,
         );
 
-        return $this->result = $summarizer->execute();
+        return $this->result = new DefaultResult($summarizer);
     }
 
     /**
