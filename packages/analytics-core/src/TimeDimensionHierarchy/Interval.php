@@ -34,6 +34,8 @@ interface Interval extends \Stringable, TranslatableInterface
     /**
      * Example: if this is a date, then this returns the week and month that
      * this date is in.
+     * 
+     * @todo deprecate
      *
      * @return list<Interval>
      */

@@ -56,11 +56,7 @@ final class MonthOfYear implements RecurringInterval
         $dateTime = (new \DateTimeImmutable('now', $this->timeZone))
             ->setDate(2000, $this->databaseValue, 1);
 
-        $locale = setlocale(LC_TIME, '0');
-
-        if ($locale === false) {
-            $locale = 'C';
-        }
+        $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             $locale,

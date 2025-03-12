@@ -90,11 +90,7 @@ final class Month implements Interval
         );
 
         try {
-            $locale = setlocale(LC_TIME, '0');
-
-            if ($locale === false) {
-                $locale = 'C';
-            }
+            $locale = $translator->getLocale();
 
             $intlDateFormatter = new \IntlDateFormatter(
                 $locale,

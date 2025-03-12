@@ -49,12 +49,7 @@ final class DayOfWeek implements RecurringInterval
         };
 
         $dateTime = new \DateTimeImmutable('next ' . $dayOfWeek, $this->timeZone);
-
-        $locale = setlocale(LC_TIME, '0');
-
-        if ($locale === false) {
-            $locale = 'C';
-        }
+        $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             $locale,
