@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
-use Colors\RandomColor;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Query\Measures;
 use Rekalogika\Analytics\Query\Result;
@@ -23,11 +22,15 @@ use Symfony\UX\Chartjs\Model\Chart;
 
 final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 {
+    private ColorDispenser $colorDispenser;
+
     public function __construct(
         private LocaleSwitcher $localeSwitcher,
         private ChartBuilderInterface $chartBuilder,
         private Stringifier $stringifier,
-    ) {}
+    ) {
+        $this->colorDispenser = new ColorDispenser();
+    }
 
     #[\Override]
     public function createChart(
@@ -192,14 +195,6 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
     private function dispenseColor(): string
     {
-        $color = RandomColor::one([
-            'alpha' => 0.5,
-        ]);
-
-        if (!\is_string($color)) {
-            throw new \LogicException('Failed to generate color');
-        }
-
-        return $color;
+        return $this->colorDispenser->dispenseColor();
     }
 }

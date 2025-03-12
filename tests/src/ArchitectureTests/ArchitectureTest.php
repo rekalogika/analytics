@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
-use Colors\RandomColor;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPat\Selector\Selector;
@@ -145,7 +144,7 @@ final class ArchitectureTest
                 Selector::classname(\Traversable::class),
                 Selector::classname(AssetMapperInterface::class),
                 Selector::classname(ContainerInterface::class),
-                Selector::classname(RandomColor::class),
+                Selector::inNamespace('OzdemirBurak\Iris\Color'),
 
                 // twig
                 Selector::classname(Environment::class),
