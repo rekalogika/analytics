@@ -94,7 +94,7 @@ final class UnpivotTableToTreeTransformer
 
         $node = DefaultTreeNode::createLeafNode(
             key: $lastResultValue->getField(),
-            legend: $lastResultValue->getLabel(),
+            label: $lastResultValue->getLabel(),
             member: $lastResultValue->getValue(),
             value: $resultValue->getValue(),
             rawValue: $rawValue,

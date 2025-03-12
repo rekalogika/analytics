@@ -32,7 +32,7 @@ interface TreeNode extends \Traversable, \Countable
     /**
      * Description of the dimension (e.g. Country, Hour of the day)
      */
-    public function getLegend(): string|TranslatableInterface;
+    public function getLabel(): string|TranslatableInterface;
 
     /**
      * The member that this node represents. (e.g. France, 12:00).
