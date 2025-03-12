@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\Measure;
+use Rekalogika\Analytics\Query\Unit;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -25,18 +26,20 @@ final readonly class DefaultMeasure implements Measure
         private mixed $value,
         private mixed $rawValue,
         private int|float $numericValue,
-        private ?string $unit,
+        private ?Unit $unit,
     ) {}
 
     public static function createFromResultValue(ResultValue $resultValue): self
     {
+        $unit = DefaultUnit::createFromResultValue($resultValue);
+
         return new self(
             label: $resultValue->getLabel(),
             key: $resultValue->getField(),
             value: $resultValue->getValue(),
             rawValue: $resultValue->getRawValue(),
             numericValue: $resultValue->getNumericValue(),
-            unit: $resultValue->getUnit(),
+            unit: $unit,
         );
     }
 
@@ -71,7 +74,7 @@ final readonly class DefaultMeasure implements Measure
     }
 
     #[\Override]
-    public function getUnit(): ?string
+    public function getUnit(): ?Unit
     {
         return $this->unit;
     }

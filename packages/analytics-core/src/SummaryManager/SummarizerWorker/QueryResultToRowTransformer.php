@@ -119,6 +119,10 @@ final readonly class QueryResultToRowTransformer
                 ->getMeasureMetadata($key)
                 ->getUnit();
 
+            $unitSignature = $this->metadata
+                ->getMeasureMetadata($key)
+                ->getUnitSignature();
+
             $resultValue = new ResultValue(
                 field: $key,
                 rawValue: $rawValue,
@@ -126,6 +130,7 @@ final readonly class QueryResultToRowTransformer
                 label: $this->getLabel($key),
                 numericValue: $numericValue,
                 unit: $unit,
+                unitSignature: $unitSignature,
             );
 
             $measureValues[$key] = $resultValue;
@@ -185,6 +190,7 @@ final readonly class QueryResultToRowTransformer
                 label: $this->getLabel($key),
                 numericValue: 0,
                 unit: null,
+                unitSignature: null,
             );
 
             $dimensionValues[$key] = $resultValue;

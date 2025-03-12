@@ -148,6 +148,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         function: new Sum('item.price'),
         label: new TranslatableMessage('Price'),
         numericValueResolver: new DivideBy(100),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
     private ?int $price = null;
 

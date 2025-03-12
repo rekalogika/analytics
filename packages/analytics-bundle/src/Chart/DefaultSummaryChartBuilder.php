@@ -43,7 +43,9 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         $labels = [];
         $dataSets = [];
-        $label = null;
+
+        $xTitle = null;
+        $yTitle = null;
 
         // populate labels
 
@@ -53,6 +55,16 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
             $dataSets[$key]['data'] = [];
             $dataSets[$key]['backgroundColor'] = $this->dispenseColor();
+
+            if ($yTitle !== null) {
+                continue;
+            }
+
+            $unit = $measure->getUnit();
+
+            if ($unit !== null) {
+                $yTitle = $this->stringifier->toString($unit);
+            }
         }
 
         // populate data
@@ -84,6 +96,32 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             'datasets' => array_values($dataSets),
         ]);
 
+        // xtitle
+
+        // @phpstan-ignore identical.alwaysTrue
+        if ($xTitle === null) {
+            $xTitle = [
+                'display' => false,
+            ];
+        } else {
+            $xTitle = [
+                'display' => false,
+            ];
+        }
+
+        // ytitle
+
+        if ($yTitle === null) {
+            $yTitle = [
+                'display' => false,
+            ];
+        } else {
+            $yTitle = [
+                'display' => true,
+                'text' => $yTitle,
+            ];
+        }
+
         $chart->setOptions([
             'responsive' => true,
             'locale' => $this->localeSwitcher->getLocale(),
@@ -94,6 +132,14 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                 ],
                 'title' => [
                     'display' => false,
+                ],
+            ],
+            'scales' => [
+                'x' => [
+                    'title' => $xTitle,
+                ],
+                'y' => [
+                    'title' => $yTitle,
                 ],
             ],
         ]);
@@ -122,8 +168,6 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
             if ($selectedUnit === $unit) {
                 $selectedMeasures[] = $measure->getKey();
-            } else {
-                break;
             }
         }
 

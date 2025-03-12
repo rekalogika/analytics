@@ -27,7 +27,8 @@ final readonly class ResultValue
         private mixed $value,
         private mixed $rawValue,
         private int|float $numericValue,
-        private ?string $unit,
+        private null|string|TranslatableInterface $unit,
+        private null|string $unitSignature,
     ) {}
 
     public function isSame(self $other): bool
@@ -61,8 +62,13 @@ final readonly class ResultValue
         return $this->numericValue;
     }
 
-    public function getUnit(): ?string
+    public function getUnit(): null|string|TranslatableInterface
     {
         return $this->unit;
+    }
+
+    public function getUnitSignature(): ?string
+    {
+        return $this->unitSignature;
     }
 }

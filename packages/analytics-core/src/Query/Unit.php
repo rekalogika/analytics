@@ -16,21 +16,11 @@ namespace Rekalogika\Analytics\Query;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a tuple
+ * Represent a unit of measurement
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Measure
+interface Unit extends TranslatableInterface
 {
-    public function getLabel(): string|TranslatableInterface;
-
-    public function getKey(): string;
-
-    public function getValue(): mixed;
-
-    public function getRawValue(): mixed;
-
-    public function getNumericValue(): int|float;
-
-    public function getUnit(): ?Unit;
+    public function getSignature(): string;
 }

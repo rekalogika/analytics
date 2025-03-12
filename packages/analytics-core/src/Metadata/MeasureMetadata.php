@@ -27,7 +27,8 @@ final readonly class MeasureMetadata
         private string $summaryProperty,
         private string|TranslatableInterface $label,
         private NumericValueResolver $numericValueResolver,
-        private ?string $unit,
+        private null|string|TranslatableInterface $unit,
+        private ?string $unitSignature,
     ) {}
 
     /**
@@ -60,9 +61,14 @@ final readonly class MeasureMetadata
         return $this->numericValueResolver;
     }
 
-    public function getUnit(): ?string
+    public function getUnit(): null|string|TranslatableInterface
     {
         return $this->unit;
+    }
+
+    public function getUnitSignature(): ?string
+    {
+        return $this->unitSignature;
     }
 
     /**

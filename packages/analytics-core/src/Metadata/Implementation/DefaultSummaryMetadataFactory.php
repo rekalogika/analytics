@@ -508,6 +508,12 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $numericValueResolver = $measureAttribute->getNumericValueResolver();
         $unit = $measureAttribute->getUnit();
 
+        if ($unit !== null) {
+            $unitSignature = sha1(serialize($unit));
+        } else {
+            $unitSignature = null;
+        }
+
         if (!\is_array($function)) {
             $newFunction = [];
 
@@ -536,6 +542,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             label: $measureAttribute->getLabel() ?? $property,
             numericValueResolver: $numericValueResolver,
             unit: $unit,
+            unitSignature: $unitSignature,
         );
     }
 
