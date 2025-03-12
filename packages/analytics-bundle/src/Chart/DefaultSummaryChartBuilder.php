@@ -28,6 +28,8 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         private LocaleSwitcher $localeSwitcher,
         private ChartBuilderInterface $chartBuilder,
         private Stringifier $stringifier,
+        private string $transparency = '60',
+        private int $borderWidth = 1,
     ) {
         $this->colorDispenser = new ColorDispenser();
     }
@@ -81,8 +83,9 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $dataSets[$key]['data'] = [];
 
             $color = $this->dispenseColor();
-            $dataSets[$key]['backgroundColor'] = $color . 'a0';
+            $dataSets[$key]['backgroundColor'] = $color . $this->transparency;
             $dataSets[$key]['borderColor'] = $color;
+            $dataSets[$key]['borderWidth'] = $this->borderWidth;
 
             if ($yTitle !== null) {
                 continue;
@@ -219,7 +222,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         // populate data
 
         foreach ($result->getTree() as $node) {
-            $labels[] = $this->stringifier->toString($node->getRawMember());
+            $labels[] = $this->stringifier->toString($node->getMember());
 
             if ($xTitle === null) {
                 $xTitle = $this->stringifier->toString($node->getLabel());
@@ -232,8 +235,9 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
                 if (!isset($dataSets[$signature]['backgroundColor'])) {
                     $color = $this->dispenseColor();
-                    $dataSets[$signature]['backgroundColor'] = $color . 'a0';
+                    $dataSets[$signature]['backgroundColor'] = $color . $this->transparency;
                     $dataSets[$signature]['borderColor'] = $color;
+                    $dataSets[$signature]['borderWidth'] = $this->borderWidth;
                 }
 
                 if ($node2 === null) {
