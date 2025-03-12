@@ -13,50 +13,69 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Query\Dimension;
+use Rekalogika\Analytics\Query\Dimensions;
 use Rekalogika\Analytics\Query\Tuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DefaultTuple implements Tuple
+/**
+ * @implements \IteratorAggregate<string,Dimension>
+ */
+final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 {
-    /**
-     * @param array<string,TranslatableInterface|string> $labels
-     * @param array<string,mixed> $members
-     */
     public function __construct(
-        private array $labels,
-        private array $members,
+        private Dimensions $dimensions,
     ) {}
-
 
     public static function fromResultTuple(ResultTuple $resultTuple): self
     {
-        $labels = array_map(
-            static fn(ResultValue $value): TranslatableInterface|string => $value->getLabel(),
+        $dimensions = array_map(
+            static fn(ResultValue $value): mixed => DefaultDimension::createFromResultValue($value),
             $resultTuple->getDimensions(),
         );
 
-        $members = array_map(
-            static fn(ResultValue $value): mixed => $value->getValue(),
-            $resultTuple->getDimensions(),
+        $dimensions = new DefaultDimensions(
+            dimensions: $dimensions,
         );
 
-        return new self(
-            labels: $labels,
-            members: $members,
-        );
-    }
-
-    #[\Override]
-    public function getLabels(): array
-    {
-        return $this->labels;
+        return new self($dimensions);
     }
 
     #[\Override]
     public function getMembers(): array
     {
-        return $this->members;
+        $members = [];
+
+        foreach ($this->dimensions as $dimension) {
+            /** @psalm-suppress MixedAssignment */
+            $members[$dimension->getKey()] = $dimension->getValue();
+        }
+
+        return $members;
+    }
+
+    #[\Override]
+    public function get(string $key): Dimension
+    {
+        return $this->dimensions->get($key);
+    }
+
+    #[\Override]
+    public function count(): int
+    {
+        return $this->dimensions->count();
+    }
+
+    #[\Override]
+    public function getIterator(): \Traversable
+    {
+        yield from $this->dimensions;
+    }
+
+    #[\Override]
+    public function first(): ?Dimension
+    {
+        return $this->dimensions->first();
     }
 }

@@ -55,7 +55,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function getFirstRow(): ?Row
+    public function first(): ?Row
     {
         return $this->rows[0] ?? null;
     }

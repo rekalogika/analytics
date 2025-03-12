@@ -33,7 +33,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
     public function createChart(
         Result $result,
     ): Chart {
-        $measures = $result->getTable()->getFirstRow()?->getMeasures();
+        $measures = $result->getTable()->first()?->getMeasures();
 
         if ($measures === null) {
             throw new UnsupportedData('Measures not found');
@@ -70,15 +70,27 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $members = $row->getTuple()->getMembers();
+            $dimensions = $row->getTuple();
 
-            if (\count($members) !== 1) {
+            if (\count($dimensions) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            /** @psalm-suppress MixedAssignment */
-            $member = array_shift($members);
-            $labels[] = $this->stringifier->toString($member);
+            $member = $dimensions->first();
+
+            if ($member === null) {
+                throw new UnsupportedData('Expected only one member');
+            }
+
+            // get label
+
+            if ($xTitle === null) {
+                $xTitle = $this->stringifier->toString($member->getLabel());
+            }
+
+            // get value
+
+            $labels[] = $this->stringifier->toString($member->getValue());
 
             $measures = $row->getMeasures();
 
@@ -98,14 +110,14 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         // xtitle
 
-        // @phpstan-ignore identical.alwaysTrue
         if ($xTitle === null) {
             $xTitle = [
                 'display' => false,
             ];
         } else {
             $xTitle = [
-                'display' => false,
+                'display' => true,
+                'text' => $xTitle,
             ];
         }
 
@@ -122,14 +134,18 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             ];
         }
 
+        // legend
+
+        $legend = [
+            'display' => true,
+            'position' => 'top',
+        ];
+
         $chart->setOptions([
             'responsive' => true,
             'locale' => $this->localeSwitcher->getLocale(),
             'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
+                'legend' => $legend,
                 'title' => [
                     'display' => false,
                 ],

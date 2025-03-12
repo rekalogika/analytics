@@ -26,4 +26,6 @@ interface Measures extends \Traversable, \Countable
      * @throws \InvalidArgumentException
      */
     public function get(string $key): Measure;
+
+    public function first(): ?Measure;
 }

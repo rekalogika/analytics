@@ -13,14 +13,20 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 /**
- * A query result in tabular format
+ * Represent a dimension
  *
  * For consumption only, do not implement. Methods may be added in the future.
- *
- * @extends \Traversable<int,Row>
  */
-interface Table extends \Traversable, \Countable
+interface Dimension
 {
-    public function first(): ?Row;
+    public function getLabel(): string|TranslatableInterface;
+
+    public function getKey(): string;
+
+    public function getValue(): mixed;
+
+    public function getRawValue(): mixed;
 }

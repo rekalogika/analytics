@@ -67,4 +67,16 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     {
         yield from $this->measures;
     }
+
+    #[\Override]
+    public function first(): ?Measure
+    {
+        $firstKey = array_key_first($this->measures);
+
+        if ($firstKey === null) {
+            return null;
+        }
+
+        return $this->measures[$firstKey] ?? null;
+    }
 }
