@@ -37,7 +37,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly mixed $value,
         private readonly mixed $rawValue,
         private readonly int|float $numericValue,
-        private readonly string|TranslatableInterface $legend,
+        private readonly string|TranslatableInterface $label,
         private readonly mixed $member,
         private readonly bool $leaf,
         private readonly ?Unit $unit,
@@ -59,12 +59,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     public static function createBranchNode(
         string $key,
-        string|TranslatableInterface $legend,
+        string|TranslatableInterface $label,
         mixed $member,
     ): self {
         return new self(
             key: $key,
-            legend: $legend,
+            label: $label,
             member: $member,
             value: null,
             rawValue: null,
@@ -80,12 +80,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         mixed $rawValue,
         int|float $numericValue,
         ?Unit $unit,
-        string|TranslatableInterface $legend,
+        string|TranslatableInterface $label,
         mixed $member,
     ): self {
         return new self(
             key: $key,
-            legend: $legend,
+            label: $label,
             member: $member,
             value: $value,
             rawValue: $rawValue,
@@ -109,9 +109,9 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getLegend(): string|TranslatableInterface
+    public function getLabel(): string|TranslatableInterface
     {
-        return $this->legend;
+        return $this->label;
     }
 
     #[\Override]
