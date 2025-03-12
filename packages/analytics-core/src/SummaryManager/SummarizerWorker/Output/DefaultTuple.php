@@ -71,6 +71,12 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
+    public function getByIndex(int $index): Dimension
+    {
+        return $this->dimensions->getByIndex($index);
+    }
+
+    #[\Override]
     public function isSame(Tuple $other): bool
     {
         foreach ($this->dimensions as $key => $dimension) {

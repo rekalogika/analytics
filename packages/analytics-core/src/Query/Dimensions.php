@@ -27,6 +27,8 @@ interface Dimensions extends \Traversable, \Countable
      */
     public function get(string $key): Dimension;
 
+    public function getByIndex(int $index): Dimension;
+
     public function first(): ?Dimension;
 
     public function has(string $key): bool;
