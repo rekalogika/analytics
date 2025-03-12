@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Query;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a tuple
+ * Represent a measure
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */

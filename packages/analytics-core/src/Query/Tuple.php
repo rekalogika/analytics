@@ -13,20 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
 /**
  * Represent a tuple
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Tuple
+interface Tuple extends Dimensions
 {
-    /**
-     * @return array<string,TranslatableInterface|string>
-     */
-    public function getLabels(): array;
-
     /**
      * @return array<string,mixed>
      */

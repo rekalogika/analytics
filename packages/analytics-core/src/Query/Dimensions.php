@@ -14,13 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * A query result in tabular format
+ * Collection of dimensions
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<int,Row>
+ * @extends \Traversable<string,Dimension>
  */
-interface Table extends \Traversable, \Countable
+interface Dimensions extends \Traversable, \Countable
 {
-    public function first(): ?Row;
+    /**
+     * @throws \InvalidArgumentException
+     */
+    public function get(string $key): Dimension;
+
+    public function first(): ?Dimension;
 }
