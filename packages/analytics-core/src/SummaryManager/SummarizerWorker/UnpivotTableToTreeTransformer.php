@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultUnpivotRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 
 final class UnpivotTableToTreeTransformer
 {
@@ -98,6 +99,8 @@ final class UnpivotTableToTreeTransformer
             member: $lastResultValue->getValue(),
             value: $resultValue->getValue(),
             rawValue: $rawValue,
+            numericValue: $resultValue->getNumericValue(),
+            unit: DefaultUnit::createFromResultValue($resultValue),
         );
 
         if ($columnNumber === 0) {

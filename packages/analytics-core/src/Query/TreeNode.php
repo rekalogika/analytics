@@ -46,9 +46,20 @@ interface TreeNode extends \Traversable, \Countable
     public function getValue(): mixed;
 
     /**
-     * The raw value. If not in leaf node, the value is null.
+     * The raw value as returned by the database. If not in leaf node, the value
+     * is null.
      */
-    public function getRawValue(): int|float|null;
+    public function getRawValue(): mixed;
+
+    /**
+     * Like the canonical value, but guaranteed to be in numeric format.
+     */
+    public function getNumericValue(): int|float;
+
+    /**
+     * The unit of the value. If not in leaf node, the value is always null.
+     */
+    public function getUnit(): ?Unit;
 
     /**
      * Whether this node is a leaf node.

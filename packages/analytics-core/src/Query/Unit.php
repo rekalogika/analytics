@@ -22,5 +22,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 interface Unit extends TranslatableInterface
 {
+    /**
+     * The unit signature. Two units with the same signature are considered
+     * identical.
+     */
     public function getSignature(): string;
 }

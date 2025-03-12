@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\TreeNode;
+use Rekalogika\Analytics\Query\Unit;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -34,10 +35,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private function __construct(
         private readonly string $key,
         private readonly mixed $value,
-        private readonly int|float|null $rawValue,
+        private readonly mixed $rawValue,
+        private readonly int|float $numericValue,
         private readonly string|TranslatableInterface $legend,
         private readonly mixed $member,
         private readonly bool $leaf,
+        private readonly ?Unit $unit,
     ) {}
 
     #[\Override]
@@ -65,6 +68,8 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             member: $member,
             value: null,
             rawValue: null,
+            numericValue: 0,
+            unit: null,
             leaf: false,
         );
     }
@@ -72,7 +77,9 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public static function createLeafNode(
         string $key,
         mixed $value,
-        int|float|null $rawValue,
+        mixed $rawValue,
+        int|float $numericValue,
+        ?Unit $unit,
         string|TranslatableInterface $legend,
         mixed $member,
     ): self {
@@ -82,6 +89,8 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             member: $member,
             value: $value,
             rawValue: $rawValue,
+            numericValue: $numericValue,
+            unit: $unit,
             leaf: true,
         );
     }
@@ -145,8 +154,20 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getRawValue(): int|float|null
+    public function getRawValue(): mixed
     {
         return $this->rawValue;
+    }
+
+    #[\Override]
+    public function getNumericValue(): int|float
+    {
+        return $this->numericValue;
+    }
+
+    #[\Override]
+    public function getUnit(): ?Unit
+    {
+        return $this->unit;
     }
 }
