@@ -61,7 +61,6 @@ final class QueryTest extends KernelTestCase
         $node = $result->traverse('count');
         $this->assertNotNull($node);
         $this->assertEquals('@values', $node->getKey());
-        $this->assertEquals('count', $node->getMeasurePropertyName());
         $this->assertIsInt($node->getValue());
     }
 

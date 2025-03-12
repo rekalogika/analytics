@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\TreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -149,15 +148,5 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getRawValue(): int|float|null
     {
         return $this->rawValue;
-    }
-
-    #[\Override]
-    public function getMeasurePropertyName(): ?string
-    {
-        if ($this->member instanceof MeasureDescription) {
-            return $this->member->getMeasurePropertyName();
-        }
-
-        return null;
     }
 }

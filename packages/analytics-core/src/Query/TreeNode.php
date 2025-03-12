@@ -50,8 +50,6 @@ interface TreeNode extends \Traversable, \Countable
      */
     public function getRawValue(): int|float|null;
 
-    public function getMeasurePropertyName(): ?string;
-
     /**
      * Whether this node is a leaf node.
      */
