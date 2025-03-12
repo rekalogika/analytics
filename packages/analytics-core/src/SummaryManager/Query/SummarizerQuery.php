@@ -23,10 +23,7 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -115,20 +112,14 @@ final class SummarizerQuery extends AbstractQuery
 
         // check if select is empty
         if ($this->query->getSelect() === []) {
-            $treeResult = new DefaultTreeResult(children: []);
-            $table = new DefaultTable([]);
-
-            return new DefaultResult(
-                treeResult: $treeResult,
-                table: $table,
-            );
+            return DefaultResult::createEmpty();
         }
 
         // execute doctrine query
         $result = $this->getResult();
 
         // hydrate into summary object
-        $result = QueryResultToRowTransformer::transform(
+        $table = QueryResultToRowTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
@@ -136,36 +127,23 @@ final class SummarizerQuery extends AbstractQuery
             input: $result,
         );
 
-
-        // create table result
-
-        /**
-         * @psalm-suppress InvalidArgument
-         * @var list<ResultRow>
-         * */
-        $result = array_values(iterator_to_array($result));
-
-        $table = DefaultTable::fromResultRows($result);
-
         // unpivot result
-        $result = UnpivotValuesTransformer::transform(
+        $normalTable = UnpivotValuesTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
-            input: $result,
+            input: $table,
         );
 
         // convert to tree or table
-        $result = UnpivotTableToTreeTransformer::transform(
-            rows: $result,
+        $tree = UnpivotTableToTreeTransformer::transform(
+            normalTable: $normalTable,
             type: $this->hasTieredOrder() ? 'tree' : 'table',
         );
 
-        // wrap the result using our SummaryResult class
-        $treeResult = new DefaultTreeResult(children: $result);
-
         return new DefaultResult(
-            treeResult: $treeResult,
+            treeResult: $tree,
             table: $table,
+            normalTable: $normalTable,
         );
     }
 

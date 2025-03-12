@@ -16,36 +16,34 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Query\Dimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DefaultDimension implements Dimension
+final readonly class ValueDimension implements Dimension
 {
     public function __construct(
-        private string|TranslatableInterface $label,
-        private string $key,
-        private mixed $member,
-        private mixed $rawMember,
+        private string|TranslatableInterface $valuesLabel,
+        private mixed $measureLabel,
     ) {}
 
     #[\Override]
     public function getLabel(): string|TranslatableInterface
     {
-        return $this->label;
+        return $this->valuesLabel;
     }
 
     #[\Override]
     public function getKey(): string
     {
-        return $this->key;
+        return '@values';
     }
 
     #[\Override]
     public function getMember(): mixed
     {
-        return $this->member;
+        return $this->measureLabel;
     }
 
     #[\Override]
     public function getRawMember(): mixed
     {
-        return $this->rawMember;
+        return $this->measureLabel;
     }
 }

@@ -13,20 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
 /**
- * Represent a dimension
+ * A query result in normalized tabular format. Each row contains one measure.
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<int,Row>
  */
-interface Dimension
+interface NormalTable extends \Traversable, \Countable
 {
-    public function getLabel(): string|TranslatableInterface;
-
-    public function getKey(): string;
-
-    public function getMember(): mixed;
-
-    public function getRawMember(): mixed;
+    public function first(): ?NormalRow;
 }

@@ -13,23 +13,23 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Row;
-use Rekalogika\Analytics\Query\Table;
+use Rekalogika\Analytics\Query\NormalRow;
+use Rekalogika\Analytics\Query\NormalTable;
 
 /**
- * @implements \IteratorAggregate<int,DefaultRow>
+ * @implements \IteratorAggregate<int,DefaultNormalRow>
  */
-final readonly class DefaultTable implements Table, \IteratorAggregate
+final readonly class DefaultNormalTable implements NormalTable, \IteratorAggregate
 {
     /**
-     * @param list<DefaultRow> $rows
+     * @param list<DefaultNormalRow> $rows
      */
     public function __construct(
         private array $rows,
     ) {}
 
     #[\Override]
-    public function first(): ?Row
+    public function first(): ?NormalRow
     {
         return $this->rows[0] ?? null;
     }

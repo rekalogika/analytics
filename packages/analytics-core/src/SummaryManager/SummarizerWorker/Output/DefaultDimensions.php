@@ -41,14 +41,6 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
         $this->dimensions = $dimensionsArray;
     }
 
-    /**
-     * @param iterable<Dimension> $dimensions
-     */
-    public static function fromDimensions(iterable $dimensions): self
-    {
-        return new self($dimensions);
-    }
-
     #[\Override]
     public function first(): ?Dimension
     {
@@ -66,6 +58,12 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     {
         return $this->dimensions[$key]
             ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $key));
+    }
+
+    #[\Override]
+    public function has(string $key): bool
+    {
+        return isset($this->dimensions[$key]);
     }
 
     #[\Override]

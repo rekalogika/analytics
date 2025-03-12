@@ -41,7 +41,7 @@ final readonly class PivotTableLeaf implements LeafNode
     #[\Override]
     public function getLegend(): mixed
     {
-        return $this->node->getLegend();
+        return $this->node->getLabel();
     }
 
     #[\Override]

@@ -41,19 +41,17 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
         $this->measures = $measuresArray;
     }
 
-    /**
-     * @param iterable<Measure> $measures
-     */
-    public static function fromMeasures(iterable $measures): self
-    {
-        return new self($measures);
-    }
-
     #[\Override]
     public function get(string $key): Measure
     {
         return $this->measures[$key]
             ?? throw new \InvalidArgumentException(\sprintf('Measure "%s" not found', $key));
+    }
+
+    #[\Override]
+    public function has(string $key): bool
+    {
+        return isset($this->measures[$key]);
     }
 
     #[\Override]

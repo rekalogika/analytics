@@ -13,36 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Measure;
 use Rekalogika\Analytics\Query\Measures;
 use Rekalogika\Analytics\Query\Row;
 use Rekalogika\Analytics\Query\Tuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 
 final readonly class DefaultRow implements Row
 {
     public function __construct(
         private Tuple $tuple,
         private Measures $measures,
+        private string $groupings,
     ) {}
-
-    public static function createFromResultRow(ResultRow $resultRow): self
-    {
-        $tuple = DefaultTuple::fromResultTuple($resultRow->getTuple());
-
-        $measures = array_map(
-            static fn(ResultValue $resultValue): Measure => DefaultMeasure::createFromResultValue($resultValue),
-            $resultRow->getMeasures(),
-        );
-
-        $measures = DefaultMeasures::fromMeasures($measures);
-
-        return new self(
-            tuple: $tuple,
-            measures: $measures,
-        );
-    }
 
     #[\Override]
     public function getTuple(): Tuple
@@ -54,5 +35,15 @@ final readonly class DefaultRow implements Row
     public function getMeasures(): Measures
     {
         return $this->measures;
+    }
+
+    public function getGroupings(): string
+    {
+        return $this->groupings;
+    }
+
+    public function isSubtotal(): bool
+    {
+        return substr_count($this->groupings, '1') !== 0;
     }
 }

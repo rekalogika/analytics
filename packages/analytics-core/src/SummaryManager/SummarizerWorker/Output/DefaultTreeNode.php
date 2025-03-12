@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\TreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
+use Rekalogika\Analytics\Query\Unit;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -35,10 +35,13 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private function __construct(
         private readonly string $key,
         private readonly mixed $value,
-        private readonly int|float|null $rawValue,
-        private readonly string|TranslatableInterface $legend,
+        private readonly mixed $rawValue,
+        private readonly int|float $numericValue,
+        private readonly string|TranslatableInterface $label,
         private readonly mixed $member,
+        private readonly mixed $rawMember,
         private readonly bool $leaf,
+        private readonly ?Unit $unit,
     ) {}
 
     #[\Override]
@@ -57,15 +60,19 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     public static function createBranchNode(
         string $key,
-        string|TranslatableInterface $legend,
+        string|TranslatableInterface $label,
         mixed $member,
+        mixed $rawMember,
     ): self {
         return new self(
             key: $key,
-            legend: $legend,
+            label: $label,
             member: $member,
+            rawMember: $rawMember,
             value: null,
             rawValue: null,
+            numericValue: 0,
+            unit: null,
             leaf: false,
         );
     }
@@ -73,16 +80,22 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public static function createLeafNode(
         string $key,
         mixed $value,
-        int|float|null $rawValue,
-        string|TranslatableInterface $legend,
+        mixed $rawValue,
+        int|float $numericValue,
+        ?Unit $unit,
+        string|TranslatableInterface $label,
         mixed $member,
+        mixed $rawMember,
     ): self {
         return new self(
             key: $key,
-            legend: $legend,
+            label: $label,
             member: $member,
+            rawMember: $rawMember,
             value: $value,
             rawValue: $rawValue,
+            numericValue: $numericValue,
+            unit: $unit,
             leaf: true,
         );
     }
@@ -101,15 +114,21 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getLegend(): string|TranslatableInterface
+    public function getLabel(): string|TranslatableInterface
     {
-        return $this->legend;
+        return $this->label;
     }
 
     #[\Override]
     public function getMember(): mixed
     {
         return $this->member;
+    }
+
+    #[\Override]
+    public function getRawMember(): mixed
+    {
+        return $this->rawMember;
     }
 
     public function setParent(DefaultTreeNode $parent): void
@@ -146,18 +165,20 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getRawValue(): int|float|null
+    public function getRawValue(): mixed
     {
         return $this->rawValue;
     }
 
     #[\Override]
-    public function getMeasurePropertyName(): ?string
+    public function getNumericValue(): int|float
     {
-        if ($this->member instanceof MeasureDescription) {
-            return $this->member->getMeasurePropertyName();
-        }
+        return $this->numericValue;
+    }
 
-        return null;
+    #[\Override]
+    public function getUnit(): ?Unit
+    {
+        return $this->unit;
     }
 }

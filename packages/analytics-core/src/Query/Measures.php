@@ -28,4 +28,6 @@ interface Measures extends \Traversable, \Countable
     public function get(string $key): Measure;
 
     public function first(): ?Measure;
+
+    public function has(string $key): bool;
 }

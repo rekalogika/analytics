@@ -13,20 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
 /**
- * Represent a dimension
+ * Represent a normalized row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Dimension
+interface NormalRow
 {
-    public function getLabel(): string|TranslatableInterface;
+    public function getTuple(): Tuple;
 
-    public function getKey(): string;
-
-    public function getMember(): mixed;
-
-    public function getRawMember(): mixed;
+    public function getMeasure(): Measure;
 }

@@ -16,8 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Query\Dimension;
 use Rekalogika\Analytics\Query\Dimensions;
 use Rekalogika\Analytics\Query\Tuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultTuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
+use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**
  * @implements \IteratorAggregate<string,Dimension>
@@ -28,20 +27,6 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         private Dimensions $dimensions,
     ) {}
 
-    public static function fromResultTuple(ResultTuple $resultTuple): self
-    {
-        $dimensions = array_map(
-            static fn(ResultValue $value): mixed => DefaultDimension::createFromResultValue($value),
-            $resultTuple->getDimensions(),
-        );
-
-        $dimensions = new DefaultDimensions(
-            dimensions: $dimensions,
-        );
-
-        return new self($dimensions);
-    }
-
     #[\Override]
     public function getMembers(): array
     {
@@ -49,7 +34,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
         foreach ($this->dimensions as $dimension) {
             /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getKey()] = $dimension->getValue();
+            $members[$dimension->getKey()] = $dimension->getMember();
         }
 
         return $members;
@@ -59,6 +44,12 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     public function get(string $key): Dimension
     {
         return $this->dimensions->get($key);
+    }
+
+    #[\Override]
+    public function has(string $key): bool
+    {
+        return $this->dimensions->has($key);
     }
 
     #[\Override]
@@ -77,5 +68,23 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     public function first(): ?Dimension
     {
         return $this->dimensions->first();
+    }
+
+    #[\Override]
+    public function isSame(Tuple $other): bool
+    {
+        foreach ($this->dimensions as $key => $dimension) {
+            if (!$other->has($key)) {
+                return false;
+            }
+
+            $otherDimension = $other->get($key);
+
+            if (!DimensionUtil::isSame($dimension, $otherDimension)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

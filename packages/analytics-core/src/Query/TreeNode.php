@@ -32,12 +32,18 @@ interface TreeNode extends \Traversable, \Countable
     /**
      * Description of the dimension (e.g. Country, Hour of the day)
      */
-    public function getLegend(): string|TranslatableInterface;
+    public function getLabel(): string|TranslatableInterface;
 
     /**
-     * The member that this node represents. (e.g. France, 12:00).
+     * The member of the dimension that this node represents. (e.g. France,
+     * 12:00).
      */
     public function getMember(): mixed;
+
+    /**
+     * The raw member of the dimension as returned by the database.
+     */
+    public function getRawMember(): mixed;
 
     /**
      * The canonical value. If not in leaf node, the value is null. Usually a
@@ -46,11 +52,20 @@ interface TreeNode extends \Traversable, \Countable
     public function getValue(): mixed;
 
     /**
-     * The raw value. If not in leaf node, the value is null.
+     * The raw value as returned by the database. If not in leaf node, the value
+     * is null.
      */
-    public function getRawValue(): int|float|null;
+    public function getRawValue(): mixed;
 
-    public function getMeasurePropertyName(): ?string;
+    /**
+     * Like the canonical value, but guaranteed to be in numeric format.
+     */
+    public function getNumericValue(): int|float;
+
+    /**
+     * The unit of the value. If not in leaf node, the value is always null.
+     */
+    public function getUnit(): ?Unit;
 
     /**
      * Whether this node is a leaf node.
