@@ -35,9 +35,15 @@ interface TreeNode extends \Traversable, \Countable
     public function getLabel(): string|TranslatableInterface;
 
     /**
-     * The member that this node represents. (e.g. France, 12:00).
+     * The member of the dimension that this node represents. (e.g. France,
+     * 12:00).
      */
     public function getMember(): mixed;
+
+    /**
+     * The raw member of the dimension as returned by the database.
+     */
+    public function getRawMember(): mixed;
 
     /**
      * The canonical value. If not in leaf node, the value is null. Usually a
