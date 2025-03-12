@@ -22,5 +22,7 @@ interface Result
 {
     public function getTree(): TreeResult;
 
+    public function getNormalTable(): NormalTable;
+
     public function getTable(): Table;
 }

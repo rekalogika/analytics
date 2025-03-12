@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Query;
 
 /**
- * A query result in normalized tabular format
+ * A query result in normalized tabular format. Each row contains one measure.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

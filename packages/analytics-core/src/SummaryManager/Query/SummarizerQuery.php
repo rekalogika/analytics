@@ -24,8 +24,6 @@ use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
@@ -114,13 +112,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // check if select is empty
         if ($this->query->getSelect() === []) {
-            $treeResult = new DefaultTreeResult(children: []);
-            $table = new DefaultTable([]);
-
-            return new DefaultResult(
-                treeResult: $treeResult,
-                table: $table,
-            );
+            return DefaultResult::createEmpty();
         }
 
         // execute doctrine query
@@ -151,6 +143,7 @@ final class SummarizerQuery extends AbstractQuery
         return new DefaultResult(
             treeResult: $tree,
             table: $table,
+            normalTable: $normalTable,
         );
     }
 
