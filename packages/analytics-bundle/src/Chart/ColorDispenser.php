@@ -21,7 +21,7 @@ final class ColorDispenser
 
     public function __construct()
     {
-        $this->hsl = new Hsl('hsl(210,70%,80%)');
+        $this->hsl = new Hsl('hsl(210,90%,70%)');
     }
 
     public function dispenseColor(): string

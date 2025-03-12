@@ -61,6 +61,18 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     }
 
     #[\Override]
+    public function getByIndex(int $index): Dimension
+    {
+        $keys = array_keys($this->dimensions);
+
+        if (!isset($keys[$index])) {
+            throw new \InvalidArgumentException(\sprintf('Dimension at index "%d" not found', $index));
+        }
+
+        return $this->dimensions[$keys[$index]];
+    }
+
+    #[\Override]
     public function has(string $key): bool
     {
         return isset($this->dimensions[$key]);
