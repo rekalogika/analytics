@@ -20,7 +20,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\ResultValue;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
-use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -432,14 +432,11 @@ final readonly class QueryResultToRowTransformer
             throw new \RuntimeException(\sprintf('Hierarchy not found: %s', $dimensionName));
         }
 
-        return new TranslatableMessage(
-            '{property} - {dimension}',
-            [
-                '{property}' => $metadata->getLabel(),
-                '{dimension}' => $hierarchyMetadata
-                    ->getProperty($propertyName)
-                    ->getLabel(),
-            ],
+        return new TranslatablePropertyDimension(
+            propertyLabel: $metadata->getLabel(),
+            dimensionLabel: $hierarchyMetadata
+                ->getProperty($propertyName)
+                ->getLabel(),
         );
     }
 

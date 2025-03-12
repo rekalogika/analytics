@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="en">
+  <file id="rekalogika_analytics.en">
+    <unit id="True" name="True">
+      <segment>
+        <source>True</source>
+        <target>True</target>
+      </segment>
+    </unit>
+    <unit id="False" name="False">
+      <segment>
+        <source>False</source>
+        <target>False</target>
+      </segment>
+    </unit>
+    <unit id="Values" name="Values">
+      <segment>
+        <source>Values</source>
+        <target>Values</target>
+      </segment>
+    </unit>
+    <unit id="Yes" name="Yes">
+      <segment>
+        <source>Yes</source>
+        <target>Yes</target>
+      </segment>
+    </unit>
+    <unit id="No" name="No">
+      <segment>
+        <source>No</source>
+        <target>No</target>
+      </segment>
+    </unit>
+    <unit id="Year" name="Year">
+      <segment>
+        <source>Year</source>
+        <target>Year</target>
+      </segment>
+    </unit>
+    <unit id="Quarter" name="Quarter">
+      <segment>
+        <source>Quarter</source>
+        <target>Quarter</target>
+      </segment>
+    </unit>
+    <unit id="QuarterofYear" name="Quarter of Year">
+      <segment>
+        <source>Quarter of Year</source>
+        <target>Quarter of Year</target>
+      </segment>
+    </unit>
+    <unit id="Month" name="Month">
+      <segment>
+        <source>Month</source>
+        <target>Month</target>
+      </segment>
+    </unit>
+    <unit id="MonthofYear" name="Month of Year">
+      <segment>
+        <source>Month of Year</source>
+        <target>Month of Year</target>
+      </segment>
+    </unit>
+    <unit id="Date" name="Date">
+      <segment>
+        <source>Date</source>
+        <target>Date</target>
+      </segment>
+    </unit>
+    <unit id="WeekDate" name="Week Date">
+      <segment>
+        <source>Week Date</source>
+        <target>Week Date</target>
+      </segment>
+    </unit>
+    <unit id="DayofWeek" name="Day of Week">
+      <segment>
+        <source>Day of Week</source>
+        <target>Day of Week</target>
+      </segment>
+    </unit>
+    <unit id="DayofMonth" name="Day of Month">
+      <segment>
+        <source>Day of Month</source>
+        <target>Day of Month</target>
+      </segment>
+    </unit>
+    <unit id="DayofYear" name="Day of Year">
+      <segment>
+        <source>Day of Year</source>
+        <target>Day of Year</target>
+      </segment>
+    </unit>
+    <unit id="Hour" name="Hour">
+      <segment>
+        <source>Hour</source>
+        <target>Hour</target>
+      </segment>
+    </unit>
+    <unit id="HourofDay" name="Hour of Day">
+      <segment>
+        <source>Hour of Day</source>
+        <target>Hour of Day</target>
+      </segment>
+    </unit>
+    <unit id="WeekYear" name="Week Year">
+      <segment>
+        <source>Week Year</source>
+        <target>Week Year</target>
+      </segment>
+    </unit>
+    <unit id="Week" name="Week">
+      <segment>
+        <source>Week</source>
+        <target>Week</target>
+      </segment>
+    </unit>
+    <unit id="WeekofYear" name="Week of Year">
+      <segment>
+        <source>Week of Year</source>
+        <target>Week of Year</target>
+      </segment>
+    </unit>
+    <unit id="WeekofMonth" name="Week of Month">
+      <segment>
+        <source>Week of Month</source>
+        <target>Week of Month</target>
+      </segment>
+    </unit>
+  </file>
+</xliff>

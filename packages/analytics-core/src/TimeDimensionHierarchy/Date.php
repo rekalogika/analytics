@@ -78,14 +78,24 @@ final class Date implements Interval
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $translator->trans(
-            id: '{date, date}',
-            parameters: [
-                'date' => $this->getStart(),
-            ],
-            domain: 'rekalogika_analytics+intl-icu',
-            locale: $locale,
+        $locale = $locale ?? $translator->getLocale();
+
+        $intlDateFormatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            $this->start->getTimezone(),
+            \IntlDateFormatter::GREGORIAN,
+            null,
         );
+
+        $formatted = $intlDateFormatter->format($this->start);
+
+        if (!\is_string($formatted)) {
+            $formatted = (string) $this;
+        }
+
+        return $formatted;
     }
 
     #[\Override]
