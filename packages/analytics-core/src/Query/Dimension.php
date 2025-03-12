@@ -26,7 +26,7 @@ interface Dimension
 
     public function getKey(): string;
 
-    public function getValue(): mixed;
+    public function getMember(): mixed;
 
-    public function getRawValue(): mixed;
+    public function getRawMember(): mixed;
 }

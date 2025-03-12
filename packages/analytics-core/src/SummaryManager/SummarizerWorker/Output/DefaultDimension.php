@@ -22,8 +22,8 @@ final readonly class DefaultDimension implements Dimension
     public function __construct(
         private string|TranslatableInterface $label,
         private string $key,
-        private mixed $value,
-        private mixed $rawValue,
+        private mixed $member,
+        private mixed $rawMember,
     ) {}
 
     public static function createFromResultValue(ResultValue $resultValue): self
@@ -31,8 +31,8 @@ final readonly class DefaultDimension implements Dimension
         return new self(
             label: $resultValue->getLabel(),
             key: $resultValue->getField(),
-            value: $resultValue->getValue(),
-            rawValue: $resultValue->getRawValue(),
+            member: $resultValue->getValue(),
+            rawMember: $resultValue->getRawValue(),
         );
     }
 
@@ -49,14 +49,14 @@ final readonly class DefaultDimension implements Dimension
     }
 
     #[\Override]
-    public function getValue(): mixed
+    public function getMember(): mixed
     {
-        return $this->value;
+        return $this->member;
     }
 
     #[\Override]
-    public function getRawValue(): mixed
+    public function getRawMember(): mixed
     {
-        return $this->rawValue;
+        return $this->rawMember;
     }
 }

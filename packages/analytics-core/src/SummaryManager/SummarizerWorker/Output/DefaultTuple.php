@@ -49,7 +49,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
         foreach ($this->dimensions as $dimension) {
             /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getKey()] = $dimension->getValue();
+            $members[$dimension->getKey()] = $dimension->getMember();
         }
 
         return $members;

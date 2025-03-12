@@ -76,21 +76,21 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $member = $dimensions->first();
+            $dimension = $dimensions->first();
 
-            if ($member === null) {
+            if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
             }
 
             // get label
 
             if ($xTitle === null) {
-                $xTitle = $this->stringifier->toString($member->getLabel());
+                $xTitle = $this->stringifier->toString($dimension->getLabel());
             }
 
             // get value
 
-            $labels[] = $this->stringifier->toString($member->getValue());
+            $labels[] = $this->stringifier->toString($dimension->getMember());
 
             $measures = $row->getMeasures();
 
