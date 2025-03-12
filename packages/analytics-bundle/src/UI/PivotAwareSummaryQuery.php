@@ -470,7 +470,9 @@ final class PivotAwareSummaryQuery
         }
 
         if (\is_bool($choice)) {
-            $choice = $choice ? new TranslatableMessage('Yes') : new TranslatableMessage('No');
+            $choice = $choice
+                ? new TranslatableMessage('Yes')
+                : new TranslatableMessage('No');
 
             return $choice->trans($this->translator);
         }

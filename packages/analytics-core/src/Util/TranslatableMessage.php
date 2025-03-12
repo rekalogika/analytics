@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Nate Wiebe <nate@northern.co>
  */
-final class TranslatableMessage implements TranslatableInterface
+final class TranslatableMessage implements TranslatableInterface, \Stringable
 {
     /**
      * @param array<string,mixed> $parameters
@@ -30,9 +30,10 @@ final class TranslatableMessage implements TranslatableInterface
     public function __construct(
         private string $message,
         private array $parameters = [],
-        private ?string $domain = null,
+        private ?string $domain = 'rekalogika_analytics',
     ) {}
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->message;
