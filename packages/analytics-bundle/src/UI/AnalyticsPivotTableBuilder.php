@@ -11,9 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Formatter;
+namespace Rekalogika\Analytics\Bundle\UI;
 
-interface Stringifier
+use Rekalogika\Analytics\Query\Result;
+
+interface AnalyticsPivotTableBuilder
 {
-    public function toString(mixed $input): string;
+    public function createPivotTable(
+        Result $result,
+    ): string;
 }

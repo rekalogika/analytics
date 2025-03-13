@@ -25,6 +25,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\RuntimeExtensionInterface;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 final class ArchitectureTest
@@ -151,6 +152,7 @@ final class ArchitectureTest
                 Selector::classname(Environment::class),
                 Selector::classname(RuntimeExtensionInterface::class),
                 Selector::classname(TwigFunction::class),
+                Selector::classname(TwigFilter::class),
                 Selector::classname(AbstractExtension::class),
 
                 // doctrine

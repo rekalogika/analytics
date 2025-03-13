@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Bundle\UI;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PivotAwareSummaryQueryFactory
+final readonly class PivotAwareSummaryQueryFactory
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {}
 
     /**

@@ -117,8 +117,8 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     if ($numMeasures === 1) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($measure->getLabel()) ?? '-',
-                            $this->stringifier->toString($unit) ?? '-',
+                            $this->stringifier->toString($measure->getLabel()),
+                            $this->stringifier->toString($unit),
                         );
                     } else {
                         $yTitle = $this->stringifier->toString($unit);
@@ -306,8 +306,8 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($valueNode->getMember()) ?? '-',
-                            $this->stringifier->toString($unit) ?? '-',
+                            $this->stringifier->toString($valueNode->getMember()),
+                            $this->stringifier->toString($unit),
                         );
                     } else {
                         $yTitle = $this->stringifier->toString($valueNode->getMember());

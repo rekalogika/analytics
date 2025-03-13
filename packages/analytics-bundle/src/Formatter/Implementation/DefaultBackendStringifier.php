@@ -11,9 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Formatter;
+namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-final readonly class DefaultStringifier implements Stringifier
+use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
+
+final readonly class DefaultBackendStringifier implements BackendStringifier
 {
     #[\Override]
     public function toString(mixed $input): string
