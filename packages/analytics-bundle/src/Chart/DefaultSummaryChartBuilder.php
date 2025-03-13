@@ -264,6 +264,8 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                             $this->stringifier->toString($valueNode->getMember()) ?? '-',
                             $this->stringifier->toString($unit) ?? '-',
                         );
+                    } else {
+                        $yTitle = $this->stringifier->toString($valueNode->getMember());
                     }
                 }
 
