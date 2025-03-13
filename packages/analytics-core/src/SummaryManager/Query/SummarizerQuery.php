@@ -107,7 +107,9 @@ final class SummarizerQuery extends AbstractQuery
         $this->processAllDimensions();
 
         // add partition where clause
-        $this->addPartitionWhere();
+        if (!$this->addPartitionWhere()) {
+            return [];
+        }
 
         // add where clause supplied by the user
         $this->addUserSuppliedWhere();
@@ -325,9 +327,14 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    private function addPartitionWhere(): void
+    private function addPartitionWhere(): bool
     {
         $maxId = $this->getLowestPartitionMaxId();
+
+        if ($maxId === null) {
+            return false;
+        }
+
         $partitionClass = $this->metadata->getPartition()->getPartitionClass();
         $lowestLevel = PartitionUtil::getLowestLevel($partitionClass);
         $pointPartition = $partitionClass::createFromSourceValue($maxId, $lowestLevel);
@@ -337,6 +344,8 @@ final class SummarizerQuery extends AbstractQuery
         $orX = $this->queryBuilder->expr()->orX(...$conditions);
 
         $this->queryBuilder->andWhere($orX);
+
+        return true;
     }
 
     private function getLowestPartitionMaxId(): int|string|null
