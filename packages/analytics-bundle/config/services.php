@@ -22,13 +22,18 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
-use Rekalogika\Analytics\Bundle\Formatter\ChainStringifier;
-use Rekalogika\Analytics\Bundle\Formatter\DefaultStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultHtmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\Formatter\TranslatableStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierExtension;
+use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -286,11 +291,35 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('twig.extension');
 
     $services
+        ->set(HtmlifierRuntime::class)
+        ->tag('twig.runtime')
+        ->args([
+            '$htmlifier' => service(Htmlifier::class),
+        ])
+    ;
+
+    $services
+        ->set(HtmlifierExtension::class)
+        ->tag('twig.extension')
+    ;
+
+    $services
         ->set(PivotAwareSummaryQueryFactory::class)
         ->args([
             '$translator' => service('translator'),
         ])
     ;
+
+    $services
+        ->set(PivotTableRenderer::class)
+        ->args([
+            '$twig' => service('twig'),
+        ])
+    ;
+
+    //
+    // chart
+    //
 
     $services
         ->set(AnalyticsChartBuilder::class)
@@ -306,14 +335,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(ChartConfiguration::class);
 
-
     //
     // stringifier
     //
 
     $services
-        ->set(DefaultStringifier::class)
-        ->tag('rekalogika.analytics.stringifier', [
+        ->set(DefaultBackendStringifier::class)
+        ->tag('rekalogika.analytics.backend_stringifier', [
             'priority' => -1000,
         ])
     ;
@@ -323,16 +351,25 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$translator' => service('translator'),
         ])
-        ->tag('rekalogika.analytics.stringifier', [
+        ->tag('rekalogika.analytics.backend_stringifier', [
             'priority' => -900,
         ])
     ;
 
     $services
         ->set(Stringifier::class)
-        ->class(ChainStringifier::class)
+        ->class(DefaultStringifier::class)
         ->args([
-            '$stringifiers' => tagged_iterator('rekalogika.analytics.stringifier'),
+            '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
+        ])
+    ;
+
+    $services
+        ->set(Htmlifier::class)
+        ->class(DefaultHtmlifier::class)
+        ->args([
+            '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
+            '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
         ])
     ;
 };

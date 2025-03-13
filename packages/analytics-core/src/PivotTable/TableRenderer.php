@@ -21,6 +21,9 @@ use Rekalogika\Analytics\PivotTable\Table\Row;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 use Rekalogika\Analytics\PivotTable\Table\Table;
 
+/**
+ * @api
+ */
 class TableRenderer
 {
     /**
@@ -111,7 +114,7 @@ class TableRenderer
     /**
      * @param 'thead'|'tbody'|'tfoot' $tag
      */
-    protected function renderRows(string $tag, string $tagAttributes, Rows $rows): string
+    private function renderRows(string $tag, string $tagAttributes, Rows $rows): string
     {
         $result = \sprintf('<%s %s>', $tag, $tagAttributes);
 

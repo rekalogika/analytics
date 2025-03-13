@@ -11,13 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Formatter;
+namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
+use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class TranslatableStringifier implements Stringifier
+final readonly class TranslatableStringifier implements BackendStringifier
 {
     public function __construct(
         private TranslatorInterface $translator,

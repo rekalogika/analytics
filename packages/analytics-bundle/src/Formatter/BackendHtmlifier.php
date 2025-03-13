@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter;
 
-interface Stringifier
+interface BackendHtmlifier
 {
-    public function toString(mixed $input): string;
+    public function toHtml(mixed $input): ?string;
 }

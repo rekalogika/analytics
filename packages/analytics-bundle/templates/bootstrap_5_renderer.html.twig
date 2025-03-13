@@ -1,0 +1,31 @@
+{% extends '@RekalogikaAnalytics/renderer.html.twig' %}
+
+{% block no_data %}
+    <div class="alert alert-danger" role="alert">
+        {{ 'No data'|trans }}
+    </div>
+{% endblock no_data %}
+
+{% block table_attr %}
+    class="table table-bordered"
+{% endblock table_attr %}
+
+{% block header_attr %}
+    class="table-light"
+{% endblock header_attr %}
+
+{% block body_attr %}
+    class="table-group-divider"
+{% endblock body_attr %}
+
+{% block footer_attr %}
+{% endblock footer_attr %}
+
+{% block row_attr %}
+{% endblock row_attr %}
+
+{% block data_cell_attr %}
+{% endblock data_cell_attr %}
+
+{% block header_cell_attr %}
+{% endblock header_cell_attr %}

@@ -1,0 +1,91 @@
+{% block table %}
+    {% if table|length == 0 %}
+        {{ block("no_data") }}
+    {% else %}
+        <table {{ block("table_attr") }}>
+            {% set rows = table.header %}
+            {{ block("header") }}
+
+            {% set rows = table.body %}
+            {{ block("body") }}
+
+            {% set rows = table.footer %}
+            {{ block("footer") }}
+        </table>
+    {% endif %}
+{% endblock table %}
+
+{% block header %}
+    <thead {{ block("header_attr") }}>
+        {% for row in rows %}{{ block("row") }}{% endfor %}
+    </thead>
+{% endblock header %}
+
+{% block body %}
+    <tbody {{ block("body_attr") }}>
+        {% for row in rows %}{{ block("row") }}{% endfor %}
+    </tbody>
+{% endblock body %}
+
+{% block footer %}
+    <tbody {{ block("footer_attr") }}>
+        {% for row in rows %}{{ block("row") }}{% endfor %}
+    </tbody>
+{% endblock footer %}
+
+{% block row %}
+    <tr {{ block("row_attr") }}>
+        {% for cell in row %}{{ block("cell") }}{% endfor %}
+    </tr>
+{% endblock row %}
+
+{% block cell %}
+    {% if constant('class', cell) == 'Rekalogika\\Analytics\\PivotTable\\Table\\HeaderCell' %}
+        {{ block("header_cell") }}
+    {% else %}
+        {{ block("data_cell") }}
+    {% endif %}
+{% endblock cell %}
+
+{% block data_cell %}
+    <td {{ block("data_cell_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
+        {% set content = cell.content %}
+        {{ block("content") }}
+    </td>
+{% endblock data_cell %}
+
+{% block header_cell %}
+    <th {{ block("header_cell_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
+        {% set content = cell.content %}
+        {{ block("content") }}
+    </th>
+{% endblock header_cell %}
+
+{% block content %}
+    {{ content|analytics_to_html }}
+{% endblock content %}
+
+{% block no_data %}
+    <p>No Data</p>
+{% endblock no_data %}
+
+{% block table_attr %}
+{% endblock table_attr %}
+
+{% block header_attr %}
+{% endblock header_attr %}
+
+{% block body_attr %}
+{% endblock body_attr %}
+
+{% block footer_attr %}
+{% endblock footer_attr %}
+
+{% block row_attr %}
+{% endblock row_attr %}
+
+{% block data_cell_attr %}
+{% endblock data_cell_attr %}
+
+{% block header_cell_attr %}
+{% endblock header_cell_attr %}

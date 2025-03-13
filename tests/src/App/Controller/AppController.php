@@ -16,11 +16,10 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\DistinctValuesResolver;
-use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
-use Rekalogika\Analytics\Tests\App\Misc\PivotTableRenderer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -30,7 +29,6 @@ final class AppController extends AbstractController
 {
     public function __construct(
         private readonly SummaryManagerRegistry $summaryManagerRegistry,
-        private readonly PivotTableRenderer $pivotTableRenderer,
     ) {}
 
 
@@ -40,6 +38,7 @@ final class AppController extends AbstractController
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
         AnalyticsChartBuilder $summaryChartBuilder,
+        PivotTableRenderer $pivotTableRenderer,
     ): Response {
 
         if ($parameters === null) {
@@ -53,34 +52,32 @@ final class AppController extends AbstractController
             $parameters = [];
         }
 
-        // dump($parameters);
-
         /** @var array<string,mixed> $parameters */
 
         $summaryTableManager = $this->summaryManagerRegistry
             ->getManager(OrderSummary::class);
 
+        // populate query from url parameter
         $query = $summaryTableManager->createQuery();
         $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
-        $treeResult = $query->getResult()->getTree();
+        $result = $query->getResult();
 
         // create pivot table
-        $pivotTable = new PivotTableAdapter($treeResult);
-        $renderedPivotTable = $this->pivotTableRenderer->render(
-            treeNode: $pivotTable,
-            pivotedNodes: $query->getPivotedDimensions(),
+        $pivotTable = $pivotTableRenderer->createPivotTable(
+            result: $result,
+            pivotedDimensions: $query->getPivotedDimensions(),
         );
 
         // create chart
         try {
-            $chart = $summaryChartBuilder->createChart($query->getResult());
+            $chart = $summaryChartBuilder->createChart($result);
         } catch (UnsupportedData $e) {
             $chart = null;
         }
 
         return $this->render('app/index.html.twig', [
             'query' => $query,
-            'pivotTable' => $renderedPivotTable,
+            'pivotTable' => $pivotTable,
             'chart' => $chart,
         ]);
     }
