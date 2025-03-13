@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
-use Rekalogika\Analytics\Query\Result;
-use Symfony\UX\Chartjs\Model\Chart;
-
-interface SummaryChartBuilder
+enum ChartType
 {
-    /**
-     * @throws UnsupportedData
-     */
-    public function createChart(Result $result): Chart;
+    case Auto;
+    case Bar;
+    case StackedBar;
+    case Pie;
 }

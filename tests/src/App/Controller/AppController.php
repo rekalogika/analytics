@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
-use Rekalogika\Analytics\Bundle\Chart\SummaryChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -34,12 +34,12 @@ final class AppController extends AbstractController
     ) {}
 
 
-    #[Route('/app', name: 'app_app')]
+    #[Route('/', name: 'index')]
     public function index(
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
-        SummaryChartBuilder $summaryChartBuilder,
+        AnalyticsChartBuilder $summaryChartBuilder,
     ): Response {
 
         if ($parameters === null) {

@@ -13,21 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
-use OzdemirBurak\Iris\Color\Hsl;
+use Rekalogika\Analytics\Query\Result;
+use Symfony\UX\Chartjs\Model\Chart;
 
-final class ColorDispenser
+interface AnalyticsChartBuilder
 {
-    private Hsl $hsl;
-
-    public function __construct()
-    {
-        $this->hsl = new Hsl('hsl(210,90%,70%)');
-    }
-
-    public function dispenseColor(): string
-    {
-        $this->hsl->spin(137.5);
-
-        return (string) $this->hsl->toHex();
-    }
+    /**
+     * @throws UnsupportedData
+     */
+    public function createChart(
+        Result $result,
+        ChartType $chartType = ChartType::Auto,
+    ): Chart;
 }

@@ -11,8 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\Chart;
+namespace Rekalogika\Analytics\Bundle\Chart\Implementation;
 
+use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\ChartType;
+use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Query\Measures;
 use Rekalogika\Analytics\Query\Result;
@@ -20,22 +23,36 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-final class DefaultSummaryChartBuilder implements SummaryChartBuilder
+final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 {
-    private ColorDispenser $colorDispenser;
-
     public function __construct(
         private LocaleSwitcher $localeSwitcher,
         private ChartBuilderInterface $chartBuilder,
         private Stringifier $stringifier,
-        private string $transparency = '60',
-        private int $borderWidth = 1,
-    ) {
-        $this->colorDispenser = new ColorDispenser();
-    }
+        private ChartConfiguration $configuration,
+    ) {}
 
     #[\Override]
-    public function createChart(Result $result): Chart
+    public function createChart(
+        Result $result,
+        ChartType $chartType = ChartType::Auto,
+    ): Chart {
+        if ($chartType === ChartType::Auto) {
+            return $this->createAutoChart($result);
+        }
+
+        if ($chartType === ChartType::Bar) {
+            return $this->createBarChart($result);
+        }
+
+        if ($chartType === ChartType::StackedBar) {
+            return $this->createStackedBarChart($result);
+        }
+
+        throw new UnsupportedData('Unsupported chart type');
+    }
+
+    private function createAutoChart(Result $result): Chart
     {
         $measures = $result->getTable()->first()?->getMeasures();
 
@@ -58,8 +75,9 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         throw new UnsupportedData('Unsupported chart type');
     }
 
-    public function createBarChart(Result $result): Chart
+    private function createBarChart(Result $result): Chart
     {
+        $colorDispenser = $this->createColorDispenser();
         $measures = $result->getTable()->first()?->getMeasures();
 
         if ($measures === null) {
@@ -83,10 +101,10 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
             $dataSets[$key]['data'] = [];
 
-            $color = $this->dispenseColor();
-            $dataSets[$key]['backgroundColor'] = $color . $this->transparency;
+            $color = $colorDispenser->dispenseColor();
+            $dataSets[$key]['backgroundColor'] = $color . $this->configuration->areaTransparency;
             $dataSets[$key]['borderColor'] = $color;
-            $dataSets[$key]['borderWidth'] = $this->borderWidth;
+            $dataSets[$key]['borderWidth'] = $this->configuration->areaBorderWidth;
 
             if ($yTitle === null) {
                 $unit = $measure->getUnit();
@@ -160,6 +178,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $xTitle = [
                 'display' => true,
                 'text' => $xTitle,
+                'font' => $this->configuration->labelFont,
             ];
         }
 
@@ -173,6 +192,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $yTitle = [
                 'display' => true,
                 'text' => $yTitle,
+                'font' => $this->configuration->labelFont,
             ];
         }
 
@@ -211,8 +231,9 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         return $chart;
     }
 
-    public function createStackedBarChart(Result $result): Chart
+    private function createStackedBarChart(Result $result): Chart
     {
+        $colorDispenser = $this->createColorDispenser();
         $measure = $result->getTable()->first()?->getMeasures()->first();
 
         if ($measure === null) {
@@ -253,10 +274,10 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                 $signature = $this->getSignature($dimension2);
 
                 if (!isset($dataSets[$signature]['backgroundColor'])) {
-                    $color = $this->dispenseColor();
-                    $dataSets[$signature]['backgroundColor'] = $color . $this->transparency;
+                    $color = $colorDispenser->dispenseColor();
+                    $dataSets[$signature]['backgroundColor'] = $color . $this->configuration->areaTransparency;
                     $dataSets[$signature]['borderColor'] = $color;
-                    $dataSets[$signature]['borderWidth'] = $this->borderWidth;
+                    $dataSets[$signature]['borderWidth'] = $this->configuration->areaBorderWidth;
                 }
 
 
@@ -312,6 +333,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $xTitle = [
                 'display' => true,
                 'text' => $xTitle,
+                'font' => $this->configuration->labelFont,
             ];
         }
 
@@ -325,6 +347,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $yTitle = [
                 'display' => true,
                 'text' => $yTitle,
+                'font' => $this->configuration->labelFont,
             ];
         }
 
@@ -338,6 +361,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $legendTitle = [
                 'display' => true,
                 'text' => $legendTitle,
+                'font' => $this->configuration->labelFont,
             ];
         }
 
@@ -405,11 +429,6 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         return $selectedMeasures;
     }
 
-    private function dispenseColor(): string
-    {
-        return $this->colorDispenser->dispenseColor();
-    }
-
     private function getSignature(mixed $variable): string
     {
         if (\is_object($variable)) {
@@ -417,5 +436,10 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         }
 
         return hash('xxh128', serialize($variable));
+    }
+
+    private function createColorDispenser(): ColorDispenser
+    {
+        return new ColorDispenser();
     }
 }

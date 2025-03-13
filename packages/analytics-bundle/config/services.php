@@ -15,8 +15,9 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
-use Rekalogika\Analytics\Bundle\Chart\DefaultSummaryChartBuilder;
-use Rekalogika\Analytics\Bundle\Chart\SummaryChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\Chart\Implementation\ChartConfiguration;
+use Rekalogika\Analytics\Bundle\Chart\Implementation\DefaultAnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
@@ -292,14 +293,19 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(SummaryChartBuilder::class)
-        ->class(DefaultSummaryChartBuilder::class)
+        ->set(AnalyticsChartBuilder::class)
+        ->class(DefaultAnalyticsChartBuilder::class)
         ->args([
             '$localeSwitcher' => service('translation.locale_switcher'),
             '$chartBuilder' => service(ChartBuilderInterface::class),
             '$stringifier' => service(Stringifier::class),
+            '$configuration' => service(ChartConfiguration::class),
         ])
     ;
+
+    $services
+        ->set(ChartConfiguration::class);
+
 
     //
     // stringifier
