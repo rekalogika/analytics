@@ -97,7 +97,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                     }
                 } else {
                     if ($numMeasures === 1) {
-                        $yTitle = sprintf(
+                        $yTitle = \sprintf(
                             '%s - %s',
                             $this->stringifier->toString($measure->getLabel()) ?? '-',
                             $this->stringifier->toString($unit) ?? '-',
@@ -232,7 +232,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         foreach ($result->getTable() as $row) {
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getRawMember();
+            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -249,6 +249,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             /** @psalm-suppress MixedAssignment */
             foreach ($secondDimensions as $dimension2) {
                 $node2 = $node->traverse($dimension2);
+
                 $signature = $this->getSignature($dimension2);
 
                 if (!isset($dataSets[$signature]['backgroundColor'])) {
@@ -257,6 +258,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                     $dataSets[$signature]['borderColor'] = $color;
                     $dataSets[$signature]['borderWidth'] = $this->borderWidth;
                 }
+
 
                 if ($node2 === null) {
                     $dataSets[$signature]['data'][] = 0;
