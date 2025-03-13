@@ -67,6 +67,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
         }
 
         $selectedMeasures = $this->selectMeasures($measures);
+        $numMeasures = \count($selectedMeasures);
 
         $labels = [];
         $dataSets = [];
@@ -87,14 +88,24 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             $dataSets[$key]['borderColor'] = $color;
             $dataSets[$key]['borderWidth'] = $this->borderWidth;
 
-            if ($yTitle !== null) {
-                continue;
-            }
+            if ($yTitle === null) {
+                $unit = $measure->getUnit();
 
-            $unit = $measure->getUnit();
-
-            if ($unit !== null) {
-                $yTitle = $this->stringifier->toString($unit);
+                if ($unit === null) {
+                    if ($numMeasures === 1) {
+                        $yTitle = $this->stringifier->toString($measure->getLabel());
+                    }
+                } else {
+                    if ($numMeasures === 1) {
+                        $yTitle = sprintf(
+                            '%s - %s',
+                            $this->stringifier->toString($measure->getLabel()) ?? '-',
+                            $this->stringifier->toString($unit) ?? '-',
+                        );
+                    } else {
+                        $yTitle = $this->stringifier->toString($unit);
+                    }
+                }
             }
         }
 
@@ -167,10 +178,16 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         // legend
 
-        $legend = [
-            'display' => true,
-            'position' => 'top',
-        ];
+        if ($numMeasures > 1) {
+            $legend = [
+                'display' => true,
+                'position' => 'top',
+            ];
+        } else {
+            $legend = [
+                'display' => false,
+            ];
+        }
 
         $chart->setOptions([
             'responsive' => true,
@@ -207,6 +224,7 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
 
         $xTitle = null;
         $yTitle = null;
+        $legendTitle = null;
 
         // collect second dimension
 
@@ -250,6 +268,10 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                     $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getMember());
                 }
 
+                if ($legendTitle === null) {
+                    $legendTitle = $this->stringifier->toString($node2->getLabel());
+                }
+
                 $children = iterator_to_array($node2, false);
                 $valueNode = $children[0];
 
@@ -268,7 +290,6 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
                         $yTitle = $this->stringifier->toString($valueNode->getMember());
                     }
                 }
-
             }
         }
 
@@ -305,6 +326,19 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             ];
         }
 
+        // legend title
+
+        if ($legendTitle === null) {
+            $legendTitle = [
+                'display' => false,
+            ];
+        } else {
+            $legendTitle = [
+                'display' => true,
+                'text' => $legendTitle,
+            ];
+        }
+
         // legend
 
         $legend = [
@@ -316,7 +350,10 @@ final class DefaultSummaryChartBuilder implements SummaryChartBuilder
             'responsive' => true,
             'locale' => $this->localeSwitcher->getLocale(),
             'plugins' => [
-                'legend' => $legend,
+                'legend' => [
+                    'title' => $legendTitle,
+                    'labels' => $legend,
+                ],
                 'title' => [
                     'display' => false,
                 ],
