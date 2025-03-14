@@ -20,7 +20,9 @@ trait CacheTrait
      */
     private static array $cache = [];
 
-    public static function createFromDatabaseValue(
+    private int $databaseValue;
+
+    private static function create(
         int $databaseValue,
         \DateTimeZone $timeZone,
     ): static {
@@ -34,8 +36,28 @@ trait CacheTrait
             ??= new static($databaseValue, $timeZone);
     }
 
+    public static function createFromDatabaseValue(int $databaseValue): static
+    {
+        $timeZone = new \DateTimeZone('UTC');
+
+        return self::create($databaseValue, $timeZone);
+    }
+
     abstract private function __construct(
         int $databaseValue,
         \DateTimeZone $timeZone,
     );
+
+    public function withTimeZone(\DateTimeZone $timeZone): static
+    {
+        return self::create(
+            $this->databaseValue,
+            $timeZone,
+        );
+    }
+
+    public function getDatabaseValue(): int
+    {
+        return $this->databaseValue;
+    }
 }

@@ -17,8 +17,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface RecurringInterval extends \Stringable, TranslatableInterface
 {
-    public static function createFromDatabaseValue(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ): static;
+    public static function createFromDatabaseValue(int $databaseValue): static;
+
+    public function getDatabaseValue(): int;
 }

@@ -204,12 +204,12 @@ final class QueryTest extends KernelTestCase
 
     public function testWhereMonthObject(): void
     {
-        $month = Month::createFromDatabaseValue(202410, new \DateTimeZone('UTC'));
+        $month = Month::createFromDatabaseValue(202410);
 
         $result = $this->getQuery()
             ->groupBy('time.month')
             ->select('count')
-            ->where(Criteria::expr()->eq('time.month', $month->getStartDatabaseValue()))
+            ->where(Criteria::expr()->eq('time.month', $month->getDatabaseValue()))
             ->getResult()
             ->getTree();
 

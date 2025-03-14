@@ -37,7 +37,7 @@ final class AppController extends AbstractController
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
-        AnalyticsChartBuilder $summaryChartBuilder,
+        AnalyticsChartBuilder $chartBuilder,
         PivotTableRenderer $pivotTableRenderer,
     ): Response {
 
@@ -70,7 +70,7 @@ final class AppController extends AbstractController
 
         // create chart
         try {
-            $chart = $summaryChartBuilder->createChart($result);
+            $chart = $chartBuilder->createChart($result);
         } catch (UnsupportedData $e) {
             $chart = null;
         }

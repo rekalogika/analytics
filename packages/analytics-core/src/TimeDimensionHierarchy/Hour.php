@@ -27,6 +27,8 @@ final class Hour implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $ymdh = \sprintf('%010d', $databaseValue);
 
         $y = (int) substr($ymdh, 0, 4);
@@ -47,14 +49,14 @@ final class Hour implements Interval
         return 100;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [
-            $this->getContainingDate(),
-            $this->getContainingWeekDate(),
-        ];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [
+    //         $this->getContainingDate(),
+    //         $this->getContainingWeekDate(),
+    //     ];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
@@ -64,7 +66,7 @@ final class Hour implements Interval
         $dateTime = \DateTimeImmutable::createFromInterface($dateTime)
             ->setTimezone($timeZone);
 
-        return new self(
+        return self::create(
             (int) $dateTime->format('YmdH'),
             $timeZone,
         );
@@ -96,30 +98,29 @@ final class Hour implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('YmdH');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('YmdH');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('YmdH');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('YmdH');
+    // }
 
-    private function getContainingDate(): Date
-    {
-        return Date::createFromDatabaseValue(
-            (int) $this->start->format('Ymd'),
-            $this->start->getTimezone(),
-        );
-    }
+    // private function getContainingDate(): Date
+    // {
+    //     return Date::createFromDatabaseValue(
+    //         (int) $this->start->format('Ymd'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 
-    private function getContainingWeekDate(): WeekDate
-    {
-        return WeekDate::createFromDatabaseValue(
-            (int) $this->start->format('oWw'),
-            $this->start->getTimezone(),
-        );
-    }
-
+    // private function getContainingWeekDate(): WeekDate
+    // {
+    //     return WeekDate::createFromDatabaseValue(
+    //         (int) $this->start->format('oWw'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 }

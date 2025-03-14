@@ -27,6 +27,8 @@ final class Week implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $string = \sprintf('%06d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
@@ -45,20 +47,20 @@ final class Week implements Interval
         return 300;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [
-            $this->getContainingWeekYear(),
-        ];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [
+    //         $this->getContainingWeekYear(),
+    //     ];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
         \DateTimeZone $timeZone,
     ): static {
-        return new self(
+        return self::create(
             (int) $dateTime->format('oW'),
             $timeZone,
         );
@@ -98,21 +100,21 @@ final class Week implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('oW');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('oW');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('oW');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('oW');
+    // }
 
-    private function getContainingWeekYear(): WeekYear
-    {
-        return WeekYear::createFromDatabaseValue(
-            (int) $this->start->format('o'),
-            $this->start->getTimezone(),
-        );
-    }
+    // private function getContainingWeekYear(): WeekYear
+    // {
+    //     return WeekYear::createFromDatabaseValue(
+    //         (int) $this->start->format('o'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 }

@@ -27,6 +27,8 @@ final class Quarter implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $string = \sprintf('%05d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
@@ -56,13 +58,13 @@ final class Quarter implements Interval
         return 500;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [
-            $this->getContainingYear(),
-        ];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [
+    //         $this->getContainingYear(),
+    //     ];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
@@ -72,7 +74,7 @@ final class Quarter implements Interval
         $q = self::monthToQuarter((int) $dateTime->format('m'));
         $v = (int) ($dateTime->format('Y') . $q);
 
-        return new self($v, $timeZone);
+        return self::create($v, $timeZone);
     }
 
     #[\Override]
@@ -133,25 +135,25 @@ final class Quarter implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        $q = self::monthToQuarter((int) $this->start->format('m'));
+    // public function getStartDatabaseValue(): int
+    // {
+    //     $q = self::monthToQuarter((int) $this->start->format('m'));
 
-        return (int) ($this->start->format('Y') . $q);
-    }
+    //     return (int) ($this->start->format('Y') . $q);
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        $q = self::monthToQuarter((int) $this->end->format('m'));
+    // public function getEndDatabaseValue(): int
+    // {
+    //     $q = self::monthToQuarter((int) $this->end->format('m'));
 
-        return (int) ($this->end->format('Y') . $q);
-    }
+    //     return (int) ($this->end->format('Y') . $q);
+    // }
 
-    private function getContainingYear(): Year
-    {
-        return Year::createFromDatabaseValue(
-            (int) $this->start->format('Y'),
-            $this->start->getTimezone(),
-        );
-    }
+    // private function getContainingYear(): Year
+    // {
+    //     return Year::createFromDatabaseValue(
+    //         (int) $this->start->format('Y'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 }

@@ -27,6 +27,8 @@ final class Date implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $string = \sprintf('%08d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
@@ -41,27 +43,26 @@ final class Date implements Interval
         $this->end = $this->start->modify('+1 day');
     }
 
-
     public function getHierarchyLevel(): int
     {
         return 200;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [
-            $this->getContainingWeek(),
-            $this->getContainingMonth(),
-        ];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [
+    //         $this->getContainingWeek(),
+    //         $this->getContainingMonth(),
+    //     ];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
         \DateTimeZone $timeZone,
     ): static {
-        return new self(
+        return self::create(
             (int) $dateTime->format('Ymd'),
             $timeZone,
         );
@@ -110,29 +111,29 @@ final class Date implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('Ymd');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('Ymd');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('Ymd');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('Ymd');
+    // }
 
-    private function getContainingWeek(): Week
-    {
-        return Week::createFromDatabaseValue(
-            (int) $this->start->format('oW'),
-            $this->start->getTimezone(),
-        );
-    }
+    // private function getContainingWeek(): Week
+    // {
+    //     return Week::createFromDatabaseValue(
+    //         (int) $this->start->format('oW'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 
-    private function getContainingMonth(): Month
-    {
-        return Month::createFromDatabaseValue(
-            (int) $this->start->format('Ym'),
-            $this->start->getTimezone(),
-        );
-    }
+    // private function getContainingMonth(): Month
+    // {
+    //     return Month::createFromDatabaseValue(
+    //         (int) $this->start->format('Ym'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 }

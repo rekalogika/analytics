@@ -27,6 +27,8 @@ final class WeekYear implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
             ->setISODate($databaseValue, 1)
@@ -40,18 +42,18 @@ final class WeekYear implements Interval
         return 700;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
         \DateTimeZone $timeZone,
     ): static {
-        return new self(
+        return self::create(
             (int) $dateTime->format('o'),
             $timeZone,
         );
@@ -83,13 +85,13 @@ final class WeekYear implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('o');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('o');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('o');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('o');
+    // }
 }
