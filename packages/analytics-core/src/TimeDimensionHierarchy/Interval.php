@@ -29,7 +29,6 @@ interface Interval extends \Stringable, TranslatableInterface
 
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static;
 
     // /**

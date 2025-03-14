@@ -61,14 +61,10 @@ final class Hour implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
-        $dateTime = \DateTimeImmutable::createFromInterface($dateTime)
-            ->setTimezone($timeZone);
-
         return self::create(
             (int) $dateTime->format('YmdH'),
-            $timeZone,
+            $dateTime->getTimezone(),
         );
     }
 

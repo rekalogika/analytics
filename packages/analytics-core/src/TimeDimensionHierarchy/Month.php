@@ -67,8 +67,9 @@ final class Month implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
+        $timeZone = $dateTime->getTimezone();
+
         return self::create(
             (int) $dateTime->format('Ym'),
             $timeZone,

@@ -82,6 +82,7 @@ final class ArchitectureTest
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\BadMethodCallException::class),
                 Selector::classname(\UnexpectedValueException::class),
                 Selector::classname(\Error::class),
             );
