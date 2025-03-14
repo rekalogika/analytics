@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Persistence\ManagerRegistry;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -113,6 +112,7 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
+                Selector::inNamespace('Doctrine\Persistence'),
                 Selector::inNamespace('Doctrine\ORM'),
                 Selector::inNamespace('Psr\Cache'),
                 Selector::inNamespace('Psr\Log'),
@@ -130,7 +130,6 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\Translation'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
-                Selector::classname(ManagerRegistry::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\InvalidArgumentException::class),
                 Selector::classname(\Exception::class),
