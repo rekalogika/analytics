@@ -71,4 +71,9 @@ abstract class AbstractTimeDimensionType extends Type
             $class,
         ));
     }
+
+    final public function getName(): string
+    {
+        return $this->getClass();
+    }
 }
