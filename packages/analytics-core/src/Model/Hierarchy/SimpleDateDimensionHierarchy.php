@@ -30,7 +30,6 @@ final class SimpleDateDimensionHierarchy implements TimeZoneAwareDimensionHierar
 {
     use TimeZoneTrait;
     use YearTrait;
-    use QuarterTrait;
     use MonthTrait;
     use DayTrait;
 }

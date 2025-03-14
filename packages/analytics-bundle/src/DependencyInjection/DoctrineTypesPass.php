@@ -51,7 +51,6 @@ final class DoctrineTypesPass implements CompilerPassInterface
         foreach ($this->getTypes() as $type) {
             $typeDefinition[$type] = [
                 'class' => $type,
-                'commented' => true,
             ];
         }
 
