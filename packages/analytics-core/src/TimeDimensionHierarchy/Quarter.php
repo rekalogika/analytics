@@ -69,12 +69,11 @@ final class Quarter implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
         $q = self::monthToQuarter((int) $dateTime->format('m'));
         $v = (int) ($dateTime->format('Y') . $q);
 
-        return self::create($v, $timeZone);
+        return self::create($v, $dateTime->getTimezone());
     }
 
     #[\Override]

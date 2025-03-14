@@ -51,11 +51,10 @@ final class WeekYear implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
         return self::create(
             (int) $dateTime->format('o'),
-            $timeZone,
+            $dateTime->getTimezone(),
         );
     }
 

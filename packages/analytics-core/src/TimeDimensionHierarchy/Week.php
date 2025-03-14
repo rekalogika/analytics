@@ -58,11 +58,10 @@ final class Week implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
         return self::create(
             (int) $dateTime->format('oW'),
-            $timeZone,
+            $dateTime->getTimezone(),
         );
     }
 

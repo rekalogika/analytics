@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
@@ -32,6 +33,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     private array $involvedDimensions = [];
 
     /**
+     * @var ClassMetadata<object>
+     */
+    private ClassMetadata $classMetadata;
+
+    /**
      * @param list<string> $validFields
      */
     public function __construct(
@@ -41,6 +47,10 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     ) {
         $this->rootAlias = $this->queryBuilder->getRootAliases()[0]
             ?? throw new \InvalidArgumentException('No root alias found');
+
+        $this->classMetadata = $this->queryBuilder->getEntityManager()
+            ->getClassMetadata($this->queryBuilder->getRootEntities()[0]
+                ?? throw new \InvalidArgumentException('No root entity found'));
     }
 
     /**
@@ -60,11 +70,17 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             throw new \InvalidArgumentException("Invalid dimension: $field");
         }
 
+        $fieldMetadata = $this->classMetadata->getFieldMapping($field);
+
         $this->involvedDimensions[$field] = true;
         $field = $this->rootAlias . '.' . $field;
 
-        /** @psalm-suppress MixedAssignment */
-        $value = $this->walkValue($comparison->getValue());
+        /**
+         * @psalm-suppress MixedArgument
+         * @phpstan-ignore argument.type
+         */
+        $value = $this->queryContext->createNamedParameter(value: $comparison->getValue()->getValue(), type: $fieldMetadata['type'] ?? null);
+
         $operator = $comparison->getOperator();
 
         return match ($operator) {
@@ -83,8 +99,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkValue(Value $value): mixed
     {
-        return $this->queryContext
-            ->createNamedParameter($value->getValue());
+        throw new \BadMethodCallException('Not used');
     }
 
     #[\Override]

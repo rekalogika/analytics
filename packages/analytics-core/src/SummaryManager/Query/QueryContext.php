@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\SummaryManager\Query\Path\Path;
 use Rekalogika\Analytics\SummaryManager\Query\Path\PathResolver;
@@ -77,10 +79,12 @@ final class QueryContext
      * Doctrine 2 does not have createNamedParameter method in QueryBuilder,
      * so we do it manually here.
      */
-    public function createNamedParameter(mixed $value): string
-    {
+    public function createNamedParameter(
+        mixed $value,
+        int|string|ParameterType|ArrayParameterType|null $type = null,
+    ): string {
         $name = 'querycontext' . $this->boundCounter++;
-        $this->queryBuilder->setParameter($name, $value);
+        $this->queryBuilder->setParameter($name, $value, $type);
 
         return ':' . $name;
     }

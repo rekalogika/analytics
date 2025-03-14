@@ -59,6 +59,10 @@ abstract class AbstractTimeDimensionType extends Type
             return null;
         }
 
+        if (\is_int($value)) {
+            return $value;
+        }
+
         $class = $this->getClass();
 
         if (\is_object($value) && is_a($value, $class, true)) {

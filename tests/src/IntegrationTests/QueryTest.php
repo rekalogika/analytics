@@ -209,7 +209,21 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('time.month')
             ->select('count')
-            ->where(Criteria::expr()->eq('time.month', $month->getDatabaseValue()))
+            ->where(Criteria::expr()->eq('time.month', $month))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+    }
+
+    public function testWhereMonthDatabaseValue(): void
+    {
+        $month = 202410;
+
+        $result = $this->getQuery()
+            ->groupBy('time.month')
+            ->select('count')
+            ->where(Criteria::expr()->eq('time.month', $month))
             ->getResult()
             ->getTree();
 

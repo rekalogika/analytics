@@ -59,11 +59,10 @@ final class WeekDate implements Interval
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
-        \DateTimeZone $timeZone,
     ): static {
         return self::create(
             (int) $dateTime->format('oWN'),
-            $timeZone,
+            $dateTime->getTimezone(),
         );
     }
 
