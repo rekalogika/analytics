@@ -27,6 +27,8 @@ final class Month implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $string = \sprintf('%06d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
@@ -54,20 +56,20 @@ final class Month implements Interval
         return 400;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [
-            $this->getContainingQuarter(),
-        ];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [
+    //         $this->getContainingQuarter(),
+    //     ];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
         \DateTimeZone $timeZone,
     ): static {
-        return new self(
+        return self::create(
             (int) $dateTime->format('Ym'),
             $timeZone,
         );
@@ -147,30 +149,30 @@ final class Month implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('Ym');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('Ym');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('Ym');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('Ym');
+    // }
 
-    private function getContainingQuarter(): Quarter
-    {
-        $m = (int) $this->start->format('m');
+    // private function getContainingQuarter(): Quarter
+    // {
+    //     $m = (int) $this->start->format('m');
 
-        $q = match ($m) {
-            1, 2, 3 => 1,
-            4, 5, 6 => 2,
-            7, 8, 9 => 3,
-            10, 11, 12 => 4,
-        };
+    //     $q = match ($m) {
+    //         1, 2, 3 => 1,
+    //         4, 5, 6 => 2,
+    //         7, 8, 9 => 3,
+    //         10, 11, 12 => 4,
+    //     };
 
-        return Quarter::createFromDatabaseValue(
-            (int) ($this->start->format('Y') . $q),
-            $this->start->getTimezone(),
-        );
-    }
+    //     return Quarter::createFromDatabaseValue(
+    //         (int) ($this->start->format('Y') . $q),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
 }

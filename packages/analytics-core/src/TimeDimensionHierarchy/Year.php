@@ -27,6 +27,8 @@ final class Year implements Interval
         int $databaseValue,
         \DateTimeZone $timeZone,
     ) {
+        $this->databaseValue = $databaseValue;
+
         $string = \sprintf('%04d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
@@ -53,18 +55,18 @@ final class Year implements Interval
         return 600;
     }
 
-    #[\Override]
-    public function getContainingIntervals(): array
-    {
-        return [];
-    }
+    // #[\Override]
+    // public function getContainingIntervals(): array
+    // {
+    //     return [];
+    // }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
         \DateTimeZone $timeZone,
     ): static {
-        return new self(
+        return self::create(
             (int) $dateTime->format('Y'),
             $timeZone,
         );
@@ -96,13 +98,13 @@ final class Year implements Interval
         return $this->end;
     }
 
-    public function getStartDatabaseValue(): int
-    {
-        return (int) $this->start->format('Y');
-    }
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('Y');
+    // }
 
-    public function getEndDatabaseValue(): int
-    {
-        return (int) $this->end->format('Y');
-    }
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('Y');
+    // }
 }

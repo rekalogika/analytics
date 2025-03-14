@@ -43,10 +43,7 @@ final class TimeDimensionHierarchyTest extends TestCase
         $messageFormatter = new MessageFormatter();
         $translator = new Translator('en', $messageFormatter);
 
-        $interval = $class::createFromDatabaseValue(
-            databaseValue: $databaseInput,
-            timeZone: new \DateTimeZone('UTC'),
-        );
+        $interval = $class::createFromDatabaseValue($databaseInput);
 
         $start = $interval->getStart();
         $end = $interval->getEnd();

@@ -31,6 +31,7 @@
         "symfony/config": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/event-dispatcher": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/lock": "^6.4 || ^7.0",
         "symfony/messenger": "^6.4 || ^7.0",
@@ -43,7 +44,8 @@
         "symfony/translation-contracts": "^3",
         "symfony/twig-pack": "^1.0",
         "symfony/uid": "^6.4 || ^7.0",
-        "symfony/ux-chartjs": "^2.23"
+        "symfony/ux-chartjs": "^2.23",
+        "twig/twig": "^3.15 || ^4.0"
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.1",
@@ -51,7 +53,7 @@
         "dama/doctrine-test-bundle": "^8.2",
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "ekino/phpstan-banned-code": "^3.0",
-        "phpat/phpat": "^0.11.0",
+        "phpat/phpat": "^0.11.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-doctrine": "^2.0",

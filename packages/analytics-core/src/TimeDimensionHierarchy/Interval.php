@@ -17,10 +17,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface Interval extends \Stringable, TranslatableInterface
 {
-    public static function createFromDatabaseValue(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ): static;
+    public static function createFromDatabaseValue(int $databaseValue): static;
+
+    public function getDatabaseValue(): int;
+
+    public function withTimeZone(\DateTimeZone $timeZone): static;
 
     public function getStart(): \DateTimeInterface;
 
@@ -31,13 +32,13 @@ interface Interval extends \Stringable, TranslatableInterface
         \DateTimeZone $timeZone,
     ): static;
 
-    /**
-     * Example: if this is a date, then this returns the week and month that
-     * this date is in.
-     *
-     * @todo deprecate
-     *
-     * @return list<Interval>
-     */
-    public function getContainingIntervals(): array;
+    // /**
+    //  * Example: if this is a date, then this returns the week and month that
+    //  * this date is in.
+    //  *
+    //  * @todo deprecate
+    //  *
+    //  * @return list<Interval>
+    //  */
+    // public function getContainingIntervals(): array;
 }

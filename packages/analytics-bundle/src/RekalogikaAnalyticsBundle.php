@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
+use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
 use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -38,6 +39,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $container->addCompilerPass(new DoctrineEntityPass());
         $container->addCompilerPass(new DistinctValuesResolverPass());
+        $container->addCompilerPass(new DoctrineTypesPass());
     }
 
     /**
