@@ -11,13 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeDimensionHierarchy;
+namespace Rekalogika\Analytics;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface RecurringInterval extends \Stringable, TranslatableInterface
+interface TimeInterval extends \Stringable, TranslatableInterface
 {
+    public static function createFromDateTime(
+        \DateTimeInterface $dateTime,
+    ): static;
+
     public static function createFromDatabaseValue(int $databaseValue): static;
 
     public function getDatabaseValue(): int;
+
+    public function withTimeZone(\DateTimeZone $timeZone): static;
+
+    public function getStart(): \DateTimeInterface;
+
+    public function getEnd(): \DateTimeInterface;
+
 }

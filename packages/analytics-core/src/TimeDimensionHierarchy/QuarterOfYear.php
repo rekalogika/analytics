@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class QuarterOfYear implements RecurringInterval
+final class QuarterOfYear implements RecurringTimeInterval
 {
     use CacheTrait;
 

@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Date;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Hour;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Interval;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Quarter;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Week;
 use Rekalogika\Analytics\TimeDimensionHierarchy\WeekDate;
 use Rekalogika\Analytics\TimeDimensionHierarchy\WeekYear;
 use Rekalogika\Analytics\TimeDimensionHierarchy\Year;
+use Rekalogika\Analytics\TimeInterval;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 
@@ -30,7 +30,7 @@ final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
      * @dataProvider intervalProvider
-     * @param class-string<Interval> $class
+     * @param class-string<TimeInterval> $class
      */
     public function testInterval(
         int $databaseInput,
@@ -55,7 +55,7 @@ final class TimeDimensionHierarchyTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<Interval>,\DateTimeInterface,\DateTimeInterface,string,string}>
+     * @return iterable<array-key,array{int,class-string<TimeInterval>,\DateTimeInterface,\DateTimeInterface,string,string}>
      */
     public static function intervalProvider(): iterable
     {

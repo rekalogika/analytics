@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DayOfWeek implements RecurringInterval
+final class DayOfWeek implements RecurringTimeInterval
 {
     use CacheTrait;
 

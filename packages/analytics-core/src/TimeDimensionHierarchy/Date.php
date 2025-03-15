@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Rekalogika\Analytics\TimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Date implements Interval
+final class Date implements TimeInterval
 {
     use CacheTrait;
 

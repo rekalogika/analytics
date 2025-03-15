@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\TimeDimensionHierarchy\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Interval;
-use Rekalogika\Analytics\TimeDimensionHierarchy\RecurringInterval;
+use Rekalogika\Analytics\RecurringTimeInterval;
+use Rekalogika\Analytics\TimeInterval;
 
 abstract class AbstractTimeDimensionType extends Type
 {
     /**
-     * @return class-string<Interval|RecurringInterval>
+     * @return class-string<TimeInterval|RecurringTimeInterval>
      */
     abstract protected function getClass(): string;
 
@@ -66,7 +66,7 @@ abstract class AbstractTimeDimensionType extends Type
         $class = $this->getClass();
 
         if (\is_object($value) && is_a($value, $class, true)) {
-            /** @var Interval|RecurringInterval $value */
+            /** @var TimeInterval|RecurringTimeInterval $value */
             return $value->getDatabaseValue();
         }
 

@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeDimensionHierarchy;
 
+use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class MonthOfYear implements RecurringInterval
+final class MonthOfYear implements RecurringTimeInterval
 {
     use CacheTrait;
 
