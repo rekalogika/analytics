@@ -17,16 +17,16 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Date;
-use Rekalogika\Analytics\TimeDimensionHierarchy\DayOfMonth;
-use Rekalogika\Analytics\TimeDimensionHierarchy\DayOfWeek;
-use Rekalogika\Analytics\TimeDimensionHierarchy\DayOfYear;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\DateType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\DayOfMonthType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\DayOfWeekType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\DayOfYearType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\WeekDateType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\WeekDate;
+use Rekalogika\Analytics\TimeInterval\Date;
+use Rekalogika\Analytics\TimeInterval\DayOfMonth;
+use Rekalogika\Analytics\TimeInterval\DayOfWeek;
+use Rekalogika\Analytics\TimeInterval\DayOfYear;
+use Rekalogika\Analytics\TimeInterval\Types\DateType;
+use Rekalogika\Analytics\TimeInterval\Types\DayOfMonthType;
+use Rekalogika\Analytics\TimeInterval\Types\DayOfWeekType;
+use Rekalogika\Analytics\TimeInterval\Types\DayOfYearType;
+use Rekalogika\Analytics\TimeInterval\Types\WeekDateType;
+use Rekalogika\Analytics\TimeInterval\WeekDate;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait DayTrait

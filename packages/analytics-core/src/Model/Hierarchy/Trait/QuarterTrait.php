@@ -17,10 +17,10 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Quarter;
-use Rekalogika\Analytics\TimeDimensionHierarchy\QuarterOfYear;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\QuarterOfYearType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\QuarterType;
+use Rekalogika\Analytics\TimeInterval\Quarter;
+use Rekalogika\Analytics\TimeInterval\QuarterOfYear;
+use Rekalogika\Analytics\TimeInterval\Types\QuarterOfYearType;
+use Rekalogika\Analytics\TimeInterval\Types\QuarterType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait QuarterTrait

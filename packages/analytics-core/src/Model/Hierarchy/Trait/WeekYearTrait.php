@@ -17,8 +17,8 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\WeekYearType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\WeekYear;
+use Rekalogika\Analytics\TimeInterval\Types\WeekYearType;
+use Rekalogika\Analytics\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait WeekYearTrait

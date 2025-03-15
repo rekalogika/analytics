@@ -17,12 +17,12 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\WeekOfMonthType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\WeekOfYearType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\WeekType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Week;
-use Rekalogika\Analytics\TimeDimensionHierarchy\WeekOfMonth;
-use Rekalogika\Analytics\TimeDimensionHierarchy\WeekOfYear;
+use Rekalogika\Analytics\TimeInterval\Types\WeekOfMonthType;
+use Rekalogika\Analytics\TimeInterval\Types\WeekOfYearType;
+use Rekalogika\Analytics\TimeInterval\Types\WeekType;
+use Rekalogika\Analytics\TimeInterval\Week;
+use Rekalogika\Analytics\TimeInterval\WeekOfMonth;
+use Rekalogika\Analytics\TimeInterval\WeekOfYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait WeekTrait

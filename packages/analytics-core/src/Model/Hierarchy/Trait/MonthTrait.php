@@ -17,10 +17,10 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
-use Rekalogika\Analytics\TimeDimensionHierarchy\MonthOfYear;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\MonthOfYearType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\MonthType;
+use Rekalogika\Analytics\TimeInterval\Month;
+use Rekalogika\Analytics\TimeInterval\MonthOfYear;
+use Rekalogika\Analytics\TimeInterval\Types\MonthOfYearType;
+use Rekalogika\Analytics\TimeInterval\Types\MonthType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait MonthTrait
