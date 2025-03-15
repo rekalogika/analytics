@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class HourOfDay implements RecurringTimeInterval
 {
-    use CacheTrait;
+    use TimeIntervalTrait;
 
     // @phpstan-ignore constructor.unusedParameter
     private function __construct(

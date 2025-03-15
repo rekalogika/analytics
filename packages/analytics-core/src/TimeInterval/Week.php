@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class Week implements TimeInterval
 {
-    use CacheTrait;
+    use TimeIntervalTrait;
 
     private readonly \DateTimeImmutable $start;
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeInterval;
 
-trait CacheTrait
+trait TimeIntervalTrait
 {
     /**
      * @var array<string,self>

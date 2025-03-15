@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class QuarterOfYear implements RecurringTimeInterval
 {
-    use CacheTrait;
+    use TimeIntervalTrait;
 
     private function __construct(
         private int $databaseValue,
