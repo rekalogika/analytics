@@ -108,7 +108,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         //     limit: $limit,
         // );
 
-        return [];
+        return null;
     }
 
     #[\Override]
@@ -183,7 +183,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         // return $values[$id] ?? null;
 
-        return [];
+        return null;
     }
 
 

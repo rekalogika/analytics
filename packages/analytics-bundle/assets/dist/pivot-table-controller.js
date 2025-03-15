@@ -14,8 +14,6 @@ function _classPrivateFieldLooseKey(e) { return "__private_" + id++ + "_" + e; }
 import { Controller } from '@hotwired/stimulus';
 import { visit } from '@hotwired/turbo';
 import Sortable from 'sortablejs';
-
-/* stimulusFetch: 'lazy' */
 var _animation = /*#__PURE__*/_classPrivateFieldLooseKey("animation");
 var _group = /*#__PURE__*/_classPrivateFieldLooseKey("group");
 var _onEnd = /*#__PURE__*/_classPrivateFieldLooseKey("onEnd");

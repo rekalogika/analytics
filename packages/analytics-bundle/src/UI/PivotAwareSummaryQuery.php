@@ -401,12 +401,11 @@ final class PivotAwareSummaryQuery
 
     /**
      * @param string $dimension
-     * @return null|iterable<Choice>
      */
-    public function getChoices(string $dimension): null|iterable
+    public function getChoices(string $dimension): Choices
     {
         if ($dimension === '@values') {
-            return null;
+            throw new \InvalidArgumentException('Dimension "@values" is not supported');
         }
 
         $dimensionField = $this->summaryQuery->getDimensionChoices()[$dimension]
@@ -416,7 +415,10 @@ final class PivotAwareSummaryQuery
             ->getDistinctValues($this->summaryQuery->getClass(), $dimension);
 
         if ($choices === null) {
-            return null;
+            return new Choices(
+                label: $dimensionField,
+                choices: [],
+            );
         }
 
         $choices2 = [];
