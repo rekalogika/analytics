@@ -11,17 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval\Types;
+namespace Rekalogika\Analytics;
 
-use Rekalogika\Analytics\TimeInterval\WeekYear;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 
-final class WeekYearType extends TimeIntervalType
+interface ParameterTypeAware
 {
-    use SmallintTypeTrait;
-
-    #[\Override]
-    protected function getClass(): string
-    {
-        return WeekYear::class;
-    }
+    public function getArrayParameterType(): ParameterType|ArrayParameterType|string|int|null;
 }

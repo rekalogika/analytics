@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\WeekOfYear;
 
-final class WeekOfYearType extends AbstractTimeDimensionType
+final class WeekOfYearType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

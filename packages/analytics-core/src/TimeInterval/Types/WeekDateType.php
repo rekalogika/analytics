@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\WeekDate;
 
-final class WeekDateType extends AbstractTimeDimensionType
+final class WeekDateType extends TimeIntervalType
 {
     use IntegerTypeTrait;
 

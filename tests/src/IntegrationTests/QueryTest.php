@@ -216,6 +216,24 @@ final class QueryTest extends KernelTestCase
         $this->assertCount(1, $result);
     }
 
+    public function testWhereMonthObjectIn(): void
+    {
+        $months = [
+            Month::createFromDatabaseValue(202410),
+            Month::createFromDatabaseValue(202411),
+            Month::createFromDatabaseValue(202412),
+        ];
+
+        $result = $this->getQuery()
+            ->groupBy('time.month')
+            ->select('count')
+            ->where(Criteria::expr()->in('time.month', $months))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(3, $result);
+    }
+
     public function testWhereMonthDatabaseValue(): void
     {
         $month = 202410;
