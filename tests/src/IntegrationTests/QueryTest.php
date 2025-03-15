@@ -21,7 +21,7 @@ use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Month;
+use Rekalogika\Analytics\TimeInterval\Month;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueryTest extends KernelTestCase

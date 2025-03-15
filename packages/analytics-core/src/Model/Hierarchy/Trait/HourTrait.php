@@ -17,10 +17,10 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Hour;
-use Rekalogika\Analytics\TimeDimensionHierarchy\HourOfDay;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\HourOfDayType;
-use Rekalogika\Analytics\TimeDimensionHierarchy\Types\HourType;
+use Rekalogika\Analytics\TimeInterval\Hour;
+use Rekalogika\Analytics\TimeInterval\HourOfDay;
+use Rekalogika\Analytics\TimeInterval\Types\HourOfDayType;
+use Rekalogika\Analytics\TimeInterval\Types\HourType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait HourTrait
