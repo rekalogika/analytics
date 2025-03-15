@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeInterval\Types;
 
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\ParameterTypeAware;
@@ -85,7 +85,7 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
     }
 
     #[\Override]
-    final public function getArrayParameterType(): ParameterType|ArrayParameterType|string|int|null 
+    final public function getArrayParameterType(): ParameterType|ArrayParameterType|string|int|null
     {
         return ArrayParameterType::INTEGER;
     }
