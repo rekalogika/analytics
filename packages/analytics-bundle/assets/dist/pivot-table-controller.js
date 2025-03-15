@@ -131,6 +131,11 @@ var _default = /*#__PURE__*/function (_Controller) {
         data[type][index] = value;
       }
     }
+
+    // initialize filterexpressions
+    var filterExpressions = {};
+
+    // equal filters
     var equalfilters = this.element.querySelectorAll('select.equalfilter');
     for (var _iterator2 = _createForOfIteratorHelperLoose(equalfilters), _step2; !(_step2 = _iterator2()).done;) {
       var _select = _step2.value;
@@ -139,11 +144,13 @@ var _default = /*#__PURE__*/function (_Controller) {
         var value = _ref.value;
         return value;
       });
-      if (!data['filterExpressions']) {
-        data['filterExpressions'] = {};
-      }
-      data['filterExpressions'][name] = values;
+      var equalfilter = {
+        type: 'equal',
+        values: values
+      };
+      filterExpressions[name] = equalfilter;
     }
+    data['filterExpressions'] = filterExpressions;
     return data;
   };
   _proto.filter = function filter() {

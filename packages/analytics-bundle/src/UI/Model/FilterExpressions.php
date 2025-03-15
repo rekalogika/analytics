@@ -13,24 +13,26 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 
 /**
- * @implements \IteratorAggregate<string,EqualFilter>
- * @implements \ArrayAccess<string,EqualFilter>
+ * @implements \IteratorAggregate<string,FilterExpression>
+ * @implements \ArrayAccess<string,FilterExpression>
  */
 final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
 {
     /**
      * @param class-string $summaryClass
      * @param list<string> $dimensions
-     * @param array<string,array<array-key,string>> $arrayExpressions
+     * @param array<string,mixed> $arrayExpressions
      */
     public function __construct(
         private string $summaryClass,
         array $dimensions,
         private array $arrayExpressions,
         private SummaryQuery $query,
+        private Stringifier $stringifier,
     ) {
         $this->setFilters($dimensions);
     }
@@ -76,27 +78,30 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
     private function setFilters(array $filters): void
     {
         foreach ($filters as $filter) {
-            $values = $this->arrayExpressions[$filter] ?? [];
+            $filterArray = $this->arrayExpressions[$filter] ?? [];
 
-            $values2 = [];
-
-            /** @psalm-suppress MixedAssignment */
-            foreach ($values as $v) {
-                if ($v === Choice::NULL) {
-                    $values2[] = null;
-
-                    continue;
-                }
-
-                $values2[] = $this->query->getValueFromId(
-                    class: $this->summaryClass,
-                    dimension: $filter,
-                    id: $v,
-                );
+            if (!\is_array($filterArray)) {
+                throw new \InvalidArgumentException('Invalid filter array');
             }
 
-            $this->expressions[$filter] = new EqualFilter($values2);
+            /** @var array<string,mixed> $filterArray */
+            $this->expressions[$filter] = $this->createEqualFilter($filter, $filterArray);
         }
+    }
+
+    /**
+     * @param array<string,mixed> $input
+     */
+    private function createEqualFilter(
+        string $dimension,
+        array $input,
+    ): EqualFilter {
+        return new EqualFilter(
+            query: $this->query,
+            stringifier: $this->stringifier,
+            dimension: $dimension,
+            inputArray: $input,
+        );
     }
 
     /**
@@ -105,5 +110,12 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
     public function getSummaryClass(): string
     {
         return $this->summaryClass;
+    }
+
+    public function applyToQuery(): void
+    {
+        foreach ($this->expressions as $expression) {
+            $expression->applyToQuery($this->query);
+        }
     }
 }
