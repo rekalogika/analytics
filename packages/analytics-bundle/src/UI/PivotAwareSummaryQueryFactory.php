@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class PivotAwareSummaryQueryFactory
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private Stringifier $stringifier,
     ) {}
 
     /**
@@ -32,7 +32,7 @@ final readonly class PivotAwareSummaryQueryFactory
         return new PivotAwareSummaryQuery(
             summaryQuery: $query,
             parameters: $parameters,
-            translator: $this->translator,
+            stringifier: $this->stringifier,
         );
     }
 }

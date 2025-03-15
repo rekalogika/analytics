@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI;
 
 use Doctrine\Common\Collections\Criteria;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Model\Choice;
 use Rekalogika\Analytics\Bundle\UI\Model\Choices;
 use Rekalogika\Analytics\Bundle\UI\Model\FilterExpressions;
@@ -22,7 +23,6 @@ use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PivotAwareSummaryQuery
 {
@@ -49,7 +49,7 @@ final class PivotAwareSummaryQuery
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
         array $parameters,
-        private readonly TranslatorInterface $translator,
+        private readonly Stringifier $stringifier,
     ) {
         if (isset($parameters['rows'])) {
             /**
@@ -426,7 +426,7 @@ final class PivotAwareSummaryQuery
             $choices2[] = new Choice(
                 id: $id,
                 value: $value,
-                label: $this->getChoiceLabel($value),
+                label: $this->stringifier->toString($value),
             );
         }
 
@@ -440,43 +440,5 @@ final class PivotAwareSummaryQuery
     {
         return $this->summaryQuery
             ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
-    }
-
-    public function getChoiceLabel(mixed $choice): string
-    {
-        if ($choice instanceof TranslatableInterface) {
-            return $choice->trans($this->translator);
-        }
-
-        if (
-            $choice instanceof \Stringable
-            || \is_string($choice)
-            || \is_int($choice)
-            || \is_float($choice)
-        ) {
-            return (string) $choice;
-        }
-
-        if ($choice instanceof \BackedEnum) {
-            return (string) $choice->value;
-        }
-
-        if ($choice instanceof \UnitEnum) {
-            return $choice->name;
-        }
-
-        if (\is_object($choice)) {
-            return \sprintf('%s:%s', $choice::class, spl_object_id($choice));
-        }
-
-        if (\is_bool($choice)) {
-            $choice = $choice
-                ? new TranslatableMessage('Yes')
-                : new TranslatableMessage('No');
-
-            return $choice->trans($this->translator);
-        }
-
-        return get_debug_type($choice);
     }
 }
