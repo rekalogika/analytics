@@ -37,11 +37,6 @@ final class WeekYear implements Interval
         $this->end = $this->start->setISODate($databaseValue + 1, 1);
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 700;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {

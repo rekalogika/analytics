@@ -101,12 +101,14 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         // otherwise we get the unique values from the summary table
 
-        return $this->getDistinctValuesFromSummary(
-            class: $class,
-            dimension: $dimension,
-            dimensionMetadata: $dimensionMetadata,
-            limit: $limit,
-        );
+        // return $this->getDistinctValuesFromSummary(
+        //     class: $class,
+        //     dimension: $dimension,
+        //     dimensionMetadata: $dimensionMetadata,
+        //     limit: $limit,
+        // );
+
+        return [];
     }
 
     #[\Override]
@@ -169,17 +171,19 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         // otherwise we get the unique values from the summary table
 
-        $values = $this->getDistinctValuesFromSummary(
-            class: $class,
-            dimension: $dimension,
-            dimensionMetadata: $dimensionMetadata,
-            limit: 100, // @todo remove hardcode
-        );
+        // $values = $this->getDistinctValuesFromSummary(
+        //     class: $class,
+        //     dimension: $dimension,
+        //     dimensionMetadata: $dimensionMetadata,
+        //     limit: 100, // @todo remove hardcode
+        // );
 
-        /** @psalm-suppress InvalidArgument */
-        $values = iterator_to_array($values);
+        // /** @psalm-suppress InvalidArgument */
+        // $values = iterator_to_array($values);
 
-        return $values[$id] ?? null;
+        // return $values[$id] ?? null;
+
+        return [];
     }
 
 
@@ -210,63 +214,63 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         return $query->getResult();
     }
 
-    /**
-     * @param class-string $class Summary class name
-     * @return iterable<string,mixed>
-     */
-    private function getDistinctValuesFromSummary(
-        string $class,
-        string $dimension,
-        DimensionMetadata $dimensionMetadata,
-        int $limit,
-    ): iterable {
-        $manager = $this->managerRegistry->getManagerForClass($class);
+    // /**
+    //  * @param class-string $class Summary class name
+    //  * @return iterable<string,mixed>
+    //  */
+    // private function getDistinctValuesFromSummary(
+    //     string $class,
+    //     string $dimension,
+    //     DimensionMetadata $dimensionMetadata,
+    //     int $limit,
+    // ): iterable {
+    //     $manager = $this->managerRegistry->getManagerForClass($class);
 
-        if (!$manager instanceof EntityManagerInterface) {
-            throw new \InvalidArgumentException('Invalid manager');
-        }
+    //     if (!$manager instanceof EntityManagerInterface) {
+    //         throw new \InvalidArgumentException('Invalid manager');
+    //     }
 
-        $queryBuilder = $manager->createQueryBuilder();
+    //     $queryBuilder = $manager->createQueryBuilder();
 
-        $orderBy = $dimensionMetadata->getOrderBy();
+    //     $orderBy = $dimensionMetadata->getOrderBy();
 
-        $queryBuilder = $manager->createQueryBuilder()
-            ->select("DISTINCT e.$dimension AS value")
-            ->from($class, 'e')
-            ->orderBy("e.$dimension")
-            ->setMaxResults($limit);
+    //     $queryBuilder = $manager->createQueryBuilder()
+    //         ->select("DISTINCT e.$dimension AS value")
+    //         ->from($class, 'e')
+    //         ->orderBy("e.$dimension")
+    //         ->setMaxResults($limit);
 
-        $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
-        $idReflection = $metadata->getIdReflectionProperty();
+    //     $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
+    //     $idReflection = $metadata->getIdReflectionProperty();
 
-        $result = $queryBuilder->getQuery()->getArrayResult();
+    //     $result = $queryBuilder->getQuery()->getArrayResult();
 
-        /** @var array{id:string|int,value:mixed} $row */
-        foreach ($result as $row) {
-            /** @var mixed */
-            $value = $row['value'];
+    //     /** @var array{id:string|int,value:mixed} $row */
+    //     foreach ($result as $row) {
+    //         /** @var mixed */
+    //         $value = $row['value'];
 
-            if (\is_object($value)) {
-                $id = $idReflection->getValue($value);
-            } else {
-                /** @psalm-suppress MixedAssignment */
-                $id = $value;
-            }
+    //         if (\is_object($value)) {
+    //             $id = $idReflection->getValue($value);
+    //         } else {
+    //             /** @psalm-suppress MixedAssignment */
+    //             $id = $value;
+    //         }
 
-            if ($id instanceof \Stringable || \is_int($id)) {
-                $id = (string) $id;
-            } elseif ($id === null) {
-                $id = '';
-            }
+    //         if ($id instanceof \Stringable || \is_int($id)) {
+    //             $id = (string) $id;
+    //         } elseif ($id === null) {
+    //             $id = '';
+    //         }
 
-            if (!\is_string($id)) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'The ID "%s" is not a string',
-                    get_debug_type($id),
-                ));
-            }
+    //         if (!\is_string($id)) {
+    //             throw new \InvalidArgumentException(\sprintf(
+    //                 'The ID "%s" is not a string',
+    //                 get_debug_type($id),
+    //             ));
+    //         }
 
-            yield $id => $value;
-        }
-    }
+    //         yield $id => $value;
+    //     }
+    // }
 }

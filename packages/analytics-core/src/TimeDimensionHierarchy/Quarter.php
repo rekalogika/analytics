@@ -53,11 +53,6 @@ final class Quarter implements Interval
             ->setTime(0, 0, 0);
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 500;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {
