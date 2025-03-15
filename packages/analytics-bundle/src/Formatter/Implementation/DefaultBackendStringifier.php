@@ -37,7 +37,7 @@ final readonly class DefaultBackendStringifier implements BackendStringifier
         }
 
         if ($input instanceof \BackedEnum) {
-            return (string) $input->value;
+            return $input->name;
         }
 
         if ($input instanceof \UnitEnum) {

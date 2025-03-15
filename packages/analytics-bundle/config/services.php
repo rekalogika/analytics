@@ -306,7 +306,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(PivotAwareSummaryQueryFactory::class)
         ->args([
-            '$translator' => service('translator'),
+            '$stringifier' => service(Stringifier::class),
         ])
     ;
 
