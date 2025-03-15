@@ -430,6 +430,12 @@ final class PivotAwareSummaryQuery
             );
         }
 
+        $choices2[] = new Choice(
+            id: '___null___',
+            value: null,
+            label: $this->stringifier->toString(new TranslatableMessage('(None)')),
+        );
+
         return new Choices(
             label: $dimensionField,
             choices: $choices2,

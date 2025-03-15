@@ -86,6 +86,8 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
+        // check field
+
         $field = $comparison->getField();
 
         if (!\in_array($field, $this->validFields, true)) {
@@ -93,6 +95,17 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         }
 
         $this->involvedDimensions[$field] = true;
+
+        // special case for IN and NOT IN
+
+        $operator = $comparison->getOperator();
+
+        if ($operator === Comparison::IN || $operator === Comparison::NIN) {
+            return $this->walkInOrNotInComparison($comparison);
+        }
+
+        // continue for other cases
+
         $fieldWithAlias = $this->rootAlias . '.' . $field;
 
         /** @psalm-suppress MixedAssignment */
@@ -109,8 +122,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             type: $type,
         );
 
-        $operator = $comparison->getOperator();
-
         return match ($operator) {
             Comparison::EQ => $this->queryBuilder->expr()->eq($fieldWithAlias, $value),
             Comparison::NEQ => $this->queryBuilder->expr()->neq($fieldWithAlias, $value),
@@ -118,10 +129,79 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             Comparison::LTE => $this->queryBuilder->expr()->lte($fieldWithAlias, $value),
             Comparison::GT => $this->queryBuilder->expr()->gt($fieldWithAlias, $value),
             Comparison::GTE => $this->queryBuilder->expr()->gte($fieldWithAlias, $value),
-            Comparison::IN => $this->queryBuilder->expr()->in($fieldWithAlias, $value),
-            Comparison::NIN => $this->queryBuilder->expr()->notIn($fieldWithAlias, $value),
             default => throw new \InvalidArgumentException("Unknown operator: $operator"),
         };
+    }
+
+    /**
+     * convert "field IN (null, a, b, c)" to "(field IN (a, b, c) OR field IS NULL)"
+     * and convert "field NOT IN (null, a, b, c)" to "(field NOT IN (a, b, c) AND
+     * field IS NOT NULL)"
+     *
+     * @param Comparison $comparison
+     * @return mixed
+     */
+    private function walkInOrNotInComparison(Comparison $comparison): mixed
+    {
+        $field = $comparison->getField();
+        $fieldWithAlias = $this->rootAlias . '.' . $field;
+
+        // comparison operator, make sure in or not in
+
+        $comparisonOperator = $comparison->getOperator();
+
+        if ($comparisonOperator !== Comparison::IN && $comparisonOperator !== Comparison::NIN) {
+            throw new \InvalidArgumentException('Invalid operator for IN or NOT IN');
+        }
+
+        // ensure value is array
+
+        /** @psalm-suppress MixedAssignment */
+        $value = $comparison->getValue()->getValue();
+
+        if (!\is_array($value)) {
+            throw new \InvalidArgumentException('Value must be an array with IN or NOT IN operator');
+        }
+
+        // check if value has null
+
+        $hasNull = \in_array(null, $value, true);
+        $valueWithoutNull = array_filter($value, fn($v) => $v !== null);
+
+        // build expressions
+
+        $valuesWithoutNullParameter = $this->queryContext->createNamedParameter(
+            value: $valueWithoutNull,
+            type: null,
+        );
+
+        if ($comparisonOperator === Comparison::NIN) {
+            $valuesWithoutNullExpression = $this->queryBuilder->expr()->notIn(
+                $fieldWithAlias,
+                $valuesWithoutNullParameter,
+            );
+        } else {
+            $valuesWithoutNullExpression = $this->queryBuilder->expr()->in(
+                $fieldWithAlias,
+                $valuesWithoutNullParameter,
+            );
+        }
+
+        if (!$hasNull) {
+            return $valuesWithoutNullExpression;
+        }
+
+        if ($comparisonOperator === Comparison::NIN) {
+            return $this->queryBuilder->expr()->andX(
+                $valuesWithoutNullExpression,
+                $this->queryBuilder->expr()->isNotNull($fieldWithAlias),
+            );
+        } else {
+            return $this->queryBuilder->expr()->orX(
+                $valuesWithoutNullExpression,
+                $this->queryBuilder->expr()->isNull($fieldWithAlias),
+            );
+        }
     }
 
     #[\Override]
