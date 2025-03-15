@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\Date;
 
-final class DateType extends AbstractTimeDimensionType
+final class DateType extends TimeIntervalType
 {
     use IntegerTypeTrait;
 

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\HourOfDay;
 
-final class HourOfDayType extends AbstractTimeDimensionType
+final class HourOfDayType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

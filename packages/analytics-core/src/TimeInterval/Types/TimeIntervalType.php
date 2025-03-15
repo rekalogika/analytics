@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\TimeInterval\Types;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Rekalogika\Analytics\ParameterTypeAware;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Rekalogika\Analytics\TimeInterval;
 
-abstract class AbstractTimeDimensionType extends Type
+abstract class TimeIntervalType extends Type implements ParameterTypeAware
 {
     /**
      * @return class-string<TimeInterval|RecurringTimeInterval>
@@ -79,5 +81,11 @@ abstract class AbstractTimeDimensionType extends Type
     final public function getName(): string
     {
         return $this->getClass();
+    }
+
+    #[\Override]
+    final public function getArrayParameterType(): ArrayParameterType
+    {
+        return ArrayParameterType::INTEGER;
     }
 }

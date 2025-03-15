@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\Quarter;
 
-final class QuarterType extends AbstractTimeDimensionType
+final class QuarterType extends TimeIntervalType
 {
     use IntegerTypeTrait;
 

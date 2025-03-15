@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\DayOfWeek;
 
-final class DayOfWeekType extends AbstractTimeDimensionType
+final class DayOfWeekType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

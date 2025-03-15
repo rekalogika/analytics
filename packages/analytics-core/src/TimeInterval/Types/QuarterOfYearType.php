@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\QuarterOfYear;
 
-final class QuarterOfYearType extends AbstractTimeDimensionType
+final class QuarterOfYearType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

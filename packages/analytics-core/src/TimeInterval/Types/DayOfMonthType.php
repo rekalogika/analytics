@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\DayOfMonth;
 
-final class DayOfMonthType extends AbstractTimeDimensionType
+final class DayOfMonthType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\TimeInterval\Types;
 
 use Rekalogika\Analytics\TimeInterval\MonthOfYear;
 
-final class MonthOfYearType extends AbstractTimeDimensionType
+final class MonthOfYearType extends TimeIntervalType
 {
     use SmallintTypeTrait;
 

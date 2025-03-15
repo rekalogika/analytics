@@ -17,11 +17,14 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\ParameterTypeAware;
 
 final class SummaryExpressionVisitor extends ExpressionVisitor
 {
@@ -61,12 +64,8 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         return array_keys($this->involvedDimensions);
     }
 
-    private function getFieldType(string $field, mixed $value): mixed
+    private function getFieldType(string $field): mixed
     {
-        if (\is_array($value)) {
-            return null;
-        }
-
         if (!\in_array($field, $this->validFields, true)) {
             throw new \InvalidArgumentException("Invalid dimension: $field");
         }
@@ -111,7 +110,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         /** @psalm-suppress MixedAssignment */
         $value = $comparison->getValue()->getValue();
         /** @psalm-suppress MixedAssignment */
-        $type = $this->getFieldType($field, $value);
+        $type = $this->getFieldType($field);
+
+        if (\is_array($value)) {
+            throw new \InvalidArgumentException('Value cannot be an array');
+        }
 
         /**
          * @psalm-suppress MixedArgument
@@ -157,22 +160,39 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         // ensure value is array
 
         /** @psalm-suppress MixedAssignment */
-        $value = $comparison->getValue()->getValue();
+        $values = $comparison->getValue()->getValue();
 
-        if (!\is_array($value)) {
+        if (!\is_array($values)) {
             throw new \InvalidArgumentException('Value must be an array with IN or NOT IN operator');
         }
 
         // check if value has null
 
-        $hasNull = \in_array(null, $value, true);
-        $valueWithoutNull = array_filter($value, fn($v) => $v !== null);
+        $hasNull = \in_array(null, $values, true);
+        $valuesWithoutNull = array_values(array_filter($values, fn($v) => $v !== null));
 
-        // build expressions
+        // transform valuesWithoutNull to database value
+
+        $type = $this->getType($field);
+
+        if ($type !== null) {
+            $valuesWithoutNull = $this->transformValuesToDatabaseValues(
+                $valuesWithoutNull,
+                $type,
+            );
+        }
+
+        if ($type instanceof ParameterTypeAware) {
+            $parameterType = $type->getArrayParameterType();
+        } else {
+            $parameterType = null;
+        }
+
+        // build without null expressions
 
         $valuesWithoutNullParameter = $this->queryContext->createNamedParameter(
-            value: $valueWithoutNull,
-            type: null,
+            value: $valuesWithoutNull,
+            type: $parameterType,
         );
 
         if ($comparisonOperator === Comparison::NIN) {
@@ -187,9 +207,13 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             );
         }
 
+        // if without null, return the expression
+
         if (!$hasNull) {
             return $valuesWithoutNullExpression;
         }
+
+        // if has null, add the null expression
 
         if ($comparisonOperator === Comparison::NIN) {
             return $this->queryBuilder->expr()->andX(
@@ -202,6 +226,42 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
                 $this->queryBuilder->expr()->isNull($fieldWithAlias),
             );
         }
+    }
+
+    private function getType(string $field): ?Type
+    {
+        /** @psalm-suppress MixedAssignment */
+        $type = $this->getFieldType($field);
+
+        if (!\is_string($type)) {
+            return null;
+        }
+
+        try {
+            return Type::getType($type);
+        } catch (Exception) {
+            return null;
+        }
+    }
+
+    /**
+     * @param list<mixed> $values
+     * @return list<mixed>
+     */
+    private function transformValuesToDatabaseValues(
+        array $values,
+        Type $type,
+    ): array {
+        $databasePlatform = $this->queryBuilder->getEntityManager()
+            ->getConnection()
+            ->getDatabasePlatform();
+
+        $newValues = array_map(
+            fn(mixed $value): mixed => $type->convertToDatabaseValue($value, $databasePlatform),
+            $values,
+        );
+
+        return $newValues;
     }
 
     #[\Override]

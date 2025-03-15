@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
-use Rekalogika\Analytics\TimeInterval\Types\AbstractTimeDimensionType;
 use Rekalogika\Analytics\TimeInterval\Types\DateType;
 use Rekalogika\Analytics\TimeInterval\Types\DayOfMonthType;
 use Rekalogika\Analytics\TimeInterval\Types\DayOfWeekType;
@@ -24,6 +23,7 @@ use Rekalogika\Analytics\TimeInterval\Types\MonthOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\MonthType;
 use Rekalogika\Analytics\TimeInterval\Types\QuarterOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\QuarterType;
+use Rekalogika\Analytics\TimeInterval\Types\TimeIntervalType;
 use Rekalogika\Analytics\TimeInterval\Types\WeekDateType;
 use Rekalogika\Analytics\TimeInterval\Types\WeekOfMonthType;
 use Rekalogika\Analytics\TimeInterval\Types\WeekOfYearType;
@@ -61,7 +61,7 @@ final class DoctrineTypesPass implements CompilerPassInterface
     }
 
     /**
-     * @return \Traversable<class-string<AbstractTimeDimensionType>>
+     * @return \Traversable<class-string<TimeIntervalType>>
      */
     private function getTypes(): \Traversable
     {
