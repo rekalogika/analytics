@@ -425,6 +425,10 @@ final class PivotAwareSummaryQuery
 
         /** @psalm-suppress MixedAssignment */
         foreach ($choices as $id => $value) {
+            if ($id === Choice::NULL) {
+                throw new \InvalidArgumentException('ID cannot be the same as NULL value');
+            }
+
             $choices2[] = new Choice(
                 id: $id,
                 value: $value,
@@ -433,7 +437,7 @@ final class PivotAwareSummaryQuery
         }
 
         $choices2[] = new Choice(
-            id: '___null___',
+            id: Choice::NULL,
             value: null,
             label: $this->stringifier->toString(new TranslatableMessage('(None)')),
         );
@@ -446,6 +450,10 @@ final class PivotAwareSummaryQuery
 
     public function getIdToChoice(string $dimension, string $id): mixed
     {
+        if ($id === Choice::NULL) {
+            return null;
+        }
+
         return $this->summaryQuery
             ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
     }

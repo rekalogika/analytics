@@ -18,6 +18,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class Choice implements TranslatableInterface
 {
+    /**
+     * Sentinel value to indicate null, used in query strings
+     */
+    public const NULL = "\x1E";
+
     public function __construct(
         private string $id,
         private mixed $value,

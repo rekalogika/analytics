@@ -82,6 +82,12 @@ final class FilterExpressions implements \IteratorAggregate, \ArrayAccess
 
             /** @psalm-suppress MixedAssignment */
             foreach ($values as $v) {
+                if ($v === Choice::NULL) {
+                    $values2[] = null;
+
+                    continue;
+                }
+
                 $values2[] = $this->query->getValueFromId(
                     class: $this->summaryClass,
                     dimension: $filter,

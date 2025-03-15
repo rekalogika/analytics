@@ -73,10 +73,6 @@ final class ChainDistinctValuesResolver implements DistinctValuesResolver
         string $dimension,
         string $id,
     ): mixed {
-        if ($id === '___null___') {
-            return null;
-        }
-
         $key = \sprintf('%s::%s', $class, $dimension);
 
         if ($this->specificResolverLocator->has($key)) {
