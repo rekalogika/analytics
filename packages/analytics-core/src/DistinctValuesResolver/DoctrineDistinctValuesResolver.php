@@ -171,17 +171,19 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         // otherwise we get the unique values from the summary table
 
-        $values = $this->getDistinctValuesFromSummary(
-            class: $class,
-            dimension: $dimension,
-            dimensionMetadata: $dimensionMetadata,
-            limit: 100, // @todo remove hardcode
-        );
+        // $values = $this->getDistinctValuesFromSummary(
+        //     class: $class,
+        //     dimension: $dimension,
+        //     dimensionMetadata: $dimensionMetadata,
+        //     limit: 100, // @todo remove hardcode
+        // );
 
-        /** @psalm-suppress InvalidArgument */
-        $values = iterator_to_array($values);
+        // /** @psalm-suppress InvalidArgument */
+        // $values = iterator_to_array($values);
 
-        return $values[$id] ?? null;
+        // return $values[$id] ?? null;
+
+        return [];
     }
 
 
