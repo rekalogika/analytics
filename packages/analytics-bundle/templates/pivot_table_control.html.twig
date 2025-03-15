@@ -173,20 +173,25 @@
         {% set choices = query.getChoices(dimension) %}
         <div class="mb-3">
             <label for="{{ dimension }}-{{ id }}" class="form-label">{{ choices|trans }}</label>
-            <select name="{{ dimension }}"
-                    id="{{ dimension }}-{{ id }}"
-                    class="equalfilter"
-                    multiple
-                    data-controller="rekalogika--analytics-bundle--filter"
-                    data-action="rekalogika--analytics-bundle--filter:change->rekalogika--analytics-bundle--pivot-table#filter">
+            {% if choices.hasChoices() %}
+                <select name="{{ dimension }}"
+                        id="{{ dimension }}-{{ id }}"
+                        class="equalfilter"
+                        multiple
+                        data-controller="rekalogika--analytics-bundle--filter"
+                        data-action="rekalogika--analytics-bundle--filter:change->rekalogika--analytics-bundle--pivot-table#filter">
                     ">
-                {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
-            </select>
+                    {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
+                </select>
+            {% else %}
+                <input type="text" readonly class="form-control" value="{{ 'N/A'|trans() }}">
+                <div class="form-text">
+                    {{ 'This dimension does not support filtering.'|trans }}
+                </div>
+            {% endif %}
         </div>
     {% else %}
-        <div class="alert alert-info" role="alert">
-            {{ 'No filter selected'|trans }}
-        </div>
+        <div class="alert alert-info" role="alert">{{ 'No filter selected'|trans }}</div>
     {% endfor %}
     </turbo-frame>
 {% endblock %}

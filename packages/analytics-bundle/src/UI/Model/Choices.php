@@ -22,12 +22,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class Choices implements TranslatableInterface, \IteratorAggregate
 {
     /**
-     * @param iterable<Choice> $choices
+     * @param list<Choice> $choices
      */
     public function __construct(
         private TranslatableInterface $label,
-        private iterable $choices,
+        private array $choices,
     ) {}
+
+    public function hasChoices(): bool
+    {
+        return \count($this->choices) > 0;
+    }
 
     #[\Override]
     public function trans(

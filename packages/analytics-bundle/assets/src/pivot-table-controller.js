@@ -2,7 +2,6 @@ import { Controller } from '@hotwired/stimulus'
 import { visit } from '@hotwired/turbo'
 import Sortable from 'sortablejs'
 
-/* stimulusFetch: 'lazy' */
 export default class extends Controller {
     static values = {
         urlParameter: String,
