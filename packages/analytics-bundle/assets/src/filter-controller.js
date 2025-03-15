@@ -5,7 +5,8 @@ import 'tom-select/dist/css/tom-select.default.min.css'
 export default class extends Controller {
     connect() {
         this.tomSelect = new TomSelect(this.element, {
-            maxItems: 10,
+            maxItems: 50,
+            allowEmptyOption: true,
             plugins: {
                 remove_button: {}
             },

@@ -17,7 +17,8 @@ var _default = /*#__PURE__*/function (_Controller) {
   _proto.connect = function connect() {
     var _this = this;
     this.tomSelect = new TomSelect(this.element, {
-      maxItems: 10,
+      maxItems: 50,
+      allowEmptyOption: true,
       plugins: {
         remove_button: {}
       }
