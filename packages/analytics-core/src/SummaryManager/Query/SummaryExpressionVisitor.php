@@ -100,8 +100,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         /** @psalm-suppress MixedAssignment */
         $type = $this->getFieldType($field, $value);
 
-        dump($value, $type);
-
         /**
          * @psalm-suppress MixedArgument
          */
