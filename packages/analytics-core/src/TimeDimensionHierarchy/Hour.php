@@ -44,11 +44,6 @@ final class Hour implements Interval
         $this->end = $this->start->modify('+1 hour');
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 100;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {

@@ -42,11 +42,6 @@ final class Week implements Interval
         $this->end = $this->start->modify('+1 week');
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 300;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {

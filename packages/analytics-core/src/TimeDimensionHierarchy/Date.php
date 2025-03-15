@@ -43,11 +43,6 @@ final class Date implements Interval
         $this->end = $this->start->modify('+1 day');
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 200;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {

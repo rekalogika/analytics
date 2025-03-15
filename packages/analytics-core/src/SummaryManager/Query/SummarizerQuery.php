@@ -148,7 +148,6 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         // get result
-
         /** @var list<array<string,mixed>> */
         $result = $query->getArrayResult();
 

@@ -50,11 +50,6 @@ final class Year implements Interval
             ->setTime(0, 0, 0);
     }
 
-    public function getHierarchyLevel(): int
-    {
-        return 600;
-    }
-
     // #[\Override]
     // public function getContainingIntervals(): array
     // {

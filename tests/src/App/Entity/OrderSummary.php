@@ -67,7 +67,6 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         label: new TranslatableMessage('Customer country'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
-    // @phpstan-ignore property.onlyRead
     private ?Country $customerCountry = null;
 
     #[ORM\ManyToOne()]

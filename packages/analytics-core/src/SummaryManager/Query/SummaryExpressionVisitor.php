@@ -61,6 +61,28 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         return array_keys($this->involvedDimensions);
     }
 
+    private function getFieldType(string $field, mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return null;
+        }
+
+        if (!\in_array($field, $this->validFields, true)) {
+            throw new \InvalidArgumentException("Invalid dimension: $field");
+        }
+
+        if ($this->classMetadata->hasAssociation($field)) {
+            return null;
+        } elseif ($this->classMetadata->hasField($field)) {
+            $fieldMetadata = $this->classMetadata->getFieldMapping($field);
+
+            /** @psalm-suppress MixedReturnStatement */
+            return $fieldMetadata['type'] ?? null; // @phpstan-ignore-line
+        } else {
+            return null;
+        }
+    }
+
     #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
@@ -70,28 +92,36 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             throw new \InvalidArgumentException("Invalid dimension: $field");
         }
 
-        $fieldMetadata = $this->classMetadata->getFieldMapping($field);
-
         $this->involvedDimensions[$field] = true;
-        $field = $this->rootAlias . '.' . $field;
+        $fieldWithAlias = $this->rootAlias . '.' . $field;
+
+        /** @psalm-suppress MixedAssignment */
+        $value = $comparison->getValue()->getValue();
+        /** @psalm-suppress MixedAssignment */
+        $type = $this->getFieldType($field, $value);
+
+        dump($value, $type);
 
         /**
          * @psalm-suppress MixedArgument
-         * @phpstan-ignore argument.type
          */
-        $value = $this->queryContext->createNamedParameter(value: $comparison->getValue()->getValue(), type: $fieldMetadata['type'] ?? null);
+        $value = $this->queryContext->createNamedParameter(
+            value: $value,
+            // @phpstan-ignore argument.type
+            type: $type,
+        );
 
         $operator = $comparison->getOperator();
 
         return match ($operator) {
-            Comparison::EQ => $this->queryBuilder->expr()->eq($field, $value),
-            Comparison::NEQ => $this->queryBuilder->expr()->neq($field, $value),
-            Comparison::LT => $this->queryBuilder->expr()->lt($field, $value),
-            Comparison::LTE => $this->queryBuilder->expr()->lte($field, $value),
-            Comparison::GT => $this->queryBuilder->expr()->gt($field, $value),
-            Comparison::GTE => $this->queryBuilder->expr()->gte($field, $value),
-            Comparison::IN => $this->queryBuilder->expr()->in($field, $value),
-            Comparison::NIN => $this->queryBuilder->expr()->notIn($field, $value),
+            Comparison::EQ => $this->queryBuilder->expr()->eq($fieldWithAlias, $value),
+            Comparison::NEQ => $this->queryBuilder->expr()->neq($fieldWithAlias, $value),
+            Comparison::LT => $this->queryBuilder->expr()->lt($fieldWithAlias, $value),
+            Comparison::LTE => $this->queryBuilder->expr()->lte($fieldWithAlias, $value),
+            Comparison::GT => $this->queryBuilder->expr()->gt($fieldWithAlias, $value),
+            Comparison::GTE => $this->queryBuilder->expr()->gte($fieldWithAlias, $value),
+            Comparison::IN => $this->queryBuilder->expr()->in($fieldWithAlias, $value),
+            Comparison::NIN => $this->queryBuilder->expr()->notIn($fieldWithAlias, $value),
             default => throw new \InvalidArgumentException("Unknown operator: $operator"),
         };
     }
