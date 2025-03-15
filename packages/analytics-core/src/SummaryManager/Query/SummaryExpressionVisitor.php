@@ -63,7 +63,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
 
     private function getFieldType(string $field, mixed $value): mixed
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return null;
         }
 
