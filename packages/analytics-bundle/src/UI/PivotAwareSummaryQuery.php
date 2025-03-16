@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\UI\Model\Choices;
-use Rekalogika\Analytics\Bundle\UI\Model\FilterExpressions;
+use Rekalogika\Analytics\Bundle\UI\Filter\Choices;
 use Rekalogika\Analytics\Query\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
@@ -39,7 +37,7 @@ final class PivotAwareSummaryQuery
      */
     private array $filters = [];
 
-    private FilterExpressions $filterExpressions;
+    private Filters $filterExpressions;
 
     /**
      * @param array<string,mixed> $parameters
@@ -47,7 +45,7 @@ final class PivotAwareSummaryQuery
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
         array $parameters,
-        Stringifier $stringifier,
+        FilterFactory $filterFactory,
     ) {
         if (isset($parameters['rows'])) {
             /**
@@ -84,15 +82,15 @@ final class PivotAwareSummaryQuery
         /**
          * @psalm-suppress MixedArgument
          */
-        $this->filterExpressions = new FilterExpressions(
+        $this->filterExpressions = new Filters(
+            summaryClass: $this->summaryQuery->getClass(),
             dimensions: $this->getFilters(),
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],
-            query: $summaryQuery,
-            stringifier: $stringifier,
+            filterFactory: $filterFactory,
         );
 
-        $this->filterExpressions->applyToQuery();
+        $this->filterExpressions->applyToQuery($this->summaryQuery);
     }
 
     /**
@@ -252,7 +250,7 @@ final class PivotAwareSummaryQuery
     // filter expressions
     //
 
-    public function getFilterExpressions(): FilterExpressions
+    public function getFilterExpressions(): Filters
     {
         return $this->filterExpressions;
     }

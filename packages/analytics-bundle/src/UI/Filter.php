@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface FilterExpression
+interface Filter
 {
-    public function getLabel(): TranslatableInterface;
+    public function getLabel(): string|TranslatableInterface;
 
     public function createExpression(): ?Expression;
 }

@@ -32,6 +32,8 @@ use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierExtension;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Bundle\UI\FilterFactory;
+use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
@@ -306,7 +308,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(PivotAwareSummaryQueryFactory::class)
         ->args([
-            '$stringifier' => service(Stringifier::class),
+            '$filterFactory' => service(FilterFactory::class),
         ])
     ;
 
@@ -370,6 +372,20 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
             '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
+        ])
+    ;
+
+    //
+    // filter
+    //
+
+    $services
+        ->set(FilterFactory::class)
+        ->class(DefaultFilterFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
+            '$stringifier' => service(Stringifier::class),
         ])
     ;
 };
