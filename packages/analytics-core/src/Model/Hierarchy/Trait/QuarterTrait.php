@@ -20,14 +20,13 @@ use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Quarter;
 use Rekalogika\Analytics\TimeInterval\QuarterOfYear;
-use Rekalogika\Analytics\TimeInterval\Types\QuarterType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait QuarterTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: QuarterType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_quarter', nullable: true)]
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter'),

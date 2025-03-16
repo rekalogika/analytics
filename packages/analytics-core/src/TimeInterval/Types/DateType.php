@@ -24,4 +24,9 @@ final class DateType extends TimeIntervalType
     {
         return Date::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_date';
+    }
 }

@@ -20,14 +20,13 @@ use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Hour;
 use Rekalogika\Analytics\TimeInterval\HourOfDay;
-use Rekalogika\Analytics\TimeInterval\Types\HourType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait HourTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: HourType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_hour', nullable: true)]
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour'),

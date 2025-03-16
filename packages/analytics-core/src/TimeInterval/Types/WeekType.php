@@ -24,4 +24,9 @@ final class WeekType extends TimeIntervalType
     {
         return Week::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_week';
+    }
 }

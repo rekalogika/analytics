@@ -24,4 +24,9 @@ final class YearType extends TimeIntervalType
     {
         return Year::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_year';
+    }
 }
