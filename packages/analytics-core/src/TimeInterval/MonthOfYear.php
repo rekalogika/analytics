@@ -16,46 +16,31 @@ namespace Rekalogika\Analytics\TimeInterval;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class MonthOfYear implements RecurringTimeInterval
+enum MonthOfYear: int implements RecurringTimeInterval
 {
-    use TimeIntervalTrait;
+    use RecurringTimeIntervalEnumTrait;
 
-    private function __construct(
-        private int $databaseValue,
-        private \DateTimeZone $timeZone,
-    ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return \sprintf('%02d', $this->databaseValue);
-    }
+    case January = 1;
+    case February = 2;
+    case March = 3;
+    case April = 4;
+    case May = 5;
+    case June = 6;
+    case July = 7;
+    case August = 8;
+    case September = 9;
+    case October = 10;
+    case November = 11;
+    case December = 12;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $month = match ($this->databaseValue) {
-            1 => 'January',
-            2 => 'February',
-            3 => 'March',
-            4 => 'April',
-            5 => 'May',
-            6 => 'June',
-            7 => 'July',
-            8 => 'August',
-            9 => 'September',
-            10 => 'October',
-            11 => 'November',
-            12 => 'December',
-            default => throw new \InvalidArgumentException(
-                \sprintf('Invalid month of year: %d', $this->databaseValue),
-            ),
-        };
-
-        $dateTime = (new \DateTimeImmutable('now', $this->timeZone))
-            ->setDate(2000, $this->databaseValue, 1);
+        $month = $this->name;
+        $dateTime = (new \DateTimeImmutable('now'))
+            ->setDate(2000, $this->value, 1);
 
         $locale = $translator->getLocale();
 
@@ -63,7 +48,7 @@ final class MonthOfYear implements RecurringTimeInterval
             $locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::FULL,
-            $this->timeZone,
+            null,
             \IntlDateFormatter::GREGORIAN,
             'MMMM',
         );

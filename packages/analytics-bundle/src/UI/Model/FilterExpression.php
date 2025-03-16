@@ -20,5 +20,5 @@ interface FilterExpression
 {
     public function getLabel(): TranslatableInterface;
 
-    public function createExpression(): Expression;
+    public function createExpression(): ?Expression;
 }

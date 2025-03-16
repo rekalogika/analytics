@@ -16,27 +16,20 @@ namespace Rekalogika\Analytics\TimeInterval;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class QuarterOfYear implements RecurringTimeInterval
+enum QuarterOfYear: int implements RecurringTimeInterval
 {
-    use TimeIntervalTrait;
+    use RecurringTimeIntervalEnumTrait;
 
-    private function __construct(
-        private int $databaseValue,
-        // @phpstan-ignore property.onlyWritten
-        private \DateTimeZone $timeZone,
-    ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return 'Q' . $this->databaseValue;
-    }
+    case Q1 = 1;
+    case Q2 = 2;
+    case Q3 = 3;
+    case Q4 = 4;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return 'Q' . $this->databaseValue;
+        return $this->name;
     }
 }

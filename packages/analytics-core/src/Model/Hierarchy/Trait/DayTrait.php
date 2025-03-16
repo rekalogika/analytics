@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
@@ -22,9 +23,6 @@ use Rekalogika\Analytics\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\TimeInterval\DayOfWeek;
 use Rekalogika\Analytics\TimeInterval\DayOfYear;
 use Rekalogika\Analytics\TimeInterval\Types\DateType;
-use Rekalogika\Analytics\TimeInterval\Types\DayOfMonthType;
-use Rekalogika\Analytics\TimeInterval\Types\DayOfWeekType;
-use Rekalogika\Analytics\TimeInterval\Types\DayOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\WeekDateType;
 use Rekalogika\Analytics\TimeInterval\WeekDate;
 use Rekalogika\Analytics\Util\TranslatableMessage;
@@ -49,7 +47,7 @@ trait DayTrait
     )]
     private ?WeekDate $weekDate = null;
 
-    #[Column(type: DayOfWeekType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfWeek::class)]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Week'),
@@ -57,7 +55,7 @@ trait DayTrait
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
-    #[Column(type: DayOfMonthType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfMonth::class)]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Month'),
@@ -65,7 +63,7 @@ trait DayTrait
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
-    #[Column(type: DayOfYearType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfYear::class)]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Year'),
@@ -85,16 +83,16 @@ trait DayTrait
 
     public function getDayOfWeek(): ?DayOfWeek
     {
-        return $this->dayOfWeek?->withTimeZone($this->getTimeZone());
+        return $this->dayOfWeek;
     }
 
     public function getDayOfMonth(): ?DayOfMonth
     {
-        return $this->dayOfMonth?->withTimeZone($this->getTimeZone());
+        return $this->dayOfMonth;
     }
 
     public function getDayOfYear(): ?DayOfYear
     {
-        return $this->dayOfYear?->withTimeZone($this->getTimeZone());
+        return $this->dayOfYear;
     }
 }

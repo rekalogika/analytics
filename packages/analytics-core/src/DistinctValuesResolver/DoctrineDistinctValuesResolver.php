@@ -160,7 +160,11 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         if (($enumType = $metadata->getEnumType($dimension)) !== null) {
             if (is_a($enumType, \BackedEnum::class, true)) {
-                return $enumType::from($id);
+                try {
+                    return $enumType::from($id);
+                } catch (\TypeError) {
+                    return $enumType::from((int) $id);
+                }
             }
 
             throw new \InvalidArgumentException(\sprintf(

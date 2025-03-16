@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Month;
 use Rekalogika\Analytics\TimeInterval\MonthOfYear;
-use Rekalogika\Analytics\TimeInterval\Types\MonthOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\MonthType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -35,7 +35,7 @@ trait MonthTrait
     )]
     private ?Month $month = null;
 
-    #[Column(type: MonthOfYearType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: MonthOfYear::class)]
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month of Year'),
@@ -50,6 +50,6 @@ trait MonthTrait
 
     public function getMonthOfYear(): ?MonthOfYear
     {
-        return $this->monthOfYear?->withTimeZone($this->getTimeZone());
+        return $this->monthOfYear;
     }
 }

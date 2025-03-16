@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Types\WeekOfMonthType;
-use Rekalogika\Analytics\TimeInterval\Types\WeekOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\WeekType;
 use Rekalogika\Analytics\TimeInterval\Week;
 use Rekalogika\Analytics\TimeInterval\WeekOfMonth;
@@ -37,7 +36,7 @@ trait WeekTrait
     )]
     private ?Week $week = null;
 
-    #[Column(type: WeekOfYearType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: WeekOfYear::class)]
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Year'),
@@ -45,7 +44,7 @@ trait WeekTrait
     )]
     private ?WeekOfYear $weekOfYear = null;
 
-    #[Column(type: WeekOfMonthType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: WeekOfMonth::class)]
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Month'),
@@ -60,11 +59,11 @@ trait WeekTrait
 
     public function getWeekOfYear(): ?WeekOfYear
     {
-        return $this->weekOfYear?->withTimeZone($this->getTimeZone());
+        return $this->weekOfYear;
     }
 
     public function getWeekOfMonth(): ?WeekOfMonth
     {
-        return $this->weekOfMonth?->withTimeZone($this->getTimeZone());
+        return $this->weekOfMonth;
     }
 }

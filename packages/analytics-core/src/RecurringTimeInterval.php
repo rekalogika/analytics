@@ -15,9 +15,7 @@ namespace Rekalogika\Analytics;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface RecurringTimeInterval extends
-    \Stringable,
-    TranslatableInterface
+interface RecurringTimeInterval extends TranslatableInterface
 {
     public static function createFromDatabaseValue(int $databaseValue): static;
 
