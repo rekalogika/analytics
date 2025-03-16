@@ -26,7 +26,7 @@ return [
         'version' => '1.15.6',
     ],
     '@hotwired/turbo' => [
-        'version' => '8.0.12',
+        'version' => '8.0.13',
     ],
     'tom-select' => [
         'version' => '2.4.3',
@@ -50,7 +50,7 @@ return [
         'type' => 'css',
     ],
     'chart.js' => [
-        'version' => '3.9.1',
+        'version' => '4.4.8',
     ],
     'flatpickr' => [
         'version' => '4.6.13',
@@ -59,5 +59,11 @@ return [
         'version' => '4.6.13',
         'type' => 'css',
     ],
+    '@kurkle/color' => [
+        'version' => '0.3.4',
+    ],
+    'flatpickr/dist/flatpickr.min.css' => [
+        'version' => '4.6.13',
+        'type' => 'css',
+    ],
 ];
-

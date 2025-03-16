@@ -109,7 +109,7 @@ js-compile:
 	cd packages/analytics-bundle/assets && npm run build
 
 .PHONY: asset-map
-asset-map: js
+asset-map:
 	$(PHP) tests/bin/console asset-map:compile
 
 .PHONY: js-symlink
