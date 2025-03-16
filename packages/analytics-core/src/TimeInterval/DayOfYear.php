@@ -18,8 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum DayOfYear: int implements RecurringTimeInterval
 {
-    use RecurringTimeIntervalEnumTrait;
-
     case Day1 = 1;
     case Day2 = 2;
     case Day3 = 3;

@@ -18,8 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum QuarterOfYear: int implements RecurringTimeInterval
 {
-    use RecurringTimeIntervalEnumTrait;
-
     case Q1 = 1;
     case Q2 = 2;
     case Q3 = 3;
