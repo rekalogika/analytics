@@ -24,7 +24,7 @@ use Doctrine\DBAL\ParameterType;
  * the query and convert it into OR statements because it may affect how the
  * database optimizes the query.
  *
- * @internal 
+ * @internal
  */
 interface ParameterTypeAware
 {

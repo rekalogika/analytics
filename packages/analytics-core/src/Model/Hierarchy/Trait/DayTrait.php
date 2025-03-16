@@ -18,11 +18,11 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Date;
-use Rekalogika\Analytics\TimeInterval\DayOfMonth;
-use Rekalogika\Analytics\TimeInterval\DayOfWeek;
-use Rekalogika\Analytics\TimeInterval\DayOfYear;
-use Rekalogika\Analytics\TimeInterval\WeekDate;
+use Rekalogika\Analytics\Model\TimeInterval\Date;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfWeek;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
+use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait DayTrait

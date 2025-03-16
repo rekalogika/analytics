@@ -22,7 +22,7 @@ parameters:
             path: packages/analytics-core/src/Model/Hierarchy/*
         -
             identifier: return.unusedType
-            path: packages/analytics-core/src/TimeInterval/Types/TimeIntervalType.php
+            path: packages/analytics-core/src/Doctrine/Types/TimeInterval/TimeIntervalType.php
         -   '#Doctrine\\ORM\\Query but does not specify its types: TKey, TResult#'
 
 includes:

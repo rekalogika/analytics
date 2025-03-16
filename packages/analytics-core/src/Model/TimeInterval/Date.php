@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\TimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Week implements TimeInterval
+final class Date implements TimeInterval
 {
     use TimeIntervalTrait;
 
@@ -30,24 +30,26 @@ final class Week implements TimeInterval
     ) {
         $this->databaseValue = $databaseValue;
 
-        $string = \sprintf('%06d', $databaseValue);
+        $string = \sprintf('%08d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
-        $w = (int) substr($string, 4, 2);
+        $m = (int) substr($string, 4, 2);
+        $d = (int) substr($string, 6, 2);
 
-        $this->start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
-            ->setISODate($y, $w)
-            ->setTime(0, 0, 0);
+        $this->start = new \DateTimeImmutable(
+            \sprintf('%04d-%02d-%02d 00:00:00', $y, $m, $d),
+            $timeZone,
+        );
 
-        $this->end = $this->start->modify('+1 week');
+        $this->end = $this->start->modify('+1 day');
     }
 
     // #[\Override]
     // public function getContainingIntervals(): array
     // {
     //     return [
-    //         $this->getContainingWeekYear(),
+    //         $this->getContainingWeek(),
+    //         $this->getContainingMonth(),
     //     ];
     // }
 
@@ -56,7 +58,7 @@ final class Week implements TimeInterval
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('oW'),
+            (int) $dateTime->format('Ymd'),
             $dateTime->getTimezone(),
         );
     }
@@ -64,7 +66,7 @@ final class Week implements TimeInterval
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o-\WW');
+        return $this->start->format('Y-m-d');
     }
 
     #[\Override]
@@ -72,15 +74,24 @@ final class Week implements TimeInterval
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $translator->trans(
-            id: '{start, date} - {end, date}',
-            parameters: [
-                'start' => $this->start,
-                'end' => $this->end->modify('-1 day'),
-            ],
-            domain: 'rekalogika_analytics+intl-icu',
-            locale: $locale,
+        $locale = $locale ?? $translator->getLocale();
+
+        $intlDateFormatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            $this->start->getTimezone(),
+            \IntlDateFormatter::GREGORIAN,
+            null,
         );
+
+        $formatted = $intlDateFormatter->format($this->start);
+
+        if (!\is_string($formatted)) {
+            $formatted = (string) $this;
+        }
+
+        return $formatted;
     }
 
     #[\Override]
@@ -97,18 +108,26 @@ final class Week implements TimeInterval
 
     // public function getStartDatabaseValue(): int
     // {
-    //     return (int) $this->start->format('oW');
+    //     return (int) $this->start->format('Ymd');
     // }
 
     // public function getEndDatabaseValue(): int
     // {
-    //     return (int) $this->end->format('oW');
+    //     return (int) $this->end->format('Ymd');
     // }
 
-    // private function getContainingWeekYear(): WeekYear
+    // private function getContainingWeek(): Week
     // {
-    //     return WeekYear::createFromDatabaseValue(
-    //         (int) $this->start->format('o'),
+    //     return Week::createFromDatabaseValue(
+    //         (int) $this->start->format('oW'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
+
+    // private function getContainingMonth(): Month
+    // {
+    //     return Month::createFromDatabaseValue(
+    //         (int) $this->start->format('Ym'),
     //         $this->start->getTimezone(),
     //     );
     // }

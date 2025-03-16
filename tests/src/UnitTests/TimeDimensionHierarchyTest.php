@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Model\TimeInterval\Date;
+use Rekalogika\Analytics\Model\TimeInterval\Hour;
+use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeInterval\Quarter;
+use Rekalogika\Analytics\Model\TimeInterval\Week;
+use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
+use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
+use Rekalogika\Analytics\Model\TimeInterval\Year;
 use Rekalogika\Analytics\TimeInterval;
-use Rekalogika\Analytics\TimeInterval\Date;
-use Rekalogika\Analytics\TimeInterval\Hour;
-use Rekalogika\Analytics\TimeInterval\Month;
-use Rekalogika\Analytics\TimeInterval\Quarter;
-use Rekalogika\Analytics\TimeInterval\Week;
-use Rekalogika\Analytics\TimeInterval\WeekDate;
-use Rekalogika\Analytics\TimeInterval\WeekYear;
-use Rekalogika\Analytics\TimeInterval\Year;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 

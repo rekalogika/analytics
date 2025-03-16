@@ -18,8 +18,8 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Hour;
-use Rekalogika\Analytics\TimeInterval\HourOfDay;
+use Rekalogika\Analytics\Model\TimeInterval\Hour;
+use Rekalogika\Analytics\Model\TimeInterval\HourOfDay;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait HourTrait

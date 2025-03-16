@@ -11,22 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval\Types;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
 
-use Rekalogika\Analytics\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeInterval\Hour;
 
-final class MonthType extends TimeIntervalType
+final class HourType extends TimeIntervalType
 {
     use IntegerTypeTrait;
 
     #[\Override]
     protected function getClass(): string
     {
-        return Month::class;
+        return Hour::class;
     }
 
     final public function getName(): string
     {
-        return 'rekalogika_analytics_month';
+        return 'rekalogika_analytics_hour';
     }
 }

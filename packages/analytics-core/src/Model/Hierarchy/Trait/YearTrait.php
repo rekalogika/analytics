@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Year;
+use Rekalogika\Analytics\Model\TimeInterval\Year;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait YearTrait
