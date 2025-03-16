@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
-use Rekalogika\Analytics\TimeInterval\Types\DateType;
-use Rekalogika\Analytics\TimeInterval\Types\HourType;
-use Rekalogika\Analytics\TimeInterval\Types\MonthType;
-use Rekalogika\Analytics\TimeInterval\Types\QuarterType;
-use Rekalogika\Analytics\TimeInterval\Types\TimeIntervalType;
-use Rekalogika\Analytics\TimeInterval\Types\WeekDateType;
-use Rekalogika\Analytics\TimeInterval\Types\WeekType;
-use Rekalogika\Analytics\TimeInterval\Types\WeekYearType;
-use Rekalogika\Analytics\TimeInterval\Types\YearType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\DateType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\HourType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\MonthType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\QuarterType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\TimeIntervalType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekDateType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekYearType;
+use Rekalogika\Analytics\Doctrine\Types\TimeInterval\YearType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

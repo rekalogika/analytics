@@ -11,25 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum QuarterOfYear: int implements RecurringTimeInterval
+enum WeekOfMonth: int implements RecurringTimeInterval
 {
-    use RecurringTimeIntervalEnumTrait;
-
-    case Q1 = 1;
-    case Q2 = 2;
-    case Q3 = 3;
-    case Q4 = 4;
+    case Week1 = 1;
+    case Week2 = 2;
+    case Week3 = 3;
+    case Week4 = 4;
+    case Week5 = 5;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->name;
+        return 'W' . $this->value;
     }
 }

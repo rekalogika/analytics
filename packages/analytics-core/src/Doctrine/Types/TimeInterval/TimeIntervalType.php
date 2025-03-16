@@ -11,20 +11,19 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval\Types;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\ParameterTypeAware;
-use Rekalogika\Analytics\RecurringTimeInterval;
 use Rekalogika\Analytics\TimeInterval;
 
 abstract class TimeIntervalType extends Type implements ParameterTypeAware
 {
     /**
-     * @return class-string<TimeInterval|RecurringTimeInterval>
+     * @return class-string<TimeInterval>
      */
     abstract protected function getClass(): string;
 
@@ -69,7 +68,7 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
         $class = $this->getClass();
 
         if (\is_object($value) && is_a($value, $class, true)) {
-            /** @var TimeInterval|RecurringTimeInterval $value */
+            /** @var TimeInterval $value */
             return $value->getDatabaseValue();
         }
 

@@ -11,37 +11,28 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum MonthOfYear: int implements RecurringTimeInterval
+enum DayOfWeek: int implements RecurringTimeInterval
 {
-    use RecurringTimeIntervalEnumTrait;
-
-    case January = 1;
-    case February = 2;
-    case March = 3;
-    case April = 4;
-    case May = 5;
-    case June = 6;
-    case July = 7;
-    case August = 8;
-    case September = 9;
-    case October = 10;
-    case November = 11;
-    case December = 12;
+    case Monday = 1;
+    case Tuesday = 2;
+    case Wednesday = 3;
+    case Thursday = 4;
+    case Friday = 5;
+    case Saturday = 6;
+    case Sunday = 7;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $month = $this->name;
-        $dateTime = (new \DateTimeImmutable('now'))
-            ->setDate(2000, $this->value, 1);
-
+        $dayOfWeek = $this->name;
+        $dateTime = new \DateTimeImmutable('next ' . $dayOfWeek);
         $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
@@ -50,13 +41,13 @@ enum MonthOfYear: int implements RecurringTimeInterval
             \IntlDateFormatter::FULL,
             null,
             \IntlDateFormatter::GREGORIAN,
-            'MMMM',
+            'EEEE',
         );
 
         $formatted = $intlDateFormatter->format($dateTime);
 
         if (!\is_string($formatted)) {
-            $formatted = $month;
+            $formatted = $dayOfWeek;
         }
 
         return $formatted;

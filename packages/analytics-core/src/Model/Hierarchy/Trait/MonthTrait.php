@@ -18,8 +18,8 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Month;
-use Rekalogika\Analytics\TimeInterval\MonthOfYear;
+use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait MonthTrait

@@ -11,15 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum DayOfMonth: int implements RecurringTimeInterval
 {
-    use RecurringTimeIntervalEnumTrait;
-
     case Day1 = 1;
     case Day2 = 2;
     case Day3 = 3;

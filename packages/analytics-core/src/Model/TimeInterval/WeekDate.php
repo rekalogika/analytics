@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\TimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Hour implements TimeInterval
+final class WeekDate implements TimeInterval
 {
     use TimeIntervalTrait;
 
@@ -30,27 +30,25 @@ final class Hour implements TimeInterval
     ) {
         $this->databaseValue = $databaseValue;
 
-        $ymdh = \sprintf('%010d', $databaseValue);
+        $string = \sprintf('%07d', $databaseValue);
 
-        $y = (int) substr($ymdh, 0, 4);
-        $m = (int) substr($ymdh, 4, 2);
-        $d = (int) substr($ymdh, 6, 2);
-        $h = (int) substr($ymdh, 8, 2);
+        $y = (int) substr($string, 0, 4);
+        $w = (int) substr($string, 4, 2);
+        $d = (int) substr($string, 6, 1);
 
-        $this->start = new \DateTimeImmutable(
-            \sprintf('%04d-%02d-%02d %02d:00:00', $y, $m, $d, $h),
-            $timeZone,
-        );
+        $this->start = (new \DateTimeImmutable())
+            ->setTimezone($timeZone)
+            ->setISODate($y, $w, $d)
+            ->setTime(0, 0, 0);
 
-        $this->end = $this->start->modify('+1 hour');
+        $this->end = $this->start->modify('+1 day');
     }
 
     // #[\Override]
     // public function getContainingIntervals(): array
     // {
     //     return [
-    //         $this->getContainingDate(),
-    //         $this->getContainingWeekDate(),
+    //         $this->getContainingWeek(),
     //     ];
     // }
 
@@ -59,7 +57,7 @@ final class Hour implements TimeInterval
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('YmdH'),
+            (int) $dateTime->format('oWN'),
             $dateTime->getTimezone(),
         );
     }
@@ -67,7 +65,7 @@ final class Hour implements TimeInterval
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('Y-m-d H:00');
+        return $this->start->format('o-\WW-N');
     }
 
     #[\Override]
@@ -75,7 +73,7 @@ final class Hour implements TimeInterval
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->start->format('Y-m-d H:00');
+        return $this->start->format('o-\WW-N');
     }
 
     #[\Override]
@@ -92,26 +90,18 @@ final class Hour implements TimeInterval
 
     // public function getStartDatabaseValue(): int
     // {
-    //     return (int) $this->start->format('YmdH');
+    //     return (int) $this->start->format('oWN');
     // }
 
     // public function getEndDatabaseValue(): int
     // {
-    //     return (int) $this->end->format('YmdH');
+    //     return (int) $this->end->format('oWN');
     // }
 
-    // private function getContainingDate(): Date
+    // private function getContainingWeek(): Week
     // {
-    //     return Date::createFromDatabaseValue(
-    //         (int) $this->start->format('Ymd'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
-    // private function getContainingWeekDate(): WeekDate
-    // {
-    //     return WeekDate::createFromDatabaseValue(
-    //         (int) $this->start->format('oWw'),
+    //     return Week::createFromDatabaseValue(
+    //         (int) $this->start->format('oW'),
     //         $this->start->getTimezone(),
     //     );
     // }

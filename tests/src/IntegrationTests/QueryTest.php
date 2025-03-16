@@ -16,12 +16,12 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Model\TimeInterval\Month;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
-use Rekalogika\Analytics\TimeInterval\Month;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueryTest extends KernelTestCase
