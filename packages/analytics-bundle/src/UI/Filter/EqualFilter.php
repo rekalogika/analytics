@@ -11,16 +11,17 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\Filter;
+use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class EqualFilter implements FilterExpression
+final class EqualFilter implements Filter
 {
     /**
      * @var list<mixed>|null
@@ -33,22 +34,22 @@ final class EqualFilter implements FilterExpression
     private ?array $choices = null;
 
     /**
+     * @param class-string $class
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly SummaryQuery $query,
+        private readonly string $class,
+        private readonly TranslatableInterface|string $label,
         private readonly Stringifier $stringifier,
+        private readonly DistinctValuesResolver $distinctValuesResolver,
         private readonly string $dimension,
         private readonly array $inputArray,
     ) {}
 
     #[\Override]
-    public function getLabel(): TranslatableInterface
+    public function getLabel(): string|TranslatableInterface
     {
-        $dimensionField = $this->query->getDimensionChoices()[$this->dimension]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $this->dimension));
-
-        return $dimensionField;
+        return $this->label;
     }
 
     /**
@@ -80,8 +81,8 @@ final class EqualFilter implements FilterExpression
                 throw new \InvalidArgumentException('Invalid input value');
             }
 
-            $values[] = $this->query->getValueFromId(
-                class: $this->query->getClass(),
+            $values[] = $this->distinctValuesResolver->getValueFromId(
+                class: $this->class,
                 dimension: $this->dimension,
                 id: $v,
             );
@@ -108,12 +109,11 @@ final class EqualFilter implements FilterExpression
             return $this->choices;
         }
 
-        $choices = $this->query
-            ->getDistinctValues($this->query->getClass(), $this->dimension);
-
-        if ($choices === null) {
-            return [];
-        }
+        $choices = $this->distinctValuesResolver->getDistinctValues(
+            class: $this->class,
+            dimension: $this->dimension,
+            limit: 100,
+        ) ?? [];
 
         $choices2 = [];
 

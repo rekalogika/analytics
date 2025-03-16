@@ -11,26 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI\Filter;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class NullFilter implements FilterExpression
+final class NullFilter implements Filter
 {
     public function __construct(
-        private readonly SummaryQuery $query,
-        private readonly string $dimension,
+        private readonly TranslatableInterface|string $label,
     ) {}
 
     #[\Override]
-    public function getLabel(): TranslatableInterface
+    public function getLabel(): TranslatableInterface|string
     {
-        $dimensionField = $this->query->getDimensionChoices()[$this->dimension]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $this->dimension));
-
-        return $dimensionField;
+        return $this->label;
     }
 
     #[\Override]

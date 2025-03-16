@@ -25,6 +25,7 @@ class SummaryMetadata {
     +calculateSourceBoundValueFromPartition(Partition,string): int|string
     +getGroupingsProperty(): string
     +involvedProperties: <class-string,list<string>>
+    +resolveFullyQualifiedDimensionName(string): DimensionMetadata|DimensionPropertyMetadata
 }
 
 SummaryMetadata *-- DimensionMetadata

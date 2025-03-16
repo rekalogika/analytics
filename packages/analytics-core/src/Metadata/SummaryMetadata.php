@@ -23,9 +23,9 @@ final readonly class SummaryMetadata
     private array $dimensions;
 
     /**
-     * @var list<string>
+     * @var array<string,FullyQualifiedDimensionMetadata>
      */
-    private array $dimensionProperties;
+    private array $fullyQualifiedDimensions;
 
     /**
      * @param non-empty-list<class-string> $sourceClasses
@@ -42,7 +42,7 @@ final readonly class SummaryMetadata
         private string $groupingsProperty,
         private string|TranslatableInterface $label,
     ) {
-        $dimensionProperties = [];
+        $fullyQualifiedDimensions = [];
         $newDimensions = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
@@ -51,16 +51,28 @@ final readonly class SummaryMetadata
             $hierarchy = $dimension->getHierarchy();
 
             if ($hierarchy === null) {
-                $dimensionProperties[$dimension->getSummaryProperty()] = true;
+                $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
+                    dimension: $dimension,
+                    dimensionProperty: null,
+                    summaryMetadata: $this,
+                );
+
+                $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
             } else {
                 foreach ($hierarchy->getProperties() as $property) {
-                    $dimensionProperties[$property->getFullName()] = true;
+                    $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
+                        dimension: $dimension,
+                        dimensionProperty: $property,
+                        summaryMetadata: $this,
+                    );
+
+                    $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
                 }
             }
         }
 
         $this->dimensions = $newDimensions;
-        $this->dimensionProperties = array_keys($dimensionProperties);
+        $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
     }
 
     /**
@@ -129,31 +141,10 @@ final readonly class SummaryMetadata
         return $this->dimensions[$dimensionName] ?? throw new \RuntimeException('Field not found');
     }
 
-    public function getDimensionTypeClass(string $dimensionName): ?string
+    public function getFullyQualifiedDimension(string $dimensionName): FullyQualifiedDimensionMetadata
     {
-        if (str_contains($dimensionName, '.')) {
-            /** @psalm-suppress PossiblyUndefinedArrayOffset */
-            [$dimensionName, $propertyName] = explode('.', $dimensionName, 2);
-
-            $dimension = $this->dimensions[$dimensionName] ?? null;
-
-            if ($dimension === null) {
-                return null;
-            }
-
-            return $dimension
-                ->getHierarchy()
-                ?->getProperty($propertyName)
-                ->getTypeClass();
-        }
-
-        $dimension = $this->dimensions[$dimensionName] ?? null;
-
-        if ($dimension === null) {
-            return null;
-        }
-
-        return $dimension->getTypeClass();
+        return $this->fullyQualifiedDimensions[$dimensionName]
+            ?? throw new \RuntimeException('Dimension not found');
     }
 
     /**
@@ -161,7 +152,7 @@ final readonly class SummaryMetadata
      */
     public function getDimensionPropertyNames(): array
     {
-        return $this->dimensionProperties;
+        return array_keys($this->fullyQualifiedDimensions);
     }
 
     public function isMeasure(string $fieldName): bool

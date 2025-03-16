@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\TimeInterval;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class DateRangeFilter implements FilterExpression
+final class DateRangeFilter implements Filter
 {
     private ?string $rawUpperBound = null;
     private ?TimeInterval $upperBound = null;
@@ -32,19 +32,16 @@ final class DateRangeFilter implements FilterExpression
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly SummaryQuery $query,
+        private readonly TranslatableInterface|string $label,
         private readonly string $dimension,
         private readonly string $typeClass,
         private readonly array $inputArray,
     ) {}
 
     #[\Override]
-    public function getLabel(): TranslatableInterface
+    public function getLabel(): TranslatableInterface|string
     {
-        $dimensionField = $this->query->getDimensionChoices()[$this->dimension]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $this->dimension));
-
-        return $dimensionField;
+        return $this->label;
     }
 
     public function getRawStart(): string

@@ -11,12 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\Model;
+namespace Rekalogika\Analytics\Bundle\UI\Filter;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
-final class Choice implements TranslatableInterface
+final class Choice
 {
     /**
      * Sentinel value to indicate null, used in query strings
@@ -26,20 +23,8 @@ final class Choice implements TranslatableInterface
     public function __construct(
         private string $id,
         private mixed $value,
-        private string|TranslatableInterface $label,
+        private string $label,
     ) {}
-
-    #[\Override]
-    public function trans(
-        TranslatorInterface $translator,
-        ?string $locale = null,
-    ): string {
-        if ($this->label instanceof TranslatableInterface) {
-            return $this->label->trans($translator, $locale);
-        }
-
-        return $this->label;
-    }
 
     public function getId(): string
     {
@@ -51,7 +36,7 @@ final class Choice implements TranslatableInterface
         return $this->value;
     }
 
-    public function getLabel(): TranslatableInterface|string
+    public function getLabel(): string
     {
         return $this->label;
     }
