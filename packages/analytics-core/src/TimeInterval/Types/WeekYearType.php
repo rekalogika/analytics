@@ -24,4 +24,9 @@ final class WeekYearType extends TimeIntervalType
     {
         return WeekYear::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_week_year';
+    }
 }

@@ -20,14 +20,13 @@ use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Month;
 use Rekalogika\Analytics\TimeInterval\MonthOfYear;
-use Rekalogika\Analytics\TimeInterval\Types\MonthType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait MonthTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: MonthType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_month', nullable: true)]
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month'),

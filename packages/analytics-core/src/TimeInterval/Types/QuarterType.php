@@ -24,4 +24,9 @@ final class QuarterType extends TimeIntervalType
     {
         return Quarter::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_quarter';
+    }
 }

@@ -79,14 +79,14 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
         ));
     }
 
-    final public function getName(): string
-    {
-        return $this->getClass();
-    }
-
     #[\Override]
     final public function getArrayParameterType(): ParameterType|ArrayParameterType|string|int|null
     {
         return ArrayParameterType::INTEGER;
+    }
+
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return true;
     }
 }

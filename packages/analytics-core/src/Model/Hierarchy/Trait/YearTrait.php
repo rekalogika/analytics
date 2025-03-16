@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Types\YearType;
 use Rekalogika\Analytics\TimeInterval\Year;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -25,7 +24,7 @@ trait YearTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: YearType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_year', nullable: true)]
     #[LevelProperty(
         level: 600,
         label: new TranslatableMessage('Year'),

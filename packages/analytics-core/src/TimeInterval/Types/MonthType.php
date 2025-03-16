@@ -24,4 +24,9 @@ final class MonthType extends TimeIntervalType
     {
         return Month::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_month';
+    }
 }

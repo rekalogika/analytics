@@ -40,8 +40,8 @@ final class DoctrineTypesPass implements CompilerPassInterface
             throw new \RuntimeException('The type definition is not an array.');
         }
 
-        foreach ($this->getTypes() as $type) {
-            $typeDefinition[$type] = [
+        foreach ($this->getTypes() as $id => $type) {
+            $typeDefinition[$id] = [
                 'class' => $type,
             ];
         }
@@ -53,17 +53,17 @@ final class DoctrineTypesPass implements CompilerPassInterface
     }
 
     /**
-     * @return \Traversable<class-string<TimeIntervalType>>
+     * @return \Traversable<string,class-string<TimeIntervalType>>
      */
     private function getTypes(): \Traversable
     {
-        yield DateType::class;
-        yield HourType::class;
-        yield MonthType::class;
-        yield QuarterType::class;
-        yield WeekDateType::class;
-        yield WeekType::class;
-        yield WeekYearType::class;
-        yield YearType::class;
+        yield 'rekalogika_analytics_date' => DateType::class;
+        yield 'rekalogika_analytics_hour' => HourType::class;
+        yield 'rekalogika_analytics_month' => MonthType::class;
+        yield 'rekalogika_analytics_quarter' => QuarterType::class;
+        yield 'rekalogika_analytics_week_date' => WeekDateType::class;
+        yield 'rekalogika_analytics_week' => WeekType::class;
+        yield 'rekalogika_analytics_week_year' => WeekYearType::class;
+        yield 'rekalogika_analytics_year' => YearType::class;
     }
 }

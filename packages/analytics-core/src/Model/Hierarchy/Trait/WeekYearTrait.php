@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\TimeInterval\Types\WeekYearType;
 use Rekalogika\Analytics\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -25,7 +24,7 @@ trait WeekYearTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: WeekYearType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_week_year', nullable: true)]
     #[LevelProperty(
         level: 700,
         label: new TranslatableMessage('Week Year'),

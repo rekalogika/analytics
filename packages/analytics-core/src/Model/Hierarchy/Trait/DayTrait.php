@@ -22,8 +22,6 @@ use Rekalogika\Analytics\TimeInterval\Date;
 use Rekalogika\Analytics\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\TimeInterval\DayOfWeek;
 use Rekalogika\Analytics\TimeInterval\DayOfYear;
-use Rekalogika\Analytics\TimeInterval\Types\DateType;
-use Rekalogika\Analytics\TimeInterval\Types\WeekDateType;
 use Rekalogika\Analytics\TimeInterval\WeekDate;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -31,7 +29,7 @@ trait DayTrait
 {
     abstract public function getTimeZone(): \DateTimeZone;
 
-    #[Column(type: DateType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Date'),
@@ -39,7 +37,7 @@ trait DayTrait
     )]
     private ?Date $date = null;
 
-    #[Column(type: WeekDateType::class, nullable: true)]
+    #[Column(type: 'rekalogika_analytics_week_date', nullable: true)]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Week Date'),

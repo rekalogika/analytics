@@ -24,4 +24,9 @@ final class HourType extends TimeIntervalType
     {
         return Hour::class;
     }
+
+    final public function getName(): string
+    {
+        return 'rekalogika_analytics_hour';
+    }
 }
