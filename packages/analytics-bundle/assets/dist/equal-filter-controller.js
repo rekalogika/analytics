@@ -7,7 +7,6 @@ function _inheritsLoose(t, o) { t.prototype = Object.create(o.prototype), t.prot
 function _setPrototypeOf(t, e) { return _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) { return t.__proto__ = e, t; }, _setPrototypeOf(t, e); }
 import { Controller } from '@hotwired/stimulus';
 import TomSelect from 'tom-select';
-import 'tom-select/dist/css/tom-select.bootstrap5.min.css';
 var _default = /*#__PURE__*/function (_Controller) {
   function _default() {
     return _callSuper(this, _default, arguments);
