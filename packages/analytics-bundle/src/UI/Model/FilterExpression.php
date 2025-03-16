@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Doctrine\Common\Collections\Expr\Expression;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface FilterExpression
 {
     public function getLabel(): TranslatableInterface;
 
-    public function applyToQuery(SummaryQuery $query): void;
+    public function createExpression(): Expression;
 }

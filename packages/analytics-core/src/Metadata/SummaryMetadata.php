@@ -129,6 +129,33 @@ final readonly class SummaryMetadata
         return $this->dimensions[$dimensionName] ?? throw new \RuntimeException('Field not found');
     }
 
+    public function getDimensionTypeClass(string $dimensionName): ?string
+    {
+        if (str_contains($dimensionName, '.')) {
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
+            [$dimensionName, $propertyName] = explode('.', $dimensionName, 2);
+
+            $dimension = $this->dimensions[$dimensionName] ?? null;
+
+            if ($dimension === null) {
+                return null;
+            }
+
+            return $dimension
+                ->getHierarchy()
+                ?->getProperty($propertyName)
+                ->getTypeClass();
+        }
+
+        $dimension = $this->dimensions[$dimensionName] ?? null;
+
+        if ($dimension === null) {
+            return null;
+        }
+
+        return $dimension->getTypeClass();
+    }
+
     /**
      * @return list<string>
      */

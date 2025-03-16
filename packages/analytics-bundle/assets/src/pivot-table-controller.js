@@ -111,19 +111,19 @@ export default class extends Controller {
         // initialize filterexpressions
         let filterExpressions = {};
 
-        // equal filters
-        const equalfilters = this.element.querySelectorAll('select.equalfilter')
+        // filters
+        const filterElements = this.element.querySelectorAll('.filterelement')
 
-        for (const select of equalfilters) {
-            let name = select.name
-            let values = Array.from(select.selectedOptions).map(({ value }) => value)
-
-            let equalfilter = {
-                type: 'equal',
-                values: values
+        for (const filterElement of filterElements) {
+            let data = filterElement.data
+            
+            if (!data) {
+                continue
             }
 
-            filterExpressions[name] = equalfilter
+            let dimension = data.dimension
+
+            filterExpressions[dimension] = data
         }
 
         // finishing

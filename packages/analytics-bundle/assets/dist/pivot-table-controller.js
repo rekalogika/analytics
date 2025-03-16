@@ -135,21 +135,19 @@ var _default = /*#__PURE__*/function (_Controller) {
     // initialize filterexpressions
     var filterExpressions = {};
 
-    // equal filters
-    var equalfilters = this.element.querySelectorAll('select.equalfilter');
-    for (var _iterator2 = _createForOfIteratorHelperLoose(equalfilters), _step2; !(_step2 = _iterator2()).done;) {
-      var _select = _step2.value;
-      var name = _select.name;
-      var values = Array.from(_select.selectedOptions).map(function (_ref) {
-        var value = _ref.value;
-        return value;
-      });
-      var equalfilter = {
-        type: 'equal',
-        values: values
-      };
-      filterExpressions[name] = equalfilter;
+    // filters
+    var filterElements = this.element.querySelectorAll('.filterelement');
+    for (var _iterator2 = _createForOfIteratorHelperLoose(filterElements), _step2; !(_step2 = _iterator2()).done;) {
+      var filterElement = _step2.value;
+      var _data = filterElement.data;
+      if (!_data) {
+        continue;
+      }
+      var dimension = _data.dimension;
+      filterExpressions[dimension] = _data;
     }
+
+    // finishing
     data['filterExpressions'] = filterExpressions;
     return data;
   };

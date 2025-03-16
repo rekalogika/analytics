@@ -24,6 +24,7 @@ final readonly class DimensionMetadata
     /**
      * @param array<class-string,ValueResolver> $source
      * @param Order|array<string,Order> $orderBy
+     * @param null|class-string $typeClass
      */
     public function __construct(
         private array $source,
@@ -33,6 +34,7 @@ final readonly class DimensionMetadata
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
         private Order|array $orderBy,
+        private ?string $typeClass,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {
         if ($hierarchy !== null && \is_array($orderBy)) {
@@ -52,6 +54,7 @@ final readonly class DimensionMetadata
             summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
             orderBy: $this->orderBy,
+            typeClass: $this->typeClass,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -131,5 +134,13 @@ final readonly class DimensionMetadata
     public function getOrderBy(): Order|array
     {
         return $this->orderBy;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getTypeClass(): ?string
+    {
+        return $this->typeClass;
     }
 }

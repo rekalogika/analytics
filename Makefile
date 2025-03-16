@@ -101,6 +101,29 @@ fixtures-load: compose-up
 	$(PHP) tests/bin/console doctrine:fixtures:load --no-interaction
 
 #
+# js
+#
+
+.PHONY: js-compile
+js-compile:
+	cd packages/analytics-bundle/assets && npm run build
+
+.PHONY: asset-map
+asset-map: js
+	$(PHP) tests/bin/console asset-map:compile
+
+.PHONY: js-symlink
+js-symlink:
+	cd tests/assets/controllers/rekalogika/analytics-bundle && rm -f * ; for A in ../../../../../packages/analytics-bundle/assets/dist/*; do ln -sf $$A ; done
+
+.PHONY: importmap-install
+importmap-install:
+	$(PHP) tests/bin/console importmap:install
+
+.PHONY: js
+js: js-compile js-symlink importmap-install asset-map
+
+#
 # update schema
 #
 

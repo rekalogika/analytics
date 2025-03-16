@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
@@ -90,13 +91,11 @@ final class EqualFilter implements FilterExpression
     }
 
     #[\Override]
-    public function applyToQuery(SummaryQuery $query): void
+    public function createExpression(): Expression
     {
-        $query->andWhere(
-            Criteria::expr()->in(
-                $this->dimension,
-                $this->getValues(),
-            ),
+        return Criteria::expr()->in(
+            $this->dimension,
+            $this->getValues(),
         );
     }
 

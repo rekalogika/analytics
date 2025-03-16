@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\UI\Model\Choice;
 use Rekalogika\Analytics\Bundle\UI\Model\Choices;
 use Rekalogika\Analytics\Bundle\UI\Model\FilterExpressions;
 use Rekalogika\Analytics\Query\Result;
@@ -86,7 +85,6 @@ final class PivotAwareSummaryQuery
          * @psalm-suppress MixedArgument
          */
         $this->filterExpressions = new FilterExpressions(
-            summaryClass: $summaryQuery->getClass(),
             dimensions: $this->getFilters(),
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],

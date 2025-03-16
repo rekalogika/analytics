@@ -10,18 +10,31 @@
                 "fetch": "eager",
                 "enabled": true
             },
-            "filter": {
-                "main": "dist/filter-controller.js",
+            "equal-filter": {
+                "main": "dist/equal-filter-controller.js",
                 "fetch": "eager",
-                "enabled": true
+                "enabled": true,
+                "autoimport": {
+                    "tom-select/dist/css/tom-select.default.css": true,
+                    "tom-select/dist/css/tom-select.bootstrap4.css": false,
+                    "tom-select/dist/css/tom-select.bootstrap5.css": false
+                }
+            },
+            "date-range-filter": {
+                "main": "dist/date-range-controller.js",
+                "fetch": "eager",
+                "enabled": true,
+                "autoimport": {
+                    "flatpickr/dist/flatpickr.css": true
+                }
             }
-
         },
         "importmap": {
             "@hotwired/stimulus": "^3.0",
             "@hotwired/turbo": "^7.0",
             "sortablejs": "^1.14.0",
-            "tom-select": "^2.4.3"
+            "tom-select": "^2.4.3",
+            "flatpickr": "^4.6.13"
         }
     },
     "scripts": {
@@ -30,7 +43,8 @@
     "peerDependencies": {
         "@hotwired/stimulus": "^3.0.0",
         "sortablejs": "^1.14.0",
-        "tom-select": "^2.4.3"
+        "tom-select": "^2.4.3",
+        "flatpickr": "^4.6.13"
     },
     "devDependencies": {
         "@babel/cli": "^7.26",

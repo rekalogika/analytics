@@ -92,6 +92,11 @@ final class SummaryQuery implements Query
         return $this->metadata->getSummaryClass();
     }
 
+    public function getMetadata(): SummaryMetadata
+    {
+        return $this->metadata;
+    }
+
     //
     // available choices
     //
