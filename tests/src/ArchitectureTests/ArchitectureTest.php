@@ -85,6 +85,7 @@ final class ArchitectureTest
                 Selector::classname(\InvalidArgumentException::class),
                 Selector::classname(\BadMethodCallException::class),
                 Selector::classname(\UnexpectedValueException::class),
+                Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
             );
     }
@@ -148,7 +149,6 @@ final class ArchitectureTest
                 Selector::classname(AssetMapperInterface::class),
                 Selector::classname(ContainerInterface::class),
                 Selector::classname(\UnitEnum::class),
-                Selector::classname(\TypeError::class),
                 Selector::inNamespace('OzdemirBurak\Iris\Color'),
 
                 // twig
