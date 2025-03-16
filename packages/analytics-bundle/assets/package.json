@@ -21,7 +21,7 @@
                 }
             },
             "date-range-filter": {
-                "main": "dist/date-range-controller.js",
+                "main": "dist/date-range-filter-controller.js",
                 "fetch": "eager",
                 "enabled": true,
                 "autoimport": {
