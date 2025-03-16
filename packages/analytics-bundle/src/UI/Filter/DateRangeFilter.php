@@ -39,6 +39,18 @@ final class DateRangeFilter implements Filter
     ) {}
 
     #[\Override]
+    public function getTemplate(): string
+    {
+        return '@RekalogikaAnalytics/filter/date_range_filter.html.twig';
+    }
+
+    #[\Override]
+    public function getDimension(): string
+    {
+        return $this->dimension;
+    }
+
+    #[\Override]
     public function getLabel(): TranslatableInterface|string
     {
         return $this->label;

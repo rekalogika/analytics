@@ -386,6 +386,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$stringifier' => service(Stringifier::class),
+            '$managerRegistry' => service('doctrine'),
         ])
     ;
 };

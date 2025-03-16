@@ -17,11 +17,24 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class NullFilter implements Filter
+final readonly class NullFilter implements Filter
 {
     public function __construct(
-        private readonly TranslatableInterface|string $label,
+        private string $dimension,
+        private TranslatableInterface|string $label,
     ) {}
+
+    #[\Override]
+    public function getTemplate(): string
+    {
+        return '@RekalogikaAnalytics/filter/null_filter.html.twig';
+    }
+
+    #[\Override]
+    public function getDimension(): string
+    {
+        return $this->dimension;
+    }
 
     #[\Override]
     public function getLabel(): TranslatableInterface|string
