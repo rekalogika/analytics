@@ -62,7 +62,7 @@ final class FilterExpressions implements \IteratorAggregate
 
             $typeClass = $this->query->getMetadata()->getDimensionTypeClass($filter);
 
-            if ($typeClass === null) {
+            if ($typeClass === null || enum_exists($typeClass)) {
                 $filterExpression = $this->createEqualFilter($filter, $filterArray);
             } elseif (is_a($typeClass, TimeInterval::class, true)) {
                 $filterExpression = $this->createDateRangeFilter($filter, $filterArray, $typeClass);

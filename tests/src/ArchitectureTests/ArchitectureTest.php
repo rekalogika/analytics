@@ -148,6 +148,7 @@ final class ArchitectureTest
                 Selector::classname(AssetMapperInterface::class),
                 Selector::classname(ContainerInterface::class),
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\TypeError::class),
                 Selector::inNamespace('OzdemirBurak\Iris\Color'),
 
                 // twig

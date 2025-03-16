@@ -16,21 +16,34 @@ namespace Rekalogika\Analytics\TimeInterval;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class HourOfDay implements RecurringTimeInterval
+enum HourOfDay: int implements RecurringTimeInterval
 {
-    use TimeIntervalTrait;
+    use RecurringTimeIntervalEnumTrait;
 
-    // @phpstan-ignore constructor.unusedParameter
-    private function __construct(
-        private int $databaseValue,
-        private \DateTimeZone $timeZone,
-    ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return (string) $this->databaseValue;
-    }
+    case Hour0 = 0;
+    case Hour1 = 1;
+    case Hour2 = 2;
+    case Hour3 = 3;
+    case Hour4 = 4;
+    case Hour5 = 5;
+    case Hour6 = 6;
+    case Hour7 = 7;
+    case Hour8 = 8;
+    case Hour9 = 9;
+    case Hour10 = 10;
+    case Hour11 = 11;
+    case Hour12 = 12;
+    case Hour13 = 13;
+    case Hour14 = 14;
+    case Hour15 = 15;
+    case Hour16 = 16;
+    case Hour17 = 17;
+    case Hour18 = 18;
+    case Hour19 = 19;
+    case Hour20 = 20;
+    case Hour21 = 21;
+    case Hour22 = 22;
+    case Hour23 = 23;
 
     #[\Override]
     public function trans(
@@ -39,13 +52,8 @@ final class HourOfDay implements RecurringTimeInterval
     ): string {
         return \sprintf(
             '%02d:00-%02d:59',
-            $this->databaseValue,
-            $this->databaseValue,
+            $this->value,
+            $this->value,
         );
-    }
-
-    public function getTimezone(): \DateTimeZone
-    {
-        return $this->timeZone;
     }
 }

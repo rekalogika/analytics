@@ -16,47 +16,32 @@ namespace Rekalogika\Analytics\TimeInterval;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DayOfWeek implements RecurringTimeInterval
+enum DayOfWeek: int implements RecurringTimeInterval
 {
-    use TimeIntervalTrait;
+    use RecurringTimeIntervalEnumTrait;
 
-    private function __construct(
-        private int $databaseValue,
-        private \DateTimeZone $timeZone,
-    ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return (string) $this->databaseValue;
-    }
+    case Monday = 1;
+    case Tuesday = 2;
+    case Wednesday = 3;
+    case Thursday = 4;
+    case Friday = 5;
+    case Saturday = 6;
+    case Sunday = 7;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $dayOfWeek = match ($this->databaseValue) {
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-            7 => 'Sunday',
-            default => throw new \InvalidArgumentException(
-                \sprintf('Invalid day of week: %d', $this->databaseValue),
-            ),
-        };
-
-        $dateTime = new \DateTimeImmutable('next ' . $dayOfWeek, $this->timeZone);
+        $dayOfWeek = $this->name;
+        $dateTime = new \DateTimeImmutable('next ' . $dayOfWeek);
         $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::FULL,
-            $this->timeZone,
+            null,
             \IntlDateFormatter::GREGORIAN,
             'EEEE',
         );

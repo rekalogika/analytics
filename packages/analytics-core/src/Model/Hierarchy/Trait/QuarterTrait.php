@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Quarter;
 use Rekalogika\Analytics\TimeInterval\QuarterOfYear;
-use Rekalogika\Analytics\TimeInterval\Types\QuarterOfYearType;
 use Rekalogika\Analytics\TimeInterval\Types\QuarterType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -35,7 +35,7 @@ trait QuarterTrait
     )]
     private ?Quarter $quarter = null;
 
-    #[Column(type: QuarterOfYearType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: QuarterOfYear::class)]
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter of Year'),
@@ -50,6 +50,6 @@ trait QuarterTrait
 
     public function getQuarterOfYear(): ?QuarterOfYear
     {
-        return $this->quarterOfYear?->withTimeZone($this->getTimeZone());
+        return $this->quarterOfYear;
     }
 }

@@ -16,27 +16,21 @@ namespace Rekalogika\Analytics\TimeInterval;
 use Rekalogika\Analytics\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WeekOfMonth implements RecurringTimeInterval
+enum WeekOfMonth: int implements RecurringTimeInterval
 {
-    use TimeIntervalTrait;
+    use RecurringTimeIntervalEnumTrait;
 
-    private function __construct(
-        private int $databaseValue,
-        // @phpstan-ignore property.onlyWritten
-        private \DateTimeZone $timeZone,
-    ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return (string) $this->databaseValue;
-    }
+    case Week1 = 1;
+    case Week2 = 2;
+    case Week3 = 3;
+    case Week4 = 4;
+    case Week5 = 5;
 
     #[\Override]
     public function trans(
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return (string) $this->databaseValue;
+        return 'W' . $this->value;
     }
 }

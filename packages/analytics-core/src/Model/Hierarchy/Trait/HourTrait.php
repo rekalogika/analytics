@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\TimeInterval\Hour;
 use Rekalogika\Analytics\TimeInterval\HourOfDay;
-use Rekalogika\Analytics\TimeInterval\Types\HourOfDayType;
 use Rekalogika\Analytics\TimeInterval\Types\HourType;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 
@@ -35,7 +35,7 @@ trait HourTrait
     )]
     private ?Hour $hour = null;
 
-    #[Column(type: HourOfDayType::class, nullable: true)]
+    #[Column(type: Types::SMALLINT, nullable: true, enumType: HourOfDay::class)]
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour of Day'),
@@ -50,6 +50,6 @@ trait HourTrait
 
     public function getHourOfDay(): ?HourOfDay
     {
-        return $this->hourOfDay?->withTimeZone($this->getTimeZone());
+        return $this->hourOfDay;
     }
 }
