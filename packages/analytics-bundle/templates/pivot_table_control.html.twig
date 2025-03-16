@@ -13,12 +13,12 @@
     <ul class="nav nav-tabs" id="tab-{{ id }}" role="tablist">
         {% set active = true %}
         {% set name = "fields" %}
-        {% set label = 'Fields'|trans %}
+        {% set label = t('Fields', domain = 'rekalogika_analytics')|trans %}
         {{ block("tab") }}
 
         {% set active = false %}
         {% set name = "filters" %}
-        {% set label = 'Filters'|trans %}
+        {% set label = t('Filters', domain = 'rekalogika_analytics')|trans %}
         {{ block("tab") }}
     </ul>
 {% endblock %}
@@ -99,23 +99,23 @@
     {% if type == 'available' %}
         {% set items = query.availableWithoutSubitems %}
         {% set icon = "fa-solid fa-list" %}
-        {% set description = 'Available Fields'|trans %}
+        {% set description = t('Available fields', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'rows' %}
         {% set items = query.rowsWithoutSubitems %}
         {% set icon = "fa-solid fa-table-list" %}
-        {% set description = 'Rows'|trans %}
+        {% set description = t('Rows', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'columns' %}
         {% set items = query.columnsWithoutSubitems %}
         {% set icon = "fa-solid fa-table-columns" %}
-        {% set description = 'Columns'|trans %}
+        {% set description = t('Columns', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'values' %}
         {% set items = query.valuesWithoutSubitems %}
         {% set icon = "fa-solid fa-gauge" %}
-        {% set description = 'Values'|trans %}
+        {% set description = t('Values', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'filters' %}
         {% set items = query.filtersWithoutSubitems %}
         {% set icon = "fa-solid fa-filter" %}
-        {% set description = 'Filters'|trans %}
+        {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
     <div class="card border-dark pb-1">
@@ -185,5 +185,5 @@
 {% endblock filter %}
 
 {% block empty_filter %}
-    <div class="alert alert-info" role="alert">{{ 'No filter selected'|trans }}</div>
+    <div class="alert alert-info" role="alert">{{ t('No filter selected.', domain = 'rekalogika_analytics')|trans }}</div>
 {% endblock empty_filter %}
