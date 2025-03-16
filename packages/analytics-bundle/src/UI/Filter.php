@@ -18,7 +18,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface Filter
 {
+    public function getDimension(): string;
+
     public function getLabel(): string|TranslatableInterface;
 
     public function createExpression(): ?Expression;
+
+    public function getTemplate(): string;
 }

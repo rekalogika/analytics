@@ -61,7 +61,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
             );
         }
 
-        return $this->createNullFilter($label);
+        return $this->createNullFilter($dimension->getFullName(), $label);
     }
 
     /**
@@ -103,9 +103,11 @@ final readonly class DefaultFilterFactory implements FilterFactory
     }
 
     private function createNullFilter(
+        string $dimension,
         TranslatableInterface|string $label,
     ): NullFilter {
         return new NullFilter(
+            dimension: $dimension,
             label: $label,
         );
     }

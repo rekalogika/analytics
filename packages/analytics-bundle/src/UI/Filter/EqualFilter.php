@@ -47,6 +47,18 @@ final class EqualFilter implements Filter
     ) {}
 
     #[\Override]
+    public function getTemplate(): string
+    {
+        return '@RekalogikaAnalytics/filter/equal_filter.html.twig';
+    }
+
+    #[\Override]
+    public function getDimension(): string
+    {
+        return $this->dimension;
+    }
+
+    #[\Override]
     public function getLabel(): string|TranslatableInterface
     {
         return $this->label;
