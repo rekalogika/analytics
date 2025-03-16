@@ -67,7 +67,7 @@ final class FilterExpressions implements \IteratorAggregate
             } elseif (is_a($typeClass, TimeInterval::class, true)) {
                 $filterExpression = $this->createDateRangeFilter($filter, $filterArray, $typeClass);
             } else {
-                $filterExpression = $this->createEqualFilter($filter, $filterArray);
+                $filterExpression = $this->createNullFilter($filter);
             }
 
             $this->expressions[$filter] = $filterExpression;
@@ -106,10 +106,23 @@ final class FilterExpressions implements \IteratorAggregate
         );
     }
 
+    private function createNullFilter(
+        string $dimension,
+    ): NullFilter {
+        return new NullFilter(
+            query: $this->query,
+            dimension: $dimension,
+        );
+    }
+
     public function applyToQuery(): void
     {
-        foreach ($this->expressions as $expression) {
-            $this->query->andWhere($expression->createExpression());
+        foreach ($this->expressions as $filterExpression) {
+            $expression = $filterExpression->createExpression();
+
+            if ($expression !== null) {
+                $this->query->andWhere($expression);
+            }
         }
     }
 }

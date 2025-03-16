@@ -175,7 +175,7 @@
         {% elseif constant('class', filterExpression) == 'Rekalogika\\Analytics\\Bundle\\UI\\Model\\DateRangeFilter' %}
             {{ block("date_range_filter") }}
         {% else %}
-            {{ block("unknown_filter") }}
+            {{ block("null_filter") }}
         {% endif %}
     {% else %}
         <div class="alert alert-info" role="alert">{{ 'No filter selected'|trans }}</div>
@@ -230,14 +230,14 @@
     {{ block("filter_widget") }}
 {% endblock date_range_filter %}
 
-{% block unknown_filter %}
+{% block null_filter %}
     {% set content %}
         <input type="text"
                readonly
                disabled
                class="form-control text-secondary"
-               value="{{ 'This dimension does not support filtering.'|trans }}">
+               placeholder="{{ 'This dimension does not support filtering.'|trans }}">
     {% endset %}
 
     {{ block("filter_widget") }}
-{% endblock unknown_filter %}
+{% endblock null_filter %}
