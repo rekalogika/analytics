@@ -4,12 +4,12 @@
     {% if choices|length > 0 %}
         <select id="{{ filter.dimension }}-{{ id }}"
                 class="filterelement"
-                placeholder="{{ 'Select items...'|trans }}"
+                placeholder="{{ t('Select items...', domain = 'rekalogika_analytics') }}"
                 multiple
                 data-controller="rekalogika--analytics-bundle--equal-filter"
                 data-dimension="{{ filter.dimension }}"
                 data-action="rekalogika--analytics-bundle--equal-filter:change->rekalogika--analytics-bundle--pivot-table#filter">
-            {% for choice in choices %}<option value="{{ choice.id }}">{{ choice.label|trans }}</option>{% endfor %}
+            {% for choice in choices %}<option value="{{ choice.id }}">{{ choice.label }}</option>{% endfor %}
         </select>
     {% else %}
         <input id="{{ filter.dimension }}-{{ id }}"
@@ -17,6 +17,6 @@
                readonly
                disabled
                class="form-control text-secondary"
-               value="{{ 'Unable to find choices to present.'|trans }}">
+               value="{{ t('Unable to find choices to present.', domain = 'rekalogika_analytics', domain = 'rekalogika_analytics')|trans }}">
     {% endif %}
 {% endblock filter %}

@@ -1,7 +1,7 @@
 {% block filter %}
     <input type="text"
-           placeholder="{{ 'Select date range...'|trans }}"
-           aria-label="{{ 'Start'|trans }}"
+           placeholder="{{ t('Select date range...', domain = 'rekalogika_analytics')|trans }}"
+           aria-label="{{ t('Date range', domain = 'rekalogika_analytics')|trans }}"
            lang="{{ app.request.locale }}"
            class="form-control filterelement"
            data-controller="rekalogika--analytics-bundle--date-range-filter"

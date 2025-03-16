@@ -127,5 +127,83 @@
         <target>Week of Month</target>
       </segment>
     </unit>
+    <unit id="selectDateRange" name="Select date range...">
+      <segment>
+        <source>Select date range...</source>
+        <target>Select date range...</target>
+      </segment>
+    </unit>
+    <unit id="dateRange" name="Date range">
+      <segment>
+        <source>Date range</source>
+        <target>Date range</target>
+      </segment>
+    </unit>
+    <unit id="unableToFindChoices" name="Unable to find choices to present.">
+      <segment>
+        <source>Unable to find choices to present.</source>
+        <target>Unable to find choices to present.</target>
+      </segment>
+    </unit>
+    <unit id="dimensionDoesNotSupportFiltering" name="This dimension does not support filtering.">
+      <segment>
+        <source>This dimension does not support filtering.</source>
+        <target>This dimension does not support filtering.</target>
+      </segment>
+    </unit>
+    <unit id="noResultReturned" name="No result returned.">
+      <segment>
+        <source>No result returned.</source>
+        <target>No result returned.</target>
+      </segment>
+    </unit>
+    <unit id="fields" name="Fields">
+      <segment>
+        <source>Fields</source>
+        <target>Fields</target>
+      </segment>
+    </unit>
+    <unit id="filters" name="Filters">
+      <segment>
+        <source>Filters</source>
+        <target>Filters</target>
+      </segment>
+    </unit>
+    <unit id="availableFields" name="Available fields">
+      <segment>
+        <source>Available fields</source>
+        <target>Available fields</target>
+      </segment>
+    </unit>
+    <unit id="rows" name="Rows">
+      <segment>
+        <source>Rows</source>
+        <target>Rows</target>
+      </segment>
+    </unit>
+    <unit id="columns" name="Columns">
+      <segment>
+        <source>Columns</source>
+        <target>Columns</target>
+      </segment>
+    </unit>
+    <unit id="values" name="Values">
+      <segment>
+        <source>Values</source>
+        <target>Values</target>
+      </segment>
+    </unit>
+    <unit id="noFilterSelected" name="No filter selected.">
+      <segment>
+        <source>No filter selected.</source>
+        <target>No filter selected.</target>
+      </segment>
+    </unit>
+    <unit id="none" name="(None)">
+      <segment>
+        <source>(None)</source>
+        <target>(None)</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
