@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -138,6 +139,7 @@ final class ArchitectureTest
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateTimeImmutable::class),
                 Selector::classname(\Stringable::class),
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\ArrayAccess::class),
@@ -157,6 +159,7 @@ final class ArchitectureTest
 
                 // doctrine
                 Selector::classname(Criteria::class),
+                Selector::classname(Expression::class),
 
                 // Chartjs
                 Selector::classname(ChartBuilderInterface::class),

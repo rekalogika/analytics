@@ -43,7 +43,7 @@ final readonly class AttributeUtil
 
     /**
      * @param class-string $class
-     * @return iterable<string>
+     * @return iterable<\ReflectionProperty>
      */
     public static function getPropertiesOfClass(string $class): iterable
     {
@@ -54,11 +54,11 @@ final readonly class AttributeUtil
             $reflectionClass = new \ReflectionClass($class);
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-                $properties[$reflectionProperty->getName()] = true;
+                $properties[$reflectionProperty->getName()] = $reflectionProperty;
             }
         }
 
-        yield from array_keys($properties);
+        yield from array_values($properties);
     }
 
     /**
@@ -137,5 +137,34 @@ final readonly class AttributeUtil
         }
 
         return null;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public static function getTypeClass(
+        \ReflectionProperty $reflectionProperty,
+    ): ?string {
+        $type = $reflectionProperty->getType();
+
+        if ($type === null) {
+            return null;
+        }
+
+        if (!$type instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        if ($type->isBuiltin()) {
+            return null;
+        }
+
+        $name = $type->getName();
+
+        if (!class_exists($name)) {
+            return null;
+        }
+
+        return $name;
     }
 }

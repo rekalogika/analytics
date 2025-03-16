@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Doctrine\Common\Collections\Criteria;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\UI\Model\Choice;
 use Rekalogika\Analytics\Bundle\UI\Model\Choices;
 use Rekalogika\Analytics\Bundle\UI\Model\FilterExpressions;
 use Rekalogika\Analytics\Query\Result;
@@ -49,7 +47,7 @@ final class PivotAwareSummaryQuery
     public function __construct(
         private readonly SummaryQuery $summaryQuery,
         array $parameters,
-        private readonly Stringifier $stringifier,
+        Stringifier $stringifier,
     ) {
         if (isset($parameters['rows'])) {
             /**
@@ -87,18 +85,14 @@ final class PivotAwareSummaryQuery
          * @psalm-suppress MixedArgument
          */
         $this->filterExpressions = new FilterExpressions(
-            summaryClass: $summaryQuery->getClass(),
             dimensions: $this->getFilters(),
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],
             query: $summaryQuery,
+            stringifier: $stringifier,
         );
 
-        foreach ($this->filterExpressions as $dimension => $filter) {
-            /** @psalm-suppress ImpureMethodCall */
-            $this->summaryQuery
-                ->andWhere(Criteria::expr()->in($dimension, $filter->getValues()));
-        }
+        $this->filterExpressions->applyToQuery();
     }
 
     /**
@@ -393,68 +387,5 @@ final class PivotAwareSummaryQuery
         }
 
         return $items;
-    }
-
-    //
-    // distinct values
-    //
-
-    /**
-     * @param string $dimension
-     */
-    public function getChoices(string $dimension): Choices
-    {
-        if ($dimension === '@values') {
-            throw new \InvalidArgumentException('Dimension "@values" is not supported');
-        }
-
-        $dimensionField = $this->summaryQuery->getDimensionChoices()[$dimension]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $dimension));
-
-        $choices = $this->summaryQuery
-            ->getDistinctValues($this->summaryQuery->getClass(), $dimension);
-
-        if ($choices === null) {
-            return new Choices(
-                label: $dimensionField,
-                choices: [],
-            );
-        }
-
-        $choices2 = [];
-
-        /** @psalm-suppress MixedAssignment */
-        foreach ($choices as $id => $value) {
-            if ($id === Choice::NULL) {
-                throw new \InvalidArgumentException('ID cannot be the same as NULL value');
-            }
-
-            $choices2[] = new Choice(
-                id: $id,
-                value: $value,
-                label: $this->stringifier->toString($value),
-            );
-        }
-
-        $choices2[] = new Choice(
-            id: Choice::NULL,
-            value: null,
-            label: $this->stringifier->toString(new TranslatableMessage('(None)')),
-        );
-
-        return new Choices(
-            label: $dimensionField,
-            choices: $choices2,
-        );
-    }
-
-    public function getIdToChoice(string $dimension, string $id): mixed
-    {
-        if ($id === Choice::NULL) {
-            return null;
-        }
-
-        return $this->summaryQuery
-            ->getValueFromId($this->summaryQuery->getClass(), $dimension, $id);
     }
 }

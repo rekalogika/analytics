@@ -165,30 +165,79 @@
             {% endif %}
         </div>
     </li>
-{% endblock %}
+{% endblock item %}
 
 {% block filters %}
     <turbo-frame id="__filters">
     {% for dimension, filterExpression in query.filterExpressions %}
-        {% set choices = query.getChoices(dimension) %}
-        <div class="mb-3">
-            <label for="{{ dimension }}-{{ id }}" class="form-label">{{ choices|trans }}</label>
-            {% if choices.hasChoices() %}
-                <select name="{{ dimension }}"
-                        id="{{ dimension }}-{{ id }}"
-                        class="equalfilter"
-                        multiple
-                        data-controller="rekalogika--analytics-bundle--filter"
-                        data-action="rekalogika--analytics-bundle--filter:change->rekalogika--analytics-bundle--pivot-table#filter">
-                    {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
-                </select>
-            {% else %}
-                <input type="text" readonly class="form-control" value="{{ 'N/A'|trans() }}">
-                <div class="form-text">{{ 'This dimension does not support filtering.'|trans }}</div>
-            {% endif %}
-        </div>
+        {% if constant('class', filterExpression) == 'Rekalogika\\Analytics\\Bundle\\UI\\Model\\EqualFilter' %}
+            {{ block("equal_filter") }}
+        {% elseif constant('class', filterExpression) == 'Rekalogika\\Analytics\\Bundle\\UI\\Model\\DateRangeFilter' %}
+            {{ block("date_range_filter") }}
+        {% else %}
+            {{ block("unknown_filter") }}
+        {% endif %}
     {% else %}
         <div class="alert alert-info" role="alert">{{ 'No filter selected'|trans }}</div>
     {% endfor %}
     </turbo-frame>
-{% endblock %}
+{% endblock filters %}
+
+{% block filter_widget %}
+    <div class="mb-3">
+        <label for="{{ dimension }}-{{ id }}" class="form-label">{{ filterExpression.label|trans }}</label>
+        {{ content }}
+    </div>
+{% endblock filter_widget %}
+
+{% block equal_filter %}
+    {% set content %}
+        {% set choices = filterExpression.choices %}
+
+        {% if choices|length > 0 %}
+            <select class="filterelement"
+                    placeholder="{{ 'Select items...'|trans }}"
+                    multiple
+                    data-controller="rekalogika--analytics-bundle--equal-filter"
+                    data-dimension="{{ dimension }}"
+                    data-action="rekalogika--analytics-bundle--equal-filter:change->rekalogika--analytics-bundle--pivot-table#filter">
+                {% for choice in choices %}<option value="{{ choice.id }}">{{ choice|trans }}</option>{% endfor %}
+            </select>
+        {% else %}
+            <input type="text"
+                   readonly
+                   disabled
+                   class="form-control text-secondary"
+                   value="{{ 'Unable to find choices to present.'|trans }}">
+        {% endif %}
+    {% endset %}
+
+    {{ block("filter_widget") }}
+{% endblock equal_filter %}
+
+{% block date_range_filter %}
+    {% set content %}
+        <input type="text"
+               placeholder="{{ 'Select date range...'|trans }}"
+               aria-label="{{ 'Start'|trans }}"
+               lang="{{ app.request.locale }}"
+               class="form-control filterelement"
+               data-controller="rekalogika--analytics-bundle--date-range-filter"
+               data-dimension="{{ dimension }}"
+               data-action="rekalogika--analytics-bundle--date-range-filter:change->rekalogika--analytics-bundle--pivot-table#filter">
+    {% endset %}
+
+    {{ block("filter_widget") }}
+{% endblock date_range_filter %}
+
+{% block unknown_filter %}
+    {% set content %}
+        <input type="text"
+               readonly
+               disabled
+               class="form-control text-secondary"
+               value="{{ 'This dimension does not support filtering.'|trans }}">
+    {% endset %}
+
+    {{ block("filter_widget") }}
+{% endblock unknown_filter %}

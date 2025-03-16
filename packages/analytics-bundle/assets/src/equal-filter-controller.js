@@ -1,11 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import TomSelect from 'tom-select'
-import 'tom-select/dist/css/tom-select.default.min.css'
+import 'tom-select/dist/css/tom-select.bootstrap5.min.css'
 
 export default class extends Controller {
     connect() {
+        this.element.data = this.getData()
+
         this.tomSelect = new TomSelect(this.element, {
-            maxItems: 50,
+            maxItems: 500,
             allowEmptyOption: true,
             plugins: {
                 remove_button: {}
@@ -13,8 +15,18 @@ export default class extends Controller {
         })
 
         this.element.addEventListener('change', () => {
+            this.element.data = this.getData()
             this.dispatch('change', {})
         })
+    }
+
+    getData() {
+        const values = Array.from(this.element.selectedOptions).map(({ value }) => value)
+
+        return {
+            dimension: this.element.dataset.dimension,
+            values: values
+        }
     }
 
     disconnect() {

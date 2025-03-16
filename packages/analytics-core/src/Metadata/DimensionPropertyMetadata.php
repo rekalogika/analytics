@@ -18,11 +18,15 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata
 {
+    /**
+     * @param null|class-string $typeClass
+     */
     public function __construct(
         private string $name,
         private string $hierarchyName,
         private string|TranslatableInterface $label,
         private DimensionValueResolver $valueResolver,
+        private ?string $typeClass,
         private ?DimensionLevelMetadata $levelMetadata = null,
     ) {}
 
@@ -33,6 +37,7 @@ final readonly class DimensionPropertyMetadata
             hierarchyName: $this->hierarchyName,
             label: $this->label,
             valueResolver: $this->valueResolver,
+            typeClass: $this->typeClass,
             levelMetadata: $levelMetadata,
         );
     }
@@ -69,5 +74,13 @@ final readonly class DimensionPropertyMetadata
     public function getValueResolver(): DimensionValueResolver
     {
         return $this->valueResolver;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getTypeClass(): ?string
+    {
+        return $this->typeClass;
     }
 }

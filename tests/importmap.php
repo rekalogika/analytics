@@ -41,7 +41,23 @@ return [
         'version' => '2.4.3',
         'type' => 'css',
     ],
+    'tom-select/dist/css/tom-select.bootstrap4.min.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.bootstrap5.min.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
     'chart.js' => [
         'version' => '3.9.1',
     ],
+    'flatpickr' => [
+        'version' => '4.6.13',
+    ],
+    'flatpickr/dist/flatpickr.css' => [
+        'version' => '4.6.13',
+        'type' => 'css',
+    ],
 ];
+
