@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Implementation;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\DateRangeFilter;
@@ -30,6 +31,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
         private SummaryMetadataFactory $summaryMetadataFactory,
         private DistinctValuesResolver $distinctValuesResolver,
         private Stringifier $stringifier,
+        private ManagerRegistry $managerRegistry,
     ) {}
 
     #[\Override]
@@ -45,7 +47,11 @@ final readonly class DefaultFilterFactory implements FilterFactory
         $typeClass = $dimension->getTypeClass();
         $label = $dimension->getLabel();
 
-        if ($typeClass === null || enum_exists($typeClass)) {
+        if (
+            $typeClass === null
+            || enum_exists($typeClass)
+            || $this->isDoctrineRelation($summaryClass, $dimension->getFullName())
+        ) {
             return $this->createEqualFilter(
                 summaryClass: $summaryClass,
                 dimension: $dimension->getFullName(),
@@ -62,6 +68,25 @@ final readonly class DefaultFilterFactory implements FilterFactory
         }
 
         return $this->createNullFilter($dimension->getFullName(), $label);
+    }
+
+    /**
+     * @param class-string $summaryClass
+     * @param string $dimension
+     */
+    private function isDoctrineRelation(
+        string $summaryClass,
+        string $dimension,
+    ): bool {
+        $doctrineMetadata = $this->managerRegistry
+            ->getManagerForClass($summaryClass)
+            ?->getClassMetadata($summaryClass);
+
+        if ($doctrineMetadata === null) {
+            return false;
+        }
+
+        return $doctrineMetadata->hasAssociation($dimension);
     }
 
     /**
