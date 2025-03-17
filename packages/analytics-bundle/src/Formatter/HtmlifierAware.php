@@ -13,14 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter;
 
-interface BackendStringifier
+interface HtmlifierAware
 {
-    /**
-     * @param class-string|null $summaryClass
-     */
-    public function toString(
-        mixed $input,
-        ?string $summaryClass = null,
-        ?string $property = null,
-    ): ?string;
+    public function withHtmlifier(Htmlifier $htmlifier): static;
 }

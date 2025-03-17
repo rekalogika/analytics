@@ -18,8 +18,11 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 final readonly class DefaultBackendStringifier implements BackendStringifier
 {
     #[\Override]
-    public function toString(mixed $input): string
-    {
+    public function toString(
+        mixed $input,
+        ?string $summaryClass = null,
+        ?string $property = null,
+    ): string {
         if ($input instanceof \Stringable) {
             return (string) $input;
         }
