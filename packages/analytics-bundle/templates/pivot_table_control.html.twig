@@ -98,31 +98,23 @@
 {% block item_block %}
     {% if type == 'available' %}
         {% set items = query.availableWithoutSubitems %}
-        {% set icon = "fa-solid fa-list" %}
         {% set description = t('Available fields', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'rows' %}
         {% set items = query.rowsWithoutSubitems %}
-        {% set icon = "fa-solid fa-table-list" %}
         {% set description = t('Rows', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'columns' %}
         {% set items = query.columnsWithoutSubitems %}
-        {% set icon = "fa-solid fa-table-columns" %}
         {% set description = t('Columns', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'values' %}
         {% set items = query.valuesWithoutSubitems %}
-        {% set icon = "fa-solid fa-gauge" %}
         {% set description = t('Values', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'filters' %}
         {% set items = query.filtersWithoutSubitems %}
-        {% set icon = "fa-solid fa-filter" %}
         {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
     <div class="card border-dark pb-1">
-        <h4 class="card-header">
-            <i class="{{ icon }}"></i>
-            {{ description }}
-        </h4>
+        <h4 class="card-header">{{ description }}</h4>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
             style="min-height: 70px">
@@ -185,5 +177,5 @@
 {% endblock filter %}
 
 {% block empty_filter %}
-    <div class="alert alert-info" role="alert">{{ t('No filter selected.', domain = 'rekalogika_analytics')|trans }}</div>
+    <div class="alert alert-info" role="alert">{{ t('No filter selected.', domain = 'rekalogika_analytics') |trans }}</div>
 {% endblock empty_filter %}
