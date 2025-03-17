@@ -15,5 +15,12 @@ namespace Rekalogika\Analytics\Bundle\Formatter;
 
 interface Stringifier
 {
-    public function toString(mixed $input): string;
+    /**
+     * @param class-string|null $summaryClass
+     */
+    public function toString(
+        mixed $input,
+        ?string $summaryClass = null,
+        ?string $property = null,
+    ): string;
 }

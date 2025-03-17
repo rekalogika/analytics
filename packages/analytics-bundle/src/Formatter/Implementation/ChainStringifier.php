@@ -13,37 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 
-final readonly class DefaultHtmlifier implements Htmlifier
+final readonly class ChainStringifier implements Stringifier
 {
     /**
-     * @param iterable<BackendHtmlifier> $backendHtmlifiers
      * @param iterable<BackendStringifier> $backendStringifiers
      */
     public function __construct(
-        private iterable $backendHtmlifiers,
         private iterable $backendStringifiers,
     ) {}
 
     #[\Override]
-    public function toHtml(mixed $input): string
-    {
-        foreach ($this->backendHtmlifiers as $htmlifier) {
-            $result = $htmlifier->toHtml($input);
-
-            if ($result !== null) {
-                return $result;
-            }
-        }
-
+    public function toString(
+        mixed $input,
+        ?string $summaryClass = null,
+        ?string $property = null,
+    ): string {
         foreach ($this->backendStringifiers as $stringifier) {
             $result = $stringifier->toString($input);
 
             if ($result !== null) {
-                return htmlspecialchars($result);
+                return $result;
             }
         }
 

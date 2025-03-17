@@ -15,5 +15,12 @@ namespace Rekalogika\Analytics\Bundle\Formatter;
 
 interface BackendHtmlifier
 {
-    public function toHtml(mixed $input): ?string;
+    /**
+     * @param class-string|null $summaryClass
+     */
+    public function toHtml(
+        mixed $input,
+        ?string $summaryClass = null,
+        ?string $property = null,
+    ): ?string;
 }
