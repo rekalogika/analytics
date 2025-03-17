@@ -31,6 +31,10 @@ final readonly class TranslatableStringifier implements BackendStringifier
             return $input->trans($this->translator);
         }
 
+        if ($input === null) {
+            return (new TranslatableMessage('(none)'))->trans($this->translator);
+        }
+
         if (\is_bool($input)) {
             return $input
                 ? (new TranslatableMessage('True'))->trans($this->translator)
