@@ -22,11 +22,22 @@ use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 /**
  * @internal
  */
-final class DefaultResult implements Result
+final readonly class DefaultResult implements Result
 {
+    /**
+     * @param class-string $summaryClass
+     * @param SummarizerQuery $query
+     */
     public function __construct(
+        private string $summaryClass,
         private SummarizerQuery $query,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function getTree(): TreeResult

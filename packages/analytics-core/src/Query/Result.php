@@ -20,6 +20,11 @@ namespace Rekalogika\Analytics\Query;
  */
 interface Result
 {
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
     public function getTree(): TreeResult;
 
     public function getNormalTable(): NormalTable;

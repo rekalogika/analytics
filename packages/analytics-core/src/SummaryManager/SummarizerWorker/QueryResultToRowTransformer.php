@@ -58,7 +58,10 @@ final readonly class QueryResultToRowTransformer
 
         $rows = $transformer->doTransform($input);
 
-        return new DefaultTable($rows);
+        return new DefaultTable(
+            summaryClass: $metadata->getSummaryClass(),
+            rows: $rows,
+        );
     }
 
     /**
@@ -144,6 +147,7 @@ final readonly class QueryResultToRowTransformer
             );
 
             $measure = new DefaultMeasure(
+                summaryClass: $this->metadata->getSummaryClass(),
                 label: $this->getLabel($key),
                 key: $key,
                 value: $value,
@@ -203,6 +207,7 @@ final readonly class QueryResultToRowTransformer
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
             $dimension = new DefaultDimension(
+                summaryClass: $this->metadata->getSummaryClass(),
                 label: $this->getLabel($key),
                 key: $key,
                 member: $value,

@@ -24,6 +24,11 @@ use Doctrine\Common\Collections\Order;
 interface Query
 {
     /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
+    /**
      * @return list<string>
      */
     public function getGroupBy(): array;

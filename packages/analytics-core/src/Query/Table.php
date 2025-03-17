@@ -22,5 +22,10 @@ namespace Rekalogika\Analytics\Query;
  */
 interface Table extends \Traversable, \Countable
 {
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
     public function first(): ?Row;
 }

@@ -35,7 +35,10 @@ final class UnpivotTableToTreeTransformer
             'table' => $transformer->transformToTable($normalTable),
         };
 
-        return new DefaultTreeResult(children: $rootNodes);
+        return new DefaultTreeResult(
+            summaryClass: $normalTable->getSummaryClass(),
+            children: $rootNodes,
+        );
     }
 
     /**
@@ -54,6 +57,7 @@ final class UnpivotTableToTreeTransformer
         bool $forceCreate,
     ): void {
         $node = DefaultTreeNode::createBranchNode(
+            summaryClass: $dimension->getSummaryClass(),
             key: $dimension->getKey(),
             label: $dimension->getLabel(),
             member: $dimension->getMember(),
@@ -96,6 +100,7 @@ final class UnpivotTableToTreeTransformer
         }
 
         $node = DefaultTreeNode::createLeafNode(
+            summaryClass: $lastDimension->getSummaryClass(),
             key: $lastDimension->getKey(),
             label: $lastDimension->getLabel(),
             member: $lastDimension->getMember(),

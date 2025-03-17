@@ -22,6 +22,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 interface Measure
 {
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
     public function getLabel(): string|TranslatableInterface;
 
     public function getKey(): string;
