@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'rekalogika_summary_properties')]
-final class SummaryTableProperties
+class SummaryTableProperties
 {
     #[ORM\Column(length: 255)]
     private ?string $lastId = null;
