@@ -49,4 +49,9 @@ final readonly class PivotTableLeaf implements LeafNode
     {
         return $this->node->getMember();
     }
+
+    public function getTreeNode(): TreeNode
+    {
+        return $this->node;
+    }
 }

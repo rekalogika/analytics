@@ -51,4 +51,9 @@ final readonly class PivotTableBranch implements BranchNode
             }
         }
     }
+
+    public function getTreeNode(): TreeNode
+    {
+        return $this->node;
+    }
 }
