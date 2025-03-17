@@ -23,9 +23,9 @@ use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolv
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainHtmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultHtmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierExtension;
@@ -360,7 +360,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(Stringifier::class)
-        ->class(ChainStringifier::class)
+        ->class(DefaultStringifier::class)
         ->args([
             '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
         ])
@@ -368,7 +368,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(Htmlifier::class)
-        ->class(ChainHtmlifier::class)
+        ->class(DefaultHtmlifier::class)
         ->args([
             '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
             '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
