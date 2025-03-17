@@ -25,11 +25,19 @@ final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
     use NodeTrait;
 
     /**
+     * @param class-string $summaryClass
      * @param list<TreeNode> $children
      */
     public function __construct(
+        private string $summaryClass,
         private array $children,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function count(): int

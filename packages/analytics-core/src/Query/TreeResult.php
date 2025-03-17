@@ -22,5 +22,10 @@ namespace Rekalogika\Analytics\Query;
  */
 interface TreeResult extends \Traversable, \Countable
 {
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
     public function traverse(mixed ...$members): ?TreeNode;
 }

@@ -96,7 +96,10 @@ final class UnpivotValuesTransformer
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
-        return new DefaultNormalTable($rows);
+        return new DefaultNormalTable(
+            summaryClass: $input->getSummaryClass(),
+            rows: $rows,
+        );
     }
 
     private function getMeasureSorterCallable(): callable
@@ -136,6 +139,7 @@ final class UnpivotValuesTransformer
             $measureLabel = $this->getMeasureDescription($measure);
 
             $newRow['@values'] = new ValueDimension(
+                summaryClass: $this->metadata->getSummaryClass(),
                 valuesLabel: $this->valuesLabel,
                 measureLabel: $measureLabel,
             );

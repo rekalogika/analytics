@@ -68,6 +68,12 @@ final class SummaryQuery implements Query
         private readonly DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->metadata->getSummaryClass();
+    }
+
     public function getResult(): Result
     {
         if ($this->result !== null) {
@@ -81,7 +87,10 @@ final class SummaryQuery implements Query
             propertyAccessor: $this->propertyAccessor,
         );
 
-        return $this->result = new DefaultResult($summarizer);
+        return $this->result = new DefaultResult(
+            summaryClass: $this->metadata->getSummaryClass(),
+            query: $summarizer,
+        );
     }
 
     /**
