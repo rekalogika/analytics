@@ -25,11 +25,8 @@ final readonly class TranslatableStringifier implements BackendStringifier
     ) {}
 
     #[\Override]
-    public function toString(
-        mixed $input,
-        ?string $summaryClass = null,
-        ?string $property = null,
-    ): ?string {
+    public function toString(mixed $input): ?string
+    {
         if ($input instanceof TranslatableInterface) {
             return $input->trans($this->translator);
         }
