@@ -24,7 +24,7 @@ use Symfony\Component\Uid\UuidV7;
 #[ORM\Entity()]
 #[ORM\Table(name: 'rekalogika_summary_dirty')]
 #[ORM\Index(fields: ['class', 'level', 'key'])]
-final class DirtyFlag
+class DirtyFlag
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::GUID, nullable: false)]
