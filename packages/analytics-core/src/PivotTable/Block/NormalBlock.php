@@ -22,7 +22,11 @@ final class NormalBlock extends NodeBlock
     #[\Override]
     protected function createHeaderRows(): Rows
     {
-        $cell = new HeaderCell($this->getTreeNode()->getLegend());
+        $cell = new HeaderCell(
+            content: $this->getTreeNode()->getLegend(),
+            treeNode: $this->getTreeNode(),
+        );
+
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
 
         return $cell->appendRowsRight($blockGroup->getHeaderRows());
@@ -31,7 +35,11 @@ final class NormalBlock extends NodeBlock
     #[\Override]
     protected function createDataRows(): Rows
     {
-        $cell = new DataCell($this->getTreeNode()->getItem());
+        $cell = new DataCell(
+            content: $this->getTreeNode()->getItem(),
+            treeNode: $this->getTreeNode(),
+        );
+
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
 
         return $cell->appendRowsRight($blockGroup->getDataRows());

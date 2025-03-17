@@ -21,7 +21,11 @@ final class PivotBlock extends NodeBlock
     #[\Override]
     protected function createHeaderRows(): Rows
     {
-        $valueCell = new DataCell($this->getBranchNode()->getItem());
+        $valueCell = new DataCell(
+            content: $this->getBranchNode()->getItem(),
+            treeNode: $this->getBranchNode(),
+        );
+
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
         $rows = $blockGroup->getHeaderRows();
 

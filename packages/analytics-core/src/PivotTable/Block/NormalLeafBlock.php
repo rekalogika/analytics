@@ -23,8 +23,12 @@ final class NormalLeafBlock extends NodeBlock
     #[\Override]
     protected function createHeaderRows(): Rows
     {
-        $cell = (new HeaderCell($this->getLeafNode()->getLegend()))
-            ->withColumnSpan(2);
+        $cell = new HeaderCell(
+            content: $this->getLeafNode()->getLegend(),
+            treeNode: $this->getLeafNode(),
+            columnSpan: 2,
+        );
+
         $row = new Row([$cell]);
 
         return new Rows([$row]);
@@ -33,8 +37,16 @@ final class NormalLeafBlock extends NodeBlock
     #[\Override]
     protected function createDataRows(): Rows
     {
-        $name = new DataCell($this->getLeafNode()->getItem());
-        $value = new DataCell($this->getLeafNode()->getValue());
+        $name = new DataCell(
+            content: $this->getLeafNode()->getItem(),
+            treeNode: $this->getLeafNode(),
+        );
+
+        $value = new DataCell(
+            content: $this->getLeafNode()->getValue(),
+            treeNode: $this->getLeafNode(),
+        );
+
         $row = new Row([$name, $value]);
 
         return new Rows([$row]);
