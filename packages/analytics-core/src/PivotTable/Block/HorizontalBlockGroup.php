@@ -37,7 +37,11 @@ final class HorizontalBlockGroup extends BlockGroup
             $firstChild->getKey() !== '@values'
             || !$firstChild instanceof LeafNode
         ) {
-            $nameCell = new HeaderCell($firstChild->getLegend());
+            $nameCell = new HeaderCell(
+                content: $firstChild->getLegend(),
+                treeNode: $firstChild,
+            );
+
             $rows = $nameCell->appendRowsBelow($rows);
         }
 

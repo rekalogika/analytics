@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Table;
 
+use Rekalogika\Analytics\PivotTable\TreeNode;
+
 abstract readonly class Cell
 {
     final public function __construct(
         private mixed $content,
+        private TreeNode $treeNode,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
     ) {}
@@ -26,6 +29,11 @@ abstract readonly class Cell
         return $this->content;
     }
 
+    public function getTreeNode(): TreeNode
+    {
+        return $this->treeNode;
+    }
+
     public function getColumnSpan(): int
     {
         return $this->columnSpan;
@@ -33,7 +41,12 @@ abstract readonly class Cell
 
     public function withColumnSpan(int $columnSpan): static
     {
-        return new static($this->content, $columnSpan, $this->rowSpan);
+        return new static(
+            content: $this->content,
+            treeNode: $this->treeNode,
+            columnSpan: $columnSpan,
+            rowSpan: $this->rowSpan,
+        );
     }
 
     public function getRowSpan(): int
@@ -43,7 +56,12 @@ abstract readonly class Cell
 
     public function withRowSpan(int $rowSpan): static
     {
-        return new static($this->content, $this->columnSpan, $rowSpan);
+        return new static(
+            content: $this->content,
+            treeNode: $this->treeNode,
+            columnSpan: $this->columnSpan,
+            rowSpan: $rowSpan,
+        );
     }
 
     public function appendRowsRight(Rows $rows): Rows

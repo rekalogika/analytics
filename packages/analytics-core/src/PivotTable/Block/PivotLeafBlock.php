@@ -26,9 +26,15 @@ final class PivotLeafBlock extends NodeBlock
         if (
             $this->getLeafNode()->getKey() === '@values'
         ) {
-            $cell = new HeaderCell($this->getLeafNode()->getItem());
+            $cell = new HeaderCell(
+                content: $this->getLeafNode()->getItem(),
+                treeNode: $this->getLeafNode(),
+            );
         } else {
-            $cell = new DataCell($this->getLeafNode()->getItem());
+            $cell = new DataCell(
+                content: $this->getLeafNode()->getItem(),
+                treeNode: $this->getLeafNode(),
+            );
         }
 
         $row = new Row([$cell]);
@@ -39,7 +45,11 @@ final class PivotLeafBlock extends NodeBlock
     #[\Override]
     protected function createDataRows(): Rows
     {
-        $cell = new DataCell($this->getLeafNode()->getValue());
+        $cell = new DataCell(
+            content: $this->getLeafNode()->getValue(),
+            treeNode: $this->getLeafNode(),
+        );
+
         $row = new Row([$cell]);
 
         return new Rows([$row]);
