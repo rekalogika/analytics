@@ -206,12 +206,16 @@ final readonly class QueryResultToRowTransformer
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
+            /** @psalm-suppress MixedAssignment */
+            $displayValue = $value ?? $this->getNullValue($key);
+
             $dimension = new DefaultDimension(
                 summaryClass: $this->metadata->getSummaryClass(),
                 label: $this->getLabel($key),
                 key: $key,
                 member: $value,
                 rawMember: $rawValue,
+                displayMember: $displayValue,
             );
 
             $dimensionValues[$key] = $dimension;
@@ -468,6 +472,13 @@ final readonly class QueryResultToRowTransformer
                 ->getProperty($propertyName)
                 ->getLabel(),
         );
+    }
+
+    private function getNullValue(string $field): TranslatableInterface
+    {
+        return $this->metadata
+            ->getFullyQualifiedDimension($field)
+            ->getNullLabel();
     }
 
     private function getNumericValueResolver(string $key): NumericValueResolver

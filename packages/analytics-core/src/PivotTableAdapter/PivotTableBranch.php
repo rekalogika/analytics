@@ -37,7 +37,7 @@ final readonly class PivotTableBranch implements BranchNode
     #[\Override]
     public function getItem(): mixed
     {
-        return $this->node->getMember();
+        return $this->node->getDisplayMember();
     }
 
     #[\Override]

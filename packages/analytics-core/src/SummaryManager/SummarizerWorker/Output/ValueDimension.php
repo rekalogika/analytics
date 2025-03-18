@@ -56,4 +56,11 @@ final readonly class ValueDimension implements Dimension
     {
         return $this->measureLabel;
     }
+
+    #[\Override]
+    public function getDisplayMember(): mixed
+    {
+        return $this->measureLabel;
+    }
+
 }

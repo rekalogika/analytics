@@ -150,7 +150,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 
             // get value
 
-            $labels[] = $this->stringifier->toString($dimension->getMember());
+            $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
 
@@ -253,7 +253,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 
         foreach ($result->getTable() as $row) {
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
+            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getDisplayMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -261,7 +261,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         // populate data
 
         foreach ($result->getTree() as $node) {
-            $labels[] = $this->stringifier->toString($node->getMember());
+            $labels[] = $this->stringifier->toString($node->getDisplayMember());
 
             if ($xTitle === null) {
                 $xTitle = $this->stringifier->toString($node->getLabel());
@@ -288,7 +288,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getMember());
+                    $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getDisplayMember());
                 }
 
                 if ($legendTitle === null) {
@@ -306,11 +306,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($valueNode->getMember()),
+                            $this->stringifier->toString($valueNode->getDisplayMember()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($valueNode->getMember());
+                        $yTitle = $this->stringifier->toString($valueNode->getDisplayMember());
                     }
                 }
             }

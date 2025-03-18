@@ -27,6 +27,7 @@ final readonly class DefaultDimension implements Dimension
         private string $key,
         private mixed $member,
         private mixed $rawMember,
+        private mixed $displayMember,
     ) {}
 
     #[\Override]
@@ -57,5 +58,11 @@ final readonly class DefaultDimension implements Dimension
     public function getRawMember(): mixed
     {
         return $this->rawMember;
+    }
+
+    #[\Override]
+    public function getDisplayMember(): mixed
+    {
+        return $this->displayMember;
     }
 }
