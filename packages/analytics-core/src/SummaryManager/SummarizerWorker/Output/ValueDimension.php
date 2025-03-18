@@ -18,20 +18,10 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class ValueDimension implements Dimension
 {
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
-        private string $summaryClass,
         private string|TranslatableInterface $valuesLabel,
         private mixed $measureLabel,
     ) {}
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
-    }
 
     #[\Override]
     public function getLabel(): string|TranslatableInterface
@@ -62,5 +52,4 @@ final readonly class ValueDimension implements Dimension
     {
         return $this->measureLabel;
     }
-
 }

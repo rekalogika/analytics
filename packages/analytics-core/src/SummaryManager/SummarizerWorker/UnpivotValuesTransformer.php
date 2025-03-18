@@ -139,7 +139,6 @@ final class UnpivotValuesTransformer
             $measureLabel = $this->getMeasureDescription($measure);
 
             $newRow['@values'] = new ValueDimension(
-                summaryClass: $this->metadata->getSummaryClass(),
                 valuesLabel: $this->valuesLabel,
                 measureLabel: $measureLabel,
             );

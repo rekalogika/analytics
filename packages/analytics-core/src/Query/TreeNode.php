@@ -25,11 +25,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 interface TreeNode extends \Traversable, \Countable
 {
     /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    /**
      * Dimension property name (e.g. country, time.hour)
      */
     public function getKey(): string;
