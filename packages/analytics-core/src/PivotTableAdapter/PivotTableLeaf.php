@@ -29,7 +29,7 @@ final readonly class PivotTableLeaf implements LeafNode
     #[\Override]
     public function getValue(): mixed
     {
-        return $this->node->getValue();
+        return $this->node->getMeasure()?->getValue();
     }
 
     #[\Override]
@@ -47,7 +47,7 @@ final readonly class PivotTableLeaf implements LeafNode
     #[\Override]
     public function getItem(): mixed
     {
-        return $this->node->getMember();
+        return $this->node->getDisplayMember();
     }
 
     public function getTreeNode(): TreeNode

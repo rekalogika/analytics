@@ -13,21 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 /**
- * Represent a node in the query result.
+ * Represent a property, which can be either a dimension or a measure
  *
  * For consumption only, do not implement. Methods may be added in the future.
- *
- * @extends \Traversable<mixed,TreeNode>
  */
-interface TreeNode extends \Traversable, \Countable, Dimension
+interface Property
 {
-    public function getMeasure(): ?Measure;
+    /**
+     * Property name (e.g. country, time.hour, count, etc)
+     */
+    public function getKey(): string;
 
     /**
-     * Whether this node is a leaf node.
+     * Description of the property (e.g. Country, Hour of the day)
      */
-    public function isLeaf(): bool;
-
-    public function traverse(mixed ...$members): ?TreeNode;
+    public function getLabel(): string|TranslatableInterface;
 }

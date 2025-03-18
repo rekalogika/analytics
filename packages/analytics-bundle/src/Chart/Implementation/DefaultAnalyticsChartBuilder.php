@@ -296,21 +296,26 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 }
 
                 $children = iterator_to_array($node2, false);
-                $valueNode = $children[0];
+                $dimension = $children[0];
+                $measure = $dimension->getMeasure();
 
-                $dataSets[$signature]['data'][] = $valueNode->getNumericValue();
+                if ($measure === null) {
+                    throw new UnsupportedData('Measures not found');
+                }
+
+                $dataSets[$signature]['data'][] = $measure->getNumericValue();
 
                 if ($yTitle === null) {
-                    $unit = $valueNode->getUnit();
+                    $unit = $measure->getUnit();
 
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($valueNode->getDisplayMember()),
+                            $this->stringifier->toString($dimension->getDisplayMember()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($valueNode->getDisplayMember());
+                        $yTitle = $this->stringifier->toString($dimension->getDisplayMember());
                     }
                 }
             }

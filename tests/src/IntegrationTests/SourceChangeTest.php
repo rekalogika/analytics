@@ -59,7 +59,7 @@ final class SourceChangeTest extends KernelTestCase
             ->getResult()
             ->getTree();
 
-        $count = $result->traverse('count')?->getValue();
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
 
         return $count;
@@ -77,7 +77,7 @@ final class SourceChangeTest extends KernelTestCase
             ->getResult()
             ->getTree();
 
-        $count = $result->traverse('2030', 'count')?->getValue() ?? 0;
+        $count = $result->traverse('2030', 'count')?->getMeasure()?->getValue() ?? 0;
         $this->assertIsInt($count);
 
         return $count;
