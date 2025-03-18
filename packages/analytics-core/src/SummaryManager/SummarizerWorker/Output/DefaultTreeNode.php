@@ -37,14 +37,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private Dimension $dimension,
         private ?Measure $measure,
     ) {
-        // if ($measure !== null && $measure->getKey() !== $dimension->getKey()) {
-        //     dump($measure, $dimension);
-        //     throw new \InvalidArgumentException(sprintf(
-        //         'Dimension key "%s" and measure key "%s" must be the same',
-        //         $dimension->getKey(),
-        //         $measure->getKey(),
-        //     ));
-        // }
     }
 
     #[\Override]
