@@ -18,30 +18,44 @@ use Rekalogika\Analytics\PivotTable\TreeNode;
 abstract readonly class Cell
 {
     final public function __construct(
+        private ContentType $type,
+        private string $key,
         private mixed $content,
         private TreeNode $treeNode,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
     ) {}
 
-    public function getContent(): mixed
+    final public function getType(): ContentType
+    {
+        return $this->type;
+    }
+
+    final public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    final public function getContent(): mixed
     {
         return $this->content;
     }
 
-    public function getTreeNode(): TreeNode
+    final public function getTreeNode(): TreeNode
     {
         return $this->treeNode;
     }
 
-    public function getColumnSpan(): int
+    final public function getColumnSpan(): int
     {
         return $this->columnSpan;
     }
 
-    public function withColumnSpan(int $columnSpan): static
+    final public function withColumnSpan(int $columnSpan): static
     {
         return new static(
+            type: $this->type,
+            key: $this->key,
             content: $this->content,
             treeNode: $this->treeNode,
             columnSpan: $columnSpan,
@@ -49,14 +63,16 @@ abstract readonly class Cell
         );
     }
 
-    public function getRowSpan(): int
+    final public function getRowSpan(): int
     {
         return $this->rowSpan;
     }
 
-    public function withRowSpan(int $rowSpan): static
+    final public function withRowSpan(int $rowSpan): static
     {
         return new static(
+            type: $this->type,
+            key: $this->key,
             content: $this->content,
             treeNode: $this->treeNode,
             columnSpan: $this->columnSpan,
@@ -64,7 +80,7 @@ abstract readonly class Cell
         );
     }
 
-    public function appendRowsRight(Rows $rows): Rows
+    final public function appendRowsRight(Rows $rows): Rows
     {
         $cell = $this->withRowSpan($rows->getHeight());
 
@@ -76,7 +92,7 @@ abstract readonly class Cell
         return new Rows([$firstRow, ...$secondToLastRows]);
     }
 
-    public function appendRowsBelow(Rows $rows): Rows
+    final public function appendRowsBelow(Rows $rows): Rows
     {
         $cell = $this->withColumnSpan($rows->getWidth());
         $first = new Rows([new Row([$cell])]);
@@ -84,7 +100,7 @@ abstract readonly class Cell
         return $first->appendBelow($rows);
     }
 
-    public function appendCellBelow(Cell $cell): Rows
+    final public function appendCellBelow(Cell $cell): Rows
     {
         $row1 = new Row([$this]);
         $row2 = new Row([$cell]);

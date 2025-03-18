@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Block;
 
+use Rekalogika\Analytics\PivotTable\Table\ContentType;
 use Rekalogika\Analytics\PivotTable\Table\DataCell;
 use Rekalogika\Analytics\PivotTable\Table\HeaderCell;
 use Rekalogika\Analytics\PivotTable\Table\Row;
@@ -24,6 +25,8 @@ final class NormalLeafBlock extends NodeBlock
     protected function createHeaderRows(): Rows
     {
         $cell = new HeaderCell(
+            type: ContentType::Legend,
+            key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getLegend(),
             treeNode: $this->getLeafNode(),
             columnSpan: 2,
@@ -38,11 +41,15 @@ final class NormalLeafBlock extends NodeBlock
     protected function createDataRows(): Rows
     {
         $name = new DataCell(
+            type: ContentType::Item,
+            key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getItem(),
             treeNode: $this->getLeafNode(),
         );
 
         $value = new DataCell(
+            type: ContentType::Value,
+            key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
             treeNode: $this->getLeafNode(),
         );

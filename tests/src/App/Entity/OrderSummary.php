@@ -118,6 +118,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
             ],
         ),
         label: new TranslatableMessage('Customer Gender'),
+        nullLabel: new TranslatableMessage('Unspecified'),
     )]
     private ?Gender $customerGender = null;
 

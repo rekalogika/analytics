@@ -91,7 +91,7 @@ final readonly class FullyQualifiedDimensionMetadata
         return $this->summaryMetadata;
     }
 
-    public function getNullLabel(): null|string|TranslatableInterface
+    public function getNullLabel(): TranslatableInterface
     {
         if ($this->dimensionProperty === null) {
             return $this->dimension->getNullLabel();
