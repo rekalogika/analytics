@@ -19,6 +19,9 @@ final class TranslatableUtil
 {
     private function __construct() {}
 
+    /**
+     * @return ($translatable is null ? null : TranslatableInterface)
+     */
     public static function normalize(
         null|string|TranslatableInterface $translatable,
     ): ?TranslatableInterface {

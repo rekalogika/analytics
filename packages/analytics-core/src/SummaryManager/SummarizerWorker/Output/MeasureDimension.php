@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Query\Dimension;
+use Rekalogika\Analytics\Query\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureDimension implements Dimension
 {
     public function __construct(
         private TranslatableInterface $label,
-        private mixed $measure,
+        private MeasureMember $measureMember,
     ) {}
 
     #[\Override]
@@ -36,20 +37,20 @@ final readonly class MeasureDimension implements Dimension
     }
 
     #[\Override]
-    public function getMember(): mixed
+    public function getMember(): MeasureMember
     {
-        return $this->measure;
+        return $this->measureMember;
     }
 
     #[\Override]
-    public function getRawMember(): mixed
+    public function getRawMember(): MeasureMember
     {
-        return $this->measure;
+        return $this->measureMember;
     }
 
     #[\Override]
-    public function getDisplayMember(): mixed
+    public function getDisplayMember(): MeasureMember
     {
-        return $this->measure;
+        return $this->measureMember;
     }
 }

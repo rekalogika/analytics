@@ -13,35 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Unit;
+use Rekalogika\Analytics\Query\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DefaultUnit implements Unit
+final readonly class DefaultMeasureMember implements MeasureMember
 {
-    private function __construct(
+    public function __construct(
         private TranslatableInterface $label,
-        private string $signature,
+        private string $property,
     ) {}
 
-    public static function create(
-        null|TranslatableInterface $label,
-        null|string $signature,
-    ): ?self {
-        if ($label === null || $signature === null) {
-            return null;
-        }
-
-        return new self(
-            label: $label,
-            signature: $signature,
-        );
-    }
-
     #[\Override]
-    public function getSignature(): string
+    public function getMeasureProperty(): string
     {
-        return $this->signature;
+        return $this->property;
     }
 
     #[\Override]

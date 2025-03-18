@@ -25,9 +25,9 @@ final readonly class MeasureMetadata
     public function __construct(
         private array $function,
         private string $summaryProperty,
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
         private NumericValueResolver $numericValueResolver,
-        private null|string|TranslatableInterface $unit,
+        private null|TranslatableInterface $unit,
         private ?string $unitSignature,
     ) {}
 
@@ -51,7 +51,7 @@ final readonly class MeasureMetadata
         return $this->summaryProperty;
     }
 
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }
@@ -61,7 +61,7 @@ final readonly class MeasureMetadata
         return $this->numericValueResolver;
     }
 
-    public function getUnit(): null|string|TranslatableInterface
+    public function getUnit(): null|TranslatableInterface
     {
         return $this->unit;
     }

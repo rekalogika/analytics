@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Query\MeasureMember;
 use Rekalogika\Analytics\Query\TreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
 
 trait NodeTrait
 {
@@ -23,8 +23,8 @@ trait NodeTrait
         /** @var mixed $currentMember */
         foreach ($this as $currentMember => $child) {
             if (
-                $currentMember instanceof MeasureDescription
-                && $currentMember->getMeasurePropertyName() === $member
+                $currentMember instanceof MeasureMember
+                && $currentMember->getMeasureProperty() === $member
             ) {
                 return $child;
             }
