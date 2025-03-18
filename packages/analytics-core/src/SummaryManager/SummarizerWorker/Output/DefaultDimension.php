@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class DefaultDimension implements Dimension
 {
     public function __construct(
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
         private string $key,
         private mixed $member,
         private mixed $rawMember,
@@ -27,7 +27,7 @@ final readonly class DefaultDimension implements Dimension
     ) {}
 
     #[\Override]
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }

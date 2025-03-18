@@ -44,7 +44,7 @@ final readonly class FullyQualifiedDimensionMetadata
         return $this->dimensionProperty->getFullName();
     }
 
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         if ($this->dimensionProperty === null) {
             return $this->dimension->getLabel();

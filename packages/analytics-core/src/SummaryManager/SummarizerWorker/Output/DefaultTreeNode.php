@@ -83,7 +83,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->dimension->getLabel();
     }

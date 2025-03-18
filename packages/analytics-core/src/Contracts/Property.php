@@ -30,5 +30,5 @@ interface Property
     /**
      * Description of the property (e.g. Country, Hour of the day)
      */
-    public function getLabel(): string|TranslatableInterface;
+    public function getLabel(): TranslatableInterface;
 }
