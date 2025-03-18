@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
 use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
+use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -61,6 +62,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $builder->registerForAutoconfiguration(BackendHtmlifier::class)
             ->addTag('rekalogika.analytics.backend_htmlifier');
+
+        $builder->registerForAutoconfiguration(SpecificFilterFactory::class)
+            ->addTag('rekalogika.analytics.specific_filter_factory');
     }
 
     /**

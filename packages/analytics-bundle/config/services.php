@@ -36,6 +36,9 @@ use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
+use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
+use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
+use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NullFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -60,6 +63,7 @@ use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
@@ -383,10 +387,35 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(FilterFactory::class)
         ->class(DefaultFilterFactory::class)
         ->args([
+            '$specificFilterFactories' => tagged_locator('rekalogika.analytics.specific_filter_factory', defaultIndexMethod: 'getFilterClass'),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
+        ])
+    ;
+
+    $services
+        ->set(DateRangeFilterFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+        ->tag('rekalogika.analytics.specific_filter_factory')
+    ;
+
+    $services
+        ->set(EqualFilterFactory::class)
+        ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$stringifier' => service(Stringifier::class),
-            '$managerRegistry' => service('doctrine'),
         ])
+        ->tag('rekalogika.analytics.specific_filter_factory')
+    ;
+
+    $services
+        ->set(NullFilterFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+        ->tag('rekalogika.analytics.specific_filter_factory')
     ;
 };
