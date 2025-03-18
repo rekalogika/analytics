@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Block;
 
+use Rekalogika\Analytics\PivotTable\Table\ContentType;
 use Rekalogika\Analytics\PivotTable\Table\DataCell;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 
@@ -22,6 +23,8 @@ final class PivotBlock extends NodeBlock
     protected function createHeaderRows(): Rows
     {
         $valueCell = new DataCell(
+            type: ContentType::Item,
+            key: $this->getBranchNode()->getKey(),
             content: $this->getBranchNode()->getItem(),
             treeNode: $this->getBranchNode(),
         );

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Block;
 
 use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\Analytics\PivotTable\Table\ContentType;
 use Rekalogika\Analytics\PivotTable\Table\HeaderCell;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 
@@ -38,6 +39,8 @@ final class HorizontalBlockGroup extends BlockGroup
             || !$firstChild instanceof LeafNode
         ) {
             $nameCell = new HeaderCell(
+                type: ContentType::Legend,
+                key: $firstChild->getKey(),
                 content: $firstChild->getLegend(),
                 treeNode: $firstChild,
             );

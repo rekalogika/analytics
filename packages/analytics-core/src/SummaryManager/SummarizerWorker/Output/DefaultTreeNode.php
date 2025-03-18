@@ -44,6 +44,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly string|TranslatableInterface $label,
         private readonly mixed $member,
         private readonly mixed $rawMember,
+        private readonly mixed $displayMember,
         private readonly bool $leaf,
         private readonly ?Unit $unit,
     ) {}
@@ -77,6 +78,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         string|TranslatableInterface $label,
         mixed $member,
         mixed $rawMember,
+        mixed $displayMember,
     ): self {
         return new self(
             summaryClass: $summaryClass,
@@ -84,6 +86,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             label: $label,
             member: $member,
             rawMember: $rawMember,
+            displayMember: $displayMember,
             value: null,
             rawValue: null,
             numericValue: 0,
@@ -105,6 +108,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         string|TranslatableInterface $label,
         mixed $member,
         mixed $rawMember,
+        mixed $displayMember,
     ): self {
         return new self(
             summaryClass: $summaryClass,
@@ -112,6 +116,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             label: $label,
             member: $member,
             rawMember: $rawMember,
+            displayMember: $displayMember,
             value: $value,
             rawValue: $rawValue,
             numericValue: $numericValue,
@@ -149,6 +154,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getRawMember(): mixed
     {
         return $this->rawMember;
+    }
+
+    #[\Override]
+    public function getDisplayMember(): mixed
+    {
+        return $this->displayMember;
     }
 
     public function setParent(DefaultTreeNode $parent): void

@@ -40,6 +40,8 @@ use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Partition as DoctrineSummaryPartition;
 use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\AttributeUtil;
+use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatableUtil;
 use Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
@@ -363,6 +365,9 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $dimensionHierarchy = null;
         }
 
+        $nullLabel = TranslatableUtil::normalize($dimensionAttribute->getNullLabel())
+            ?? new TranslatableMessage('(None)');
+
         return new DimensionMetadata(
             source: $sourceProperty,
             summaryProperty: $summaryProperty,
@@ -372,6 +377,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             hierarchy: $dimensionHierarchy,
             orderBy: $dimensionAttribute->getOrderBy(),
             typeClass: $typeClass,
+            nullLabel: $nullLabel,
         );
     }
 
@@ -613,12 +619,16 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $valueResolver = $dimensionLevelAttribute->getValueResolver();
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
 
+            $nullLabel = TranslatableUtil::normalize($dimensionLevelAttribute->getNullLabel())
+                ?? new TranslatableMessage('(None)');
+
             $dimensionPropertyMetadata = new DimensionPropertyMetadata(
                 name: $name,
                 hierarchyName: $hierarchyPropertyName,
                 label: $label,
                 valueResolver: $valueResolver,
                 typeClass: $typeClass,
+                nullLabel: $nullLabel,
             );
 
             $levels[$level][] = $dimensionPropertyMetadata;

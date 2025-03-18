@@ -62,6 +62,7 @@ final class UnpivotTableToTreeTransformer
             label: $dimension->getLabel(),
             member: $dimension->getMember(),
             rawMember: $dimension->getRawMember(),
+            displayMember: $dimension->getDisplayMember(),
         );
 
         $current = $this->currentPath[$columnNumber] ?? null;
@@ -105,6 +106,7 @@ final class UnpivotTableToTreeTransformer
             label: $lastDimension->getLabel(),
             member: $lastDimension->getMember(),
             rawMember: $lastDimension->getRawMember(),
+            displayMember: $lastDimension->getDisplayMember(),
             value: $measure->getValue(),
             rawValue: $rawValue,
             numericValue: $measure->getNumericValue(),

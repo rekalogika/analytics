@@ -22,7 +22,7 @@ final readonly class FullyQualifiedDimensionMetadata
      */
     public function __construct(
         private DimensionMetadata $dimension,
-        private ?DimensionPropertyMetadata $dimensionProperty = null,
+        private ?DimensionPropertyMetadata $dimensionProperty,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
 
@@ -89,5 +89,14 @@ final readonly class FullyQualifiedDimensionMetadata
         }
 
         return $this->summaryMetadata;
+    }
+
+    public function getNullLabel(): TranslatableInterface
+    {
+        if ($this->dimensionProperty === null) {
+            return $this->dimension->getNullLabel();
+        }
+
+        return $this->dimensionProperty->getNullLabel();
     }
 }

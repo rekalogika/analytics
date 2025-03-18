@@ -34,4 +34,6 @@ interface Dimension
     public function getMember(): mixed;
 
     public function getRawMember(): mixed;
+
+    public function getDisplayMember(): mixed;
 }

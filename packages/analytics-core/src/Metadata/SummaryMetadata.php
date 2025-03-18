@@ -144,7 +144,7 @@ final readonly class SummaryMetadata
     public function getFullyQualifiedDimension(string $dimensionName): FullyQualifiedDimensionMetadata
     {
         return $this->fullyQualifiedDimensions[$dimensionName]
-            ?? throw new \RuntimeException('Dimension not found');
+            ?? throw new \RuntimeException(\sprintf('Dimension not found: %s', $dimensionName));
     }
 
     /**

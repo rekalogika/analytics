@@ -51,6 +51,12 @@ interface TreeNode extends \Traversable, \Countable
     public function getRawMember(): mixed;
 
     /**
+     * The member in the form suitable for display. i.e. null values are
+     * replaced with the null label.
+     */
+    public function getDisplayMember(): mixed;
+
+    /**
      * The canonical value. If not in leaf node, the value is null. Usually a
      * number, but can also be an object that represents the value, e.g. Money
      */
