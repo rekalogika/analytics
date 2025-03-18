@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Query\Result;
+use Rekalogika\Analytics\Contracts\Result;
 
 interface AnalyticsPivotTableBuilder
 {

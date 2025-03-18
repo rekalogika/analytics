@@ -11,21 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Contracts;
 
 /**
- * A query result in normalized tabular format. Each row contains one measure.
+ * Represent a node in the query result.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<int,Row>
+ * @extends \Traversable<mixed,TreeNode>
  */
-interface NormalTable extends \Traversable, \Countable
+interface TreeNode extends \Traversable, \Countable, Dimension
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
+    public function getMeasure(): ?Measure;
 
-    public function first(): ?NormalRow;
+    public function traverse(mixed ...$members): ?TreeNode;
 }

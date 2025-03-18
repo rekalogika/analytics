@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\TreeNode;
-use Rekalogika\Analytics\Query\TreeResult;
+use Rekalogika\Analytics\Contracts\TreeNode;
+use Rekalogika\Analytics\Contracts\TreeResult;
 
 /**
  * @implements \IteratorAggregate<mixed,TreeNode>

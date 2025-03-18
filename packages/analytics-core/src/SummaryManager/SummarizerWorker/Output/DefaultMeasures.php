@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Measure;
-use Rekalogika\Analytics\Query\Measures;
+use Rekalogika\Analytics\Contracts\Measure;
+use Rekalogika\Analytics\Contracts\Measures;
 
 /**
  * @implements \IteratorAggregate<string,Measure>
