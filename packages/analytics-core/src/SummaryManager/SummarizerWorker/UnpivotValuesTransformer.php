@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Query\Dimension;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescription;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Model\MeasureDescriptionFactory;
+use Rekalogika\Analytics\Query\MeasureMember;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
@@ -41,11 +41,9 @@ final class UnpivotValuesTransformer
     private readonly array $measures;
 
     /**
-     * @var array<string,TranslatableInterface|string>
+     * @var array<string,MeasureMember>
      */
-    private array $measureLabelCache = [];
-
-    private MeasureDescriptionFactory $measureDescriptionFactory;
+    private array $measureMemberCache = [];
 
     private function __construct(
         SummaryQuery $summaryQuery,
@@ -60,8 +58,6 @@ final class UnpivotValuesTransformer
 
         $this->dimensions = $dimensions;
         $this->measures = $summaryQuery->getSelect();
-
-        $this->measureDescriptionFactory = new MeasureDescriptionFactory();
     }
 
     public static function transform(
@@ -136,11 +132,11 @@ final class UnpivotValuesTransformer
             // @values represent the place of the value column in the
             // row. the value column is not always at the end of the row
 
-            $measureValue = $this->getMeasureDescription($measure);
+            $measureValue = $this->getMeasureMember($measure);
 
             $newRow['@values'] = new MeasureDimension(
                 label: $this->measureLabel,
-                measure: $measureValue,
+                measureMember: $measureValue,
             );
 
             /** @var array<string,Dimension> $newRow */
@@ -155,14 +151,11 @@ final class UnpivotValuesTransformer
         }
     }
 
-    private function getMeasureDescription(string $measure): MeasureDescription
+    private function getMeasureMember(string $measure): MeasureMember
     {
-        $label = $this->measureLabelCache[$measure]
-            ??= $this->metadata->getMeasureMetadata($measure)->getLabel();
-
-        return $this->measureDescriptionFactory->createMeasureDescription(
-            measurePropertyName: $measure,
-            label: $label,
+        return $this->measureMemberCache[$measure] ??= new DefaultMeasureMember(
+            label: $this->metadata->getMeasureMetadata($measure)->getLabel(),
+            property: $measure,
         );
     }
 }

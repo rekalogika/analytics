@@ -40,6 +40,7 @@ use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Partition as DoctrineSummaryPartition;
 use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\AttributeUtil;
+use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Rekalogika\Analytics\Util\TranslatableUtil;
 use Rekalogika\Analytics\ValueResolver;
@@ -522,6 +523,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     ): MeasureMetadata {
         $function = $measureAttribute->getFunction();
         $numericValueResolver = $measureAttribute->getNumericValueResolver();
+
         $unit = $measureAttribute->getUnit();
 
         if ($unit !== null) {
@@ -529,6 +531,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         } else {
             $unitSignature = null;
         }
+
+        $unit = TranslatableUtil::normalize($unit);
 
         if (!\is_array($function)) {
             $newFunction = [];
@@ -552,10 +556,13 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
         }
 
+        $label = TranslatableUtil::normalize($measureAttribute->getLabel())
+            ?? new LiteralString($property);
+
         return new MeasureMetadata(
             function: $function,
             summaryProperty: $property,
-            label: $measureAttribute->getLabel() ?? $property,
+            label: $label,
             numericValueResolver: $numericValueResolver,
             unit: $unit,
             unitSignature: $unitSignature,
