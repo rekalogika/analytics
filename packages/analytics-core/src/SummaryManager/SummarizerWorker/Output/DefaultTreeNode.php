@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Query\Dimension;
+use Rekalogika\Analytics\Query\Measure;
 use Rekalogika\Analytics\Query\TreeNode;
-use Rekalogika\Analytics\Query\Unit;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -33,16 +34,8 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private ?DefaultTreeNode $parent = null;
 
     private function __construct(
-        private readonly string $key,
-        private readonly mixed $value,
-        private readonly mixed $rawValue,
-        private readonly int|float $numericValue,
-        private readonly string|TranslatableInterface $label,
-        private readonly mixed $member,
-        private readonly mixed $rawMember,
-        private readonly mixed $displayMember,
-        private readonly bool $leaf,
-        private readonly ?Unit $unit,
+        private Dimension $dimension,
+        private ?Measure $measure,
     ) {}
 
     #[\Override]
@@ -59,86 +52,64 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
     }
 
-    public static function createBranchNode(
-        string $key,
-        string|TranslatableInterface $label,
-        mixed $member,
-        mixed $rawMember,
-        mixed $displayMember,
-    ): self {
+    public static function createBranchNode(Dimension $dimension): self
+    {
         return new self(
-            key: $key,
-            label: $label,
-            member: $member,
-            rawMember: $rawMember,
-            displayMember: $displayMember,
-            value: null,
-            rawValue: null,
-            numericValue: 0,
-            unit: null,
-            leaf: false,
+            dimension: $dimension,
+            measure: null,
         );
     }
 
     public static function createLeafNode(
-        string $key,
-        mixed $value,
-        mixed $rawValue,
-        int|float $numericValue,
-        ?Unit $unit,
-        string|TranslatableInterface $label,
-        mixed $member,
-        mixed $rawMember,
-        mixed $displayMember,
+        Dimension $dimension,
+        Measure $measure,
     ): self {
         return new self(
-            key: $key,
-            label: $label,
-            member: $member,
-            rawMember: $rawMember,
-            displayMember: $displayMember,
-            value: $value,
-            rawValue: $rawValue,
-            numericValue: $numericValue,
-            unit: $unit,
-            leaf: true,
+            dimension: $dimension,
+            measure: $measure,
         );
     }
 
     public function isEqual(self $other): bool
     {
-        return $this->key === $other->key
-            && $this->member === $other->member;
+        return $this->getKey() === $other->getKey()
+            && $this->getRawMember() === $other->getRawMember();
     }
 
     #[\Override]
-    public function isLeaf(): bool
+    public function getKey(): string
     {
-        return $this->leaf;
+        return $this->dimension->getKey();
     }
 
     #[\Override]
     public function getLabel(): string|TranslatableInterface
     {
-        return $this->label;
+        return $this->dimension->getLabel();
     }
 
     #[\Override]
     public function getMember(): mixed
     {
-        return $this->member;
+        return $this->dimension->getMember();
     }
 
     #[\Override]
     public function getRawMember(): mixed
     {
-        return $this->rawMember;
+        return $this->dimension->getRawMember();
     }
 
     #[\Override]
     public function getDisplayMember(): mixed
     {
-        return $this->displayMember;
+        return $this->dimension->getDisplayMember();
+    }
+
+    #[\Override]
+    public function getMeasure(): ?Measure
+    {
+        return $this->measure;
     }
 
     public function setParent(DefaultTreeNode $parent): void
@@ -151,12 +122,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         return $this->parent;
     }
 
-    #[\Override]
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
     public function __clone()
     {
         $this->children = [];
@@ -166,29 +131,5 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     {
         $this->children[] = $node;
         $node->setParent($this);
-    }
-
-    #[\Override]
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    #[\Override]
-    public function getRawValue(): mixed
-    {
-        return $this->rawValue;
-    }
-
-    #[\Override]
-    public function getNumericValue(): int|float
-    {
-        return $this->numericValue;
-    }
-
-    #[\Override]
-    public function getUnit(): ?Unit
-    {
-        return $this->unit;
     }
 }

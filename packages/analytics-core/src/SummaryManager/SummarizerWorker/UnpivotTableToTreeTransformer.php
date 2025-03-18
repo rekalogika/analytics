@@ -56,13 +56,7 @@ final class UnpivotTableToTreeTransformer
         int $columnNumber,
         bool $forceCreate,
     ): void {
-        $node = DefaultTreeNode::createBranchNode(
-            key: $dimension->getKey(),
-            label: $dimension->getLabel(),
-            member: $dimension->getMember(),
-            rawMember: $dimension->getRawMember(),
-            displayMember: $dimension->getDisplayMember(),
-        );
+        $node = DefaultTreeNode::createBranchNode($dimension);
 
         $current = $this->currentPath[$columnNumber] ?? null;
 
@@ -92,23 +86,9 @@ final class UnpivotTableToTreeTransformer
         Measure $measure,
         int $columnNumber,
     ): void {
-        /** @psalm-suppress MixedAssignment */
-        $rawValue = $measure->getRawValue();
-
-        if (!\is_int($rawValue) && !\is_float($rawValue)) {
-            $rawValue = 0;
-        }
-
         $node = DefaultTreeNode::createLeafNode(
-            key: $lastDimension->getKey(),
-            label: $lastDimension->getLabel(),
-            member: $lastDimension->getMember(),
-            rawMember: $lastDimension->getRawMember(),
-            displayMember: $lastDimension->getDisplayMember(),
-            value: $measure->getValue(),
-            rawValue: $rawValue,
-            numericValue: $measure->getNumericValue(),
-            unit: $measure->getUnit(),
+            dimension: $lastDimension,
+            measure: $measure,
         );
 
         if ($columnNumber === 0) {

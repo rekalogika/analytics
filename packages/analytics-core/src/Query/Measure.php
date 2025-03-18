@@ -13,24 +13,37 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Query;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
 /**
  * Represent a measure
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Measure
+interface Measure extends Property
 {
-    public function getLabel(): string|TranslatableInterface;
-
-    public function getKey(): string;
-
+    /**
+     * The canonical value of the measure, as returned by normal access methods.
+     * If a getter exists, it will be used to fetch the value instead of
+     * accessing the property directly.
+     */
     public function getValue(): mixed;
 
+    /**
+     * The value returned by Doctrine.
+     */
     public function getRawValue(): mixed;
 
+    /**
+     * The value in numeric format. Unlike getValue and getRawValue, this method
+     * guarantees that the value is in numeric format. This is useful if the
+     * consumer (charting libraries, etc) only accepts numeric values, and
+     * cannot work with higher level abstractions of the value.
+     */
     public function getNumericValue(): int|float;
 
+    /**
+     * The value's unit of measurement. This is useful for formatting, or used
+     * by charting libraries to determine if different measures can be plotted
+     * on the same axis.
+     */
     public function getUnit(): ?Unit;
 }

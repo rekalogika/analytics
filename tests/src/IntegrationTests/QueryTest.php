@@ -61,7 +61,7 @@ final class QueryTest extends KernelTestCase
         $node = $result->traverse('count');
         $this->assertNotNull($node);
         $this->assertEquals('@values', $node->getKey());
-        $this->assertIsInt($node->getValue());
+        $this->assertIsInt($node->getMeasure()?->getValue());
     }
 
     public function testInvalidDimension(): void
@@ -104,7 +104,7 @@ final class QueryTest extends KernelTestCase
         // single traverse
         $node1 = $result->traverse('2024', $country, 'count');
         $this->assertNotNull($node1);
-        $this->assertIsInt($node1->getValue());
+        $this->assertIsInt($node1->getMeasure()?->getValue());
 
         // multistep traverse
         $node2 = $result
@@ -145,7 +145,7 @@ final class QueryTest extends KernelTestCase
             ->getTree();
 
         $node = $result->traverse('2024', 'count', $country->getName());
-        $this->assertIsInt($node?->getValue());
+        $this->assertIsInt($node?->getMeasure()?->getValue());
     }
 
     public function testGroupByValueTypeFirst(): void
@@ -166,7 +166,7 @@ final class QueryTest extends KernelTestCase
             ->getTree();
 
         $node = $result->traverse('count', '2024', $country->getName());
-        $this->assertIsInt($node?->getValue());
+        $this->assertIsInt($node?->getMeasure()?->getValue());
     }
 
     public function testGroupByValueTypeLast(): void
@@ -187,7 +187,7 @@ final class QueryTest extends KernelTestCase
             ->getTree();
 
         $node = $result->traverse('2024', $country->getName(), 'count');
-        $this->assertIsInt($node?->getValue());
+        $this->assertIsInt($node?->getMeasure()?->getValue());
     }
 
     public function testWhere(): void
@@ -270,7 +270,7 @@ final class QueryTest extends KernelTestCase
             ->getResult()
             ->getTree()
             ->traverse('count')
-            ?->getValue();
+            ?->getMeasure()?->getValue();
 
         $this->assertNotNull($all);
 
@@ -280,7 +280,7 @@ final class QueryTest extends KernelTestCase
             ->getResult()
             ->getTree()
             ->traverse('count')
-            ?->getValue();
+            ?->getMeasure()?->getValue();
 
         $this->assertNotNull($withWhere);
 
@@ -326,7 +326,7 @@ final class QueryTest extends KernelTestCase
 
         foreach ($result as $node) {
             /** @psalm-suppress MixedAssignment */
-            $counts[] = $node->traverse('count')?->getValue();
+            $counts[] = $node->traverse('count')?->getMeasure()?->getValue();
         }
 
         // assert that the counts are sorted in descending order
