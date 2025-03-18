@@ -32,11 +32,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     private ?DefaultTreeNode $parent = null;
 
-    /**
-     * @param class-string $summaryClass
-     */
     private function __construct(
-        private readonly string $summaryClass,
         private readonly string $key,
         private readonly mixed $value,
         private readonly mixed $rawValue,
@@ -48,12 +44,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly bool $leaf,
         private readonly ?Unit $unit,
     ) {}
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
-    }
 
     #[\Override]
     public function count(): int
@@ -69,11 +59,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
     }
 
-    /**
-     * @param class-string $summaryClass
-     */
     public static function createBranchNode(
-        string $summaryClass,
         string $key,
         string|TranslatableInterface $label,
         mixed $member,
@@ -81,7 +67,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         mixed $displayMember,
     ): self {
         return new self(
-            summaryClass: $summaryClass,
             key: $key,
             label: $label,
             member: $member,
@@ -95,11 +80,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         );
     }
 
-    /**
-     * @param class-string $summaryClass
-     */
     public static function createLeafNode(
-        string $summaryClass,
         string $key,
         mixed $value,
         mixed $rawValue,
@@ -111,7 +92,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         mixed $displayMember,
     ): self {
         return new self(
-            summaryClass: $summaryClass,
             key: $key,
             label: $label,
             member: $member,
@@ -129,7 +109,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     {
         return $this->key === $other->key
             && $this->member === $other->member;
-        ;
     }
 
     #[\Override]

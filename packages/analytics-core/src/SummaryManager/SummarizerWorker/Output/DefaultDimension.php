@@ -18,23 +18,13 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultDimension implements Dimension
 {
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
-        private string $summaryClass,
         private string|TranslatableInterface $label,
         private string $key,
         private mixed $member,
         private mixed $rawMember,
         private mixed $displayMember,
     ) {}
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
-    }
 
     #[\Override]
     public function getLabel(): string|TranslatableInterface

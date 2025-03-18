@@ -147,7 +147,6 @@ final readonly class QueryResultToRowTransformer
             );
 
             $measure = new DefaultMeasure(
-                summaryClass: $this->metadata->getSummaryClass(),
                 label: $this->getLabel($key),
                 key: $key,
                 value: $value,
@@ -210,7 +209,6 @@ final readonly class QueryResultToRowTransformer
             $displayValue = $value ?? $this->getNullValue($key);
 
             $dimension = new DefaultDimension(
-                summaryClass: $this->metadata->getSummaryClass(),
                 label: $this->getLabel($key),
                 key: $key,
                 member: $value,

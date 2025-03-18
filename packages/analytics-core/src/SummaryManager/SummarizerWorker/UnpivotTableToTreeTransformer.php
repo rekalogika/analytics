@@ -57,7 +57,6 @@ final class UnpivotTableToTreeTransformer
         bool $forceCreate,
     ): void {
         $node = DefaultTreeNode::createBranchNode(
-            summaryClass: $dimension->getSummaryClass(),
             key: $dimension->getKey(),
             label: $dimension->getLabel(),
             member: $dimension->getMember(),
@@ -101,7 +100,6 @@ final class UnpivotTableToTreeTransformer
         }
 
         $node = DefaultTreeNode::createLeafNode(
-            summaryClass: $lastDimension->getSummaryClass(),
             key: $lastDimension->getKey(),
             label: $lastDimension->getLabel(),
             member: $lastDimension->getMember(),
