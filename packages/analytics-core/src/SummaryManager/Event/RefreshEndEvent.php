@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Event;
 
+use Rekalogika\Analytics\Util\DateTimeUtil;
+
 final readonly class RefreshEndEvent
 {
     private float $end;
@@ -66,36 +68,12 @@ final readonly class RefreshEndEvent
 
     public function getStart(): \DateTimeInterface
     {
-        $result = \DateTimeImmutable::createFromFormat(
-            'U.u',
-            number_format($this->start, 6, '.', ''),
-        );
-
-        if (false === $result) {
-            throw new \RuntimeException(\sprintf(
-                'Failed to create DateTimeImmutable from %s.',
-                (string) $this->start,
-            ));
-        }
-
-        return $result;
+        return DateTimeUtil::floatToDateTime($this->start);
     }
 
     public function getEnd(): \DateTimeInterface
     {
-        $result = \DateTimeImmutable::createFromFormat(
-            'U.u',
-            number_format($this->end, 6, '.', ''),
-        );
-
-        if (false === $result) {
-            throw new \RuntimeException(\sprintf(
-                'Failed to create DateTimeImmutable from %s.',
-                (string) $this->end,
-            ));
-        }
-
-        return $result;
+        return DateTimeUtil::floatToDateTime($this->end);
     }
 
     public function getDuration(): \DateInterval

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Event;
 
 use Rekalogika\Analytics\SummaryManager\PartitionRange;
+use Rekalogika\Analytics\Util\DateTimeUtil;
 
 abstract readonly class AbstractStartEvent implements \Stringable
 {
@@ -69,18 +70,6 @@ abstract readonly class AbstractStartEvent implements \Stringable
 
     public function getStart(): \DateTimeInterface
     {
-        $result = \DateTimeImmutable::createFromFormat(
-            'U.u',
-            number_format($this->start, 6, '.', ''),
-        );
-
-        if (false === $result) {
-            throw new \RuntimeException(\sprintf(
-                'Failed to create DateTimeImmutable from %s.',
-                (string) $this->start,
-            ));
-        }
-
-        return $result;
+        return DateTimeUtil::floatToDateTime($this->start);
     }
 }
