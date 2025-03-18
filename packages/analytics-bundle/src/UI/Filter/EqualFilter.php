@@ -18,7 +18,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\DistinctValuesResolver;
-use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class EqualFilter implements Filter
@@ -33,15 +33,17 @@ final class EqualFilter implements Filter
      */
     private ?array $choices = null;
 
+    private ?TranslatableInterface $label = null;
+
     /**
      * @param class-string $class
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
         private readonly string $class,
-        private readonly TranslatableInterface|string $label,
         private readonly Stringifier $stringifier,
         private readonly DistinctValuesResolver $distinctValuesResolver,
+        private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly string $dimension,
         private readonly array $inputArray,
     ) {}
@@ -59,9 +61,12 @@ final class EqualFilter implements Filter
     }
 
     #[\Override]
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
-        return $this->label;
+        return $this->label ??= $this->summaryMetadataFactory
+            ->getSummaryMetadata($this->class)
+            ->getFullyQualifiedDimension($this->dimension)
+            ->getLabel();
     }
 
     /**
@@ -142,10 +147,15 @@ final class EqualFilter implements Filter
             );
         }
 
+        $nullLabel = $this->summaryMetadataFactory
+            ->getSummaryMetadata($this->class)
+            ->getFullyQualifiedDimension($this->dimension)
+            ->getNullLabel();
+
         $choices2[] = new Choice(
             id: Choice::NULL,
             value: null,
-            label: $this->stringifier->toString(new TranslatableMessage('(None)')),
+            label: $this->stringifier->toString($nullLabel),
         );
 
         return $this->choices = $choices2;

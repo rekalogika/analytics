@@ -43,17 +43,11 @@ final readonly class EqualFilterFactory implements SpecificFilterFactory
         string $dimension,
         array $inputArray,
     ): Filter {
-        $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($summaryClass);
-
-        $dimensionMetadata = $metadata->getFullyQualifiedDimension($dimension);
-        $label = $dimensionMetadata->getLabel();
-
         return new EqualFilter(
             class: $summaryClass,
-            label: $label,
             stringifier: $this->stringifier,
             distinctValuesResolver: $this->distinctValuesResolver,
+            summaryMetadataFactory: $this->summaryMetadataFactory,
             dimension: $dimension,
             inputArray: $inputArray,
         );
