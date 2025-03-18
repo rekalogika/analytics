@@ -36,8 +36,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private function __construct(
         private Dimension $dimension,
         private ?Measure $measure,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function count(): int
