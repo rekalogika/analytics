@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Contracts;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;

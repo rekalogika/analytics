@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
-
-use Symfony\Contracts\Translation\TranslatableInterface;
+namespace Rekalogika\Analytics\Contracts;
 
 /**
- * Represent a measure within a tuple.
+ * Represent a row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface MeasureMember extends TranslatableInterface
+interface Row
 {
-    public function getMeasureProperty(): string;
+    public function getTuple(): Tuple;
+
+    public function getMeasures(): Measures;
 }

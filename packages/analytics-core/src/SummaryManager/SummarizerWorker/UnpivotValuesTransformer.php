@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\Contracts\MeasureMember;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Query\Dimension;
-use Rekalogika\Analytics\Query\MeasureMember;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Dimension;
-use Rekalogika\Analytics\Query\MeasureMember;
+use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\Contracts\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureDimension implements Dimension

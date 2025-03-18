@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\NormalTable;
-use Rekalogika\Analytics\Query\Result;
-use Rekalogika\Analytics\Query\Table;
-use Rekalogika\Analytics\Query\TreeResult;
+use Rekalogika\Analytics\Contracts\NormalTable;
+use Rekalogika\Analytics\Contracts\Result;
+use Rekalogika\Analytics\Contracts\Table;
+use Rekalogika\Analytics\Contracts\TreeResult;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 
 /**

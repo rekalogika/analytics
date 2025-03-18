@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Dimension;
+use Rekalogika\Analytics\Contracts\Dimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultDimension implements Dimension

@@ -11,19 +11,21 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Contracts;
 
 /**
- * Represent a tuple
+ * A query result in normalized tabular format. Each row contains one measure.
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<int,Row>
  */
-interface Tuple extends Dimensions
+interface NormalTable extends \Traversable, \Countable
 {
     /**
-     * @return array<string,mixed>
+     * @return class-string
      */
-    public function getMembers(): array;
+    public function getSummaryClass(): string;
 
-    public function isSame(self $other): bool;
+    public function first(): ?NormalRow;
 }

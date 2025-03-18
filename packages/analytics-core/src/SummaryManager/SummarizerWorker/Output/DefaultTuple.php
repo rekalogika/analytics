@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Dimension;
-use Rekalogika\Analytics\Query\Dimensions;
-use Rekalogika\Analytics\Query\Tuple;
+use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\Contracts\Dimensions;
+use Rekalogika\Analytics\Contracts\Tuple;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**

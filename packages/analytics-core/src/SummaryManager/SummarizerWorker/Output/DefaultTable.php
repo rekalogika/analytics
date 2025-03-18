@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Row;
-use Rekalogika\Analytics\Query\Table;
+use Rekalogika\Analytics\Contracts\Row;
+use Rekalogika\Analytics\Contracts\Table;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>

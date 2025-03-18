@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Measure;
-use Rekalogika\Analytics\Query\NormalRow;
-use Rekalogika\Analytics\Query\Tuple;
+use Rekalogika\Analytics\Contracts\Measure;
+use Rekalogika\Analytics\Contracts\NormalRow;
+use Rekalogika\Analytics\Contracts\Tuple;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow

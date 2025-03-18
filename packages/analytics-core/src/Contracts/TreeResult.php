@@ -11,16 +11,21 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Contracts;
 
 /**
- * Represent a normalized row in a table
+ * Represents a query result.
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<mixed,TreeNode>
  */
-interface NormalRow
+interface TreeResult extends \Traversable, \Countable
 {
-    public function getTuple(): Tuple;
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
 
-    public function getMeasure(): Measure;
+    public function traverse(mixed ...$members): ?TreeNode;
 }

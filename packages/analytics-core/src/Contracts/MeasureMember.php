@@ -11,23 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Query;
+namespace Rekalogika\Analytics\Contracts;
+
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represents a query result.
+ * Represent a measure within a tuple.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Result
+interface MeasureMember extends TranslatableInterface
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getTree(): TreeResult;
-
-    public function getNormalTable(): NormalTable;
-
-    public function getTable(): Table;
+    public function getMeasureProperty(): string;
 }

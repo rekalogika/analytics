@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Measures;
-use Rekalogika\Analytics\Query\Row;
-use Rekalogika\Analytics\Query\Tuple;
+use Rekalogika\Analytics\Contracts\Measures;
+use Rekalogika\Analytics\Contracts\Row;
+use Rekalogika\Analytics\Contracts\Tuple;
 
 final readonly class DefaultRow implements Row
 {

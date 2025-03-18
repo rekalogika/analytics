@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Query\Measure;
-use Rekalogika\Analytics\Query\Unit;
+use Rekalogika\Analytics\Contracts\Measure;
+use Rekalogika\Analytics\Contracts\Unit;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultMeasure implements Measure
