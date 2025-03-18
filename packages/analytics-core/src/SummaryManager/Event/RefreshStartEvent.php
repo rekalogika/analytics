@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Event;
 
+use Rekalogika\Analytics\Util\DateTimeUtil;
+
 final readonly class RefreshStartEvent
 {
     private float $start;
@@ -77,12 +79,6 @@ final readonly class RefreshStartEvent
 
     public function getStart(): \DateTimeInterface
     {
-        $result = \DateTimeImmutable::createFromFormat('U.u', (string) $this->start);
-
-        if (false === $result) {
-            throw new \RuntimeException('Failed to create DateTimeImmutable from microtime.');
-        }
-
-        return $result;
+        return DateTimeUtil::floatToDateTime($this->start);
     }
 }
