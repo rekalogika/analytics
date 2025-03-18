@@ -24,10 +24,5 @@ interface TreeNode extends \Traversable, \Countable, Dimension
 {
     public function getMeasure(): ?Measure;
 
-    /**
-     * Whether this node is a leaf node.
-     */
-    public function isLeaf(): bool;
-
     public function traverse(mixed ...$members): ?TreeNode;
 }

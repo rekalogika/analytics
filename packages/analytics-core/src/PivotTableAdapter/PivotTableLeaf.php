@@ -14,22 +14,29 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\Analytics\Query\Measure;
 use Rekalogika\Analytics\Query\TreeNode;
 
 final readonly class PivotTableLeaf implements LeafNode
 {
+    private Measure $measure;
+
     public function __construct(
         private TreeNode $node,
     ) {
-        if (!$node->isLeaf()) {
+        $measure = $node->getMeasure();
+
+        if ($measure === null) {
             throw new \InvalidArgumentException('Item must be a leaf');
         }
+
+        $this->measure = $measure;
     }
 
     #[\Override]
     public function getValue(): mixed
     {
-        return $this->node->getMeasure()?->getValue();
+        return $this->measure->getValue();
     }
 
     #[\Override]

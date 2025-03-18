@@ -86,12 +86,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function isLeaf(): bool
-    {
-        return $this->measure !== null;
-    }
-
-    #[\Override]
     public function getKey(): string
     {
         return $this->dimension->getKey();
