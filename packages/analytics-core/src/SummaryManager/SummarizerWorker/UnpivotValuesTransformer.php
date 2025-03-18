@@ -23,7 +23,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTab
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\ValueDimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\MeasureDimension;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -50,7 +50,7 @@ final class UnpivotValuesTransformer
     private function __construct(
         SummaryQuery $summaryQuery,
         private readonly SummaryMetadata $metadata,
-        private readonly TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
+        private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $dimensions = $summaryQuery->getGroupBy();
 
@@ -73,7 +73,7 @@ final class UnpivotValuesTransformer
         $transformer = new self(
             summaryQuery: $summaryQuery,
             metadata: $metadata,
-            valuesLabel: $valuesLabel,
+            measureLabel: $valuesLabel,
         );
 
         return $transformer->doTransform($input);
@@ -136,11 +136,11 @@ final class UnpivotValuesTransformer
             // @values represent the place of the value column in the
             // row. the value column is not always at the end of the row
 
-            $measureLabel = $this->getMeasureDescription($measure);
+            $measureValue = $this->getMeasureDescription($measure);
 
-            $newRow['@values'] = new ValueDimension(
-                valuesLabel: $this->valuesLabel,
-                measureLabel: $measureLabel,
+            $newRow['@values'] = new MeasureDimension(
+                label: $this->measureLabel,
+                measure: $measureValue,
             );
 
             /** @var array<string,Dimension> $newRow */
