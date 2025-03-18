@@ -279,6 +279,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         }
 
         $label = $summaryAttribute->getLabel() ?? $reflectionClass->getShortName();
+        $label = TranslatableUtil::normalize($label);
 
         return new SummaryMetadata(
             sourceClasses: $sourceClasses,
@@ -366,13 +367,16 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $dimensionHierarchy = null;
         }
 
+        $label = $dimensionAttribute->getLabel() ?? $summaryProperty;
+        $label = TranslatableUtil::normalize($label);
+
         $nullLabel = TranslatableUtil::normalize($dimensionAttribute->getNullLabel())
             ?? new TranslatableMessage('(None)');
 
         return new DimensionMetadata(
             source: $sourceProperty,
             summaryProperty: $summaryProperty,
-            label: $dimensionAttribute->getLabel() ?? $summaryProperty,
+            label: $label,
             sourceTimeZone: $dimensionAttribute->getSourceTimeZone(),
             summaryTimeZone: $dimensionAttribute->getSummaryTimeZone(),
             hierarchy: $dimensionHierarchy,

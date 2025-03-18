@@ -29,7 +29,7 @@ final readonly class DimensionMetadata
     public function __construct(
         private array $source,
         private string $summaryProperty,
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
         private \DateTimeZone $sourceTimeZone,
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
@@ -83,7 +83,7 @@ final readonly class DimensionMetadata
         return $this->summaryProperty;
     }
 
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }

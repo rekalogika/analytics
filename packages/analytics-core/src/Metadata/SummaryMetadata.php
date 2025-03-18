@@ -27,6 +27,12 @@ final readonly class SummaryMetadata
      */
     private array $fullyQualifiedDimensions;
 
+
+    /**
+     * @var array<string,FullyQualifiedPropertyMetadata>
+     */
+    private array $fullyQualifiedProperties;
+
     /**
      * @param non-empty-list<class-string> $sourceClasses
      * @param class-string $summaryClass
@@ -40,8 +46,10 @@ final readonly class SummaryMetadata
         array $dimensions,
         private array $measures,
         private string $groupingsProperty,
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
     ) {
+        // process dimensions
+
         $fullyQualifiedDimensions = [];
         $newDimensions = [];
 
@@ -73,6 +81,28 @@ final readonly class SummaryMetadata
 
         $this->dimensions = $newDimensions;
         $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
+
+        // process fully qualified properties
+
+        $fullyQualifiedProperties = [];
+
+        foreach ($this->fullyQualifiedDimensions as $dimension) {
+            $fullyQualifiedProperties[$dimension->getFullName()] =
+            new FullyQualifiedPropertyMetadata(
+                property: $dimension,
+                summaryMetadata: $this,
+            );
+        }
+
+        foreach ($this->measures as $measure) {
+            $fullyQualifiedProperties[$measure->getSummaryProperty()] =
+            new FullyQualifiedPropertyMetadata(
+                property: $measure,
+                summaryMetadata: $this,
+            );
+        }
+
+        $this->fullyQualifiedProperties = $fullyQualifiedProperties;
     }
 
     /**
@@ -91,7 +121,7 @@ final readonly class SummaryMetadata
         return $this->sourceClasses;
     }
 
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }
@@ -145,6 +175,12 @@ final readonly class SummaryMetadata
     {
         return $this->fullyQualifiedDimensions[$dimensionName]
             ?? throw new \RuntimeException(\sprintf('Dimension not found: %s', $dimensionName));
+    }
+
+    public function getFullyQualifiedProperty(string $propertyName): FullyQualifiedPropertyMetadata
+    {
+        return $this->fullyQualifiedProperties[$propertyName]
+            ?? throw new \RuntimeException(\sprintf('Property not found: %s', $propertyName));
     }
 
     /**

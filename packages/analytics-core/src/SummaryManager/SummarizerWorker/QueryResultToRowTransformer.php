@@ -26,7 +26,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
-use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -447,42 +446,24 @@ final readonly class QueryResultToRowTransformer
         return $class;
     }
 
-    private function getLabel(string $field): TranslatableInterface|string
-    {
-        if (!str_contains($field, '.')) {
-            $metadata = $this->metadata->getFieldMetadata($field);
-
-            return $metadata->getLabel();
-        }
-
-        [$dimensionName, $propertyName] = explode('.', $field);
-        $metadata = $this->metadata->getDimensionMetadata($dimensionName);
-
-        $hierarchyMetadata = $metadata->getHierarchy();
-
-        if ($hierarchyMetadata === null) {
-            throw new \RuntimeException(\sprintf('Hierarchy not found: %s', $dimensionName));
-        }
-
-        return new TranslatablePropertyDimension(
-            propertyLabel: $metadata->getLabel(),
-            dimensionLabel: $hierarchyMetadata
-                ->getProperty($propertyName)
-                ->getLabel(),
-        );
-    }
-
-    private function getNullValue(string $field): TranslatableInterface
+    private function getLabel(string $property): TranslatableInterface
     {
         return $this->metadata
-            ->getFullyQualifiedDimension($field)
+            ->getFullyQualifiedProperty($property)
+            ->getLabel();
+    }
+
+    private function getNullValue(string $dimension): TranslatableInterface
+    {
+        return $this->metadata
+            ->getFullyQualifiedDimension($dimension)
             ->getNullLabel();
     }
 
-    private function getNumericValueResolver(string $key): NumericValueResolver
+    private function getNumericValueResolver(string $measure): NumericValueResolver
     {
-        $metadata = $this->metadata->getMeasureMetadata($key);
-
-        return $metadata->getNumericValueResolver();
+        return $this->metadata
+            ->getMeasureMetadata($measure)
+            ->getNumericValueResolver();
     }
 }
