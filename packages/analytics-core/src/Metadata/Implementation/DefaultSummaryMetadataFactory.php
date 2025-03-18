@@ -372,6 +372,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             hierarchy: $dimensionHierarchy,
             orderBy: $dimensionAttribute->getOrderBy(),
             typeClass: $typeClass,
+            nullLabel: $dimensionAttribute->getNullLabel(),
         );
     }
 
@@ -612,6 +613,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $label = $dimensionLevelAttribute->getLabel() ?? $name;
             $valueResolver = $dimensionLevelAttribute->getValueResolver();
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
+            $nullLabel = $dimensionLevelAttribute->getNullLabel();
 
             $dimensionPropertyMetadata = new DimensionPropertyMetadata(
                 name: $name,
@@ -619,6 +621,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 label: $label,
                 valueResolver: $valueResolver,
                 typeClass: $typeClass,
+                nullLabel: $nullLabel,
             );
 
             $levels[$level][] = $dimensionPropertyMetadata;

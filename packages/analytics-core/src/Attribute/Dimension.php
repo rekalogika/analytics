@@ -30,6 +30,7 @@ final readonly class Dimension
         private \DateTimeZone $sourceTimeZone = new \DateTimeZone('UTC'),
         private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
         private Order|array $orderBy = Order::Ascending,
+        private null|string|TranslatableInterface $nullLabel = null,
     ) {}
 
     /**
@@ -61,5 +62,10 @@ final readonly class Dimension
     public function getOrderBy(): Order|array
     {
         return $this->orderBy;
+    }
+
+    public function getNullLabel(): null|string|TranslatableInterface
+    {
+        return $this->nullLabel;
     }
 }

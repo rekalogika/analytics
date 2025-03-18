@@ -27,6 +27,7 @@ final readonly class DimensionPropertyMetadata
         private string|TranslatableInterface $label,
         private DimensionValueResolver $valueResolver,
         private ?string $typeClass,
+        private null|string|TranslatableInterface $nullLabel,
         private ?DimensionLevelMetadata $levelMetadata = null,
     ) {}
 
@@ -38,6 +39,7 @@ final readonly class DimensionPropertyMetadata
             label: $this->label,
             valueResolver: $this->valueResolver,
             typeClass: $this->typeClass,
+            nullLabel: $this->nullLabel,
             levelMetadata: $levelMetadata,
         );
     }
@@ -82,5 +84,10 @@ final readonly class DimensionPropertyMetadata
     public function getTypeClass(): ?string
     {
         return $this->typeClass;
+    }
+
+    public function getNullLabel(): null|string|TranslatableInterface
+    {
+        return $this->nullLabel;
     }
 }

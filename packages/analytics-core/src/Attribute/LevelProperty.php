@@ -23,6 +23,7 @@ final readonly class LevelProperty
         private int $level,
         private DimensionValueResolver $valueResolver,
         private null|string|TranslatableInterface $label = null,
+        private null|string|TranslatableInterface $nullLabel = null,
     ) {}
 
     public function getLevel(): int
@@ -38,5 +39,10 @@ final readonly class LevelProperty
     public function getValueResolver(): DimensionValueResolver
     {
         return $this->valueResolver;
+    }
+
+    public function getNullLabel(): null|string|TranslatableInterface
+    {
+        return $this->nullLabel;
     }
 }
