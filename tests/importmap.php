@@ -66,4 +66,7 @@ return [
         'version' => '4.6.13',
         'type' => 'css',
     ],
+    'flatpickr/dist/l10n/id.js' => [
+        'version' => '4.6.13'
+    ],
 ];

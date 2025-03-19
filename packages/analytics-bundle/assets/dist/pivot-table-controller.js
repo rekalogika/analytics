@@ -100,11 +100,8 @@ var _default = /*#__PURE__*/function (_Controller) {
     var _this3 = this;
     var defaultActions = event.detail.render;
     event.detail.render = function (streamElement) {
-      console.log(streamElement.getAttribute('target'));
-      console.log(_this3.filterChanged);
       if (streamElement.getAttribute('target') === '__filters') {
         if (_this3.filterChanged === true) {
-          console.log('filter changed');
           _this3.filterChanged = false;
           defaultActions(streamElement);
         }

@@ -76,11 +76,8 @@ export default class extends Controller {
         const defaultActions = event.detail.render
 
         event.detail.render = (streamElement) => {
-            console.log(streamElement.getAttribute('target'))
-            console.log(this.filterChanged)
             if (streamElement.getAttribute('target') === '__filters') {
                 if (this.filterChanged === true) {
-                    console.log('filter changed')
                     this.filterChanged = false
                     defaultActions(streamElement)
                 }

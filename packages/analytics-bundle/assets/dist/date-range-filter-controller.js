@@ -17,13 +17,37 @@ var _default = /*#__PURE__*/function (_Controller) {
   _proto.connect = function connect() {
     var _this = this;
     this.element.data = this.getData();
-    this.flatpickr = flatpickr(this.element, {
+    this.lang = this.element.dataset.lang;
+
+    // ensure lang only contains alphanumeric or underscore
+    this.lang = this.lang.toLowerCase().replace(/-/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    if (this.lang) {
+      import("flatpickr/dist/l10n/" + this.lang + ".js")["catch"](function (error) {
+        _this.initialize(null);
+      }).then(function (module) {
+        var lang = module["default"]["default"][_this.lang];
+        _this.initialize(lang);
+      });
+    } else {
+      this.initialize(null);
+    }
+  };
+  _proto.initialize = function initialize(lang) {
+    var _this2 = this;
+    var options = {
       mode: 'range',
       allowInput: true
-    });
+    };
+    if (lang) {
+      options.locale = lang;
+      console.log(lang);
+    } else {
+      console.log('flatpickr locale: default');
+    }
+    this.flatpickr = flatpickr(this.element, options);
     this.element.addEventListener('change', function () {
-      _this.element.data = _this.getData();
-      _this.dispatch('change', {});
+      _this2.element.data = _this2.getData();
+      _this2.dispatch('change', {});
     });
   };
   _proto.getData = function getData() {
