@@ -127,12 +127,6 @@
         <target>Week of Month</target>
       </segment>
     </unit>
-    <unit id="selectDateRange" name="Select date range...">
-      <segment>
-        <source>Select date range...</source>
-        <target>Select date range...</target>
-      </segment>
-    </unit>
     <unit id="dateRange" name="Date range">
       <segment>
         <source>Date range</source>
