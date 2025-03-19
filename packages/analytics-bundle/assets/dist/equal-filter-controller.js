@@ -15,23 +15,42 @@ var _default = /*#__PURE__*/function (_Controller) {
   var _proto = _default.prototype;
   _proto.connect = function connect() {
     var _this = this;
+    if (!this.element instanceof HTMLSelectElement) {
+      throw new Error('Element is not a select element');
+    }
+    this.element.labelEmpty = this.element.dataset.labelEmpty;
+    this.element.labelSelected = this.element.dataset.labelSelected;
     this.element.data = this.getData();
     this.tomSelect = new TomSelect(this.element, {
       maxItems: 500,
       allowEmptyOption: true,
-      // sortField: [
-      //     { field: '$order' },
-      //     { field: '$score' }
-      // ],
       plugins: {
         remove_button: {},
         clear_button: {}
       }
     });
     this.element.addEventListener('change', function () {
+      // change placeholder text based on selected options
+      _this.updatePlaceholder();
+
+      // dispatch change event
       _this.element.data = _this.getData();
       _this.dispatch('change', {});
     });
+    this.updatePlaceholder();
+  };
+  _proto.updatePlaceholder = function updatePlaceholder() {
+    if (this.element.selectedOptions.length === 0) {
+      if (this.element.labelEmpty) {
+        this.tomSelect.settings.placeholder = this.element.labelEmpty;
+        this.tomSelect.inputState();
+      }
+    } else {
+      if (this.element.labelSelected) {
+        this.tomSelect.settings.placeholder = this.element.labelSelected;
+        this.tomSelect.inputState();
+      }
+    }
   };
   _proto.getData = function getData() {
     var values = Array.from(this.element.selectedOptions).map(function (_ref) {
