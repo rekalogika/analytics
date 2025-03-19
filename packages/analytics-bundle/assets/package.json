@@ -34,7 +34,24 @@
             "@hotwired/turbo": "^7.0",
             "sortablejs": "^1.14.0",
             "tom-select": "^2.4.3",
-            "flatpickr": "^4.6.13"
+            "flatpickr": "^4.6.13",
+            "flatpickr/dist/l10n/ar.js": "^4.6.13",
+            "flatpickr/dist/l10n/da.js": "^4.6.13",
+            "flatpickr/dist/l10n/de.js": "^4.6.13",
+            "flatpickr/dist/l10n/fr.js": "^4.6.13",
+            "flatpickr/dist/l10n/it.js": "^4.6.13",
+            "flatpickr/dist/l10n/ms.js": "^4.6.13",
+            "flatpickr/dist/l10n/nl.js": "^4.6.13",
+            "flatpickr/dist/l10n/no.js": "^4.6.13",
+            "flatpickr/dist/l10n/pl.js": "^4.6.13",
+            "flatpickr/dist/l10n/pt.js": "^4.6.13",
+            "flatpickr/dist/l10n/ru.js": "^4.6.13",
+            "flatpickr/dist/l10n/th.js": "^4.6.13",
+            "flatpickr/dist/l10n/uk.js": "^4.6.13",
+            "flatpickr/dist/l10n/vn.js": "^4.6.13",
+            "flatpickr/dist/l10n/zh.js": "^4.6.13",
+            "flatpickr/dist/l10n/zh_tw.js": "^4.6.13",
+            "flatpickr/dist/l10n/id.js": "^4.6.13"
         }
     },
     "scripts": {

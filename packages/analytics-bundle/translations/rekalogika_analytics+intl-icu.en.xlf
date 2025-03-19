@@ -205,5 +205,17 @@
         <target>(None)</target>
       </segment>
     </unit>
+    <unit id="all" name="(All)">
+      <segment>
+        <source>(All)</source>
+        <target>(All)</target>
+      </segment>
+    </unit>
+    <unit id="selectItems" name="Select items...">
+      <segment>
+        <source>Select items...</source>
+        <target>Select items...</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

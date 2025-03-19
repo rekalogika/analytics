@@ -5,11 +5,43 @@ import 'flatpickr/dist/flatpickr.css'
 export default class extends Controller {
     connect() {
         this.element.data = this.getData()
+        this.lang = this.element.dataset.lang
 
-        this.flatpickr = flatpickr(this.element, {
+        // ensure lang only contains alphanumeric or underscore
+        this.lang = this.lang
+            .toLowerCase()
+            .replace(/-/g, '_')
+            .replace(/[^a-zA-Z0-9_]/g, '')
+
+        if (this.lang) {
+            import("flatpickr/dist/l10n/" + this.lang + ".js")
+                .catch((error) => {
+                    this.initialize(null)
+                })
+                .then((module) => {
+                    const lang = module.default.default[this.lang]
+
+                    this.initialize(lang)
+                })
+        } else {
+            this.initialize(null)
+        }
+    }
+
+    initialize(lang) {
+        let options = {
             mode: 'range',
             allowInput: true,
-        })
+        }
+
+        if (lang) {
+            options.locale = lang
+            console.log(lang)
+        } else {
+            console.log('flatpickr locale: default')
+        }
+
+        this.flatpickr = flatpickr(this.element, options)
 
         this.element.addEventListener('change', () => {
             this.element.data = this.getData()
