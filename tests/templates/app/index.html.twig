@@ -1,15 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {{ analytics_render_control(query, frame: 'pivottable', urlParameter: 'parameters') }}
-
-    <div class="mt-5" style="min-height: 500px;">
-        <turbo-frame id="pivottable">
+    {% set output %}
+        <div class="mt-5" style="min-height: 500px;">
             <div class="mb-5">
                 {% if chart %}{{ render_chart(chart) }}{% endif %}
             </div>
 
             <div>{{ pivotTable|raw }}</div>
-        </turbo-frame>
-    </div>
-{% endblock %}
+        </div>
+    {% endset %}
+
+    {{ analytics_render_control(query: query, output: output, target: 'pivottable', urlParameter: 'parameters') }}
+
+    <turbo-frame id="pivottable">
+    </turbo-frame>
+{% endblock body %}
