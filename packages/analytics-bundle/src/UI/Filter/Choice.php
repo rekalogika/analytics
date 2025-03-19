@@ -24,6 +24,7 @@ final class Choice
         private string $id,
         private mixed $value,
         private string $label,
+        private bool $selected,
     ) {}
 
     public function getId(): string
@@ -39,5 +40,10 @@ final class Choice
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function isSelected(): bool
+    {
+        return $this->selected;
     }
 }

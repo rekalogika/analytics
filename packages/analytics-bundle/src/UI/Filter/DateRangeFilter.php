@@ -32,7 +32,7 @@ final class DateRangeFilter implements Filter
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly TranslatableInterface|string $label,
+        private readonly TranslatableInterface $label,
         private readonly string $dimension,
         private readonly string $typeClass,
         private readonly array $inputArray,
@@ -51,68 +51,87 @@ final class DateRangeFilter implements Filter
     }
 
     #[\Override]
-    public function getLabel(): TranslatableInterface|string
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }
 
-    public function getRawStart(): string
+    public function getRawStart(): ?string
     {
         if ($this->rawLowerBound !== null) {
             return $this->rawLowerBound;
         }
 
         /** @psalm-suppress MixedAssignment */
-        $string = $this->inputArray['start'] ?? '';
+        $string = $this->inputArray['start'] ?? null;
 
         if (!\is_string($string)) {
-            $string = '';
+            return null;
         }
 
         return $this->rawLowerBound = $string;
     }
 
-    public function getStart(): TimeInterval
+    public function getStart(): ?TimeInterval
     {
         if ($this->lowerBound !== null) {
             return $this->lowerBound;
         }
 
-        $dateTime = new \DateTimeImmutable($this->getRawStart());
+        $rawStart = $this->getRawStart();
+
+        if ($rawStart === null) {
+            return null;
+        }
+
+        $dateTime = new \DateTimeImmutable($rawStart);
 
         return $this->lowerBound = ($this->typeClass)::createFromDateTime($dateTime);
     }
 
-    public function getRawEnd(): string
+    public function getRawEnd(): ?string
     {
         if ($this->rawUpperBound !== null) {
             return $this->rawUpperBound;
         }
 
         /** @psalm-suppress MixedAssignment */
-        $string = $this->inputArray['end'] ?? '';
+        $string = $this->inputArray['end'] ?? null;
 
         if (!\is_string($string)) {
-            $string = '';
+            return null;
         }
 
         return $this->rawUpperBound = $string;
     }
 
-    public function getEnd(): TimeInterval
+    public function getEnd(): ?TimeInterval
     {
         if ($this->upperBound !== null) {
             return $this->upperBound;
         }
 
-        $dateTime = new \DateTimeImmutable($this->getRawEnd());
+        $rawEnd = $this->getRawEnd();
+
+        if ($rawEnd === null) {
+            return null;
+        }
+
+        $dateTime = new \DateTimeImmutable($rawEnd);
 
         return $this->upperBound = ($this->typeClass)::createFromDateTime($dateTime);
     }
 
     #[\Override]
-    public function createExpression(): Expression
+    public function createExpression(): ?Expression
     {
+        $start = $this->getStart();
+        $end = $this->getEnd();
+
+        if ($start === null || $end === null) {
+            return null;
+        }
+
         return Criteria::expr()->andX(
             Criteria::expr()->gte($this->dimension, $this->getStart()),
             Criteria::expr()->lte($this->dimension, $this->getEnd()),

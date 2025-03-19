@@ -21,7 +21,7 @@ final readonly class NullFilter implements Filter
 {
     public function __construct(
         private string $dimension,
-        private TranslatableInterface|string $label,
+        private TranslatableInterface $label,
     ) {}
 
     #[\Override]
@@ -37,7 +37,7 @@ final readonly class NullFilter implements Filter
     }
 
     #[\Override]
-    public function getLabel(): TranslatableInterface|string
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }

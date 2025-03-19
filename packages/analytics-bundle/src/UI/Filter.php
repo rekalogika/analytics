@@ -20,7 +20,7 @@ interface Filter
 {
     public function getDimension(): string;
 
-    public function getLabel(): string|TranslatableInterface;
+    public function getLabel(): TranslatableInterface;
 
     public function createExpression(): ?Expression;
 

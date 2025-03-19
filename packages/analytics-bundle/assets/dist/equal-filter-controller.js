@@ -19,8 +19,14 @@ var _default = /*#__PURE__*/function (_Controller) {
     this.tomSelect = new TomSelect(this.element, {
       maxItems: 500,
       allowEmptyOption: true,
+      sortField: [{
+        field: '$order'
+      }, {
+        field: '$score'
+      }],
       plugins: {
-        remove_button: {}
+        remove_button: {},
+        clear_button: {}
       }
     });
     this.element.addEventListener('change', function () {

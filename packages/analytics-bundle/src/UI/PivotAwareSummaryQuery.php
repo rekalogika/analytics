@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Bundle\UI\Filter\Choices;
 use Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
@@ -47,50 +46,87 @@ final class PivotAwareSummaryQuery
         array $parameters,
         FilterFactory $filterFactory,
     ) {
-        if (isset($parameters['rows'])) {
-            /**
-             * @psalm-suppress MixedArgument
-             * @phpstan-ignore argument.type
-             */
-            $this->setRows($parameters['rows']);
-        }
+        $this->setRows(
+            $this->getListOfStringFromArray($parameters['rows'] ?? null),
+        );
 
-        if (isset($parameters['columns'])) {
-            /**
-             * @psalm-suppress MixedArgument
-             * @phpstan-ignore argument.type
-             */
-            $this->setColumns($parameters['columns']);
-        }
+        $this->setColumns(
+            $this->getListOfStringFromArray($parameters['columns'] ?? null),
+        );
 
-        if (isset($parameters['values'])) {
-            /**
-             * @psalm-suppress MixedArgument
-             * @phpstan-ignore argument.type
-             */
-            $this->setValues($parameters['values']);
-        }
+        $this->setValues(
+            $this->getListOfStringFromArray($parameters['values'] ?? null),
+        );
 
-        if (isset($parameters['filters'])) {
-            /**
-             * @psalm-suppress MixedArgument
-             * @phpstan-ignore argument.type
-             */
-            $this->setFilters($parameters['filters']);
-        }
+        $this->setFilters(
+            $this->getListOfStringFromArray($parameters['filters'] ?? null),
+        );
+
+        //
+        // process filters
+        //
+
+        $filterDimensions = array_merge(
+            $this->getRows(),
+            $this->getColumns(),
+            $this->getFilters(),
+        );
+
+        $filterDimensions = array_values(array_unique(array_filter(
+            $filterDimensions,
+            static fn(string $dimension): bool => $dimension !== '@values',
+        )));
 
         /**
          * @psalm-suppress MixedArgument
          */
         $this->filterExpressions = new Filters(
             summaryClass: $this->summaryQuery->getClass(),
-            dimensions: $this->getFilters(),
+            dimensions: $filterDimensions,
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],
             filterFactory: $filterFactory,
         );
 
-        $this->filterExpressions->applyToQuery($this->summaryQuery);
+        $unusedFilters = [];
+
+        foreach ($this->filterExpressions as $filterExpression) {
+            $expression = $filterExpression->createExpression();
+
+            if ($expression !== null) {
+                $this->summaryQuery->andWhere($expression);
+            } else {
+                $unusedFilters[] = $filterExpression->getDimension();
+            }
+        }
+
+        $filters = $this->getFilters();
+
+        $effectiveFilters = array_values(array_diff(
+            $filters,
+            $unusedFilters,
+        ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getListOfStringFromArray(mixed $maybeArray): array
+    {
+        if (!\is_array($maybeArray)) {
+            return [];
+        }
+
+        $result = [];
+
+        /** @var mixed $item */
+        foreach ($maybeArray as $item) {
+            if (\is_string($item)) {
+                $result[] = $item;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -301,7 +337,7 @@ final class PivotAwareSummaryQuery
      */
     public function getAvailableWithoutSubItems(): array
     {
-        $columns = $this->columns;
+        $columns = $this->getColumnsWithoutSubitems();
 
         if (
             !\in_array('@values', $this->columns, true)
@@ -313,11 +349,35 @@ final class PivotAwareSummaryQuery
         // items not in rows or columns
         return array_values(array_diff(
             $this->getAllItems(),
-            $this->rows,
+            $this->getRowsWithoutSubItems(),
             $columns,
             $this->getValues(),
-            $this->filters,
+            $this->getFiltersWithoutSubitems(),
         ));
+    }
+
+    public function getSelectedSubitem(string $item): ?string
+    {
+        $withSubItems = [
+            ...$this->getRows(),
+            ...$this->getColumns(),
+            ...$this->getFilters(),
+        ];
+
+        foreach ($withSubItems as $withSubItem) {
+            if (!str_contains($withSubItem, '.')) {
+                continue;
+            }
+
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
+            [$dimension, $subItem] = explode('.', $withSubItem, 2);
+
+            if ($dimension === $item) {
+                return $subItem;
+            }
+        }
+
+        return null;
     }
 
     /**

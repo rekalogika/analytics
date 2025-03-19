@@ -25,6 +25,7 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
         PivotAwareSummaryQuery $query,
         ?string $urlParameter = null,
         ?string $frame = null,
+        ?string $output = null,
     ): string {
         return $this->twig
             ->load('@RekalogikaAnalytics/pivot_table_control.html.twig')
@@ -32,6 +33,7 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
                 'query' => $query,
                 'urlParameter' => $urlParameter,
                 'frame' => $frame,
+                'output' => $output,
             ]);
     }
 }
