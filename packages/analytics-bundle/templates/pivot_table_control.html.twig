@@ -145,12 +145,11 @@
                 <span>{{ item.label|trans }}</span>
             </div>
             {% if item.choices %}
-                {% set selected = query.resolve(item.key) %}
                 <div class="col-auto ">
                     <select class="form-select form-select-sm py-0">
+                    {% set selected = query.getSelectedSubItem(item.key) %}
                         {% for key, choice in item.choices %}
-                            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
-                            </option>
+                            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -161,21 +160,25 @@
 
 {% block filters %}
     <turbo-frame id="__filters">
-    {% for filter in query.filterExpressions %}
-        {{ block("filter") }}
-    {% else %}
-        {{ block("empty_filter") }}
-    {% endfor %}
+        {% for filter in query.filterExpressions %}
+            {{ block("filter") }}
+        {% else %}
+            {{ block("empty_filter") }}
+        {% endfor %}
     </turbo-frame>
 {% endblock filters %}
 
 {% block filter %}
     <div class="mb-3">
-        <label for="{{ filter.dimension }}-{{ id }}" class="form-label">{{ filter.label|trans }}</label>
+        <label for="{{ filter.dimension }}-{{ id }}" class="form-label">
+            {{ filter.label|trans }}
+        </label>
         {{ block('filter', filter.template) }}
     </div>
 {% endblock filter %}
 
 {% block empty_filter %}
-    <div class="alert alert-info" role="alert">{{ t('No filter selected.', domain = 'rekalogika_analytics') |trans }}</div>
+    <div class="alert alert-info" role="alert">
+        {{ t('No filter selected.', domain = 'rekalogika_analytics') |trans }}
+    </div>
 {% endblock empty_filter %}

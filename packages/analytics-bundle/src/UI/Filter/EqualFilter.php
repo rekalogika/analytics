@@ -109,8 +109,12 @@ final class EqualFilter implements Filter
     }
 
     #[\Override]
-    public function createExpression(): Expression
+    public function createExpression(): ?Expression
     {
+        if ($this->getValues() === []) {
+            return null;
+        }
+
         return Criteria::expr()->in(
             $this->dimension,
             $this->getValues(),
@@ -144,6 +148,11 @@ final class EqualFilter implements Filter
                 id: $id,
                 value: $value,
                 label: $this->stringifier->toString($value),
+                selected: \in_array(
+                    $value,
+                    $this->getValues(),
+                    strict: true,
+                ),
             );
         }
 
@@ -156,6 +165,11 @@ final class EqualFilter implements Filter
             id: Choice::NULL,
             value: null,
             label: $this->stringifier->toString($nullLabel),
+            selected: \in_array(
+                null,
+                $this->getValues(),
+                strict: true,
+            ),
         );
 
         return $this->choices = $choices2;

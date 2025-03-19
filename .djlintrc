@@ -1,3 +1,5 @@
 {
-    "max_blank_lines": 2
+    "max_blank_lines": 2,
+    "custom_html": "turbo-frame,turbo-stream",
+    "max_line_length": 80
 }

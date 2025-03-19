@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-
 /**
  * @implements \IteratorAggregate<string,Filter>
  */
-final class Filters implements \IteratorAggregate
+final readonly class Filters implements \IteratorAggregate
 {
+    /**
+     * @var array<string,Filter>
+     */
+    private array $filters;
+
     /**
      * @param class-string $summaryClass
      * @param list<string> $dimensions
@@ -31,28 +34,26 @@ final class Filters implements \IteratorAggregate
         private array $arrayExpressions,
         private FilterFactory $filterFactory,
     ) {
-        $this->initializeFilters($dimensions);
+        $this->filters = $this->initializeFilters($dimensions);
     }
-
-    /**
-     * @var array<string,Filter>
-     */
-    private array $expressions = [];
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this->expressions);
+        return new \ArrayIterator($this->filters);
     }
 
     /**
-     * @param list<string> $filters
+     * @param list<string> $dimensions
+     * @return array<string,Filter>
      */
-    private function initializeFilters(array $filters): void
+    private function initializeFilters(array $dimensions): array
     {
-        foreach ($filters as $filter) {
+        $filters = [];
+
+        foreach ($dimensions as $dimension) {
             /** @psalm-suppress MixedAssignment */
-            $filterArray = $this->arrayExpressions[$filter] ?? [];
+            $filterArray = $this->arrayExpressions[$dimension] ?? [];
 
             if (!\is_array($filterArray)) {
                 $filterArray = [];
@@ -60,23 +61,14 @@ final class Filters implements \IteratorAggregate
 
             /** @var array<string,mixed> $filterArray */
 
-            $this->expressions[$filter] = $this->filterFactory
+            $filters[$dimension] = $this->filterFactory
                 ->createFilter(
                     summaryClass: $this->summaryClass,
-                    dimension: $filter,
+                    dimension: $dimension,
                     inputArray: $filterArray,
                 );
         }
-    }
 
-    public function applyToQuery(SummaryQuery $query): void
-    {
-        foreach ($this->expressions as $filterExpression) {
-            $expression = $filterExpression->createExpression();
-
-            if ($expression !== null) {
-                $query->andWhere($expression);
-            }
-        }
+        return $filters;
     }
 }

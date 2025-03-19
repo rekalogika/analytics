@@ -87,14 +87,22 @@ var _default = /*#__PURE__*/function (_Controller) {
     });
     this.element.querySelectorAll('select').forEach(function (select) {
       select.addEventListener('change', function () {
-        if (select.closest('.filters')) {
+        if (select.closest('.filters') || select.closest('.rows') || select.closest('.columns')) {
           _this2.filterChanged = true;
         }
         _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
       });
     });
-
-    // this.#submit()
+    document.addEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this));
+  };
+  _proto.beforeFrameRender = function beforeFrameRender(event) {
+    console.log(event);
+    if (this.filterChanged) {
+      event.detail.render = function (currentElement, newElement) {
+        currentElement.replaceWith(newElement);
+      };
+      this.filterChanged = false;
+    }
   };
   _proto.disconnect = function disconnect() {
     this.sortableItems.destroy();
@@ -102,6 +110,7 @@ var _default = /*#__PURE__*/function (_Controller) {
     this.sortableColumns.destroy();
     this.sortableValues.destroy();
     this.sortableFilters.destroy();
+    document.removeEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this));
   };
   _proto.getData = function getData() {
     var data = {};
@@ -159,7 +168,7 @@ var _default = /*#__PURE__*/function (_Controller) {
 function _onEnd2(event) {
   var sourceType = event.from.dataset.type;
   var targetType = event.to.dataset.type;
-  if (targetType === 'filters' || sourceType === 'filters') {
+  if (targetType === 'filters' || sourceType === 'filters' || targetType === 'rows' || sourceType === 'rows' || targetType === 'columns' || sourceType === 'columns') {
     this.filterChanged = true;
   }
   _classPrivateFieldLooseBase(this, _submit)[_submit]();

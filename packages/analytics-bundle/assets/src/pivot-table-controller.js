@@ -57,7 +57,11 @@ export default class extends Controller {
 
         this.element.querySelectorAll('select').forEach((select) => {
             select.addEventListener('change', () => {
-                if (select.closest('.filters')) {
+                if (
+                    select.closest('.filters')
+                    || select.closest('.rows')
+                    || select.closest('.columns')
+                ) {
                     this.filterChanged = true
                 }
 
@@ -65,7 +69,18 @@ export default class extends Controller {
             })
         })
 
-        // this.#submit()
+        document.addEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this))
+    }
+
+    beforeFrameRender(event) {
+        console.log(event)
+        if (this.filterChanged) {
+            event.detail.render = (currentElement, newElement) => {
+                currentElement.replaceWith(newElement)
+            }
+
+            this.filterChanged = false
+        }
     }
 
     disconnect() {
@@ -74,6 +89,8 @@ export default class extends Controller {
         this.sortableColumns.destroy()
         this.sortableValues.destroy()
         this.sortableFilters.destroy()
+
+        document.removeEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this))
     }
 
     getData() {
@@ -116,7 +133,7 @@ export default class extends Controller {
 
         for (const filterElement of filterElements) {
             let data = filterElement.data
-            
+
             if (!data) {
                 continue
             }
@@ -140,7 +157,11 @@ export default class extends Controller {
         let sourceType = event.from.dataset.type
         let targetType = event.to.dataset.type
 
-        if (targetType === 'filters' || sourceType === 'filters') {
+        if (
+            targetType === 'filters' || sourceType === 'filters'
+            || targetType === 'rows' || sourceType === 'rows'
+            || targetType === 'columns' || sourceType === 'columns'
+        ) {
             this.filterChanged = true
         }
 
