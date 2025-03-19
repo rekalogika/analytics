@@ -8,7 +8,9 @@
                 multiple
                 data-controller="rekalogika--analytics-bundle--equal-filter"
                 data-dimension="{{ filter.dimension }}"
-                data-action="rekalogika--analytics-bundle--equal-filter:change->rekalogika--analytics-bundle--pivot-table#filter">
+                data-action="rekalogika--analytics-bundle--equal-filter:change->rekalogika--analytics-bundle--pivot-table#filter"
+                data-label-empty="{{ t('(All)', domain = 'rekalogika_analytics')|trans }}"
+                data-label-selected="{{ t('Select items...', domain = 'rekalogika_analytics')|trans }}">
             {% for choice in choices %}
                 <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }}>{{ choice.label }}</option>
             {% endfor %}
