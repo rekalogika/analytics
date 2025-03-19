@@ -101,7 +101,6 @@ var _default = /*#__PURE__*/function (_Controller) {
       event.detail.render = function (currentElement, newElement) {
         currentElement.replaceWith(newElement);
       };
-      console.log('filter changed');
       this.filterChanged = false;
     }
   };
@@ -198,12 +197,13 @@ function _submit2() {
   if (this.urlParameterValue && this.frameValue) {
     var url = new URL(window.location);
     url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()));
-
-    // if (this.filterChanged) {
-    //     visit(url.toString(), { 'frame': '__filters', 'action': 'replace' })
-    //     this.filterChanged = false
-    // }
-
+    if (this.filterChanged) {
+      visit(url.toString(), {
+        'frame': '__filters',
+        'action': 'replace'
+      });
+      this.filterChanged = false;
+    }
     visit(url.toString(), {
       'frame': this.frameValue,
       'action': 'advance'
