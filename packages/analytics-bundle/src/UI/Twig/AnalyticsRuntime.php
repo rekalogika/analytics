@@ -24,7 +24,7 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
     public function renderControl(
         PivotAwareSummaryQuery $query,
         ?string $urlParameter = null,
-        ?string $frame = null,
+        ?string $target = null,
         ?string $output = null,
     ): string {
         return $this->twig
@@ -32,7 +32,7 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
             ->renderBlock('control', [
                 'query' => $query,
                 'urlParameter' => $urlParameter,
-                'frame' => $frame,
+                'target' => $target,
                 'output' => $output,
             ]);
     }

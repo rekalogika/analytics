@@ -49,6 +49,7 @@ var _default = /*#__PURE__*/function (_Controller) {
   var _proto = _default.prototype;
   _proto.connect = function connect() {
     var _this2 = this;
+    this.filterChanged = false;
     _classPrivateFieldLooseBase(this, _group)[_group] = 'g' + Math.random().toString(36);
     this.itemsElement = this.element.querySelector('.available');
     this.rowsElement = this.element.querySelector('.rows');
@@ -93,16 +94,24 @@ var _default = /*#__PURE__*/function (_Controller) {
         _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
       });
     });
-    document.addEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this));
+    document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this));
   };
-  _proto.beforeFrameRender = function beforeFrameRender(event) {
-    console.log(event);
-    if (this.filterChanged) {
-      event.detail.render = function (currentElement, newElement) {
-        currentElement.replaceWith(newElement);
-      };
-      this.filterChanged = false;
-    }
+  _proto.beforeStreamRender = function beforeStreamRender(event) {
+    var _this3 = this;
+    var defaultActions = event.detail.render;
+    event.detail.render = function (streamElement) {
+      console.log(streamElement.getAttribute('target'));
+      console.log(_this3.filterChanged);
+      if (streamElement.getAttribute('target') === '__filters') {
+        if (_this3.filterChanged === true) {
+          console.log('filter changed');
+          _this3.filterChanged = false;
+          defaultActions(streamElement);
+        }
+      } else {
+        defaultActions(streamElement);
+      }
+    };
   };
   _proto.disconnect = function disconnect() {
     this.sortableItems.destroy();
@@ -110,7 +119,7 @@ var _default = /*#__PURE__*/function (_Controller) {
     this.sortableColumns.destroy();
     this.sortableValues.destroy();
     this.sortableFilters.destroy();
-    document.removeEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this));
+    document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this));
   };
   _proto.getData = function getData() {
     var data = {};
@@ -194,24 +203,16 @@ function _onMove2(event, originalEvent) {
   return false;
 }
 function _submit2() {
-  if (this.urlParameterValue && this.frameValue) {
+  if (this.urlParameterValue) {
     var url = new URL(window.location);
     url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()));
-    if (this.filterChanged) {
-      visit(url.toString(), {
-        'frame': '__filters',
-        'action': 'replace'
-      });
-      this.filterChanged = false;
-    }
     visit(url.toString(), {
-      'frame': this.frameValue,
+      'frame': 'turbo-frame',
       'action': 'advance'
     });
   }
 }
 _default.values = {
-  urlParameter: String,
-  frame: String
+  urlParameter: String
 };
 export { _default as default };

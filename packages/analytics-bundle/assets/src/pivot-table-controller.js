@@ -5,13 +5,13 @@ import Sortable from 'sortablejs'
 export default class extends Controller {
     static values = {
         urlParameter: String,
-        frame: String,
     }
 
     #animation = 150
     #group
 
     connect() {
+        this.filterChanged = false
         this.#group = 'g' + Math.random().toString(36)
 
         this.itemsElement = this.element.querySelector('.available')
@@ -69,18 +69,26 @@ export default class extends Controller {
             })
         })
 
-        document.addEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this))
+        document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this))
     }
 
-    beforeFrameRender(event) {
-        console.log(event)
-        if (this.filterChanged) {
-            event.detail.render = (currentElement, newElement) => {
-                currentElement.replaceWith(newElement)
-            }
+    beforeStreamRender(event) {
+        const defaultActions = event.detail.render
 
-            this.filterChanged = false
+        event.detail.render = (streamElement) => {
+            console.log(streamElement.getAttribute('target'))
+            console.log(this.filterChanged)
+            if (streamElement.getAttribute('target') === '__filters') {
+                if (this.filterChanged === true) {
+                    console.log('filter changed')
+                    this.filterChanged = false
+                    defaultActions(streamElement)
+                }
+            } else {
+                defaultActions(streamElement)
+            }
         }
+
     }
 
     disconnect() {
@@ -90,7 +98,7 @@ export default class extends Controller {
         this.sortableValues.destroy()
         this.sortableFilters.destroy()
 
-        document.removeEventListener('turbo:before-frame-render', this.beforeFrameRender.bind(this))
+        document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this))
     }
 
     getData() {
@@ -195,16 +203,10 @@ export default class extends Controller {
     }
 
     #submit() {
-        if (this.urlParameterValue && this.frameValue) {
+        if (this.urlParameterValue) {
             const url = new URL(window.location)
             url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()))
-
-            if (this.filterChanged) {
-                visit(url.toString(), { 'frame': '__filters', 'action': 'replace' })
-                this.filterChanged = false
-            }
-
-            visit(url.toString(), { 'frame': this.frameValue, 'action': 'advance' })
+            visit(url.toString(), { 'frame': 'turbo-frame', 'action': 'advance' })
         }
     }
 }

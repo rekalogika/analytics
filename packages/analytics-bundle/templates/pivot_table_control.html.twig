@@ -2,12 +2,35 @@
     {% set id = random() %}
 
     <div data-controller="rekalogika--analytics-bundle--pivot-table"
-         {% if frame %}data-rekalogika--analytics-bundle--pivot-table-frame-value="{{ frame }}"{% endif %}
+         {% if target %}data-rekalogika--analytics-bundle--pivot-table-target-value="{{ target }}"{% endif %}
+         {% if output %}data-rekalogika--analytics-bundle--pivot-table-output-value="{{ output }}"{% endif %}
          {% if urlParameter %} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {% endif %}>
         {{ block("tab_group") }}
         {{ block("tab_pane_group") }}
     </div>
+
+    {{ block("turbo_stream") }}
 {% endblock %}
+
+{% block turbo_stream %}
+    <turbo-frame id="turbo-frame">
+        <turbo-stream action="update" target="{{ target }}">
+            <template>
+                {{ output|raw }}
+            </template>
+        </turbo-stream>
+
+        <turbo-stream action="update" target="__filters">
+            <template>
+                {% for filter in query.filterExpressions %}
+                    {{ block("filter") }}
+                {% else %}
+                    {{ block("empty_filter") }}
+                {% endfor %}
+            </template>
+        </turbo-stream>
+    </turbo-frame>
+{% endblock turbo_stream %}
 
 {% block tab_group %}
     <ul class="nav nav-tabs" id="tab-{{ id }}" role="tablist">
@@ -147,9 +170,10 @@
             {% if item.choices %}
                 <div class="col-auto ">
                     <select class="form-select form-select-sm py-0">
-                    {% set selected = query.getSelectedSubItem(item.key) %}
+                        {% set selected = query.getSelectedSubItem(item.key) %}
                         {% for key, choice in item.choices %}
-                            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}</option>
+                            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -160,11 +184,6 @@
 
 {% block filters %}
     <turbo-frame id="__filters">
-        {% for filter in query.filterExpressions %}
-            {{ block("filter") }}
-        {% else %}
-            {{ block("empty_filter") }}
-        {% endfor %}
     </turbo-frame>
 {% endblock filters %}
 

@@ -8,10 +8,10 @@ export default class extends Controller {
         this.tomSelect = new TomSelect(this.element, {
             maxItems: 500,
             allowEmptyOption: true,
-            sortField: [
-                { field: '$order' },
-                { field: '$score' }
-            ],
+            // sortField: [
+            //     { field: '$order' },
+            //     { field: '$score' }
+            // ],
             plugins: {
                 remove_button: {},
                 clear_button: {}
