@@ -19,6 +19,7 @@
         "psr/clock": "^1.0",
         "psr/event-dispatcher": "^1.0",
         "rekalogika/doctrine-advanced-group-by": "^2.0 || ^3.0",
+        "symfony/polyfill-intl-icu": "^1.31",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3",

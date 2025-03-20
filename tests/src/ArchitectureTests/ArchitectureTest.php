@@ -40,6 +40,7 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
+                
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
@@ -70,7 +71,6 @@ final class ArchitectureTest
                 Selector::classname(\UnitEnum::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\Attribute::class),
-                Selector::classname(\IntlDateFormatter::class),
 
                 // reflections
                 Selector::classname(\ReflectionClass::class),
@@ -87,6 +87,9 @@ final class ArchitectureTest
                 Selector::classname(\UnexpectedValueException::class),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
+
+                // intl
+                Selector::classname(\IntlDateFormatter::class),
             );
     }
 
