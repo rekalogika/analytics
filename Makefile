@@ -5,8 +5,13 @@ DOCKER=docker
 PSQL=psql
 PG_DUMP=pg_dump
 ZSTD=zstd
+LANG=en id
 
 -include local.mk
+
+TRANSLATION_EXTRACT_TARGETS=$(addprefix translation-extract-, $(LANG))
+TRANSLATION_UNUSED_TARGETS=$(addprefix translation-unused-, $(LANG))
+TRANSLATION_DOMAIN=rekalogika_analytics
 
 .PHONY: test 
 test: clean composer-dump lint monorepo-validate phpstan psalm doctrine-schema-create summary-refresh phpunit
@@ -122,6 +127,28 @@ importmap-install:
 
 .PHONY: js
 js: js-compile js-symlink importmap-install asset-map
+
+#
+# translation
+#
+
+.PHONY: translation-extract-%
+translation-extract-%:
+	$(PHP) tests/bin/console translation:extract --force --no-interaction --format=xlf20 $*
+
+.PHONY: translation-unused-%
+translation-unused-%:
+	$(PHP) tests/bin/console debug:translation $* --only-unused --domain=$(TRANSLATION_DOMAIN)
+
+.PHONY: translation-unused
+translation-unused: $(TRANSLATION_UNUSED_TARGETS)
+
+.PHONY: translation-clean
+translation-clean:
+	rm -f packages/analytics-bundle/translations/messages*.xlf
+
+.PHONY: translation
+translation: translation-clean $(TRANSLATION_EXTRACT_TARGETS)
 
 #
 # update schema

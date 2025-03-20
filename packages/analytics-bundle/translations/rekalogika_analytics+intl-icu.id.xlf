@@ -1,262 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="en">
-  <file id="rekalogika_analytics.en">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="id">
+  <file id="rekalogika_analytics.id">
     <unit id="6sAtc6u" name="Example: 1-5,10,15-20">
       <segment>
         <source>Example: 1-5,10,15-20</source>
-        <target>Example: 1-5,10,15-20</target>
+        <target>Contoh: 1-5,10,15-20</target>
       </segment>
     </unit>
     <unit id="6qKYQrK" name="Example: 1,3-5 (1 is Monday, 7 is Sunday)">
       <segment>
         <source>Example: 1,3-5 (1 is Monday, 7 is Sunday)</source>
-        <target>Example: 1,3-5 (1 is Monday, 7 is Sunday)</target>
+        <target>Contoh: 1,3-5 (1 adalah hari Senin, 7 adalah hari Minggu)</target>
       </segment>
     </unit>
     <unit id="O45un_U" name="Example: 1-90,100">
       <segment>
         <source>Example: 1-90,100</source>
-        <target>Example: 1-90,100</target>
+        <target>Contoh: 1-90,100</target>
       </segment>
     </unit>
     <unit id="EZwMH9h" name="Example: 8-12,13-17">
       <segment>
         <source>Example: 8-12,13-17</source>
-        <target>Example: 8-12,13-17</target>
+        <target>Contoh: 8-12,13-17</target>
       </segment>
     </unit>
     <unit id="G6XyQaf" name="Example: 1-3,5,7-12">
       <segment>
         <source>Example: 1-3,5,7-12</source>
-        <target>Example: 1-3,5,7-12</target>
+        <target>Contoh: 1-3,5,7-12</target>
       </segment>
     </unit>
     <unit id="mvvMlnE" name="Example: 1-2,4">
       <segment>
         <source>Example: 1-2,4</source>
-        <target>Example: 1-2,4</target>
+        <target>Contoh: 1-2,4</target>
       </segment>
     </unit>
     <unit id="O0faxaE" name="Example: 2020-2022,2024">
       <segment>
         <source>Example: 2020-2022,2024</source>
-        <target>Example: 2020-2022,2024</target>
+        <target>Contoh: 2020-2022,2024</target>
       </segment>
     </unit>
     <unit id="CwC2I7e" name="Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)">
       <segment>
         <source>Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)</source>
-        <target>Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)</target>
+        <target>Contoh: 2024021-2024032,2024041 (2024021 artinya tahun 2024, minggu 2, hari Senin)</target>
       </segment>
     </unit>
     <unit id="yDIStCh" name="Example: 20241-20243,20252 (20241 means 2024 Q1)">
       <segment>
         <source>Example: 20241-20243,20252 (20241 means 2024 Q1)</source>
-        <target>Example: 20241-20243,20252 (20241 means 2024 Q1)</target>
+        <target>Contoh: 20241-20243,20252 (20241 artinya 2024 Q1)</target>
       </segment>
     </unit>
     <unit id="0V658Qw" name="Example: 20241-20243,20251 (20241 means January 2024)">
       <segment>
         <source>Example: 20241-20243,20251 (20241 means January 2024)</source>
-        <target>Example: 20241-20243,20251 (20241 means January 2024)</target>
+        <target>Contoh: 20241-20243,20251 (20241 artinya Januari 2024)</target>
       </segment>
     </unit>
     <unit id="HgQLR5y" name="Example: 202402-202405,202514 (202402 means week 2 of 2024)">
       <segment>
         <source>Example: 202402-202405,202514 (202402 means week 2 of 2024)</source>
-        <target>Example: 202402-202405,202514 (202402 means week 2 of 2024)</target>
+        <target>Contoh: 202402-202405,202514 (202402 artinya minggu kedua pada tahun 2024)</target>
       </segment>
     </unit>
     <unit id="OkCD0xj" name="Values">
       <segment>
         <source>Values</source>
-        <target>Values</target>
+        <target>Nilai</target>
       </segment>
     </unit>
     <unit id="HWekgRg" name="True">
       <segment>
         <source>True</source>
-        <target>True</target>
+        <target>Benar</target>
       </segment>
     </unit>
     <unit id="BdNA23t" name="False">
       <segment>
         <source>False</source>
-        <target>False</target>
+        <target>Salah</target>
       </segment>
     </unit>
     <unit id="FikYwQ3" name="This dimension does not support filtering.">
       <segment>
         <source>This dimension does not support filtering.</source>
-        <target>This dimension does not support filtering.</target>
+        <target>Dimensi ini tak mendukung filter.</target>
       </segment>
     </unit>
     <unit id="C2ipWal" name="Select items...">
       <segment>
         <source>Select items...</source>
-        <target>Select items...</target>
+        <target>Pilih butir...</target>
       </segment>
     </unit>
     <unit id="9OXOEsX" name="(All)">
       <segment>
         <source>(All)</source>
-        <target>(All)</target>
+        <target>(Semua)</target>
       </segment>
     </unit>
     <unit id="cZ7YjPF" name="Unable to find choices to present.">
       <segment>
         <source>Unable to find choices to present.</source>
-        <target>Unable to find choices to present.</target>
+        <target>Gagal mendapatkan pilihan untuk ditampilkan.</target>
       </segment>
     </unit>
     <unit id="Y8P2gR1" name="Date range">
       <segment>
         <source>Date range</source>
-        <target>Date range</target>
+        <target>Rentang tanggal</target>
       </segment>
     </unit>
     <unit id="V7Kt4qA" name="No result returned.">
       <segment>
         <source>No result returned.</source>
-        <target>No result returned.</target>
+        <target>Tak mendapatkan hasil.</target>
       </segment>
     </unit>
     <unit id="hw5xEEJ" name="Fields">
       <segment>
         <source>Fields</source>
-        <target>Fields</target>
+        <target>Bidang</target>
       </segment>
     </unit>
     <unit id="jqwP5Ri" name="Filters">
       <segment>
         <source>Filters</source>
-        <target>Filters</target>
+        <target>Filter</target>
       </segment>
     </unit>
     <unit id="hrtVq78" name="Available fields">
       <segment>
         <source>Available fields</source>
-        <target>Available fields</target>
+        <target>Bidang yang tersedia</target>
       </segment>
     </unit>
     <unit id="mwkgsc5" name="Rows">
       <segment>
         <source>Rows</source>
-        <target>Rows</target>
+        <target>Baris</target>
       </segment>
     </unit>
     <unit id="5THj8oK" name="Columns">
       <segment>
         <source>Columns</source>
-        <target>Columns</target>
+        <target>Kolom</target>
       </segment>
     </unit>
     <unit id="imrEk3V" name="No filter selected.">
       <segment>
         <source>No filter selected.</source>
-        <target>No filter selected.</target>
+        <target>Tak ada filter yang dipilih.</target>
       </segment>
     </unit>
     <unit id=".F.swjO" name="(None)">
       <segment>
         <source>(None)</source>
-        <target>(None)</target>
+        <target>(Tak ada)</target>
       </segment>
     </unit>
     <unit id="1cuPpsS" name="Date">
       <segment>
         <source>Date</source>
-        <target>Date</target>
+        <target>Tanggal</target>
       </segment>
     </unit>
     <unit id="mlo9OOj" name="Week Date">
       <segment>
         <source>Week Date</source>
-        <target>Week Date</target>
+        <target>Tanggal Minggu</target>
       </segment>
     </unit>
     <unit id="wE2foKB" name="Day of Week">
       <segment>
         <source>Day of Week</source>
-        <target>Day of Week</target>
+        <target>Hari dalam Minggu</target>
       </segment>
     </unit>
     <unit id="gIkhTNq" name="Day of Month">
       <segment>
         <source>Day of Month</source>
-        <target>Day of Month</target>
+        <target>Tanggal dalam Bulan</target>
       </segment>
     </unit>
     <unit id="T.1eFz_" name="Day of Year">
       <segment>
         <source>Day of Year</source>
-        <target>Day of Year</target>
+        <target>Tanggal dalam Tahun</target>
       </segment>
     </unit>
     <unit id="DVQrumo" name="Hour">
       <segment>
         <source>Hour</source>
-        <target>Hour</target>
+        <target>Jam</target>
       </segment>
     </unit>
     <unit id="MwRxkjl" name="Hour of Day">
       <segment>
         <source>Hour of Day</source>
-        <target>Hour of Day</target>
+        <target>Jam dalam Hari</target>
       </segment>
     </unit>
     <unit id="EhM5rNi" name="Month">
       <segment>
         <source>Month</source>
-        <target>Month</target>
+        <target>Bulan</target>
       </segment>
     </unit>
     <unit id="uugdNxO" name="Month of Year">
       <segment>
         <source>Month of Year</source>
-        <target>Month of Year</target>
+        <target>Bulan dalam Tahun</target>
       </segment>
     </unit>
     <unit id="n8MC0Bj" name="Quarter">
       <segment>
         <source>Quarter</source>
-        <target>Quarter</target>
+        <target>Kuartal</target>
       </segment>
     </unit>
     <unit id="EsxU1M." name="Quarter of Year">
       <segment>
         <source>Quarter of Year</source>
-        <target>Quarter of Year</target>
+        <target>Kuartal dalam Tahun</target>
       </segment>
     </unit>
     <unit id="VRNwM24" name="Week">
       <segment>
         <source>Week</source>
-        <target>Week</target>
+        <target>Minggu</target>
       </segment>
     </unit>
     <unit id="_UMApKX" name="Week of Year">
       <segment>
         <source>Week of Year</source>
-        <target>Week of Year</target>
+        <target>Minggu dalam Tahun</target>
       </segment>
     </unit>
     <unit id="cU6hyTv" name="Week of Month">
       <segment>
         <source>Week of Month</source>
-        <target>Week of Month</target>
+        <target>Minggu dalam Bulan</target>
       </segment>
     </unit>
     <unit id="br1.iAd" name="Week Year">
       <segment>
         <source>Week Year</source>
-        <target>Week Year</target>
+        <target>Tahun Minggu</target>
       </segment>
     </unit>
     <unit id="gVXPSQC" name="Year">
       <segment>
         <source>Year</source>
-        <target>Year</target>
+        <target>Tahun</target>
       </segment>
     </unit>
   </file>

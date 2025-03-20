@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 
 use Rekalogika\Analytics\Tests\App\Misc\DebugToolbarReplacerSubscriber;
+use Rekalogika\Analytics\Tests\App\Translation\TranslatableMessageVisitor;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -22,13 +23,23 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public();
+        ->public()
+    ;
 
     $services
         ->load('Rekalogika\\Analytics\\Tests\\App\\', '../src/App/')
-        ->exclude('../src/App/{Entity,Exception}');
+        ->exclude('../src/App/{Entity,Exception}')
+    ;
 
     $services->set(DebugToolbarReplacerSubscriber::class)
         ->args([service('kernel')])
-        ->tag('kernel.event_subscriber');
+        ->tag('kernel.event_subscriber')
+    ;
+
+    $services
+        ->set(TranslatableMessageVisitor::class)
+        ->tag('translation.extractor.visitor', [
+            'priority' => 1000,
+        ])
+    ;
 };

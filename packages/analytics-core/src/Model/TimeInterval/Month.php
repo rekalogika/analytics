@@ -92,12 +92,11 @@ final class Month implements TimeInterval
             $locale = $translator->getLocale();
 
             $intlDateFormatter = new \IntlDateFormatter(
-                $locale,
-                \IntlDateFormatter::FULL,
-                \IntlDateFormatter::FULL,
-                $this->start->getTimezone(),
-                \IntlDateFormatter::GREGORIAN,
-                'MMMM YYYY',
+                locale: $locale,
+                dateType: \IntlDateFormatter::FULL,
+                timeType: \IntlDateFormatter::FULL,
+                timezone: $this->start->getTimezone(),
+                pattern: 'MMMM YYYY',
             );
 
             $formatted = $intlDateFormatter->format($dateTime);

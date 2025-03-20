@@ -88,6 +88,9 @@ jobs:
     - name: Lint Doctrine
       run: tests/bin/console doctrine:schema:validate --skip-sync
 
+    - name: Find unused translations
+      run: make translation-unused
+
     - name: Validate php-cs-fixer
       run: |
         PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer check --allow-risky=yes
