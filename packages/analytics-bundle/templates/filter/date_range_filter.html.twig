@@ -1,5 +1,8 @@
 {% block filter %}
     <input type="text"
+           value="{{ filter.rawValue }}"
+           data-start="{{ filter.rawStart }}"
+           data-end="{{ filter.rawEnd }}"
            placeholder="{{ t('(All)', domain = 'rekalogika_analytics') |trans }}"
            aria-label="{{ t('Date range', domain = 'rekalogika_analytics') |trans }}"
            lang="{{ app.request.locale }}"

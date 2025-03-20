@@ -56,7 +56,7 @@ final class DateRangeFilter implements Filter
         return $this->label;
     }
 
-    public function getRawStart(): ?string
+    public function getRawStart(): string
     {
         if ($this->rawLowerBound !== null) {
             return $this->rawLowerBound;
@@ -65,11 +65,43 @@ final class DateRangeFilter implements Filter
         /** @psalm-suppress MixedAssignment */
         $string = $this->inputArray['start'] ?? null;
 
-        if (!\is_string($string) || $string === '') {
-            return null;
+        if (!\is_string($string)) {
+            $string = '';
         }
 
         return $this->rawLowerBound = $string;
+    }
+
+    public function getRawEnd(): string
+    {
+        if ($this->rawUpperBound !== null) {
+            return $this->rawUpperBound;
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $string = $this->inputArray['end'] ?? null;
+
+        if (!\is_string($string)) {
+            $string = '';
+        }
+
+        return $this->rawUpperBound = $string;
+    }
+
+    public function getRawValue(): string
+    {
+        $start = $this->getRawStart();
+        $end = $this->getRawEnd();
+
+        if ($start === '') {
+            return '';
+        }
+
+        if ($end === '') {
+            return $start;
+        }
+
+        return \sprintf('%s - %s', $start, $end);
     }
 
     public function getStart(): ?TimeInterval
@@ -80,29 +112,13 @@ final class DateRangeFilter implements Filter
 
         $rawStart = $this->getRawStart();
 
-        if ($rawStart === null) {
+        if ($rawStart === '') {
             return null;
         }
 
         $dateTime = new \DateTimeImmutable($rawStart);
 
         return $this->lowerBound = ($this->typeClass)::createFromDateTime($dateTime);
-    }
-
-    public function getRawEnd(): ?string
-    {
-        if ($this->rawUpperBound !== null) {
-            return $this->rawUpperBound;
-        }
-
-        /** @psalm-suppress MixedAssignment */
-        $string = $this->inputArray['end'] ?? null;
-
-        if (!\is_string($string) || $string === '') {
-            return null;
-        }
-
-        return $this->rawUpperBound = $string;
     }
 
     public function getEnd(): ?TimeInterval
@@ -113,7 +129,7 @@ final class DateRangeFilter implements Filter
 
         $rawEnd = $this->getRawEnd();
 
-        if ($rawEnd === null) {
+        if ($rawEnd === '') {
             return null;
         }
 

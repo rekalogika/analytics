@@ -40,9 +40,12 @@ var _default = /*#__PURE__*/function (_Controller) {
     };
     if (lang) {
       options.locale = lang;
-      console.log(lang);
-    } else {
-      console.log('flatpickr locale: default');
+    }
+    var start = this.element.dataset.start;
+    var end = this.element.dataset.end;
+    if (start && end) {
+      options.defaultDate = [start, end];
+      this.element.value = start + ' - ' + end;
     }
     this.flatpickr = flatpickr(this.element, options);
     this.element.addEventListener('change', function () {
