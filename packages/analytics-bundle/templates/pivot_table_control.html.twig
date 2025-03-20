@@ -5,8 +5,9 @@
          {% if target %}data-rekalogika--analytics-bundle--pivot-table-target-value="{{ target }}"{% endif %}
          {% if output %}data-rekalogika--analytics-bundle--pivot-table-output-value="{{ output }}"{% endif %}
          {% if urlParameter %} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {% endif %}>
-        {{ block("tab_group") }}
-        {{ block("tab_pane_group") }}
+        {{ block("fields") }}
+        <turbo-frame id="__filters">
+        </turbo-frame>
     </div>
 
     {{ block("turbo_stream") }}
@@ -20,80 +21,27 @@
             </template>
         </turbo-stream>
 
-        <turbo-stream action="update" target="__filters">
+        <turbo-stream action="update" method="morph" target="__filters">
             <template>
-                {% for filter in query.filterExpressions %}
-                    {{ block("filter") }}
-                {% else %}
-                    {{ block("empty_filter") }}
-                {% endfor %}
+                {{ block("filters") }}
             </template>
         </turbo-stream>
     </turbo-frame>
 {% endblock turbo_stream %}
 
-{% block tab_group %}
-    <ul class="nav nav-tabs" id="tab-{{ id }}" role="tablist">
-        {% set active = true %}
-        {% set name = "fields" %}
-        {% set label = t('Fields', domain = 'rekalogika_analytics')|trans %}
-        {{ block("tab") }}
-
-        {% set active = false %}
-        {% set name = "filters" %}
-        {% set label = t('Filters', domain = 'rekalogika_analytics')|trans %}
-        {{ block("tab") }}
-    </ul>
-{% endblock %}
-
-{% block tab_pane_group %}
-    <div class="tab-content" id="tab-content-{{ id }}">
-        {% set active = true %}
-        {% set name = "fields" %}
-        {% set content = block('fields') %}
-        {{ block("tab_pane") }}
-
-        {% set active = false %}
-        {% set name = "filters" %}
-        {% set content = block('filters') %}
-        {{ block("tab_pane") }}
-    </div>
-{% endblock %}
-
-{% block tab %}
-    <li class="nav-item" role="presentation">
-        <button class="nav-link {{ active ? 'active' : '' }}"
-                id="{{ name }}-tab-{{ id }}"
-                data-bs-toggle="tab"
-                data-bs-target="#{{ name }}-tab-pane-{{ id }}"
-                type="button"
-                role="tab"
-                aria-controls="{{ name }}-tab-pane-{{ id }}"
-                aria-selected="true">{{ label }}</button>
-    </li>
-{% endblock %}
-
-{% block tab_pane %}
-    <div class="tab-pane fade show {{ active ? 'active' : '' }}"
-         id="{{ name }}-tab-pane-{{ id }}"
-         role="tabpanel"
-         aria-labelledby="{{ name }}-tab-{{ id }}"
-         tabindex="0">
-        <div class="card">
-            <div class="card-body">{{ content|raw }}</div>
-        </div>
-    </div>
-{% endblock %}
-
 {% block fields %}
-    <div class="row g-3">
+    <div class="row g-md-3 gx-3">
         <div class="col-md-4">
-            {% set type = "available" %}
-            {{ block("item_block") }}
+            <div class="row row-cols-1 g-3 gx-3">
+                <div class="col">
+                    {% set type = "available" %}
+                    {{ block("item_block") }}
+                </div>
+            </div>
         </div>
 
         <div class="col-md-8">
-            <div class="row row-cols-md-2 g-3">
+            <div class="row row-cols-2 g-md-3 gx-3">
                 <div class="col">
                     {% set type = "rows" %}
                     {{ block("item_block") }}
@@ -136,7 +84,7 @@
         {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
-    <div class="card border-dark pb-1">
+    <div class="card pb-1">
         <h6 class="card-header">{{ description }}</h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
@@ -183,21 +131,24 @@
 {% endblock item %}
 
 {% block filters %}
-    <turbo-frame id="__filters">
-    </turbo-frame>
+    {% if query.filterExpressions|length > 0 %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row row-cols-md-2 g-3">
+                    {% for filter in query.filterExpressions %}
+                        <div class="col">{{ block("filter") }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock filters %}
 
 {% block filter %}
-    <div class="mb-3">
+    <div class="">
         <label for="{{ filter.dimension }}-{{ id }}" class="form-label">
             {{ filter.label|trans }}
         </label>
         {{ block('filter', filter.template) }}
     </div>
 {% endblock filter %}
-
-{% block empty_filter %}
-    <div class="alert alert-info" role="alert">
-        {{ t('No filter selected.', domain = 'rekalogika_analytics') |trans }}
-    </div>
-{% endblock empty_filter %}
