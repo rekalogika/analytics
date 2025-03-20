@@ -90,6 +90,7 @@ jobs:
 
     - name: Find unused translations
       run: make translation-unused
+      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
     - name: Validate php-cs-fixer
       run: |
