@@ -36,6 +36,7 @@
         "symfony/lock": "^6.4 || ^7.0",
         "symfony/messenger": "^6.4 || ^7.0",
         "symfony/options-resolver": "^6.4 || ^7.0",
+        "symfony/polyfill-intl-icu": "^1.31",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/service-contracts": "^3",
