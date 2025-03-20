@@ -134,7 +134,7 @@ js: js-compile js-symlink importmap-install asset-map
 
 .PHONY: translation-extract-%
 translation-extract-%:
-	$(PHP) tests/bin/console translation:extract --force --no-interaction --format=xlf20 $*
+	$(PHP) tests/bin/console translation:extract --domain=$(TRANSLATION_DOMAIN) --force --no-interaction --format=xlf20 $*
 
 .PHONY: translation-lint-%
 translation-lint-%:
