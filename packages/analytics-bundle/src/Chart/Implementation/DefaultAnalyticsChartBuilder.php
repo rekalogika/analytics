@@ -257,7 +257,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 
         foreach ($result->getTable() as $row) {
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getDisplayMember();
+            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -284,7 +284,6 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     $dataSets[$signature]['borderWidth'] = $this->configuration->areaBorderWidth;
                 }
 
-
                 if ($node2 === null) {
                     $dataSets[$signature]['data'][] = 0;
 
@@ -292,7 +291,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getDisplayMember());
+                    $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getDisplayMember() ?? null);
                 }
 
                 if ($legendTitle === null) {
