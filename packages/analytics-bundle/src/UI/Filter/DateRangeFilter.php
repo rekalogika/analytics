@@ -65,7 +65,7 @@ final class DateRangeFilter implements Filter
         /** @psalm-suppress MixedAssignment */
         $string = $this->inputArray['start'] ?? null;
 
-        if (!\is_string($string)) {
+        if (!\is_string($string) || $string === '') {
             return null;
         }
 
@@ -98,7 +98,7 @@ final class DateRangeFilter implements Filter
         /** @psalm-suppress MixedAssignment */
         $string = $this->inputArray['end'] ?? null;
 
-        if (!\is_string($string)) {
+        if (!\is_string($string) || $string === '') {
             return null;
         }
 

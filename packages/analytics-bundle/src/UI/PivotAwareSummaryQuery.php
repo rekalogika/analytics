@@ -95,17 +95,8 @@ final class PivotAwareSummaryQuery
 
             if ($expression !== null) {
                 $this->summaryQuery->andWhere($expression);
-            } else {
-                $unusedFilters[] = $filterExpression->getDimension();
             }
         }
-
-        $filters = $this->getFilters();
-
-        $effectiveFilters = array_values(array_diff(
-            $filters,
-            $unusedFilters,
-        ));
     }
 
     /**
