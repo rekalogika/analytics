@@ -124,7 +124,7 @@
     <unit id="hw5xEEJ" name="Fields">
       <segment>
         <source>Fields</source>
-        <target>Bidang</target>
+        <target>Kolom</target>
       </segment>
     </unit>
     <unit id="jqwP5Ri" name="Filters">
