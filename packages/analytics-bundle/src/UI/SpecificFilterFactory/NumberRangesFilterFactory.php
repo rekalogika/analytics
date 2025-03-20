@@ -13,15 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 
-use Rekalogika\Analytics\Bundle\UI\Filter;
-use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
+use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\RecurringTimeInterval;
+use Rekalogika\Analytics\TimeInterval;
 
 /**
- * @implements SpecificFilterFactory<NullFilter>
+ * @implements SpecificFilterFactory<NumberRangesFilter>
  */
-final readonly class NullFilterFactory implements SpecificFilterFactory
+final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
 {
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -30,7 +31,7 @@ final readonly class NullFilterFactory implements SpecificFilterFactory
     #[\Override]
     public static function getFilterClass(): string
     {
-        return NullFilter::class;
+        return NumberRangesFilter::class;
     }
 
     #[\Override]
@@ -39,16 +40,33 @@ final readonly class NullFilterFactory implements SpecificFilterFactory
         string $dimension,
         array $inputArray,
         ?object $options = null,
-    ): Filter {
+    ): NumberRangesFilter {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
         $dimensionMetadata = $metadata->getFullyQualifiedDimension($dimension);
         $label = $dimensionMetadata->getLabel();
+        $typeClass = $dimensionMetadata->getTypeClass();
 
-        return new NullFilter(
+        if (
+            $typeClass === null || (
+                !is_a($typeClass, TimeInterval::class, true)
+                && !is_a($typeClass, RecurringTimeInterval::class, true)
+            )
+        ) {
+            throw new \InvalidArgumentException(\sprintf(
+                'NumberRangesFilter needs the type class of "%s" or "%s", "%s" given',
+                TimeInterval::class,
+                RecurringTimeInterval::class,
+                get_debug_type($typeClass),
+            ));
+        }
+
+        return new NumberRangesFilter(
             dimension: $dimension,
             label: $label,
+            inputArray: $inputArray,
+            typeClass: $typeClass,
         );
     }
 }

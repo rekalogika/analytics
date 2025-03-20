@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum DayOfWeek: int implements RecurringTimeInterval
 {
+    use RecurringTimeIntervalTrait;
+
     case Monday = 1;
     case Tuesday = 2;
     case Wednesday = 3;

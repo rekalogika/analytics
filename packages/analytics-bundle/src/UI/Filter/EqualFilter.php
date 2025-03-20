@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
+use Rekalogika\Analytics\Bundle\UI\Filter\Model\Choice;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;

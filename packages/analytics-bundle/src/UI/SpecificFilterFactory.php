@@ -33,5 +33,6 @@ interface SpecificFilterFactory extends FilterFactory
         string $summaryClass,
         string $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter;
 }

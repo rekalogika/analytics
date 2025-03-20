@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum WeekOfMonth: int implements RecurringTimeInterval
 {
+    use RecurringTimeIntervalTrait;
+
     case Week1 = 1;
     case Week2 = 2;
     case Week3 = 3;
