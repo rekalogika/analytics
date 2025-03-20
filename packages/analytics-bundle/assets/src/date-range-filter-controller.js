@@ -36,9 +36,14 @@ export default class extends Controller {
 
         if (lang) {
             options.locale = lang
-            console.log(lang)
-        } else {
-            console.log('flatpickr locale: default')
+        }
+
+        const start = this.element.dataset.start
+        const end = this.element.dataset.end
+
+        if (start && end) {
+            options.defaultDate = [start, end]
+            this.element.value = start + ' - ' + end
         }
 
         this.flatpickr = flatpickr(this.element, options)
