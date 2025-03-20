@@ -42,6 +42,7 @@ final readonly class EqualFilterFactory implements SpecificFilterFactory
         string $summaryClass,
         string $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter {
         return new EqualFilter(
             class: $summaryClass,

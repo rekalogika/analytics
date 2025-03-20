@@ -39,6 +39,7 @@ use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NullFilterFactory;
+use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NumberRangesFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -407,6 +408,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$stringifier' => service(Stringifier::class),
+        ])
+        ->tag('rekalogika.analytics.specific_filter_factory')
+    ;
+
+    $services
+        ->set(NumberRangesFilterFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.specific_filter_factory')
     ;

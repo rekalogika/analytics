@@ -211,5 +211,53 @@
         <target>Select items...</target>
       </segment>
     </unit>
+    <unit id="exampleDayOfMonth" name="exampleDayOfMonth">
+      <segment>
+        <source>Example: 1-5,10,15-20</source>
+        <target>Example: 1-5,10,15-20</target>
+      </segment>
+    </unit>
+    <unit id="exampleDayOfWeek" name="exampleDayOfWeek">
+      <segment>
+        <source>Example: 1,3-5 (1 is Monday, 7 is Sunday)</source>
+        <target>Example: 1,3-5 (1 is Monday, 7 is Sunday)</target>
+      </segment>
+    </unit>
+    <unit id="exampleDayOfYear" name="exampleDayOfYear">
+      <segment>
+        <source>Example: 1-90,100</source>
+        <target>Example: 1-90,100</target>
+      </segment>
+    </unit>
+    <unit id="exampleHourOfDay" name="exampleHourOfDay">
+      <segment>
+        <source>Example: 8-12,13-17</source>
+        <target>Example: 8-12,13-17</target>
+      </segment>
+    </unit>
+    <unit id="exampleMonthOfYear" name="exampleMonthOfYear">
+      <segment>
+        <source>Example: 1-3,5,7-12</source>
+        <target>Example: 1-3,5,7-12</target>
+      </segment>
+    </unit>
+    <unit id="exampleSmallNumberComponents" name="exampleSmallNumberComponents">
+      <segment>
+        <source>Example: 1-2,4</source>
+        <target>Example: 1-2,4</target>
+      </segment>
+    </unit>
+    <unit id="exampleYear" name="exampleYear">
+      <segment>
+        <source>Example: 2020-2022,2024</source>
+        <target>Example: 2020-2022,2024</target>
+      </segment>
+    </unit>
+    <unit id="exampleMonth" name="exampleMonth">
+      <segment>
+        <source>Example: 20241-20243,20251 (20241 means January 2024)</source>
+        <target>Example: 20241-20243,20251 (20241 means January 2024)</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

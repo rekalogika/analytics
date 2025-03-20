@@ -19,9 +19,21 @@ use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\DateRangeFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\EqualFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
+use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
+use Rekalogika\Analytics\Model\TimeInterval\HourOfDay;
+use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeInterval\Quarter;
+use Rekalogika\Analytics\Model\TimeInterval\Week;
+use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
+use Rekalogika\Analytics\Model\TimeInterval\WeekOfMonth;
+use Rekalogika\Analytics\Model\TimeInterval\WeekOfYear;
+use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
+use Rekalogika\Analytics\Model\TimeInterval\Year;
 use Rekalogika\Analytics\TimeInterval;
 
 final readonly class DefaultFilterFactory implements FilterFactory
@@ -37,6 +49,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
         string $summaryClass,
         string $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
@@ -46,9 +59,24 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
         if (
             $typeClass === null
-            || enum_exists($typeClass)
             || $this->isDoctrineRelation($summaryClass, $dimension->getFullName())
         ) {
+            $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
+        } elseif (\in_array($typeClass, [
+            Year::class,
+            Quarter::class,
+            Month::class,
+            WeekDate::class,
+            DayOfMonth::class,
+            DayOfYear::class,
+            WeekOfMonth::class,
+            WeekOfYear::class,
+            HourOfDay::class,
+            WeekYear::class,
+            Week::class,
+        ], true)) {
+            $filterFactory = $this->getSpecificFilterFactory(NumberRangesFilter::class);
+        } elseif (enum_exists($typeClass)) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
         } elseif (is_a($typeClass, TimeInterval::class, true)) {
             $filterFactory = $this->getSpecificFilterFactory(DateRangeFilter::class);

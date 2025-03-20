@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum HourOfDay: int implements RecurringTimeInterval
 {
+    use RecurringTimeIntervalTrait;
+
     case Hour0 = 0;
     case Hour1 = 1;
     case Hour2 = 2;

@@ -39,6 +39,7 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
         string $summaryClass,
         string $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);

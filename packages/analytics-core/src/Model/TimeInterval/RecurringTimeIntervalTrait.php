@@ -11,11 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
-interface RecurringTimeInterval extends TranslatableInterface
+trait RecurringTimeIntervalTrait
 {
-    public static function createFromDatabaseValue(int $databaseValue): static;
+    public static function createFromDatabaseValue(int $databaseValue): static
+    {
+        return self::from($databaseValue);
+    }
 }
