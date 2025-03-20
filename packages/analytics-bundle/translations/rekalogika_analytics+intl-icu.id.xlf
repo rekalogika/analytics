@@ -247,5 +247,23 @@
         <target>Tahun</target>
       </segment>
     </unit>
+    <unit id="icnWST9" name="{field} is a dimension, and can be placed in the Rows, Columns, or Filters">
+      <segment>
+        <source>{field} is a dimension, and can be placed in the Rows, Columns, or Filters</source>
+        <target>{field} adalah dimensi, dan dapat diletakkan di Baris, Kolom, atau Filter</target>
+      </segment>
+    </unit>
+    <unit id="uKB7tEL" name="The value dimension, must be placed in the Rows or Columns">
+      <segment>
+        <source>The value dimension, must be placed in the Rows or Columns</source>
+        <target>Dimensi nilai, harus diletakkan di Baris atau Kolom</target>
+      </segment>
+    </unit>
+    <unit id="QgOGcqa" name="{field} is a measure, and can be placed in the Values">
+      <segment>
+        <source>{field} is a measure, and can be placed in the Values</source>
+        <target>{field} adalah ukuran, dan dapat diletakkan di Nilai</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

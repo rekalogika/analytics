@@ -119,8 +119,19 @@
         {%- endif -%}
     {%- endset -%}
 
+    {%- set help -%}
+        {%- if item.type == 'dimension' -%}
+            {{ t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+        {%- elseif item.type == 'measure' -%}
+            {{ t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+        {%- elseif item.type == 'values' -%}
+            {{ t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics')|trans }}
+        {%- endif -%}
+    {%- endset -%}
+
     <li data-type="{{ item.type }}"
         data-value="{{ item.key }}"
+        title="{{ help }}"
         class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
         <div class="row align-items-center">
