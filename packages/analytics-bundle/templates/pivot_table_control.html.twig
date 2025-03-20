@@ -5,8 +5,9 @@
          {% if target %}data-rekalogika--analytics-bundle--pivot-table-target-value="{{ target }}"{% endif %}
          {% if output %}data-rekalogika--analytics-bundle--pivot-table-output-value="{{ output }}"{% endif %}
          {% if urlParameter %} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {% endif %}>
-        {{ block("tab_group") }}
-        {{ block("tab_pane_group") }}
+        {{ block("fields") }}
+        <turbo-frame id="__filters">
+        </turbo-frame>
     </div>
 
     {{ block("turbo_stream") }}
@@ -20,96 +21,43 @@
             </template>
         </turbo-stream>
 
-        <turbo-stream action="update" target="__filters">
+        <turbo-stream action="update" method="morph" target="__filters">
             <template>
-                {% for filter in query.filterExpressions %}
-                    {{ block("filter") }}
-                {% else %}
-                    {{ block("empty_filter") }}
-                {% endfor %}
+                {{ block("filters") }}
             </template>
         </turbo-stream>
     </turbo-frame>
 {% endblock turbo_stream %}
 
-{% block tab_group %}
-    <ul class="nav nav-tabs" id="tab-{{ id }}" role="tablist">
-        {% set active = true %}
-        {% set name = "fields" %}
-        {% set label = t('Fields', domain = 'rekalogika_analytics')|trans %}
-        {{ block("tab") }}
-
-        {% set active = false %}
-        {% set name = "filters" %}
-        {% set label = t('Filters', domain = 'rekalogika_analytics')|trans %}
-        {{ block("tab") }}
-    </ul>
-{% endblock %}
-
-{% block tab_pane_group %}
-    <div class="tab-content" id="tab-content-{{ id }}">
-        {% set active = true %}
-        {% set name = "fields" %}
-        {% set content = block('fields') %}
-        {{ block("tab_pane") }}
-
-        {% set active = false %}
-        {% set name = "filters" %}
-        {% set content = block('filters') %}
-        {{ block("tab_pane") }}
-    </div>
-{% endblock %}
-
-{% block tab %}
-    <li class="nav-item" role="presentation">
-        <button class="nav-link {{ active ? 'active' : '' }}"
-                id="{{ name }}-tab-{{ id }}"
-                data-bs-toggle="tab"
-                data-bs-target="#{{ name }}-tab-pane-{{ id }}"
-                type="button"
-                role="tab"
-                aria-controls="{{ name }}-tab-pane-{{ id }}"
-                aria-selected="true">{{ label }}</button>
-    </li>
-{% endblock %}
-
-{% block tab_pane %}
-    <div class="tab-pane fade show {{ active ? 'active' : '' }}"
-         id="{{ name }}-tab-pane-{{ id }}"
-         role="tabpanel"
-         aria-labelledby="{{ name }}-tab-{{ id }}"
-         tabindex="0">
-        <div class="card">
-            <div class="card-body">{{ content|raw }}</div>
-        </div>
-    </div>
-{% endblock %}
-
 {% block fields %}
-    <div class="row g-3">
+    <div class="row g-md-3 gx-3">
         <div class="col-md-4">
-            {% set type = "available" %}
-            {{ block("item_block") }}
+            <div class="row g-3 gx-3">
+                <div class="col-12">
+                    {% set type = "available" %}
+                    {{ block("item_block") }}
+                </div>
+            </div>
         </div>
 
         <div class="col-md-8">
-            <div class="row row-cols-md-2 g-3">
-                <div class="col">
+            <div class="row g-md-3 gx-3">
+                <div class="col-md-6">
                     {% set type = "rows" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "columns" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "values" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "filters" %}
                     {{ block("item_block") }}
                 </div>
@@ -122,22 +70,34 @@
     {% if type == 'available' %}
         {% set items = query.availableWithoutSubitems %}
         {% set description = t('Available fields', domain = 'rekalogika_analytics')|trans %}
+        {% set icon = block('icon_fields') %}
     {% elseif type == 'rows' %}
         {% set items = query.rowsWithoutSubitems %}
         {% set description = t('Rows', domain = 'rekalogika_analytics')|trans %}
+        {% set icon = block('icon_rows') %}
     {% elseif type == 'columns' %}
         {% set items = query.columnsWithoutSubitems %}
         {% set description = t('Columns', domain = 'rekalogika_analytics')|trans %}
+        {% set icon = block('icon_columns') %}
     {% elseif type == 'values' %}
         {% set items = query.valuesWithoutSubitems %}
         {% set description = t('Values', domain = 'rekalogika_analytics')|trans %}
+        {% set icon = block('icon_values') %}
     {% elseif type == 'filters' %}
         {% set items = query.filtersWithoutSubitems %}
         {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
+        {% set icon = block('icon_filters') %}
     {% endif %}
 
-    <div class="card border-dark pb-1">
-        <h6 class="card-header">{{ description }}</h6>
+    <div class="card pb-1 mb-3 mb-md-0">
+        <h6 class="card-header"
+            style="display: grid;
+                   grid-template-columns: auto 1fr;
+                   align-items: center;
+                   grid-gap: 0.3em">
+            {{ icon|raw }}
+            <span>{{ description }}</span>
+        </h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
             style="min-height: 70px">
@@ -159,12 +119,28 @@
         {%- endif -%}
     {%- endset -%}
 
+    {%- set help -%}
+        {%- if item.type == 'dimension' -%}
+            {{ t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+        {%- elseif item.type == 'measure' -%}
+            {{ t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+        {%- elseif item.type == 'values' -%}
+            {{ t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics')|trans }}
+        {%- endif -%}
+    {%- endset -%}
+
     <li data-type="{{ item.type }}"
         data-value="{{ item.key }}"
-        class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1"
+        title="{{ help }}"
+        class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
         <div class="row align-items-center">
-            <div class="col-auto me-auto">
+            <div class="col-auto me-auto"
+                 style="display: grid;
+                        grid-template-columns: auto 1fr;
+                        align-items: center;
+                        grid-gap: 0.3em">
+                <span class="text-body-tertiary">{{ block("burger") }}</span>
                 <span>{{ item.label|trans }}</span>
             </div>
             {% if item.choices %}
@@ -183,8 +159,17 @@
 {% endblock item %}
 
 {% block filters %}
-    <turbo-frame id="__filters">
-    </turbo-frame>
+    {% if query.filterExpressions|length > 0 %}
+        <div class="card pb-0 mt-md-3">
+            <div class="card-body">
+                <div class="row gx-3">
+                    {% for filter in query.filterExpressions %}
+                        <div class="col-md-4">{{ block("filter") }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock filters %}
 
 {% block filter %}
@@ -196,8 +181,109 @@
     </div>
 {% endblock filter %}
 
-{% block empty_filter %}
-    <div class="alert alert-info" role="alert">
-        {{ t('No filter selected.', domain = 'rekalogika_analytics') |trans }}
-    </div>
-{% endblock empty_filter %}
+{% block icon_fields %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-cube">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M21 16.008v-8.018a1.98 1.98 0 0 0 -1 -1.717l-7 -4.008a2.016 2.016 0 0 0 -2 0l-7 4.008c-.619 .355 -1 1.01 -1 1.718v8.018c0 .709 .381 1.363 1 1.717l7 4.008a2.016 2.016 0 0 0 2 0l7 -4.008c.619 -.355 1 -1.01 1 -1.718z" />
+        <path d="M12 22v-10" />
+        <path d="M12 12l8.73 -5.04" />
+        <path d="M3.27 6.96l8.73 5.04" />
+    </svg>
+{% endblock %}
+
+{% block icon_columns %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-layout-columns">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+        <path d="M12 4l0 16" />
+    </svg>
+{% endblock %}
+
+{% block icon_rows %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-layout-rows">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+        <path d="M4 12l16 0" />
+    </svg>
+{% endblock %}
+
+{% block icon_values %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-ruler-2">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M17 3l4 4l-14 14l-4 -4z" />
+        <path d="M16 7l-1.5 -1.5" />
+        <path d="M13 10l-1.5 -1.5" />
+        <path d="M10 13l-1.5 -1.5" />
+        <path d="M7 16l-1.5 -1.5" />
+    </svg>
+{% endblock %}
+
+{% block icon_filters %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-filter">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227z" />
+    </svg>
+{% endblock %}
+
+{% block burger %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M4 6l16 0" />
+        <path d="M4 12l16 0" />
+        <path d="M4 18l16 0" />
+    </svg>
+{% endblock %}

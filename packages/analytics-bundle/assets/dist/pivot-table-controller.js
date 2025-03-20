@@ -90,8 +90,8 @@ var _default = /*#__PURE__*/function (_Controller) {
       select.addEventListener('change', function () {
         if (select.closest('.filters') || select.closest('.rows') || select.closest('.columns')) {
           _this2.filterChanged = true;
+          _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
         }
-        _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
       });
     });
     document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this));

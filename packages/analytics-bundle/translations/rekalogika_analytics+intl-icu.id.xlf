@@ -121,12 +121,6 @@
         <target>Tak mendapatkan hasil.</target>
       </segment>
     </unit>
-    <unit id="hw5xEEJ" name="Fields">
-      <segment>
-        <source>Fields</source>
-        <target>Kolom</target>
-      </segment>
-    </unit>
     <unit id="jqwP5Ri" name="Filters">
       <segment>
         <source>Filters</source>
@@ -149,12 +143,6 @@
       <segment>
         <source>Columns</source>
         <target>Kolom</target>
-      </segment>
-    </unit>
-    <unit id="imrEk3V" name="No filter selected.">
-      <segment>
-        <source>No filter selected.</source>
-        <target>Tak ada filter yang dipilih.</target>
       </segment>
     </unit>
     <unit id=".F.swjO" name="(None)">
@@ -257,6 +245,24 @@
       <segment>
         <source>Year</source>
         <target>Tahun</target>
+      </segment>
+    </unit>
+    <unit id="icnWST9" name="{field} is a dimension, and can be placed in the Rows, Columns, or Filters">
+      <segment>
+        <source>{field} is a dimension, and can be placed in the Rows, Columns, or Filters</source>
+        <target>{field} adalah dimensi, dan dapat diletakkan di Baris, Kolom, atau Filter</target>
+      </segment>
+    </unit>
+    <unit id="uKB7tEL" name="The value dimension, must be placed in the Rows or Columns">
+      <segment>
+        <source>The value dimension, must be placed in the Rows or Columns</source>
+        <target>Dimensi nilai, harus diletakkan di Baris atau Kolom</target>
+      </segment>
+    </unit>
+    <unit id="QgOGcqa" name="{field} is a measure, and can be placed in the Values">
+      <segment>
+        <source>{field} is a measure, and can be placed in the Values</source>
+        <target>{field} adalah ukuran, dan dapat diletakkan di Nilai</target>
       </segment>
     </unit>
   </file>

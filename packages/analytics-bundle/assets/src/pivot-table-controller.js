@@ -63,9 +63,8 @@ export default class extends Controller {
                     || select.closest('.columns')
                 ) {
                     this.filterChanged = true
+                    this.#submit()
                 }
-
-                this.#submit()
             })
         })
 
