@@ -46,7 +46,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         }
 
         if ($chartType === ChartType::StackedBar) {
-            return $this->createStackedBarChart($result);
+            return $this->createGroupedBarChart($result, true);
+        }
+
+        if ($chartType === ChartType::GroupedBar) {
+            return $this->createGroupedBarChart($result, false);
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -69,7 +73,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         if (\count($tuple) === 1) {
             return $this->createBarChart($result);
         } elseif (\count($tuple) === 2) {
-            return $this->createStackedBarChart($result);
+            return $this->createGroupedBarChart($result, false);
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -231,7 +235,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         return $chart;
     }
 
-    private function createStackedBarChart(Result $result): Chart
+    private function createGroupedBarChart(Result $result, bool $stacked): Chart
     {
         $colorDispenser = $this->createColorDispenser();
         $measure = $result->getTable()->first()?->getMeasures()->first();
@@ -392,11 +396,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             'scales' => [
                 'x' => [
                     'title' => $xTitle,
-                    'stacked' => true,
+                    'stacked' => $stacked,
                 ],
                 'y' => [
                     'title' => $yTitle,
-                    'stacked' => true,
+                    'stacked' => $stacked,
                 ],
             ],
         ]);

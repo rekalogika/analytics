@@ -18,5 +18,6 @@ enum ChartType
     case Auto;
     case Bar;
     case StackedBar;
+    case GroupedBar;
     case Pie;
 }
