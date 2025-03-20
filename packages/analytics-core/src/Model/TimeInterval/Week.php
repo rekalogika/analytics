@@ -72,14 +72,17 @@ final class Week implements TimeInterval
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $translator->trans(
-            id: '{start, date} - {end, date}',
-            parameters: [
-                'start' => $this->start,
-                'end' => $this->end->modify('-1 day'),
-            ],
-            domain: 'rekalogika_analytics+intl-icu',
+        $formatter = new \IntlDateFormatter(
             locale: $locale,
+            dateType: \IntlDateFormatter::MEDIUM,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
+        );
+
+        return \sprintf(
+            '%s - %s',
+            $formatter->format($this->start),
+            $formatter->format($this->end->modify('-1 day')),
         );
     }
 

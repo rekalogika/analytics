@@ -38,12 +38,10 @@ enum DayOfWeek: int implements RecurringTimeInterval
         $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
-            $locale,
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::FULL,
-            null,
-            \IntlDateFormatter::GREGORIAN,
-            'EEEE',
+            locale: $locale,
+            dateType: \IntlDateFormatter::FULL,
+            timeType: \IntlDateFormatter::FULL,
+            pattern: 'EEEE',
         );
 
         $formatted = $intlDateFormatter->format($dateTime);

@@ -1,2 +1,5 @@
 twig:
     form_themes: ['bootstrap_5_horizontal_layout.html.twig']
+    paths:
+        '%kernel.project_dir%/../packages/analytics-core/src/': 'foo'
+        '%kernel.project_dir%/../packages/analytics-bundle/src/': 'foo'

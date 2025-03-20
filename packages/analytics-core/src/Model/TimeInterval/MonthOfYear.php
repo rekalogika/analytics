@@ -45,12 +45,10 @@ enum MonthOfYear: int implements RecurringTimeInterval
         $locale = $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
-            $locale,
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::FULL,
-            null,
-            \IntlDateFormatter::GREGORIAN,
-            'MMMM',
+            locale: $locale,
+            dateType: \IntlDateFormatter::FULL,
+            timeType: \IntlDateFormatter::FULL,
+            pattern: 'MMMM',
         );
 
         $formatted = $intlDateFormatter->format($dateTime);

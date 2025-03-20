@@ -77,12 +77,10 @@ final class Date implements TimeInterval
         $locale = $locale ?? $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
-            $locale,
-            \IntlDateFormatter::MEDIUM,
-            \IntlDateFormatter::NONE,
-            $this->start->getTimezone(),
-            \IntlDateFormatter::GREGORIAN,
-            null,
+            locale: $locale,
+            dateType: \IntlDateFormatter::MEDIUM,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
         );
 
         $formatted = $intlDateFormatter->format($this->start);
