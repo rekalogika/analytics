@@ -32,8 +32,8 @@
 {% block fields %}
     <div class="row g-md-3 gx-3">
         <div class="col-md-4">
-            <div class="row row-cols-1 g-3 gx-3">
-                <div class="col">
+            <div class="row g-3 gx-3">
+                <div class="col-12">
                     {% set type = "available" %}
                     {{ block("item_block") }}
                 </div>
@@ -41,23 +41,23 @@
         </div>
 
         <div class="col-md-8">
-            <div class="row row-cols-2 g-md-3 gx-3">
-                <div class="col">
+            <div class="row g-md-3 gx-3">
+                <div class="col-md-6">
                     {% set type = "rows" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "columns" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "values" %}
                     {{ block("item_block") }}
                 </div>
 
-                <div class="col">
+                <div class="col-md-6">
                     {% set type = "filters" %}
                     {{ block("item_block") }}
                 </div>
@@ -84,7 +84,7 @@
         {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
-    <div class="card pb-1">
+    <div class="card pb-1 mb-3 mb-md-0">
         <h6 class="card-header">{{ description }}</h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
@@ -132,11 +132,11 @@
 
 {% block filters %}
     {% if query.filterExpressions|length > 0 %}
-        <div class="card mt-3">
+        <div class="card mt-md-3">
             <div class="card-body">
-                <div class="row row-cols-md-2 g-3">
+                <div class="row gx-3">
                     {% for filter in query.filterExpressions %}
-                        <div class="col">{{ block("filter") }}</div>
+                        <div class="col-md-4">{{ block("filter") }}</div>
                     {% endfor %}
                 </div>
             </div>
@@ -145,7 +145,7 @@
 {% endblock filters %}
 
 {% block filter %}
-    <div class="">
+    <div class="mb-3 mb-md-0">
         <label for="{{ filter.dimension }}-{{ id }}" class="form-label">
             {{ filter.label|trans }}
         </label>

@@ -121,12 +121,6 @@
         <target>No result returned.</target>
       </segment>
     </unit>
-    <unit id="hw5xEEJ" name="Fields">
-      <segment>
-        <source>Fields</source>
-        <target>Fields</target>
-      </segment>
-    </unit>
     <unit id="jqwP5Ri" name="Filters">
       <segment>
         <source>Filters</source>
@@ -149,12 +143,6 @@
       <segment>
         <source>Columns</source>
         <target>Columns</target>
-      </segment>
-    </unit>
-    <unit id="imrEk3V" name="No filter selected.">
-      <segment>
-        <source>No filter selected.</source>
-        <target>No filter selected.</target>
       </segment>
     </unit>
     <unit id=".F.swjO" name="(None)">

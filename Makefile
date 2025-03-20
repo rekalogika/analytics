@@ -10,7 +10,8 @@ LANG=en id
 -include local.mk
 
 TRANSLATION_EXTRACT_TARGETS=$(addprefix translation-extract-, $(LANG))
-TRANSLATION_UNUSED_TARGETS=$(addprefix translation-lint-, $(LANG))
+TRANSLATION_UNUSED_TARGETS=$(addprefix translation-unused-, $(LANG))
+TRANSLATION_MISSING_TARGETS=$(addprefix translation-missing-, $(LANG))
 TRANSLATION_DOMAIN=rekalogika_analytics
 
 .PHONY: test 
@@ -136,12 +137,16 @@ js: js-compile js-symlink importmap-install asset-map
 translation-extract-%:
 	$(PHP) tests/bin/console translation:extract --domain=$(TRANSLATION_DOMAIN) --force --no-interaction --format=xlf20 $*
 
-.PHONY: translation-lint-%
-translation-lint-%:
-	$(PHP) tests/bin/console debug:translation $* --domain=$(TRANSLATION_DOMAIN)
+.PHONY: translation-unused-%
+translation-unused-%:
+	$(PHP) tests/bin/console debug:translation $* --domain=$(TRANSLATION_DOMAIN) --only-unused
+
+.PHONY: translation-missing-%
+translation-missing-%:
+	$(PHP) tests/bin/console debug:translation $* --domain=$(TRANSLATION_DOMAIN) --only-missing
 
 .PHONY: translation-lint
-translation-lint: $(TRANSLATION_UNUSED_TARGETS)
+translation-lint: $(TRANSLATION_UNUSED_TARGETS) $(TRANSLATION_MISSING_TARGETS)
 
 .PHONY: translation-clean
 translation-clean:
