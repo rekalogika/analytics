@@ -36,6 +36,9 @@ final readonly class ChainNumberifier implements Numberifier
             }
         }
 
-        return 0;
+        throw new \InvalidArgumentException(\sprintf(
+            'Cannot convert "%s" to number',
+            get_debug_type($input)
+        ));
     }
 }
