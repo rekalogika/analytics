@@ -37,7 +37,8 @@ final readonly class ChainNumberifier implements Numberifier
         }
 
         throw new \InvalidArgumentException(\sprintf(
-            'Cannot convert "%s" to number',
+            'Cannot convert "%s" to a number. To fix this problem, you need to create a custom implementation of "BackendNumberifier" for "%s".',
+            get_debug_type($input),
             get_debug_type($input),
         ));
     }
