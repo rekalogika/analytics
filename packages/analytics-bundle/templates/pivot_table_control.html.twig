@@ -116,32 +116,26 @@
 {% block item %}
     {% set item = query.resolve(item) %}
 
-    {%- set color_class -%}
-        {%- if item.type == 'dimension' -%}
-            list-group-item-success
-        {%- elseif item.type == 'measure' -%}
-            list-group-item-info
-        {%- elseif item.type == 'values' -%}
-            list-group-item-warning
-        {%- endif -%}
-    {%- endset -%}
-
-    {%- set help -%}
-        {%- if item.type == 'dimension' -%}
-            {{ t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans }}
-        {%- elseif item.type == 'measure' -%}
-            {{ t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans }}
-        {%- elseif item.type == 'values' -%}
-            {{ t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics') |trans }}
-        {%- endif -%}
-    {%- endset -%}
+    {%- if item.type == 'dimension' -%}
+        {%- set color_class = "list-group-item-success" -%}
+        {%- set icon = block('icon_dimension') -%}
+        {%- set help = t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans -%}
+    {%- elseif item.type == 'measure' -%}
+        {%- set color_class = "list-group-item-info" -%}
+        {%- set icon = block('icon_measure') -%}
+        {%- set help = t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans -%}
+    {%- elseif item.type == 'values' -%}
+        {%- set color_class = "list-group-item-warning" -%}
+        {%- set icon = block('icon_value') -%}
+        {%- set help = t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics') |trans -%}
+    {%- endif -%}
 
     <li data-type="{{ item.type }}"
         data-value="{{ item.key }}"
         data-controller="rekalogika--analytics-bundle--help"
         data-help="{{ help }}"
         data-help-delay="1000"
-        class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1 px-2"
+        class="list-group-item {{ color_class }} rounded-3 ms-2 me-2 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
         <div class="row align-items-center">
             <div class="col-auto me-auto"
@@ -149,7 +143,7 @@
                         grid-template-columns: auto 1fr;
                         align-items: center;
                         grid-gap: 0.3em">
-                <span class="text-body-tertiary">{{ block("icon_burger") }}</span>
+                <span class="">{{ icon|raw }}</span>
                 <span>{{ item.label|trans }}</span>
             </div>
             {% if item.choices %}
@@ -279,24 +273,6 @@
     </svg>
 {% endblock %}
 
-{% block icon_burger %}
-    <svg xmlns="http://www.w3.org/2000/svg"
-         width="24"
-         height="24"
-         viewBox="0 0 24 24"
-         fill="none"
-         stroke="currentColor"
-         stroke-width="2"
-         stroke-linecap="round"
-         stroke-linejoin="round"
-         class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M4 6l16 0" />
-        <path d="M4 12l16 0" />
-        <path d="M4 18l16 0" />
-    </svg>
-{% endblock %}
-
 {% block icon_help %}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
@@ -312,5 +288,56 @@
         <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
         <path d="M12 17l0 .01" />
         <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" />
+    </svg>
+{% endblock %}
+
+{% block icon_dimension %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-square-rounded-letter-d">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M10 8v8h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-2z" />
+        <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
+    </svg>
+{% endblock %}
+
+{% block icon_measure %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-square-rounded-letter-m">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M9 16v-8l3 5l3 -5v8" />
+        <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
+    </svg>
+{% endblock %}
+
+{% block icon_value %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-square-rounded-letter-v">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M10 8l2 8l2 -8" />
+        <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
     </svg>
 {% endblock %}

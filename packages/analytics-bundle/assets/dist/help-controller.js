@@ -8,6 +8,7 @@ function _setPrototypeOf(t, e) { return _setPrototypeOf = Object.setPrototypeOf 
 import { Controller } from '@hotwired/stimulus';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import 'tippy.js/animations/scale-extreme.css';
 var _default = /*#__PURE__*/function (_Controller) {
   function _default() {
     return _callSuper(this, _default, arguments);
@@ -19,7 +20,8 @@ var _default = /*#__PURE__*/function (_Controller) {
     var delay = this.element.dataset.helpDelay;
     this.tippy = tippy(this.element, {
       content: content,
-      delay: [delay ? parseInt(delay) : null, null]
+      delay: [delay ? parseInt(delay) : null, null],
+      animation: 'scale-extreme'
     });
   };
   _proto.disconnect = function disconnect() {

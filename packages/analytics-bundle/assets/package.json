@@ -33,7 +33,8 @@
                 "fetch": "eager",
                 "enabled": true,
                 "autoimport": {
-                    "tippy.js/dist/tippy.css": true
+                    "tippy.js/dist/tippy.css": true,
+                    "tippy.js/animations/scale-extreme.css": true
                 }
             }
         },
