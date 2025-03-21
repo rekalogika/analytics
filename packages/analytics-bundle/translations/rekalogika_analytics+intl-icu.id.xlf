@@ -88,7 +88,7 @@
     <unit id="FikYwQ3" name="This dimension does not support filtering.">
       <segment>
         <source>This dimension does not support filtering.</source>
-        <target>Dimensi ini tak mendukung filter.</target>
+        <target>Dimensi ini tak mendukung penyaringan.</target>
       </segment>
     </unit>
     <unit id="C2ipWal" name="Select items...">
@@ -124,7 +124,7 @@
     <unit id="jqwP5Ri" name="Filters">
       <segment>
         <source>Filters</source>
-        <target>Filter</target>
+        <target>Penyaringan</target>
       </segment>
     </unit>
     <unit id="hrtVq78" name="Available fields">
@@ -250,7 +250,7 @@
     <unit id="icnWST9" name="{field} is a dimension, and can be placed in the Rows, Columns, or Filters">
       <segment>
         <source>{field} is a dimension, and can be placed in the Rows, Columns, or Filters</source>
-        <target>{field} adalah dimensi, dan dapat diletakkan di Baris, Kolom, atau Filter</target>
+        <target>{field} adalah dimensi, dan dapat diletakkan di Baris, Kolom, atau Penyaringan</target>
       </segment>
     </unit>
     <unit id="uKB7tEL" name="The value dimension, must be placed in the Rows or Columns">
