@@ -1,0 +1,1 @@
+../../../../../packages/analytics-bundle/assets/dist/help-controller.js

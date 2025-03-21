@@ -265,5 +265,35 @@
         <target>The value dimension, must be placed in the Rows or Columns</target>
       </segment>
     </unit>
+    <unit id="bNjSBpY">
+      <segment>
+        <source>The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.</source>
+        <target>The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.</target>
+      </segment>
+    </unit>
+    <unit id="hLvdhXu">
+      <segment>
+        <source>Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.</source>
+        <target>Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.</target>
+      </segment>
+    </unit>
+    <unit id="GeT5L7O">
+      <segment>
+        <source>Drag dimensions here to organize data into columns. Each unique value will create a separate column.</source>
+        <target>Drag dimensions here to organize data into columns. Each unique value will create a separate column.</target>
+      </segment>
+    </unit>
+    <unit id="EP9BjPA" name="Drag measures here to display them in the pivot table.">
+      <segment>
+        <source>Drag measures here to display them in the pivot table.</source>
+        <target>Drag measures here to display them in the pivot table.</target>
+      </segment>
+    </unit>
+    <unit id="kdd10eZ">
+      <segment>
+        <source>Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.</source>
+        <target>Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

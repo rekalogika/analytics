@@ -27,6 +27,14 @@
                 "autoimport": {
                     "flatpickr/dist/flatpickr.css": true
                 }
+            },
+            "help": {
+                "main": "dist/help-controller.js",
+                "fetch": "eager",
+                "enabled": true,
+                "autoimport": {
+                    "tippy.js/dist/tippy.css": true
+                }
             }
         },
         "importmap": {
@@ -61,7 +69,8 @@
         "@hotwired/stimulus": "^3.0.0",
         "sortablejs": "^1.14.0",
         "tom-select": "^2.4.3",
-        "flatpickr": "^4.6.13"
+        "flatpickr": "^4.6.13",
+        "tippy.js": "^6.3"
     },
     "devDependencies": {
         "@babel/cli": "^7.26",

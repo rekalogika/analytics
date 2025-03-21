@@ -71,32 +71,39 @@
         {% set items = query.availableWithoutSubitems %}
         {% set description = t('Available fields', domain = 'rekalogika_analytics')|trans %}
         {% set icon = block('icon_fields') %}
+        {% set help = t('The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'rows' %}
         {% set items = query.rowsWithoutSubitems %}
         {% set description = t('Rows', domain = 'rekalogika_analytics')|trans %}
         {% set icon = block('icon_rows') %}
+        {% set help = t('Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'columns' %}
         {% set items = query.columnsWithoutSubitems %}
         {% set description = t('Columns', domain = 'rekalogika_analytics')|trans %}
         {% set icon = block('icon_columns') %}
+        {% set help = t('Drag dimensions here to organize data into columns. Each unique value will create a separate column.', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'values' %}
         {% set items = query.valuesWithoutSubitems %}
         {% set description = t('Values', domain = 'rekalogika_analytics')|trans %}
         {% set icon = block('icon_values') %}
+        {% set help = t('Drag measures here to display them in the pivot table.', domain = 'rekalogika_analytics')|trans %}
     {% elseif type == 'filters' %}
         {% set items = query.filtersWithoutSubitems %}
         {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
         {% set icon = block('icon_filters') %}
+        {% set help = t('Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
     <div class="card pb-1 mb-3 mb-md-0">
         <h6 class="card-header"
             style="display: grid;
-                   grid-template-columns: auto 1fr;
+                   grid-template-columns: auto 1fr auto;
                    align-items: center;
                    grid-gap: 0.3em">
             {{ icon|raw }}
             <span>{{ description }}</span>
+            <span data-controller="rekalogika--analytics-bundle--help"
+                  data-help="{{ help }}">{{ block("icon_help") }}</span>
         </h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
@@ -121,17 +128,19 @@
 
     {%- set help -%}
         {%- if item.type == 'dimension' -%}
-            {{ t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+            {{ t('{field} is a dimension, and can be placed in the Rows, Columns, or Filters', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans }}
         {%- elseif item.type == 'measure' -%}
-            {{ t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans})|trans }}
+            {{ t('{field} is a measure, and can be placed in the Values', domain = 'rekalogika_analytics', parameters = {'{field}': item.label|trans}) |trans }}
         {%- elseif item.type == 'values' -%}
-            {{ t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics')|trans }}
+            {{ t('The value dimension, must be placed in the Rows or Columns', domain = 'rekalogika_analytics') |trans }}
         {%- endif -%}
     {%- endset -%}
 
     <li data-type="{{ item.type }}"
         data-value="{{ item.key }}"
-        title="{{ help }}"
+        data-controller="rekalogika--analytics-bundle--help"
+        data-help="{{ help }}"
+        data-help-delay="1000"
         class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
         <div class="row align-items-center">
@@ -140,7 +149,7 @@
                         grid-template-columns: auto 1fr;
                         align-items: center;
                         grid-gap: 0.3em">
-                <span class="text-body-tertiary">{{ block("burger") }}</span>
+                <span class="text-body-tertiary">{{ block("icon_burger") }}</span>
                 <span>{{ item.label|trans }}</span>
             </div>
             {% if item.choices %}
@@ -270,7 +279,7 @@
     </svg>
 {% endblock %}
 
-{% block burger %}
+{% block icon_burger %}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -285,5 +294,23 @@
         <path d="M4 6l16 0" />
         <path d="M4 12l16 0" />
         <path d="M4 18l16 0" />
+    </svg>
+{% endblock %}
+
+{% block icon_help %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="icon icon-tabler icons-tabler-outline icon-tabler-help">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+        <path d="M12 17l0 .01" />
+        <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" />
     </svg>
 {% endblock %}

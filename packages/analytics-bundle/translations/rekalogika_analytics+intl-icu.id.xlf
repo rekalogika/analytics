@@ -262,7 +262,37 @@
     <unit id="QgOGcqa" name="{field} is a measure, and can be placed in the Values">
       <segment>
         <source>{field} is a measure, and can be placed in the Values</source>
-        <target>{field} adalah ukuran, dan dapat diletakkan di Nilai</target>
+        <target>{field} adalah pengukuran, dan dapat diletakkan di Nilai</target>
+      </segment>
+    </unit>
+    <unit id="bNjSBpY">
+      <segment>
+        <source>The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.</source>
+        <target>Properti yang tersedia, yang tak digunakan dalam tabel pivot. Geser properti ke kotak lainnya untuk menggunakannya.</target>
+      </segment>
+    </unit>
+    <unit id="hLvdhXu">
+      <segment>
+        <source>Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.</source>
+        <target>Geser dimensi ke sini untuk menampilkannya sebagai baris di tabel pivot. Setiap nilai akan ditampilkan sebagai satu baris.</target>
+      </segment>
+    </unit>
+    <unit id="GeT5L7O">
+      <segment>
+        <source>Drag dimensions here to organize data into columns. Each unique value will create a separate column.</source>
+        <target>Geser dimensi ke sini untuk menampilkannya sebagai kolom. Setiap nilai unik akan menjadi sebuah kolom.</target>
+      </segment>
+    </unit>
+    <unit id="EP9BjPA" name="Drag measures here to display them in the pivot table.">
+      <segment>
+        <source>Drag measures here to display them in the pivot table.</source>
+        <target>Geser pengukuran ke sini untuk menampilkannya di tabel pivot.</target>
+      </segment>
+    </unit>
+    <unit id="kdd10eZ">
+      <segment>
+        <source>Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.</source>
+        <target>Geser dimensi ke sini untuk melakukan penyaringan terhadap seluruh tabel pivot. Pilih nilai tertentu untuk mempersempit data anda.</target>
       </segment>
     </unit>
   </file>

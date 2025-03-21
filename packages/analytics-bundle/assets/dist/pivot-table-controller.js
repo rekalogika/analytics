@@ -43,13 +43,14 @@ var _default = /*#__PURE__*/function (_Controller) {
       writable: true,
       value: void 0
     });
+    _this.changed = false;
     return _this;
   }
   _inheritsLoose(_default, _Controller);
   var _proto = _default.prototype;
   _proto.connect = function connect() {
     var _this2 = this;
-    this.filterChanged = false;
+    this.changed = false;
     _classPrivateFieldLooseBase(this, _group)[_group] = 'g' + Math.random().toString(36);
     this.itemsElement = this.element.querySelector('.available');
     this.rowsElement = this.element.querySelector('.rows');
@@ -89,7 +90,7 @@ var _default = /*#__PURE__*/function (_Controller) {
     this.element.querySelectorAll('select').forEach(function (select) {
       select.addEventListener('change', function () {
         if (select.closest('.filters') || select.closest('.rows') || select.closest('.columns')) {
-          _this2.filterChanged = true;
+          _this2.changed = true;
           _classPrivateFieldLooseBase(_this2, _submit)[_submit]();
         }
       });
@@ -101,8 +102,8 @@ var _default = /*#__PURE__*/function (_Controller) {
     var defaultActions = event.detail.render;
     event.detail.render = function (streamElement) {
       if (streamElement.getAttribute('target') === '__filters') {
-        if (_this3.filterChanged === true) {
-          _this3.filterChanged = false;
+        if (_this3.changed === true) {
+          _this3.changed = false;
           defaultActions(streamElement);
         }
       } else {
@@ -174,8 +175,11 @@ var _default = /*#__PURE__*/function (_Controller) {
 function _onEnd2(event) {
   var sourceType = event.from.dataset.type;
   var targetType = event.to.dataset.type;
+  if (targetType === 'available' && sourceType === 'available') {
+    return;
+  }
   if (targetType === 'filters' || sourceType === 'filters' || targetType === 'rows' || sourceType === 'rows' || targetType === 'columns' || sourceType === 'columns') {
-    this.filterChanged = true;
+    this.changed = true;
   }
   _classPrivateFieldLooseBase(this, _submit)[_submit]();
 }

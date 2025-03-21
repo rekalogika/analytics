@@ -9,9 +9,10 @@ export default class extends Controller {
 
     #animation = 150
     #group
+    changed = false
 
     connect() {
-        this.filterChanged = false
+        this.changed = false
         this.#group = 'g' + Math.random().toString(36)
 
         this.itemsElement = this.element.querySelector('.available')
@@ -62,7 +63,7 @@ export default class extends Controller {
                     || select.closest('.rows')
                     || select.closest('.columns')
                 ) {
-                    this.filterChanged = true
+                    this.changed = true
                     this.#submit()
                 }
             })
@@ -76,8 +77,8 @@ export default class extends Controller {
 
         event.detail.render = (streamElement) => {
             if (streamElement.getAttribute('target') === '__filters') {
-                if (this.filterChanged === true) {
-                    this.filterChanged = false
+                if (this.changed === true) {
+                    this.changed = false
                     defaultActions(streamElement)
                 }
             } else {
@@ -161,12 +162,16 @@ export default class extends Controller {
         let sourceType = event.from.dataset.type
         let targetType = event.to.dataset.type
 
+        if (targetType === 'available' && sourceType === 'available') {
+            return
+        }
+
         if (
             targetType === 'filters' || sourceType === 'filters'
             || targetType === 'rows' || sourceType === 'rows'
             || targetType === 'columns' || sourceType === 'columns'
         ) {
-            this.filterChanged = true
+            this.changed = true
         }
 
         this.#submit()
