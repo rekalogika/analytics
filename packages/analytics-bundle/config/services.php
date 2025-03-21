@@ -23,10 +23,13 @@ use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolv
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainHtmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainNumberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultHtmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierExtension;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
@@ -336,6 +339,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$chartBuilder' => service(ChartBuilderInterface::class),
             '$stringifier' => service(Stringifier::class),
             '$configuration' => service(ChartConfiguration::class),
+            '$numberifier' => service(Numberifier::class),
         ])
     ;
 
@@ -365,18 +369,41 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(Stringifier::class)
-        ->class(DefaultStringifier::class)
+        ->class(ChainStringifier::class)
         ->args([
             '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
         ])
     ;
 
+    #
+    # htmlifier
+    #
+
     $services
         ->set(Htmlifier::class)
-        ->class(DefaultHtmlifier::class)
+        ->class(ChainHtmlifier::class)
         ->args([
             '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
             '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
+        ])
+    ;
+
+    #
+    # numberifier
+    #
+
+    $services
+        ->set(Numberifier::class)
+        ->class(ChainNumberifier::class)
+        ->args([
+            '$backendNumberifiers' => tagged_iterator('rekalogika.analytics.backend_numberifier'),
+        ])
+    ;
+
+    $services
+        ->set(DefaultBackendNumberifier::class)
+        ->tag('rekalogika.analytics.backend_numberifier', [
+            'priority' => -1000,
         ])
     ;
 

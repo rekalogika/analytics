@@ -33,14 +33,6 @@ interface Measure extends Property
     public function getRawValue(): mixed;
 
     /**
-     * The value in numeric format. Unlike getValue and getRawValue, this method
-     * guarantees that the value is in numeric format. This is useful if the
-     * consumer (charting libraries, etc) only accepts numeric values, and
-     * cannot work with higher level abstractions of the value.
-     */
-    public function getNumericValue(): int|float;
-
-    /**
      * The value's unit of measurement. This is useful for formatting, or used
      * by charting libraries to determine if different measures can be plotted
      * on the same axis.

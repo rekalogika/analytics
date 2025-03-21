@@ -24,7 +24,6 @@ final readonly class DefaultMeasure implements Measure
         private string $key,
         private mixed $value,
         private mixed $rawValue,
-        private int|float $numericValue,
         private ?Unit $unit,
     ) {}
 
@@ -50,12 +49,6 @@ final readonly class DefaultMeasure implements Measure
     public function getRawValue(): mixed
     {
         return $this->rawValue;
-    }
-
-    #[\Override]
-    public function getNumericValue(): int|float
-    {
-        return $this->numericValue;
     }
 
     #[\Override]
