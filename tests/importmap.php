@@ -79,4 +79,8 @@ return [
         'version' => '6.3.7',
         'type' => 'css',
     ],
+    'tippy.js/animations/scale-extreme.css' => [
+        'version' => '6.3.7',
+        'type' => 'css',
+    ],
 ];
