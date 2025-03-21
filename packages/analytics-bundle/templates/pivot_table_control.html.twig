@@ -96,13 +96,14 @@
 
     <div class="card pb-1 mb-3 mb-md-0">
         <h6 class="card-header"
-            title="{{ help }}"
             style="display: grid;
-                   grid-template-columns: auto 1fr;
+                   grid-template-columns: auto 1fr auto;
                    align-items: center;
                    grid-gap: 0.3em">
             {{ icon|raw }}
             <span>{{ description }}</span>
+            <span data-controller="rekalogika--analytics-bundle--help"
+                  data-help="{{ help }}">{{ block("icon_help") }}</span>
         </h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
@@ -137,7 +138,9 @@
 
     <li data-type="{{ item.type }}"
         data-value="{{ item.key }}"
-        title="{{ help }}"
+        data-controller="rekalogika--analytics-bundle--help"
+        data-help="{{ help }}"
+        data-help-delay="1000"
         class="list-group-item {{ color_class }} rounded-3 ms-1 me-1 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
         <div class="row align-items-center">

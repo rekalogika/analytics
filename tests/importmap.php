@@ -67,6 +67,16 @@ return [
         'type' => 'css',
     ],
     'flatpickr/dist/l10n/id.js' => [
-        'version' => '4.6.13'
+        'version' => '4.6.13',
+    ],
+    'tippy.js' => [
+        'version' => '6.3.7',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'tippy.js/dist/tippy.css' => [
+        'version' => '6.3.7',
+        'type' => 'css',
     ],
 ];
