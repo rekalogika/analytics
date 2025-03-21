@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\NumericValueResolver;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -125,12 +124,6 @@ final readonly class QueryResultToRowTransformer
 
             /** @psalm-suppress MixedAssignment */
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
-            $numericValueResolver = $this->getNumericValueResolver($key);
-
-            $numericValue = $numericValueResolver->resolveNumericValue(
-                value: $value,
-                rawValue: $rawValue,
-            );
 
             $unit = $this->metadata
                 ->getMeasureMetadata($key)
@@ -150,7 +143,6 @@ final readonly class QueryResultToRowTransformer
                 key: $key,
                 value: $value,
                 rawValue: $rawValue,
-                numericValue: $numericValue,
                 unit: $unit,
             );
 
@@ -458,12 +450,5 @@ final readonly class QueryResultToRowTransformer
         return $this->metadata
             ->getFullyQualifiedDimension($dimension)
             ->getNullLabel();
-    }
-
-    private function getNumericValueResolver(string $measure): NumericValueResolver
-    {
-        return $this->metadata
-            ->getMeasureMetadata($measure)
-            ->getNumericValueResolver();
     }
 }

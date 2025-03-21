@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 
-final readonly class DefaultHtmlifier implements Htmlifier
+final readonly class ChainHtmlifier implements Htmlifier
 {
     /**
      * @param iterable<BackendHtmlifier> $backendHtmlifiers

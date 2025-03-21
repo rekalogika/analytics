@@ -13,29 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 
-final readonly class DefaultStringifier implements Stringifier
+final readonly class ChainNumberifier implements Numberifier
 {
     /**
-     * @param iterable<BackendStringifier> $backendStringifiers
+     * @param iterable<BackendNumberifier> $backendNumberifiers
      */
     public function __construct(
-        private iterable $backendStringifiers,
+        private iterable $backendNumberifiers,
     ) {}
 
     #[\Override]
-    public function toString(mixed $input): string
+    public function toNumber(mixed $input): int|float
     {
-        foreach ($this->backendStringifiers as $stringifier) {
-            $result = $stringifier->toString($input);
+        foreach ($this->backendNumberifiers as $numberifier) {
+            $result = $numberifier->toNumber($input);
 
             if ($result !== null) {
                 return $result;
             }
         }
 
-        return get_debug_type($input);
+        return 0;
     }
 }

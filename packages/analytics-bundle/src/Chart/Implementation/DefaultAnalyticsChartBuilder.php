@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Chart\Implementation;
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\ChartType;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Contracts\Measures;
 use Rekalogika\Analytics\Contracts\Result;
@@ -30,6 +31,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         private ChartBuilderInterface $chartBuilder,
         private Stringifier $stringifier,
         private ChartConfiguration $configuration,
+        private Numberifier $numberifier,
     ) {}
 
     #[\Override]
@@ -161,7 +163,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             foreach ($selectedMeasures as $key) {
                 $measure = $measures->get($key);
 
-                $dataSets[$key]['data'][] = $measure->getNumericValue();
+                $dataSets[$key]['data'][] = $this->numberifier->toNumber($measure->getValue());
             }
         }
 
@@ -306,7 +308,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     throw new UnsupportedData('Measures not found');
                 }
 
-                $dataSets[$signature]['data'][] = $measure->getNumericValue();
+                $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measure->getValue());
 
                 if ($yTitle === null) {
                     $unit = $measure->getUnit();

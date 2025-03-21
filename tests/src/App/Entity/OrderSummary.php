@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\NumericValueResolver\DivideBy;
 use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\ValueResolver\CustomDQLValueResolver;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
@@ -147,7 +146,6 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Measure(
         function: new Sum('item.price'),
         label: new TranslatableMessage('Price'),
-        numericValueResolver: new DivideBy(100),
         unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
     private ?int $price = null;

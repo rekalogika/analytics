@@ -11,14 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\Bundle\Formatter;
 
-/**
- * Determines the numeric value out of the value and raw value of a measure.
- *
- * @deprecated
- */
-interface NumericValueResolver
+interface Numberifier
 {
-    public function resolveNumericValue(mixed $value, mixed $rawValue): int|float;
+    public function toNumber(mixed $input): int|float;
 }
