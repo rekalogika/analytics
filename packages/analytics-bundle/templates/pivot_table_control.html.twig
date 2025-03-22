@@ -137,29 +137,30 @@
         data-help-delay="1000"
         class="list-group-item list-group-item-{{ color_class }} rounded-3 ms-2 me-2 mt-1 mb-0 py-1 px-2"
         style="cursor: grab">
-        <div class="row align-items-center">
-            <div class="col-auto me-auto"
-                 style="display: grid;
-                        grid-template-columns: auto 1fr;
-                        align-items: center;
-                        grid-gap: 0.3em">
-                <span class="text-{{ color_class }}">{{ icon|raw }}</span>
-                <span>{{ item.label|trans }}</span>
+        <div style="display: grid;
+                    grid-template-columns: auto 1fr;
+                    align-items: center;
+                    grid-gap: 0.3em">
+            <span class="text-{{ color_class }}">{{ icon|raw }}</span>
+            <div class="row align-items-center g-0">
+                <div class="col-auto me-auto">{{ item.label|trans }}</div>
+                {% if item.choices %}
+                    <div class="col-auto">{{ block("item_choices") }}</div>
+                {% endif %}
             </div>
-            {% if item.choices %}
-                <div class="col-auto ">
-                    <select class="form-select form-select-sm py-0">
-                        {% set selected = query.getSelectedSubItem(item.key) %}
-                        {% for key, choice in item.choices %}
-                            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% endif %}
         </div>
     </li>
 {% endblock item %}
+
+{% block item_choices %}
+    <select class="form-select form-select-sm py-0">
+        {% set selected = query.getSelectedSubItem(item.key) %}
+        {% for key, choice in item.choices %}
+            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
+            </option>
+        {% endfor %}
+    </select>
+{% endblock %}
 
 {% block filters %}
     {% if query.filterExpressions|length > 0 %}
