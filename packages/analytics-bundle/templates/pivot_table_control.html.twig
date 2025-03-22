@@ -40,28 +40,20 @@
             </div>
         </div>
 
-        <div class="col-md-8">
-            <div class="row g-md-3 gx-3">
-                <div class="col-md-6">
-                    {% set type = "rows" %}
-                    {{ block("item_block") }}
-                </div>
+        <div class="col-md-4">
+            {% set type = "rows" %}
+            {{ block("item_block") }}
 
-                <div class="col-md-6">
-                    {% set type = "columns" %}
-                    {{ block("item_block") }}
-                </div>
+            {% set type = "columns" %}
+            {{ block("item_block") }}
+        </div>
 
-                <div class="col-md-6">
-                    {% set type = "values" %}
-                    {{ block("item_block") }}
-                </div>
-
-                <div class="col-md-6">
-                    {% set type = "filters" %}
-                    {{ block("item_block") }}
-                </div>
-            </div>
+        <div class="col-md-4">
+            {% set type = "values" %}
+            {{ block("item_block") }}
+            
+            {% set type = "filters" %}
+            {{ block("item_block") }}
         </div>
     </div>
 {% endblock %}
@@ -94,7 +86,7 @@
         {% set help = t('Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.', domain = 'rekalogika_analytics')|trans %}
     {% endif %}
 
-    <div class="card pb-1 mb-3 mb-md-0">
+    <div class="card pb-1 mb-3">
         <h6 class="card-header"
             data-controller="rekalogika--analytics-bundle--help"
             data-help="{{ help }}"
