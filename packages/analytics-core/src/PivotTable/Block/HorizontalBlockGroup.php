@@ -33,14 +33,16 @@ final class HorizontalBlockGroup extends BlockGroup
 
         $firstChild = $children[0];
 
-        $nameCell = new HeaderCell(
-            type: ContentType::Legend,
-            key: $firstChild->getKey(),
-            content: $firstChild->getLegend(),
-            treeNode: $firstChild,
-        );
+        if (!$this->getContext()->hasSuperfluousLegend($firstChild)) {
+            $nameCell = new HeaderCell(
+                type: ContentType::Legend,
+                key: $firstChild->getKey(),
+                content: $firstChild->getLegend(),
+                treeNode: $firstChild,
+            );
 
-        $rows = $nameCell->appendRowsBelow($rows);
+            $rows = $nameCell->appendRowsBelow($rows);
+        }
 
         return $rows;
     }
