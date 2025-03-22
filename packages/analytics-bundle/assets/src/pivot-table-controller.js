@@ -72,6 +72,16 @@ export default class extends Controller {
         document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this))
     }
 
+    disconnect() {
+        this.sortableItems.destroy()
+        this.sortableRows.destroy()
+        this.sortableColumns.destroy()
+        this.sortableValues.destroy()
+        this.sortableFilters.destroy()
+
+        document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this))
+    }
+
     beforeStreamRender(event) {
         const defaultActions = event.detail.render
 
@@ -85,17 +95,6 @@ export default class extends Controller {
                 defaultActions(streamElement)
             }
         }
-
-    }
-
-    disconnect() {
-        this.sortableItems.destroy()
-        this.sortableRows.destroy()
-        this.sortableColumns.destroy()
-        this.sortableValues.destroy()
-        this.sortableFilters.destroy()
-
-        document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this))
     }
 
     getData() {

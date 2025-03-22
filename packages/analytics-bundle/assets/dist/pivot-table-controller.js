@@ -97,6 +97,14 @@ var _default = /*#__PURE__*/function (_Controller) {
     });
     document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this));
   };
+  _proto.disconnect = function disconnect() {
+    this.sortableItems.destroy();
+    this.sortableRows.destroy();
+    this.sortableColumns.destroy();
+    this.sortableValues.destroy();
+    this.sortableFilters.destroy();
+    document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this));
+  };
   _proto.beforeStreamRender = function beforeStreamRender(event) {
     var _this3 = this;
     var defaultActions = event.detail.render;
@@ -110,14 +118,6 @@ var _default = /*#__PURE__*/function (_Controller) {
         defaultActions(streamElement);
       }
     };
-  };
-  _proto.disconnect = function disconnect() {
-    this.sortableItems.destroy();
-    this.sortableRows.destroy();
-    this.sortableColumns.destroy();
-    this.sortableValues.destroy();
-    this.sortableFilters.destroy();
-    document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this));
   };
   _proto.getData = function getData() {
     var data = {};
