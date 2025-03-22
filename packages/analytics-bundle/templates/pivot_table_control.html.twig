@@ -30,7 +30,7 @@
 {% endblock turbo_stream %}
 
 {% block fields %}
-    <div class="row g-md-3 gx-3">
+    <div class="row g-md-3 gx-3 user-select-none">
         <div class="col-md-4">
             <div class="row g-3 gx-3">
                 <div class="col-12">
@@ -96,14 +96,14 @@
 
     <div class="card pb-1 mb-3 mb-md-0">
         <h6 class="card-header"
+            data-controller="rekalogika--analytics-bundle--help"
+            data-help="{{ help }}"
             style="display: grid;
                    grid-template-columns: auto 1fr auto auto;
                    align-items: center;
                    grid-gap: 0.3em">
             {{ icon|raw }}
-            <span style="cursor: help"
-                  data-controller="rekalogika--analytics-bundle--help"
-                  data-help="{{ help }}">{{ description }}</span>
+            <span style="cursor: help">{{ description }}</span>
         </h6>
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
