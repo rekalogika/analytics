@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Block;
 
-use Rekalogika\Analytics\PivotTable\LeafNode;
 use Rekalogika\Analytics\PivotTable\Table\ContentType;
 use Rekalogika\Analytics\PivotTable\Table\HeaderCell;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
@@ -34,19 +33,14 @@ final class HorizontalBlockGroup extends BlockGroup
 
         $firstChild = $children[0];
 
-        if (
-            $firstChild->getKey() !== '@values'
-            || !$firstChild instanceof LeafNode
-        ) {
-            $nameCell = new HeaderCell(
-                type: ContentType::Legend,
-                key: $firstChild->getKey(),
-                content: $firstChild->getLegend(),
-                treeNode: $firstChild,
-            );
+        $nameCell = new HeaderCell(
+            type: ContentType::Legend,
+            key: $firstChild->getKey(),
+            content: $firstChild->getLegend(),
+            treeNode: $firstChild,
+        );
 
-            $rows = $nameCell->appendRowsBelow($rows);
-        }
+        $rows = $nameCell->appendRowsBelow($rows);
 
         return $rows;
     }
