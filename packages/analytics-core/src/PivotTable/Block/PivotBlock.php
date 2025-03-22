@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\PivotTable\Block;
 
 use Rekalogika\Analytics\PivotTable\Table\ContentType;
 use Rekalogika\Analytics\PivotTable\Table\DataCell;
+use Rekalogika\Analytics\PivotTable\Table\HeaderCell;
 use Rekalogika\Analytics\PivotTable\Table\Rows;
 
 final class PivotBlock extends NodeBlock
@@ -22,12 +23,23 @@ final class PivotBlock extends NodeBlock
     #[\Override]
     protected function createHeaderRows(): Rows
     {
-        $valueCell = new DataCell(
-            type: ContentType::Item,
-            key: $this->getBranchNode()->getKey(),
-            content: $this->getBranchNode()->getItem(),
-            treeNode: $this->getBranchNode(),
-        );
+        if (
+            $this->getContext()->hasSuperfluousLegend($this->getBranchNode())
+        ) {
+            $valueCell = new HeaderCell(
+                type: ContentType::Item,
+                key: $this->getBranchNode()->getKey(),
+                content: $this->getBranchNode()->getItem(),
+                treeNode: $this->getBranchNode(),
+            );
+        } else {
+            $valueCell = new DataCell(
+                type: ContentType::Item,
+                key: $this->getBranchNode()->getKey(),
+                content: $this->getBranchNode()->getItem(),
+                treeNode: $this->getBranchNode(),
+            );
+        }
 
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
         $rows = $blockGroup->getHeaderRows();

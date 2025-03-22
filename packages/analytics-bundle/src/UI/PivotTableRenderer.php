@@ -44,7 +44,7 @@ final readonly class PivotTableRenderer
     ): string {
         $treeResult = $result->getTree();
         $pivotTable = new PivotTableAdapter($treeResult);
-        $block = Block::new($pivotTable, $pivotedDimensions);
+        $block = Block::new($pivotTable, $pivotedDimensions, ['@values']);
         $table = $block->generateTable();
 
         return $this->renderBlock('table', [

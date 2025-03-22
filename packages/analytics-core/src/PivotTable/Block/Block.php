@@ -67,16 +67,19 @@ abstract class Block
 
     /**
      * @param list<string> $pivotedNodes
+     * @param list<string> $superfluousLegends
      */
     final public static function new(
         TreeNode $treeNode,
         array $pivotedNodes = [],
+        array $superfluousLegends = [],
     ): Block {
         $distinct = DistinctNodeListResolver::getDistinctNodes($treeNode);
 
         $context = new BlockContext(
             distinct: $distinct,
             pivotedDimensions: $pivotedNodes,
+            superfluousLegends: $superfluousLegends,
         );
 
         return new RootBlock($treeNode, $context);
