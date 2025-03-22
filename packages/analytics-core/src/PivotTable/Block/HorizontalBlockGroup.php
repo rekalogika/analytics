@@ -33,7 +33,9 @@ final class HorizontalBlockGroup extends BlockGroup
 
         $firstChild = $children[0];
 
-        if (!$this->getContext()->hasSuperfluousLegend($firstChild)) {
+        if (
+            !$this->getContext()->hasSuperfluousLegend($firstChild)
+        ) {
             $nameCell = new HeaderCell(
                 type: ContentType::Legend,
                 key: $firstChild->getKey(),
