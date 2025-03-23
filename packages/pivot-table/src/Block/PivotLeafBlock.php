@@ -17,7 +17,6 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Table\ContentType;
 
 final class PivotLeafBlock extends NodeBlock
 {
@@ -28,17 +27,13 @@ final class PivotLeafBlock extends NodeBlock
             $this->getContext()->hasSuperfluousLegend($this->getLeafNode())
         ) {
             $cell = new DefaultHeaderCell(
-                type: ContentType::Item,
                 key: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
-                treeNode: $this->getLeafNode(),
             );
         } else {
             $cell = new DefaultDataCell(
-                type: ContentType::Item,
                 key: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
-                treeNode: $this->getLeafNode(),
             );
         }
 
@@ -51,10 +46,8 @@ final class PivotLeafBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
-            type: ContentType::Value,
             key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
-            treeNode: $this->getLeafNode(),
         );
 
         $row = new DefaultRow([$cell]);

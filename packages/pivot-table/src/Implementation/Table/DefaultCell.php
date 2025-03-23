@@ -13,25 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Table\Cell;
-use Rekalogika\PivotTable\Table\ContentType;
 
 abstract readonly class DefaultCell implements Cell
 {
     final public function __construct(
-        private ContentType $type,
         private string $key,
         private mixed $content,
-        private TreeNode $treeNode,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
     ) {}
-
-    final public function getType(): ContentType
-    {
-        return $this->type;
-    }
 
     final public function getKey(): string
     {
@@ -44,11 +35,6 @@ abstract readonly class DefaultCell implements Cell
         return $this->content;
     }
 
-    final public function getTreeNode(): TreeNode
-    {
-        return $this->treeNode;
-    }
-
     #[\Override]
     final public function getColumnSpan(): int
     {
@@ -58,10 +44,8 @@ abstract readonly class DefaultCell implements Cell
     final public function withColumnSpan(int $columnSpan): static
     {
         return new static(
-            type: $this->type,
             key: $this->key,
             content: $this->content,
-            treeNode: $this->treeNode,
             columnSpan: $columnSpan,
             rowSpan: $this->rowSpan,
         );
@@ -76,10 +60,8 @@ abstract readonly class DefaultCell implements Cell
     final public function withRowSpan(int $rowSpan): static
     {
         return new static(
-            type: $this->type,
             key: $this->key,
             content: $this->content,
-            treeNode: $this->treeNode,
             columnSpan: $this->columnSpan,
             rowSpan: $rowSpan,
         );

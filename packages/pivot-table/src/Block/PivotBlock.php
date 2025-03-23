@@ -16,7 +16,6 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Table\ContentType;
 
 final class PivotBlock extends NodeBlock
 {
@@ -27,17 +26,13 @@ final class PivotBlock extends NodeBlock
             $this->getContext()->hasSuperfluousLegend($this->getBranchNode())
         ) {
             $valueCell = new DefaultHeaderCell(
-                type: ContentType::Item,
                 key: $this->getBranchNode()->getKey(),
                 content: $this->getBranchNode()->getItem(),
-                treeNode: $this->getBranchNode(),
             );
         } else {
             $valueCell = new DefaultDataCell(
-                type: ContentType::Item,
                 key: $this->getBranchNode()->getKey(),
                 content: $this->getBranchNode()->getItem(),
-                treeNode: $this->getBranchNode(),
             );
         }
 
