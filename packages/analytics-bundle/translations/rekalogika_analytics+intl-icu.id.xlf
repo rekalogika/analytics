@@ -70,7 +70,7 @@
     <unit id="OkCD0xj" name="Values">
       <segment>
         <source>Values</source>
-        <target>Nilai</target>
+        <target>Ukuran</target>
       </segment>
     </unit>
     <unit id="HWekgRg" name="True">
@@ -256,13 +256,13 @@
     <unit id="uKB7tEL" name="The value dimension, must be placed in the Rows or Columns">
       <segment>
         <source>The value dimension, must be placed in the Rows or Columns</source>
-        <target>Dimensi nilai, harus diletakkan di Baris atau Kolom</target>
+        <target>Dimensi ukuran, harus diletakkan di Baris atau Kolom</target>
       </segment>
     </unit>
     <unit id="QgOGcqa" name="{field} is a measure, and can be placed in the Values">
       <segment>
         <source>{field} is a measure, and can be placed in the Values</source>
-        <target>{field} adalah pengukuran, dan dapat diletakkan di Nilai</target>
+        <target>{field} adalah pengukuran, dan dapat diletakkan di Ukuran</target>
       </segment>
     </unit>
     <unit id="bNjSBpY">
@@ -274,13 +274,13 @@
     <unit id="hLvdhXu">
       <segment>
         <source>Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.</source>
-        <target>Geser dimensi ke sini untuk menampilkannya sebagai baris di tabel pivot. Setiap nilai akan ditampilkan sebagai satu baris.</target>
+        <target>Geser dimensi ke sini untuk menampilkannya sebagai baris di tabel pivot. Setiap dimensi akan ditampilkan sebagai satu baris.</target>
       </segment>
     </unit>
     <unit id="GeT5L7O">
       <segment>
         <source>Drag dimensions here to organize data into columns. Each unique value will create a separate column.</source>
-        <target>Geser dimensi ke sini untuk menampilkannya sebagai kolom. Setiap nilai unik akan menjadi sebuah kolom.</target>
+        <target>Geser dimensi ke sini untuk menampilkannya sebagai kolom. Setiap dimensi unik akan menjadi sebuah kolom.</target>
       </segment>
     </unit>
     <unit id="EP9BjPA" name="Drag measures here to display them in the pivot table.">
