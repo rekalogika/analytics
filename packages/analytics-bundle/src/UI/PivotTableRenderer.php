@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\UIPivotTableAdapter;
 use Rekalogika\Analytics\Contracts\Result;
-use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Twig\Environment;
 
@@ -43,7 +43,7 @@ final readonly class PivotTableRenderer
         array $pivotedDimensions = [],
     ): string {
         $treeResult = $result->getTree();
-        $pivotTable = new PivotTableAdapter($treeResult);
+        $pivotTable = new UIPivotTableAdapter($treeResult);
 
         $table = PivotTableTransformer::transformTreeNodeToPivotTable(
             treeNode: $pivotTable,

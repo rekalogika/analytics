@@ -38,6 +38,8 @@ use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperNumberifier;
+use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperStringifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
@@ -453,5 +455,23 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.specific_filter_factory')
+    ;
+
+    //
+    // UI pivot table adapter
+    //
+
+    $services
+        ->set(NodeWrapperNumberifier::class)
+        ->tag('rekalogika.analytics.backend_numberifier', [
+            'priority' => 500,
+        ])
+    ;
+
+    $services
+        ->set(NodeWrapperStringifier::class)
+        ->tag('rekalogika.analytics.backend_stringifier', [
+            'priority' => 500,
+        ])
     ;
 };
