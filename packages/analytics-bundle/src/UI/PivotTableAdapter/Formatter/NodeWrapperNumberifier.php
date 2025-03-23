@@ -18,6 +18,9 @@ use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
 
+/**
+ * @deprecated
+ */
 final readonly class NodeWrapperNumberifier implements BackendNumberifier, NumberifierAware
 {
     public function __construct(

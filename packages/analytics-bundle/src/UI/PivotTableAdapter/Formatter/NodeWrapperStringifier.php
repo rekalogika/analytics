@@ -18,6 +18,9 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\StringifierAware;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
 
+/**
+ * @deprecated
+ */
 final readonly class NodeWrapperStringifier implements BackendStringifier, StringifierAware
 {
     public function __construct(
