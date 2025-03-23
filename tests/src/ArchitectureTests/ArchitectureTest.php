@@ -19,6 +19,7 @@ use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 use Psr\Container\ContainerInterface;
+use Rekalogika\PivotTable\PivotTableTransformer;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -52,7 +53,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\Uid'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
-                Selector::inNamespace('Rekalogika\PivotTable'),
+                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -171,7 +172,7 @@ final class ArchitectureTest
                 Selector::classname(Chart::class),
 
                 // pivot table
-                Selector::inNamespace('Rekalogika\PivotTable'),
+                Selector::classname(PivotTableTransformer::class),
             );
     }
 

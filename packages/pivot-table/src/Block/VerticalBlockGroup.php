@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Table\Rows;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
         $firstChildren = $this->getChildren()[0] ?? null;
 
@@ -32,9 +32,9 @@ final class VerticalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        $dataRows = new Rows([]);
+        $dataRows = new DefaultRows([]);
 
         foreach ($this->getChildren() as $childNode) {
             $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);

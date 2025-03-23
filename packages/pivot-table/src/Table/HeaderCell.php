@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Table;
 
-final readonly class HeaderCell extends Cell {}
+/**
+ * Represents a HTML header cell (<th>)
+ */
+interface HeaderCell extends Cell {}

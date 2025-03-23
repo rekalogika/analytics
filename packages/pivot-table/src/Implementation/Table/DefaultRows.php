@@ -11,12 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Table;
+namespace Rekalogika\PivotTable\Implementation\Table;
+
+use Rekalogika\PivotTable\Table\Row;
+use Rekalogika\PivotTable\Table\RowGroup;
 
 /**
  * @implements \IteratorAggregate<Row>
  */
-final class Rows implements \IteratorAggregate, \Countable
+final class DefaultRows implements \IteratorAggregate, \Countable, RowGroup
 {
     /**
      * @var int<0,max>|null
@@ -24,7 +27,7 @@ final class Rows implements \IteratorAggregate, \Countable
     private ?int $width = null;
 
     /**
-     * @param list<Row> $rows
+     * @param list<DefaultRow> $rows
      */
     public function __construct(private readonly array $rows = []) {}
 
@@ -34,6 +37,9 @@ final class Rows implements \IteratorAggregate, \Countable
         return \count($this->rows);
     }
 
+    /**
+     * @return \Traversable<DefaultRow>
+     */
     #[\Override]
     public function getIterator(): \Traversable
     {
@@ -41,7 +47,7 @@ final class Rows implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return list<Row>
+     * @return list<DefaultRow>
      */
     public function toArray(): array
     {
@@ -71,22 +77,22 @@ final class Rows implements \IteratorAggregate, \Countable
         return \count($this->rows);
     }
 
-    public function getFirstRow(): Row
+    public function getFirstRow(): DefaultRow
     {
-        return $this->rows[0] ?? new Row([]);
+        return $this->rows[0] ?? new DefaultRow([]);
     }
 
-    public function getSecondToLastRows(): Rows
+    public function getSecondToLastRows(): DefaultRows
     {
         return new self(\array_slice($this->rows, 1));
     }
 
-    public function appendBelow(Rows $rows): Rows
+    public function appendBelow(DefaultRows $rows): DefaultRows
     {
         return new self([...$this->rows, ...$rows->toArray()]);
     }
 
-    public function appendRight(Rows $rows): Rows
+    public function appendRight(DefaultRows $rows): DefaultRows
     {
         $height = max($this->getHeight(), $rows->getHeight());
         $rowsToAdd = $rows->toArray();
@@ -94,8 +100,8 @@ final class Rows implements \IteratorAggregate, \Countable
         $newRows = [];
 
         for ($i = 0; $i < $height; $i++) {
-            $newRows[$i] = $this->rows[$i] ?? new Row([]);
-            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new Row([]));
+            $newRows[$i] = $this->rows[$i] ?? new DefaultRow([]);
+            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([]));
         }
 
         return new self(array_values($newRows));

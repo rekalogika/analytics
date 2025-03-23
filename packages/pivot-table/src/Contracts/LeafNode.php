@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable;
+namespace Rekalogika\PivotTable\Contracts;
 
 interface LeafNode extends TreeNode
 {

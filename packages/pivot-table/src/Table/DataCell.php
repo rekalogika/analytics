@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Table;
 
-final readonly class DataCell extends Cell {}
+/**
+ * Represents a HTML data cell (<td>)
+ */
+interface DataCell extends Cell {}

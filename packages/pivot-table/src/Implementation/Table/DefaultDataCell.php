@@ -11,14 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Table;
+namespace Rekalogika\PivotTable\Implementation\Table;
 
-/**
- * Represents a HTML table (<table>)
- *
- * @extends \Traversable<RowGroup>
- */
-interface Table extends \Traversable, \Countable, Tag
+use Rekalogika\PivotTable\Table\DataCell;
+
+final readonly class DefaultDataCell extends DefaultCell implements DataCell
 {
-    public function getRows(): RowGroup;
+    #[\Override]
+    public function getTag(): string
+    {
+        return 'td';
+    }
 }

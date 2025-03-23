@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Table\ContentType;
-use Rekalogika\PivotTable\Table\DataCell;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Rows;
 
 final class NormalLeafBlock extends NodeBlock
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
-        $cell = new HeaderCell(
+        $cell = new DefaultHeaderCell(
             type: ContentType::Legend,
             key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getLegend(),
@@ -32,30 +32,30 @@ final class NormalLeafBlock extends NodeBlock
             columnSpan: 2,
         );
 
-        $row = new Row([$cell]);
+        $row = new DefaultRow([$cell]);
 
-        return new Rows([$row]);
+        return new DefaultRows([$row]);
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        $name = new DataCell(
+        $name = new DefaultDataCell(
             type: ContentType::Item,
             key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getItem(),
             treeNode: $this->getLeafNode(),
         );
 
-        $value = new DataCell(
+        $value = new DefaultDataCell(
             type: ContentType::Value,
             key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
             treeNode: $this->getLeafNode(),
         );
 
-        $row = new Row([$name, $value]);
+        $row = new DefaultRow([$name, $value]);
 
-        return new Rows([$row]);
+        return new DefaultRows([$row]);
     }
 }

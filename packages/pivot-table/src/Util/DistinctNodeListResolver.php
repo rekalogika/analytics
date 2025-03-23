@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\PivotTable\BranchNode;
-use Rekalogika\PivotTable\LeafNode;
-use Rekalogika\PivotTable\Model\NullBranchNode;
-use Rekalogika\PivotTable\Model\NullLeafNode;
-use Rekalogika\PivotTable\TreeNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\NullLeafNode;
 
 final readonly class DistinctNodeListResolver
 {

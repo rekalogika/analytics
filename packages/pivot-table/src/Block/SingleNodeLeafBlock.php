@@ -13,28 +13,28 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Table\ContentType;
-use Rekalogika\PivotTable\Table\DataCell;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Rows;
 
 final class SingleNodeLeafBlock extends NodeBlock
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getLeafNode())
         ) {
-            $cell = new HeaderCell(
+            $cell = new DefaultHeaderCell(
                 type: ContentType::Item,
                 key: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
                 treeNode: $this->getLeafNode(),
             );
         } else {
-            $cell = new HeaderCell(
+            $cell = new DefaultHeaderCell(
                 type: ContentType::Item,
                 key: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
@@ -42,23 +42,23 @@ final class SingleNodeLeafBlock extends NodeBlock
             );
         }
 
-        $row = new Row([$cell]);
+        $row = new DefaultRow([$cell]);
 
-        return new Rows([$row]);
+        return new DefaultRows([$row]);
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        $cell = new DataCell(
+        $cell = new DefaultDataCell(
             type: ContentType::Value,
             key: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
             treeNode: $this->getLeafNode(),
         );
 
-        $row = new Row([$cell]);
+        $row = new DefaultRow([$cell]);
 
-        return new Rows([$row]);
+        return new DefaultRows([$row]);
     }
 }

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Table\Rows;
-use Rekalogika\PivotTable\TreeNode;
+use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class RootBlock extends NodeBlock
 {
@@ -26,7 +26,7 @@ final class RootBlock extends NodeBlock
     }
 
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
         return $this
             ->createGroupBlock($this->getBranchNode(), $this->getLevel())
@@ -34,7 +34,7 @@ final class RootBlock extends NodeBlock
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
         return $this
             ->createGroupBlock($this->getBranchNode(), $this->getLevel())

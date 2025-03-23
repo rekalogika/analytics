@@ -13,18 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\BranchNode;
-use Rekalogika\PivotTable\LeafNode;
-use Rekalogika\PivotTable\Table\Rows;
-use Rekalogika\PivotTable\Table\Table;
-use Rekalogika\PivotTable\TreeNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
+use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
+use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
+use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
+use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
 use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
 abstract class Block
 {
-    private ?Rows $headerRowsCache = null;
+    private ?DefaultRows $headerRowsCache = null;
 
-    private ?Rows $dataRowsCache = null;
+    private ?DefaultRows $dataRowsCache = null;
 
     protected function __construct(
         private readonly int $level,
@@ -155,26 +158,26 @@ abstract class Block
         return $result;
     }
 
-    final protected function getHeaderRows(): Rows
+    final protected function getHeaderRows(): DefaultRows
     {
         return $this->headerRowsCache ??= $this->createHeaderRows();
     }
 
-    final protected function getDataRows(): Rows
+    final protected function getDataRows(): DefaultRows
     {
         return $this->dataRowsCache ??= $this->createDataRows();
     }
 
-    abstract protected function createHeaderRows(): Rows;
+    abstract protected function createHeaderRows(): DefaultRows;
 
-    abstract protected function createDataRows(): Rows;
+    abstract protected function createDataRows(): DefaultRows;
 
-    final public function generateTable(): Table
+    final public function generateTable(): DefaultTable
     {
-        return new Table(
-            header: $this->getHeaderRows(),
-            body: $this->getDataRows(),
-            footer: new Rows([]),
-        );
+        return new DefaultTable([
+            new DefaultTableHeader($this->getHeaderRows()),
+            new DefaultTableBody($this->getDataRows()),
+            new DefaultTableFooter(new DefaultRows([])),
+        ]);
     }
 }
