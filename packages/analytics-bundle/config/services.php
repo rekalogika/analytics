@@ -384,7 +384,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(ChainHtmlifier::class)
         ->args([
             '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
-            '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
+            '$stringifier' => service(Stringifier::class),
         ])
     ;
 

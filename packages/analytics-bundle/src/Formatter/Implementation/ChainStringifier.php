@@ -15,15 +15,33 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\StringifierAware;
 
 final readonly class ChainStringifier implements Stringifier
 {
     /**
+     * @var list<BackendStringifier>
+     */
+    private array $backendStringifiers;
+
+    /**
      * @param iterable<BackendStringifier> $backendStringifiers
      */
     public function __construct(
-        private iterable $backendStringifiers,
-    ) {}
+        iterable $backendStringifiers,
+    ) {
+        $newBackendStringifiers = [];
+
+        foreach ($backendStringifiers as $backendStringifier) {
+            if ($backendStringifier instanceof StringifierAware) {
+                $backendStringifier = $backendStringifier->withStringifier($this);
+            }
+
+            $newBackendStringifiers[] = $backendStringifier;
+        }
+
+        $this->backendStringifiers = $newBackendStringifiers;
+    }
 
     #[\Override]
     public function toString(mixed $input): string
