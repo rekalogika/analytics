@@ -116,6 +116,18 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             throw new \InvalidArgumentException('Value cannot be an array');
         }
 
+        // special case for eq null
+
+        if ($operator === Comparison::EQ && $value === null) {
+            return $this->queryBuilder->expr()->isNull($fieldWithAlias);
+        }
+
+        // special case for neq null
+
+        if ($operator === Comparison::NEQ && $value === null) {
+            return $this->queryBuilder->expr()->isNotNull($fieldWithAlias);
+        }
+
         /**
          * @psalm-suppress MixedArgument
          */
