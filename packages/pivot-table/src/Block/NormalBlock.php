@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Table\ContentType;
-use Rekalogika\PivotTable\Table\DataCell;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Rows;
 
 final class NormalBlock extends NodeBlock
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
-        $cell = new HeaderCell(
+        $cell = new DefaultHeaderCell(
             type: ContentType::Legend,
             key: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
@@ -36,9 +36,9 @@ final class NormalBlock extends NodeBlock
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        $cell = new DataCell(
+        $cell = new DefaultDataCell(
             type: ContentType::Item,
             key: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),

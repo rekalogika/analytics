@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Table\ContentType;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Rows;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
-        $rows = new Rows([]);
+        $rows = new DefaultRows([]);
         $children = $this->getBalancedChildren();
 
         foreach ($children as $childNode) {
@@ -36,7 +36,7 @@ final class HorizontalBlockGroup extends BlockGroup
         if (
             !$this->getContext()->hasSuperfluousLegend($firstChild)
         ) {
-            $nameCell = new HeaderCell(
+            $nameCell = new DefaultHeaderCell(
                 type: ContentType::Legend,
                 key: $firstChild->getKey(),
                 content: $firstChild->getLegend(),
@@ -50,9 +50,9 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        $rows = new Rows([]);
+        $rows = new DefaultRows([]);
 
         foreach ($this->getBalancedChildren() as $childNode) {
             $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);

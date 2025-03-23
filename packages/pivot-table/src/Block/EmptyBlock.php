@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Table\Rows;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class EmptyBlock extends NodeBlock
 {
     #[\Override]
-    protected function createHeaderRows(): Rows
+    protected function createHeaderRows(): DefaultRows
     {
-        return new Rows([]);
+        return new DefaultRows([]);
     }
 
     #[\Override]
-    protected function createDataRows(): Rows
+    protected function createDataRows(): DefaultRows
     {
-        return new Rows([]);
+        return new DefaultRows([]);
     }
 }

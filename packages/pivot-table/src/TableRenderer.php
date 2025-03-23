@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\HeaderCell;
 use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Rows;
+use Rekalogika\PivotTable\Table\RowGroup;
 use Rekalogika\PivotTable\Table\Table;
+use Rekalogika\PivotTable\Table\TableBody;
+use Rekalogika\PivotTable\Table\TableFooter;
+use Rekalogika\PivotTable\Table\TableHeader;
 
 /**
  * @api
@@ -43,17 +47,19 @@ class TableRenderer
      */
     public function renderTable(Table $table): string
     {
-        if (\count($table) === 0) {
+        if (\count($table->getRows()) === 0) {
             return $this->renderNoData();
         }
 
-        return \sprintf(
-            '<table %s>%s%s%s</table>',
-            $this->getTableAttributes(),
-            $this->renderHeader($table->getHeader()),
-            $this->renderBody($table->getBody()),
-            $this->renderFooter($table->getFooter()),
-        );
+        $result = \sprintf('<table %s>', $this->getTableAttributes());
+
+        foreach ($table as $rowGroup) {
+            $result .= $this->renderRowGroup($rowGroup);
+        }
+
+        $result .= '</table>';
+
+        return $result;
     }
 
     protected function renderNoData(): string
@@ -96,17 +102,30 @@ class TableRenderer
         return '';
     }
 
-    protected function renderHeader(Rows $header): string
+    protected function renderRowGroup(RowGroup $rowGroup): string
+    {
+        if ($rowGroup instanceof TableHeader) {
+            return $this->renderHeader($rowGroup);
+        } elseif ($rowGroup instanceof TableBody) {
+            return $this->renderBody($rowGroup);
+        } elseif ($rowGroup instanceof TableFooter) {
+            return $this->renderFooter($rowGroup);
+        }
+
+        throw new \InvalidArgumentException('Unknown row group type');
+    }
+
+    protected function renderHeader(TableHeader $header): string
     {
         return $this->renderRows('thead', $this->getTableHeaderAttributes(), $header);
     }
 
-    protected function renderBody(Rows $body): string
+    protected function renderBody(TableBody $body): string
     {
         return $this->renderRows('tbody', $this->getTableBodyAttributes(), $body);
     }
 
-    protected function renderFooter(Rows $footer): string
+    protected function renderFooter(TableFooter $footer): string
     {
         return $this->renderRows('tfoot', $this->getTableFooterAttributes(), $footer);
     }
@@ -114,7 +133,7 @@ class TableRenderer
     /**
      * @param 'thead'|'tbody'|'tfoot' $tag
      */
-    private function renderRows(string $tag, string $tagAttributes, Rows $rows): string
+    private function renderRows(string $tag, string $tagAttributes, RowGroup $rows): string
     {
         $result = \sprintf('<%s %s>', $tag, $tagAttributes);
 

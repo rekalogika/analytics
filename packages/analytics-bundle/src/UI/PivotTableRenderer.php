@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
-use Rekalogika\PivotTable\Block\Block;
+use Rekalogika\PivotTable\PivotTableTransformer;
 use Twig\Environment;
 
 final readonly class PivotTableRenderer
@@ -44,8 +44,12 @@ final readonly class PivotTableRenderer
     ): string {
         $treeResult = $result->getTree();
         $pivotTable = new PivotTableAdapter($treeResult);
-        $block = Block::new($pivotTable, $pivotedDimensions, ['@values']);
-        $table = $block->generateTable();
+
+        $table = PivotTableTransformer::transformTreeNodeToPivotTable(
+            treeNode: $pivotTable,
+            pivotedNodes: $pivotedDimensions,
+            superfluousLegends: ['@values'],
+        );
 
         return $this->renderBlock('table', [
             'table' => $table,

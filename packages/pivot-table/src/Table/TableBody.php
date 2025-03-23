@@ -11,13 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable;
+namespace Rekalogika\PivotTable\Table;
 
-interface TreeNode
-{
-    public function getKey(): string;
-
-    public function getLegend(): mixed;
-
-    public function getItem(): mixed;
-}
+/**
+ * Represents a HTML table body (<tbody>)
+ */
+interface TableBody extends RowGroup, Tag {}

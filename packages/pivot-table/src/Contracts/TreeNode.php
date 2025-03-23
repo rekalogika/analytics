@@ -11,14 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Table;
+namespace Rekalogika\PivotTable\Contracts;
 
-/**
- * Represents a HTML table (<table>)
- *
- * @extends \Traversable<RowGroup>
- */
-interface Table extends \Traversable, \Countable, Tag
+interface TreeNode
 {
-    public function getRows(): RowGroup;
+    public function getKey(): string;
+
+    public function getLegend(): mixed;
+
+    public function getItem(): mixed;
 }

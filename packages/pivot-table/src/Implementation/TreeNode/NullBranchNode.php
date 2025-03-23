@@ -11,9 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Model;
+namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\BranchNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
 
 final readonly class NullBranchNode implements BranchNode
 {

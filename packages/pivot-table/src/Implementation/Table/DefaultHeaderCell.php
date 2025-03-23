@@ -11,12 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable;
+namespace Rekalogika\PivotTable\Implementation\Table;
 
-interface BranchNode extends TreeNode
+use Rekalogika\PivotTable\Table\HeaderCell;
+
+final readonly class DefaultHeaderCell extends DefaultCell implements HeaderCell
 {
-    /**
-     * @return iterable<TreeNode>
-     */
-    public function getChildren(): iterable;
+    #[\Override]
+    public function getTag(): string
+    {
+        return 'th';
+    }
 }

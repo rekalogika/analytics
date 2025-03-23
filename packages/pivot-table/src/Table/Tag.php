@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML table (<table>)
- *
- * @extends \Traversable<RowGroup>
+ * Represents a HTML tag
  */
-interface Table extends \Traversable, \Countable, Tag
+interface Tag
 {
-    public function getRows(): RowGroup;
+    public function getTag(): string;
 }

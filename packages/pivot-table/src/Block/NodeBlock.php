@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\BranchNode;
-use Rekalogika\PivotTable\LeafNode;
-use Rekalogika\PivotTable\TreeNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 
 abstract class NodeBlock extends Block
 {
