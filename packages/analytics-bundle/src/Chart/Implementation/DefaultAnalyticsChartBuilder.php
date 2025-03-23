@@ -55,6 +55,10 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             return $this->createGroupedBarChart($result, false);
         }
 
+        if ($chartType === ChartType::Pie) {
+            return $this->createPieChart($result);
+        }
+
         throw new UnsupportedData('Unsupported chart type');
     }
 
@@ -404,6 +408,88 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     'stacked' => $stacked,
                 ],
             ],
+        ]);
+
+        return $chart;
+    }
+
+    private function createPieChart(Result $result): Chart
+    {
+        $colorDispenser = $this->createColorDispenser();
+        $measures = $result->getTable()->first()?->getMeasures();
+
+        if ($measures === null) {
+            throw new UnsupportedData('Measures not found');
+        }
+
+        $selectedMeasures = $this->selectMeasures($measures);
+        $numMeasures = \count($selectedMeasures);
+
+        if ($numMeasures !== 1) {
+            throw new UnsupportedData('Only one measure is supported');
+        }
+
+        // populate labels
+
+        $key = $selectedMeasures[0];
+        $measure = $measures->get($key);
+
+        $labels = [];
+        $dataSet = [];
+
+        $dataSet['label'] = $this->stringifier->toString($measure->getLabel());
+        $dataSet['data'] = [];
+        $dataSet['backgroundColor'] = [];
+        $dataSet['hoverOffset'] = 4;
+
+        $title = null;
+
+        // populate data
+
+        foreach ($result->getTable() as $row) {
+            $dimensions = $row->getTuple();
+
+            if (\count($dimensions) !== 1) {
+                throw new UnsupportedData('Expected only one member');
+            }
+
+            $dimension = $dimensions->first();
+
+            if ($dimension === null) {
+                throw new UnsupportedData('Expected only one member');
+            }
+
+            // get label
+
+            if ($title === null) {
+                $title = $this->stringifier->toString($dimension->getLabel());
+            }
+
+            // get value
+
+            $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
+
+            $measures = $row->getMeasures();
+            $measure = $measures->get($key);
+
+            $dataSet['data'][] = $this->numberifier->toNumber($measure->getValue());
+
+            // color
+
+            $color = $colorDispenser->dispenseColor();
+            $dataSet['backgroundColor'][] = $color . $this->configuration->areaTransparency;
+        }
+
+        $chart = $this->chartBuilder->createChart(Chart::TYPE_PIE);
+
+        $chart->setData([
+            'labels' => $labels,
+            'datasets' => [$dataSet],
+        ]);
+
+        $chart->setOptions([
+            'responsive' => true,
+            'locale' => $this->localeSwitcher->getLocale(),
         ]);
 
         return $chart;
