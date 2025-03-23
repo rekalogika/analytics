@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Contracts\Result;
-use Rekalogika\Analytics\PivotTable\Block\Block;
 use Rekalogika\Analytics\PivotTableAdapter\PivotTableAdapter;
+use Rekalogika\PivotTable\Block\Block;
 use Twig\Environment;
 
 final readonly class PivotTableRenderer

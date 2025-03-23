@@ -25,6 +25,9 @@
         "symfony/translation-contracts": "^3",
         "symfony/service-contracts": "^3"
     },
+    "suggest": {
+        "rekalogika/pivot-table": "Transforms the result into a pivot table"
+    },
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "src/"
