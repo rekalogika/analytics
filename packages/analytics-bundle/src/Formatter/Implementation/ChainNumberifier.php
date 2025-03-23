@@ -15,15 +15,33 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
+use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
 
 final readonly class ChainNumberifier implements Numberifier
 {
     /**
+     * @var list<BackendNumberifier>
+     */
+    private array $backendNumberifiers;
+
+    /**
      * @param iterable<BackendNumberifier> $backendNumberifiers
      */
     public function __construct(
-        private iterable $backendNumberifiers,
-    ) {}
+        iterable $backendNumberifiers,
+    ) {
+        $newBackendNumberifiers = [];
+
+        foreach ($backendNumberifiers as $backendNumberifier) {
+            if ($backendNumberifier instanceof NumberifierAware) {
+                $backendNumberifier = $backendNumberifier->withNumberifier($this);
+            }
+
+            $newBackendNumberifiers[] = $backendNumberifier;
+        }
+
+        $this->backendNumberifiers = $newBackendNumberifiers;
+    }
 
     #[\Override]
     public function toNumber(mixed $input): int|float
