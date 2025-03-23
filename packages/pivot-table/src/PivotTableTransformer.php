@@ -50,7 +50,7 @@ final readonly class PivotTableTransformer
         $block = self::transformTreeNodeToBlock(
             treeNode: $treeNode,
             pivotedNodes: $pivotedNodes,
-            superfluousLegends: $superfluousLegends
+            superfluousLegends: $superfluousLegends,
         );
 
         return self::transformBlockToPivotTable($block);
