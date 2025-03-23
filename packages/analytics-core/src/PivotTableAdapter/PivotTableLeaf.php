@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\TreeNode;
-use Rekalogika\Analytics\PivotTable\LeafNode;
+use Rekalogika\PivotTable\LeafNode;
 
 final readonly class PivotTableLeaf implements LeafNode
 {

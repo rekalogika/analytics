@@ -1,0 +1,21 @@
+{
+    "name": "rekalogika/pivot-table",
+    "description": "Simplify the creation of pivot tables.",
+    "homepage": "https://rekalogika.dev/analytics",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Priyadi Iman Nurcahyo",
+            "email": "priyadi@rekalogika.com"
+        }
+    ],
+    "type": "library",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rekalogika\\PivotTable\\": "src/"
+        }
+    }
+}

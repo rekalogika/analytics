@@ -52,6 +52,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\Uid'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
+                Selector::inNamespace('Rekalogika\PivotTable'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -168,6 +169,32 @@ final class ArchitectureTest
                 // Chartjs
                 Selector::classname(ChartBuilderInterface::class),
                 Selector::classname(Chart::class),
+
+                // pivot table
+                Selector::inNamespace('Rekalogika\PivotTable'),
+            );
+    }
+
+    /**
+     * pivot-table deps
+     */
+    public function testPackagePivotTable(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selector::inNamespace('Rekalogika\PivotTable'),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selector::inNamespace('Rekalogika\PivotTable'),
+                Selector::classname(\LogicException::class),
+                Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\Countable::class),
+                Selector::classname(\Override::class),
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\Traversable::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\UnitEnum::class),
             );
     }
 }

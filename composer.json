@@ -86,12 +86,14 @@
     },
     "replace": {
         "rekalogika/analytics-bundle": "self.version",
-        "rekalogika/analytics-core": "self.version"
+        "rekalogika/analytics-core": "self.version",
+        "rekalogika/pivot-table": "self.version"
     },
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
-            "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/"
+            "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/",
+            "Rekalogika\\PivotTable\\": "packages/pivot-table/src/"
         }
     },
     "autoload-dev": {
