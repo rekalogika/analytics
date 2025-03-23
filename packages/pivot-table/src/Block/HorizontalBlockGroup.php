@@ -15,7 +15,6 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Table\ContentType;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
@@ -37,10 +36,8 @@ final class HorizontalBlockGroup extends BlockGroup
             !$this->getContext()->hasSuperfluousLegend($firstChild)
         ) {
             $nameCell = new DefaultHeaderCell(
-                type: ContentType::Legend,
                 key: $firstChild->getKey(),
                 content: $firstChild->getLegend(),
-                treeNode: $firstChild,
             );
 
             $rows = $nameCell->appendRowsBelow($rows);

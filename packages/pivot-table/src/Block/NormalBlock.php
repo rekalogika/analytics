@@ -16,7 +16,6 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Table\ContentType;
 
 final class NormalBlock extends NodeBlock
 {
@@ -24,10 +23,8 @@ final class NormalBlock extends NodeBlock
     protected function createHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
-            type: ContentType::Legend,
             key: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
-            treeNode: $this->getTreeNode(),
         );
 
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
@@ -39,10 +36,8 @@ final class NormalBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
-            type: ContentType::Item,
             key: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
-            treeNode: $this->getTreeNode(),
         );
 
         $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
