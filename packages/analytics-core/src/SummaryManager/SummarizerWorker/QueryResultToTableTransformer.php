@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
@@ -30,12 +29,16 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class QueryResultToTableTransformer
 {
+    private DimensionFactory $dimensionFactory;
+
     private function __construct(
         private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
-    ) {}
+    ) {
+        $this->dimensionFactory = new DimensionFactory();
+    }
 
     /**
      * @param list<array<string,mixed>> $input
@@ -199,7 +202,7 @@ final readonly class QueryResultToTableTransformer
             /** @psalm-suppress MixedAssignment */
             $displayValue = $value ?? $this->getNullValue($key);
 
-            $dimension = new DefaultDimension(
+            $dimension = $this->dimensionFactory->createDimension(
                 label: $this->getLabel($key),
                 key: $key,
                 member: $value,
