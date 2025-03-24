@@ -28,7 +28,7 @@ use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class UnpivotValuesTransformer
+final class TableToNormalTableTransformer
 {
     /**
      * @var list<string>
