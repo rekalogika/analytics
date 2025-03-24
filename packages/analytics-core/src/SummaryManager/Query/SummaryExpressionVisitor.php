@@ -296,6 +296,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         return match ($expr->getType()) {
             CompositeExpression::TYPE_AND => $this->queryBuilder->expr()->andX(...$expressions),
             CompositeExpression::TYPE_OR => $this->queryBuilder->expr()->orX(...$expressions),
+            CompositeExpression::TYPE_NOT => $this->queryBuilder->expr()->not(...$expressions),
             default => throw new \InvalidArgumentException("Unknown composite expression type: {$expr->getType()}"),
         };
     }
