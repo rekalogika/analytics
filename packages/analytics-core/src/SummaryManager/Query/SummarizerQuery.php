@@ -21,12 +21,12 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToRowTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotTableToTreeTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\UnpivotValuesTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -181,7 +181,7 @@ final class SummarizerQuery extends AbstractQuery
             return $this->table;
         }
 
-        return $this->table = QueryResultToRowTransformer::transform(
+        return $this->table = QueryResultToTableTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
@@ -196,7 +196,7 @@ final class SummarizerQuery extends AbstractQuery
             return $this->normalTable;
         }
 
-        return $this->normalTable = UnpivotValuesTransformer::transform(
+        return $this->normalTable = TableToNormalTableTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
             input: $this->getTable(),
@@ -209,7 +209,7 @@ final class SummarizerQuery extends AbstractQuery
             return $this->tree;
         }
 
-        return $this->tree = UnpivotTableToTreeTransformer::transform(
+        return $this->tree = NormalTableToTreeTransformer::transform(
             normalTable: $this->getNormalTable(),
             type: $this->hasTieredOrder() ? 'tree' : 'table',
         );

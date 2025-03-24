@@ -28,7 +28,7 @@ use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class QueryResultToRowTransformer
+final readonly class QueryResultToTableTransformer
 {
     private function __construct(
         private readonly SummaryQuery $query,

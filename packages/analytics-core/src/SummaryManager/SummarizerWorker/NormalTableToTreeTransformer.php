@@ -19,7 +19,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTab
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 
-final class UnpivotTableToTreeTransformer
+final class NormalTableToTreeTransformer
 {
     /**
      * @param 'tree'|'table' $type
