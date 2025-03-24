@@ -13,9 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
-interface RecurringTimeInterval extends TranslatableInterface, SequenceMember
+/**
+ * Represents a member of a sequence.
+ */
+interface SequenceMember
 {
-    public static function createFromDatabaseValue(int $databaseValue): static;
+    // public function getNext(): ?static;
+
+    // public function getPrevious(): ?static;
+
+    // public function isSameAs(SequenceMember $other): bool;
 }
