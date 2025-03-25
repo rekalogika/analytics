@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\NormalRow;
 use Rekalogika\Analytics\Contracts\NormalTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
  * @implements \IteratorAggregate<int,DefaultNormalRow>
@@ -28,6 +29,7 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function __construct(
         private string $summaryClass,
         private array $rows,
+        private UniqueDimensions $uniqueDimensions,
     ) {}
 
     #[\Override]
@@ -52,5 +54,10 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function getIterator(): \Traversable
     {
         yield from $this->rows;
+    }
+
+    public function getUniqueDimensions(): UniqueDimensions
+    {
+        return $this->uniqueDimensions;
     }
 }

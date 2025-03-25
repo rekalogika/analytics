@@ -38,6 +38,7 @@ final class NormalTableToTreeTransformer
         return new DefaultTreeResult(
             summaryClass: $normalTable->getSummaryClass(),
             children: $rootNodes,
+            uniqueDimensions: $normalTable->getUniqueDimensions(),
         );
     }
 

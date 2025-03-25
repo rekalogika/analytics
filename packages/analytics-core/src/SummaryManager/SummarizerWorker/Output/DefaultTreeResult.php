@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\TreeNode;
 use Rekalogika\Analytics\Contracts\TreeResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
  * @implements \IteratorAggregate<mixed,TreeNode>
@@ -31,6 +32,7 @@ final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         private array $children,
+        private UniqueDimensions $uniqueDimensions,
     ) {}
 
     #[\Override]
@@ -51,5 +53,10 @@ final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
         foreach ($this->children as $child) {
             yield $child->getMember() => $child;
         }
+    }
+
+    public function getUniqueDimensions(): UniqueDimensions
+    {
+        return $this->uniqueDimensions;
     }
 }

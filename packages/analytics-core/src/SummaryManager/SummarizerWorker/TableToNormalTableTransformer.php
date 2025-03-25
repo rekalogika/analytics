@@ -95,6 +95,7 @@ final class TableToNormalTableTransformer
         return new DefaultNormalTable(
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
+            uniqueDimensions: $input->getUniqueDimensions(),
         );
     }
 

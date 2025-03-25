@@ -177,11 +177,7 @@ final class SummarizerQuery extends AbstractQuery
 
     public function getTable(): DefaultTable
     {
-        if ($this->table !== null) {
-            return $this->table;
-        }
-
-        return $this->table = QueryResultToTableTransformer::transform(
+        return $this->table ??= QueryResultToTableTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
@@ -192,11 +188,7 @@ final class SummarizerQuery extends AbstractQuery
 
     public function getNormalTable(): DefaultNormalTable
     {
-        if ($this->normalTable !== null) {
-            return $this->normalTable;
-        }
-
-        return $this->normalTable = TableToNormalTableTransformer::transform(
+        return $this->normalTable ??= TableToNormalTableTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
             input: $this->getTable(),
@@ -205,11 +197,7 @@ final class SummarizerQuery extends AbstractQuery
 
     public function getTree(): DefaultTreeResult
     {
-        if ($this->tree !== null) {
-            return $this->tree;
-        }
-
-        return $this->tree = NormalTableToTreeTransformer::transform(
+        return $this->tree ??= NormalTableToTreeTransformer::transform(
             normalTable: $this->getNormalTable(),
             type: $this->hasTieredOrder() ? 'tree' : 'table',
         );

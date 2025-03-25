@@ -63,7 +63,7 @@ final readonly class DefaultNormalRow implements NormalRow
                 throw new \RuntimeException('Only DefaultDimension is supported');
             }
 
-            if (!DimensionUtil::isSame($value1, $value2)) {
+            if (!DimensionUtil::isDimensionSame($value1, $value2)) {
                 return 0;
             }
         }
