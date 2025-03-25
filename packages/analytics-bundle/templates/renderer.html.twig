@@ -69,7 +69,11 @@
 {% endblock header_cell %}
 
 {% block content %}
-    {{ content.content|analytics_to_html }}
+    {% if content %}
+        {{ content.content|analytics_to_html }}
+    {% else %}
+        {{ content|analytics_to_html }}
+    {% endif %}
 {% endblock content %}
 
 {% block no_data %}
