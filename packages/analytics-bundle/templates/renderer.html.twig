@@ -16,33 +16,27 @@
     {%- endif -%}
 {%- endblock table -%}
 
-{%- block section -%}
-    <{{ tag }} {{ attr|raw }}>
-    {%- for row in section -%}{{ block("row") }}{%- endfor -%}
-    </{{ tag }}>
-{%- endblock section -%}
-
 {%- block header -%}
-    {%- set tag = "thead" -%}
-    {%- set attr = block('thead_attr') -%}
-    {{ block("section") }}
+    <thead {{ block("thead_attr") }}>
+        {%- for row in section -%}{{ block("row") }}{% endfor %}
+    </thead>
 {%- endblock header -%}
 
 {%- block body -%}
-    {%- set tag = "tbody" -%}
-    {%- set attr = block('tbody_attr') -%}
-    {{ block("section") }}
+    <tbody {{ block("tbody_attr") }}>
+        {%- for row in section -%}{{ block("row") }}{% endfor %}
+    </tbody>
 {%- endblock body -%}
 
 {%- block footer -%}
-    {%- set tag = "tfoot" -%}
-    {%- set attr = block('tfoot_attr') -%}
-    {{ block("section") }}
+    <tfoot {{ block("tfoot_attr") }}>
+        {%- for row in section -%}{{ block("row") }}{% endfor %}
+    </tfoot>
 {%- endblock footer -%}
 
 {%- block row -%}
     <tr {{ block("tr_attr") }}>
-        {%- for cell in row -%}{{ block("cell") }}{%- endfor -%}
+        {%- for cell in row -%}{{ block("cell") }}{% endfor %}
     </tr>
 {%- endblock row -%}
 
@@ -81,31 +75,31 @@
 {# tag attrs #}
 
 {%- block table_attr -%}
-    class="{{ block('table_class') }}"
+    class="{{ block("table_class") }}"
 {%- endblock table_attr -%}
 
 {%- block thead_attr -%}
-    class="{{ block('thead_class') }}"
+    class="{{ block("thead_class") }}"
 {%- endblock thead_attr -%}
 
 {%- block tbody_attr -%}
-    class="{{ block('tbody_class') }}"
+    class="{{ block("tbody_class") }}"
 {%- endblock tbody_attr -%}
 
 {%- block tfoot_attr -%}
-    class="{{ block('tfoot_class') }}"
+    class="{{ block("tfoot_class") }}"
 {%- endblock tfoot_attr -%}
 
 {%- block tr_attr -%}
-    class="{{ block('tr_class') }}"
+    class="{{ block("tr_class") }}"
 {%- endblock tr_attr -%}
 
 {%- block td_attr -%}
-    class="{{ block('td_class') }}"
+    class="{{ block("td_class") }}"
 {%- endblock td_attr -%}
 
 {%- block th_attr -%}
-    class="{{ block('th_class') }}"
+    class="{{ block("th_class") }}"
 {%- endblock th_attr -%}
 
 {# tag classes #}
@@ -126,9 +120,15 @@
 {%- endblock tr_class -%}
 
 {%- block td_class -%}
-    analytics-{{ cell.key }}
+    analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
+    {% if cell.content.node.measure.key is defined -%}
+        analytics-measure-{{ cell.content.node.measure.key }}
+    {%- endif -%}
 {%- endblock td_class -%}
 
 {%- block th_class -%}
-    analytics-{{ cell.key }}
+    analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
+    {% if cell.content.node.measure.key is defined -%}
+        analytics-measure-{{ cell.content.node.measure.key }}
+    {%- endif -%}
 {%- endblock th_class -%}

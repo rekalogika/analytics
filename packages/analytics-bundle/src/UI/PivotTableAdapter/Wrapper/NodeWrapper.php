@@ -20,4 +20,9 @@ abstract readonly class NodeWrapper
     final public function __construct(protected TreeNode $node) {}
 
     abstract public function getContent(): mixed;
+
+    final public function getNode(): TreeNode
+    {
+        return $this->node;
+    }
 }
