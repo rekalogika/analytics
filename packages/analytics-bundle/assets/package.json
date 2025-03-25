@@ -28,6 +28,11 @@
                     "flatpickr/dist/flatpickr.css": true
                 }
             },
+            "number-ranges-filter": {
+                "main": "dist/number-ranges-filter-controller.js",
+                "fetch": "eager",
+                "enabled": true
+            },
             "help": {
                 "main": "dist/help-controller.js",
                 "fetch": "eager",
