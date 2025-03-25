@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="id">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="id" trgLang="id">
   <file id="rekalogika_analytics.id">
     <unit id="6sAtc6u" name="Example: 1-5,10,15-20">
       <segment>
@@ -55,10 +55,10 @@
         <target>Contoh: 20241-20243,20252 (20241 artinya 2024 Q1)</target>
       </segment>
     </unit>
-    <unit id="0V658Qw" name="Example: 20241-20243,20251 (20241 means January 2024)">
+    <unit id="4oCPLCt" name="Example: 202401-202403,202501 (202401 means January 2024)">
       <segment>
-        <source>Example: 20241-20243,20251 (20241 means January 2024)</source>
-        <target>Contoh: 20241-20243,20251 (20241 artinya Januari 2024)</target>
+        <source>Example: 202401-202403,202501 (202401 means January 2024)</source>
+        <target>Contoh: 202401-202403,202501 (202401 artinya Januari 2024)</target>
       </segment>
     </unit>
     <unit id="HgQLR5y" name="Example: 202402-202405,202514 (202402 means week 2 of 2024)">

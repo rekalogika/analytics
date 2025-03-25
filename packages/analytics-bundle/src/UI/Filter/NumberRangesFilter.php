@@ -102,7 +102,7 @@ final class NumberRangesFilter implements Filter
             WeekDate::class => new TranslatableMessage('Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)'),
             default => null,
             Quarter::class => new TranslatableMessage('Example: 20241-20243,20252 (20241 means 2024 Q1)'),
-            Month::class => new TranslatableMessage('Example: 20241-20243,20251 (20241 means January 2024)'),
+            Month::class => new TranslatableMessage('Example: 202401-202403,202501 (202401 means January 2024)'),
             Week::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
         };
     }
