@@ -17,31 +17,31 @@
 {% endblock table %}
 
 {% block section %}
-    <{{ tag }} {{ attr }}>
+    <{{ tag }} {{ attr|raw }}>
     {% for row in section %}{{ block("row") }}{% endfor %}
     </{{ tag }}>
 {% endblock section %}
 
 {% block header %}
     {% set tag = "thead" %}
-    {% set attr = block('header_attr') %}
+    {% set attr = block('thead_attr') %}
     {{ block("section") }}
 {% endblock header %}
 
 {% block body %}
     {% set tag = "tbody" %}
-    {% set attr = block('body_attr') %}
+    {% set attr = block('tbody_attr') %}
     {{ block("section") }}
 {% endblock body %}
 
 {% block footer %}
     {% set tag = "tfoot" %}
-    {% set attr = block('footer_attr') %}
+    {% set attr = block('tfoot_attr') %}
     {{ block("section") }}
 {% endblock footer %}
 
 {% block row %}
-    <tr {{ block("row_attr") }}>
+    <tr {{ block("tr_attr") }}>
         {% for cell in row %}{{ block("cell") }}{% endfor %}
     </tr>
 {% endblock row %}
@@ -55,14 +55,14 @@
 {% endblock cell %}
 
 {% block data_cell %}
-    <td {{ block("data_cell_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
+    <td {{ block("td_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
         {% set content = cell.content %}
         {{ block("content") }}
     </td>
 {% endblock data_cell %}
 
 {% block header_cell %}
-    <th {{ block("header_cell_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
+    <th {{ block("th_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
         {% set content = cell.content %}
         {{ block("content") }}
     </th>
@@ -71,8 +71,6 @@
 {% block content %}
     {% if content %}
         {{ content.content|analytics_to_html }}
-    {% else %}
-        {{ content|analytics_to_html }}
     {% endif %}
 {% endblock content %}
 
@@ -80,23 +78,57 @@
     <p>No Data</p>
 {% endblock no_data %}
 
+{# tag attrs #}
+
 {% block table_attr %}
+    class="{{ block('table_class') }}"
 {% endblock table_attr %}
 
-{% block header_attr %}
-{% endblock header_attr %}
+{% block thead_attr %}
+    class="{{ block('thead_class') }}"
+{% endblock thead_attr %}
 
-{% block body_attr %}
-{% endblock body_attr %}
+{% block tbody_attr %}
+    class="{{ block('tbody_class') }}"
+{% endblock tbody_attr %}
 
-{% block footer_attr %}
-{% endblock footer_attr %}
+{% block tfoot_attr %}
+    class="{{ block('tfoot_class') }}"
+{% endblock tfoot_attr %}
 
-{% block row_attr %}
-{% endblock row_attr %}
+{% block tr_attr %}
+    class="{{ block('tr_class') }}"
+{% endblock tr_attr %}
 
-{% block data_cell_attr %}
-{% endblock data_cell_attr %}
+{% block td_attr %}
+    class="{{ block('td_class') }}"
+{% endblock td_attr %}
 
-{% block header_cell_attr %}
-{% endblock header_cell_attr %}
+{% block th_attr %}
+    class="{{ block('th_class') }}"
+{% endblock th_attr %}
+
+{# tag classes #}
+
+{% block table_class %}
+{% endblock table_class %}
+
+{% block thead_class %}
+{% endblock thead_class %}
+
+{% block tbody_class %}
+{% endblock tbody_class %}
+
+{% block tfoot_class %}
+{% endblock tfoot_class %}
+
+{% block tr_class %}
+{% endblock tr_class %}
+
+{% block td_class %}
+    analytics-{{ cell.key }}
+{% endblock td_class %}
+
+{% block th_class %}
+    analytics-{{ cell.key }}
+{% endblock th_class %}

@@ -6,26 +6,17 @@
     </div>
 {% endblock no_data %}
 
-{% block table_attr %}
-    class="table table-bordered"
-{% endblock table_attr %}
+{% block table_class %}
+    {{ parent() }}
+    table table-bordered
+{% endblock table_class %}
 
-{% block header_attr %}
-    class="table-light"
-{% endblock header_attr %}
+{% block thead_class %}
+    {{ parent() }}
+    table-light
+{% endblock thead_class %}
 
-{% block body_attr %}
-    class="table-group-divider"
-{% endblock body_attr %}
-
-{% block footer_attr %}
-{% endblock footer_attr %}
-
-{% block row_attr %}
-{% endblock row_attr %}
-
-{% block data_cell_attr %}
-{% endblock data_cell_attr %}
-
-{% block header_cell_attr %}
-{% endblock header_cell_attr %}
+{% block tbody_class %}
+    {{ parent() }}
+    table-group-divider
+{% endblock tbody_class %}
