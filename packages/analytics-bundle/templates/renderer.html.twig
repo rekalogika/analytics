@@ -120,13 +120,19 @@
 {%- block td_class -%}
     analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
     {% if cell.content.node.measure.key is defined -%}
+        analytics-measure
         analytics-measure-{{ cell.content.node.measure.key }}
+    {%- else -%}
+        analytics-dimension
     {%- endif -%}
 {%- endblock td_class -%}
 
 {%- block th_class -%}
     analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
     {% if cell.content.node.measure.key is defined -%}
+        analytics-measure
         analytics-measure-{{ cell.content.node.measure.key }}
+    {%- else -%}
+        analytics-dimension
     {%- endif -%}
 {%- endblock th_class -%}
