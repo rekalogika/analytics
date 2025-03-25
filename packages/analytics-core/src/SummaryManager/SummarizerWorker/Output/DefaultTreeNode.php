@@ -34,6 +34,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private ?DefaultTreeNode $parent = null;
 
     private function __construct(
+        private ?string $childrenKey,
         private Dimension $dimension,
         private ?Measure $measure,
     ) {}
@@ -52,9 +53,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
     }
 
-    public static function createBranchNode(Dimension $dimension): self
-    {
+    public static function createBranchNode(
+        string $childrenKey,
+        Dimension $dimension
+    ): self {
         return new self(
+            childrenKey: $childrenKey,
             dimension: $dimension,
             measure: null,
         );
@@ -65,6 +69,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         Measure $measure,
     ): self {
         return new self(
+            childrenKey: null,
             dimension: $dimension,
             measure: $measure,
         );
@@ -129,6 +134,16 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     public function addChild(DefaultTreeNode $node): void
     {
+        if ($this->childrenKey === null) {
+            throw new \LogicException('Cannot add child to a leaf node');
+        }
+
+        if ($node->getKey() !== $this->childrenKey) {
+            throw new \InvalidArgumentException(
+                \sprintf('Invalid child key "%s", expected "%s"', $node->getKey(), $this->childrenKey),
+            );
+        }
+
         $this->children[] = $node;
         $node->setParent($this);
     }

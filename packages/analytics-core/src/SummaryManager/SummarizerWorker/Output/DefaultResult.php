@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Contracts\NormalTable;
 use Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Table;
-use Rekalogika\Analytics\Contracts\TreeResult;
+use Rekalogika\Analytics\Contracts\Tree;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 
 /**
@@ -40,7 +40,7 @@ final readonly class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getTree(): TreeResult
+    public function getTree(): Tree
     {
         return $this->query->getTree();
     }

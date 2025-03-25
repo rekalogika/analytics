@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
@@ -67,7 +67,7 @@ final class SummarizerQuery extends AbstractQuery
 
     private ?DefaultNormalTable $normalTable = null;
 
-    private ?DefaultTreeResult $tree = null;
+    private ?DefaultTree $tree = null;
 
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
@@ -195,12 +195,15 @@ final class SummarizerQuery extends AbstractQuery
         );
     }
 
-    public function getTree(): DefaultTreeResult
+    public function getTree(): DefaultTree
     {
-        return $this->tree ??= NormalTableToTreeTransformer::transform(
+        $result = $this->tree ??= NormalTableToTreeTransformer::transform(
             normalTable: $this->getNormalTable(),
             type: $this->hasTieredOrder() ? 'tree' : 'table',
         );
+
+        dump($result);
+        return $result;
     }
 
     private function hasTieredOrder(): bool

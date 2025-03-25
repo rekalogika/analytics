@@ -20,7 +20,7 @@ namespace Rekalogika\Analytics\Contracts;
  *
  * @extends \Traversable<mixed,TreeNode>
  */
-interface TreeResult extends \Traversable, \Countable
+interface Tree extends \Traversable, \Countable
 {
     /**
      * @return class-string

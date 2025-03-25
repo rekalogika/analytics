@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeResult;
 
 final class NormalTableToTreeTransformer
 {
@@ -27,19 +27,48 @@ final class NormalTableToTreeTransformer
     public static function transform(
         DefaultNormalTable $normalTable,
         string $type,
-    ): DefaultTreeResult {
-        $transformer = new self();
+    ): DefaultTree {
+        // check if empty
+
+        $firstRow = $normalTable->first();
+
+        if ($firstRow === null) {
+            return new DefaultTree(
+                childrenKey: null,
+                summaryClass: $normalTable->getSummaryClass(),
+                children: [],
+                uniqueDimensions: $normalTable->getUniqueDimensions(),
+            );
+        }
+
+        // get keys from the first row
+
+        $members = $firstRow->getTuple()->getMembers();
+        $keys = \array_keys($members);
+
+        // instantiate and process
+
+        $transformer = new self($keys);
 
         $rootNodes = match ($type) {
             'tree' => $transformer->transformToTree($normalTable),
             'table' => $transformer->transformToTable($normalTable),
         };
 
-        return new DefaultTreeResult(
+        return new DefaultTree(
+            childrenKey: $keys[0],
             summaryClass: $normalTable->getSummaryClass(),
             children: $rootNodes,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
         );
+    }
+
+    /**
+     * @param list<string> $keys
+     */
+    public function __construct(
+        private readonly array $keys,
+    ) {
     }
 
     /**
@@ -57,7 +86,13 @@ final class NormalTableToTreeTransformer
         int $columnNumber,
         bool $forceCreate,
     ): void {
-        $node = DefaultTreeNode::createBranchNode($dimension);
+        $childrenKey = $this->keys[$columnNumber+1] ?? null;
+
+        if ($childrenKey === null) {
+            throw new \InvalidArgumentException('Children key cannot be null');
+        }
+
+        $node = DefaultTreeNode::createBranchNode($childrenKey, $dimension);
 
         $current = $this->currentPath[$columnNumber] ?? null;
 

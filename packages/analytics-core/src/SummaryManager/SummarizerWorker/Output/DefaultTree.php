@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Contracts\Tree;
 use Rekalogika\Analytics\Contracts\TreeNode;
-use Rekalogika\Analytics\Contracts\TreeResult;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
  * @implements \IteratorAggregate<mixed,TreeNode>
  * @internal
  */
-final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
+final readonly class DefaultTree implements Tree, \IteratorAggregate
 {
     use NodeTrait;
 
@@ -31,9 +31,24 @@ final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
      */
     public function __construct(
         private string $summaryClass,
+        private ?string $childrenKey,
         private array $children,
         private UniqueDimensions $uniqueDimensions,
-    ) {}
+    ) {
+        if ($childrenKey === null) {
+            if ($children !== []) {
+                throw new \InvalidArgumentException('Children key cannot be null if children is not empty');
+            }
+        }
+
+        foreach ($children as $child) {
+            if ($child->getKey() !== $childrenKey) {
+                throw new \InvalidArgumentException(
+                    \sprintf('Invalid child key "%s", expected "%s"', $child->getKey(), \get_debug_type($childrenKey)),
+                );
+            }
+        }
+    }
 
     #[\Override]
     public function getSummaryClass(): string
@@ -58,5 +73,10 @@ final readonly class DefaultTreeResult implements TreeResult, \IteratorAggregate
     public function getUniqueDimensions(): UniqueDimensions
     {
         return $this->uniqueDimensions;
+    }
+
+    public function getChildrenKey(): ?string
+    {
+        return $this->childrenKey;
     }
 }

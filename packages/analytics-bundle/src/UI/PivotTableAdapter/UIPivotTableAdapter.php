@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter;
 
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapperFactory;
-use Rekalogika\Analytics\Contracts\TreeResult;
+use Rekalogika\Analytics\Contracts\Tree;
 use Rekalogika\PivotTable\Contracts\BranchNode;
 
 final readonly class UIPivotTableAdapter implements BranchNode
@@ -22,7 +22,7 @@ final readonly class UIPivotTableAdapter implements BranchNode
     private NodeWrapperFactory $nodeWrapperFactory;
 
     public function __construct(
-        private TreeResult $result,
+        private Tree $result,
     ) {
         $this->nodeWrapperFactory = new NodeWrapperFactory();
     }
