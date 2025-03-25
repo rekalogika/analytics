@@ -1,4 +1,4 @@
-{% block filter %}
+{%- block filter -%}
     <input type="text"
            value="{{ filter.value }}"
            placeholder="{{ t('(All)', domain = 'rekalogika_analytics') |trans }}"
@@ -8,4 +8,4 @@
            data-dimension="{{ filter.dimension }}"
            data-action="rekalogika--analytics-bundle--number-ranges-filter:change->rekalogika--analytics-bundle--pivot-table#filter">
     <div class="form-text">{{ filter.help|trans }}</div>
-{% endblock filter %}
+{%- endblock filter -%}
