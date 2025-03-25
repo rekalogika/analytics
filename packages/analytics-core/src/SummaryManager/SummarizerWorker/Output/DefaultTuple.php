@@ -86,7 +86,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
             $otherDimension = $other->get($key);
 
-            if (!DimensionUtil::isSame($dimension, $otherDimension)) {
+            if (!DimensionUtil::isDimensionSame($dimension, $otherDimension)) {
                 return false;
             }
         }

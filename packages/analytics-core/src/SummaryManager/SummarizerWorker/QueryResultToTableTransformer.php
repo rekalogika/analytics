@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\DimensionCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
@@ -30,6 +31,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class QueryResultToTableTransformer
 {
     private DimensionFactory $dimensionFactory;
+    private DimensionCollector $dimensionCollector;
 
     private function __construct(
         private readonly SummaryQuery $query,
@@ -38,6 +40,7 @@ final readonly class QueryResultToTableTransformer
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->dimensionFactory = new DimensionFactory();
+        $this->dimensionCollector = new DimensionCollector();
     }
 
     /**
@@ -62,6 +65,7 @@ final readonly class QueryResultToTableTransformer
         return new DefaultTable(
             summaryClass: $metadata->getSummaryClass(),
             rows: $rows,
+            uniqueDimensions: $transformer->dimensionCollector->getResult(),
         );
     }
 
@@ -213,15 +217,29 @@ final readonly class QueryResultToTableTransformer
             $dimensionValues[$key] = $dimension;
         }
 
+        //
+        // instantiate
+        //
+
         $dimensions = new DefaultDimensions($dimensionValues);
         $tuple = new DefaultTuple($dimensions);
         $measures = new DefaultMeasures($measureValues);
 
-        return new DefaultRow(
+        $row = new DefaultRow(
             tuple: $tuple,
             measures: $measures,
             groupings: $groupings,
         );
+
+        //
+        // collect unique dimensions
+        //
+
+        if (!$row->isSubtotal()) {
+            $this->dimensionCollector->processTuple($tuple);
+        }
+
+        return $row;
     }
 
     /**
