@@ -18,9 +18,6 @@ use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
 
-/**
- * @deprecated
- */
 final readonly class NodeWrapperNumberifier implements BackendNumberifier, NumberifierAware
 {
     public function __construct(
@@ -47,14 +44,6 @@ final readonly class NodeWrapperNumberifier implements BackendNumberifier, Numbe
         /** @psalm-suppress MixedAssignment */
         $content = $input->getContent();
 
-        if (\is_int($content) || \is_float($content)) {
-            return $content;
-        }
-
-        if ($this->numberifier === null) {
-            throw new \LogicException('Numberifier is not set.');
-        }
-
-        return $this->numberifier->toNumber($content);
+        return $this->numberifier?->toNumber($content);
     }
 }

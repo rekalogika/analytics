@@ -44,14 +44,6 @@ final readonly class NodeWrapperHtmlifier implements BackendHtmlifier, Htmlifier
         /** @psalm-suppress MixedAssignment */
         $content = $input->getContent();
 
-        if (\is_string($content)) {
-            return $content;
-        }
-
-        if ($this->htmlifier === null) {
-            throw new \LogicException('Htmlifier is not set.');
-        }
-
-        return $this->htmlifier->toHtml($content);
+        return $this->htmlifier?->toHtml($content);
     }
 }
