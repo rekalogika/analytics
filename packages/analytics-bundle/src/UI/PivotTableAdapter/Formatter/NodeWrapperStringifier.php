@@ -18,9 +18,6 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\StringifierAware;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
 
-/**
- * @deprecated
- */
 final readonly class NodeWrapperStringifier implements BackendStringifier, StringifierAware
 {
     public function __construct(
@@ -47,14 +44,6 @@ final readonly class NodeWrapperStringifier implements BackendStringifier, Strin
         /** @psalm-suppress MixedAssignment */
         $content = $input->getContent();
 
-        if (\is_string($content)) {
-            return $content;
-        }
-
-        if ($this->stringifier === null) {
-            throw new \LogicException('Stringifier is not set.');
-        }
-
-        return $this->stringifier->toString($content);
+        return $this->stringifier?->toString($content);
     }
 }

@@ -63,9 +63,7 @@
 {%- endblock header_cell -%}
 
 {%- block content -%}
-    {%- if content -%}
-        {{ content.content|analytics_to_html }}
-    {%- endif -%}
+    {{ content|analytics_to_html }}
 {%- endblock content -%}
 
 {%- block no_data -%}
