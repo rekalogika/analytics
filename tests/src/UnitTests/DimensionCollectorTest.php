@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\DimensionByKeyCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
-use Rekalogika\Analytics\Util\TranslatableMessage;
+use Symfony\Component\Translation\TranslatableMessage;
 
 final class DimensionCollectorTest extends TestCase
 {
