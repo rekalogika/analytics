@@ -1,19 +1,19 @@
-{% block control %}
-    {% set id = random() %}
+{%- block control -%}
+    {%- set id = random() -%}
 
     <div data-controller="rekalogika--analytics-bundle--pivot-table"
-         {% if target %}data-rekalogika--analytics-bundle--pivot-table-target-value="{{ target }}"{% endif %}
-         {% if output %}data-rekalogika--analytics-bundle--pivot-table-output-value="{{ output }}"{% endif %}
-         {% if urlParameter %} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {% endif %}>
+         {%- if target -%}data-rekalogika--analytics-bundle--pivot-table-target-value="{{ target }}"{%- endif -%}
+         {%- if output -%}data-rekalogika--analytics-bundle--pivot-table-output-value="{{ output }}"{%- endif -%}
+         {%- if urlParameter -%} data-rekalogika--analytics-bundle--pivot-table-url-parameter-value="{{ urlParameter }}" {%- endif -%}>
         {{ block("fields") }}
         <turbo-frame id="__filters">
         </turbo-frame>
     </div>
 
     {{ block("turbo_stream") }}
-{% endblock %}
+{%- endblock -%}
 
-{% block turbo_stream %}
+{%- block turbo_stream -%}
     <turbo-frame id="turbo-frame">
         <turbo-stream action="update" target="{{ target }}">
             <template>
@@ -27,64 +27,64 @@
             </template>
         </turbo-stream>
     </turbo-frame>
-{% endblock turbo_stream %}
+{%- endblock turbo_stream -%}
 
-{% block fields %}
+{%- block fields -%}
     <div class="row g-md-3 gx-3 user-select-none">
         <div class="col-md-4">
             <div class="row g-3 gx-3">
                 <div class="col-12">
-                    {% set type = "available" %}
+                    {%- set type = "available" -%}
                     {{ block("item_block") }}
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            {% set type = "rows" %}
+            {%- set type = "rows" -%}
             {{ block("item_block") }}
 
-            {% set type = "columns" %}
+            {%- set type = "columns" -%}
             {{ block("item_block") }}
         </div>
 
         <div class="col-md-4">
-            {% set type = "values" %}
+            {%- set type = "values" -%}
             {{ block("item_block") }}
             
-            {% set type = "filters" %}
+            {%- set type = "filters" -%}
             {{ block("item_block") }}
         </div>
     </div>
-{% endblock %}
+{%- endblock -%}
 
-{% block item_block %}
-    {% if type == 'available' %}
-        {% set items = query.availableWithoutSubitems %}
-        {% set description = t('Available fields', domain = 'rekalogika_analytics')|trans %}
-        {% set icon = block('icon_fields') %}
-        {% set help = t('The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.', domain = 'rekalogika_analytics')|trans %}
-    {% elseif type == 'rows' %}
-        {% set items = query.rowsWithoutSubitems %}
-        {% set description = t('Rows', domain = 'rekalogika_analytics')|trans %}
-        {% set icon = block('icon_rows') %}
-        {% set help = t('Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.', domain = 'rekalogika_analytics')|trans %}
-    {% elseif type == 'columns' %}
-        {% set items = query.columnsWithoutSubitems %}
-        {% set description = t('Columns', domain = 'rekalogika_analytics')|trans %}
-        {% set icon = block('icon_columns') %}
-        {% set help = t('Drag dimensions here to organize data into columns. Each unique value will create a separate column.', domain = 'rekalogika_analytics')|trans %}
-    {% elseif type == 'values' %}
-        {% set items = query.valuesWithoutSubitems %}
-        {% set description = t('Values', domain = 'rekalogika_analytics')|trans %}
-        {% set icon = block('icon_values') %}
-        {% set help = t('Drag measures here to display them in the pivot table.', domain = 'rekalogika_analytics')|trans %}
-    {% elseif type == 'filters' %}
-        {% set items = query.filtersWithoutSubitems %}
-        {% set description = t('Filters', domain = 'rekalogika_analytics')|trans %}
-        {% set icon = block('icon_filters') %}
-        {% set help = t('Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.', domain = 'rekalogika_analytics')|trans %}
-    {% endif %}
+{%- block item_block -%}
+    {%- if type == 'available' -%}
+        {%- set items = query.availableWithoutSubitems -%}
+        {%- set description = t('Available fields', domain = 'rekalogika_analytics')|trans -%}
+        {%- set icon = block('icon_fields') -%}
+        {%- set help = t('The available fields, not currently used in the pivot table. Drag the fields to the other boxes to use them.', domain = 'rekalogika_analytics')|trans -%}
+    {%- elseif type == 'rows' -%}
+        {%- set items = query.rowsWithoutSubitems -%}
+        {%- set description = t('Rows', domain = 'rekalogika_analytics')|trans -%}
+        {%- set icon = block('icon_rows') -%}
+        {%- set help = t('Drag dimensions here to display them as rows in your pivot table. Each value will create a separate row.', domain = 'rekalogika_analytics')|trans -%}
+    {%- elseif type == 'columns' -%}
+        {%- set items = query.columnsWithoutSubitems -%}
+        {%- set description = t('Columns', domain = 'rekalogika_analytics')|trans -%}
+        {%- set icon = block('icon_columns') -%}
+        {%- set help = t('Drag dimensions here to organize data into columns. Each unique value will create a separate column.', domain = 'rekalogika_analytics')|trans -%}
+    {%- elseif type == 'values' -%}
+        {%- set items = query.valuesWithoutSubitems -%}
+        {%- set description = t('Values', domain = 'rekalogika_analytics')|trans -%}
+        {%- set icon = block('icon_values') -%}
+        {%- set help = t('Drag measures here to display them in the pivot table.', domain = 'rekalogika_analytics')|trans -%}
+    {%- elseif type == 'filters' -%}
+        {%- set items = query.filtersWithoutSubitems -%}
+        {%- set description = t('Filters', domain = 'rekalogika_analytics')|trans -%}
+        {%- set icon = block('icon_filters') -%}
+        {%- set help = t('Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.', domain = 'rekalogika_analytics')|trans -%}
+    {%- endif -%}
 
     <div class="card pb-1 mb-3">
         <h6 class="card-header"
@@ -100,13 +100,13 @@
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
             style="min-height: 70px">
-            {% for item in items %}{{ block("item") }}{% endfor %}
+            {%- for item in items -%}{{ block("item") }}{%- endfor -%}
         </ul>
     </div>
-{% endblock %}
+{%- endblock -%}
 
-{% block item %}
-    {% set item = query.resolve(item) %}
+{%- block item -%}
+    {%- set item = query.resolve(item) -%}
 
     {%- if item.type == 'dimension' -%}
         {%- set color_class = "success" -%}
@@ -136,48 +136,48 @@
             <span class="text-{{ color_class }}">{{ icon|raw }}</span>
             <div class="row align-items-center g-0">
                 <div class="col-auto me-auto">{{ item.label|trans }}</div>
-                {% if item.choices %}
+                {%- if item.choices -%}
                     <div class="col-auto">{{ block("item_choices") }}</div>
-                {% endif %}
+                {%- endif -%}
             </div>
         </div>
     </li>
-{% endblock item %}
+{%- endblock item -%}
 
-{% block item_choices %}
+{%- block item_choices -%}
     <select class="form-select form-select-sm py-0">
-        {% set selected = query.getSelectedSubItem(item.key) %}
-        {% for key, choice in item.choices %}
+        {%- set selected = query.getSelectedSubItem(item.key) -%}
+        {%- for key, choice in item.choices -%}
             <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
             </option>
-        {% endfor %}
+        {%- endfor -%}
     </select>
-{% endblock %}
+{%- endblock -%}
 
-{% block filters %}
-    {% if query.filterExpressions|length > 0 %}
+{%- block filters -%}
+    {%- if query.filterExpressions|length > 0 -%}
         <div class="card pb-0 mt-md-3">
             <div class="card-body">
                 <div class="row gx-3">
-                    {% for filter in query.filterExpressions %}
+                    {%- for filter in query.filterExpressions -%}
                         <div class="col-md-4">{{ block("filter") }}</div>
-                    {% endfor %}
+                    {%- endfor -%}
                 </div>
             </div>
         </div>
-    {% endif %}
-{% endblock filters %}
+    {%- endif -%}
+{%- endblock filters -%}
 
-{% block filter %}
+{%- block filter -%}
     <div class="mb-3">
         <label for="{{ filter.dimension }}-{{ id }}" class="form-label">
             {{ filter.label|trans }}
         </label>
         {{ block('filter', filter.template) }}
     </div>
-{% endblock filter %}
+{%- endblock filter -%}
 
-{% block icon_fields %}
+{%- block icon_fields -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -194,9 +194,9 @@
         <path d="M12 12l8.73 -5.04" />
         <path d="M3.27 6.96l8.73 5.04" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_columns %}
+{%- block icon_columns -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -211,9 +211,9 @@
         <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
         <path d="M12 4l0 16" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_rows %}
+{%- block icon_rows -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -228,9 +228,9 @@
         <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
         <path d="M4 12l16 0" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_values %}
+{%- block icon_values -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -248,9 +248,9 @@
         <path d="M10 13l-1.5 -1.5" />
         <path d="M7 16l-1.5 -1.5" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_filters %}
+{%- block icon_filters -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -264,9 +264,9 @@
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227z" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_dimension %}
+{%- block icon_dimension -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -281,9 +281,9 @@
         <path d="M10 8v8h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-2z" />
         <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_measure %}
+{%- block icon_measure -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -298,9 +298,9 @@
         <path d="M9 16v-8l3 5l3 -5v8" />
         <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
     </svg>
-{% endblock %}
+{%- endblock -%}
 
-{% block icon_value %}
+{%- block icon_value -%}
     <svg xmlns="http://www.w3.org/2000/svg"
          width="24"
          height="24"
@@ -315,4 +315,4 @@
         <path d="M10 8l2 8l2 -8" />
         <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z" />
     </svg>
-{% endblock %}
+{%- endblock -%}

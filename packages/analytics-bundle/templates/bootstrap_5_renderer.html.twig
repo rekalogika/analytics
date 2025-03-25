@@ -1,22 +1,22 @@
-{% extends '@RekalogikaAnalytics/renderer.html.twig' %}
+{%- extends '@RekalogikaAnalytics/renderer.html.twig' -%}
 
-{% block no_data %}
+{%- block no_data -%}
     <div class="alert alert-danger" role="alert">
         {{ t('No result returned.', domain = 'rekalogika_analytics')|trans }}
     </div>
-{% endblock no_data %}
+{%- endblock no_data -%}
 
-{% block table_class %}
+{%- block table_class -%}
     {{ parent() }}
     table table-bordered
-{% endblock table_class %}
+{%- endblock table_class -%}
 
-{% block thead_class %}
+{%- block thead_class -%}
     {{ parent() }}
     table-light
-{% endblock thead_class %}
+{%- endblock thead_class -%}
 
-{% block tbody_class %}
+{%- block tbody_class -%}
     {{ parent() }}
     table-group-divider
-{% endblock tbody_class %}
+{%- endblock tbody_class -%}

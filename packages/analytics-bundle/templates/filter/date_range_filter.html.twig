@@ -1,4 +1,4 @@
-{% block filter %}
+{%- block filter -%}
     <input type="text"
            value="{{ filter.rawValue }}"
            data-start="{{ filter.rawStart }}"
@@ -11,4 +11,4 @@
            data-dimension="{{ filter.dimension }}"
            data-action="rekalogika--analytics-bundle--date-range-filter:change->rekalogika--analytics-bundle--pivot-table#filter"
            data-lang="{{ app.request.locale }}">
-{% endblock filter %}
+{%- endblock filter -%}

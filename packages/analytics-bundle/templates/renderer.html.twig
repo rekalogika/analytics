@@ -1,134 +1,134 @@
-{% block table %}
-    {% if table.rows|length == 0 %}
+{%- block table -%}
+    {%- if table.rows|length == 0 -%}
         {{ block("no_data") }}
-    {% else %}
+    {%- else -%}
         <table {{ block("table_attr") }}>
-            {% for section in table %}
-                {% if section.tag == 'thead' %}
+            {%- for section in table -%}
+                {%- if section.tag == 'thead' -%}
                     {{ block("header") }}
-                {% elseif section.tag == 'tbody' %}
+                {%- elseif section.tag == 'tbody' -%}
                     {{ block("body") }}
-                {% elseif section.tag == 'tfoot' %}
+                {%- elseif section.tag == 'tfoot' -%}
                     {{ block("footer") }}
-                {% endif %}
-            {% endfor %}
+                {%- endif -%}
+            {%- endfor -%}
         </table>
-    {% endif %}
-{% endblock table %}
+    {%- endif -%}
+{%- endblock table -%}
 
-{% block section %}
+{%- block section -%}
     <{{ tag }} {{ attr|raw }}>
-    {% for row in section %}{{ block("row") }}{% endfor %}
+    {%- for row in section -%}{{ block("row") }}{%- endfor -%}
     </{{ tag }}>
-{% endblock section %}
+{%- endblock section -%}
 
-{% block header %}
-    {% set tag = "thead" %}
-    {% set attr = block('thead_attr') %}
+{%- block header -%}
+    {%- set tag = "thead" -%}
+    {%- set attr = block('thead_attr') -%}
     {{ block("section") }}
-{% endblock header %}
+{%- endblock header -%}
 
-{% block body %}
-    {% set tag = "tbody" %}
-    {% set attr = block('tbody_attr') %}
+{%- block body -%}
+    {%- set tag = "tbody" -%}
+    {%- set attr = block('tbody_attr') -%}
     {{ block("section") }}
-{% endblock body %}
+{%- endblock body -%}
 
-{% block footer %}
-    {% set tag = "tfoot" %}
-    {% set attr = block('tfoot_attr') %}
+{%- block footer -%}
+    {%- set tag = "tfoot" -%}
+    {%- set attr = block('tfoot_attr') -%}
     {{ block("section") }}
-{% endblock footer %}
+{%- endblock footer -%}
 
-{% block row %}
+{%- block row -%}
     <tr {{ block("tr_attr") }}>
-        {% for cell in row %}{{ block("cell") }}{% endfor %}
+        {%- for cell in row -%}{{ block("cell") }}{%- endfor -%}
     </tr>
-{% endblock row %}
+{%- endblock row -%}
 
-{% block cell %}
-    {% if cell.tag == 'th' %}
+{%- block cell -%}
+    {%- if cell.tag == 'th' -%}
         {{ block("header_cell") }}
-    {% elseif cell.tag == 'td' %}
+    {%- elseif cell.tag == 'td' -%}
         {{ block("data_cell") }}
-    {% endif %}
-{% endblock cell %}
+    {%- endif -%}
+{%- endblock cell -%}
 
-{% block data_cell %}
+{%- block data_cell -%}
     <td {{ block("td_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {% set content = cell.content %}
+        {%- set content = cell.content -%}
         {{ block("content") }}
     </td>
-{% endblock data_cell %}
+{%- endblock data_cell -%}
 
-{% block header_cell %}
+{%- block header_cell -%}
     <th {{ block("th_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {% set content = cell.content %}
+        {%- set content = cell.content -%}
         {{ block("content") }}
     </th>
-{% endblock header_cell %}
+{%- endblock header_cell -%}
 
-{% block content %}
-    {% if content %}
+{%- block content -%}
+    {%- if content -%}
         {{ content.content|analytics_to_html }}
-    {% endif %}
-{% endblock content %}
+    {%- endif -%}
+{%- endblock content -%}
 
-{% block no_data %}
+{%- block no_data -%}
     <p>No Data</p>
-{% endblock no_data %}
+{%- endblock no_data -%}
 
 {# tag attrs #}
 
-{% block table_attr %}
+{%- block table_attr -%}
     class="{{ block('table_class') }}"
-{% endblock table_attr %}
+{%- endblock table_attr -%}
 
-{% block thead_attr %}
+{%- block thead_attr -%}
     class="{{ block('thead_class') }}"
-{% endblock thead_attr %}
+{%- endblock thead_attr -%}
 
-{% block tbody_attr %}
+{%- block tbody_attr -%}
     class="{{ block('tbody_class') }}"
-{% endblock tbody_attr %}
+{%- endblock tbody_attr -%}
 
-{% block tfoot_attr %}
+{%- block tfoot_attr -%}
     class="{{ block('tfoot_class') }}"
-{% endblock tfoot_attr %}
+{%- endblock tfoot_attr -%}
 
-{% block tr_attr %}
+{%- block tr_attr -%}
     class="{{ block('tr_class') }}"
-{% endblock tr_attr %}
+{%- endblock tr_attr -%}
 
-{% block td_attr %}
+{%- block td_attr -%}
     class="{{ block('td_class') }}"
-{% endblock td_attr %}
+{%- endblock td_attr -%}
 
-{% block th_attr %}
+{%- block th_attr -%}
     class="{{ block('th_class') }}"
-{% endblock th_attr %}
+{%- endblock th_attr -%}
 
 {# tag classes #}
 
-{% block table_class %}
-{% endblock table_class %}
+{%- block table_class -%}
+{%- endblock table_class -%}
 
-{% block thead_class %}
-{% endblock thead_class %}
+{%- block thead_class -%}
+{%- endblock thead_class -%}
 
-{% block tbody_class %}
-{% endblock tbody_class %}
+{%- block tbody_class -%}
+{%- endblock tbody_class -%}
 
-{% block tfoot_class %}
-{% endblock tfoot_class %}
+{%- block tfoot_class -%}
+{%- endblock tfoot_class -%}
 
-{% block tr_class %}
-{% endblock tr_class %}
+{%- block tr_class -%}
+{%- endblock tr_class -%}
 
-{% block td_class %}
+{%- block td_class -%}
     analytics-{{ cell.key }}
-{% endblock td_class %}
+{%- endblock td_class -%}
 
-{% block th_class %}
+{%- block th_class -%}
     analytics-{{ cell.key }}
-{% endblock th_class %}
+{%- endblock th_class -%}
