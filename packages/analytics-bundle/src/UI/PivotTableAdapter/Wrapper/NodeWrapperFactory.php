@@ -18,63 +18,55 @@ use Rekalogika\Analytics\Contracts\TreeNode;
 final class NodeWrapperFactory
 {
     /**
-     * @var array<string,NodeLabel>
+     * @var \WeakMap<TreeNode,NodeLabel>
      */
-    private array $labelCache = [];
+    private \WeakMap $labelCache;
 
     /**
-     * @var array<string,NodeMember>
+     * @var \WeakMap<TreeNode,NodeMember>
      */
-    private array $memberCache = [];
+    private \WeakMap $memberCache;
 
 
     /**
-     * @var array<string,NodeValue>
+     * @var \WeakMap<TreeNode,NodeValue>
      */
-    private array $valueCache = [];
+    private \WeakMap $valueCache;
 
-    private function getHash(TreeNode $treeNode): string
+    public function __construct()
     {
-        /** @psalm-suppress MixedAssignment */
-        $item = $treeNode->getMember();
-
-        if (\is_object($item)) {
-            return (string) spl_object_id($item);
-        }
-
-        return hash('xxh128', serialize($item));
+        /** @psalm-suppress PropertyTypeCoercion */
+        $this->labelCache = new \WeakMap();
+        /** @psalm-suppress PropertyTypeCoercion */
+        $this->memberCache = new \WeakMap();
+        /** @psalm-suppress PropertyTypeCoercion */
+        $this->valueCache = new \WeakMap();
     }
 
     public function getLabel(TreeNode $treeNode): NodeLabel
     {
-        $hash = $this->getHash($treeNode);
-
-        if (isset($this->labelCache[$hash])) {
-            return $this->labelCache[$hash];
-        }
-
-        return $this->labelCache[$hash] = new NodeLabel($treeNode);
+        /**
+         * @var NodeLabel
+         * @psalm-suppress PossiblyNullArgument
+         */
+        return $this->labelCache[$treeNode] ??= new NodeLabel($treeNode);
     }
 
     public function getMember(TreeNode $treeNode): NodeMember
     {
-        $hash = $this->getHash($treeNode);
-
-        if (isset($this->memberCache[$hash])) {
-            return $this->memberCache[$hash];
-        }
-
-        return $this->memberCache[$hash] = new NodeMember($treeNode);
+        /**
+         * @var NodeMember
+         * @psalm-suppress PossiblyNullArgument
+         */
+        return $this->memberCache[$treeNode] ??= new NodeMember($treeNode);
     }
 
     public function getValue(TreeNode $treeNode): NodeValue
     {
-        $hash = $this->getHash($treeNode);
-
-        if (isset($this->valueCache[$hash])) {
-            return $this->valueCache[$hash];
-        }
-
-        return $this->valueCache[$hash] = new NodeValue($treeNode);
+        /**
+         * @var NodeValue
+         * @psalm-suppress PossiblyNullArgument
+         */
+        return $this->valueCache[$treeNode] ??= new NodeValue($treeNode);
     }
 }
