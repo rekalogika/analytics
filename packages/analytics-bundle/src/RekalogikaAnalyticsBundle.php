@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
+use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
@@ -66,6 +67,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $builder->registerForAutoconfiguration(BackendNumberifier::class)
             ->addTag('rekalogika.analytics.backend_numberifier');
+
+        $builder->registerForAutoconfiguration(BackendCellifier::class)
+            ->addTag('rekalogika.analytics.backend_cellifier');
 
         $builder->registerForAutoconfiguration(SpecificFilterFactory::class)
             ->addTag('rekalogika.analytics.specific_filter_factory');

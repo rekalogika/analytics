@@ -14,14 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
-use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\HtmlifierAware;
-use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellifierAware;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 
 final readonly class ChainCellifier implements Cellifier
 {

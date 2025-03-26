@@ -42,6 +42,7 @@ use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperCellifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperHtmlifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperNumberifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperStringifier;
@@ -50,6 +51,7 @@ use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NullFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NumberRangesFilterFactory;
+use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -342,6 +344,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
     ;
 
+    $services
+        ->set(SpreadsheetRenderer::class)
+        ->args([
+            '$twig' => service('twig'),
+        ])
+    ;
+
     //
     // chart
     //
@@ -511,6 +520,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(NodeWrapperStringifier::class)
         ->tag('rekalogika.analytics.backend_stringifier', [
+            'priority' => -100,
+        ])
+    ;
+
+    $services
+        ->set(NodeWrapperCellifier::class)
+        ->tag('rekalogika.analytics.backend_cellifier', [
             'priority' => -100,
         ])
     ;

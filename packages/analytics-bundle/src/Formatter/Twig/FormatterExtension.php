@@ -30,7 +30,7 @@ final class FormatterExtension extends AbstractExtension
                     'is_safe' => ['html'],
                 ],
             ),
-        ];  
+        ];
     }
 
     #[\Override]

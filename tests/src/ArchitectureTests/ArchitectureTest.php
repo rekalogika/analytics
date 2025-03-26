@@ -19,6 +19,8 @@ use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Container\ContainerInterface;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -180,6 +182,8 @@ final class ArchitectureTest
 
                 // PhpSpreadsheet
                 Selector::classname(DataType::class),
+                Selector::classname(Html::class),
+                Selector::classname(Spreadsheet::class),
             );
     }
 

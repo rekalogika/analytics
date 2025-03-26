@@ -48,7 +48,7 @@ final readonly class CellProperties
         $attributes = [];
 
         foreach ($this->attributes as $key => $value) {
-            $attributes[] = sprintf('%s="%s"', htmlspecialchars($key), htmlspecialchars($value));
+            $attributes[] = \sprintf('%s="%s"', htmlspecialchars($key), htmlspecialchars($value));
         }
 
         return implode(' ', $attributes);

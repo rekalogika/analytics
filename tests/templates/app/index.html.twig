@@ -7,6 +7,9 @@
                 {% if chart %}{{ render_chart(chart) }}{% endif %}
             </div>
 
+            <a download target="_blank" class="btn btn-secondary btn-sm float-end mb-2"
+               href="{{ path('download', {parameters: app.request.query.get('parameters') }) }}">Download</a>
+
             <div>{{ pivotTable|raw }}</div>
         </div>
     {% endset %}

@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
 
 final readonly class DefaultBackendCellifier implements BackendCellifier

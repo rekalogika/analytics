@@ -27,5 +27,5 @@
 {%- endblock header_cell -%}
 
 {%- block attr -%}
-    data-type="{{ type }}" data-format="{{ format_code }}" {{ attributes|raw }}
+    data-type="{{ type }}" {% if format_code %}data-format="{{ format_code }}"{% endif %} {{ attributes|raw }}
 {%- endblock -%}
