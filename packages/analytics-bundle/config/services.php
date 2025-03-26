@@ -22,22 +22,27 @@ use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierExtension;
+use Rekalogika\Analytics\Bundle\Formatter\Twig\CellifierRuntime;
+use Rekalogika\Analytics\Bundle\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperCellifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperHtmlifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperNumberifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperStringifier;
@@ -46,6 +51,7 @@ use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NullFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NumberRangesFilterFactory;
+use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\DistinctValuesResolver;
@@ -312,7 +318,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(HtmlifierExtension::class)
+        ->set(CellifierRuntime::class)
+        ->tag('twig.runtime')
+        ->args([
+            '$cellifier' => service(Cellifier::class),
+        ])
+    ;
+
+    $services
+        ->set(FormatterExtension::class)
         ->tag('twig.extension')
     ;
 
@@ -325,6 +339,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(PivotTableRenderer::class)
+        ->args([
+            '$twig' => service('twig'),
+        ])
+    ;
+
+    $services
+        ->set(SpreadsheetRenderer::class)
         ->args([
             '$twig' => service('twig'),
         ])
@@ -411,6 +432,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     //
+    // cellifier
+    //
+
+    $services
+        ->set(Cellifier::class)
+        ->class(ChainCellifier::class)
+        ->args([
+            '$backendCellifiers' => tagged_iterator('rekalogika.analytics.backend_cellifier'),
+            '$stringifier' => service(Stringifier::class),
+        ])
+    ;
+
+    $services
+        ->set(DefaultBackendCellifier::class)
+        ->tag('rekalogika.analytics.backend_cellifier', [
+            'priority' => -1000,
+        ])
+    ;
+
+    //
     // filter
     //
 
@@ -479,6 +520,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(NodeWrapperStringifier::class)
         ->tag('rekalogika.analytics.backend_stringifier', [
+            'priority' => -100,
+        ])
+    ;
+
+    $services
+        ->set(NodeWrapperCellifier::class)
+        ->tag('rekalogika.analytics.backend_cellifier', [
             'priority' => -100,
         ])
     ;

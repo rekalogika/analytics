@@ -17,11 +17,13 @@ use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
+use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\DistinctValuesResolver;
 use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -80,6 +82,56 @@ final class AppController extends AbstractController
             'pivotTable' => $pivotTable,
             'chart' => $chart,
         ]);
+    }
+
+    #[Route('/download', name: 'download')]
+    public function download(
+        #[MapQueryParameter()]
+        ?string $parameters,
+        PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
+        SpreadsheetRenderer $spreadsheetRenderer,
+    ): Response {
+
+        if ($parameters === null) {
+            $parameters = [];
+        } else {
+            /** @psalm-suppress MixedAssignment */
+            $parameters = json_decode($parameters, true);
+        }
+
+        if (!\is_array($parameters)) {
+            $parameters = [];
+        }
+
+        /** @var array<string,mixed> $parameters */
+
+        $summaryTableManager = $this->summaryManagerRegistry
+            ->getManager(OrderSummary::class);
+
+        // populate query from url parameter
+        $query = $summaryTableManager->createQuery();
+        $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
+        $result = $query->getResult();
+
+        // create pivot table
+        $spreadsheet = $spreadsheetRenderer->createSpreadsheet(
+            result: $result,
+            pivotedDimensions: $query->getPivotedDimensions(),
+        );
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+        $response = new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            },
+        );
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="spreadsheet.xlsx"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 
     /**

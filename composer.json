@@ -18,6 +18,7 @@
         "doctrine/orm": "^2.20 || ^3.2",
         "doctrine/persistence": "^3.1",
         "ozdemirburak/iris": "^3.1",
+        "phpoffice/phpspreadsheet": "^4.0",
         "psr/cache": "^3.0",
         "psr/clock": "^1.0",
         "psr/container": "^2.0",
