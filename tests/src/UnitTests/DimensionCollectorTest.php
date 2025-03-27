@@ -23,16 +23,16 @@ use Symfony\Component\Translation\TranslatableMessage;
 final class DimensionCollectorTest extends TestCase
 {
     /**
-     * @var array<string,Dimension>
+     * @var array<string,DefaultDimension>
      */
     private array $dimensions = [];
 
-    private function addDimension(string $id, Dimension $dimension): void
+    private function addDimension(string $id, DefaultDimension $dimension): void
     {
         $this->dimensions[$id] = $dimension;
     }
 
-    private function getDimension(string $id): Dimension
+    private function getDimension(string $id): DefaultDimension
     {
         if (!isset($this->dimensions[$id])) {
             throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $id));

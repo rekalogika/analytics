@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
 use Rekalogika\Analytics\Contracts\Dimension;
-use Rekalogika\Analytics\Contracts\Tuple;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class DimensionCollector
 {
@@ -39,7 +39,7 @@ final class DimensionCollector
         return $this->collectors[$key] ??= new DimensionByKeyCollector($key);
     }
 
-    public function processTuple(Tuple $tuple): void
+    public function processTuple(DefaultTuple $tuple): void
     {
         $earlierDimensions = [];
 

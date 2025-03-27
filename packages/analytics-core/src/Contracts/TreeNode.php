@@ -25,4 +25,11 @@ interface TreeNode extends \Traversable, \Countable, Dimension
     public function getMeasure(): ?Measure;
 
     public function traverse(mixed ...$members): ?TreeNode;
+
+    /**
+     * Determine if this TreeNode is created to balance the tree, and does not
+     * result from the query. If true, this node always leads to a deadend, and
+     * won't have any measure on its leaves
+     */
+    public function isNull(): bool;
 }

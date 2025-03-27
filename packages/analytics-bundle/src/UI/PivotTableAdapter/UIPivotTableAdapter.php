@@ -49,6 +49,10 @@ final readonly class UIPivotTableAdapter implements BranchNode
     public function getChildren(): iterable
     {
         foreach ($this->result as $item) {
+            if ($item->isNull()) {
+                continue;
+            }
+
             if ($item->getMeasure() === null) {
                 yield new UIPivotTableBranch($item, $this->nodeWrapperFactory);
             } else {

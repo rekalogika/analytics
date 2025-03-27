@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
-use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 
 /**
- * @implements \IteratorAggregate<Dimension>
+ * @implements \IteratorAggregate<DefaultDimension>
  */
 final readonly class UniqueDimensionsByKey implements \IteratorAggregate, \Countable
 {
     /**
-     * @param list<Dimension> $dimensions
+     * @param list<DefaultDimension> $dimensions
      */
     public function __construct(
         private string $key,

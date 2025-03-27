@@ -30,6 +30,11 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
      */
     private array $children = [];
 
+    /**
+     * @var null|list<DefaultTreeNode>
+     */
+    private ?array $balancedChildren = null;
+
     private ?DefaultTreeNode $parent = null;
 
     private function __construct(
@@ -37,6 +42,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly DefaultDimension $dimension,
         private readonly ?DefaultMeasure $measure,
         private readonly UniqueDimensions $uniqueDimensions,
+        private readonly bool $null,
     ) {}
 
     #[\Override]
@@ -48,7 +54,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->getChildren() as $child) {
+        foreach ($this->getBalancedChildren() as $child) {
             yield $child->getMember() => $child;
         }
     }
@@ -61,6 +67,59 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         return $this->children;
     }
 
+    /**
+     * @return list<DefaultTreeNode>
+     */
+    public function getBalancedChildren(): array
+    {
+        if ($this->balancedChildren !== null) {
+            return $this->balancedChildren;
+        }
+
+        if ($this->childrenKey === null) {
+            return $this->children;
+        }
+
+        $uniqueChildrenDimensions = $this->uniqueDimensions
+            ->get($this->childrenKey);
+
+        $balancedChildren = [];
+
+        foreach ($uniqueChildrenDimensions as $dimension) {
+            $child = $this->getChildEqualTo($dimension);
+
+            if ($child === null) {
+                // continue;
+                $child = new DefaultTreeNode(
+                    childrenKey: $this->uniqueDimensions
+                        ->getKeyAfter($this->childrenKey),
+                    dimension: $dimension,
+                    measure: null,
+                    uniqueDimensions: $this->uniqueDimensions,
+                    null: true,
+                );
+            }
+
+            $child->setParent($this);
+
+            $balancedChildren[] = $child;
+        }
+
+        return $this->balancedChildren = $balancedChildren;
+    }
+
+    private function getChildEqualTo(
+        DefaultDimension $dimension,
+    ): ?DefaultTreeNode {
+        foreach ($this->children as $child) {
+            if ($child->isEqual($dimension)) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
     public static function createBranchNode(
         string $childrenKey,
         DefaultDimension $dimension,
@@ -71,6 +130,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             dimension: $dimension,
             measure: null,
             uniqueDimensions: $uniqueDimensions,
+            null: false,
         );
     }
 
@@ -84,10 +144,11 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             dimension: $dimension,
             uniqueDimensions: $uniqueDimensions,
             measure: $measure,
+            null: false,
         );
     }
 
-    public function isEqual(self $other): bool
+    public function isEqual(self|DefaultDimension $other): bool
     {
         return $this->getKey() === $other->getKey()
             && $this->getRawMember() === $other->getRawMember();
@@ -168,5 +229,11 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getUniqueDimensions(): UniqueDimensions
     {
         return $this->uniqueDimensions;
+    }
+
+    #[\Override]
+    public function isNull(): bool
+    {
+        return $this->null;
     }
 }

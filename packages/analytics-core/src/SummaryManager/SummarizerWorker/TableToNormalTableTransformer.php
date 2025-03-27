@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Contracts\MeasureMember;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\DimensionCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
@@ -40,9 +40,11 @@ final class TableToNormalTableTransformer
     private readonly array $measures;
 
     /**
-     * @var array<string,MeasureMember>
+     * @var array<string,DefaultMeasureMember>
      */
     private array $measureMemberCache = [];
+
+    private DimensionCollector $dimensionCollector;
 
     private function __construct(
         SummaryQuery $summaryQuery,
@@ -57,6 +59,7 @@ final class TableToNormalTableTransformer
 
         $this->dimensions = $dimensions;
         $this->measures = $summaryQuery->getSelect();
+        $this->dimensionCollector = new DimensionCollector();
     }
 
     public static function transform(
@@ -85,16 +88,19 @@ final class TableToNormalTableTransformer
 
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
+                $this->dimensionCollector->processTuple($row2->getTuple());
             }
         }
 
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
+        $uniqueDimensions = $this->dimensionCollector->getResult();
+
         return new DefaultNormalTable(
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
-            uniqueDimensions: $input->getUniqueDimensions(),
+            uniqueDimensions: $uniqueDimensions,
         );
     }
 
@@ -151,7 +157,7 @@ final class TableToNormalTableTransformer
         }
     }
 
-    private function getMeasureMember(string $measure): MeasureMember
+    private function getMeasureMember(string $measure): DefaultMeasureMember
     {
         return $this->measureMemberCache[$measure] ??= new DefaultMeasureMember(
             label: $this->metadata->getMeasureMetadata($measure)->getLabel(),

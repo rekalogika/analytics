@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
 use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**
@@ -22,13 +23,13 @@ use Rekalogika\Analytics\Util\DimensionUtil;
 final class DimensionByKeyCollector
 {
     /**
-     * @var array<string,Dimension>
+     * @var array<string,DefaultDimension>
      */
     private array $dimensions = [];
 
     private ?string $lastEarlierDimensionsInTupleSignature = null;
 
-    private ?Dimension $previousDimension = null;
+    private ?DefaultDimension $previousDimension = null;
 
     public function __construct(
         private readonly string $key,
@@ -43,11 +44,11 @@ final class DimensionByKeyCollector
     }
 
     /**
-     * @param list<Dimension> $earlierDimensionsInTuple
+     * @param list<DefaultDimension> $earlierDimensionsInTuple
      */
     public function addDimension(
         array $earlierDimensionsInTuple,
-        Dimension $dimension,
+        DefaultDimension $dimension,
     ): void {
         $previousDimension = $this->previousDimension;
         $this->previousDimension = $dimension;
@@ -115,8 +116,8 @@ final class DimensionByKeyCollector
      * Adds $dimension after $previousDimension in the $this->dimensions array
      */
     private function insertDimensionAfter(
-        Dimension $dimension,
-        Dimension $previousDimension,
+        DefaultDimension $dimension,
+        DefaultDimension $previousDimension,
     ): void {
         $newDimensions = [];
 
@@ -133,7 +134,7 @@ final class DimensionByKeyCollector
     }
 
     private function insertDimensionAtTheBeginning(
-        Dimension $dimension,
+        DefaultDimension $dimension,
     ): void {
         $signature = DimensionUtil::getDimensionSignature($dimension);
 

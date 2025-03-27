@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
