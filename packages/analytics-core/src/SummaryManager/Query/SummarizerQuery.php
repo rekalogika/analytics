@@ -197,13 +197,10 @@ final class SummarizerQuery extends AbstractQuery
 
     public function getTree(): DefaultTree
     {
-        $result = $this->tree ??= NormalTableToTreeTransformer::transform(
+        return $this->tree ??= NormalTableToTreeTransformer::transform(
             normalTable: $this->getNormalTable(),
             type: $this->hasTieredOrder() ? 'tree' : 'table',
         );
-
-        dump($result);
-        return $result;
     }
 
     private function hasTieredOrder(): bool

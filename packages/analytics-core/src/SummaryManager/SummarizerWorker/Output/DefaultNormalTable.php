@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\NormalRow;
 use Rekalogika\Analytics\Contracts\NormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
@@ -39,7 +38,7 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     }
 
     #[\Override]
-    public function first(): ?NormalRow
+    public function first(): ?DefaultNormalRow
     {
         return $this->rows[0] ?? null;
     }

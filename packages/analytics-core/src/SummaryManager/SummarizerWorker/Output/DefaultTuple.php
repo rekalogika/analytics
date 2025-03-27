@@ -14,17 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Dimension;
-use Rekalogika\Analytics\Contracts\Dimensions;
 use Rekalogika\Analytics\Contracts\Tuple;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 /**
- * @implements \IteratorAggregate<string,Dimension>
+ * @implements \IteratorAggregate<string,DefaultDimension>
  */
 final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 {
     public function __construct(
-        private Dimensions $dimensions,
+        private DefaultDimensions $dimensions,
     ) {}
 
     #[\Override]
@@ -41,7 +40,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): Dimension
+    public function get(string $key): DefaultDimension
     {
         return $this->dimensions->get($key);
     }

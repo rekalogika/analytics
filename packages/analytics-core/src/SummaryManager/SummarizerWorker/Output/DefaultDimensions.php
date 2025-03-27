@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\Dimensions;
 
 /**
- * @implements \IteratorAggregate<string,Dimension>
+ * @implements \IteratorAggregate<string,DefaultDimension>
  */
 final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
 {
     /**
-     * @var array<string,Dimension>
+     * @var array<string,DefaultDimension>
      */
     private array $dimensions;
 
     /**
-     * @param iterable<Dimension> $dimensions
+     * @param iterable<DefaultDimension> $dimensions
      */
     public function __construct(
         iterable $dimensions,
@@ -42,7 +41,7 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?Dimension
+    public function first(): ?DefaultDimension
     {
         $firstKey = array_key_first($this->dimensions);
 
@@ -54,14 +53,14 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): Dimension
+    public function get(string $key): DefaultDimension
     {
         return $this->dimensions[$key]
             ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $key));
     }
 
     #[\Override]
-    public function getByIndex(int $index): Dimension
+    public function getByIndex(int $index): DefaultDimension
     {
         $keys = array_keys($this->dimensions);
 

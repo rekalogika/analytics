@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\Measure;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
@@ -44,11 +46,14 @@ final class NormalTableToTreeTransformer
         // get keys from the first row
 
         $members = $firstRow->getTuple()->getMembers();
-        $keys = \array_keys($members);
+        $keys = array_keys($members);
 
         // instantiate and process
 
-        $transformer = new self($keys);
+        $transformer = new self(
+            keys: $keys,
+            uniqueDimensions: $normalTable->getUniqueDimensions(),
+        );
 
         $rootNodes = match ($type) {
             'tree' => $transformer->transformToTree($normalTable),
@@ -68,8 +73,8 @@ final class NormalTableToTreeTransformer
      */
     public function __construct(
         private readonly array $keys,
-    ) {
-    }
+        private readonly UniqueDimensions $uniqueDimensions,
+    ) {}
 
     /**
      * @var list<DefaultTreeNode>
@@ -82,17 +87,21 @@ final class NormalTableToTreeTransformer
     private array $tree = [];
 
     private function addDimension(
-        Dimension $dimension,
+        DefaultDimension $dimension,
         int $columnNumber,
         bool $forceCreate,
     ): void {
-        $childrenKey = $this->keys[$columnNumber+1] ?? null;
+        $childrenKey = $this->keys[$columnNumber + 1] ?? null;
 
         if ($childrenKey === null) {
             throw new \InvalidArgumentException('Children key cannot be null');
         }
 
-        $node = DefaultTreeNode::createBranchNode($childrenKey, $dimension);
+        $node = DefaultTreeNode::createBranchNode(
+            childrenKey: $childrenKey,
+            dimension: $dimension,
+            uniqueDimensions: $this->uniqueDimensions,
+        );
 
         $current = $this->currentPath[$columnNumber] ?? null;
 
@@ -118,12 +127,13 @@ final class NormalTableToTreeTransformer
     }
 
     private function addMeasure(
-        Dimension $lastDimension,
+        DefaultDimension $lastDimension,
         Measure $measure,
         int $columnNumber,
     ): void {
         $node = DefaultTreeNode::createLeafNode(
             dimension: $lastDimension,
+            uniqueDimensions: $this->uniqueDimensions,
             measure: $measure,
         );
 

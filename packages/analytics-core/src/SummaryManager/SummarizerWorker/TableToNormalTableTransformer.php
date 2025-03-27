@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\MeasureMember;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
@@ -23,7 +23,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTab
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\MeasureDimension;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -135,12 +134,12 @@ final class TableToNormalTableTransformer
 
             $measureValue = $this->getMeasureMember($measure);
 
-            $newRow['@values'] = new MeasureDimension(
+            $newRow['@values'] = DefaultDimension::createMeasureDimension(
                 label: $this->measureLabel,
                 measureMember: $measureValue,
             );
 
-            /** @var array<string,Dimension> $newRow */
+            /** @var array<string,DefaultDimension> $newRow */
             $dimensions = new DefaultDimensions($newRow);
             $tuple = new DefaultTuple($dimensions);
 

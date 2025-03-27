@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\TreeNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -34,9 +34,10 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private ?DefaultTreeNode $parent = null;
 
     private function __construct(
-        private ?string $childrenKey,
-        private Dimension $dimension,
-        private ?Measure $measure,
+        private readonly ?string $childrenKey,
+        private readonly DefaultDimension $dimension,
+        private readonly ?Measure $measure,
+        private readonly UniqueDimensions $uniqueDimensions,
     ) {}
 
     #[\Override]
@@ -48,29 +49,41 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->children as $child) {
+        foreach ($this->getChildren() as $child) {
             yield $child->getMember() => $child;
         }
     }
 
+    /**
+     * @return list<DefaultTreeNode>
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
     public static function createBranchNode(
         string $childrenKey,
-        Dimension $dimension
+        DefaultDimension $dimension,
+        UniqueDimensions $uniqueDimensions,
     ): self {
         return new self(
             childrenKey: $childrenKey,
             dimension: $dimension,
             measure: null,
+            uniqueDimensions: $uniqueDimensions,
         );
     }
 
     public static function createLeafNode(
-        Dimension $dimension,
+        DefaultDimension $dimension,
+        UniqueDimensions $uniqueDimensions,
         Measure $measure,
     ): self {
         return new self(
             childrenKey: null,
             dimension: $dimension,
+            uniqueDimensions: $uniqueDimensions,
             measure: $measure,
         );
     }
@@ -146,5 +159,15 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         $this->children[] = $node;
         $node->setParent($this);
+    }
+
+    public function getChildrenKey(): ?string
+    {
+        return $this->childrenKey;
+    }
+
+    public function getUniqueDimensions(): UniqueDimensions
+    {
+        return $this->uniqueDimensions;
     }
 }

@@ -44,7 +44,7 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
         foreach ($children as $child) {
             if ($child->getKey() !== $childrenKey) {
                 throw new \InvalidArgumentException(
-                    \sprintf('Invalid child key "%s", expected "%s"', $child->getKey(), \get_debug_type($childrenKey)),
+                    \sprintf('Invalid child key "%s", expected "%s"', $child->getKey(), get_debug_type($childrenKey)),
                 );
             }
         }
