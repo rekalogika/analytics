@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Dimension;
 use Rekalogika\Analytics\Contracts\Tuple;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
@@ -64,13 +63,13 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?Dimension
+    public function first(): ?DefaultDimension
     {
         return $this->dimensions->first();
     }
 
     #[\Override]
-    public function getByIndex(int $index): Dimension
+    public function getByIndex(int $index): DefaultDimension
     {
         return $this->dimensions->getByIndex($index);
     }

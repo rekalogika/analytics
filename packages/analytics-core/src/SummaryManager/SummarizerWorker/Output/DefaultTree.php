@@ -14,11 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Tree;
-use Rekalogika\Analytics\Contracts\TreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
- * @implements \IteratorAggregate<mixed,TreeNode>
+ * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  * @internal
  */
 final readonly class DefaultTree implements Tree, \IteratorAggregate
@@ -27,7 +26,7 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
 
     /**
      * @param class-string $summaryClass
-     * @param list<TreeNode> $children
+     * @param list<DefaultTreeNode> $children
      */
     public function __construct(
         private string $summaryClass,

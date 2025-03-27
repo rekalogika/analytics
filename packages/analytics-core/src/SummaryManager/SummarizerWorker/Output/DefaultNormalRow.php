@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\NormalRow;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
@@ -21,7 +20,7 @@ final readonly class DefaultNormalRow implements NormalRow
 {
     public function __construct(
         private DefaultTuple $tuple,
-        private Measure $measure,
+        private DefaultMeasure $measure,
         private string $groupings,
     ) {}
 
@@ -32,7 +31,7 @@ final readonly class DefaultNormalRow implements NormalRow
     }
 
     #[\Override]
-    public function getMeasure(): Measure
+    public function getMeasure(): DefaultMeasure
     {
         return $this->measure;
     }

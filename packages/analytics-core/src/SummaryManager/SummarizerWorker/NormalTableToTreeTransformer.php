@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Contracts\Dimension;
-use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
@@ -128,7 +128,7 @@ final class NormalTableToTreeTransformer
 
     private function addMeasure(
         DefaultDimension $lastDimension,
-        Measure $measure,
+        DefaultMeasure $measure,
         int $columnNumber,
     ): void {
         $node = DefaultTreeNode::createLeafNode(

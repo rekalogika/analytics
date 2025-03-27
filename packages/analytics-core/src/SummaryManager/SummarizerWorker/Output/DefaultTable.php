@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Row;
 use Rekalogika\Analytics\Contracts\Table;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
@@ -39,7 +38,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?Row
+    public function first(): ?DefaultRow
     {
         return $this->rows[0] ?? null;
     }

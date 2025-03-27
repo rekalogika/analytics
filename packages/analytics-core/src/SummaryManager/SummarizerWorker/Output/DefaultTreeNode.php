@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\TreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @implements \IteratorAggregate<mixed,TreeNode>
+ * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  * @internal
  */
 final class DefaultTreeNode implements TreeNode, \IteratorAggregate
@@ -36,7 +35,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private function __construct(
         private readonly ?string $childrenKey,
         private readonly DefaultDimension $dimension,
-        private readonly ?Measure $measure,
+        private readonly ?DefaultMeasure $measure,
         private readonly UniqueDimensions $uniqueDimensions,
     ) {}
 
@@ -78,7 +77,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public static function createLeafNode(
         DefaultDimension $dimension,
         UniqueDimensions $uniqueDimensions,
-        Measure $measure,
+        DefaultMeasure $measure,
     ): self {
         return new self(
             childrenKey: null,
@@ -125,7 +124,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getMeasure(): ?Measure
+    public function getMeasure(): ?DefaultMeasure
     {
         return $this->measure;
     }
