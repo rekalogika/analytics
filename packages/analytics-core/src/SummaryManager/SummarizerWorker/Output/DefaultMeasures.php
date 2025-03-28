@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\Measures;
 
 /**
- * @implements \IteratorAggregate<string,Measure>
+ * @implements \IteratorAggregate<string,DefaultMeasure>
  */
 final readonly class DefaultMeasures implements Measures, \IteratorAggregate
 {
     /**
-     * @var array<string,Measure>
+     * @var array<string,DefaultMeasure>
      */
     private array $measures;
 
     /**
-     * @param iterable<Measure> $measures
+     * @param iterable<DefaultMeasure> $measures
      */
     public function __construct(
         iterable $measures,
@@ -42,7 +41,7 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): Measure
+    public function get(string $key): DefaultMeasure
     {
         return $this->measures[$key]
             ?? throw new \InvalidArgumentException(\sprintf('Measure "%s" not found', $key));
@@ -67,7 +66,7 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?Measure
+    public function first(): ?DefaultMeasure
     {
         $firstKey = array_key_first($this->measures);
 

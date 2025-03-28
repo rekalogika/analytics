@@ -25,7 +25,7 @@ interface Result
      */
     public function getSummaryClass(): string;
 
-    public function getTree(): TreeResult;
+    public function getTree(): Tree;
 
     public function getNormalTable(): NormalTable;
 

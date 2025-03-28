@@ -13,27 +13,25 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measure;
 use Rekalogika\Analytics\Contracts\NormalRow;
-use Rekalogika\Analytics\Contracts\Tuple;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow
 {
     public function __construct(
-        private Tuple $tuple,
-        private Measure $measure,
+        private DefaultTuple $tuple,
+        private DefaultMeasure $measure,
         private string $groupings,
     ) {}
 
     #[\Override]
-    public function getTuple(): Tuple
+    public function getTuple(): DefaultTuple
     {
         return $this->tuple;
     }
 
     #[\Override]
-    public function getMeasure(): Measure
+    public function getMeasure(): DefaultMeasure
     {
         return $this->measure;
     }
@@ -57,10 +55,6 @@ final readonly class DefaultNormalRow implements NormalRow
 
             if ($key === '@values') {
                 break;
-            }
-
-            if (!$value1 instanceof DefaultDimension || !$value2 instanceof DefaultDimension) {
-                throw new \RuntimeException('Only DefaultDimension is supported');
             }
 
             if (!DimensionUtil::isDimensionSame($value1, $value2)) {

@@ -24,9 +24,7 @@ final readonly class UIPivotTableLeaf implements LeafNode
         private TreeNode $node,
         private NodeWrapperFactory $nodeWrapperFactory,
     ) {
-        $measure = $node->getMeasure();
-
-        if ($measure === null) {
+        if (\count($node) > 0) {
             throw new \InvalidArgumentException('Item must be a leaf');
         }
     }

@@ -37,6 +37,24 @@ final readonly class UniqueDimensions implements \IteratorAggregate, \Countable
             ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $key));
     }
 
+    public function getKeyAfter(string $key): ?string
+    {
+        $keys = array_keys($this->dimensions);
+        $keyIndex = array_search($key, $keys, true);
+
+        if ($keyIndex === false) {
+            return null;
+        }
+
+        $nextKeyIndex = $keyIndex + 1;
+
+        if (!isset($keys[$nextKeyIndex])) {
+            return null;
+        }
+
+        return $keys[$nextKeyIndex];
+    }
+
 
     #[\Override]
     public function count(): int

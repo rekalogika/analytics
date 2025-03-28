@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Measure;
-use Rekalogika\Analytics\Contracts\Unit;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultMeasure implements Measure
@@ -24,7 +23,7 @@ final readonly class DefaultMeasure implements Measure
         private string $key,
         private mixed $value,
         private mixed $rawValue,
-        private ?Unit $unit,
+        private ?DefaultUnit $unit,
     ) {}
 
     #[\Override]
@@ -52,7 +51,7 @@ final readonly class DefaultMeasure implements Measure
     }
 
     #[\Override]
-    public function getUnit(): ?Unit
+    public function getUnit(): ?DefaultUnit
     {
         return $this->unit;
     }

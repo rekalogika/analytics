@@ -46,7 +46,11 @@ final readonly class UIPivotTableBranch implements BranchNode
     public function getChildren(): iterable
     {
         foreach ($this->node as $item) {
-            if ($item->getMeasure() === null) {
+            if ($item->isNull()) {
+                continue;
+            }
+
+            if (\count($item) > 0) {
                 yield new UIPivotTableBranch($item, $this->nodeWrapperFactory);
             } else {
                 yield new UIPivotTableLeaf($item, $this->nodeWrapperFactory);

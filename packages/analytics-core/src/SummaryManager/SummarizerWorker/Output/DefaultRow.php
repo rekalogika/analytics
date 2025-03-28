@@ -13,26 +13,24 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measures;
 use Rekalogika\Analytics\Contracts\Row;
-use Rekalogika\Analytics\Contracts\Tuple;
 
 final readonly class DefaultRow implements Row
 {
     public function __construct(
-        private Tuple $tuple,
-        private Measures $measures,
+        private DefaultTuple $tuple,
+        private DefaultMeasures $measures,
         private string $groupings,
     ) {}
 
     #[\Override]
-    public function getTuple(): Tuple
+    public function getTuple(): DefaultTuple
     {
         return $this->tuple;
     }
 
     #[\Override]
-    public function getMeasures(): Measures
+    public function getMeasures(): DefaultMeasures
     {
         return $this->measures;
     }
