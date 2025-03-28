@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
 use Rekalogika\Analytics\Contracts\Dimension;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class DimensionCollector
@@ -23,15 +24,23 @@ final class DimensionCollector
      */
     private array $collectors = [];
 
+    /**
+     * @var array<string,DefaultMeasure>
+     */
+    private array $measures = [];
+
     public function getResult(): UniqueDimensions
     {
-        $result = [];
+        $uniqueDimensionsByKey = [];
 
         foreach ($this->collectors as $key => $collector) {
-            $result[$key] = $collector->getResult();
+            $uniqueDimensionsByKey[$key] = $collector->getResult();
         }
 
-        return new UniqueDimensions($result);
+        return new UniqueDimensions(
+            dimensions: $uniqueDimensionsByKey,
+            measures: $this->measures,
+        );
     }
 
     private function getCollectorForKey(string $key): DimensionByKeyCollector
@@ -53,6 +62,12 @@ final class DimensionCollector
 
             $earlierDimensions[] = $dimension;
         }
+    }
+
+    public function processMeasure(DefaultMeasure $measure): void
+    {
+        $this->measures[$measure->getKey()]
+            ??= DefaultMeasure::createNullFromSelf($measure);
     }
 
     /**

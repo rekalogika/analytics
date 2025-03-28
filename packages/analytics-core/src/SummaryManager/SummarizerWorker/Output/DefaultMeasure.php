@@ -26,6 +26,29 @@ final readonly class DefaultMeasure implements Measure
         private ?DefaultUnit $unit,
     ) {}
 
+    public static function createNull(
+        TranslatableInterface $label,
+        string $key,
+        ?DefaultUnit $unit,
+    ): self {
+        return new self(
+            label: $label,
+            key: $key,
+            value: null,
+            rawValue: null,
+            unit: $unit,
+        );
+    }
+
+    public static function createNullFromSelf(DefaultMeasure $measure): self
+    {
+        return self::createNull(
+            label: $measure->label,
+            key: $measure->key,
+            unit: $measure->unit,
+        );
+    }
+
     #[\Override]
     public function getLabel(): TranslatableInterface
     {

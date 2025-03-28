@@ -17,9 +17,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -33,11 +35,15 @@ final class DefaultResult implements Result
      */
     private ?array $queryResult = null;
 
-    private ?DefaultTable $table = null;
+    private ?DefaultTable $unbalancedTable = null;
+
+    private ?DefaultNormalTable $unbalancedNormalTable = null;
+
+    private ?DefaultTree $tree = null;
 
     private ?DefaultNormalTable $normalTable = null;
 
-    private ?DefaultTree $tree = null;
+    private ?DefaultTable $table = null;
 
     /**
      * @param class-string $summaryClass
@@ -66,10 +72,9 @@ final class DefaultResult implements Result
         return $this->queryResult ??= $this->summarizerQuery->getQueryResult();
     }
 
-    #[\Override]
-    public function getTable(): DefaultTable
+    public function getUnbalancedTable(): DefaultTable
     {
-        return $this->table ??= QueryResultToTableTransformer::transform(
+        return $this->unbalancedTable ??= QueryResultToTableTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
@@ -78,13 +83,12 @@ final class DefaultResult implements Result
         );
     }
 
-    #[\Override]
-    public function getNormalTable(): DefaultNormalTable
+    public function getUnbalancedNormalTable(): DefaultNormalTable
     {
-        return $this->normalTable ??= TableToNormalTableTransformer::transform(
+        return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             summaryQuery: $this->query,
             metadata: $this->metadata,
-            input: $this->getTable(),
+            input: $this->getUnbalancedTable(),
         );
     }
 
@@ -92,9 +96,23 @@ final class DefaultResult implements Result
     public function getTree(): DefaultTree
     {
         return $this->tree ??= NormalTableToTreeTransformer::transform(
-            normalTable: $this->getNormalTable(),
+            normalTable: $this->getUnbalancedNormalTable(),
             query: $this->query,
             metadata: $this->metadata,
         );
+    }
+
+    #[\Override]
+    public function getNormalTable(): DefaultNormalTable
+    {
+        return $this->normalTable ??= TreeToBalancedNormalTableTransformer
+            ::transform(tree: $this->getTree());
+    }
+
+    #[\Override]
+    public function getTable(): DefaultTable
+    {
+        return $this->table ??= BalancedNormalTableToBalancedTableTransformer
+            ::transform(normalTable: $this->getNormalTable());
     }
 }
