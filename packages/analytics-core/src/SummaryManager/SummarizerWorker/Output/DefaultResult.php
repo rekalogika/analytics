@@ -13,21 +13,43 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result;
+use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
+use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @internal
  */
-final readonly class DefaultResult implements Result
+final class DefaultResult implements Result
 {
     /**
+     * @var list<array<string, mixed>>|null
+     */
+    private ?array $queryResult = null;
+
+    private ?DefaultTable $table = null;
+
+    private ?DefaultNormalTable $normalTable = null;
+
+    private ?DefaultTree $tree = null;
+
+    /**
      * @param class-string $summaryClass
-     * @param SummarizerQuery $query
+     * @param SummarizerQuery $summarizerQuery
      */
     public function __construct(
         private string $summaryClass,
-        private SummarizerQuery $query,
+        private SummaryQuery $query,
+        private SummaryMetadata $metadata,
+        private SummarizerQuery $summarizerQuery,
+        private PropertyAccessorInterface $propertyAccessor,
+        private EntityManagerInterface $entityManager,
     ) {}
 
     #[\Override]
@@ -36,21 +58,43 @@ final readonly class DefaultResult implements Result
         return $this->summaryClass;
     }
 
-    #[\Override]
-    public function getTree(): DefaultTree
+    /**
+     * @return list<array<string,mixed>>
+     */
+    public function getQueryResult(): array
     {
-        return $this->query->getTree();
+        return $this->queryResult ??= $this->summarizerQuery->getQueryResult();
     }
 
     #[\Override]
     public function getTable(): DefaultTable
     {
-        return $this->query->getTable();
+        return $this->table ??= QueryResultToTableTransformer::transform(
+            query: $this->query,
+            metadata: $this->metadata,
+            entityManager: $this->entityManager,
+            propertyAccessor: $this->propertyAccessor,
+            input: $this->getQueryResult(),
+        );
     }
 
     #[\Override]
     public function getNormalTable(): DefaultNormalTable
     {
-        return $this->query->getNormalTable();
+        return $this->normalTable ??= TableToNormalTableTransformer::transform(
+            summaryQuery: $this->query,
+            metadata: $this->metadata,
+            input: $this->getTable(),
+        );
+    }
+
+    #[\Override]
+    public function getTree(): DefaultTree
+    {
+        return $this->tree ??= NormalTableToTreeTransformer::transform(
+            normalTable: $this->getNormalTable(),
+            query: $this->query,
+            metadata: $this->metadata,
+        );
     }
 }

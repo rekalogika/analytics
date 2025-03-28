@@ -13,21 +13,41 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
+use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 
 final class NormalTableToTreeTransformer
 {
     /**
-     * @param 'tree'|'table' $type
+     * @var list<DefaultTreeNode>
      */
+    private array $currentPath = [];
+
+    /**
+     * @var list<DefaultTreeNode>
+     */
+    private array $tree = [];
+
+    /**
+     * @param list<string> $keys
+     */
+    public function __construct(
+        private readonly SummaryQuery $query,
+        private readonly SummaryMetadata $metadata,
+        private readonly array $keys,
+        private readonly UniqueDimensions $uniqueDimensions,
+    ) {}
+
     public static function transform(
+        SummaryQuery $query,
+        SummaryMetadata $metadata,
         DefaultNormalTable $normalTable,
-        string $type,
     ): DefaultTree {
         // check if empty
 
@@ -50,40 +70,37 @@ final class NormalTableToTreeTransformer
         // instantiate and process
 
         $transformer = new self(
+            query: $query,
+            metadata: $metadata,
             keys: $keys,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
         );
 
-        $rootNodes = match ($type) {
-            'tree' => $transformer->transformToTree($normalTable),
-            'table' => $transformer->transformToTable($normalTable),
-        };
-
         return new DefaultTree(
             childrenKey: $keys[0],
             summaryClass: $normalTable->getSummaryClass(),
-            children: $rootNodes,
+            children: $transformer->doTransform($normalTable),
             uniqueDimensions: $normalTable->getUniqueDimensions(),
         );
     }
 
-    /**
-     * @param list<string> $keys
-     */
-    public function __construct(
-        private readonly array $keys,
-        private readonly UniqueDimensions $uniqueDimensions,
-    ) {}
+    private function hasTieredOrder(): bool
+    {
+        $orderBy = $this->query->getOrderBy();
 
-    /**
-     * @var list<DefaultTreeNode>
-     */
-    private array $currentPath = [];
+        if (\count($orderBy) === 0) {
+            return true;
+        }
 
-    /**
-     * @var list<DefaultTreeNode>
-     */
-    private array $tree = [];
+        $orderFields = array_keys($orderBy);
+
+        $dimensionWithoutValues = array_filter(
+            $this->metadata->getDimensionPropertyNames(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        );
+
+        return $orderFields === $dimensionWithoutValues;
+    }
 
     private function addDimension(
         DefaultDimension $dimension,
@@ -150,6 +167,18 @@ final class NormalTableToTreeTransformer
         } else {
             $this->currentPath = [$node];
             $this->tree[] = $node;
+        }
+    }
+
+    /**
+     * @return list<DefaultTreeNode>
+     */
+    private function doTransform(DefaultNormalTable $normalTable): array
+    {
+        if ($this->hasTieredOrder()) {
+            return $this->transformToTree($normalTable);
+        } else {
+            return $this->transformToTable($normalTable);
         }
     }
 
