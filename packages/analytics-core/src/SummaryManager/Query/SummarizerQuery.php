@@ -21,18 +21,11 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class SummarizerQuery extends AbstractQuery
 {
@@ -63,17 +56,10 @@ final class SummarizerQuery extends AbstractQuery
      */
     private ?array $queryResult = null;
 
-    private ?DefaultTable $table = null;
-
-    private ?DefaultNormalTable $normalTable = null;
-
-    private ?DefaultTree $tree = null;
-
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
-        private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
         parent::__construct($queryBuilder);
 
@@ -89,7 +75,7 @@ final class SummarizerQuery extends AbstractQuery
     /**
      * @return list<array<string,mixed>>
      */
-    private function getQueryResult(): array
+    public function getQueryResult(): array
     {
         if ($this->queryResult !== null) {
             return $this->queryResult;
@@ -97,7 +83,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // check if select is empty
         if ($this->query->getSelect() === []) {
-            return [];
+            return $this->queryResult = [];
         }
 
         // add query builder parameters that are always used
@@ -108,7 +94,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // add partition where clause
         if (!$this->addPartitionWhere()) {
-            return [];
+            return $this->queryResult = [];
         }
 
         // add where clause supplied by the user
@@ -173,52 +159,6 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         return $this->queryResult = $newResult;
-    }
-
-    public function getTable(): DefaultTable
-    {
-        return $this->table ??= QueryResultToTableTransformer::transform(
-            query: $this->query,
-            metadata: $this->metadata,
-            entityManager: $this->entityManager,
-            propertyAccessor: $this->propertyAccessor,
-            input: $this->getQueryResult(),
-        );
-    }
-
-    public function getNormalTable(): DefaultNormalTable
-    {
-        return $this->normalTable ??= TableToNormalTableTransformer::transform(
-            summaryQuery: $this->query,
-            metadata: $this->metadata,
-            input: $this->getTable(),
-        );
-    }
-
-    public function getTree(): DefaultTree
-    {
-        return $this->tree ??= NormalTableToTreeTransformer::transform(
-            normalTable: $this->getNormalTable(),
-            type: $this->hasTieredOrder() ? 'tree' : 'table',
-        );
-    }
-
-    private function hasTieredOrder(): bool
-    {
-        $orderBy = $this->query->getOrderBy();
-
-        if (\count($orderBy) === 0) {
-            return true;
-        }
-
-        $orderFields = array_keys($orderBy);
-
-        $dimensionWithoutValues = array_filter(
-            $this->metadata->getDimensionPropertyNames(),
-            fn(string $dimension): bool => $dimension !== '@values',
-        );
-
-        return $orderFields === $dimensionWithoutValues;
     }
 
     private function initializeQueryBuilder(): void

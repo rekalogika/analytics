@@ -84,12 +84,15 @@ final class SummaryQuery implements Query
             queryBuilder: $this->entityManager->createQueryBuilder(),
             query: $this,
             metadata: $this->metadata,
-            propertyAccessor: $this->propertyAccessor,
         );
 
         return $this->result = new DefaultResult(
             summaryClass: $this->metadata->getSummaryClass(),
-            query: $summarizer,
+            query: $this,
+            metadata: $this->metadata,
+            summarizerQuery: $summarizer,
+            propertyAccessor: $this->propertyAccessor,
+            entityManager: $this->entityManager,
         );
     }
 
