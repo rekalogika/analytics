@@ -53,7 +53,7 @@ final readonly class UIPivotTableAdapter implements BranchNode
                 continue;
             }
 
-            if ($item->getMeasure() === null) {
+            if (\count($item) > 0) {
                 yield new UIPivotTableBranch($item, $this->nodeWrapperFactory);
             } else {
                 yield new UIPivotTableLeaf($item, $this->nodeWrapperFactory);
