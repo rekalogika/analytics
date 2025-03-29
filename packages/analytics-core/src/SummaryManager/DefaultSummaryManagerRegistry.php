@@ -15,10 +15,10 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\SummaryManager;
-use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegistry

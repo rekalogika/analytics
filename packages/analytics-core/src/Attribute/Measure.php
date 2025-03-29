@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]

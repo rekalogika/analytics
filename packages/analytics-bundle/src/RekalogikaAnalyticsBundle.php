@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

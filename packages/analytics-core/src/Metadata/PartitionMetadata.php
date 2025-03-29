@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
-use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\PartitionKeyClassifier;
-use Rekalogika\Analytics\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
 final readonly class PartitionMetadata
 {

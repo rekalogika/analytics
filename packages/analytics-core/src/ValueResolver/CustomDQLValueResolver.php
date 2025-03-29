@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-use Rekalogika\Analytics\ValueResolver;
 
 final readonly class CustomDQLValueResolver implements ValueResolver
 {

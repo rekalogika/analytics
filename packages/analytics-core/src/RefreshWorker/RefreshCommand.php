@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\RefreshWorker;
 
-use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 
 /**
  * @template L of object The lock object used by the framework.

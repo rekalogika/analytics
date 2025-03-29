@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
 use Rekalogika\Analytics\Model\TimeInterval\Date;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
@@ -22,7 +23,6 @@ use Rekalogika\Analytics\Model\TimeInterval\Week;
 use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
 use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Model\TimeInterval\Year;
-use Rekalogika\Analytics\TimeInterval;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 

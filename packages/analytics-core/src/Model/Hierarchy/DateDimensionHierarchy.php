@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Model\Hierarchy;
 
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Attribute\Hierarchy;
+use Rekalogika\Analytics\Contracts\Summary\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\DayTrait;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\MonthTrait;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\QuarterTrait;
@@ -22,7 +23,6 @@ use Rekalogika\Analytics\Model\Hierarchy\Trait\TimeZoneTrait;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\WeekTrait;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\WeekYearTrait;
 use Rekalogika\Analytics\Model\Hierarchy\Trait\YearTrait;
-use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
 
 #[Embeddable]
 #[Hierarchy([

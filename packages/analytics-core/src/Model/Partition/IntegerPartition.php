@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
-use Rekalogika\Analytics\Partition;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\PartitionKeyClassifier\BigIntClassifier;
 
 /**

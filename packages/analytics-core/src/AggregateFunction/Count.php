@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class Count implements AggregateFunction

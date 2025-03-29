@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\DimensionValueResolver;
 
-use Rekalogika\Analytics\DimensionValueResolver;
-use Rekalogika\Analytics\DimensionValueResolverContext;
+use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolverContext;
 
 final readonly class TimeDimensionValueResolver implements DimensionValueResolver
 {

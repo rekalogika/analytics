@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
-use Rekalogika\Analytics\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;

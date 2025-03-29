@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class PropertyValueResolver implements PartitionValueResolver

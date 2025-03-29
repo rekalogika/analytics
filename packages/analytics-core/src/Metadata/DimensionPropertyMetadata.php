@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
-use Rekalogika\Analytics\DimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata

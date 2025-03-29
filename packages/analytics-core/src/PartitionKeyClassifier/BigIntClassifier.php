@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PartitionKeyClassifier;
 
-use Rekalogika\Analytics\PartitionKeyClassifier;
-use Rekalogika\Analytics\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class BigIntClassifier implements PartitionKeyClassifier

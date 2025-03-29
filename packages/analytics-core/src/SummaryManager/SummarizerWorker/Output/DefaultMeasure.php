@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Measure;
+use Rekalogika\Analytics\Contracts\Result\Measure;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultMeasure implements Measure

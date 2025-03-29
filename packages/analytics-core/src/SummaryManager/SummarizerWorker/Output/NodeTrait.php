@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\MeasureMember;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 
 trait NodeTrait
 {

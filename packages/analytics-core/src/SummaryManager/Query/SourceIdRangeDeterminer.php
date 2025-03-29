@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\PartitionValueResolver;
-use Rekalogika\Analytics\ValueRangeResolver;
 
 /**
  * Roll up lower level summary to higher level by grouping by the entire row set
