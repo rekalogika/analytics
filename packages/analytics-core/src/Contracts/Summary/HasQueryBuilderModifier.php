@@ -11,11 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
+use Doctrine\ORM\QueryBuilder;
 
-interface RecurringTimeInterval extends TranslatableInterface, SequenceMember
+interface HasQueryBuilderModifier
 {
-    public static function createFromDatabaseValue(int $databaseValue): static;
+    public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void;
 }

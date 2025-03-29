@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Attribute;
 
 use Doctrine\Common\Collections\Order;
-use Rekalogika\Analytics\ValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]

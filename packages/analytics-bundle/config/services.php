@@ -54,7 +54,8 @@ use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NumberRangesFilterFacto
 use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
@@ -69,7 +70,6 @@ use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistr
 use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;
-use Rekalogika\Analytics\SummaryManagerRegistry;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager;
 
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
-use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
 /**

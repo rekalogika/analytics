@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\EqualFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 
 /**

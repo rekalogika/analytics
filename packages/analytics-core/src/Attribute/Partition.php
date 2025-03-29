@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class Partition

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\RecurringTimeInterval;
+use Rekalogika\Analytics\Contracts\Summary\RecurringTimeInterval;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum QuarterOfYear: int implements RecurringTimeInterval

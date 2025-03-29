@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\PartitionKeyClassifier;
+use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class PartitionKey

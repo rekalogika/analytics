@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
+use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
@@ -34,7 +35,6 @@ use Rekalogika\Analytics\Model\TimeInterval\WeekOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\WeekOfYear;
 use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Model\TimeInterval\Year;
-use Rekalogika\Analytics\TimeInterval;
 
 final readonly class DefaultFilterFactory implements FilterFactory
 {

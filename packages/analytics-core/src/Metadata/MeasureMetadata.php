@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
-use Rekalogika\Analytics\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata

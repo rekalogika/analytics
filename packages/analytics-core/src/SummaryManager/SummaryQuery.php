@@ -18,7 +18,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;

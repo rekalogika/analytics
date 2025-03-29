@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Summary\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -23,7 +24,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Rekalogika\Analytics\TimeZoneAwareDimensionHierarchy;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\DistinctValuesResolver;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;

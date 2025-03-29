@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;

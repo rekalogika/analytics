@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
-use Rekalogika\Analytics\ValueRangeResolver;
 
 /**
  * Truncate source value in UUID format to 64-bit integer.

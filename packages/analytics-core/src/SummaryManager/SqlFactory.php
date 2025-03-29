@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\Query\InsertIntoSummaryQuery;

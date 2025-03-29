@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
+use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Metadata\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
-use Rekalogika\Analytics\Partition;
-use Rekalogika\Analytics\PartitionValueResolver;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

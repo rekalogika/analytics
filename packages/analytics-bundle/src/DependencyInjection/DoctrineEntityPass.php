@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Rekalogika\Analytics\SummaryManager;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -61,6 +61,6 @@ final class DoctrineEntityPass implements CompilerPassInterface
             throw new \RuntimeException('Reflection failed');
         }
 
-        return \dirname($fileName, 1) . '/Model';
+        return \dirname($fileName, 2) . '/Model';
     }
 }

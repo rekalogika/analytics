@@ -11,14 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\Contracts\Summary;
 
-interface SummaryManagerRegistry
+interface TimeZoneAwareDimensionHierarchy
 {
-    /**
-     * @template T of object
-     * @param class-string<T> $class
-     * @return SummaryManager<T>
-     */
-    public function getManager(string $class): SummaryManager;
+    public function setTimeZone(\DateTimeZone $timeZone): void;
 }

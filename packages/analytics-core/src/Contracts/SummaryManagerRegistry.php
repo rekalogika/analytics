@@ -11,11 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics;
+namespace Rekalogika\Analytics\Contracts;
 
-use Doctrine\ORM\QueryBuilder;
-
-interface HasQueryBuilderModifier
+interface SummaryManagerRegistry
 {
-    public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void;
+    /**
+     * @template T of object
+     * @param class-string<T> $class
+     * @return SummaryManager<T>
+     */
+    public function getManager(string $class): SummaryManager;
 }

@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\DimensionValueResolverContext;
-use Rekalogika\Analytics\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolverContext;
+use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Partition;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;

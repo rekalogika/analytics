@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Partition;
 
 final readonly class DeleteExistingSummaryQuery
 {
