@@ -89,6 +89,7 @@ final class TableToNormalTableTransformer
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
                 $this->dimensionCollector->processTuple($row2->getTuple());
+                $this->dimensionCollector->processMeasure($row2->getMeasure());
             }
         }
 

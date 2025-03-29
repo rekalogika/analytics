@@ -76,9 +76,9 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             throw new UnsupportedData('No data found');
         }
 
-        if (\count($tuple) === 1) {
+        if (\count($tuple) === 2) {
             return $this->createBarChart($result);
-        } elseif (\count($tuple) === 2) {
+        } elseif (\count($tuple) === 3) {
             return $this->createGroupedBarChart($result, false);
         }
 
@@ -142,7 +142,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         foreach ($result->getTable() as $row) {
             $dimensions = $row->getTuple();
 
-            if (\count($dimensions) !== 1) {
+            if (\count($dimensions) !== 2) {
                 throw new UnsupportedData('Expected only one member');
             }
 

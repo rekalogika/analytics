@@ -88,4 +88,23 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     {
         yield from $this->dimensions;
     }
+
+    public function isSame(Dimensions $dimensions): bool
+    {
+        if ($this->count() !== $dimensions->count()) {
+            return false;
+        }
+
+        foreach ($this->dimensions as $key => $dimension) {
+            if (!$dimensions->has($key)) {
+                return false;
+            }
+
+            if (!$dimension->isSame($dimensions->get($key))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

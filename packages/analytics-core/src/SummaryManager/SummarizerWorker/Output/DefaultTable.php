@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Table;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>
@@ -28,7 +27,6 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         private array $rows,
-        // private UniqueDimensions $uniqueDimensions,
     ) {}
 
     #[\Override]
@@ -54,9 +52,4 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     {
         yield from $this->rows;
     }
-
-    // public function getUniqueDimensions(): UniqueDimensions
-    // {
-    //     return $this->uniqueDimensions;
-    // }
 }

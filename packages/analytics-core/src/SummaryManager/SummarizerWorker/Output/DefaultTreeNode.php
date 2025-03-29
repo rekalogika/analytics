@@ -40,7 +40,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private function __construct(
         private readonly ?string $childrenKey,
         private readonly DefaultDimension $dimension,
-        private readonly ?DefaultMeasure $measure,
+        private ?DefaultMeasure $measure,
         private readonly UniqueDimensions $uniqueDimensions,
         private readonly bool $null,
     ) {}
@@ -48,7 +48,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function count(): int
     {
-        return \count($this->children);
+        return \count($this->getBalancedChildren());
     }
 
     #[\Override]
@@ -70,7 +70,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     /**
      * @return list<DefaultTreeNode>
      */
-    public function getBalancedChildren(): array
+    private function getBalancedChildren(): array
     {
         if ($this->balancedChildren !== null) {
             return $this->balancedChildren;
@@ -81,7 +81,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
 
         $uniqueChildrenDimensions = $this->uniqueDimensions
-            ->get($this->childrenKey);
+            ->getDimensions($this->childrenKey);
 
         $balancedChildren = [];
 
@@ -187,7 +187,43 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getMeasure(): ?DefaultMeasure
     {
-        return $this->measure;
+        if ($this->measure !== null) {
+            return $this->measure;
+        }
+
+        // if has children, then measure must be null
+        if (\count($this) > 0) {
+            return null;
+        }
+
+        // we need to create a null measure here, first find the measure
+        // member
+
+        $measureMember = null;
+
+        $parent = $this;
+
+        do {
+            /** @psalm-suppress MixedAssignment */
+            $member = $parent->getMember();
+
+            if ($member instanceof DefaultMeasureMember) {
+                $measureMember = $member;
+                break;
+            }
+        } while ($parent = $parent->getParent());
+
+        if ($measureMember === null) {
+            throw new \UnexpectedValueException('Measure member not found');
+        }
+
+        // get the measure key
+        $measureProperty = $measureMember->getMeasureProperty();
+
+        // get the null measure
+        $measure = $this->uniqueDimensions->getMeasure($measureProperty);
+
+        return $this->measure = $measure;
     }
 
     public function setParent(DefaultTreeNode $parent): void
@@ -235,5 +271,10 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function isNull(): bool
     {
         return $this->null;
+    }
+
+    public function getDimension(): DefaultDimension
+    {
+        return $this->dimension;
     }
 }
