@@ -203,7 +203,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         $parent = $this;
 
-        do  {
+        do {
             /** @psalm-suppress MixedAssignment */
             $member = $parent->getMember();
 

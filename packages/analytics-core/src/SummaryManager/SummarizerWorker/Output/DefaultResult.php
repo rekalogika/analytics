@@ -105,14 +105,12 @@ final class DefaultResult implements Result
     #[\Override]
     public function getNormalTable(): DefaultNormalTable
     {
-        return $this->normalTable ??= TreeToBalancedNormalTableTransformer
-            ::transform(tree: $this->getTree());
+        return $this->normalTable ??= TreeToBalancedNormalTableTransformer::transform(tree: $this->getTree());
     }
 
     #[\Override]
     public function getTable(): DefaultTable
     {
-        return $this->table ??= BalancedNormalTableToBalancedTableTransformer
-            ::transform(normalTable: $this->getNormalTable());
+        return $this->table ??= BalancedNormalTableToBalancedTableTransformer::transform(normalTable: $this->getNormalTable());
     }
 }
