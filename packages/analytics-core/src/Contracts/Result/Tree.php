@@ -11,23 +11,21 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
  * Represents a query result.
  *
  * For consumption only, do not implement. Methods may be added in the future.
+ *
+ * @extends \Traversable<mixed,TreeNode>
  */
-interface Result
+interface Tree extends \Traversable, \Countable
 {
     /**
      * @return class-string
      */
     public function getSummaryClass(): string;
 
-    public function getTree(): Tree;
-
-    public function getNormalTable(): NormalTable;
-
-    public function getTable(): Table;
+    public function traverse(mixed ...$members): ?TreeNode;
 }

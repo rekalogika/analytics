@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Row;
+use Rekalogika\Analytics\Contracts\Result\Row;
 
 final readonly class DefaultRow implements Row
 {

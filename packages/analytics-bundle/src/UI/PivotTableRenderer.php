@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\UIPivotTableAdapter;
-use Rekalogika\Analytics\Contracts\Result;
+use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Twig\Environment;
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\NormalRow;
+use Rekalogika\Analytics\Contracts\Result\NormalRow;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow

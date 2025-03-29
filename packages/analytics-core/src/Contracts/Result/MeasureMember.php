@@ -11,20 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a unit of measurement
+ * Represent a measure within a tuple.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Unit extends TranslatableInterface
+interface MeasureMember extends TranslatableInterface
 {
-    /**
-     * The unit signature. Two units with the same signature are considered
-     * identical.
-     */
-    public function getSignature(): string;
+    public function getMeasureProperty(): string;
 }

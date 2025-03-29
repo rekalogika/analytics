@@ -11,19 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a tuple
+ * Represent a row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Tuple extends Dimensions
+interface Row
 {
-    /**
-     * @return array<string,mixed>
-     */
-    public function getMembers(): array;
+    public function getTuple(): Tuple;
 
-    public function isSame(self $other): bool;
+    public function getMeasures(): Measures;
 }
