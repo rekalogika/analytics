@@ -48,7 +48,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function count(): int
     {
-        return \count($this->children);
+        return \count($this->getBalancedChildren());
     }
 
     #[\Override]
@@ -201,7 +201,9 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         $measureMember = null;
 
-        while ($parent = $this->getParent()) {
+        $parent = $this;
+
+        do  {
             /** @psalm-suppress MixedAssignment */
             $member = $parent->getMember();
 
@@ -209,7 +211,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
                 $measureMember = $member;
                 break;
             }
-        }
+        } while ($parent = $parent->getParent());
 
         if ($measureMember === null) {
             throw new \UnexpectedValueException('Measure member not found');

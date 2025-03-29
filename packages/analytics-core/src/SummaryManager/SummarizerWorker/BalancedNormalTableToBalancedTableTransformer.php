@@ -53,6 +53,8 @@ final class BalancedNormalTableToBalancedTableTransformer
                 || $lastRow->getTuple()->isSame($currentRow->getTuple())
             ) {
                 $this->measures[] = $currentRow->getMeasure();
+            } else {
+                $this->measures = [$currentRow->getMeasure()];
             }
 
             $this->rows[] = new DefaultRow(
