@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Rekalogika\Analytics\Contracts\Result;
+use Rekalogika\Analytics\Contracts\Result\Result;
 use Twig\Environment;
 
 final readonly class SpreadsheetRenderer

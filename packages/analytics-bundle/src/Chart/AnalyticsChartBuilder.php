@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Chart;
 
-use Rekalogika\Analytics\Contracts\Result;
+use Rekalogika\Analytics\Contracts\Result\Result;
 use Symfony\UX\Chartjs\Model\Chart;
 
 interface AnalyticsChartBuilder

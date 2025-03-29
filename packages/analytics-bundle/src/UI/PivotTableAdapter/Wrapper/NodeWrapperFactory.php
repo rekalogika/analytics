@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper;
 
-use Rekalogika\Analytics\Contracts\TreeNode;
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 
 final class NodeWrapperFactory
 {

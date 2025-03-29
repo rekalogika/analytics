@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTableAdapter;
 
-use Rekalogika\Analytics\Contracts\Measure;
-use Rekalogika\Analytics\Contracts\TreeNode;
+use Rekalogika\Analytics\Contracts\Result\Measure;
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
 final readonly class PivotTableLeaf implements LeafNode

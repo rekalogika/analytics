@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Util;
 
-use Rekalogika\Analytics\Contracts\Dimension;
-use Rekalogika\Analytics\Contracts\Dimensions;
+use Rekalogika\Analytics\Contracts\Result\Dimension;
+use Rekalogika\Analytics\Contracts\Result\Dimensions;
 
 final readonly class DimensionUtil
 {

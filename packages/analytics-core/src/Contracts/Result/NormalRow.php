@@ -11,21 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * A query result in normalized tabular format. Each row contains one measure.
+ * Represent a normalized row in a table
  *
  * For consumption only, do not implement. Methods may be added in the future.
- *
- * @extends \Traversable<int,Row>
  */
-interface NormalTable extends \Traversable, \Countable
+interface NormalRow
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
+    public function getTuple(): Tuple;
 
-    public function first(): ?NormalRow;
+    public function getMeasure(): Measure;
 }

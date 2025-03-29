@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
  * Represent a measure

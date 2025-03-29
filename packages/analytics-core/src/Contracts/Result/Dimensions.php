@@ -11,23 +11,25 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts;
+namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Collection of measures
+ * Collection of dimensions
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<string,Measure>
+ * @extends \Traversable<string,Dimension>
  */
-interface Measures extends \Traversable, \Countable
+interface Dimensions extends \Traversable, \Countable
 {
     /**
      * @throws \InvalidArgumentException
      */
-    public function get(string $key): Measure;
+    public function get(string $key): Dimension;
 
-    public function first(): ?Measure;
+    public function getByIndex(int $index): Dimension;
+
+    public function first(): ?Dimension;
 
     public function has(string $key): bool;
 }
