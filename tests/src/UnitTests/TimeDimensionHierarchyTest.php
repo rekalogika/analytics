@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Model\TimeInterval\Date;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;

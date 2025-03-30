@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\DateRangeFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 
 /**

@@ -17,8 +17,8 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Contracts\Summary\ParameterTypeAware;
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\ParameterTypeAware;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Exception\ConversionException;
 
 abstract class TimeIntervalType extends Type implements ParameterTypeAware

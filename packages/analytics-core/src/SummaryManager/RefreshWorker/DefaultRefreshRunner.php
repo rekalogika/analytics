@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\RefreshWorker;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
 use Rekalogika\Analytics\SummaryManager\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\SummaryManager\SummaryRefresherFactory;

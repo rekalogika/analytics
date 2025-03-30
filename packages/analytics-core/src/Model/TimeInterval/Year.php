@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

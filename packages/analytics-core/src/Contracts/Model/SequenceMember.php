@@ -11,9 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Summary;
+namespace Rekalogika\Analytics\Contracts\Model;
 
-interface TimeZoneAwareDimensionHierarchy
+/**
+ * Represents a member of a sequence.
+ */
+interface SequenceMember
 {
-    public function setTimeZone(\DateTimeZone $timeZone): void;
+    // public function getNext(): ?static;
+
+    // public function getPrevious(): ?static;
+
+    // public function isSameAs(SequenceMember $other): bool;
 }

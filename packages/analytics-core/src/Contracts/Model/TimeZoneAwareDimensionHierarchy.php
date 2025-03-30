@@ -11,11 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Summary;
+namespace Rekalogika\Analytics\Contracts\Model;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
-
-interface RecurringTimeInterval extends TranslatableInterface, SequenceMember
+interface TimeZoneAwareDimensionHierarchy
 {
-    public static function createFromDatabaseValue(int $databaseValue): static;
+    public function setTimeZone(\DateTimeZone $timeZone): void;
 }
