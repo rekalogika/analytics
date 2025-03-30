@@ -67,6 +67,7 @@ final class SummaryQuery implements Query
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly DistinctValuesResolver $distinctValuesResolver,
+        private readonly int $queryResultLimit,
     ) {}
 
     #[\Override]
@@ -81,17 +82,18 @@ final class SummaryQuery implements Query
             return $this->result;
         }
 
-        $summarizer = new SummarizerQuery(
+        $summarizerQuery = new SummarizerQuery(
             queryBuilder: $this->entityManager->createQueryBuilder(),
             query: $this,
             metadata: $this->metadata,
+            queryResultLimit: $this->queryResultLimit,
         );
 
         return $this->result = new DefaultResult(
             summaryClass: $this->metadata->getSummaryClass(),
             query: $this,
             metadata: $this->metadata,
-            summarizerQuery: $summarizer,
+            summarizerQuery: $summarizerQuery,
             propertyAccessor: $this->propertyAccessor,
             entityManager: $this->entityManager,
         );

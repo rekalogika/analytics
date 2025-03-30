@@ -39,6 +39,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
         private DistinctValuesResolver $distinctValuesResolver,
+        private int $queryResultLimit,
     ) {}
 
     #[\Override]
@@ -181,8 +182,9 @@ final readonly class DefaultSummaryManager implements SummaryManager
 
 
     #[\Override]
-    public function createQuery(): SummaryQuery
-    {
+    public function createQuery(
+        ?int $queryResultLimit = null,
+    ): SummaryQuery {
         $dimensionChoices = [
             ...$this->getDimensionChoices(),
             '@values' => new Field(
@@ -200,6 +202,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
             metadata: $this->metadata,
             propertyAccessor: $this->propertyAccessor,
             distinctValuesResolver: $this->distinctValuesResolver,
+            queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
         );
     }
 }

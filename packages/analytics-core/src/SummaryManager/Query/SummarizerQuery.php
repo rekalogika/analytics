@@ -21,6 +21,7 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
@@ -62,6 +63,7 @@ final class SummarizerQuery extends AbstractQuery
         private readonly QueryBuilder $queryBuilder,
         private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
+        private int $queryResultLimit,
     ) {
         parent::__construct($queryBuilder);
 
@@ -139,6 +141,15 @@ final class SummarizerQuery extends AbstractQuery
         /** @var list<array<string,mixed>> */
         $result = $query->getArrayResult();
 
+        // check safeguard
+
+        if (\count($result) > $this->queryResultLimit) {
+            throw new OverflowException(\sprintf(
+                'The query result exceeds the safeguard limit of %d. Modify your query to return less records.',
+                $this->queryResultLimit,
+            ));
+        }
+
         // change alias to dimension name
 
         $newResult = [];
@@ -167,7 +178,10 @@ final class SummarizerQuery extends AbstractQuery
     {
         $summaryClass = $this->metadata->getSummaryClass();
 
-        $this->queryBuilder->from($summaryClass, 'root');
+        $this->queryBuilder
+            ->from($summaryClass, 'root')
+            ->setMaxResults($this->queryResultLimit + 1) // safeguard
+        ;
 
         foreach ($this->metadata->getDimensionPropertyNames() as $propertyName) {
             $this->groupings[$propertyName] = true;

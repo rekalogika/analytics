@@ -79,6 +79,9 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
+    $parameters = $containerConfigurator->parameters();
+    $parameters->set('rekalogika.analytics.query_result_limit', 5000);
+
     $services = $containerConfigurator->services();
 
     $services
@@ -107,6 +110,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$distinctValuesResolver' => service(DistinctValuesResolver::class),
+            '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
         ])
     ;
 

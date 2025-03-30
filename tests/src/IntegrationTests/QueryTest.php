@@ -17,7 +17,9 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -26,11 +28,18 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueryTest extends KernelTestCase
 {
-    private function getQuery(): SummaryQuery
-    {
-        return static::getContainer()->get(SummaryManagerRegistry::class)
-            ->getManager(OrderSummary::class)
-            ->createQuery();
+    private function getQuery(
+        ?int $queryResultLimit = null,
+    ): SummaryQuery {
+        $summaryManager = static::getContainer()->get(SummaryManagerRegistry::class)
+            ->getManager(OrderSummary::class);
+
+        $this->assertInstanceOf(DefaultSummaryManager::class, $summaryManager);
+
+        /** @psalm-suppress InvalidNamedArgument */
+        return $summaryManager->createQuery(
+            queryResultLimit: $queryResultLimit,
+        );
     }
 
     public function testEmptyQuery(): void
@@ -334,5 +343,18 @@ final class QueryTest extends KernelTestCase
         rsort($sorted);
 
         $this->assertEquals($counts, $sorted);
+    }
+
+    public function testQueryResultLimit(): void
+    {
+        $this->expectException(OverflowException::class);
+
+        $result = $this->getQuery(queryResultLimit: 1)
+            ->groupBy('time.hour')
+            ->select('count')
+            ->getResult()
+            ->getTree();
+
+        $c = \count($result);
     }
 }

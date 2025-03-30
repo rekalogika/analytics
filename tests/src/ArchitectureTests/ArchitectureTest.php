@@ -141,6 +141,7 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
+                Selector::inNamespace('Symfony\Component\Config'),
                 Selector::inNamespace('Doctrine\Persistence'),
                 Selector::inNamespace('Doctrine\ORM'),
                 Selector::inNamespace('Psr\Cache'),
