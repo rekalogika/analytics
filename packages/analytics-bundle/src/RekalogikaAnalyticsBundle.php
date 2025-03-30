@@ -23,6 +23,8 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -45,6 +47,18 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $container->addCompilerPass(new DoctrineTypesPass());
     }
 
+    #[\Override]
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        $root = $definition->rootNode();
+        \assert($root instanceof ArrayNodeDefinition);
+
+        $root->children()->integerNode('query_result_limit')
+            ->defaultValue(5000)
+            ->min(1)
+            ->info('The maximum number of results to be returned from the query. If a query exceeds this limit, OverflowException will be thrown.');
+    }
+
     /**
      * @param array<array-key,mixed> $config
      */
@@ -55,6 +69,12 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerBuilder $builder,
     ): void {
         $container->import('../config/services.php');
+
+        $container->parameters()
+            ->set(
+                'rekalogika.analytics.query_result_limit',
+                $config['query_result_limit'],
+            );
 
         $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
             ->addTag('rekalogika.analytics.distinct_values_resolver');

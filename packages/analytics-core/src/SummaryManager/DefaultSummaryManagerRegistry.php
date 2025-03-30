@@ -30,6 +30,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
         private DistinctValuesResolver $distinctValuesResolver,
+        private int $queryResultLimit,
     ) {}
 
     #[\Override]
@@ -50,6 +51,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
             propertyAccessor: $this->propertyAccessor,
             refresherFactory: $this->refresherFactory,
             distinctValuesResolver: $this->distinctValuesResolver,
+            queryResultLimit: $this->queryResultLimit,
         );
     }
 }
