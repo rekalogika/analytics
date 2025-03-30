@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class Year implements TimeInterval
@@ -41,7 +42,10 @@ final class Year implements TimeInterval
         );
 
         if ($start === false) {
-            throw new \InvalidArgumentException('Invalid database value');
+            throw new UnexpectedValueException(\sprintf(
+                'Invalid date format: %s',
+                \sprintf('%04d-01-01 00:00:00', $y),
+            ));
         }
 
         $this->start = $start;

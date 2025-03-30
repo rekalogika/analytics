@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
@@ -172,7 +174,11 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
                 foreach ($hierarchyMetadata->getProperties() as $property) {
                     $name = $property->getName();
-                    $alias = $propertyToAlias[$name] ?? throw new \RuntimeException('Alias not found');
+                    $alias = $propertyToAlias[$name]
+                        ?? throw new InvalidArgumentException(\sprintf(
+                            'The alias for property "%s" is not defined',
+                            $name,
+                        ));
 
                     $this->queryBuilder
                         ->addSelect(\sprintf(
@@ -236,7 +242,10 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
             $function = reset($function);
 
             if (!$function instanceof AggregateFunction) {
-                throw new \RuntimeException('Function must be an instance of AggregateFunction');
+                throw new InvalidArgumentException(\sprintf(
+                    'The function "%s" is not an instance of AggregateFunction',
+                    get_debug_type($function),
+                ));
             }
 
             $function = $function->getSummaryToSummaryDQLFunction();
@@ -288,7 +297,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         $lowerLevel = PartitionUtil::getLowerLevel($this->start);
 
         if ($lowerLevel === null) {
-            throw new \RuntimeException('The lowest level must be rolled up from the source');
+            throw new LogicException('The lowest level must be rolled up from the source');
         }
 
         $this->queryBuilder

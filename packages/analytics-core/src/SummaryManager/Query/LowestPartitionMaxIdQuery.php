@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Util\PartitionUtil;
 
@@ -62,7 +63,9 @@ final readonly class LowestPartitionMaxIdQuery
             return $result;
         }
 
-
-        throw new \RuntimeException('The result of the query is not an integer or string.');
+        throw new UnexpectedValueException(\sprintf(
+            'The result of the query is not an integer or string, got "%s"',
+            \gettype($result),
+        ));
     }
 }

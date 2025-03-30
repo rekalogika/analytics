@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -214,7 +216,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         } while ($parent = $parent->getParent());
 
         if ($measureMember === null) {
-            throw new \UnexpectedValueException('Measure member not found');
+            throw new UnexpectedValueException('Measure member not found');
         }
 
         // get the measure key
@@ -244,11 +246,11 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function addChild(DefaultTreeNode $node): void
     {
         if ($this->childrenKey === null) {
-            throw new \LogicException('Cannot add child to a leaf node');
+            throw new LogicException('Cannot add child to a leaf node');
         }
 
         if ($node->getKey() !== $this->childrenKey) {
-            throw new \InvalidArgumentException(
+            throw new UnexpectedValueException(
                 \sprintf('Invalid child key "%s", expected "%s"', $node->getKey(), $this->childrenKey),
             );
         }

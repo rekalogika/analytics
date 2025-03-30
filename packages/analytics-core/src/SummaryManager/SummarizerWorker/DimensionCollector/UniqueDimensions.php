@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 
 /**
@@ -38,13 +39,19 @@ final readonly class UniqueDimensions implements \IteratorAggregate, \Countable
     public function getDimensions(string $key): UniqueDimensionsByKey
     {
         return $this->dimensions[$key]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $key));
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Dimension "%s" not found',
+                $key,
+            ));
     }
 
     public function getMeasure(string $key): DefaultMeasure
     {
         return $this->measures[$key]
-            ?? throw new \InvalidArgumentException(\sprintf('Measure "%s" not found', $key));
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Measure "%s" not found',
+                $key,
+            ));
     }
 
     public function getKeyAfter(string $key): ?string

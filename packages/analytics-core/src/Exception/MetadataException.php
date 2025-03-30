@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Exception;
 
-class NotFoundException extends RuntimeException implements AnalyticsException {}
+/**
+ * Indicates errors in metadata
+ */
+class MetadataException extends DomainException implements AnalyticsException {}

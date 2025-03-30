@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Util\PartitionUtil;
 
 /**
@@ -26,7 +27,11 @@ final class PartitionRange implements \IteratorAggregate, \Countable
         private readonly Partition $end,
     ) {
         if ($start->getLevel() !== $end->getLevel()) {
-            throw new \InvalidArgumentException('The start and end partitions must have the same level.');
+            throw new InvalidArgumentException(\sprintf(
+                'The start and end partitions must be on the same level, but got "%d" and "%d"',
+                $start->getLevel(),
+                $end->getLevel(),
+            ));
         }
     }
 

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Util;
 
+use Rekalogika\Analytics\Exception\RuntimeException;
+
 final readonly class DateTimeUtil
 {
     private function __construct() {}
@@ -25,7 +27,7 @@ final readonly class DateTimeUtil
         );
 
         if (false === $result) {
-            throw new \RuntimeException(\sprintf(
+            throw new RuntimeException(\sprintf(
                 'Failed to create DateTimeImmutable from %s.',
                 (string) $input,
             ));

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
@@ -56,13 +57,11 @@ final class DimensionByKeyCollector
         // ensure the dimensions has the correct key
 
         if ($dimension->getKey() !== $this->key) {
-            throw new \InvalidArgumentException(
-                \sprintf(
-                    'Dimension key "%s" does not match the collector key "%s"',
-                    $dimension->getKey(),
-                    $this->key,
-                ),
-            );
+            throw new UnexpectedValueException(\sprintf(
+                'Dimension key "%s" does not match the collector key "%s"',
+                $dimension->getKey(),
+                $this->key,
+            ));
         }
 
         // if already exists, then skip

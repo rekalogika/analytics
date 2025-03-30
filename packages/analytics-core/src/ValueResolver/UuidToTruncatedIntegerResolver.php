@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 
@@ -69,14 +71,17 @@ final readonly class UuidToTruncatedIntegerResolver implements
     public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
         if (!\is_string($value)) {
-            throw new \InvalidArgumentException(\sprintf('Value must be a string, got %s', get_debug_type($value)));
+            throw new InvalidArgumentException(\sprintf(
+                'Value must be a string, got "%s".',
+                get_debug_type($value),
+            ));
         }
 
         $value = str_replace('-', '', $value);
         $value = hexdec(substr($value, 0, 12)); // first 48 bits
 
         if (\is_float($value)) {
-            throw new \InvalidArgumentException('Cannot convert UUID to integer. Make sure you are using a 64-bit system.');
+            throw new LogicException('Cannot convert UUID to integer. Make sure you are using a 64-bit system.');
         }
 
         return $value;
@@ -89,7 +94,10 @@ final readonly class UuidToTruncatedIntegerResolver implements
     public function transformSummaryValueToSourceValue(mixed $value): string
     {
         if (!\is_int($value)) {
-            throw new \InvalidArgumentException('Value must be an integer');
+            throw new InvalidArgumentException(\sprintf(
+                'Value must be an integer, got "%s".',
+                get_debug_type($value),
+            ));
         }
 
         $value <<= 16;

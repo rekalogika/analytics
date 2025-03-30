@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\DeleteExistingSummaryQuery;
@@ -157,10 +158,16 @@ final class SqlFactory
     ): iterable {
         $class = $this->summaryToSummaryRollUpClass;
 
-        if (!is_a($class, RollUpSummaryToSummaryCubingStrategyQuery::class, true)
+        if (
+            !is_a($class, RollUpSummaryToSummaryCubingStrategyQuery::class, true)
             && !is_a($class, RollUpSummaryToSummaryGroupAllStrategyQuery::class, true)
         ) {
-            throw new \InvalidArgumentException('Invalid class');
+            throw new LogicException(\sprintf(
+                'Class "%s" must be an instance of "%s" or "%s"',
+                $class,
+                RollUpSummaryToSummaryCubingStrategyQuery::class,
+                RollUpSummaryToSummaryGroupAllStrategyQuery::class,
+            ));
         }
 
         $query = new $class(

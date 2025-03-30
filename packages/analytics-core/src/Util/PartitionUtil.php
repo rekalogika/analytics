@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Util;
 
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\PartitionRange;
 
 final readonly class PartitionUtil
@@ -28,7 +29,10 @@ final readonly class PartitionUtil
         $index = array_search($level, $levels, true);
 
         if ($index === false) {
-            throw new \InvalidArgumentException('The level is not found in the partition levels.');
+            throw new UnexpectedValueException(\sprintf(
+                'The level "%s" is not found in the partition levels.',
+                $level,
+            ));
         }
 
         return $levels[$index + 1] ?? null;
@@ -42,7 +46,10 @@ final readonly class PartitionUtil
         $index = array_search($level, $levels, true);
 
         if ($index === false) {
-            throw new \InvalidArgumentException('The level is not found in the partition levels.');
+            throw new UnexpectedValueException(\sprintf(
+                'The level "%s" is not found in the partition levels.',
+                $level,
+            ));
         }
 
         if ($index === 0) {
@@ -118,7 +125,11 @@ final readonly class PartitionUtil
     public static function isLessThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
-            throw new \InvalidArgumentException('The partitions must have the same level.');
+            throw new UnexpectedValueException(\sprintf(
+                'The partitions must have the same level. "%s" and "%s" given.',
+                $a->getLevel(),
+                $b->getLevel(),
+            ));
         }
 
         return $a->getKey() < $b->getKey();
@@ -127,7 +138,11 @@ final readonly class PartitionUtil
     public static function isGreaterThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
-            throw new \InvalidArgumentException('The partitions must have the same level.');
+            throw new UnexpectedValueException(\sprintf(
+                'The partitions must have the same level. "%s" and "%s" given.',
+                $a->getLevel(),
+                $b->getLevel(),
+            ));
         }
 
         return $a->getKey() > $b->getKey();
@@ -136,7 +151,11 @@ final readonly class PartitionUtil
     public static function isEqualOrLessThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
-            throw new \InvalidArgumentException('The partitions must have the same level.');
+            throw new UnexpectedValueException(\sprintf(
+                'The partitions must have the same level. "%s" and "%s" given.',
+                $a->getLevel(),
+                $b->getLevel(),
+            ));
         }
 
         return $a->getKey() <= $b->getKey();
@@ -145,7 +164,11 @@ final readonly class PartitionUtil
     public static function isEqualOrGreaterThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
-            throw new \InvalidArgumentException('The partitions must have the same level.');
+            throw new UnexpectedValueException(\sprintf(
+                'The partitions must have the same level. "%s" and "%s" given.',
+                $a->getLevel(),
+                $b->getLevel(),
+            ));
         }
 
         return $a->getKey() >= $b->getKey();

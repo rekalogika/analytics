@@ -13,4 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Exception;
 
-class NotFoundException extends RuntimeException implements AnalyticsException {}
+use Doctrine\ORM\Query\QueryException as DoctrineQueryException;
+
+class QueryException extends DoctrineQueryException implements AnalyticsException {}

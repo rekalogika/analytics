@@ -13,4 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Exception;
 
-class NotFoundException extends RuntimeException implements AnalyticsException {}
+use Doctrine\DBAL\Types\ConversionException as DoctrineConversionException;
+
+class ConversionException extends DoctrineConversionException implements AnalyticsException {}

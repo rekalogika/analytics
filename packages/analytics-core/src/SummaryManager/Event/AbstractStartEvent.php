@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Event;
 
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SummaryManager\PartitionRange;
 use Rekalogika\Analytics\Util\DateTimeUtil;
 
@@ -40,7 +41,7 @@ abstract readonly class AbstractStartEvent implements \Stringable
         $class = str_replace('StartEvent', 'EndEvent', static::class);
 
         if (!is_a($class, AbstractEndEvent::class, true)) {
-            throw new \RuntimeException('Invalid end event class.');
+            throw new LogicException('Invalid end event class.');
         }
 
         return $class;

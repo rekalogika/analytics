@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
@@ -161,7 +163,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             $function = reset($function);
 
             if (!$function instanceof AggregateFunction) {
-                throw new \RuntimeException('Function must be an instance of AggregateFunction');
+                throw new UnexpectedValueException(\sprintf(
+                    'Function must be an instance of AggregateFunction, got "%s".',
+                    get_debug_type($function),
+                ));
             }
 
             $function = $function->getSummaryToSummaryDQLFunction();
@@ -188,7 +193,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $lowerLevel = PartitionUtil::getLowerLevel($this->start);
 
         if ($lowerLevel === null) {
-            throw new \RuntimeException('The lowest level must be rolled up from the source');
+            throw new LogicException('The lowest level must be rolled up from the source');
         }
 
         $this->queryBuilder

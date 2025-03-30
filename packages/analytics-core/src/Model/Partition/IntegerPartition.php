@@ -19,6 +19,8 @@ use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\PartitionKeyClassifier\BigIntClassifier;
 
 /**
@@ -85,13 +87,17 @@ abstract class IntegerPartition implements Partition, \Stringable
     public static function createFromSourceValue(mixed $source, int $level): static
     {
         if (!is_numeric($source)) {
-            throw new \InvalidArgumentException(\sprintf('Source value must be an integer. Got: "%s"', get_debug_type($source)));
+            throw new InvalidArgumentException(\sprintf('Source value must be an integer. Got: "%s"', get_debug_type($source)));
         }
 
         $source = (int) $source;
 
         if (!\in_array($level, static::getAllLevels(), true)) {
-            throw new \InvalidArgumentException('Invalid partitioning level.');
+            throw new InvalidArgumentException(\sprintf(
+                'Level "%d" is not valid. Valid levels are: %s',
+                $level,
+                implode(', ', static::getAllLevels()),
+            ));
         }
 
         $source &= ~((1 << $level) - 1);
@@ -118,7 +124,11 @@ abstract class IntegerPartition implements Partition, \Stringable
         $key = array_search($this->level, $levels, true);
 
         if ($key === false) {
-            throw new \RuntimeException('Partition level not found.');
+            throw new UnexpectedValueException(\sprintf(
+                'Level "%d" not found in the list of levels: %s',
+                $this->level,
+                implode(', ', $levels),
+            ));
         }
 
         $previousLevelKey = $key - 1;

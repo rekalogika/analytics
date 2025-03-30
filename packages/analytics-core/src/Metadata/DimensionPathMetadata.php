@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
+
 /**
  * @implements \IteratorAggregate<DimensionLevelMetadata>
  */
@@ -62,7 +64,7 @@ final readonly class DimensionPathMetadata implements \IteratorAggregate
     public function getHierarchyMetadata(): DimensionHierarchyMetadata
     {
         if ($this->hierarchyMetadata === null) {
-            throw new \LogicException('Hierarchy metadata is not set');
+            throw new MetadataException('Hierarchy metadata is not set');
         }
 
         return $this->hierarchyMetadata;

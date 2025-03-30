@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\PivotTableAdapter;
 
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
 final readonly class PivotTableLeaf implements LeafNode
@@ -27,7 +28,10 @@ final readonly class PivotTableLeaf implements LeafNode
         $measure = $node->getMeasure();
 
         if ($measure === null) {
-            throw new \InvalidArgumentException('Item must be a leaf');
+            throw new UnexpectedValueException(\sprintf(
+                'Leaf node "%s" does not have a measure',
+                $node->getKey(),
+            ));
         }
 
         $this->measure = $measure;

@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -37,7 +38,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
         $entityManager = $this->managerRegistry->getManagerForClass($class);
 
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \RuntimeException('Entity manager not found for class ' . $class);
+            throw new UnexpectedValueException('Entity manager not found for class ' . $class);
         }
 
         $summaryMetadata = $this->metadataFactory->getSummaryMetadata($class);

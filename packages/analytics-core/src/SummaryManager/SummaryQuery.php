@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
@@ -223,7 +224,10 @@ final class SummaryQuery implements Query
         }
 
         if ($invalid !== []) {
-            throw new \InvalidArgumentException(\sprintf('Invalid field: %s', implode(', ', $invalid)));
+            throw new InvalidArgumentException(\sprintf(
+                'Invalid field: %s',
+                implode(', ', $invalid),
+            ));
         }
     }
 
@@ -348,7 +352,7 @@ final class SummaryQuery implements Query
         $this->ensureFieldValid([$field], 'both');
 
         if ($field === '@values') {
-            throw new \InvalidArgumentException('Cannot order by @values');
+            throw new InvalidArgumentException('Ordering by @values is not supported.');
         }
 
         $this->result = null;

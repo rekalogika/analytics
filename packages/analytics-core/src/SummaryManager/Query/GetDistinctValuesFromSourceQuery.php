@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -35,7 +37,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 
         // ensure the property is a relation
         if (!$doctrineMetadata->hasAssociation($dimension)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new MetadataException(\sprintf(
                 'The property "%s" in class "%s" is not a relation',
                 $dimension,
                 $summaryClass,
@@ -77,7 +79,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
             $id = $this->propertyAccessor->getValue($item, $idField);
 
             if (!\is_string($id) && !\is_int($id)) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new UnexpectedValueException(\sprintf(
                     'The identifier field "%s" in class "%s" is not a string or integer',
                     $idField,
                     $this->queryBuilder->getRootEntities()[0],

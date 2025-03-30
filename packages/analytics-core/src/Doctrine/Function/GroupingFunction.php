@@ -18,6 +18,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_GROUPING
@@ -44,7 +45,7 @@ final class GroupingFunction extends FunctionNode
         // type checkings
 
         if (!$this->variable instanceof Node) {
-            throw new \UnexpectedValueException('Expected Node, got ' . get_debug_type($this->variable));
+            throw new QueryException('Expected Node, got ' . get_debug_type($this->variable));
         }
 
         return \sprintf('GROUPING(%s) = 1', $this->variable->dispatch($sqlWalker));

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
+
 /**
  * @implements \IteratorAggregate<DimensionPropertyMetadata>
  */
@@ -52,7 +54,7 @@ final readonly class DimensionLevelMetadata implements \IteratorAggregate
     public function getPathMetadata(): DimensionPathMetadata
     {
         if ($this->pathMetadata === null) {
-            throw new \LogicException('Path metadata is not set');
+            throw new MetadataException('Path metadata is not set');
         }
 
         return $this->pathMetadata;

@@ -22,6 +22,7 @@ use Doctrine\ORM\Query\AST\TypedExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_TRUNCATE_UUID_TO_BIGINT
@@ -44,14 +45,14 @@ final class TruncateUuidToBigintFunction extends FunctionNode implements TypedEx
     public function getSql(SqlWalker $sqlWalker): string
     {
         if (!$this->variable instanceof Node) {
-            throw new \RuntimeException('Expected a Node');
+            throw new QueryException('Expected a Node');
         }
 
 
         $platform = $sqlWalker->getConnection()->getDatabasePlatform();
 
         if (!$platform instanceof PostgreSQLPlatform) {
-            throw new \RuntimeException('Only supported on PostgreSQL for now');
+            throw new QueryException('Only supported on PostgreSQL for now');
         }
 
         return \sprintf(

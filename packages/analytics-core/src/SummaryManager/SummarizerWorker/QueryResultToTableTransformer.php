@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\TimeZoneAwareDimensionHierarchy;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -105,7 +106,10 @@ final readonly class QueryResultToTableTransformer
 
         foreach ($measures as $key) {
             if (!\array_key_exists($key, $input)) {
-                throw new \LogicException(\sprintf('Measure "%s" not found', $key));
+                throw new LogicException(\sprintf(
+                    'Measure "%s" not found',
+                    $key,
+                ));
             }
 
             /** @psalm-suppress MixedAssignment */
@@ -157,10 +161,11 @@ final readonly class QueryResultToTableTransformer
         //
 
         /** @psalm-suppress MixedAssignment */
-        $groupings = $input['__grouping'] ?? throw new \LogicException('Grouping not found');
+        $groupings = $input['__grouping']
+            ?? throw new LogicException('Grouping not found');
 
         if (!\is_string($groupings)) {
-            throw new \LogicException('Grouping is not a string');
+            throw new LogicException('Grouping is not a string');
         }
 
         //
@@ -176,7 +181,7 @@ final readonly class QueryResultToTableTransformer
             }
 
             if (!\array_key_exists($key, $input)) {
-                throw new \LogicException(\sprintf('Dimension "%s" not found', $key));
+                throw new LogicException(\sprintf('Dimension "%s" not found', $key));
             }
 
             /** @psalm-suppress MixedAssignment */
@@ -289,7 +294,7 @@ final readonly class QueryResultToTableTransformer
         $parent = $reflectionClass->getParentClass();
 
         if ($parent === false) {
-            throw new \LogicException(\sprintf('Property "%s" not found in class "%s"', $propertyName, $reflectionClass->getName()));
+            throw new LogicException(\sprintf('Property "%s" not found in class "%s"', $propertyName, $reflectionClass->getName()));
         }
 
         return $this->getReflectionProperty($parent, $propertyName);
@@ -330,7 +335,7 @@ final readonly class QueryResultToTableTransformer
             $reflectionClass = $reflectionClass->getParentClass();
 
             if ($reflectionClass === false) {
-                throw new \LogicException('Property not found');
+                throw new LogicException('Property not found');
             }
         }
     }
@@ -360,13 +365,13 @@ final readonly class QueryResultToTableTransformer
                     $reflectionType = $reflectionProperty->getType();
 
                     if (!$reflectionType instanceof \ReflectionNamedType) {
-                        throw new \LogicException('Property type not found');
+                        throw new LogicException('Property type not found');
                     }
 
                     $propertyClass = $reflectionType->getName();
 
                     if (!class_exists($propertyClass)) {
-                        throw new \LogicException('Property class not found');
+                        throw new LogicException('Property class not found');
                     }
 
                     $hierarchyClassReflection = new \ReflectionClass($propertyClass);
@@ -379,7 +384,7 @@ final readonly class QueryResultToTableTransformer
                 $hierarchyObject = $reflectionProperty->getValue($object);
 
                 if (!\is_object($hierarchyObject)) {
-                    throw new \LogicException('Hierarchy object not found');
+                    throw new LogicException('Hierarchy object not found');
                 }
 
                 $hierarchyObjectReflection = new \ReflectionObject($hierarchyObject);
@@ -390,7 +395,7 @@ final readonly class QueryResultToTableTransformer
             $curReflectionClass = $curReflectionClass->getParentClass();
 
             if ($curReflectionClass === false) {
-                throw new \LogicException('Property not found');
+                throw new LogicException('Property not found');
             }
         }
 
@@ -407,7 +412,7 @@ final readonly class QueryResultToTableTransformer
         // inject value to hierarchy object
 
         if ($hierarchyObjectReflection === null) {
-            throw new \LogicException('Hierarchy object not found');
+            throw new LogicException('Hierarchy object not found');
         }
 
         while (true) {
@@ -422,7 +427,7 @@ final readonly class QueryResultToTableTransformer
             $hierarchyObjectReflection = $hierarchyObjectReflection->getParentClass();
 
             if ($hierarchyObjectReflection === false) {
-                throw new \LogicException('Property not found');
+                throw new LogicException('Property not found');
             }
         }
     }

@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
@@ -53,7 +55,10 @@ final readonly class PartitionManager
             }
         }
 
-        throw new \RuntimeException('Source not found');
+        throw new MetadataException(\sprintf(
+            'Partition source not found for class "%s"',
+            $entity::class,
+        ));
     }
 
     public function getLowestPartitionFromEntity(object $entity): Partition
@@ -61,7 +66,10 @@ final readonly class PartitionManager
         $source = $this->resolvePartitionSource($entity);
 
         $sourceProperty = $source->getInvolvedProperties()[0]
-            ?? throw new \UnexpectedValueException('Source property not found');
+            ?? throw new UnexpectedValueException(\sprintf(
+                'Partition source "%s" does not have any involved properties',
+                get_debug_type($source),
+            ));
 
         $sourceValue = $this->propertyAccessor->getValue($entity, $sourceProperty);
 
@@ -70,7 +78,10 @@ final readonly class PartitionManager
         }
 
         if (!\is_string($sourceValue) && !\is_int($sourceValue)) {
-            throw new \UnexpectedValueException('Source value must be string or int');
+            throw new UnexpectedValueException(\sprintf(
+                'Partition source value must be a string or an integer, "%s" given',
+                get_debug_type($sourceValue),
+            ));
         }
 
         return $this->createLowestPartitionFromSourceValue($sourceValue);
@@ -86,7 +97,10 @@ final readonly class PartitionManager
         $valueResolver = reset($source);
 
         if ($valueResolver === false) {
-            throw new \RuntimeException('Partition source is empty');
+            throw new UnexpectedValueException(\sprintf(
+                'Value resolver not found for class "%s"',
+                $partitionClass,
+            ));
         }
 
         /** @var mixed */
@@ -131,7 +145,10 @@ final readonly class PartitionManager
         $valueResolver = reset($source);
 
         if ($valueResolver === false) {
-            throw new \RuntimeException('Partition source is empty');
+            throw new UnexpectedValueException(\sprintf(
+                'Value resolver not found for class "%s"',
+                $partition::class,
+            ));
         }
 
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);

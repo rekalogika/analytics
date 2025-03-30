@@ -20,6 +20,8 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -347,7 +349,10 @@ final class SummarizerQuery extends AbstractQuery
                 $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
                 if ($dimensionHierarchyMetadata === null) {
-                    throw new \InvalidArgumentException(\sprintf('Dimension %s is not hierarchical', $dimensionProperty));
+                    throw new UnexpectedValueException(\sprintf(
+                        'Dimension "%s" is not hierarchical',
+                        $dimensionProperty,
+                    ));
                 }
 
                 $groupings = $dimensionHierarchyMetadata
@@ -399,7 +404,10 @@ final class SummarizerQuery extends AbstractQuery
         [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
         if ($hierarchyProperty === '') {
-            throw new \InvalidArgumentException(\sprintf('Invalid hierarchical dimension: %s', $dimensionProperty));
+            throw new UnexpectedValueException(\sprintf(
+                'Invalid hierarchical dimension "%s".',
+                $dimensionProperty,
+            ));
         }
 
         // create alias
@@ -415,7 +423,10 @@ final class SummarizerQuery extends AbstractQuery
         $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
         if ($dimensionHierarchyMetadata === null) {
-            throw new \InvalidArgumentException(\sprintf('Dimension %s is not hierarchical', $dimensionProperty));
+            throw new UnexpectedValueException(\sprintf(
+                'Dimension "%s" is not hierarchical',
+                $dimensionProperty,
+            ));
         }
 
         // add where level clause
@@ -445,7 +456,7 @@ final class SummarizerQuery extends AbstractQuery
         $orderBy = $dimensionMetadata->getOrderBy();
 
         if (\is_array($orderBy)) {
-            throw new \InvalidArgumentException('orderBy cannot be an array for hierarchical dimension');
+            throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
 
         $this->queryBuilder->addOrderBy(
@@ -498,6 +509,7 @@ final class SummarizerQuery extends AbstractQuery
         try {
             $joinedEntityClass = $classMetadata
                 ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
+            // @phpstan-ignore phpat.testPackageAnalyticsCore
         } catch (MappingException | \InvalidArgumentException) {
             $joinedEntityClass = null;
         }
@@ -571,7 +583,7 @@ final class SummarizerQuery extends AbstractQuery
         $orderBy = $dimensionMetadata->getOrderBy();
 
         if (\is_array($orderBy)) {
-            throw new \InvalidArgumentException('orderBy cannot be an array for non-hierarchical dimension');
+            throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
         }
 
         $this->queryBuilder

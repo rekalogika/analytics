@@ -17,6 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
@@ -53,7 +55,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
 
         if (!$metadata->hasProperty($dimension)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new MetadataException(\sprintf(
                 'The class "%s" does not have a field named "%s"',
                 $class,
                 $dimension,
@@ -68,7 +70,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $dimensionMetadata = $summaryMetadata->getFieldMetadata($dimension);
 
         if (!$dimensionMetadata instanceof DimensionMetadata) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new MetadataException(\sprintf(
                 'The field "%s" in class "%s" is not a dimension',
                 $dimension,
                 $class,
@@ -126,7 +128,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
 
         if (!$metadata->hasProperty($dimension)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new MetadataException(\sprintf(
                 'The class "%s" does not have a field named "%s"',
                 $class,
                 $dimension,
@@ -141,7 +143,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
         $dimensionMetadata = $summaryMetadata->getFieldMetadata($dimension);
 
         if (!$dimensionMetadata instanceof DimensionMetadata) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new MetadataException(\sprintf(
                 'The field "%s" in class "%s" is not a dimension',
                 $dimension,
                 $class,
@@ -167,7 +169,7 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
                 }
             }
 
-            throw new \InvalidArgumentException(\sprintf(
+            throw new UnexpectedValueException(\sprintf(
                 'The enum type "%s" is not a BackedEnum',
                 $enumType,
             ));

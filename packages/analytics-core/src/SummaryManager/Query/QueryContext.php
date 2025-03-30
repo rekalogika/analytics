@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SummaryManager\Query\Path\Path;
 use Rekalogika\Analytics\SummaryManager\Query\Path\PathResolver;
 
@@ -43,10 +44,10 @@ final class QueryContext
     private function getRootClass(): string
     {
         $result = $this->queryBuilder->getRootEntities()[0]
-            ?? throw new \RuntimeException('Root class not found');
+            ?? throw new LogicException('Root class not found');
 
         if (!class_exists($result)) {
-            throw new \RuntimeException('Root class not found');
+            throw new LogicException('Root class not found');
         }
 
         return $result;
@@ -55,10 +56,10 @@ final class QueryContext
     private function getRootAlias(): string
     {
         $alias = $this->queryBuilder->getRootAliases()[0]
-            ?? throw new \RuntimeException('Root alias not found');
+            ?? throw new LogicException('Root alias not found');
 
         if ($alias !== 'root') {
-            throw new \RuntimeException('Root alias must be "root"');
+            throw new LogicException('Root alias must be "root"');
         }
 
         return $alias;

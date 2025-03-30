@@ -19,6 +19,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_CAST
@@ -45,7 +46,7 @@ final class CastFunction extends FunctionNode
     public function getSql(SqlWalker $sqlWalker): string
     {
         if ($this->expr1 === null || $this->expr2 === null) {
-            throw new \RuntimeException('CAST() function must have 2 arguments');
+            throw new QueryException('CAST() function must have 2 arguments');
         }
 
         $type = trim($this->expr2->dispatch($sqlWalker), "'");

@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 
 /**
  * Compatibility layer for Doctrine ClassMetadata. Abstracts the differences
@@ -40,7 +42,10 @@ final readonly class ClassMetadataWrapper
         }
 
         if (!$manager instanceof EntityManagerInterface) {
-            throw new \InvalidArgumentException('Invalid manager');
+            throw new UnexpectedValueException(\sprintf(
+                'ManagerRegistry does not have a manager for class "%s"',
+                $class,
+            ));
         }
 
         $classMetadata = $manager->getClassMetadata($class);
@@ -56,7 +61,7 @@ final readonly class ClassMetadataWrapper
         $class = $this->classMetadata->getName();
 
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(\sprintf('Class "%s" not found', $class));
+            throw new UnexpectedValueException(\sprintf('Class "%s" not found', $class));
         }
 
         return $class;
@@ -91,7 +96,7 @@ final readonly class ClassMetadataWrapper
         $class = $this->classMetadata->embeddedClasses[$property]['class'] ?? null;
 
         if (!\is_string($class) || !class_exists($class)) {
-            throw new \InvalidArgumentException(\sprintf('Embedded class for property "%s" not found', $property));
+            throw new MetadataException(\sprintf('Embedded class for property "%s" not found', $property));
         }
 
         return $class;
@@ -119,7 +124,7 @@ final readonly class ClassMetadataWrapper
         } elseif ($this->isPropertyEntity($property)) {
             return $this->classMetadata->getSingleAssociationJoinColumnName($property);
         } else {
-            throw new \InvalidArgumentException(\sprintf('Property "%s" not found', $property));
+            throw new MetadataException(\sprintf('Property "%s" not found', $property));
         }
     }
 
@@ -131,7 +136,7 @@ final readonly class ClassMetadataWrapper
         $targetClass = $this->classMetadata->getAssociationTargetClass($property);
 
         if (!class_exists($targetClass)) {
-            throw new \InvalidArgumentException(\sprintf('Target class for association "%s" not found', $property));
+            throw new MetadataException(\sprintf('Target class for association "%s" not found', $property));
         }
 
         return $targetClass;
@@ -151,7 +156,7 @@ final readonly class ClassMetadataWrapper
         }
 
         if (!\is_string($enumType) || !enum_exists($enumType)) {
-            throw new \InvalidArgumentException(\sprintf('Enum type "%s" not found', get_debug_type($enumType)));
+            throw new MetadataException(\sprintf('Enum type "%s" not found', get_debug_type($enumType)));
         }
 
         /** @var class-string<\UnitEnum> */
@@ -163,7 +168,7 @@ final readonly class ClassMetadataWrapper
         $reflection = $this->classMetadata->getSingleIdReflectionProperty();
 
         if (!$reflection instanceof \ReflectionProperty) {
-            throw new \InvalidArgumentException('Reflection property not found');
+            throw new MetadataException('Reflection property not found');
         }
 
         return $reflection;
