@@ -24,7 +24,7 @@ use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Contracts\Summary\ParameterTypeAware;
+use Rekalogika\Analytics\Contracts\Model\ParameterTypeAware;
 use Rekalogika\Analytics\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;

@@ -11,16 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Summary;
+namespace Rekalogika\Analytics\Contracts\Model;
 
-/**
- * Represents a member of a sequence.
- */
-interface SequenceMember
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+interface RecurringTimeInterval extends TranslatableInterface, SequenceMember
 {
-    // public function getNext(): ?static;
-
-    // public function getPrevious(): ?static;
-
-    // public function isSameAs(SequenceMember $other): bool;
+    public static function createFromDatabaseValue(int $databaseValue): static;
 }

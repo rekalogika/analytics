@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
 
 use Psr\Container\ContainerInterface;
-use Rekalogika\Analytics\Contracts\Summary\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 
 final class ChainDistinctValuesResolver implements DistinctValuesResolver
 {

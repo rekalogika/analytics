@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\Fixtures\Refresh;
 
-use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
 use Symfony\Component\Clock\ClockInterface;
 

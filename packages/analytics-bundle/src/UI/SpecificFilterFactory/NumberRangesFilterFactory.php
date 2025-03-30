@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Contracts\Summary\RecurringTimeInterval;
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 
 /**

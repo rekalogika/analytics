@@ -25,7 +25,7 @@ use Rekalogika\Analytics\Attribute\Partition;
 use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Attribute\Summary;
-use Rekalogika\Analytics\Contracts\Summary\Partition as DoctrineSummaryPartition;
+use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;

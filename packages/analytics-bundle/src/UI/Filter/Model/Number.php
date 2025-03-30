@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Bundle\UI\Filter\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Summary\RecurringTimeInterval;
-use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 
 final readonly class Number implements \Stringable
 {
