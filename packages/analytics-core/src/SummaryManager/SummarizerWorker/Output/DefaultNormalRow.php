@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow
@@ -63,10 +64,10 @@ final readonly class DefaultNormalRow implements NormalRow
         }
 
         $measure1Order = $measures[$row1->getMeasure()->getKey()]
-            ?? throw new \RuntimeException('Measure not found');
+            ?? throw new LogicException('Measure not found');
 
         $measure2Order = $measures[$row2->getMeasure()->getKey()]
-            ?? throw new \RuntimeException('Measure not found');
+            ?? throw new LogicException('Measure not found');
 
         return $measure1Order <=> $measure2Order;
     }

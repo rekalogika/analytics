@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
+use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\ORM\Query\QueryException;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -85,16 +87,32 @@ final class ArchitectureTest
                 Selector::classname(\ReflectionException::class),
 
                 // exceptions
-                Selector::classname(\RuntimeException::class),
-                Selector::classname(\LogicException::class),
-                Selector::classname(\InvalidArgumentException::class),
-                Selector::classname(\BadMethodCallException::class),
-                Selector::classname(\UnexpectedValueException::class),
+                Selectors::selectAnalyticsCoreException(),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
 
                 // intl
                 Selector::classname(\IntlDateFormatter::class),
+            );
+    }
+
+    public function testPackageAnalyticsCoreException(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selectors::selectAnalyticsCoreException())
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCore(),
+                Selector::classname(\RuntimeException::class),
+                Selector::classname(\LogicException::class),
+                Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\BadMethodCallException::class),
+                Selector::classname(\UnexpectedValueException::class),
+                Selector::classname(\OverflowException::class),
+                Selector::classname(\DomainException::class),
+                Selector::classname(QueryException::class),
+                Selector::classname(ConversionException::class),
             );
     }
 

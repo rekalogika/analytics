@@ -17,6 +17,9 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolverContext;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
@@ -88,7 +91,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $partitionMetadata = $this->metadata->getPartition();
 
         $valueResolver = $partitionMetadata->getSource()[$this->sourceClass]
-            ?? throw new \RuntimeException('Value resolver not found');
+            ?? throw new MetadataException(\sprintf(
+                'Value resolver not found for source class "%s".',
+                $this->sourceClass,
+            ));
 
         $partitionClass = $partitionMetadata->getPartitionClass();
         $partitioningLevels = $partitionClass::getAllLevels();
@@ -125,7 +131,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             $hierarchyMetadata = $metadata->getHierarchy();
 
             $valueResolver = $metadata->getSource()[$this->sourceClass]
-                ?? throw new \RuntimeException('Value resolver not found');
+                ?? throw new MetadataException(\sprintf(
+                    'Value resolver not found for source class "%s".',
+                    $this->sourceClass,
+                ));
 
             $propertySqlField = $valueResolver->getDQL($this->getQueryContext());
 
@@ -179,7 +188,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     $name = $property->getName();
 
                     $alias = $propertyToAlias[$name]
-                        ?? throw new \RuntimeException('Alias not found');
+                        ?? throw new InvalidArgumentException(\sprintf(
+                            'Alias for property "%s" not found.',
+                            $name,
+                        ));
 
                     $valueResolver = $property->getValueResolver();
 
@@ -224,7 +236,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         foreach ($this->metadata->getMeasureMetadatas() as $metadata) {
             $function = $metadata->getFunction()[$this->sourceClass]
-                ?? throw new \RuntimeException('Function not found');
+                ?? throw new InvalidArgumentException(\sprintf(
+                    'Function not found for source class "%s".',
+                    $this->sourceClass,
+                ));
 
             $function = $function
                 ->getSourceToSummaryDQLFunction($this->getQueryContext());
@@ -238,7 +253,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $partitionMetadata = $this->metadata->getPartition();
 
         $valueResolver = $partitionMetadata->getSource()[$this->sourceClass]
-            ?? throw new \RuntimeException('Value resolver not found');
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Value resolver not found for source class "%s".',
+                $this->sourceClass,
+            ));
 
         $start = $this->partitionManager
             ->calculateSourceBoundValueFromPartition($this->start, 'lower');
@@ -251,7 +269,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $properties = $valueResolver->getInvolvedProperties();
 
         if (\count($properties) !== 1) {
-            throw new \RuntimeException('Value resolver for a partition must have exactly one property');
+            throw new UnexpectedValueException(\sprintf(
+                'Expected exactly one property, got %d',
+                \count($properties),
+            ));
         }
 
         $property = $properties[0];

@@ -19,6 +19,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_NEXTVAL
@@ -50,17 +51,17 @@ final class NextValFunction extends FunctionNode
         $platform = $sqlWalker->getConnection()->getDatabasePlatform();
 
         if (!$platform instanceof PostgreSQLPlatform) {
-            throw new \RuntimeException('Only supported on PostgreSQL for now');
+            throw new QueryException('Only supported on PostgreSQL for now');
         }
 
         // type checkings
 
         if (!\is_string($this->class)) {
-            throw new \UnexpectedValueException('Expected string, got ' . \gettype($this->class));
+            throw new QueryException('Expected string, got ' . \gettype($this->class));
         }
 
         if (!class_exists($this->class)) {
-            throw new \InvalidArgumentException('Class ' . $this->class . ' does not exist');
+            throw new QueryException('Class ' . $this->class . ' does not exist');
         }
 
         $classMetadata = $sqlWalker->getEntityManager()->getClassMetadata($this->class);

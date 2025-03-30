@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Measures;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultMeasure>
@@ -44,7 +45,10 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     public function get(string $key): DefaultMeasure
     {
         return $this->measures[$key]
-            ?? throw new \InvalidArgumentException(\sprintf('Measure "%s" not found', $key));
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Measure "%s" not found',
+                $key,
+            ));
     }
 
     #[\Override]

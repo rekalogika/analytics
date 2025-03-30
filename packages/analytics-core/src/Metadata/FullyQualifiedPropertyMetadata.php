@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class FullyQualifiedPropertyMetadata
@@ -53,7 +54,7 @@ final readonly class FullyQualifiedPropertyMetadata
     public function getSummaryMetadata(): SummaryMetadata
     {
         if ($this->summaryMetadata === null) {
-            throw new \LogicException('Summary metadata is not set');
+            throw new MetadataException('Summary metadata is not set');
         }
 
         return $this->summaryMetadata;

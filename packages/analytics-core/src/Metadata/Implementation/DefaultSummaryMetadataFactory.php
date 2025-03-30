@@ -29,6 +29,7 @@ use Rekalogika\Analytics\Contracts\Summary\Partition as DoctrineSummaryPartition
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionLevelMetadata;
@@ -228,7 +229,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
 
             if ($dimensionAttribute !== null && $measureAttribute !== null) {
-                throw new \RuntimeException('Property cannot have both Dimension and Measure attributes');
+                throw new MetadataException('Property cannot have both Dimension and Measure attributes');
             }
 
             if ($dimensionAttribute !== null) {
@@ -263,19 +264,19 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         }
 
         if ($dimensionMetadatas === []) {
-            throw new \RuntimeException('At least one Dimension attribute is required');
+            throw new MetadataException('At least one Dimension attribute is required');
         }
 
         if ($measureMetadatas === []) {
-            throw new \RuntimeException('At least one Measure attribute is required');
+            throw new MetadataException('At least one Measure attribute is required');
         }
 
         if ($partitionMetadata === null) {
-            throw new \RuntimeException('Partition attribute is required');
+            throw new MetadataException('Partition attribute is required');
         }
 
         if ($groupingsProperty === null) {
-            throw new \RuntimeException('Groupings attribute is required');
+            throw new MetadataException('Groupings attribute is required');
         }
 
         $label = $summaryAttribute->getLabel() ?? $reflectionClass->getShortName();
@@ -338,7 +339,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
 
             $sourceClassMetadata = $sourceClassesMetadata[$sourceClass]
-                ?? throw new \RuntimeException(\sprintf('Source class not found: %s', $sourceClass));
+                ?? throw new MetadataException(\sprintf('Source class not found: %s', $sourceClass));
 
             $isEntity = $sourceClassMetadata->isPropertyEntity($curProperty);
             $isField = $sourceClassMetadata->isPropertyField($curProperty);
@@ -430,12 +431,12 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
 
             $sourceClassMetadata = $sourceClassesMetadata[$sourceClass]
-                ?? throw new \RuntimeException(\sprintf('Source class not found: %s', $sourceClass));
+                ?? throw new MetadataException(\sprintf('Source class not found: %s', $sourceClass));
 
             $isField = $sourceClassMetadata->isPropertyField($curProperty);
 
             if (!$isField) {
-                throw new \RuntimeException('Partition property must be field');
+                throw new MetadataException('Partition property must be field');
             }
 
             $newSourceProperty[$sourceClass] = new PropertyValueResolver($curProperty);
@@ -444,14 +445,14 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $sourceProperty = $newSourceProperty;
 
         if (!$summaryClassMetadata->isPropertyEmbedded($summaryProperty)) {
-            throw new \RuntimeException('Partition property must be embedded');
+            throw new MetadataException('Partition property must be embedded');
         }
 
         $partitionClass = $summaryClassMetadata
             ->getEmbeddedClassOfProperty($summaryProperty);
 
         if (!is_a($partitionClass, DoctrineSummaryPartition::class, true)) {
-            throw new \RuntimeException('Partition class must implement Partition interface');
+            throw new MetadataException('Partition class must implement Partition interface');
         }
 
         // get partition level and partition id property names
@@ -479,7 +480,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
             if ($partitionLevelAttribute !== null) {
                 if ($partitionLevelPropertyName !== null) {
-                    throw new \RuntimeException('Multiple partition level properties found');
+                    throw new MetadataException('Multiple partition level properties found');
                 }
 
                 $partitionLevelPropertyName = $property;
@@ -487,7 +488,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
             if ($partitionKeyAttribute !== null) {
                 if ($partitionKeyPropertyName !== null) {
-                    throw new \RuntimeException('Multiple partition id properties found');
+                    throw new MetadataException('Multiple partition id properties found');
                 }
 
                 $partitionKeyPropertyName = $property;
@@ -496,15 +497,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         }
 
         if ($partitionLevelPropertyName === null) {
-            throw new \RuntimeException('Partition level property not found');
+            throw new MetadataException('Partition level property not found');
         }
 
         if ($partitionKeyPropertyName === null) {
-            throw new \RuntimeException('Partition id property not found');
+            throw new MetadataException('Partition id property not found');
         }
 
         if ($partitionKeyClassifier === null) {
-            throw new \RuntimeException('Partition id classifier not found');
+            throw new MetadataException('Partition id classifier not found');
         }
 
         return new PartitionMetadata(
@@ -555,7 +556,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             if ($class === null) {
                 $class = $curFunction::class;
             } elseif ($class !== $curFunction::class) {
-                throw new \RuntimeException('All functions must be of the same class');
+                throw new MetadataException('All functions must be of the same class');
             }
         }
 
@@ -579,13 +580,13 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $manager = $this->managerRegistry->getManagerForClass($class);
 
         if ($manager === null) {
-            throw new \RuntimeException(\sprintf('No manager found for class %s', $class));
+            throw new MetadataException(\sprintf('No manager found for class %s', $class));
         }
 
         $classMetadata = $manager->getClassMetadata($class);
 
         if (!$classMetadata instanceof ClassMetadata) {
-            throw new \RuntimeException('Unsupported class metadata object returned');
+            throw new MetadataException('Unsupported class metadata object returned');
         }
 
         return new ClassMetadataWrapper($classMetadata);
@@ -601,7 +602,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $hierarchyAttribute = AttributeUtil::getClassAttribute(
             class: $hierarchyClass,
             attributeClass: Hierarchy::class,
-        ) ?? throw new \RuntimeException('DimensionHierarchy attribute is required, but not found');
+        ) ?? throw new MetadataException('DimensionHierarchy attribute is required, but not found');
 
         // collect properties & levels
 
@@ -663,11 +664,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
             foreach ($path as $level) {
                 $levels[] = $dimensionLevelsMetadata[$level]
-                    ?? throw new \RuntimeException(\sprintf('Level not found: %d', $level));
+                    ?? throw new MetadataException(\sprintf('Level not found: %d', $level));
             }
 
             if ($levels === []) {
-                throw new \RuntimeException('At least one level is required');
+                throw new MetadataException('At least one level is required');
             }
 
             $dimensionPathsMetadata[] = new DimensionPathMetadata(
@@ -678,7 +679,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         // make sure at least one path is defined
 
         if ($dimensionPathsMetadata === []) {
-            throw new \RuntimeException('At least one path is required');
+            throw new MetadataException('At least one path is required');
         }
 
         // ensure the lowest level of each path is the same
@@ -691,7 +692,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             if ($lowest === null) {
                 $lowest = $lowestLevel;
             } elseif ($lowest !== $lowestLevel) {
-                throw new \RuntimeException('All paths must have the same lowest level');
+                throw new MetadataException('All paths must have the same lowest level');
             }
         }
 

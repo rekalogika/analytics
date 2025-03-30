@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -76,7 +77,7 @@ final readonly class FullyQualifiedDimensionMetadata
     public function getDimensionProperty(): DimensionPropertyMetadata
     {
         if ($this->dimensionProperty === null) {
-            throw new \LogicException('Dimension property is not set');
+            throw new MetadataException('Dimension property is not set');
         }
 
         return $this->dimensionProperty;
@@ -85,7 +86,7 @@ final readonly class FullyQualifiedDimensionMetadata
     public function getSummaryMetadata(): SummaryMetadata
     {
         if ($this->summaryMetadata === null) {
-            throw new \LogicException('Summary table metadata is not set');
+            throw new MetadataException('Summary table metadata is not set');
         }
 
         return $this->summaryMetadata;

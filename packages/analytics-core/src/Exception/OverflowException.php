@@ -13,4 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Exception;
 
-class NotFoundException extends RuntimeException implements AnalyticsException {}
+class OverflowException extends \OverflowException implements AnalyticsException {}

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -110,7 +111,7 @@ final class NormalTableToTreeTransformer
         $childrenKey = $this->keys[$columnNumber + 1] ?? null;
 
         if ($childrenKey === null) {
-            throw new \InvalidArgumentException('Children key cannot be null');
+            throw new UnexpectedValueException('Children key cannot be null');
         }
 
         $node = DefaultTreeNode::createBranchNode(

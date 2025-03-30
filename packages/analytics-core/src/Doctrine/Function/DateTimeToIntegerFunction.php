@@ -20,6 +20,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_DATETIME_TO_INTEGER
@@ -63,25 +64,25 @@ final class DateTimeToIntegerFunction extends FunctionNode
         $platform = $sqlWalker->getConnection()->getDatabasePlatform();
 
         if (!$platform instanceof PostgreSQLPlatform) {
-            throw new \RuntimeException('Only supported on PostgreSQL for now');
+            throw new QueryException('Only supported on PostgreSQL for now');
         }
 
         // type checkings
 
         if (!$this->outputFormat instanceof Literal) {
-            throw new \UnexpectedValueException('Output format must be a literal');
+            throw new QueryException('Output format must be a literal');
         }
 
         if (!$this->sourceDatetime instanceof Node) {
-            throw new \UnexpectedValueException('Source datetime must be a node');
+            throw new QueryException('Source datetime must be a node');
         }
 
         if (!$this->storedTimeZone instanceof Literal) {
-            throw new \UnexpectedValueException('Stored time zone must be a literal');
+            throw new QueryException('Stored time zone must be a literal');
         }
 
         if (!$this->summaryTimeZone instanceof Literal) {
-            throw new \UnexpectedValueException('Summary time zone must be a literal');
+            throw new QueryException('Summary time zone must be a literal');
         }
 
         $sqlOutputFormat = match ($this->outputFormat->value) {
@@ -101,7 +102,10 @@ final class DateTimeToIntegerFunction extends FunctionNode
             'quarter' => 'YYYYQ',
             'quarterOfYear' => 'Q',
             'year' => 'YYYY',
-            default => throw new \RuntimeException('Invalid output format'),
+            default => throw new QueryException(\sprintf(
+                'Unsupported output format "%s". Supported formats are: hour, hourOfDay, date, dayOfWeek, dayOfMonth, dayOfYear, week, weekDate, weekYear, weekOfYear, weekOfMonth, month, monthOfYear, quarter, quarterOfYear and year.',
+                get_debug_type($this->outputFormat->value),
+            )),
         };
 
         return 'TO_CHAR('

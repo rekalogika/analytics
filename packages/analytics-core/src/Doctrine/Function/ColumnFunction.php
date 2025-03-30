@@ -19,6 +19,7 @@ use Doctrine\ORM\Query\AST\PathExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_COLUMN
@@ -43,7 +44,7 @@ final class ColumnFunction extends FunctionNode
         // type checkings
 
         if (!$this->path instanceof PathExpression) {
-            throw new \UnexpectedValueException('Expected PathExpression, got ' . \gettype($this->path));
+            throw new QueryException('Expected PathExpression, got ' . \gettype($this->path));
         }
 
         return $this->path->dispatch($sqlWalker);

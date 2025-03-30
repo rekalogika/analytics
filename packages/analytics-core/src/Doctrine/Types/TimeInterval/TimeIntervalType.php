@@ -19,6 +19,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\Contracts\Summary\ParameterTypeAware;
 use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Exception\ConversionException;
 
 abstract class TimeIntervalType extends Type implements ParameterTypeAware
 {
@@ -43,8 +44,8 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
         }
 
         if (!\is_int($value)) {
-            throw new \InvalidArgumentException(\sprintf(
-                'The value must be an integer, %s given.',
+            throw new ConversionException(\sprintf(
+                'The value must be an integer, "%s" given.',
                 \gettype($value),
             ));
         }
@@ -72,8 +73,8 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
             return $value->getDatabaseValue();
         }
 
-        throw new \InvalidArgumentException(\sprintf(
-            'The value must be an instance of %s.',
+        throw new ConversionException(\sprintf(
+            'The value must be an instance of "%s".',
             $class,
         ));
     }

@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\Partition;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 
 final readonly class DeleteExistingSummaryQuery
@@ -40,7 +41,11 @@ final readonly class DeleteExistingSummaryQuery
         $level = $this->start->getLevel();
 
         if ($level !== $this->end->getLevel()) {
-            throw new \InvalidArgumentException('Start and end partitions must have the same level');
+            throw new InvalidArgumentException(\sprintf(
+                'The start and end partitions must be on the same level, but got "%d" and "%d"',
+                $this->start->getLevel(),
+                $this->end->getLevel(),
+            ));
         }
 
         $start = $this->start->getLowerBound();

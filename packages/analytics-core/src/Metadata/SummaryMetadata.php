@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -88,18 +89,18 @@ final readonly class SummaryMetadata
 
         foreach ($this->fullyQualifiedDimensions as $dimension) {
             $fullyQualifiedProperties[$dimension->getFullName()] =
-            new FullyQualifiedPropertyMetadata(
-                property: $dimension,
-                summaryMetadata: $this,
-            );
+                new FullyQualifiedPropertyMetadata(
+                    property: $dimension,
+                    summaryMetadata: $this,
+                );
         }
 
         foreach ($this->measures as $measure) {
             $fullyQualifiedProperties[$measure->getSummaryProperty()] =
-            new FullyQualifiedPropertyMetadata(
-                property: $measure,
-                summaryMetadata: $this,
-            );
+                new FullyQualifiedPropertyMetadata(
+                    property: $measure,
+                    summaryMetadata: $this,
+                );
         }
 
         $this->fullyQualifiedProperties = $fullyQualifiedProperties;
@@ -141,7 +142,11 @@ final readonly class SummaryMetadata
 
     public function getDimensionMetadata(string $dimensionName): DimensionMetadata
     {
-        return $this->dimensions[$dimensionName] ?? throw new \RuntimeException(\sprintf('Dimension not found: %s', $dimensionName));
+        return $this->dimensions[$dimensionName]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension not found: %s',
+                $dimensionName,
+            ));
     }
 
     /**
@@ -154,7 +159,11 @@ final readonly class SummaryMetadata
 
     public function getMeasureMetadata(string $measureName): MeasureMetadata
     {
-        return $this->measures[$measureName] ?? throw new \RuntimeException('Measure not found');
+        return $this->measures[$measureName]
+            ?? throw new MetadataException(\sprintf(
+                'Measure not found: %s',
+                $measureName,
+            ));
     }
 
     public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata
@@ -162,25 +171,32 @@ final readonly class SummaryMetadata
         if (!str_contains($fieldName, '.')) {
             return $this->dimensions[$fieldName]
                 ?? $this->measures[$fieldName]
-                ?? throw new \RuntimeException('Field not found');
+                ?? throw new MetadataException(\sprintf(
+                    'Field not found: %s',
+                    $fieldName,
+                ));
         }
 
         /** @psalm-suppress PossiblyUndefinedArrayOffset */
         [$dimensionName, $propertyName] = explode('.', $fieldName, 2);
 
-        return $this->dimensions[$dimensionName] ?? throw new \RuntimeException('Field not found');
+        return $this->dimensions[$dimensionName]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension not found: %s',
+                $dimensionName,
+            ));
     }
 
     public function getFullyQualifiedDimension(string $dimensionName): FullyQualifiedDimensionMetadata
     {
         return $this->fullyQualifiedDimensions[$dimensionName]
-            ?? throw new \RuntimeException(\sprintf('Dimension not found: %s', $dimensionName));
+            ?? throw new MetadataException(\sprintf('Dimension not found: %s', $dimensionName));
     }
 
     public function getFullyQualifiedProperty(string $propertyName): FullyQualifiedPropertyMetadata
     {
         return $this->fullyQualifiedProperties[$propertyName]
-            ?? throw new \RuntimeException(\sprintf('Property not found: %s', $propertyName));
+            ?? throw new MetadataException(\sprintf('Property not found: %s', $propertyName));
     }
 
     /**

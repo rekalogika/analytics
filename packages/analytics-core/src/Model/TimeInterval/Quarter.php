@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
 use Rekalogika\Analytics\Contracts\Summary\TimeInterval;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class Quarter implements TimeInterval
@@ -44,7 +46,10 @@ final class Quarter implements TimeInterval
         );
 
         if ($start === false) {
-            throw new \InvalidArgumentException('Invalid database value');
+            throw new UnexpectedValueException(\sprintf(
+                'Invalid date format: %s',
+                \sprintf('%04d-%02d-01', $y, $m),
+            ));
         }
 
         $this->start = $start->setTime(0, 0, 0);
@@ -103,7 +108,7 @@ final class Quarter implements TimeInterval
             4, 5, 6 => 2,
             7, 8, 9 => 3,
             10, 11, 12 => 4,
-            default => throw new \InvalidArgumentException('Invalid month: ' . $month),
+            default => throw new InvalidArgumentException('Invalid month: ' . $month),
         };
     }
 
@@ -114,7 +119,7 @@ final class Quarter implements TimeInterval
             2 => 4,
             3 => 7,
             4 => 10,
-            default => throw new \InvalidArgumentException('Invalid quarter: ' . $quarter),
+            default => throw new InvalidArgumentException('Invalid quarter: ' . $quarter),
         };
     }
 

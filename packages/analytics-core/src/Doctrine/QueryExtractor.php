@@ -19,6 +19,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 
 /**
  * Extracts information from Doctrine ORM Query objects
@@ -59,7 +61,7 @@ final readonly class QueryExtractor
             $parameter = $query->getParameter($key);
 
             if ($parameter === null) {
-                throw new \LogicException('Parameter not found');
+                throw new LogicException('Parameter not found');
             }
 
             /** @psalm-suppress MixedAssignment */
@@ -79,7 +81,7 @@ final readonly class QueryExtractor
                 && !$type instanceof ArrayParameterType
                 && !$type instanceof ParameterType
             ) {
-                throw new \LogicException('Invalid type');
+                throw new LogicException('Invalid type');
             }
 
             foreach ($positions as $position) {
@@ -103,7 +105,7 @@ final readonly class QueryExtractor
     public function getSqlStatement(): string
     {
         if (\count($this->sqlStatements) !== 1) {
-            throw new \LogicException('Expected exactly one SQL statement');
+            throw new UnexpectedValueException('Expected exactly one SQL statement');
         }
 
         return $this->sqlStatements[0];

@@ -25,6 +25,9 @@ use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Summary\ParameterTypeAware;
+use Rekalogika\Analytics\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\LogicException;
 
 final class SummaryExpressionVisitor extends ExpressionVisitor
 {
@@ -49,11 +52,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         private readonly QueryContext $queryContext,
     ) {
         $this->rootAlias = $this->queryBuilder->getRootAliases()[0]
-            ?? throw new \InvalidArgumentException('No root alias found');
+            ?? throw new LogicException('No root alias found');
 
         $this->classMetadata = $this->queryBuilder->getEntityManager()
             ->getClassMetadata($this->queryBuilder->getRootEntities()[0]
-                ?? throw new \InvalidArgumentException('No root entity found'));
+                ?? throw new LogicException('No root entity found'));
     }
 
     /**
@@ -67,7 +70,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     private function getFieldType(string $field): mixed
     {
         if (!\in_array($field, $this->validFields, true)) {
-            throw new \InvalidArgumentException("Invalid dimension: $field");
+            throw new InvalidArgumentException(\sprintf(
+                'Invalid field "%s", valid fields are: %s',
+                $field,
+                implode(', ', $this->validFields),
+            ));
         }
 
         if ($this->classMetadata->hasAssociation($field)) {
@@ -90,7 +97,11 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $field = $comparison->getField();
 
         if (!\in_array($field, $this->validFields, true)) {
-            throw new \InvalidArgumentException("Invalid dimension: $field");
+            throw new InvalidArgumentException(\sprintf(
+                'Invalid field "%s", valid fields are: %s',
+                $field,
+                implode(', ', $this->validFields),
+            ));
         }
 
         $this->involvedDimensions[$field] = true;
@@ -113,7 +124,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $type = $this->getFieldType($field);
 
         if (\is_array($value)) {
-            throw new \InvalidArgumentException('Value cannot be an array');
+            throw new LogicException('Value cannot be an array');
         }
 
         // special case for eq null
@@ -144,7 +155,20 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             Comparison::LTE => $this->queryBuilder->expr()->lte($fieldWithAlias, $value),
             Comparison::GT => $this->queryBuilder->expr()->gt($fieldWithAlias, $value),
             Comparison::GTE => $this->queryBuilder->expr()->gte($fieldWithAlias, $value),
-            default => throw new \InvalidArgumentException("Unknown operator: $operator"),
+            default => throw new InvalidArgumentException(\sprintf(
+                'Invalid operator "%s", valid operators are: %s',
+                $operator,
+                implode(', ', [
+                    Comparison::EQ,
+                    Comparison::NEQ,
+                    Comparison::LT,
+                    Comparison::LTE,
+                    Comparison::GT,
+                    Comparison::GTE,
+                    Comparison::IN,
+                    Comparison::NIN,
+                ]),
+            )),
         };
     }
 
@@ -166,7 +190,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $comparisonOperator = $comparison->getOperator();
 
         if ($comparisonOperator !== Comparison::IN && $comparisonOperator !== Comparison::NIN) {
-            throw new \InvalidArgumentException('Invalid operator for IN or NOT IN');
+            throw new LogicException('Invalid operator for IN or NOT IN');
         }
 
         // ensure value is array
@@ -175,7 +199,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $values = $comparison->getValue()->getValue();
 
         if (!\is_array($values)) {
-            throw new \InvalidArgumentException('Value must be an array with IN or NOT IN operator');
+            throw new LogicException('Value must be an array with IN or NOT IN operator');
         }
 
         // check if value has null
@@ -279,7 +303,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkValue(Value $value): mixed
     {
-        throw new \BadMethodCallException('Not used');
+        throw new BadMethodCallException('Not used');
     }
 
     #[\Override]
@@ -297,7 +321,15 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             CompositeExpression::TYPE_AND => $this->queryBuilder->expr()->andX(...$expressions),
             CompositeExpression::TYPE_OR => $this->queryBuilder->expr()->orX(...$expressions),
             CompositeExpression::TYPE_NOT => $this->queryBuilder->expr()->not(...$expressions),
-            default => throw new \InvalidArgumentException("Unknown composite expression type: {$expr->getType()}"),
+            default => throw new InvalidArgumentException(\sprintf(
+                'Invalid composite expression type "%s", valid types are: %s',
+                $expr->getType(),
+                implode(', ', [
+                    CompositeExpression::TYPE_AND,
+                    CompositeExpression::TYPE_OR,
+                    CompositeExpression::TYPE_NOT,
+                ]),
+            )),
         };
     }
 }

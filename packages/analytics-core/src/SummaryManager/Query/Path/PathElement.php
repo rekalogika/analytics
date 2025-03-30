@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query\Path;
 
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\LogicException;
+
 final readonly class PathElement
 {
     private string $name;
@@ -28,7 +31,10 @@ final readonly class PathElement
     {
         if (str_contains($part, '(')) {
             if (str_starts_with($part, '*')) {
-                throw new \RuntimeException('Cannot cast to class with alias, omit the * prefix to fix it');
+                throw new InvalidArgumentException(\sprintf(
+                    'Cannot cast to class with alias, omit the * prefix to fix it, part: "%s".',
+                    $part,
+                ));
             }
 
             $parts = explode('(', $part);
@@ -36,7 +42,10 @@ final readonly class PathElement
             $class = substr($parts[1], 0, -1);
 
             if (!class_exists($class)) {
-                throw new \RuntimeException(\sprintf('Class %s not found', $class));
+                throw new LogicException(\sprintf(
+                    'Class "%s" not found',
+                    $class,
+                ));
             }
 
             $this->castToClass = $class;

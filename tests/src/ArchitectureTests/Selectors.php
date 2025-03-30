@@ -30,6 +30,16 @@ final readonly class Selectors
             Selector::NOT(
                 Selector::inNamespace('Rekalogika\Analytics\Tests'),
             ),
+            Selector::NOT(
+                Selector::inNamespace('Rekalogika\Analytics\Exception'),
+            ),
+        );
+    }
+
+    public static function selectAnalyticsCoreException(): AllOfSelectorModifier
+    {
+        return Selector::AllOf(
+            Selector::inNamespace('Rekalogika\Analytics\Exception'),
         );
     }
 }

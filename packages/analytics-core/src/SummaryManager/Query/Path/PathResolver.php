@@ -15,6 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\Query\Path;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 
 final class PathResolver
 {
@@ -126,7 +128,10 @@ final class PathResolver
         if ($cachedAlias !== null) {
             $this->currentAlias = $cachedAlias;
             $this->currentClass = $this->aliasToClass[$cachedAlias]
-                ?? throw new \RuntimeException('Alias not found');
+                ?? throw new UnexpectedValueException(\sprintf(
+                    'Alias "%s" not found',
+                    $cachedAlias,
+                ));
 
             if ($path->getFirstPart()->getCastToClass() !== null) {
                 $this->processRelatedEntityWithCast($path);
@@ -143,7 +148,7 @@ final class PathResolver
         $relatedClass = $this->getRelatedClass($first->getNameWithoutCast());
 
         if ($relatedClass === null) {
-            throw new \RuntimeException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'Path "%s" on class "%s" does not point to a related entity',
                 $first->getName(),
                 $this->currentClass,
@@ -182,7 +187,10 @@ final class PathResolver
         if ($cachedAlias !== null) {
             $this->currentAlias = $cachedAlias;
             $this->currentClass = $this->aliasToClass[$cachedAlias]
-                ?? throw new \RuntimeException('Alias not found');
+                ?? throw new UnexpectedValueException(\sprintf(
+                    'Alias "%s" not found',
+                    $cachedAlias,
+                ));
 
             $path->shift();
 
@@ -195,7 +203,7 @@ final class PathResolver
         $castToClass = $first->getCastToClass();
 
         if ($castToClass === null) {
-            throw new \RuntimeException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'Path "%s" on class "%s" does not have a cast to class',
                 $first->getName(),
                 $this->currentClass,

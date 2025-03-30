@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Metadata;
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionMetadata
@@ -39,7 +40,7 @@ final readonly class DimensionMetadata
         private ?SummaryMetadata $summaryMetadata = null,
     ) {
         if ($hierarchy !== null && \is_array($orderBy)) {
-            throw new \InvalidArgumentException('orderBy cannot be an array for hierarchical dimension');
+            throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
 
         $this->hierarchy = $hierarchy?->withDimensionMetadata($this);
@@ -64,7 +65,7 @@ final readonly class DimensionMetadata
     public function getSummaryMetadata(): SummaryMetadata
     {
         if ($this->summaryMetadata === null) {
-            throw new \LogicException('Summary table metadata is not set');
+            throw new MetadataException('Summary table metadata is not set');
         }
 
         return $this->summaryMetadata;

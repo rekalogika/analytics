@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class PropertyValueResolver implements PartitionValueResolver
@@ -44,7 +45,10 @@ final readonly class PropertyValueResolver implements PartitionValueResolver
     public function transformSummaryValueToSourceValue(mixed $value): int|string
     {
         if (!\is_int($value) && !\is_string($value)) {
-            throw new \InvalidArgumentException('Value must be an integer or a string');
+            throw new InvalidArgumentException(\sprintf(
+                'Value must be an integer or string, "%s" given.',
+                get_debug_type($value),
+            ));
         }
 
         return $value;

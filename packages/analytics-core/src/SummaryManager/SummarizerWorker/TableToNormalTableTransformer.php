@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\DimensionCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -132,7 +133,7 @@ final class TableToNormalTableTransformer
         }
 
         if ($newRow === []) {
-            throw new \RuntimeException('No dimensions found in row');
+            throw new UnexpectedValueException('No dimensions found in row');
         }
 
         foreach ($this->measures as $measure) {

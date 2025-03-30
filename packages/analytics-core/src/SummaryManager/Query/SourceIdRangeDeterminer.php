@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 
 /**
@@ -49,7 +50,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
         $this->valueResolver = $this->summaryMetadata
             ->getPartition()
             ->getSource()[$class]
-            ?? throw new \InvalidArgumentException(\sprintf(
+            ?? throw new MetadataException(\sprintf(
                 'Value resolver for class "%s" not found',
                 $class,
             ));

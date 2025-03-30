@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata;
 
+use Rekalogika\Analytics\Exception\MetadataException;
+
 /**
  * @implements \IteratorAggregate<DimensionPathMetadata>
  */
@@ -70,7 +72,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     public function getDimensionMetadata(): DimensionMetadata
     {
         if ($this->dimensionMetadata === null) {
-            throw new \RuntimeException('Dimension metadata not set');
+            throw new MetadataException('Dimension metadata not set');
         }
 
         return $this->dimensionMetadata;
@@ -133,7 +135,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     public function getLevel(int $level): DimensionLevelMetadata
     {
         return $this->levels[$level]
-            ?? throw new \RuntimeException(\sprintf('Level not found: %d', $level));
+            ?? throw new MetadataException(\sprintf('Level not found: %d', $level));
     }
 
     public function getLowerLevel(?int $level): ?int
@@ -156,7 +158,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     public function getProperty(string $name): DimensionPropertyMetadata
     {
         return $this->properties[$name]
-            ?? throw new \RuntimeException(\sprintf('Property not found: %s', $name));
+            ?? throw new MetadataException(\sprintf('Property not found: %s', $name));
     }
 
     /**
@@ -183,7 +185,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
             }
         }
 
-        throw new \RuntimeException(\sprintf('Path not found for level: %d', $levelId));
+        throw new MetadataException(\sprintf('Path not found for level: %d', $levelId));
     }
 
     /**

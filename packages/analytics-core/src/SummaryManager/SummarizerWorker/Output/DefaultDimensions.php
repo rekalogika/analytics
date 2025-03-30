@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Dimensions;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
@@ -56,7 +57,10 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     public function get(string $key): DefaultDimension
     {
         return $this->dimensions[$key]
-            ?? throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $key));
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Dimension "%s" not found',
+                $key,
+            ));
     }
 
     #[\Override]
@@ -65,7 +69,10 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
         $keys = array_keys($this->dimensions);
 
         if (!isset($keys[$index])) {
-            throw new \InvalidArgumentException(\sprintf('Dimension at index "%d" not found', $index));
+            throw new InvalidArgumentException(\sprintf(
+                'Dimension at index "%d" not found',
+                $index,
+            ));
         }
 
         return $this->dimensions[$keys[$index]];

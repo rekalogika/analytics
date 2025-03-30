@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata
@@ -67,7 +68,7 @@ final readonly class DimensionPropertyMetadata
     public function getLevelMetadata(): DimensionLevelMetadata
     {
         if ($this->levelMetadata === null) {
-            throw new \LogicException('Level metadata is not set');
+            throw new MetadataException('Level metadata is not set');
         }
 
         return $this->levelMetadata;

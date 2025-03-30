@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query\Path;
 
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
+
 final class Path implements \Countable
 {
     /**
@@ -41,7 +43,7 @@ final class Path implements \Countable
 
     public function getFirstPart(): PathElement
     {
-        return $this->path[0] ?? throw new \RuntimeException('Path is empty');
+        return $this->path[0] ?? throw new UnexpectedValueException('Path is empty');
     }
 
     public function getPreviousFullPath(): string
@@ -73,7 +75,7 @@ final class Path implements \Countable
         $part = array_shift($this->path);
 
         if ($part === null) {
-            throw new \RuntimeException('Path is empty');
+            throw new UnexpectedValueException('Path is empty');
         }
 
         $this->previousPath[] = $part;

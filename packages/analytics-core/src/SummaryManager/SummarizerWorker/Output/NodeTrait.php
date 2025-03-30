@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 trait NodeTrait
 {
@@ -46,7 +47,9 @@ trait NodeTrait
     public function traverse(mixed ...$members): ?DefaultTreeNode
     {
         if ($members === []) {
-            throw new \InvalidArgumentException('Invalid path');
+            throw new InvalidArgumentException(
+                'Cannot traverse to empty members, expected at least 1 member.',
+            );
         }
 
         /** @psalm-suppress MixedAssignment */

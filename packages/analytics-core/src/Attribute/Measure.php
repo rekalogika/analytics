@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Attribute;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -36,7 +37,11 @@ final readonly class Measure
                 if ($class === null) {
                     $class = $function::class;
                 } elseif ($class !== $function::class) {
-                    throw new \InvalidArgumentException('All measure functions must be of the same class');
+                    throw new InvalidArgumentException(\sprintf(
+                        'All functions must be of the same class, previous function was "%s", "%s" given',
+                        $class,
+                        $function::class,
+                    ));
                 }
             }
         }

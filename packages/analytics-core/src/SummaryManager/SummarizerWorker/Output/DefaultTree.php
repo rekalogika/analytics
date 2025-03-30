@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Tree;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
 
 /**
@@ -36,13 +37,13 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
     ) {
         if ($childrenKey === null) {
             if ($children !== []) {
-                throw new \InvalidArgumentException('Children key cannot be null if children is not empty');
+                throw new UnexpectedValueException('Children key cannot be null if children is not empty');
             }
         }
 
         foreach ($children as $child) {
             if ($child->getKey() !== $childrenKey) {
-                throw new \InvalidArgumentException(
+                throw new UnexpectedValueException(
                     \sprintf('Invalid child key "%s", expected "%s"', $child->getKey(), get_debug_type($childrenKey)),
                 );
             }

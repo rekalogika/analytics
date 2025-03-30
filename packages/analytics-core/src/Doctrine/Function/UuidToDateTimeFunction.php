@@ -22,6 +22,7 @@ use Doctrine\ORM\Query\AST\TypedExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Rekalogika\Analytics\Exception\QueryException;
 
 /**
  * REKALOGIKA_UUID_TO_DATETIME
@@ -44,13 +45,13 @@ final class UuidToDateTimeFunction extends FunctionNode implements TypedExpressi
     public function getSql(SqlWalker $sqlWalker): string
     {
         if (!$this->variable instanceof Node) {
-            throw new \RuntimeException('Expected a Node');
+            throw new QueryException('Expected a Node');
         }
 
         $platform = $sqlWalker->getConnection()->getDatabasePlatform();
 
         if (!$platform instanceof PostgreSQLPlatform) {
-            throw new \RuntimeException('Only supported on PostgreSQL for now');
+            throw new QueryException('Only supported on PostgreSQL for now');
         }
 
         return \sprintf("TO_TIMESTAMP(('x'||LPAD(ENCODE(UUID_SEND(%s), 'hex'), 16, '0'))::bit(48)::bigint / 1000)", $this->variable->dispatch($sqlWalker));
