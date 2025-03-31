@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
@@ -42,7 +42,7 @@ final class NormalTableToTreeTransformer
         private readonly SummaryQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly array $keys,
-        private readonly UniqueDimensions $uniqueDimensions,
+        private readonly Items $uniqueDimensions,
     ) {}
 
     public static function transform(
@@ -117,7 +117,7 @@ final class NormalTableToTreeTransformer
         $node = DefaultTreeNode::createBranchNode(
             childrenKey: $childrenKey,
             dimension: $dimension,
-            uniqueDimensions: $this->uniqueDimensions,
+            items: $this->uniqueDimensions,
         );
 
         $current = $this->currentPath[$columnNumber] ?? null;
@@ -150,7 +150,7 @@ final class NormalTableToTreeTransformer
     ): void {
         $node = DefaultTreeNode::createLeafNode(
             dimension: $lastDimension,
-            uniqueDimensions: $this->uniqueDimensions,
+            itemsDimensions: $this->uniqueDimensions,
             measure: $measure,
         );
 

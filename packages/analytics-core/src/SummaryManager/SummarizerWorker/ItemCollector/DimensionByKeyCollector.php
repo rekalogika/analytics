@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
@@ -36,9 +36,9 @@ final class DimensionByKeyCollector
         private readonly string $key,
     ) {}
 
-    public function getResult(): UniqueDimensionsByKey
+    public function getResult(): DimensionColletion
     {
-        return new UniqueDimensionsByKey(
+        return new DimensionColletion(
             key: $this->key,
             dimensions: array_values($this->dimensions),
         );

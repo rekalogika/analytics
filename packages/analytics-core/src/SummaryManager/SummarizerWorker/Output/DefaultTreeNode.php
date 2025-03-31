@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -43,7 +43,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly ?string $childrenKey,
         private readonly DefaultDimension $dimension,
         private ?DefaultMeasure $measure,
-        private readonly UniqueDimensions $uniqueDimensions,
+        private readonly Items $items,
         private readonly bool $null,
     ) {}
 
@@ -82,22 +82,22 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             return $this->children;
         }
 
-        $uniqueChildrenDimensions = $this->uniqueDimensions
+        $childrenDimensions = $this->items
             ->getDimensions($this->childrenKey);
 
         $balancedChildren = [];
 
-        foreach ($uniqueChildrenDimensions as $dimension) {
+        foreach ($childrenDimensions as $dimension) {
             $child = $this->getChildEqualTo($dimension);
 
             if ($child === null) {
                 // continue;
                 $child = new DefaultTreeNode(
-                    childrenKey: $this->uniqueDimensions
+                    childrenKey: $this->items
                         ->getKeyAfter($this->childrenKey),
                     dimension: $dimension,
                     measure: null,
-                    uniqueDimensions: $this->uniqueDimensions,
+                    items: $this->items,
                     null: true,
                 );
             }
@@ -125,26 +125,26 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public static function createBranchNode(
         string $childrenKey,
         DefaultDimension $dimension,
-        UniqueDimensions $uniqueDimensions,
+        Items $items,
     ): self {
         return new self(
             childrenKey: $childrenKey,
             dimension: $dimension,
             measure: null,
-            uniqueDimensions: $uniqueDimensions,
+            items: $items,
             null: false,
         );
     }
 
     public static function createLeafNode(
         DefaultDimension $dimension,
-        UniqueDimensions $uniqueDimensions,
+        Items $itemsDimensions,
         DefaultMeasure $measure,
     ): self {
         return new self(
             childrenKey: null,
             dimension: $dimension,
-            uniqueDimensions: $uniqueDimensions,
+            items: $itemsDimensions,
             measure: $measure,
             null: false,
         );
@@ -223,7 +223,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         $measureProperty = $measureMember->getMeasureProperty();
 
         // get the null measure
-        $measure = $this->uniqueDimensions->getMeasure($measureProperty);
+        $measure = $this->items->getMeasure($measureProperty);
 
         return $this->measure = $measure;
     }
@@ -262,11 +262,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getChildrenKey(): ?string
     {
         return $this->childrenKey;
-    }
-
-    public function getUniqueDimensions(): UniqueDimensions
-    {
-        return $this->uniqueDimensions;
     }
 
     #[\Override]
