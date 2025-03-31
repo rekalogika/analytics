@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -29,7 +29,7 @@ final class DimensionCollector
      */
     private array $measures = [];
 
-    public function getResult(): UniqueDimensions
+    public function getResult(): Items
     {
         $uniqueDimensionsByKey = [];
 
@@ -37,7 +37,7 @@ final class DimensionCollector
             $uniqueDimensionsByKey[$key] = $collector->getResult();
         }
 
-        return new UniqueDimensions(
+        return new Items(
             dimensions: $uniqueDimensionsByKey,
             measures: $this->measures,
         );

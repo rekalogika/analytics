@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 
 /**
  * @implements \IteratorAggregate<DefaultDimension>
  */
-final readonly class UniqueDimensionsByKey implements \IteratorAggregate, \Countable
+final readonly class DimensionColletion implements \IteratorAggregate, \Countable
 {
     /**
      * @param list<DefaultDimension> $dimensions

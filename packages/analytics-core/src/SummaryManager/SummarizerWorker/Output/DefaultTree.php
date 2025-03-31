@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Tree;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector\UniqueDimensions;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 
 /**
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
@@ -33,7 +33,7 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
         private string $summaryClass,
         private ?string $childrenKey,
         private array $children,
-        private UniqueDimensions $uniqueDimensions,
+        private Items $uniqueDimensions,
     ) {
         if ($childrenKey === null) {
             if ($children !== []) {
@@ -70,7 +70,7 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
         }
     }
 
-    public function getUniqueDimensions(): UniqueDimensions
+    public function getUniqueDimensions(): Items
     {
         return $this->uniqueDimensions;
     }

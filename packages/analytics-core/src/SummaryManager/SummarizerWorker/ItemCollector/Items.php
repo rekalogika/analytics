@@ -11,18 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\DimensionCollector;
+namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 
 /**
- * @implements \IteratorAggregate<UniqueDimensionsByKey>
+ * @implements \IteratorAggregate<DimensionColletion>
  */
-final readonly class UniqueDimensions implements \IteratorAggregate, \Countable
+final readonly class Items implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<string,UniqueDimensionsByKey> $dimensions
+     * @param array<string,DimensionColletion> $dimensions
      * @param array<string,DefaultMeasure> $measures
      */
     public function __construct(
@@ -36,7 +36,7 @@ final readonly class UniqueDimensions implements \IteratorAggregate, \Countable
         yield from $this->dimensions;
     }
 
-    public function getDimensions(string $key): UniqueDimensionsByKey
+    public function getDimensions(string $key): DimensionColletion
     {
         return $this->dimensions[$key]
             ?? throw new InvalidArgumentException(\sprintf(
