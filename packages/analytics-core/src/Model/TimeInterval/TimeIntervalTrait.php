@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+
 trait TimeIntervalTrait
 {
     /**
@@ -59,5 +62,28 @@ trait TimeIntervalTrait
     public function getDatabaseValue(): int
     {
         return $this->databaseValue;
+    }
+
+    /**
+     * @return -1|0|1
+     */
+    public static function compare(
+        SequenceMember $a,
+        SequenceMember $b,
+    ): int {
+        if (
+            !$a instanceof self
+            || !$b instanceof self
+            // @phpstan-ignore notIdentical.alwaysFalse
+            || $a::class !== $b::class
+        ) {
+            throw new InvalidArgumentException(\sprintf(
+                'Cannot compare "%s" with "%s".',
+                $a::class,
+                $b::class,
+            ));
+        }
+
+        return $a->databaseValue <=> $b->databaseValue;
     }
 }

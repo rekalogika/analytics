@@ -156,4 +156,32 @@ final class Quarter implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        $next = $this->start->modify('+3 months');
+
+        return self::create(
+            (int) (
+                $next->format('Y')
+                . self::monthToQuarter((int) $next->format('m'))
+            ),
+            $this->start->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        $previous = $this->start->modify('-3 months');
+
+        return self::create(
+            (int) (
+                $previous->format('Y')
+                . self::monthToQuarter((int) $previous->format('m'))
+            ),
+            $this->start->getTimezone(),
+        );
+    }
 }

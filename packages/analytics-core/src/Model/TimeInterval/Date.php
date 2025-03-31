@@ -129,4 +129,26 @@ final class Date implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        $next = $this->start->modify('+1 day');
+
+        return self::create(
+            (int) $next->format('Ymd'),
+            $this->start->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        $previous = $this->start->modify('-1 day');
+
+        return self::create(
+            (int) $previous->format('Ymd'),
+            $this->start->getTimezone(),
+        );
+    }
 }

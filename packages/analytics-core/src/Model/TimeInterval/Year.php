@@ -106,4 +106,22 @@ final class Year implements TimeInterval
     // {
     //     return (int) $this->end->format('Y');
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        return self::create(
+            $this->databaseValue + 1,
+            $this->start->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        return self::create(
+            $this->databaseValue - 1,
+            $this->start->getTimezone(),
+        );
+    }
 }
