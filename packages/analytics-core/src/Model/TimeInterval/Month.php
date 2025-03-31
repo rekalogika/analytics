@@ -175,4 +175,22 @@ final class Month implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        return self::create(
+            (int) $this->start->modify('first day of next month')->format('Ym'),
+            $this->start->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        return self::create(
+            (int) $this->start->modify('first day of last month')->format('Ym'),
+            $this->start->getTimezone(),
+        );
+    }
 }

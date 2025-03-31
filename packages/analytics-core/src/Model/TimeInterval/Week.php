@@ -115,4 +115,24 @@ final class Week implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        return self::create(
+            (int) $this->end->format('oW'),
+            $this->end->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        $previousWeek = $this->start->modify('-1 week');
+
+        return self::create(
+            (int) $previousWeek->format('oW'),
+            $previousWeek->getTimezone(),
+        );
+    }
 }

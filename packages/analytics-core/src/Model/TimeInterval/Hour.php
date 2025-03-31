@@ -115,4 +115,26 @@ final class Hour implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        $next = $this->start->modify('+1 hour');
+
+        return self::create(
+            (int) $next->format('YmdH'),
+            $next->getTimezone(),
+        );
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        $previous = $this->start->modify('-1 hour');
+
+        return self::create(
+            (int) $previous->format('YmdH'),
+            $previous->getTimezone(),
+        );
+    }
 }

@@ -18,9 +18,15 @@ namespace Rekalogika\Analytics\Contracts\Model;
  */
 interface SequenceMember
 {
-    // public function getNext(): ?static;
+    public function getNext(): ?static;
 
-    // public function getPrevious(): ?static;
+    public function getPrevious(): ?static;
 
-    // public function isSameAs(SequenceMember $other): bool;
+    /**
+     * @return -1|0|1
+     */
+    public static function compare(
+        self $a,
+        self $b,
+    ): int;
 }

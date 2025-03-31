@@ -105,4 +105,20 @@ final class WeekDate implements TimeInterval
     //         $this->start->getTimezone(),
     //     );
     // }
+
+    #[\Override]
+    public function getNext(): static
+    {
+        $nextDateTime = $this->start->modify('+1 day');
+
+        return self::createFromDateTime($nextDateTime);
+    }
+
+    #[\Override]
+    public function getPrevious(): static
+    {
+        $previousDateTime = $this->start->modify('-1 day');
+
+        return self::createFromDateTime($previousDateTime);
+    }
 }
