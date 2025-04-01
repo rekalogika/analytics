@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
-use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
@@ -28,6 +27,10 @@ final class DimensionCollector
      * @var array<string,DefaultMeasure>
      */
     private array $measures = [];
+
+    public function __construct(
+        private readonly bool $hasTieredOrder,
+    ) {}
 
     public function getResult(): Items
     {
@@ -45,7 +48,10 @@ final class DimensionCollector
 
     private function getCollectorForKey(string $key): DimensionByKeyCollector
     {
-        return $this->collectors[$key] ??= new DimensionByKeyCollector($key);
+        return $this->collectors[$key] ??= new DimensionByKeyCollector(
+            key: $key,
+            hasTieredOrder: $this->hasTieredOrder,
+        );
     }
 
     public function processTuple(DefaultTuple $tuple): void
@@ -68,13 +74,5 @@ final class DimensionCollector
     {
         $this->measures[$measure->getKey()]
             ??= DefaultMeasure::createNullFromSelf($measure);
-    }
-
-    /**
-     * @return list<Dimension>
-     */
-    public function getDimensionsByKey(string $key): array
-    {
-        return $this->getCollectorForKey($key)->getDimensions();
     }
 }

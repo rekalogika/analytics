@@ -50,6 +50,7 @@ final class TableToNormalTableTransformer
     private function __construct(
         SummaryQuery $summaryQuery,
         private readonly SummaryMetadata $metadata,
+        bool $hasTieredOrder,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $dimensions = $summaryQuery->getGroupBy();
@@ -60,19 +61,21 @@ final class TableToNormalTableTransformer
 
         $this->dimensions = $dimensions;
         $this->measures = $summaryQuery->getSelect();
-        $this->dimensionCollector = new DimensionCollector();
+        $this->dimensionCollector = new DimensionCollector($hasTieredOrder);
     }
 
     public static function transform(
         SummaryQuery $summaryQuery,
         DefaultTable $input,
         SummaryMetadata $metadata,
+        bool $hasTieredOrder,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
             summaryQuery: $summaryQuery,
             metadata: $metadata,
             measureLabel: $valuesLabel,
+            hasTieredOrder: $hasTieredOrder,
         );
 
         return $transformer->doTransform($input);

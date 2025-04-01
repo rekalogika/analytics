@@ -26,16 +26,12 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 {
     use NodeTrait;
+    use BalancedTreeChildrenTrait;
 
     /**
      * @var list<DefaultTreeNode>
      */
     private array $children = [];
-
-    /**
-     * @var null|list<DefaultTreeNode>
-     */
-    private ?array $balancedChildren = null;
 
     private ?DefaultTreeNode $parent = null;
 
@@ -61,67 +57,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
     }
 
-    /**
-     * @return list<DefaultTreeNode>
-     */
-    public function getChildren(): array
-    {
-        return $this->children;
-    }
-
-    /**
-     * @return list<DefaultTreeNode>
-     */
-    private function getBalancedChildren(): array
-    {
-        if ($this->balancedChildren !== null) {
-            return $this->balancedChildren;
-        }
-
-        if ($this->childrenKey === null) {
-            return $this->children;
-        }
-
-        $childrenDimensions = $this->items
-            ->getDimensions($this->childrenKey);
-
-        $balancedChildren = [];
-
-        foreach ($childrenDimensions as $dimension) {
-            $child = $this->getChildEqualTo($dimension);
-
-            if ($child === null) {
-                // continue;
-                $child = new DefaultTreeNode(
-                    childrenKey: $this->items
-                        ->getKeyAfter($this->childrenKey),
-                    dimension: $dimension,
-                    measure: null,
-                    items: $this->items,
-                    null: true,
-                );
-            }
-
-            $child->setParent($this);
-
-            $balancedChildren[] = $child;
-        }
-
-        return $this->balancedChildren = $balancedChildren;
-    }
-
-    private function getChildEqualTo(
-        DefaultDimension $dimension,
-    ): ?DefaultTreeNode {
-        foreach ($this->children as $child) {
-            if ($child->isEqual($dimension)) {
-                return $child;
-            }
-        }
-
-        return null;
-    }
-
     public static function createBranchNode(
         string $childrenKey,
         DefaultDimension $dimension,
@@ -138,15 +73,30 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     public static function createLeafNode(
         DefaultDimension $dimension,
-        Items $itemsDimensions,
+        Items $items,
         DefaultMeasure $measure,
     ): self {
         return new self(
             childrenKey: null,
             dimension: $dimension,
-            items: $itemsDimensions,
+            items: $items,
             measure: $measure,
             null: false,
+        );
+    }
+
+    public static function createFillingNode(
+        ?string $childrenKey,
+        DefaultDimension $dimension,
+        Items $items,
+        ?DefaultMeasure $measure,
+    ): self {
+        return new self(
+            childrenKey: $childrenKey,
+            dimension: $dimension,
+            items: $items,
+            measure: $measure,
+            null: true,
         );
     }
 

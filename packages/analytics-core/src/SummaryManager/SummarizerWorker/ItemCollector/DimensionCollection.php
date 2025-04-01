@@ -18,7 +18,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension
 /**
  * @implements \IteratorAggregate<DefaultDimension>
  */
-final readonly class DimensionColletion implements \IteratorAggregate, \Countable
+final readonly class DimensionCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @param list<DefaultDimension> $dimensions

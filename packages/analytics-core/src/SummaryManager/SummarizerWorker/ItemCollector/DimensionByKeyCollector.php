@@ -34,13 +34,31 @@ final class DimensionByKeyCollector
 
     public function __construct(
         private readonly string $key,
+        private readonly bool $hasTieredOrder,
     ) {}
 
-    public function getResult(): DimensionColletion
+    public function getResult(): DimensionCollection
     {
-        return new DimensionColletion(
+        $firstDimension = $this->dimensions[array_key_first($this->dimensions) ?? throw new UnexpectedValueException('No dimensions found in the collector.')];
+
+        $dimensions = array_values($this->dimensions);
+
+        if ($dimensions === []) {
+            return new DimensionCollection(
+                key: $this->key,
+                dimensions: [],
+            );
+        }
+
+        if ($this->hasTieredOrder && $firstDimension->isSequence()) {
+            $dimensions = $this->fillGaps($dimensions);
+        } else {
+            $dimensions = $dimensions;
+        }
+
+        return new DimensionCollection(
             key: $this->key,
-            dimensions: array_values($this->dimensions),
+            dimensions: $dimensions,
         );
     }
 
@@ -149,4 +167,13 @@ final class DimensionByKeyCollector
 
     //     $this->dimensions[$signature] = $dimension;
     // }
+
+    /**
+     * @param non-empty-list<DefaultDimension> $dimensions
+     * @return non-empty-list<DefaultDimension>
+     */
+    private function fillGaps(array $dimensions): array
+    {
+        return GapFiller::process($dimensions);
+    }
 }

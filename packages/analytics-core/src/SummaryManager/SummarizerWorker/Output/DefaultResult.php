@@ -45,6 +45,8 @@ final class DefaultResult implements Result
 
     private ?DefaultTable $table = null;
 
+    private ?bool $hasTieredOrder = null;
+
     /**
      * @param class-string $summaryClass
      * @param SummarizerQuery $summarizerQuery
@@ -89,6 +91,7 @@ final class DefaultResult implements Result
             summaryQuery: $this->query,
             metadata: $this->metadata,
             input: $this->getUnbalancedTable(),
+            hasTieredOrder: $this->hasTieredOrder(),
         );
     }
 
@@ -97,8 +100,7 @@ final class DefaultResult implements Result
     {
         return $this->tree ??= NormalTableToTreeTransformer::transform(
             normalTable: $this->getUnbalancedNormalTable(),
-            query: $this->query,
-            metadata: $this->metadata,
+            hasTieredOrder: $this->hasTieredOrder(),
         );
     }
 
@@ -112,5 +114,27 @@ final class DefaultResult implements Result
     public function getTable(): DefaultTable
     {
         return $this->table ??= BalancedNormalTableToBalancedTableTransformer::transform(normalTable: $this->getNormalTable());
+    }
+
+    private function hasTieredOrder(): bool
+    {
+        if ($this->hasTieredOrder !== null) {
+            return $this->hasTieredOrder;
+        }
+
+        $orderBy = $this->query->getOrderBy();
+
+        if (\count($orderBy) === 0) {
+            return $this->hasTieredOrder = true;
+        }
+
+        $orderFields = array_keys($orderBy);
+
+        $dimensionWithoutValues = array_filter(
+            $this->metadata->getDimensionPropertyNames(),
+            fn(string $dimension): bool => $dimension !== '@values',
+        );
+
+        return $this->hasTieredOrder = $orderFields === $dimensionWithoutValues;
     }
 }
