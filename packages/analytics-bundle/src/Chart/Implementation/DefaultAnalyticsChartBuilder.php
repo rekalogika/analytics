@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Bundle\Chart\ChartType;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -77,7 +78,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         }
 
         if (\count($tuple) === 2) {
-            return $this->createBarChart($result);
+            if ($this->isFirstDimensionSequential($result)) {
+                return $this->createLineChart($result);
+            } else {
+                return $this->createBarChart($result);
+            }
         } elseif (\count($tuple) === 3) {
             return $this->createGroupedBarChart($result, false);
         }
@@ -85,7 +90,55 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         throw new UnsupportedData('Unsupported chart type');
     }
 
+    private function isFirstDimensionSequential(Result $result): bool
+    {
+        $tree = $result->getTree();
+
+        $lastRawMember = null;
+        $direction = null;
+
+        foreach ($tree as $child) {
+            /** @psalm-suppress MixedAssignment */
+            $rawMember = $child->getRawMember();
+
+            if (!$rawMember instanceof SequenceMember) {
+                return false;
+            }
+
+            $class = $rawMember::class;
+
+            if (
+                $lastRawMember !== null
+                && $direction !== null
+                && $class::compare($lastRawMember, $rawMember) !== $direction
+            ) {
+                return false;
+            }
+
+            if ($direction === null && $lastRawMember !== null) {
+                $direction = $class::compare($lastRawMember, $rawMember);
+            }
+
+            $lastRawMember = $rawMember;
+        }
+
+        return true;
+    }
+
     private function createBarChart(Result $result): Chart
+    {
+        return $this->createBarOrLineChart($result, Chart::TYPE_BAR);
+    }
+
+    private function createLineChart(Result $result): Chart
+    {
+        return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
+    }
+
+    /**
+     * @param Chart::TYPE_LINE|Chart::TYPE_BAR $type
+     */
+    private function createBarOrLineChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
         $measures = $result->getTable()->first()?->getMeasures();
@@ -171,7 +224,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             }
         }
 
-        $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart = $this->chartBuilder->createChart($type);
 
         $chart->setData([
             'labels' => $labels,
