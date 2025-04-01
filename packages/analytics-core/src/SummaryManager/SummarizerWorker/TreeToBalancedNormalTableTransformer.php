@@ -40,7 +40,6 @@ final class TreeToBalancedNormalTableTransformer
         $rows = $transformer->process();
 
         return new DefaultNormalTable(
-            summaryClass: $tree->getSummaryClass(),
             rows: $rows,
             uniqueDimensions: $tree->getUniqueDimensions(),
         );

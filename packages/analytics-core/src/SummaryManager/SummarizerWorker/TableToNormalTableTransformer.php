@@ -103,7 +103,6 @@ final class TableToNormalTableTransformer
         $uniqueDimensions = $this->dimensionCollector->getResult();
 
         return new DefaultNormalTable(
-            summaryClass: $input->getSummaryClass(),
             rows: $rows,
             uniqueDimensions: $uniqueDimensions,
         );

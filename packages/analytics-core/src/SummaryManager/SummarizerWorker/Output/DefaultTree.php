@@ -27,11 +27,9 @@ final class DefaultTree implements Tree, \IteratorAggregate
     use BalancedTreeChildrenTrait;
 
     /**
-     * @param class-string $summaryClass
      * @param list<DefaultTreeNode> $children
      */
     public function __construct(
-        private readonly string $summaryClass,
         private readonly ?string $childrenKey,
         private readonly array $children,
         private readonly Items $items,
@@ -50,12 +48,6 @@ final class DefaultTree implements Tree, \IteratorAggregate
                 );
             }
         }
-    }
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
     }
 
     #[\Override]
