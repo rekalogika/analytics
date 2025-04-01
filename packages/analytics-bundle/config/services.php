@@ -81,6 +81,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_lo
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
     $parameters->set('rekalogika.analytics.query_result_limit', 5000);
+    $parameters->set('rekalogika.analytics.filling_nodes_limit', 10000);
 
     $services = $containerConfigurator->services();
 
@@ -111,6 +112,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
+            '$fillingNodesLimit' => '%rekalogika.analytics.filling_nodes_limit%',
         ])
     ;
 

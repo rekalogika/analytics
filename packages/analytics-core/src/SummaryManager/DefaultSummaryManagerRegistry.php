@@ -31,6 +31,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
         private SummaryRefresherFactory $refresherFactory,
         private DistinctValuesResolver $distinctValuesResolver,
         private int $queryResultLimit,
+        private int $fillingNodesLimit,
     ) {}
 
     #[\Override]
@@ -52,6 +53,7 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
             refresherFactory: $this->refresherFactory,
             distinctValuesResolver: $this->distinctValuesResolver,
             queryResultLimit: $this->queryResultLimit,
+            fillingNodesLimit: $this->fillingNodesLimit,
         );
     }
 }
