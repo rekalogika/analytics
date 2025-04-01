@@ -61,7 +61,6 @@ final readonly class QueryResultToTableTransformer
         $rows = $transformer->doTransform($input);
 
         return new DefaultTable(
-            summaryClass: $metadata->getSummaryClass(),
             rows: $rows,
         );
     }

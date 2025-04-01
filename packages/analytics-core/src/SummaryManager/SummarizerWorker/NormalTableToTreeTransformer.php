@@ -56,7 +56,6 @@ final class NormalTableToTreeTransformer
         if ($firstRow === null) {
             return new DefaultTree(
                 childrenKey: null,
-                summaryClass: $normalTable->getSummaryClass(),
                 children: [],
                 items: $normalTable->getUniqueDimensions(),
                 treeNodeFactory: $treeNodeFactory,
@@ -79,7 +78,6 @@ final class NormalTableToTreeTransformer
 
         return new DefaultTree(
             childrenKey: $keys[0],
-            summaryClass: $normalTable->getSummaryClass(),
             children: $transformer->doTransform($normalTable),
             items: $normalTable->getUniqueDimensions(),
             treeNodeFactory: $treeNodeFactory,

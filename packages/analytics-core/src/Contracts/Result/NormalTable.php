@@ -22,10 +22,5 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface NormalTable extends \Traversable, \Countable
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
     public function first(): ?NormalRow;
 }
