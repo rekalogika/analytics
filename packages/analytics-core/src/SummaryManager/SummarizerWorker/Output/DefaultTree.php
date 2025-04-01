@@ -35,6 +35,7 @@ final class DefaultTree implements Tree, \IteratorAggregate
         private readonly ?string $childrenKey,
         private readonly array $children,
         private readonly Items $items,
+        private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {
         if ($childrenKey === null) {
             if ($children !== []) {

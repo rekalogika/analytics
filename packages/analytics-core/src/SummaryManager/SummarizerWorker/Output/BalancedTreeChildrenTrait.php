@@ -43,7 +43,7 @@ trait BalancedTreeChildrenTrait
 
             if ($child === null) {
                 // continue;
-                $child = DefaultTreeNode::createFillingNode(
+                $child = $this->treeNodeFactory->createFillingNode(
                     childrenKey: $this->items->getKeyAfter($this->childrenKey),
                     dimension: $dimension,
                     measure: null,

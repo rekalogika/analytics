@@ -35,12 +35,13 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     private ?DefaultTreeNode $parent = null;
 
-    private function __construct(
+    public function __construct(
         private readonly ?string $childrenKey,
         private readonly DefaultDimension $dimension,
         private ?DefaultMeasure $measure,
         private readonly Items $items,
         private readonly bool $null,
+        private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {}
 
     #[\Override]
@@ -55,49 +56,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         foreach ($this->getBalancedChildren() as $child) {
             yield $child->getMember() => $child;
         }
-    }
-
-    public static function createBranchNode(
-        string $childrenKey,
-        DefaultDimension $dimension,
-        Items $items,
-    ): self {
-        return new self(
-            childrenKey: $childrenKey,
-            dimension: $dimension,
-            measure: null,
-            items: $items,
-            null: false,
-        );
-    }
-
-    public static function createLeafNode(
-        DefaultDimension $dimension,
-        Items $items,
-        DefaultMeasure $measure,
-    ): self {
-        return new self(
-            childrenKey: null,
-            dimension: $dimension,
-            items: $items,
-            measure: $measure,
-            null: false,
-        );
-    }
-
-    public static function createFillingNode(
-        ?string $childrenKey,
-        DefaultDimension $dimension,
-        Items $items,
-        ?DefaultMeasure $measure,
-    ): self {
-        return new self(
-            childrenKey: $childrenKey,
-            dimension: $dimension,
-            items: $items,
-            measure: $measure,
-            null: true,
-        );
     }
 
     public function isEqual(self|DefaultDimension $other): bool

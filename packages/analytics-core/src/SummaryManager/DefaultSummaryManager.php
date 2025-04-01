@@ -40,6 +40,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private SummaryRefresherFactory $refresherFactory,
         private DistinctValuesResolver $distinctValuesResolver,
         private int $queryResultLimit,
+        private int $fillingNodesLimit,
     ) {}
 
     #[\Override]
@@ -184,6 +185,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     #[\Override]
     public function createQuery(
         ?int $queryResultLimit = null,
+        ?int $fillingNodesLimit = null,
     ): SummaryQuery {
         $dimensionChoices = [
             ...$this->getDimensionChoices(),
@@ -203,6 +205,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
             propertyAccessor: $this->propertyAccessor,
             distinctValuesResolver: $this->distinctValuesResolver,
             queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
+            fillingNodesLimit: $fillingNodesLimit ?? $this->fillingNodesLimit,
         );
     }
 }

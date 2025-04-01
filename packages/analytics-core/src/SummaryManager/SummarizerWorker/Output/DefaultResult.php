@@ -47,6 +47,8 @@ final class DefaultResult implements Result
 
     private ?bool $hasTieredOrder = null;
 
+    private DefaultTreeNodeFactory $treeNodeFactory;
+
     /**
      * @param class-string $summaryClass
      * @param SummarizerQuery $summarizerQuery
@@ -58,7 +60,12 @@ final class DefaultResult implements Result
         private SummarizerQuery $summarizerQuery,
         private PropertyAccessorInterface $propertyAccessor,
         private EntityManagerInterface $entityManager,
-    ) {}
+        int $fillingNodesLimit,
+    ) {
+        $this->treeNodeFactory = new DefaultTreeNodeFactory(
+            fillingNodesLimit: $fillingNodesLimit,
+        );
+    }
 
     #[\Override]
     public function getSummaryClass(): string
@@ -101,6 +108,7 @@ final class DefaultResult implements Result
         return $this->tree ??= NormalTableToTreeTransformer::transform(
             normalTable: $this->getUnbalancedNormalTable(),
             hasTieredOrder: $this->hasTieredOrder(),
+            treeNodeFactory: $this->treeNodeFactory,
         );
     }
 

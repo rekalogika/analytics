@@ -20,6 +20,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNodeFactory;
 
 final class NormalTableToTreeTransformer
 {
@@ -40,11 +41,13 @@ final class NormalTableToTreeTransformer
         private readonly array $keys,
         private readonly Items $uniqueDimensions,
         private readonly bool $hasTieredOrder,
+        private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {}
 
     public static function transform(
         DefaultNormalTable $normalTable,
         bool $hasTieredOrder,
+        DefaultTreeNodeFactory $treeNodeFactory,
     ): DefaultTree {
         // check if empty
 
@@ -56,6 +59,7 @@ final class NormalTableToTreeTransformer
                 summaryClass: $normalTable->getSummaryClass(),
                 children: [],
                 items: $normalTable->getUniqueDimensions(),
+                treeNodeFactory: $treeNodeFactory,
             );
         }
 
@@ -70,6 +74,7 @@ final class NormalTableToTreeTransformer
             keys: $keys,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
             hasTieredOrder: $hasTieredOrder,
+            treeNodeFactory: $treeNodeFactory,
         );
 
         return new DefaultTree(
@@ -77,6 +82,7 @@ final class NormalTableToTreeTransformer
             summaryClass: $normalTable->getSummaryClass(),
             children: $transformer->doTransform($normalTable),
             items: $normalTable->getUniqueDimensions(),
+            treeNodeFactory: $treeNodeFactory,
         );
     }
 
@@ -91,7 +97,7 @@ final class NormalTableToTreeTransformer
             throw new UnexpectedValueException('Children key cannot be null');
         }
 
-        $node = DefaultTreeNode::createBranchNode(
+        $node = $this->treeNodeFactory->createBranchNode(
             childrenKey: $childrenKey,
             dimension: $dimension,
             items: $this->uniqueDimensions,
@@ -125,7 +131,7 @@ final class NormalTableToTreeTransformer
         DefaultMeasure $measure,
         int $columnNumber,
     ): void {
-        $node = DefaultTreeNode::createLeafNode(
+        $node = $this->treeNodeFactory->createLeafNode(
             dimension: $lastDimension,
             items: $this->uniqueDimensions,
             measure: $measure,

@@ -68,6 +68,7 @@ final class SummaryQuery implements Query
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly DistinctValuesResolver $distinctValuesResolver,
         private readonly int $queryResultLimit,
+        private readonly int $fillingNodesLimit,
     ) {}
 
     #[\Override]
@@ -96,6 +97,7 @@ final class SummaryQuery implements Query
             summarizerQuery: $summarizerQuery,
             propertyAccessor: $this->propertyAccessor,
             entityManager: $this->entityManager,
+            fillingNodesLimit: $this->fillingNodesLimit,
         );
     }
 
