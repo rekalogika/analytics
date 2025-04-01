@@ -21,19 +21,20 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  * @internal
  */
-final readonly class DefaultTree implements Tree, \IteratorAggregate
+final class DefaultTree implements Tree, \IteratorAggregate
 {
     use NodeTrait;
+    use BalancedTreeChildrenTrait;
 
     /**
      * @param class-string $summaryClass
      * @param list<DefaultTreeNode> $children
      */
     public function __construct(
-        private string $summaryClass,
-        private ?string $childrenKey,
-        private array $children,
-        private Items $uniqueDimensions,
+        private readonly string $summaryClass,
+        private readonly ?string $childrenKey,
+        private readonly array $children,
+        private readonly Items $items,
     ) {
         if ($childrenKey === null) {
             if ($children !== []) {
@@ -65,14 +66,14 @@ final readonly class DefaultTree implements Tree, \IteratorAggregate
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->children as $child) {
+        foreach ($this->getBalancedChildren() as $child) {
             yield $child->getMember() => $child;
         }
     }
 
     public function getUniqueDimensions(): Items
     {
-        return $this->uniqueDimensions;
+        return $this->items;
     }
 
     public function getChildrenKey(): ?string

@@ -17,12 +17,12 @@ use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 
 /**
- * @implements \IteratorAggregate<DimensionColletion>
+ * @implements \IteratorAggregate<DimensionCollection>
  */
 final readonly class Items implements \IteratorAggregate, \Countable
 {
     /**
-     * @param array<string,DimensionColletion> $dimensions
+     * @param array<string,DimensionCollection> $dimensions
      * @param array<string,DefaultMeasure> $measures
      */
     public function __construct(
@@ -36,7 +36,7 @@ final readonly class Items implements \IteratorAggregate, \Countable
         yield from $this->dimensions;
     }
 
-    public function getDimensions(string $key): DimensionColletion
+    public function getDimensions(string $key): DimensionCollection
     {
         return $this->dimensions[$key]
             ?? throw new InvalidArgumentException(\sprintf(
@@ -54,9 +54,14 @@ final readonly class Items implements \IteratorAggregate, \Countable
             ));
     }
 
-    public function getKeyAfter(string $key): ?string
+    public function getKeyAfter(?string $key): ?string
     {
         $keys = array_keys($this->dimensions);
+
+        if ($key === null) {
+            return $keys[0] ?? null;
+        }
+
         $keyIndex = array_search($key, $keys, true);
 
         if ($keyIndex === false) {
