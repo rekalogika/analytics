@@ -366,7 +366,7 @@ final class QueryTest extends KernelTestCase
             ->select('count')
             ->where(Criteria::expr()->gte(
                 'time.hour',
-                Hour::createFromDatabaseValue(2024101010)
+                Hour::createFromDatabaseValue(2024101010),
             ))
             ->getResult()
             ->getTree();
@@ -382,11 +382,11 @@ final class QueryTest extends KernelTestCase
             ->where(Criteria::expr()->andX(
                 Criteria::expr()->gte(
                     'time.hour',
-                    Hour::createFromDatabaseValue(2024101010)
+                    Hour::createFromDatabaseValue(2024101010),
                 ),
                 Criteria::expr()->lte(
                     'time.hour',
-                    Hour::createFromDatabaseValue(2024101011)
+                    Hour::createFromDatabaseValue(2024101011),
                 ),
             ))
             ->getResult()
