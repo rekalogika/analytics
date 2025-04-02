@@ -18,10 +18,11 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Exception\OverflowException;
+use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
+use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
-use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -352,6 +353,72 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery(queryResultLimit: 1)
             ->groupBy('time.hour')
             ->select('count')
+            ->getResult()
+            ->getTree();
+
+        $c = \count($result);
+    }
+
+    public function testWhereWithTimeInterval(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.hour')
+            ->select('count')
+            ->where(Criteria::expr()->gte(
+                'time.hour',
+                Hour::createFromDatabaseValue(2024101010)
+            ))
+            ->getResult()
+            ->getTree();
+
+        $c = \count($result);
+    }
+
+    public function testWhereWithTimeIntervalRange(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.hour')
+            ->select('count')
+            ->where(Criteria::expr()->andX(
+                Criteria::expr()->gte(
+                    'time.hour',
+                    Hour::createFromDatabaseValue(2024101010)
+                ),
+                Criteria::expr()->lte(
+                    'time.hour',
+                    Hour::createFromDatabaseValue(2024101011)
+                ),
+            ))
+            ->getResult()
+            ->getTree();
+
+        $c = \count($result);
+    }
+
+    public function testWhereWithRecurringTimeIntervalRangeEnum(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.dayOfMonth')
+            ->select('count')
+            ->where(Criteria::expr()->andX(
+                Criteria::expr()->gte('time.dayOfMonth', DayOfMonth::Day10),
+                Criteria::expr()->lte('time.dayOfMonth', DayOfMonth::Day12),
+            ))
+            ->getResult()
+            ->getTree();
+
+        $c = \count($result);
+    }
+
+    public function testWhereWithRecurringTimeIntervalRangeInteger(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.dayOfMonth')
+            ->select('count')
+            ->where(Criteria::expr()->andX(
+                Criteria::expr()->gte('time.dayOfMonth', 10),
+                Criteria::expr()->lte('time.dayOfMonth', 12),
+            ))
             ->getResult()
             ->getTree();
 
