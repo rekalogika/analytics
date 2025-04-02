@@ -139,14 +139,19 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             return $this->queryBuilder->expr()->isNotNull($fieldWithAlias);
         }
 
-        /**
-         * @psalm-suppress MixedArgument
-         */
-        $value = $this->queryContext->createNamedParameter(
-            value: $value,
-            // @phpstan-ignore argument.type
-            type: $type,
-        );
+        // create named param
+
+        $param = [
+            'value' => $value,
+            'type' => $type,
+        ];
+
+        if ($value instanceof \UnitEnum) {
+            unset($param['type']);
+        }
+
+        /** @psalm-suppress MixedArgument */
+        $value = $this->queryContext->createNamedParameter(...$param);
 
         return match ($operator) {
             Comparison::EQ => $this->queryBuilder->expr()->eq($fieldWithAlias, $value),
