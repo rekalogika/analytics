@@ -48,12 +48,16 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             return $this->createBarChart($result);
         }
 
+        if ($chartType === ChartType::Line) {
+            return $this->createLineChart($result);
+        }
+
         if ($chartType === ChartType::StackedBar) {
-            return $this->createGroupedBarChart($result, true);
+            return $this->createGroupedBarChart($result, 'stackedBar');
         }
 
         if ($chartType === ChartType::GroupedBar) {
-            return $this->createGroupedBarChart($result, false);
+            return $this->createGroupedBarChart($result, 'groupedBar');
         }
 
         if ($chartType === ChartType::Pie) {
@@ -84,7 +88,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 return $this->createBarChart($result);
             }
         } elseif (\count($tuple) === 3) {
-            return $this->createGroupedBarChart($result, false);
+            return $this->createGroupedBarChart($result, 'groupedBar');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -132,7 +136,19 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 
     private function createLineChart(Result $result): Chart
     {
-        return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
+        $tuple = $result->getTable()->first()?->getTuple();
+
+        if ($tuple === null) {
+            throw new UnsupportedData('No data found');
+        }
+
+        if (\count($tuple) === 2) {
+            return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
+        } elseif (\count($tuple) === 3) {
+            return $this->createGroupedBarChart($result, 'multiLine');
+        }
+
+        throw new UnsupportedData('Unsupported chart type');
     }
 
     /**
@@ -294,7 +310,10 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         return $chart;
     }
 
-    private function createGroupedBarChart(Result $result, bool $stacked): Chart
+    /**
+     * @param 'stackedBar'|'groupedBar'|'multiLine' $type
+     */
+    private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
         $measure = $result->getTable()->first()?->getMeasures()->first();
@@ -439,6 +458,20 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             'position' => 'top',
         ];
 
+        $scales = [
+            'x' => [
+                'title' => $xTitle,
+            ],
+            'y' => [
+                'title' => $yTitle,
+            ],
+        ];
+
+        if ($type === 'stackedBar') {
+            $scales['x']['stacked'] = true;
+            $scales['y']['stacked'] = true;
+        }
+
         $chart->setOptions([
             'responsive' => true,
             'locale' => $this->localeSwitcher->getLocale(),
@@ -450,17 +483,9 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 'title' => [
                     'display' => false,
                 ],
+                'scales' => $scales,
             ],
-            'scales' => [
-                'x' => [
-                    'title' => $xTitle,
-                    'stacked' => $stacked,
-                ],
-                'y' => [
-                    'title' => $yTitle,
-                    'stacked' => $stacked,
-                ],
-            ],
+
         ]);
 
         return $chart;
