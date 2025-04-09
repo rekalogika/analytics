@@ -56,7 +56,7 @@ final class RefreshCommandOutputEventSubscriber implements EventSubscriberInterf
     }
 
     #[\Override]
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RefreshStartEvent::class => 'onRefreshStartEvent',

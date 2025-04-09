@@ -20,7 +20,7 @@ use Twig\TwigFunction;
 final class FormatterExtension extends AbstractExtension
 {
     #[\Override]
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter(
@@ -34,7 +34,7 @@ final class FormatterExtension extends AbstractExtension
     }
 
     #[\Override]
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction(
