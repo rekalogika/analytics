@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
+use Rekalogika\Analytics\Util\LiteralString;
+use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class GapFiller
@@ -75,6 +77,15 @@ final readonly class GapFiller
         }
 
         $this->dimensions = $newDimensions;
+
+        if ($label === null) {
+            $label = new LiteralString('-');
+        }
+
+        if ($key === null) {
+            $key = '?';
+        }
+
         $this->label = $label;
         $this->key = $key;
     }
