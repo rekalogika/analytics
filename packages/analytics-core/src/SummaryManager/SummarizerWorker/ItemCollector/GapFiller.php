@@ -17,7 +17,6 @@ use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Util\LiteralString;
-use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class GapFiller
