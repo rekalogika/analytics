@@ -47,6 +47,11 @@ final readonly class GapFiller
             $label ??= $dimension->getLabel();
             $key ??= $dimension->getKey();
 
+            // @todo we skip null value if there is a null value in the dimensions
+            if ($rawMember === null) {
+                continue;
+            }
+
             // ensure member implements SequenceMember
             if (!$rawMember instanceof SequenceMember) {
                 throw new InvalidArgumentException(\sprintf(
