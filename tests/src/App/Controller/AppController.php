@@ -141,4 +141,22 @@ final class AppController extends AbstractController
     {
         return new Response();
     }
+
+    // #[Route('/test', name: 'test')]
+    // public function someTest(): Response
+    // {
+    //     $summaryTableManager = $this->summaryManagerRegistry
+    //         ->getManager(OrderSummary::class);
+
+    //     // populate query from url parameter
+    //     $query = $summaryTableManager->createQuery();
+
+    //     $result = $query
+    //         ->groupBy('time.year', 'time.monthOfYear')
+    //         ->select('count')
+    //         ->getResult()
+    //         ->getTree();
+
+    //     return new Response('<html><body>Test</body></html>');
+    // }
 }

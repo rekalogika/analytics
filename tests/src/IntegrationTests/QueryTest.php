@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -423,5 +424,32 @@ final class QueryTest extends KernelTestCase
             ->getTree();
 
         $c = \count($result);
+    }
+
+    public function testYearByMonthOfYear(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.year', 'time.monthOfYear')
+            ->select('count')
+            ->getResult()
+            ->getTree();
+
+        $year2023 = $result->traverse('2023');
+        $this->assertNotNull($year2023);
+        $this->assertCount(12, $year2023);
+
+        foreach ($year2023 as $month) {
+            $this->assertInstanceOf(MonthOfYear::class, $month->getMember());
+            $this->assertNotNull($month->traverse('count')?->getMeasure());
+        }
+
+        $year2024 = $result->traverse('2024');
+        $this->assertNotNull($year2024);
+        $this->assertCount(12, $year2024);
+
+        foreach ($year2024 as $month) {
+            $this->assertInstanceOf(MonthOfYear::class, $month->getMember());
+            $this->assertNotNull($month->traverse('count')?->getMeasure());
+        }
     }
 }
