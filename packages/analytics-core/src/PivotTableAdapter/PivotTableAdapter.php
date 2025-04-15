@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTableAdapter;
 
-use Rekalogika\Analytics\Contracts\Result\Tree;
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\PivotTable\Contracts\BranchNode;
 
 final readonly class PivotTableAdapter implements BranchNode
 {
     public function __construct(
-        private Tree $result,
+        private TreeNode $result,
     ) {}
 
     #[\Override]

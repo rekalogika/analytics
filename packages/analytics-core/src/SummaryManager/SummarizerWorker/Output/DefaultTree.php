@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Measure;
-use Rekalogika\Analytics\Contracts\Result\Tree;
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Rekalogika\Analytics\Util\LiteralString;
@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  * @internal
  */
-final class DefaultTree implements Tree, \IteratorAggregate
+final class DefaultTree implements TreeNode, \IteratorAggregate
 {
     use NodeTrait;
     use BalancedTreeChildrenTrait;
