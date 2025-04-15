@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Tree;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Util\LiteralString;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
@@ -48,6 +51,48 @@ final class DefaultTree implements Tree, \IteratorAggregate
                 );
             }
         }
+    }
+
+    #[\Override]
+    public function getMeasure(): ?Measure
+    {
+        return null;
+    }
+
+    #[\Override]
+    public function isNull(): bool
+    {
+        return false;
+    }
+
+    #[\Override]
+    public function getMember(): mixed
+    {
+        return null;
+    }
+
+    #[\Override]
+    public function getRawMember(): mixed
+    {
+        return null;
+    }
+
+    #[\Override]
+    public function getDisplayMember(): mixed
+    {
+        return null;
+    }
+
+    #[\Override]
+    public function getKey(): string
+    {
+        return '';
+    }
+
+    #[\Override]
+    public function getLabel(): TranslatableInterface
+    {
+        return new LiteralString('Root');
     }
 
     #[\Override]

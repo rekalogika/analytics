@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a node in the query result.
+ * Represent a node in a tree.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
