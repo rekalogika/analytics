@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\ChartConfiguration;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\DefaultAnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
+use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
@@ -137,16 +138,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.command.refresh_summary')
-        ->class(RefreshSummaryCommand::class)
-        ->args([
-            '$summaryManagerRegistry' => service(SummaryManagerRegistry::class),
-            '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
-        ])
-        ->tag('console.command')
-    ;
-
-    $services
         ->set('rekalogika.analytics.doctrine.schema.post_generate')
         ->class(SummaryPostGenerateSchemaTableListener::class)
         ->args([
@@ -214,6 +205,27 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('doctrine.event_listener', [
             'event' => 'postLoad',
         ])
+    ;
+
+    //
+    // CLI
+    //
+
+
+    $services
+        ->set('rekalogika.analytics.command.refresh_summary')
+        ->class(RefreshSummaryCommand::class)
+        ->args([
+            '$summaryManagerRegistry' => service(SummaryManagerRegistry::class),
+            '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.uuid_convert_summary_to_source')
+        ->class(UuidConvertSummaryToSourceCommand::class)
+        ->tag('console.command')
     ;
 
     //
