@@ -30,4 +30,17 @@ final class UuidToTruncatedIntegerTest extends TestCase
 
         $this->assertEquals('01943d05-942a-0000-0000-000000000000', $reversed);
     }
+
+    public function testTransform2(): void
+    {
+        $resolver = new UuidToTruncatedIntegerResolver('foo');
+        $uuid = '01963250-b507-74c8-8f78-f6bac13088ec';
+
+        /** @var mixed */
+        $transformed = $resolver->transformSourceValueToSummaryValue($uuid);
+
+        $reversed = $resolver->transformSummaryValueToSourceValue($transformed);
+
+        $this->assertEquals('01963250-b507-0000-0000-000000000000', $reversed);
+    }
 }
