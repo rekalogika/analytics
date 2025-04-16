@@ -134,6 +134,7 @@ final class TableToNormalTableTransformer
             }
         }
 
+        // @phpstan-ignore identical.alwaysFalse
         if ($newRow === []) {
             throw new UnexpectedValueException('No dimensions found in row');
         }
