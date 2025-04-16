@@ -88,7 +88,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                 return $this->createBarChart($result);
             }
         } elseif (\count($tuple) === 3) {
-            return $this->createGroupedBarChart($result, 'groupedBar');
+            return $this->createGroupedBarChart($result, 'multiLine');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -402,7 +402,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             }
         }
 
-        $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
+        if ($type === 'multiLine') {
+            $chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
+        } else {
+            $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
+        }
 
         $chart->setData([
             'labels' => $labels,
