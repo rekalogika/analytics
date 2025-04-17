@@ -263,7 +263,7 @@ final readonly class QueryResultToTableTransformer
         $reflectionProperty = $this->getReflectionProperty($reflectionClass, $propertyName);
         $propertyClass = $this->getTypeOfProperty($reflectionProperty);
 
-        if ($value === null || is_object($value)) {
+        if ($value === null || \is_object($value)) {
             return $value;
         }
 
