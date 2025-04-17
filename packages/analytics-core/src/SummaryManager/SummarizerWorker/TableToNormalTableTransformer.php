@@ -154,9 +154,14 @@ final class TableToNormalTableTransformer
             $dimensions = new DefaultDimensions($newRow);
             $tuple = new DefaultTuple($dimensions);
 
+            $measure = $row->getMeasures()->get($measure)
+                ?? throw new UnexpectedValueException(
+                    \sprintf('Measure "%s" not found in row', $measure),
+                );
+
             yield new DefaultNormalRow(
                 tuple: $tuple,
-                measure: $row->getMeasures()->get($measure),
+                measure: $measure,
                 groupings: $row->getGroupings(),
             );
         }

@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -175,7 +176,11 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         // populate labels
 
         foreach ($selectedMeasures as $key) {
-            $measure = $measures->get($key);
+            $measure = $measures->get($key)
+                ?? throw new UnexpectedValueException(\sprintf(
+                    'Measure "%s" not found',
+                    $key,
+                ));
 
             $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
             $dataSets[$key]['data'] = [];
@@ -236,7 +241,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             foreach ($selectedMeasures as $key) {
                 $measure = $measures->get($key);
 
-                $dataSets[$key]['data'][] = $this->numberifier->toNumber($measure->getValue());
+                $dataSets[$key]['data'][] = $this->numberifier->toNumber($measure?->getValue());
             }
         }
 
@@ -519,7 +524,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
         $labels = [];
         $dataSet = [];
 
-        $dataSet['label'] = $this->stringifier->toString($measure->getLabel());
+        $dataSet['label'] = $this->stringifier->toString($measure?->getLabel());
         $dataSet['data'] = [];
         $dataSet['backgroundColor'] = [];
         $dataSet['hoverOffset'] = 4;
@@ -554,7 +559,7 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
             $measures = $row->getMeasures();
             $measure = $measures->get($key);
 
-            $dataSet['data'][] = $this->numberifier->toNumber($measure->getValue());
+            $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 
             // color
 

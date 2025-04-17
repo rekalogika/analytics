@@ -39,7 +39,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): DefaultDimension
+    public function get(string $key): ?DefaultDimension
     {
         return $this->dimensions->get($key);
     }

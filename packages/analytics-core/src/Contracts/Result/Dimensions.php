@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Exception\DimensionNotFoundException;
-
 /**
  * Collection of dimensions
  *
@@ -24,10 +22,7 @@ use Rekalogika\Analytics\Exception\DimensionNotFoundException;
  */
 interface Dimensions extends \Traversable, \Countable
 {
-    /**
-     * @throws DimensionNotFoundException
-     */
-    public function get(string $key): Dimension;
+    public function get(string $key): ?Dimension;
 
     public function getByIndex(int $index): Dimension;
 
