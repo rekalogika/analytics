@@ -71,8 +71,12 @@ final readonly class DefaultDimension implements Dimension
         return $this->displayMember;
     }
 
-    public function isSame(Dimension $dimension): bool
+    public function isSame(?Dimension $dimension): bool
     {
+        if ($dimension === null) {
+            return false;
+        }
+
         return $this->key === $dimension->getKey()
             && $this->rawMember === $dimension->getRawMember();
     }

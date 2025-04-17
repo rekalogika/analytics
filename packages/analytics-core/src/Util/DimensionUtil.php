@@ -50,8 +50,12 @@ final readonly class DimensionUtil
         return hash('xxh128', serialize($signatures));
     }
 
-    public static function isDimensionSame(Dimension $a, Dimension $b): bool
+    public static function isDimensionSame(?Dimension $a, ?Dimension $b): bool
     {
+        if ($a === null || $b === null) {
+            return false;
+        }
+
         if ($a::class !== $b::class) {
             return false;
         }

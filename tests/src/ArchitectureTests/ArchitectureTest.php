@@ -148,6 +148,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Psr\Log'),
                 Selector::inNamespace('Psr\SimpleCache'),
                 Selector::inNamespace('Rekalogika\Analytics\Bundle'),
+                Selector::inNamespace('Rekalogika\Analytics\Exception'),
                 Selectors::selectAnalyticsCore(),
                 Selector::inNamespace('Symfony\Component\Cache'),
                 Selector::inNamespace('Symfony\Component\Console'),

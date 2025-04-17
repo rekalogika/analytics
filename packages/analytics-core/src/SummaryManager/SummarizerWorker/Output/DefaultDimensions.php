@@ -54,13 +54,9 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): DefaultDimension
+    public function get(string $key): ?DefaultDimension
     {
-        return $this->dimensions[$key]
-            ?? throw new InvalidArgumentException(\sprintf(
-                'Dimension "%s" not found',
-                $key,
-            ));
+        return $this->dimensions[$key] ?? null;
     }
 
     #[\Override]

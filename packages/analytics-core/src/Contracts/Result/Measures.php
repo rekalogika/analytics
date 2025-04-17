@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Exception\MeasureNotFoundException;
-
 /**
  * Collection of measures
  *
@@ -24,10 +22,7 @@ use Rekalogika\Analytics\Exception\MeasureNotFoundException;
  */
 interface Measures extends \Traversable, \Countable
 {
-    /**
-     * @throws MeasureNotFoundException
-     */
-    public function get(string $key): Measure;
+    public function get(string $key): ?Measure;
 
     public function first(): ?Measure;
 
