@@ -262,17 +262,26 @@ final readonly class QueryResultToTableTransformer
             $reflectionProperty = $this->getReflectionProperty($reflectionClass, $propertyName);
             $propertyClass = $this->getTypeOfProperty($reflectionProperty);
 
-            if ($propertyClass !== null) {
-                if (is_a($propertyClass, \BackedEnum::class, true)) {
-                    // for older Doctrine version that don't correctly hydrate
-                    // enums with QueryBuilder
-                    if ((\is_int($value) || \is_string($value))) {
-                        $value = $propertyClass::from($value);
-                    }
-                } elseif ($value !== null) {
-                    $value = $this->entityManager
-                        ->getReference($propertyClass, $value);
+            if ($propertyClass === null) {
+                return $value;
+            }
+
+            if (is_a($propertyClass, \BackedEnum::class, true)) {
+                // for older Doctrine version that don't correctly hydrate
+                // enums with QueryBuilder
+                if ((\is_int($value) || \is_string($value))) {
+                    return $propertyClass::from($value);
                 }
+            }
+
+            // determine if propertyClass is an entity
+            $isEntity = !$this->entityManager
+                ->getMetadataFactory()
+                ->isTransient($propertyClass);
+
+            if ($isEntity) {
+                return $this->entityManager
+                    ->getReference($propertyClass, $value);
             }
 
             return $value;
