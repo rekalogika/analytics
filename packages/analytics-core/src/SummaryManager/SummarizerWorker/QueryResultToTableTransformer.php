@@ -258,34 +258,38 @@ final readonly class QueryResultToTableTransformer
             // } else {
             //     return $value;
             // }
-        } else {
-            $reflectionProperty = $this->getReflectionProperty($reflectionClass, $propertyName);
-            $propertyClass = $this->getTypeOfProperty($reflectionProperty);
+        }
 
-            if ($propertyClass === null) {
-                return $value;
-            }
+        $reflectionProperty = $this->getReflectionProperty($reflectionClass, $propertyName);
+        $propertyClass = $this->getTypeOfProperty($reflectionProperty);
 
-            if (is_a($propertyClass, \BackedEnum::class, true)) {
-                // for older Doctrine version that don't correctly hydrate
-                // enums with QueryBuilder
-                if ((\is_int($value) || \is_string($value))) {
-                    return $propertyClass::from($value);
-                }
-            }
-
-            // determine if propertyClass is an entity
-            $isEntity = !$this->entityManager
-                ->getMetadataFactory()
-                ->isTransient($propertyClass);
-
-            if ($isEntity) {
-                return $this->entityManager
-                    ->getReference($propertyClass, $value);
-            }
-
+        if ($value === null || \is_object($value)) {
             return $value;
         }
+
+        if ($propertyClass === null) {
+            return $value;
+        }
+
+        if (is_a($propertyClass, \BackedEnum::class, true)) {
+            // for older Doctrine version that don't correctly hydrate
+            // enums with QueryBuilder
+            if ((\is_int($value) || \is_string($value))) {
+                return $propertyClass::from($value);
+            }
+        }
+
+        // determine if propertyClass is an entity
+        $isEntity = !$this->entityManager
+            ->getMetadataFactory()
+            ->isTransient($propertyClass);
+
+        if ($isEntity) {
+            return $this->entityManager
+                ->getReference($propertyClass, $value);
+        }
+
+        return $value;
     }
 
     /**
