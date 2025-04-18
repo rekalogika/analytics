@@ -137,9 +137,9 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        // if end is start, return
+        // if end is same as start, and not yet recorded in the summary,
 
-        if ($start === $end) {
+        if ($start === $end && $maxOfSummary !== null) {
             $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
             return;
         }
