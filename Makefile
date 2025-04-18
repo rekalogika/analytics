@@ -170,7 +170,7 @@ doctrine-schema-create: compose-restart
 #
 
 .PHONY: summary-refresh
-summary-refresh: summary-refresh-order summary-refresh-customer
+summary-refresh: summary-refresh-order summary-refresh-customer summary-refresh-occupancy-history
 
 .PHONY: summary-refresh-order
 summary-refresh-order:
@@ -179,3 +179,7 @@ summary-refresh-order:
 .PHONY: summary-refresh-customer
 summary-refresh-customer:
 	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
+
+.PHONY: summary-refresh-occupancy-history
+summary-refresh-occupancy-history:
+	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
