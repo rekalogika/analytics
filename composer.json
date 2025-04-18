@@ -74,6 +74,7 @@
         "symfony/maker-bundle": "^1.55",
         "symfony/monolog-bundle": "^3.5",
         "symfony/runtime": "^6.4 || ^7.0",
+        "symfony/stopwatch": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/ux-turbo": "^2.22",
         "symfony/var-dumper": "^6.3 || ^7.0",

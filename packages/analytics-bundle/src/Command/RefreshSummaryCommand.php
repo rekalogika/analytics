@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
@@ -112,8 +113,19 @@ final class RefreshSummaryCommand extends Command implements SignalableCommandIn
         $class = $input->getArgument('class');
 
         /** @psalm-suppress TypeDoesNotContainType */
-        if (!\is_string($class) || !class_exists($class)) {
-            throw new \InvalidArgumentException('Invalid class: ' . get_debug_type($class));
+        if (!\is_string($class)) {
+            throw new UnexpectedValueException(\sprintf(
+                'Class name must be a string, got "%s".',
+                get_debug_type($class),
+            ));
+        }
+
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (!class_exists($class)) {
+            throw new UnexpectedValueException(\sprintf(
+                'Class "%s" not found.',
+                $class,
+            ));
         }
 
         /** @var mixed */

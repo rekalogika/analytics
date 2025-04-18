@@ -40,7 +40,7 @@ final readonly class DateToIntegerResolver implements
     public function getDQL(QueryContext $context): string
     {
         return \sprintf(
-            'DATE_DIFF(%s, "1970-01-01")',
+            "DATE_DIFF(%s, '1970-01-01')",
             $context->resolvePath($this->property),
         );
     }
@@ -69,18 +69,27 @@ final readonly class DateToIntegerResolver implements
     #[\Override]
     public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
-        if (!$value instanceof \DateTimeInterface) {
+        if (!\is_string($value)) {
             throw new InvalidArgumentException(\sprintf(
-                'Value must be an instance of DateTimeInterface, got "%s".',
+                'Value must be a string, got "%s".',
                 get_debug_type($value),
             ));
         }
 
-        if ($value->getTimestamp() < 0) {
+        $date = \DateTimeImmutable::createFromFormat('Y-m-d', $value);
+
+        if (!$date instanceof \DateTimeImmutable) {
+            throw new InvalidArgumentException(\sprintf(
+                'Unable to convert "%s" to date.',
+                $value,
+            ));
+        }
+
+        if ($date->getTimestamp() < 0) {
             throw new LogicException('Date cannot be before epoch.');
         }
 
-        return $value->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
+        return $date->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
     }
 
     /**
