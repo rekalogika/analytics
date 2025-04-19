@@ -91,6 +91,7 @@ final class SummaryQuery implements Query
         );
 
         return $this->result = new DefaultResult(
+            label: $this->metadata->getLabel(),
             summaryClass: $this->metadata->getSummaryClass(),
             query: $this,
             metadata: $this->metadata,

@@ -17,7 +17,6 @@ use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
-use Rekalogika\Analytics\Util\LiteralString;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -33,6 +32,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
      * @param list<DefaultTreeNode> $children
      */
     public function __construct(
+        private readonly TranslatableInterface $label,
         private readonly ?string $childrenKey,
         private readonly array $children,
         private readonly Items $items,
@@ -92,7 +92,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return new LiteralString('Root');
+        return $this->label;
     }
 
     #[\Override]
