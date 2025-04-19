@@ -57,7 +57,7 @@ final class SummaryQuery implements Query
     /**
      * @param non-empty-array<string,Field> $dimensionChoices
      * @param array<string,Field> $measureChoices
-     * @param non-empty-array<string,string|TranslatableInterface|\Stringable|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices
+     * @param non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices
      */
     public function __construct(
         private readonly array $dimensionChoices,
@@ -128,7 +128,7 @@ final class SummaryQuery implements Query
     }
 
     /**
-     * @return array<string,string|TranslatableInterface|\Stringable|iterable<string,string|TranslatableInterface>>
+     * @return array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
      * @todo deprecate
      * @internal
      */

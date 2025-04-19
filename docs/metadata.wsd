@@ -9,7 +9,7 @@ SummaryMetadataFactory --> SummaryMetadata
 class SummaryMetadata {
     +summaryClass: class-string
     +sourceClasses: <class-string>
-    +label: string|TranslatableInterface
+    +label: TranslatableInterface
     +partition: PartitionMetadata
     +dimensionMetadatas: <DimensionMetadata>
     +measureMetadatas: <MeasureMetadata>
@@ -30,12 +30,12 @@ class SummaryMetadata {
 
 SummaryMetadata *-- DimensionMetadata
 SummaryMetadata *-- MeasureMetadata
-SummaryMetadata *---- PartitionMetadata
+SummaryMetadata *--- PartitionMetadata
 
 class DimensionMetadata {
     +source: <class-string,ValueResolver>
     +summaryProperty: string
-    +label: string|TranslatableInterface
+    +label: TranslatableInterface
     +sourceTimeZone: \DateTimeZone
     +summaryTimeZone: \DateTimeZone
     +hierarchy: ?DimensionHierarchyMetadata
@@ -43,7 +43,6 @@ class DimensionMetadata {
     +isHierarchical(): bool
 }
 
-DimensionMetadata *-- ValueResolver
 DimensionMetadata *-- DimensionHierarchyMetadata
 
 class PartitionMetadata {
@@ -55,25 +54,11 @@ class PartitionMetadata {
     +keyClassifier: PartitionKeyClassifier
 }
 
-PartitionMetadata *--- ReversibleValueResolver
-
 class MeasureMetadata {
     +function: <class-string,AggregateFunction>
     +summaryProperty: string
-    +label: string|TranslatableInterface
+    +label: TranslatableInterface
     +involvedProperties: <class-string,list<string>>
-}
-
-MeasureMetadata *-- AggregateFunction
-
-interface ValueResolver {
-    +getDQL(QueryContext): string
-    +getProperty(): string
-    +transform(mixed): int|string
-}
-
-interface ReversibleValueResolver extends ValueResolver {
-    +reverseTransform(mixed): int|string
 }
 
 class DimensionHierarchyMetadata {
@@ -118,14 +103,8 @@ class DimensionPropertyMetadata {
     +name: string
     +hierarchyName: string
     +fullName: string
-    +label: string|TranslatableInterface
+    +label: TranslatableInterface
     +levelMetadata: DimensionLevelMetadata
 }
-
-interface AggregateFunction {
-    +getSourceToSummaryDQLFunction(QueryContext): string
-    +getSummaryToSourceDQLFunction(): string
-}
-
 
 @enduml
