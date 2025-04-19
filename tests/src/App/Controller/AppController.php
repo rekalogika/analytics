@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -31,17 +32,28 @@ final class AppController extends AbstractController
 {
     public function __construct(
         private readonly SummaryManagerRegistry $summaryManagerRegistry,
+        private readonly SummaryClassRegistry $summaryClassRegistry,
     ) {}
 
-
     #[Route('/', name: 'index')]
-    public function index(
+    public function index(): Response
+    {
+        return $this->render('app/index.html.twig', [
+            'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
+        ]);
+    }
+
+
+    #[Route('/summary/page/{hash}', name: 'summary')]
+    public function summary(
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
         AnalyticsChartBuilder $chartBuilder,
         PivotTableRenderer $pivotTableRenderer,
+        string $hash,
     ): Response {
+        $class = $this->summaryClassRegistry->getClassFromHash($hash);
 
         if ($parameters === null) {
             $parameters = [];
@@ -57,7 +69,7 @@ final class AppController extends AbstractController
         /** @var array<string,mixed> $parameters */
 
         $summaryTableManager = $this->summaryManagerRegistry
-            ->getManager(OrderSummary::class);
+            ->getManager($class);
 
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();
@@ -77,20 +89,24 @@ final class AppController extends AbstractController
             $chart = null;
         }
 
-        return $this->render('app/index.html.twig', [
+        return $this->render('app/summary.html.twig', [
+            'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'query' => $query,
             'pivotTable' => $pivotTable,
             'chart' => $chart,
+            'hash' => $hash,
         ]);
     }
 
-    #[Route('/download', name: 'download')]
+    #[Route('/summary/download/{hash}', name: 'download')]
     public function download(
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
         SpreadsheetRenderer $spreadsheetRenderer,
+        string $hash,
     ): Response {
+        $class = $this->summaryClassRegistry->getClassFromHash($hash);
 
         if ($parameters === null) {
             $parameters = [];
@@ -106,7 +122,7 @@ final class AppController extends AbstractController
         /** @var array<string,mixed> $parameters */
 
         $summaryTableManager = $this->summaryManagerRegistry
-            ->getManager(OrderSummary::class);
+            ->getManager($class);
 
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();

@@ -19,7 +19,9 @@
         {% endblock %}
     </head>
     <body>
-        <div class="container mt-5">
+        {% include 'header.html.twig' %}
+
+        <div class="container my-5">
             {% block body %}{% endblock %}
         </div>
     </body>

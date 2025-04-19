@@ -1,21 +1,4 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% set output %}
-        <div class="mt-5" style="min-height: 500px;">
-            <div class="mb-5">
-                {% if chart %}{{ render_chart(chart) }}{% endif %}
-            </div>
-
-            <a download target="_blank" class="btn btn-secondary btn-sm float-end mb-2"
-               href="{{ path('download', {parameters: app.request.query.get('parameters') }) }}">Download</a>
-
-            <div>{{ pivotTable|raw }}</div>
-        </div>
-    {% endset %}
-
-    {{ analytics_render_control(query: query, output: output, target: 'pivottable', urlParameter: 'parameters') }}
-
-    <turbo-frame id="pivottable">
-    </turbo-frame>
 {% endblock body %}
