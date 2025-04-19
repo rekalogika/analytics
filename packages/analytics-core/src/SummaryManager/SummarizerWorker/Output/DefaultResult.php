@@ -24,6 +24,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTrans
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @internal
@@ -54,6 +55,7 @@ final class DefaultResult implements Result
      * @param SummarizerQuery $summarizerQuery
      */
     public function __construct(
+        private TranslatableInterface $label,
         private string $summaryClass,
         private SummaryQuery $query,
         private SummaryMetadata $metadata,
@@ -65,6 +67,12 @@ final class DefaultResult implements Result
         $this->treeNodeFactory = new DefaultTreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,
         );
+    }
+
+    #[\Override]
+    public function getLabel(): TranslatableInterface
+    {
+        return $this->label;
     }
 
     #[\Override]
@@ -106,6 +114,7 @@ final class DefaultResult implements Result
     public function getTree(): DefaultTree
     {
         return $this->tree ??= NormalTableToTreeTransformer::transform(
+            label: $this->label,
             normalTable: $this->getUnbalancedNormalTable(),
             hasTieredOrder: $this->hasTieredOrder(),
             treeNodeFactory: $this->treeNodeFactory,

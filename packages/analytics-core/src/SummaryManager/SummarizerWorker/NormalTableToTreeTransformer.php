@@ -21,6 +21,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTab
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNodeFactory;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class NormalTableToTreeTransformer
 {
@@ -45,6 +46,7 @@ final class NormalTableToTreeTransformer
     ) {}
 
     public static function transform(
+        TranslatableInterface $label,
         DefaultNormalTable $normalTable,
         bool $hasTieredOrder,
         DefaultTreeNodeFactory $treeNodeFactory,
@@ -55,6 +57,7 @@ final class NormalTableToTreeTransformer
 
         if ($firstRow === null) {
             return new DefaultTree(
+                label: $label,
                 childrenKey: null,
                 children: [],
                 items: $normalTable->getUniqueDimensions(),
@@ -77,6 +80,7 @@ final class NormalTableToTreeTransformer
         );
 
         return new DefaultTree(
+            label: $label,
             childrenKey: $keys[0],
             children: $transformer->doTransform($normalTable),
             items: $normalTable->getUniqueDimensions(),

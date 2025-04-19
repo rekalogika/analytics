@@ -90,6 +90,7 @@ final class AppController extends AbstractController
         }
 
         return $this->render('app/summary.html.twig', [
+            'title' => $result->getLabel(),
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'query' => $query,
             'pivotTable' => $pivotTable,

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 /**
  * Represents a query result.
  *
@@ -20,6 +22,8 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Result
 {
+    public function getLabel(): TranslatableInterface;
+
     /**
      * @return class-string
      */
