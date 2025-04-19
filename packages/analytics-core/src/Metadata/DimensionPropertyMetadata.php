@@ -25,7 +25,7 @@ final readonly class DimensionPropertyMetadata
     public function __construct(
         private string $name,
         private string $hierarchyName,
-        private string|TranslatableInterface $label,
+        private TranslatableInterface $label,
         private DimensionValueResolver $valueResolver,
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
@@ -60,7 +60,7 @@ final readonly class DimensionPropertyMetadata
         return $this->hierarchyName . '.' . $this->name;
     }
 
-    public function getLabel(): string|TranslatableInterface
+    public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }

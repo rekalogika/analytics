@@ -19,24 +19,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TranslatablePropertyDimension implements TranslatableInterface
 {
     public function __construct(
-        private string|TranslatableInterface $propertyLabel,
-        private string|TranslatableInterface $dimensionLabel,
+        private TranslatableInterface $propertyLabel,
+        private TranslatableInterface $dimensionLabel,
     ) {}
 
     #[\Override]
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
-        if ($this->propertyLabel instanceof TranslatableInterface) {
-            $translatedProperty = $this->propertyLabel->trans($translator, $locale);
-        } else {
-            $translatedProperty = $this->propertyLabel;
-        }
-
-        if ($this->dimensionLabel instanceof TranslatableInterface) {
-            $translatedDimension = $this->dimensionLabel->trans($translator, $locale);
-        } else {
-            $translatedDimension = $this->dimensionLabel;
-        }
+        $translatedProperty = $this->propertyLabel->trans($translator, $locale);
+        $translatedDimension = $this->dimensionLabel->trans($translator, $locale);
 
         return \sprintf('%s - %s', $translatedProperty, $translatedDimension);
     }

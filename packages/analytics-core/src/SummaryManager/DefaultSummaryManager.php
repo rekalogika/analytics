@@ -78,7 +78,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
 
     /**
      * @internal
-     * @return non-empty-array<string,string|TranslatableInterface|\Stringable|iterable<string,TranslatableInterface>>
+     * @return non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
      */
     private function getHierarchicalDimensionChoices(): array
     {
@@ -110,7 +110,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
                 );
         }
 
-        /** @var non-empty-array<string,string|TranslatableInterface|\Stringable|iterable<string,TranslatableInterface>> */
+        /** @var non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>> */
 
         return $choices;
     }

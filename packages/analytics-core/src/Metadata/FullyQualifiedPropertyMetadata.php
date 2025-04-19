@@ -44,10 +44,6 @@ final readonly class FullyQualifiedPropertyMetadata
 
     public function getLabel(): TranslatableInterface
     {
-        if ($this->property instanceof FullyQualifiedDimensionMetadata) {
-            return $this->property->getLabel();
-        }
-
         return $this->property->getLabel();
     }
 

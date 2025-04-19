@@ -626,6 +626,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $level = $dimensionLevelAttribute->getLevel();
             $name = $property;
             $label = $dimensionLevelAttribute->getLabel() ?? $name;
+
+            if (\is_string($label)) {
+                $label = new LiteralString($label);
+            }
+
             $valueResolver = $dimensionLevelAttribute->getValueResolver();
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
 
