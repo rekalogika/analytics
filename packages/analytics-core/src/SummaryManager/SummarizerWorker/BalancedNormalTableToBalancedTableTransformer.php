@@ -50,7 +50,7 @@ final class BalancedNormalTableToBalancedTableTransformer
         foreach ($this->normalTable as $currentRow) {
             if (
                 $lastRow === null
-                || $lastRow->getTuple()->isSame($currentRow->getTuple())
+                || $lastRow->getDimensions()->isSame($currentRow->getDimensions())
             ) {
                 $this->measures[] = $currentRow->getMeasure();
             } else {
@@ -58,7 +58,7 @@ final class BalancedNormalTableToBalancedTableTransformer
             }
 
             $this->rows[] = new DefaultRow(
-                tuple: $currentRow->getTuple(),
+                dimensions: $currentRow->getDimensions(),
                 measures: new DefaultMeasures($this->measures),
                 groupings: '',
             );

@@ -92,22 +92,36 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
         yield from $this->dimensions;
     }
 
-    public function isSame(Dimensions $dimensions): bool
+    #[\Override]
+    public function isSame(Dimensions $other): bool
     {
-        if ($this->count() !== $dimensions->count()) {
+        if ($this->count() !== $other->count()) {
             return false;
         }
 
         foreach ($this->dimensions as $key => $dimension) {
-            if (!$dimensions->has($key)) {
+            if (!$other->has($key)) {
                 return false;
             }
 
-            if (!$dimension->isSame($dimensions->get($key))) {
+            if (!$dimension->isSame($other->get($key))) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    #[\Override]
+    public function getMembers(): array
+    {
+        $members = [];
+
+        foreach ($this->dimensions as $dimension) {
+            /** @psalm-suppress MixedAssignment */
+            $members[$dimension->getKey()] = $dimension->getMember();
+        }
+
+        return $members;
     }
 }

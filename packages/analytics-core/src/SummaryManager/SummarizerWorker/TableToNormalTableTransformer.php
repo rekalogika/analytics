@@ -23,7 +23,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -92,7 +91,7 @@ final class TableToNormalTableTransformer
 
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
-                $this->dimensionCollector->processTuple($row2->getTuple());
+                $this->dimensionCollector->processDimensions($row2->getDimensions());
                 $this->dimensionCollector->processMeasure($row2->getMeasure());
             }
         }
@@ -130,7 +129,7 @@ final class TableToNormalTableTransformer
                 // be set in the next loop
                 $newRow['@values'] = true;
             } else {
-                $newRow[$dimension] = $row->getTuple()->get($dimension);
+                $newRow[$dimension] = $row->getDimensions()->get($dimension);
             }
         }
 
@@ -152,7 +151,6 @@ final class TableToNormalTableTransformer
 
             /** @var array<string,DefaultDimension> $newRow */
             $dimensions = new DefaultDimensions($newRow);
-            $tuple = new DefaultTuple($dimensions);
 
             $measure = $row->getMeasures()->get($measure)
                 ?? throw new UnexpectedValueException(
@@ -160,7 +158,7 @@ final class TableToNormalTableTransformer
                 );
 
             yield new DefaultNormalRow(
-                tuple: $tuple,
+                dimensions: $dimensions,
                 measure: $measure,
                 groupings: $row->getGroupings(),
             );

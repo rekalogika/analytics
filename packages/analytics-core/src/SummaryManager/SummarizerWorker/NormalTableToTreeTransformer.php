@@ -67,7 +67,7 @@ final class NormalTableToTreeTransformer
 
         // get keys from the first row
 
-        $members = $firstRow->getTuple()->getMembers();
+        $members = $firstRow->getDimensions()->getMembers();
         $keys = array_keys($members);
 
         // instantiate and process
@@ -177,7 +177,7 @@ final class NormalTableToTreeTransformer
         $this->tree = [];
 
         foreach ($normalTable as $row) {
-            $dimensions = $row->getTuple();
+            $dimensions = $row->getDimensions();
             $columnNumber = 0;
 
             foreach ($dimensions as $dimension) {
@@ -207,10 +207,10 @@ final class NormalTableToTreeTransformer
         $previousRow = null;
 
         foreach ($normalTable as $row) {
-            $dimensions = $row->getTuple();
+            $dimensions = $row->getDimensions();
 
             $columnNumber = 0;
-            $sameAsPrevious = $previousRow !== null && $previousRow->hasSameTuple($row);
+            $sameAsPrevious = $previousRow !== null && $previousRow->hasSameDimensions($row);
 
             foreach ($dimensions as $dimension) {
                 // if last dimension
