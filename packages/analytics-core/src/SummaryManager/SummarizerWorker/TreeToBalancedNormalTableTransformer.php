@@ -21,7 +21,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class TreeToBalancedNormalTableTransformer
 {
@@ -89,8 +88,6 @@ final class TreeToBalancedNormalTableTransformer
             $currentRow,
         ));
 
-        $tuple = new DefaultTuple($dimensions);
-
-        $this->rows[] = new DefaultNormalRow($tuple, $measure, '');
+        $this->rows[] = new DefaultNormalRow($dimensions, $measure, '');
     }
 }

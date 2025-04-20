@@ -29,4 +29,11 @@ interface Dimensions extends \Traversable, \Countable
     public function first(): ?Dimension;
 
     public function has(string $key): bool;
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getMembers(): array;
+
+    public function isSame(self $other): bool;
 }

@@ -28,7 +28,7 @@ final class DimensionByKeyCollector
      */
     private array $dimensions = [];
 
-    private ?string $lastEarlierDimensionsInTupleSignature = null;
+    private ?string $lastEarlierDimensionsInDimensionsSignature = null;
 
     private ?DefaultDimension $previousDimension = null;
 
@@ -63,10 +63,10 @@ final class DimensionByKeyCollector
     }
 
     /**
-     * @param list<DefaultDimension> $earlierDimensionsInTuple
+     * @param list<DefaultDimension> $earlierDimensionsInDimensions
      */
     public function addDimension(
-        array $earlierDimensionsInTuple,
+        array $earlierDimensionsInDimensions,
         DefaultDimension $dimension,
     ): void {
         $previousDimension = $this->previousDimension;
@@ -90,21 +90,21 @@ final class DimensionByKeyCollector
             return;
         }
 
-        // if previousDimension is null, check if earlierdimension in tuple has
-        // changed. if changed, then regard previousDimension as null
+        // if previousDimension is null, check if earlierdimension in dimensions
+        // has changed. if changed, then regard previousDimension as null
 
         if ($previousDimension === null) {
-            $lastEarlierDimensionsInTupleSignature = DimensionUtil::getDimensionsSignature(
-                $earlierDimensionsInTuple,
+            $lastEarlierDimensionsInDimensionsSignature = DimensionUtil::getDimensionsSignature(
+                $earlierDimensionsInDimensions,
             );
 
             if (
-                $this->lastEarlierDimensionsInTupleSignature !== $lastEarlierDimensionsInTupleSignature
+                $this->lastEarlierDimensionsInDimensionsSignature !== $lastEarlierDimensionsInDimensionsSignature
             ) {
                 $previousDimension = null;
             }
 
-            $this->lastEarlierDimensionsInTupleSignature = $lastEarlierDimensionsInTupleSignature;
+            $this->lastEarlierDimensionsInDimensionsSignature = $lastEarlierDimensionsInDimensionsSignature;
         }
 
         // if previousDimension is null, then it is a candidate for the first

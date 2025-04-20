@@ -20,15 +20,15 @@ use Rekalogika\Analytics\Util\DimensionUtil;
 final readonly class DefaultNormalRow implements NormalRow
 {
     public function __construct(
-        private DefaultTuple $tuple,
+        private DefaultDimensions $dimensions,
         private DefaultMeasure $measure,
         private string $groupings,
     ) {}
 
     #[\Override]
-    public function getTuple(): DefaultTuple
+    public function getDimensions(): DefaultDimensions
     {
-        return $this->tuple;
+        return $this->dimensions;
     }
 
     #[\Override]
@@ -48,8 +48,8 @@ final readonly class DefaultNormalRow implements NormalRow
      */
     public static function compare(self $row1, self $row2, array $measures): int
     {
-        $dimensions1 = $row1->getTuple();
-        $dimensions2 = $row2->getTuple();
+        $dimensions1 = $row1->getDimensions();
+        $dimensions2 = $row2->getDimensions();
 
         foreach ($dimensions1 as $key => $value1) {
             $value2 = $dimensions2->get($key);
@@ -72,8 +72,8 @@ final readonly class DefaultNormalRow implements NormalRow
         return $measure1Order <=> $measure2Order;
     }
 
-    public function hasSameTuple(self $other): bool
+    public function hasSameDimensions(self $other): bool
     {
-        return $this->tuple->isSame($other->tuple);
+        return $this->dimensions->isSame($other->dimensions);
     }
 }

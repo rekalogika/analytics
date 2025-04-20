@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector;
 
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class DimensionCollector
 {
@@ -54,15 +54,15 @@ final class DimensionCollector
         );
     }
 
-    public function processTuple(DefaultTuple $tuple): void
+    public function processDimensions(DefaultDimensions $dimensions): void
     {
         $earlierDimensions = [];
 
-        foreach ($tuple as $dimension) {
+        foreach ($dimensions as $dimension) {
             $key = $dimension->getKey();
 
             $this->getCollectorForKey($key)->addDimension(
-                earlierDimensionsInTuple: $earlierDimensions,
+                earlierDimensionsInDimensions: $earlierDimensions,
                 dimension: $dimension,
             );
 

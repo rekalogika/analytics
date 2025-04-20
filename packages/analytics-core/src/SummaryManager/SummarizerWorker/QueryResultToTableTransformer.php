@@ -22,7 +22,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -222,11 +221,10 @@ final readonly class QueryResultToTableTransformer
         //
 
         $dimensions = new DefaultDimensions($dimensionValues);
-        $tuple = new DefaultTuple($dimensions);
         $measures = new DefaultMeasures($measureValues);
 
         $row = new DefaultRow(
-            tuple: $tuple,
+            dimensions: $dimensions,
             measures: $measures,
             groupings: $groupings,
         );
