@@ -31,6 +31,7 @@ final readonly class Dimension
         private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
         private Order|array $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
+        private bool $mandatory = false,
     ) {}
 
     /**
@@ -67,5 +68,10 @@ final readonly class Dimension
     public function getNullLabel(): null|string|TranslatableInterface
     {
         return $this->nullLabel;
+    }
+
+    public function isMandatory(): bool
+    {
+        return $this->mandatory;
     }
 }

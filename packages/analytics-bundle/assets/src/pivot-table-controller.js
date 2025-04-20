@@ -180,6 +180,14 @@ export default class extends Controller {
         let itemType = event.dragged.dataset.type
         let targetType = event.to.dataset.type
 
+        // prevent from placing things before a mandatorydimension
+        if (
+            event.related.dataset.type === 'mandatorydimension'
+            && event.willInsertAfter === false
+        ) {
+            return false
+        }
+
         if (itemType === 'values') {
             if (['rows', 'columns'].includes(targetType)) {
                 return true

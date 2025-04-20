@@ -295,5 +295,11 @@
         <target>Geser dimensi ke sini untuk melakukan penyaringan terhadap seluruh tabel pivot. Pilih nilai tertentu untuk mempersempit data anda.</target>
       </segment>
     </unit>
+    <unit id="3r42Pvx" name="{field} is a mandatory dimension, and must be the first dimension of the row.">
+      <segment>
+        <source>{field} is a mandatory dimension, and must be the first dimension of the row.</source>
+        <target>{field} adalah dimensi wajib, dan harus merupakan dimensi pertama dari baris.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

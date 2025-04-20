@@ -295,10 +295,10 @@
         <target>Drag fields here to apply filters across the entire pivot table. Select specific values to narrow down your data.</target>
       </segment>
     </unit>
-    <unit id="4oCPLCt" name="Example: 202401-202403,202501 (202401 means January 2024)">
+    <unit id="3r42Pvx" name="{field} is a mandatory dimension, and must be the first dimension of the row.">
       <segment>
-        <source>Example: 202401-202403,202501 (202401 means January 2024)</source>
-        <target>Example: 202401-202403,202501 (202401 means January 2024)</target>
+        <source>{field} is a mandatory dimension, and must be the first dimension of the row.</source>
+        <target>{field} is a mandatory dimension, and must be the first dimension of the row.</target>
       </segment>
     </unit>
   </file>

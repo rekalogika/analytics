@@ -149,6 +149,11 @@ final readonly class SummaryMetadata
             ));
     }
 
+    public function isDimensionMandatory(string $dimensionName): bool
+    {
+        return $this->getDimensionMetadata($dimensionName)->isMandatory();
+    }
+
     /**
      * @return non-empty-array<string,MeasureMetadata>
      */
