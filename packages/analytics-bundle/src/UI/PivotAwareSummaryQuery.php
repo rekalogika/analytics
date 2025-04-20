@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\SummaryManager\Field;
 use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -63,6 +64,31 @@ final class PivotAwareSummaryQuery
         );
 
         //
+        // make sure mandatory dimensions is placed as the first dimensions of
+        // the row
+        //
+
+        $mandatoryDimensions = [];
+
+        foreach ($this->summaryQuery->getDimensionChoices() as $key => $dimension) {
+            if ($key === '@values') {
+                continue;
+            }
+
+            if ($this->summaryQuery->isDimensionMandatory($key)) {
+                $mandatoryDimensions[] = $key;
+            }
+        }
+
+        $this->rows = array_merge(
+            $mandatoryDimensions,
+            array_values(array_diff($this->rows, $mandatoryDimensions)),
+        );
+
+        $this->columns = array_values(array_diff($this->columns, $mandatoryDimensions));
+        $this->filters = array_values(array_diff($this->filters, $mandatoryDimensions));
+
+        //
         // process filters
         //
 
@@ -87,8 +113,6 @@ final class PivotAwareSummaryQuery
             arrayExpressions: $parameters['filterExpressions'] ?? [],
             filterFactory: $filterFactory,
         );
-
-        $unusedFilters = [];
 
         foreach ($this->filterExpressions as $filterExpression) {
             $expression = $filterExpression->createExpression();
@@ -121,12 +145,12 @@ final class PivotAwareSummaryQuery
     }
 
     /**
-     * @var array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:array<string,string|TranslatableInterface>|null,type?:'dimension'|'measure'|'values'}>|null
+     * @var array<string,array{key:string,label:TranslatableInterface,choices:array<string,TranslatableInterface>|null,type?:'dimension'|'mandatorydimension'|'measure'|'values'}>|null
      */
     private ?array $allChoices = null;
 
     /**
-     * @return array<string,array{key:string,label:string|\Stringable|TranslatableInterface,choices:array<string,string|TranslatableInterface>|null,type?:'dimension'|'measure'|'values'}>
+     * @return array<string,array{key:string,label:TranslatableInterface,choices:array<string,TranslatableInterface>|null,type?:'dimension'|'mandatorydimension'|'measure'|'values'}>
      */
     private function getAllChoices(): array
     {
@@ -138,11 +162,16 @@ final class PivotAwareSummaryQuery
 
         foreach ($this->summaryQuery->getHierarchicalDimensionChoices() as $key => $dimension) {
             $result[$key]['key'] = $key;
-            $result[$key]['type'] = 'dimension';
             $result[$key]['choices'] = null;
 
+            if ($this->summaryQuery->isDimensionMandatory($key)) {
+                $result[$key]['type'] = 'mandatorydimension';
+            } else {
+                $result[$key]['type'] = 'dimension';
+            }
+
             if (is_iterable($dimension)) {
-                /** @var iterable<string,string|TranslatableInterface> $dimension */
+                /** @var iterable<string,TranslatableInterface> $dimension */
                 foreach ($dimension as $childKey => $child) {
                     $result[$key]['choices'][$childKey] = $child;
                 }
@@ -150,10 +179,8 @@ final class PivotAwareSummaryQuery
 
             if ($dimension instanceof TranslatableInterface) {
                 $result[$key]['label'] = $dimension;
-            } elseif ($dimension instanceof \Stringable) {
-                $result[$key]['label'] = (string) $dimension;
             } else {
-                $result[$key]['label'] = '(unknown)';
+                $result[$key]['label'] = new LiteralString('(unknown)');
             }
         }
 
@@ -177,7 +204,7 @@ final class PivotAwareSummaryQuery
     }
 
     /**
-     * @return array{key:string,label:string|\Stringable|TranslatableInterface,choices:?array<string,string|TranslatableInterface>,type?:'dimension'|'measure'|'values'}
+     * @return array{key:string,label:TranslatableInterface,choices:?array<string,TranslatableInterface>,type?:'dimension'|'mandatorydimension'|'measure'|'values'}
      */
     public function resolve(string $key): array
     {

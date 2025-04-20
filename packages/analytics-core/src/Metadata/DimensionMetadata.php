@@ -37,6 +37,7 @@ final readonly class DimensionMetadata
         private Order|array $orderBy,
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
+        private bool $mandatory,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {
         if ($hierarchy !== null && \is_array($orderBy)) {
@@ -58,6 +59,7 @@ final readonly class DimensionMetadata
             orderBy: $this->orderBy,
             typeClass: $this->typeClass,
             nullLabel: $this->nullLabel,
+            mandatory: $this->mandatory,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -150,5 +152,10 @@ final readonly class DimensionMetadata
     public function getNullLabel(): TranslatableInterface
     {
         return $this->nullLabel;
+    }
+
+    public function isMandatory(): bool
+    {
+        return $this->mandatory;
     }
 }

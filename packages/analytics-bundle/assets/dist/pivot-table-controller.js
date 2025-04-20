@@ -186,6 +186,11 @@ function _onEnd2(event) {
 function _onMove2(event, originalEvent) {
   var itemType = event.dragged.dataset.type;
   var targetType = event.to.dataset.type;
+
+  // prevent from placing things before a mandatorydimension
+  if (event.related.dataset.type === 'mandatorydimension' && event.willInsertAfter === false) {
+    return false;
+  }
   if (itemType === 'values') {
     if (['rows', 'columns'].includes(targetType)) {
       return true;

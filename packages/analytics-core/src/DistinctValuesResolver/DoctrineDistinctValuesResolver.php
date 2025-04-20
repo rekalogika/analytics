@@ -91,10 +91,11 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 
         // if enum
 
-        if (($enumType = $metadata->getEnumType($dimension)) !== null) {
-            /** @psalm-suppress MixedReturnTypeCoercion */
+        $enumType = $metadata->getEnumType($dimension)
+            ?? $dimensionMetadata->getTypeClass();
+
+        if ($enumType !== null && is_a($enumType, \BackedEnum::class, true)) {
             return (function () use ($enumType) {
-                /** @var \BackedEnum $case */
                 foreach ($enumType::cases() as $case) {
                     yield (string) $case->value => $case;
                 }

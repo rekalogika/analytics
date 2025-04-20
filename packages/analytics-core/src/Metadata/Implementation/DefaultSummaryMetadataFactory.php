@@ -384,6 +384,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             orderBy: $dimensionAttribute->getOrderBy(),
             typeClass: $typeClass,
             nullLabel: $nullLabel,
+            mandatory: $dimensionAttribute->isMandatory(),
         );
     }
 

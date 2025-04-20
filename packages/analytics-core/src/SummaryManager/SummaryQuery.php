@@ -145,6 +145,14 @@ final class SummaryQuery implements Query
         return $this->measureChoices;
     }
 
+    public function isDimensionMandatory(string $dimension): bool
+    {
+        // trim dot and the string after
+        $dimension = explode('.', $dimension)[0];
+
+        return $this->metadata->isDimensionMandatory($dimension);
+    }
+
     //
     // distinct values resolver
     //
