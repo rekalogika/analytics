@@ -47,4 +47,6 @@ interface Query
      * @return array<string,Order>
      */
     public function getOrderBy(): array;
+
+    public function getResult(): Result;
 }
