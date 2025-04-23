@@ -22,8 +22,8 @@ use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
 use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -32,7 +32,7 @@ final class QueryTest extends KernelTestCase
 {
     private function getQuery(
         ?int $queryResultLimit = null,
-    ): SummaryQuery {
+    ): DefaultQuery {
         $summaryManager = static::getContainer()->get(SummaryManagerRegistry::class)
             ->getManager(OrderSummary::class);
 

@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
@@ -61,7 +61,7 @@ final class SummarizerQuery extends AbstractQuery
 
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
-        private readonly SummaryQuery $query,
+        private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private int $queryResultLimit,
     ) {

@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -57,7 +57,7 @@ final class DefaultResult implements Result
     public function __construct(
         private TranslatableInterface $label,
         private string $summaryClass,
-        private SummaryQuery $query,
+        private DefaultQuery $query,
         private SummaryMetadata $metadata,
         private SummarizerQuery $summarizerQuery,
         private PropertyAccessorInterface $propertyAccessor,
@@ -103,7 +103,7 @@ final class DefaultResult implements Result
     public function getUnbalancedNormalTable(): DefaultNormalTable
     {
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
-            summaryQuery: $this->query,
+            query: $this->query,
             metadata: $this->metadata,
             input: $this->getUnbalancedTable(),
             hasTieredOrder: $this->hasTieredOrder(),

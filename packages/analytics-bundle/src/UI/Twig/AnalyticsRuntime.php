@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Twig;
 
-use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQuery;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareQuery;
 use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
 
@@ -22,7 +22,7 @@ final class AnalyticsRuntime implements RuntimeExtensionInterface
     public function __construct(private Environment $twig) {}
 
     public function renderControl(
-        PivotAwareSummaryQuery $query,
+        PivotAwareQuery $query,
         ?string $urlParameter = null,
         ?string $target = null,
         ?string $output = null,

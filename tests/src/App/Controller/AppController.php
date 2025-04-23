@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
-use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
@@ -48,7 +48,7 @@ final class AppController extends AbstractController
     public function summary(
         #[MapQueryParameter()]
         ?string $parameters,
-        PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
+        PivotAwareQueryFactory $pivotAwareQueryFactory,
         AnalyticsChartBuilder $chartBuilder,
         PivotTableRenderer $pivotTableRenderer,
         string $hash,
@@ -73,7 +73,7 @@ final class AppController extends AbstractController
 
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();
-        $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
+        $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
         $result = $query->getResult();
 
         // create pivot table
@@ -103,7 +103,7 @@ final class AppController extends AbstractController
     public function download(
         #[MapQueryParameter()]
         ?string $parameters,
-        PivotAwareSummaryQueryFactory $pivotAwareSummaryQueryFactory,
+        PivotAwareQueryFactory $pivotAwareQueryFactory,
         SpreadsheetRenderer $spreadsheetRenderer,
         string $hash,
     ): Response {
@@ -127,7 +127,7 @@ final class AppController extends AbstractController
 
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();
-        $query = $pivotAwareSummaryQueryFactory->createFromParameters($query, $parameters);
+        $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
         $result = $query->getResult();
 
         // create pivot table

@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
@@ -24,9 +23,8 @@ use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class SummaryQuery implements Query
+final class DefaultQuery implements Query
 {
     /**
      * @var list<string>
@@ -51,18 +49,15 @@ final class SummaryQuery implements Query
     private ?Result $result = null;
 
     /**
-     * @param non-empty-array<string,Field> $dimensionChoices
-     * @param array<string,Field> $measureChoices
-     * @param non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices
+     * @param non-empty-list<string> $dimensionChoices
+     * @param list<string> $measureChoices
      */
     public function __construct(
         private readonly array $dimensionChoices,
-        private readonly array $hierarchicalDimensionChoices,
         private readonly array $measureChoices,
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly DistinctValuesResolver $distinctValuesResolver,
         private readonly int $queryResultLimit,
         private readonly int $fillingNodesLimit,
     ) {}
@@ -100,78 +95,6 @@ final class SummaryQuery implements Query
     }
 
     //
-    // available choices
-    //
-
-    /**
-     * @return array<string,Field>
-     */
-    public function getDimensionChoices(): array
-    {
-        return $this->dimensionChoices;
-    }
-
-    /**
-     * @return array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
-     * @todo deprecate
-     * @internal
-     */
-    public function getHierarchicalDimensionChoices(): array
-    {
-        return $this->hierarchicalDimensionChoices;
-    }
-
-    /**
-     * @return array<string,Field>
-     */
-    public function getMeasureChoices(): array
-    {
-        return $this->measureChoices;
-    }
-
-    public function isDimensionMandatory(string $dimension): bool
-    {
-        // trim dot and the string after
-        $dimension = explode('.', $dimension)[0];
-
-        return $this->metadata->isDimensionMandatory($dimension);
-    }
-
-    //
-    // distinct values resolver
-    //
-
-    /**
-     * @param class-string $class
-     * @return null|iterable<string,mixed>
-     */
-    public function getDistinctValues(
-        string $class,
-        string $dimension,
-    ): ?iterable {
-        return $this->distinctValuesResolver->getDistinctValues(
-            class: $class,
-            dimension: $dimension,
-            limit: 100,
-        );
-    }
-
-    /**
-     * @param class-string $class
-     */
-    public function getValueFromId(
-        string $class,
-        string $dimension,
-        string $id,
-    ): mixed {
-        return $this->distinctValuesResolver->getValueFromId(
-            class: $class,
-            dimension: $dimension,
-            id: $id,
-        );
-    }
-
-    //
     // helpers
     //
 
@@ -189,7 +112,7 @@ final class SummaryQuery implements Query
         };
 
         foreach ($fields as $field) {
-            if (!\array_key_exists($field, $type)) {
+            if (!\in_array($field, $type, true)) {
                 $invalid[] = $field;
             }
         }
@@ -215,7 +138,8 @@ final class SummaryQuery implements Query
         return $this->dimensions;
     }
 
-    public function groupBy(string ...$dimensions): self
+    #[\Override]
+    public function groupBy(string ...$dimensions): static
     {
         $this->result = null;
 
@@ -227,7 +151,8 @@ final class SummaryQuery implements Query
         return $this;
     }
 
-    public function addGroupBy(string ...$dimensions): self
+    #[\Override]
+    public function addGroupBy(string ...$dimensions): static
     {
         $this->groupBy(...array_merge($this->dimensions, $dimensions));
 
@@ -247,7 +172,8 @@ final class SummaryQuery implements Query
         return $this->measures;
     }
 
-    public function select(string ...$measures): self
+    #[\Override]
+    public function select(string ...$measures): static
     {
         $this->result = null;
 
@@ -259,7 +185,8 @@ final class SummaryQuery implements Query
         return $this;
     }
 
-    public function addSelect(string ...$measures): self
+    #[\Override]
+    public function addSelect(string ...$measures): static
     {
         $this->select(...array_merge($this->measures, $measures));
 
@@ -279,7 +206,8 @@ final class SummaryQuery implements Query
         return $this->where;
     }
 
-    public function where(Expression $expression): self
+    #[\Override]
+    public function where(Expression $expression): static
     {
         $this->where = [];
         $this->andWhere($expression);
@@ -287,7 +215,8 @@ final class SummaryQuery implements Query
         return $this;
     }
 
-    public function andWhere(Expression $expression): self
+    #[\Override]
+    public function andWhere(Expression $expression): static
     {
         $this->result = null;
         $this->where[] = $expression;
@@ -308,7 +237,8 @@ final class SummaryQuery implements Query
         return $this->orderBy;
     }
 
-    public function orderBy(string $field, Order $direction = Order::Ascending): self
+    #[\Override]
+    public function orderBy(string $field, Order $direction = Order::Ascending): static
     {
         $this->result = null;
 
@@ -318,7 +248,8 @@ final class SummaryQuery implements Query
         return $this;
     }
 
-    public function addOrderBy(string $field, Order $direction = Order::Ascending): self
+    #[\Override]
+    public function addOrderBy(string $field, Order $direction = Order::Ascending): static
     {
         $this->ensureFieldValid([$field], 'both');
 

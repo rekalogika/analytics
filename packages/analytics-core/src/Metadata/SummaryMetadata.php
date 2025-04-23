@@ -35,6 +35,21 @@ final readonly class SummaryMetadata
     private array $fullyQualifiedProperties;
 
     /**
+     * @var array<string,Field>
+     */
+    private array $dimensionChoices;
+
+    /**
+     * @var array<string,Field>
+     */
+    private array $measureChoices;
+
+    /**
+     * @var non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
+     */
+    private array $hierarchicalDimensionChoices;
+
+    /**
      * @param non-empty-list<class-string> $sourceClasses
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
@@ -49,7 +64,9 @@ final readonly class SummaryMetadata
         private string $groupingsProperty,
         private TranslatableInterface $label,
     ) {
-        // process dimensions
+        //
+        // dimensions
+        //
 
         $fullyQualifiedDimensions = [];
         $newDimensions = [];
@@ -83,7 +100,9 @@ final readonly class SummaryMetadata
         $this->dimensions = $newDimensions;
         $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
 
-        // process fully qualified properties
+        //
+        // fully qualified properties
+        //
 
         $fullyQualifiedProperties = [];
 
@@ -104,6 +123,105 @@ final readonly class SummaryMetadata
         }
 
         $this->fullyQualifiedProperties = $fullyQualifiedProperties;
+
+        //
+        // dimension choices
+        //
+
+        $dimensionChoices = [];
+
+        foreach ($dimensions as $dimension) {
+            $hierarchy = $dimension->getHierarchy();
+
+            // if not hierarchical
+
+            if ($hierarchy === null) {
+                $field = new Field(
+                    key: $dimension->getSummaryProperty(),
+                    label: $dimension->getLabel(),
+                    subLabel: null,
+                );
+
+                $dimensionChoices[$field->getKey()] = $field;
+
+                continue;
+            }
+
+            // if hierarchical
+
+            foreach ($hierarchy->getProperties() as $property) {
+                $fullProperty = \sprintf(
+                    '%s.%s',
+                    $dimension->getSummaryProperty(),
+                    $property->getName(),
+                );
+
+                $field = new Field(
+                    key: $fullProperty,
+                    label: $dimension->getLabel(),
+                    subLabel: $property->getLabel(),
+                );
+
+                $dimensionChoices[$field->getKey()] = $field;
+            }
+        }
+
+        $this->dimensionChoices = $dimensionChoices;
+
+        //
+        // hierarchical dimension choices
+        //
+
+        $hierarchicalDimensionChoices = [];
+
+        foreach ($dimensions as $dimensionMetadata) {
+            $hierarchy = $dimensionMetadata->getHierarchy();
+
+            // if not hierarchical
+
+            if ($hierarchy === null) {
+                $hierarchicalDimensionChoices[$dimensionMetadata->getSummaryProperty()] = $dimensionMetadata->getLabel();
+
+                continue;
+            }
+
+            // if hierarchical
+
+            $children = [];
+
+            foreach ($hierarchy->getProperties() as $property) {
+                $children[$property->getName()] = $property->getLabel();
+            }
+
+            $hierarchicalDimensionChoices[$dimensionMetadata->getSummaryProperty()] =
+                new HierarchicalDimension(
+                    label: $dimensionMetadata->getLabel(),
+                    children: $children,
+                );
+        }
+
+        /** @var non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices */
+
+        $this->hierarchicalDimensionChoices = $hierarchicalDimensionChoices;
+
+        //
+        // measure choices
+        //
+
+        $measureChoices = [];
+
+        foreach ($measures as $measureMetadata) {
+            $field = new Field(
+                key: $measureMetadata->getSummaryProperty(),
+                label: $measureMetadata->getLabel(),
+                subLabel: null,
+            );
+
+            $measureChoices[$field->getKey()] = $field;
+        }
+
+        $this->measureChoices = $measureChoices;
+
     }
 
     /**
@@ -127,9 +245,30 @@ final readonly class SummaryMetadata
         return $this->label;
     }
 
+    //
+    // partition
+    //
+
     public function getPartition(): PartitionMetadata
     {
         return $this->partition;
+    }
+
+    public function getGroupingsProperty(): string
+    {
+        return $this->groupingsProperty;
+    }
+
+    //
+    // dimensions
+    //
+
+    /**
+     * @return list<string>
+     */
+    public function getDimensionPropertyNames(): array
+    {
+        return array_keys($this->fullyQualifiedDimensions);
     }
 
     /**
@@ -149,10 +288,32 @@ final readonly class SummaryMetadata
             ));
     }
 
-    public function isDimensionMandatory(string $dimensionName): bool
-    {
-        return $this->getDimensionMetadata($dimensionName)->isMandatory();
+    public function getFullyQualifiedDimension(
+        string $dimensionName,
+    ): FullyQualifiedDimensionMetadata {
+        return $this->fullyQualifiedDimensions[$dimensionName]
+            ?? throw new MetadataException(\sprintf('Dimension not found: %s', $dimensionName));
     }
+
+    /**
+     * @return array<string,Field>
+     */
+    public function getDimensionChoices(): array
+    {
+        return $this->dimensionChoices;
+    }
+
+    /**
+     * @return non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
+     */
+    public function getHierarchicalDimensionChoices(): array
+    {
+        return $this->hierarchicalDimensionChoices;
+    }
+
+    //
+    // measures
+    //
 
     /**
      * @return non-empty-array<string,MeasureMetadata>
@@ -170,6 +331,23 @@ final readonly class SummaryMetadata
                 $measureName,
             ));
     }
+
+    public function isMeasure(string $fieldName): bool
+    {
+        return isset($this->measures[$fieldName]);
+    }
+
+    /**
+     * @return array<string,Field>
+     */
+    public function getMeasureChoices(): array
+    {
+        return $this->measureChoices;
+    }
+
+    //
+    // field (dimension or measure)
+    //
 
     public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata
     {
@@ -192,40 +370,15 @@ final readonly class SummaryMetadata
             ));
     }
 
-    public function getFullyQualifiedDimension(string $dimensionName): FullyQualifiedDimensionMetadata
-    {
-        return $this->fullyQualifiedDimensions[$dimensionName]
-            ?? throw new MetadataException(\sprintf('Dimension not found: %s', $dimensionName));
-    }
-
-    public function getFullyQualifiedProperty(string $propertyName): FullyQualifiedPropertyMetadata
+    public function getFullyQualifiedField(string $propertyName): FullyQualifiedPropertyMetadata
     {
         return $this->fullyQualifiedProperties[$propertyName]
             ?? throw new MetadataException(\sprintf('Property not found: %s', $propertyName));
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getDimensionPropertyNames(): array
-    {
-        return array_keys($this->fullyQualifiedDimensions);
-    }
-
-    public function isMeasure(string $fieldName): bool
-    {
-        return isset($this->measures[$fieldName]);
-    }
-
-    public function isDimension(string $fieldName): bool
-    {
-        return isset($this->dimensions[$fieldName]);
-    }
-
-    public function getGroupingsProperty(): string
-    {
-        return $this->groupingsProperty;
-    }
+    //
+    // sources
+    //
 
     /**
      * Source class to the list of its properties that influence this summary.

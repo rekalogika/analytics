@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
@@ -29,7 +28,6 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
         private SummaryMetadataFactory $metadataFactory,
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
-        private DistinctValuesResolver $distinctValuesResolver,
         private int $queryResultLimit,
         private int $fillingNodesLimit,
     ) {}
@@ -51,7 +49,6 @@ final readonly class DefaultSummaryManagerRegistry implements SummaryManagerRegi
             metadata: $summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
             refresherFactory: $this->refresherFactory,
-            distinctValuesResolver: $this->distinctValuesResolver,
             queryResultLimit: $this->queryResultLimit,
             fillingNodesLimit: $this->fillingNodesLimit,
         );

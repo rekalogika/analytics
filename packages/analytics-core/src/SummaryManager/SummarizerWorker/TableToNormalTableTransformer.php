@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
@@ -23,7 +24,6 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -47,31 +47,31 @@ final class TableToNormalTableTransformer
     private DimensionCollector $dimensionCollector;
 
     private function __construct(
-        SummaryQuery $summaryQuery,
+        DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         bool $hasTieredOrder,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
-        $dimensions = $summaryQuery->getGroupBy();
+        $dimensions = $query->getGroupBy();
 
         if (!\in_array('@values', $dimensions, true)) {
             $dimensions[] = '@values';
         }
 
         $this->dimensions = $dimensions;
-        $this->measures = $summaryQuery->getSelect();
+        $this->measures = $query->getSelect();
         $this->dimensionCollector = new DimensionCollector($hasTieredOrder);
     }
 
     public static function transform(
-        SummaryQuery $summaryQuery,
+        DefaultQuery $query,
         DefaultTable $input,
         SummaryMetadata $metadata,
         bool $hasTieredOrder,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
-            summaryQuery: $summaryQuery,
+            query: $query,
             metadata: $metadata,
             measureLabel: $valuesLabel,
             hasTieredOrder: $hasTieredOrder,
