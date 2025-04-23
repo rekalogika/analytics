@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Collection of dimensions
+ * A tuple of dimensions
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

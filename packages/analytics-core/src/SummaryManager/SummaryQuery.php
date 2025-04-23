@@ -28,10 +28,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class SummaryQuery implements Query
 {
-    private mixed $lowerBound = null;
-
-    private mixed $upperBound = null;
-
     /**
      * @var list<string>
      */
@@ -77,6 +73,7 @@ final class SummaryQuery implements Query
         return $this->metadata->getSummaryClass();
     }
 
+    #[\Override]
     public function getResult(): Result
     {
         if ($this->result !== null) {
@@ -100,19 +97,6 @@ final class SummaryQuery implements Query
             entityManager: $this->entityManager,
             fillingNodesLimit: $this->fillingNodesLimit,
         );
-    }
-
-    /**
-     * @return class-string
-     */
-    public function getClass(): string
-    {
-        return $this->metadata->getSummaryClass();
-    }
-
-    public function getMetadata(): SummaryMetadata
-    {
-        return $this->metadata;
     }
 
     //
@@ -185,32 +169,6 @@ final class SummaryQuery implements Query
             dimension: $dimension,
             id: $id,
         );
-    }
-
-    //
-    // bounds
-    //
-
-    public function getLowerBound(): mixed
-    {
-        return $this->lowerBound;
-    }
-
-    public function setLowerBound(mixed $lowerBound): void
-    {
-        $this->result = null;
-        $this->lowerBound = $lowerBound;
-    }
-
-    public function getUpperBound(): mixed
-    {
-        return $this->upperBound;
-    }
-
-    public function setUpperBound(mixed $upperBound): void
-    {
-        $this->result = null;
-        $this->upperBound = $upperBound;
     }
 
     //

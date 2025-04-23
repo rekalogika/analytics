@@ -79,6 +79,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->set(
                 'rekalogika.analytics.query_result_limit',
                 $config['query_result_limit'],
+            )
+            ->set(
+                'rekalogika.analytics.filling_nodes_limit',
+                $config['filling_nodes_limit'],
             );
 
         $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
