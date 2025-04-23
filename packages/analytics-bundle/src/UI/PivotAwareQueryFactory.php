@@ -13,23 +13,30 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 
-final readonly class PivotAwareSummaryQueryFactory
+final readonly class PivotAwareQueryFactory
 {
     public function __construct(
         private FilterFactory $filterFactory,
+        private SummaryMetadataFactory $summaryMetadataFactory,
     ) {}
 
     /**
      * @param array<string,mixed> $parameters
      */
     public function createFromParameters(
-        SummaryQuery $query,
+        DefaultQuery $query,
         array $parameters,
-    ): PivotAwareSummaryQuery {
-        return new PivotAwareSummaryQuery(
-            summaryQuery: $query,
+    ): PivotAwareQuery {
+        $summaryClass = $query->getSummaryClass();
+        $metadata = $this->summaryMetadataFactory
+            ->getSummaryMetadata($summaryClass);
+
+        return new PivotAwareQuery(
+            query: $query,
+            metadata: $metadata,
             parameters: $parameters,
             filterFactory: $this->filterFactory,
         );

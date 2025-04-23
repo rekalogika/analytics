@@ -17,13 +17,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -32,7 +32,7 @@ final readonly class QueryResultToTableTransformer
     private DimensionFactory $dimensionFactory;
 
     private function __construct(
-        private readonly SummaryQuery $query,
+        private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
@@ -44,7 +44,7 @@ final readonly class QueryResultToTableTransformer
      * @param list<array<string,mixed>> $input
      */
     public static function transform(
-        SummaryQuery $query,
+        DefaultQuery $query,
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
@@ -465,7 +465,7 @@ final readonly class QueryResultToTableTransformer
     private function getLabel(string $property): TranslatableInterface
     {
         return $this->metadata
-            ->getFullyQualifiedProperty($property)
+            ->getFullyQualifiedField($property)
             ->getLabel();
     }
 

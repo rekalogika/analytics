@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 
 /**
  * @template T of object
@@ -27,5 +27,5 @@ interface SummaryManager
         ?string $resumeId = null,
     ): void;
 
-    public function createQuery(): SummaryQuery;
+    public function createQuery(): DefaultQuery;
 }

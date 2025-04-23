@@ -42,7 +42,7 @@ use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\PivotAwareSummaryQueryFactory;
+use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperCellifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperHtmlifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperNumberifier;
@@ -111,7 +111,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
-            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
             '$fillingNodesLimit' => '%rekalogika.analytics.filling_nodes_limit%',
         ])
@@ -349,9 +348,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(PivotAwareSummaryQueryFactory::class)
+        ->set(PivotAwareQueryFactory::class)
         ->args([
             '$filterFactory' => service(FilterFactory::class),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
     ;
 

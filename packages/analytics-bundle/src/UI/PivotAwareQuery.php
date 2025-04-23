@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\SummaryManager\Field;
-use Rekalogika\Analytics\SummaryManager\SummaryQuery;
+use Rekalogika\Analytics\Metadata\Field;
+use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class PivotAwareSummaryQuery
+final class PivotAwareQuery
 {
     /**
      * @var list<string>
@@ -43,7 +44,8 @@ final class PivotAwareSummaryQuery
      * @param array<string,mixed> $parameters
      */
     public function __construct(
-        private readonly SummaryQuery $summaryQuery,
+        private readonly DefaultQuery $query,
+        private readonly SummaryMetadata $metadata,
         array $parameters,
         FilterFactory $filterFactory,
     ) {
@@ -70,12 +72,12 @@ final class PivotAwareSummaryQuery
 
         $mandatoryDimensions = [];
 
-        foreach ($this->summaryQuery->getDimensionChoices() as $key => $dimension) {
+        foreach ($this->metadata->getDimensionChoices() as $key => $dimension) {
             if ($key === '@values') {
                 continue;
             }
 
-            if ($this->summaryQuery->isDimensionMandatory($key)) {
+            if ($this->isDimensionMandatory($key)) {
                 $mandatoryDimensions[] = $key;
             }
         }
@@ -107,7 +109,7 @@ final class PivotAwareSummaryQuery
          * @psalm-suppress MixedArgument
          */
         $this->filterExpressions = new Filters(
-            summaryClass: $this->summaryQuery->getSummaryClass(),
+            summaryClass: $this->query->getSummaryClass(),
             dimensions: $filterDimensions,
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],
@@ -118,7 +120,7 @@ final class PivotAwareSummaryQuery
             $expression = $filterExpression->createExpression();
 
             if ($expression !== null) {
-                $this->summaryQuery->andWhere($expression);
+                $this->query->andWhere($expression);
             }
         }
     }
@@ -160,11 +162,11 @@ final class PivotAwareSummaryQuery
 
         $result = [];
 
-        foreach ($this->summaryQuery->getHierarchicalDimensionChoices() as $key => $dimension) {
+        foreach ($this->metadata->getHierarchicalDimensionChoices() as $key => $dimension) {
             $result[$key]['key'] = $key;
             $result[$key]['choices'] = null;
 
-            if ($this->summaryQuery->isDimensionMandatory($key)) {
+            if ($this->isDimensionMandatory($key)) {
                 $result[$key]['type'] = 'mandatorydimension';
             } else {
                 $result[$key]['type'] = 'dimension';
@@ -184,7 +186,7 @@ final class PivotAwareSummaryQuery
             }
         }
 
-        foreach ($this->summaryQuery->getMeasureChoices() as $key => $measure) {
+        foreach ($this->metadata->getMeasureChoices() as $key => $measure) {
             $result[$key] = [
                 'key' => $key,
                 'type' => 'measure',
@@ -219,8 +221,8 @@ final class PivotAwareSummaryQuery
     private function getAllItems(): array
     {
         return [
-            ...array_keys($this->summaryQuery->getHierarchicalDimensionChoices()),
-            ...array_keys($this->summaryQuery->getMeasureChoices()),
+            ...array_keys($this->metadata->getHierarchicalDimensionChoices()),
+            ...array_keys($this->metadata->getMeasureChoices()),
             '@values',
         ];
     }
@@ -231,7 +233,7 @@ final class PivotAwareSummaryQuery
 
     private function syncRowsAndColumns(): void
     {
-        $this->summaryQuery->groupBy(...array_merge($this->rows, $this->columns));
+        $this->query->groupBy(...array_merge($this->rows, $this->columns));
     }
 
     /**
@@ -273,7 +275,7 @@ final class PivotAwareSummaryQuery
      */
     public function getValues(): array
     {
-        return $this->summaryQuery->getSelect();
+        return $this->query->getSelect();
     }
 
     /**
@@ -281,7 +283,7 @@ final class PivotAwareSummaryQuery
      */
     private function setValues(array $values): void
     {
-        $this->summaryQuery->select(...$values);
+        $this->query->select(...$values);
     }
 
     /**
@@ -318,7 +320,7 @@ final class PivotAwareSummaryQuery
      */
     public function getDimensionChoices(): array
     {
-        return $this->summaryQuery->getDimensionChoices();
+        return $this->metadata->getDimensionChoices();
     }
 
     /**
@@ -326,12 +328,12 @@ final class PivotAwareSummaryQuery
      */
     public function getMeasureChoices(): array
     {
-        return $this->summaryQuery->getMeasureChoices();
+        return $this->metadata->getMeasureChoices();
     }
 
     public function getResult(): Result
     {
-        return $this->summaryQuery->getResult();
+        return $this->query->getResult();
     }
 
     //
@@ -344,6 +346,14 @@ final class PivotAwareSummaryQuery
     public function getPivotedDimensions(): array
     {
         return $this->columns;
+    }
+
+    private function isDimensionMandatory(string $dimension): bool
+    {
+        // trim dot and the string after
+        $dimension = explode('.', $dimension)[0];
+
+        return $this->metadata->getDimensionMetadata($dimension)->isMandatory();
     }
 
     //
