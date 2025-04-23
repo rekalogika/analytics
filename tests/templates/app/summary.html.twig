@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ title|trans }}{% endblock %}
+
 {% block body %}
     <h1 class="h2 mb-5">{{ title|trans }}</h1>
 
@@ -9,7 +11,9 @@
                 {% if chart %}{{ render_chart(chart) }}{% endif %}
             </div>
 
-            <a download target="_blank" class="btn btn-secondary btn-sm float-end mb-2"
+            <a download
+               target="_blank"
+               class="btn btn-secondary btn-sm float-end mb-2"
                href="{{ path('download', {hash: hash, parameters: app.request.query.get('parameters') }) }}">Download</a>
 
             <div>{{ pivotTable|raw }}</div>
