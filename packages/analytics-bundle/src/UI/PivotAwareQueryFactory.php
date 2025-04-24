@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 
 final readonly class PivotAwareQueryFactory
 {
@@ -27,7 +27,7 @@ final readonly class PivotAwareQueryFactory
      * @param array<string,mixed> $parameters
      */
     public function createFromParameters(
-        DefaultQuery $query,
+        Query $query,
         array $parameters,
     ): PivotAwareQuery {
         $summaryClass = $query->getSummaryClass();

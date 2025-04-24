@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
 use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
-use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
@@ -32,7 +32,7 @@ final class QueryTest extends KernelTestCase
 {
     private function getQuery(
         ?int $queryResultLimit = null,
-    ): DefaultQuery {
+    ): Query {
         $summaryManager = static::getContainer()->get(SummaryManagerRegistry::class)
             ->getManager(OrderSummary::class);
 

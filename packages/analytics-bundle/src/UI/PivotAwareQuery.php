@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Metadata\Field;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -44,7 +44,7 @@ final class PivotAwareQuery
      * @param array<string,mixed> $parameters
      */
     public function __construct(
-        private readonly DefaultQuery $query,
+        private readonly Query $query,
         private readonly SummaryMetadata $metadata,
         array $parameters,
         FilterFactory $filterFactory,
