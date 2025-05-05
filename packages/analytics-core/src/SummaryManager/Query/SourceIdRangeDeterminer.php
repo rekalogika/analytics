@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 
@@ -58,8 +57,18 @@ final class SourceIdRangeDeterminer extends AbstractQuery
 
     public function getMinId(): int|string|null
     {
+        $partitionProperty = $this->valueResolver
+            ->getInvolvedProperties()[0];
+
+        $field = \sprintf(
+            'root.%s',
+            $partitionProperty,
+        );
+
         $result = $this->getQueryBuilder()
-            ->select($this->getMinDQL())
+            ->select($field)
+            ->orderBy($field, 'ASC')
+            ->setMaxResults(1)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -76,8 +85,18 @@ final class SourceIdRangeDeterminer extends AbstractQuery
 
     public function getMaxId(): int|string|null
     {
+        $partitionProperty = $this->valueResolver
+            ->getInvolvedProperties()[0];
+
+        $field = \sprintf(
+            'root.%s',
+            $partitionProperty,
+        );
+
         $result = $this->getQueryBuilder()
-            ->select($this->getMaxDQL())
+            ->select($field)
+            ->orderBy($field, 'DESC')
+            ->setMaxResults(1)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -90,33 +109,5 @@ final class SourceIdRangeDeterminer extends AbstractQuery
         }
 
         return (string) $result;
-    }
-
-    private function getMinDQL(): string
-    {
-        $valueResolver = $this->valueResolver;
-
-        if ($valueResolver instanceof ValueRangeResolver) {
-            return $valueResolver->getMinDQL($this->getQueryContext());
-        }
-
-        return \sprintf(
-            'MIN(%s)',
-            $valueResolver->getDQL($this->getQueryContext()),
-        );
-    }
-
-    private function getMaxDQL(): string
-    {
-        $valueResolver = $this->valueResolver;
-
-        if ($valueResolver instanceof ValueRangeResolver) {
-            return $valueResolver->getMaxDQL($this->getQueryContext());
-        }
-
-        return \sprintf(
-            'MAX(%s)',
-            $valueResolver->getDQL($this->getQueryContext()),
-        );
     }
 }

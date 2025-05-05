@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
@@ -23,9 +22,7 @@ use Rekalogika\Analytics\Util\UuidV7Util;
 /**
  * Truncate source value in UUID format to 64-bit integer.
  */
-final readonly class UuidToTruncatedIntegerResolver implements
-    ValueRangeResolver,
-    PartitionValueResolver
+final readonly class UuidToTruncatedIntegerResolver implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -42,24 +39,6 @@ final readonly class UuidToTruncatedIntegerResolver implements
     {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT(%s)',
-            $context->resolvePath($this->property),
-        );
-    }
-
-    #[\Override]
-    public function getMinDQL(QueryContext $context): string
-    {
-        return \sprintf(
-            "MIN(REKALOGIKA_CAST(%s, 'TEXT'))",
-            $context->resolvePath($this->property),
-        );
-    }
-
-    #[\Override]
-    public function getMaxDQL(QueryContext $context): string
-    {
-        return \sprintf(
-            "MAX(REKALOGIKA_CAST(%s, 'TEXT'))",
             $context->resolvePath($this->property),
         );
     }

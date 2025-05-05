@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\Contracts\Summary;
 interface PartitionValueResolver extends ValueResolver
 {
     /**
+     * Unlike ValueResolver, here we return one and only one value.
+     *
      * @return list{string}
      */
     #[\Override]
