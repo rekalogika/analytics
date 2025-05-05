@@ -24,6 +24,12 @@ parameters:
             identifier: return.unusedType
             path: packages/analytics-core/src/Doctrine/Types/TimeInterval/TimeIntervalType.php
         -   '#Doctrine\\ORM\\Query but does not specify its types: TKey, TResult#'
+        -
+            message: '#of internal class Symfony\\Polyfill\\Intl\\Icu\\IntlDateFormatter from outside its root#'
+            reportUnmatched: false
+        -
+            message: '#Attribute class Override does not exist#'
+            reportUnmatched: false
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon

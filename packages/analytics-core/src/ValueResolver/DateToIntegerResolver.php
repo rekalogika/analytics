@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Contracts\Summary\ValueRangeResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
@@ -22,9 +21,7 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 /**
  * Convert source date into integer. Epoch is 1970-01-01.
  */
-final readonly class DateToIntegerResolver implements
-    ValueRangeResolver,
-    PartitionValueResolver
+final readonly class DateToIntegerResolver implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -41,24 +38,6 @@ final readonly class DateToIntegerResolver implements
     {
         return \sprintf(
             "DATE_DIFF(%s, '1970-01-01')",
-            $context->resolvePath($this->property),
-        );
-    }
-
-    #[\Override]
-    public function getMinDQL(QueryContext $context): string
-    {
-        return \sprintf(
-            "MIN(REKALOGIKA_CAST(%s, 'TEXT'))",
-            $context->resolvePath($this->property),
-        );
-    }
-
-    #[\Override]
-    public function getMaxDQL(QueryContext $context): string
-    {
-        return \sprintf(
-            "MAX(REKALOGIKA_CAST(%s, 'TEXT'))",
             $context->resolvePath($this->property),
         );
     }
