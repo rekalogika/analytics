@@ -13,17 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 {
     public function __construct(
         DimensionMetadata $dimensionMetadata,
-        private readonly QueryBuilder $queryBuilder,
+        EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
         int $limit,
     ) {
@@ -32,7 +33,6 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
         $orderBy = $dimensionMetadata->getOrderBy();
         $dimension = $dimensionMetadata->getSummaryProperty();
 
-        $entityManager = $this->queryBuilder->getEntityManager();
         $doctrineMetadata = $entityManager->getClassMetadata($summaryClass);
 
         // ensure the property is a relation
@@ -47,18 +47,23 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
         // get relation class
         $relationClass = $doctrineMetadata->getAssociationTargetClass($dimension);
 
-        $queryBuilder
-            ->from($relationClass, 'root')
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $relationClass,
+            alias: 'root',
+        );
+
+        $simpleQueryBuilder
             ->select('root')
             ->setMaxResults($limit);
 
-        parent::__construct($queryBuilder);
+        parent::__construct($simpleQueryBuilder);
 
         if (\is_array($orderBy)) {
             foreach ($orderBy as $field => $direction) {
                 $dqlField = $this->getQueryContext()->resolvePath($field);
 
-                $queryBuilder->addOrderBy($dqlField, $direction->value);
+                $simpleQueryBuilder->addOrderBy($dqlField, $direction->value);
             }
         }
     }
@@ -69,10 +74,10 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
     public function getResult(): iterable
     {
         /** @var list<object> */
-        $result = $this->queryBuilder->getQuery()->getResult();
+        $result = $this->getSimpleQueryBuilder()->getQuery()->getResult();
 
-        $idField = $this->queryBuilder->getEntityManager()
-            ->getClassMetadata($this->queryBuilder->getRootEntities()[0])
+        $idField = $this->getSimpleQueryBuilder()->getEntityManager()
+            ->getClassMetadata($this->getSimpleQueryBuilder()->getRootEntities()[0])
             ->getSingleIdentifierFieldName();
 
         foreach ($result as $item) {
@@ -82,7 +87,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
                 throw new UnexpectedValueException(\sprintf(
                     'The identifier field "%s" in class "%s" is not a string or integer',
                     $idField,
-                    $this->queryBuilder->getRootEntities()[0],
+                    $this->getSimpleQueryBuilder()->getRootEntities()[0],
                 ));
             }
 

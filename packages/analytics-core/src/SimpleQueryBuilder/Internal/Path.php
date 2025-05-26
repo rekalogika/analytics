@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\SummaryManager\Query\Path;
+namespace Rekalogika\Analytics\SimpleQueryBuilder\Internal;
 
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 

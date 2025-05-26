@@ -13,17 +13,32 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class GetDistinctValuesFromSummaryQuery extends AbstractQuery
 {
     public function __construct(
-        private readonly DimensionMetadata $dimensionMetadata,
-        private readonly QueryBuilder $queryBuilder,
-        private readonly int $limit,
+        DimensionMetadata $dimensionMetadata,
+        EntityManagerInterface $entityManager,
+        int $limit,
     ) {
-        parent::__construct($queryBuilder);
+        $summaryMetadata = $dimensionMetadata->getSummaryMetadata();
+        $summaryClass = $summaryMetadata->getSummaryClass();
+        $dimension = $dimensionMetadata->getSummaryProperty();
+
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $summaryClass,
+            alias: 'root',
+        );
+
+        $simpleQueryBuilder
+            ->select("DISTINCT root.$dimension")
+            ->setMaxResults($limit);
+
+        parent::__construct($simpleQueryBuilder);
     }
 
     /**
@@ -31,29 +46,6 @@ final class GetDistinctValuesFromSummaryQuery extends AbstractQuery
      */
     public function getResult(): array
     {
-        $summaryMetadata = $this->dimensionMetadata->getSummaryMetadata();
-        $summaryClass = $summaryMetadata->getSummaryClass();
-        $dimension = $this->dimensionMetadata->getSummaryProperty();
-
-        $queryBuilder = $this->queryBuilder
-            ->select("DISTINCT root.$dimension")
-            ->from($summaryClass, 'root')
-            ->setMaxResults($this->limit);
-
-        // order by is disabled as probably too expensive
-
-        // $orderBy = $this->dimensionMetadata->getOrderBy();
-
-        // if (is_array($orderBy)) {
-        //     foreach ($orderBy as $field => $direction) {
-        //         $dqlField = $this->getQueryContext()->resolvePath($field);
-
-        //         $queryBuilder->addOrderBy($dqlField, $direction->value);
-        //     }
-        // } else {
-        //     $queryBuilder->addOrderBy('root.' . $dimension, $orderBy->value);
-        // }
-
-        return array_values($queryBuilder->getQuery()->getArrayResult());
+        return array_values($this->getSimpleQueryBuilder()->getQuery()->getArrayResult());
     }
 }

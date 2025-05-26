@@ -96,7 +96,7 @@ final class SqlFactory
     ): iterable {
         $query = new RollUpSourceToSummaryPerSourceQuery(
             sourceClass: $sourceClass,
-            queryBuilder: $this->entityManager->createQueryBuilder(),
+            entityManager: $this->entityManager,
             partitionManager: $this->partitionManager,
             metadata: $this->summaryMetadata,
             start: $start,
@@ -171,7 +171,7 @@ final class SqlFactory
         }
 
         $query = new $class(
-            queryBuilder: $this->entityManager->createQueryBuilder(),
+            entityManager: $this->entityManager,
             metadata: $this->summaryMetadata,
             start: $start,
             end: $end,

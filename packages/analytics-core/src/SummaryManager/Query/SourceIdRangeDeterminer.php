@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 /**
  * Roll up lower level summary to higher level by grouping by the entire row set
@@ -31,22 +32,24 @@ final class SourceIdRangeDeterminer extends AbstractQuery
      */
     public function __construct(
         string $class,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly SummaryMetadata $summaryMetadata,
+        EntityManagerInterface $entityManager,
+        SummaryMetadata $summaryMetadata,
     ) {
         $summaryClass = $summaryMetadata->getSummaryClass();
 
-        $queryBuilder = $this->entityManager
-            ->createQueryBuilder()
-            ->from($class, 'root');
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $class,
+            alias: 'root',
+        );
 
         if (is_a($summaryClass, HasQueryBuilderModifier::class, true)) {
-            $summaryClass::modifyQueryBuilder($queryBuilder);
+            $summaryClass::modifyQueryBuilder($simpleQueryBuilder->getQueryBuilder());
         }
 
-        parent::__construct($queryBuilder);
+        parent::__construct($simpleQueryBuilder);
 
-        $this->valueResolver = $this->summaryMetadata
+        $this->valueResolver = $summaryMetadata
             ->getPartition()
             ->getSource()[$class]
             ?? throw new MetadataException(\sprintf(
@@ -65,7 +68,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             $partitionProperty,
         );
 
-        $result = $this->getQueryBuilder()
+        $result = $this->getSimpleQueryBuilder()
             ->select($field)
             ->orderBy($field, 'ASC')
             ->setMaxResults(1)
@@ -93,7 +96,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             $partitionProperty,
         );
 
-        $result = $this->getQueryBuilder()
+        $result = $this->getSimpleQueryBuilder()
             ->select($field)
             ->orderBy($field, 'DESC')
             ->setMaxResults(1)

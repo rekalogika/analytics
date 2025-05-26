@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolverContext;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -43,21 +44,21 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
      */
     public function __construct(
         private readonly string $sourceClass,
-        private readonly QueryBuilder $queryBuilder,
+        EntityManagerInterface $entityManager,
         private readonly PartitionManager $partitionManager,
         private readonly SummaryMetadata $metadata,
         private readonly Partition $start,
         private readonly Partition $end,
     ) {
-        parent::__construct($queryBuilder);
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $this->sourceClass,
+            alias: 'root',
+        );
+
+        parent::__construct($simpleQueryBuilder);
 
         $this->groupBy = new GroupBy();
-    }
-
-    #[\Override]
-    protected function getQueryBuilder(): QueryBuilder
-    {
-        return $this->queryBuilder;
     }
 
     /**
@@ -78,8 +79,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function initialize(): void
     {
-        $this->queryBuilder
-            ->from($this->sourceClass, 'root')
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 "REKALOGIKA_NEXTVAL(%s)",
                 $this->metadata->getSummaryClass(),
@@ -108,7 +108,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             context: $this->getQueryContext(),
         );
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS p_key',
                 $function,
@@ -205,7 +205,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                         context: $dimensionValueResolverContext,
                     );
 
-                    $this->queryBuilder
+                    $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             '%s AS %s',
                             $function,
@@ -220,7 +220,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
                 $alias = \sprintf('d%d_', $i++);
 
-                $this->queryBuilder
+                $this->getSimpleQueryBuilder()
                     ->addSelect(\sprintf('%s AS %s', $propertySqlField, $alias));
 
                 $cube = new Cube();
@@ -244,7 +244,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             $function = $function
                 ->getSourceToSummaryDQLFunction($this->getQueryContext());
 
-            $this->queryBuilder->addSelect($function);
+            $this->getSimpleQueryBuilder()->addSelect($function);
         }
     }
 
@@ -277,7 +277,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $property = $properties[0];
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
                 "%s >= '%s'",
                 $this->resolvePath($property),
@@ -295,7 +295,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $class = $this->metadata->getSummaryClass();
 
         if (is_a($class, HasQueryBuilderModifier::class, true)) {
-            $class::modifyQueryBuilder($this->queryBuilder);
+            $class::modifyQueryBuilder(
+                $this->getSimpleQueryBuilder()->getQueryBuilder(),
+            );
         }
     }
 
@@ -303,7 +305,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         ksort($this->groupings);
 
-        $this->queryBuilder->addSelect(\sprintf(
+        $this->getSimpleQueryBuilder()->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s)",
             implode(', ', $this->groupings),
         ));
@@ -314,7 +316,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
      */
     private function createSqlStatement(): iterable
     {
-        $query = $this->queryBuilder->getQuery();
+        $query = $this->getSimpleQueryBuilder()->getQuery();
         $this->groupBy->apply($query);
         $result = $query->getSQL();
 
