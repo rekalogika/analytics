@@ -17,13 +17,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -32,8 +32,6 @@ use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final class SummarizerQuery extends AbstractQuery
 {
-    private readonly EntityManagerInterface $entityManager;
-
     /**
      * @var list<string>
      */
@@ -60,14 +58,20 @@ final class SummarizerQuery extends AbstractQuery
     private ?array $queryResult = null;
 
     public function __construct(
-        private readonly QueryBuilder $queryBuilder,
+        private readonly EntityManagerInterface $entityManager,
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private int $queryResultLimit,
     ) {
-        parent::__construct($queryBuilder);
+        $summaryClass = $metadata->getSummaryClass();
 
-        $this->entityManager = $this->queryBuilder->getEntityManager();
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $summaryClass,
+            alias: 'root',
+        );
+
+        parent::__construct($simpleQueryBuilder);
 
         $dimensionsInQuery = $this->query->getGroupBy();
 
@@ -112,7 +116,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // create grouping field
 
-        $this->queryBuilder->addSelect(\sprintf(
+        $this->getSimpleQueryBuilder()->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s) AS __grouping",
             implode(', ', $this->groupingFields),
         ));
@@ -122,7 +126,7 @@ final class SummarizerQuery extends AbstractQuery
         $rollUp = new RollUp();
 
         foreach ($this->rollUpFields as $field) {
-            // $this->queryBuilder->addGroupBy($field);
+            // $this->getSimpleQueryBuilder()->addGroupBy($field);
             $rollUp->add(new Field($field));
         }
 
@@ -131,7 +135,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // create query & apply group by
 
-        $query = $this->queryBuilder->getQuery();
+        $query = $this->getSimpleQueryBuilder()->getQuery();
 
         if (\count($groupBy) > 0) {
             $groupBy->apply($query);
@@ -176,10 +180,7 @@ final class SummarizerQuery extends AbstractQuery
 
     private function initializeQueryBuilder(): void
     {
-        $summaryClass = $this->metadata->getSummaryClass();
-
-        $this->queryBuilder
-            ->from($summaryClass, 'root')
+        $this->getSimpleQueryBuilder()
             ->setMaxResults($this->queryResultLimit + 1) // safeguard
         ;
 
@@ -222,12 +223,12 @@ final class SummarizerQuery extends AbstractQuery
         if ($higherPartition === null) {
             // if the partition is at the top level, return all top partitions
             // up to the partition
-            yield $this->queryBuilder->expr()->andX(
-                $this->queryBuilder->expr()->eq(
+            yield $this->getSimpleQueryBuilder()->expr()->andX(
+                $this->getSimpleQueryBuilder()->expr()->eq(
                     $levelProperty,
                     $partition->getLevel(),
                 ),
-                $this->queryBuilder->expr()->lt(
+                $this->getSimpleQueryBuilder()->expr()->lt(
                     $keyProperty,
                     $partition->getUpperBound(),
                 ),
@@ -243,16 +244,16 @@ final class SummarizerQuery extends AbstractQuery
             // containing parent partition up to the end of the current
             // partition
 
-            yield $this->queryBuilder->expr()->andX(
-                $this->queryBuilder->expr()->eq(
+            yield $this->getSimpleQueryBuilder()->expr()->andX(
+                $this->getSimpleQueryBuilder()->expr()->eq(
                     $levelProperty,
                     $partition->getLevel(),
                 ),
-                $this->queryBuilder->expr()->gte(
+                $this->getSimpleQueryBuilder()->expr()->gte(
                     $keyProperty,
                     $higherPartition->getLowerBound(),
                 ),
-                $this->queryBuilder->expr()->lt(
+                $this->getSimpleQueryBuilder()->expr()->lt(
                     $keyProperty,
                     $partition->getUpperBound(),
                 ),
@@ -284,9 +285,9 @@ final class SummarizerQuery extends AbstractQuery
         $conditions = $this->getRangeConditions($pointPartition);
 
         /** @psalm-suppress InvalidArgument */
-        $orX = $this->queryBuilder->expr()->orX(...$conditions);
+        $orX = $this->getSimpleQueryBuilder()->expr()->orX(...$conditions);
 
-        $this->queryBuilder->andWhere($orX);
+        $this->getSimpleQueryBuilder()->andWhere($orX);
 
         return true;
     }
@@ -312,7 +313,7 @@ final class SummarizerQuery extends AbstractQuery
             $groupingsString .= $isGrouping ? '1' : '0';
         }
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
                 "root.%s = '%s'",
                 $groupingsProperty,
@@ -331,7 +332,7 @@ final class SummarizerQuery extends AbstractQuery
         ));
 
         $visitor = new SummaryExpressionVisitor(
-            queryBuilder: $this->queryBuilder,
+            queryBuilder: $this->getSimpleQueryBuilder()->getQueryBuilder(),
             validFields: $validDimensions,
             queryContext: $this->getQueryContext(),
         );
@@ -341,7 +342,7 @@ final class SummarizerQuery extends AbstractQuery
             $expression = $visitor->dispatch($whereExpression);
 
             // @phpstan-ignore argument.type
-            $this->queryBuilder->andWhere($expression);
+            $this->getSimpleQueryBuilder()->andWhere($expression);
         }
 
         // add dimensions not in the query to the group by clause
@@ -456,7 +457,7 @@ final class SummarizerQuery extends AbstractQuery
 
         // add select
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 "root.%s.%s AS %s",
                 $dimensionProperty,
@@ -473,7 +474,7 @@ final class SummarizerQuery extends AbstractQuery
             throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
 
-        $this->queryBuilder->addOrderBy(
+        $this->getSimpleQueryBuilder()->addOrderBy(
             \sprintf(
                 'root.%s.%s',
                 $dimensionProperty,
@@ -501,7 +502,7 @@ final class SummarizerQuery extends AbstractQuery
             $function = $measureMetadata->getFirstFunction();
             $dql = $function->getSummaryToSummaryDQLFunction();
 
-            $this->queryBuilder
+            $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     $dql . ' AS %s',
                     'root.' . $measureMetadata->getSummaryProperty(),
@@ -550,7 +551,7 @@ final class SummarizerQuery extends AbstractQuery
 
             // select
 
-            $this->queryBuilder
+            $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     '%s AS %s',
                     $dqlField,
@@ -562,7 +563,7 @@ final class SummarizerQuery extends AbstractQuery
             $orderBy = $dimensionMetadata->getOrderBy();
 
             if (!\is_array($orderBy)) {
-                $this->queryBuilder->addOrderBy($dqlField, $orderBy->value);
+                $this->getSimpleQueryBuilder()->addOrderBy($dqlField, $orderBy->value);
             } else {
                 foreach ($orderBy as $orderField => $order) {
                     $dqlOrderField = $this->getQueryContext()
@@ -574,7 +575,7 @@ final class SummarizerQuery extends AbstractQuery
 
                     $alias = $dimension . '_' . $orderField;
 
-                    $this->queryBuilder
+                    $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             'MIN(%s) AS HIDDEN %s',
                             $dqlOrderField,
@@ -600,7 +601,7 @@ final class SummarizerQuery extends AbstractQuery
             throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
         }
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 'root.%s AS %s',
                 $dimensionMetadata->getSummaryProperty(),
@@ -647,9 +648,9 @@ final class SummarizerQuery extends AbstractQuery
             }
 
             if ($i === 0) {
-                $this->queryBuilder->orderBy($fieldString, $order->value);
+                $this->getSimpleQueryBuilder()->orderBy($fieldString, $order->value);
             } else {
-                $this->queryBuilder->addOrderBy($fieldString, $order->value);
+                $this->getSimpleQueryBuilder()->addOrderBy($fieldString, $order->value);
             }
 
             $i++;

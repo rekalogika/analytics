@@ -209,11 +209,9 @@ final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
             return null;
         }
 
-        $queryBuilder = $manager->createQueryBuilder();
-
         $query = new GetDistinctValuesFromSourceQuery(
             dimensionMetadata: $dimensionMetadata,
-            queryBuilder: $queryBuilder,
+            entityManager: $manager,
             limit: $limit,
             propertyAccessor: $this->propertyAccessor,
         );

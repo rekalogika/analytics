@@ -15,55 +15,13 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\SummaryManager\Query\Path\Path;
-use Rekalogika\Analytics\SummaryManager\Query\Path\PathResolver;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class QueryContext
 {
-    private ?PathResolver $pathResolver = null;
-    private int $boundCounter = 0;
-
     public function __construct(
-        private readonly QueryBuilder $queryBuilder,
+        private readonly SimpleQueryBuilder $queryBuilder,
     ) {}
-
-    private function getPathResolver(): PathResolver
-    {
-        return $this->pathResolver ??= new PathResolver(
-            rootClass: $this->getRootClass(),
-            rootAlias: $this->getRootAlias(),
-            queryBuilder: $this->queryBuilder,
-        );
-    }
-
-    /**
-     * @return class-string
-     */
-    private function getRootClass(): string
-    {
-        $result = $this->queryBuilder->getRootEntities()[0]
-            ?? throw new LogicException('Root class not found');
-
-        if (!class_exists($result)) {
-            throw new LogicException('Root class not found');
-        }
-
-        return $result;
-    }
-
-    private function getRootAlias(): string
-    {
-        $alias = $this->queryBuilder->getRootAliases()[0]
-            ?? throw new LogicException('Root alias not found');
-
-        if ($alias !== 'root') {
-            throw new LogicException('Root alias must be "root"');
-        }
-
-        return $alias;
-    }
 
     /**
      * Path is a dot-separated string that represents a path to a property of an
@@ -73,7 +31,7 @@ final class QueryContext
      */
     public function resolvePath(string $path): string
     {
-        return $this->getPathResolver()->resolvePath(new Path($path));
+        return $this->queryBuilder->resolve($path);
     }
 
     /**
@@ -84,9 +42,6 @@ final class QueryContext
         mixed $value,
         int|string|ParameterType|ArrayParameterType|null $type = null,
     ): string {
-        $name = 'querycontext' . $this->boundCounter++;
-        $this->queryBuilder->setParameter($name, $value, $type);
-
-        return ':' . $name;
+        return $this->queryBuilder->createNamedParameter($value, $type);
     }
 }

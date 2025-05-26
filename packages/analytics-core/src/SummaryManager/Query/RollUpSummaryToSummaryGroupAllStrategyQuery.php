@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
@@ -28,18 +29,18 @@ use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 {
     public function __construct(
-        private readonly QueryBuilder $queryBuilder,
+        EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly Partition $start,
         private readonly Partition $end,
     ) {
-        parent::__construct($queryBuilder);
-    }
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $this->metadata->getSummaryClass(),
+            alias: 'root',
+        );
 
-    #[\Override]
-    protected function getQueryBuilder(): QueryBuilder
-    {
-        return $this->queryBuilder;
+        parent::__construct($simpleQueryBuilder);
     }
 
     /**
@@ -59,8 +60,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
     private function initialize(): void
     {
-        $this->queryBuilder
-            ->from($this->metadata->getSummaryClass(), 'root')
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 "REKALOGIKA_NEXTVAL(%s)",
                 $this->metadata->getSummaryClass(),
@@ -84,7 +84,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             context: $this->getQueryContext(),
         );
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 'MIN(%s) AS p_key',
                 $function,
@@ -102,7 +102,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $i = 0;
 
         foreach ($this->metadata->getDimensionMetadatas() as $levelProperty => $metadata) {
-            $isEntity = $this->queryBuilder
+            $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())
                 ->hasAssociation($levelProperty);
@@ -120,7 +120,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
                     $name = $property->getName();
                     $alias = \sprintf('d%d_', $i++);
 
-                    $this->queryBuilder
+                    $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             'root.%s.%s AS %s',
                             $dimensionProperty,
@@ -133,7 +133,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             } elseif ($isEntity) {
                 $alias = \sprintf('d%d_', $i++);
 
-                $this->queryBuilder
+                $this->getSimpleQueryBuilder()
                     ->addSelect(\sprintf(
                         'IDENTITY(root.%s) AS %s',
                         $levelProperty,
@@ -144,7 +144,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             } else {
                 $alias = \sprintf('d%d_', $i++);
 
-                $this->queryBuilder
+                $this->getSimpleQueryBuilder()
                     ->addSelect(\sprintf(
                         'root.%s AS %s',
                         $levelProperty,
@@ -176,7 +176,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
                 \sprintf('root.%s', $field),
             );
 
-            $this->queryBuilder->addSelect($function);
+            $this->getSimpleQueryBuilder()->addSelect($function);
         }
     }
 
@@ -196,7 +196,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             throw new LogicException('The lowest level must be rolled up from the source');
         }
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
                 'root.%s.%s >= %d',
                 $partitionProperty,
@@ -222,7 +222,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $groupingsProperty = $this->metadata->getGroupingsProperty();
 
-        $this->queryBuilder
+        $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 "root.%s",
                 $groupingsProperty,
@@ -239,7 +239,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
      */
     private function createSQL(): iterable
     {
-        $query = $this->queryBuilder->getQuery();
+        $query = $this->getSimpleQueryBuilder()->getQuery();
         $result = $query->getSQL();
 
         if (\is_array($result)) {

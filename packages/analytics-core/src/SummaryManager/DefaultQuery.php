@@ -76,7 +76,7 @@ final class DefaultQuery implements Query
         }
 
         $summarizerQuery = new SummarizerQuery(
-            queryBuilder: $this->entityManager->createQueryBuilder(),
+            entityManager: $this->entityManager,
             query: $this,
             metadata: $this->metadata,
             queryResultLimit: $this->queryResultLimit,

@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
-use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 abstract class AbstractQuery
 {
     private readonly QueryContext $queryContext;
 
     protected function __construct(
-        private readonly QueryBuilder $queryBuilder,
+        private readonly SimpleQueryBuilder $simpleQueryBuilder,
     ) {
-        $this->queryContext = new QueryContext($queryBuilder);
+        $this->queryContext = new QueryContext($simpleQueryBuilder);
     }
 
-    protected function getQueryBuilder(): QueryBuilder
+    protected function getSimpleQueryBuilder(): SimpleQueryBuilder
     {
-        return $this->queryBuilder;
+        return $this->simpleQueryBuilder;
     }
 
     protected function getQueryContext(): QueryContext
