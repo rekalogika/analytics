@@ -102,6 +102,7 @@ abstract class IntegerPartition implements Partition, \Stringable
 
         $source &= ~((1 << $level) - 1);
 
+        // @phpstan-ignore new.staticInAbstractClassStaticMethod
         return new static($source, $level);
     }
 
