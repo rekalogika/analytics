@@ -21,7 +21,6 @@ doctrine:
                 REKALOGIKA_NEXTVAL: Rekalogika\Analytics\Doctrine\Function\NextValFunction
                 REKALOGIKA_TRUNCATE_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateBigIntFunction
                 REKALOGIKA_GROUPING_CONCAT: Rekalogika\Analytics\Doctrine\Function\GroupingConcatFunction
-                REKALOGIKA_NULL: Rekalogika\Analytics\Doctrine\Function\NullFunction
                 REKALOGIKA_CAST: Rekalogika\Analytics\Doctrine\Function\CastFunction
             numeric_functions:
                 REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER: Rekalogika\Analytics\Doctrine\Function\DateTimeToIntegerFunction
