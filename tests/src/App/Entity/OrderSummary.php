@@ -81,10 +81,10 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new CustomDQLValueResolver("
             CASE
-                WHEN {{ customer.* }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
+                WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN 'individual'
 
-                WHEN {{ customer.* }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\OrganizationalCustomer
+                WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\OrganizationalCustomer
                 THEN 'organizational'
 
                 ELSE NULLIF('a','a')
@@ -98,8 +98,8 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new CustomDQLValueResolver("
             CASE
-                WHEN {{ customer.* }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
-                THEN {{ customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender }}
+                WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
+                THEN [customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender]
 
                 ELSE NULLIF('a','a')
             END

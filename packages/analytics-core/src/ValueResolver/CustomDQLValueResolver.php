@@ -19,10 +19,12 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class CustomDQLValueResolver implements ValueResolver
 {
-    private const PATTERN = '/\{\{\s*([a-zA-Z0-9_.*()\\\ ]+)\s*\}\}/';
-
+    /**
+     * @param non-empty-string $pattern
+     */
     public function __construct(
         private string $dql,
+        private string $pattern = '/\[\s*([a-zA-Z0-9_.*()\\\ ]+)\s*\]/',
     ) {}
 
     /**
@@ -34,7 +36,7 @@ final readonly class CustomDQLValueResolver implements ValueResolver
     #[\Override]
     public function getInvolvedProperties(): array
     {
-        preg_match_all(self::PATTERN, $this->dql, $matches);
+        preg_match_all($this->pattern, $this->dql, $matches);
 
         return array_values(array_unique($matches[1]));
     }
@@ -55,7 +57,7 @@ final readonly class CustomDQLValueResolver implements ValueResolver
             return $context->resolvePath($path);
         };
 
-        $result = preg_replace_callback(self::PATTERN, $callback, $this->dql);
+        $result = preg_replace_callback($this->pattern, $callback, $this->dql);
 
         if (null === $result) {
             throw new InvalidArgumentException('Invalid DQL format');
