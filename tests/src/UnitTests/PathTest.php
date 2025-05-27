@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\Path;
 
 final class PathTest extends TestCase
@@ -25,22 +25,20 @@ final class PathTest extends TestCase
         $this->assertCount(4, $path);
         $this->assertSame('a', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(3, $path);
         $this->assertSame('b', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(2, $path);
         $this->assertSame('c', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(1, $path);
         $this->assertSame('d', $path->getFirstElement()->getName());
 
-        $path->shift();
-        $this->assertCount(0, $path);
-        $this->expectException(UnexpectedValueException::class);
-        $this->assertSame('d', $path->getFirstElement()->getName());
+        $this->expectException(LogicException::class);
+        [,$path] = $path->shift();
     }
 
     public function testAlias(): void
@@ -49,7 +47,7 @@ final class PathTest extends TestCase
         $this->assertCount(2, $path);
         $this->assertSame('a', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(1, $path);
         $this->assertSame('*', $path->getFirstElement()->getName());
     }
@@ -60,15 +58,15 @@ final class PathTest extends TestCase
         $this->assertCount(4, $path);
         $this->assertSame('a', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(3, $path);
         $this->assertSame('b', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(2, $path);
         $this->assertSame('c', $path->getFirstElement()->getName());
 
-        $path->shift();
+        [,$path] = $path->shift();
         $this->assertCount(1, $path);
         $this->assertSame('*', $path->getFirstElement()->getName());
     }

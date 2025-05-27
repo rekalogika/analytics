@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathElement;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 
@@ -37,20 +35,6 @@ final class PathElementTest extends TestCase
         $this->assertSame('foo(Rekalogika\Analytics\Tests\App\Entity\Country)', (string) $pathElement);
     }
 
-    public function testAlias(): void
-    {
-        $pathElement = PathElement::createFromString('*foo');
-        $this->assertSame('foo', $pathElement->getName());
-        $this->assertNull($pathElement->getClassCast());
-        $this->assertSame('*foo', (string) $pathElement);
-    }
-
-    public function testAliasCast(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $pathElement = PathElement::createFromString('*foo(Rekalogika\Analytics\Tests\App\Entity\Country)');
-    }
-
     public function testRootAlias(): void
     {
         $pathElement = PathElement::createFromString('*');
@@ -68,7 +52,7 @@ final class PathElementTest extends TestCase
     public function testRootCastName(): void
     {
         $pathElement = PathElement::createFromString('(Rekalogika\Analytics\Tests\App\Entity\Country)');
-        $this->expectException(LogicException::class);
-        $x = $pathElement->getName();
+        $this->assertEquals(Country::class, $pathElement->getClassCast());
+        $this->assertSame('', $pathElement->getName());
     }
 }
