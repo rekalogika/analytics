@@ -79,43 +79,31 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(enumType: CustomerType::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQLValueResolver(
-            dql: "
-                CASE
-                    WHEN %s INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
-                    THEN 'individual'
+        source: new CustomDQLValueResolver("
+            CASE
+                WHEN {{ *customer }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
+                THEN 'individual'
 
-                    WHEN %s INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\OrganizationalCustomer
-                    THEN 'organizational'
+                WHEN {{ *customer }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\OrganizationalCustomer
+                THEN 'organizational'
 
-                    ELSE REKALOGIKA_NULL()
-                END
-            ",
-            fields: [
-                '*customer',
-                '*customer',
-            ],
-        ),
+                ELSE REKALOGIKA_NULL()
+            END
+        "),
         label: new TranslatableMessage('Customer Type'),
     )]
     private ?CustomerType $customerType = null;
 
     #[ORM\Column(enumType: Gender::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQLValueResolver(
-            dql: "
-                CASE
-                    WHEN %s INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
-                    THEN %s
+        source: new CustomDQLValueResolver("
+            CASE
+                WHEN {{ *customer }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
+                THEN {{ customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender }}
 
-                    ELSE REKALOGIKA_NULL()
-                END
-            ",
-            fields: [
-                '*customer',
-                'customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender',
-            ],
-        ),
+                ELSE REKALOGIKA_NULL()
+            END
+        "),
         label: new TranslatableMessage('Customer Gender'),
         nullLabel: new TranslatableMessage('Unspecified'),
     )]
