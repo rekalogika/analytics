@@ -20,8 +20,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\SimpleQueryBuilder\Internal\Path;
-use Rekalogika\Analytics\SimpleQueryBuilder\Internal\PathResolver;
+use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 
 /**
  * @mixin QueryBuilder
@@ -53,8 +52,8 @@ final class SimpleQueryBuilder
             ->from($from, $alias, $indexBy);
 
         $this->pathResolver = new PathResolver(
-            rootClass: $from,
-            rootAlias: $alias,
+            baseClass: $from,
+            baseAlias: $alias,
             queryBuilder: $this->queryBuilder,
         );
     }
@@ -117,7 +116,7 @@ final class SimpleQueryBuilder
      */
     public function resolve(string $path): string
     {
-        return $this->pathResolver->resolvePath(new Path($path));
+        return $this->pathResolver->resolve($path);
     }
 
     /**
