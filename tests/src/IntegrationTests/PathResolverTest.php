@@ -47,6 +47,10 @@ final class PathResolverTest extends KernelTestCase
         );
     }
 
+    //
+    // ROOT
+    //
+
     public function testRootProperty(): void
     {
         $pathResolver = $this->createPathResolver(
@@ -73,55 +77,6 @@ final class PathResolverTest extends KernelTestCase
         );
     }
 
-    public function testRelatedEntity(): void
-    {
-        $pathResolver = $this->createPathResolver(
-            class: Customer::class,
-            alias: 'root',
-        );
-
-        $this->assertEquals(
-            'root.country',
-            $pathResolver->resolve('country'),
-        );
-    }
-
-    public function testRelatedEntityAlias(): void
-    {
-        $pathResolver = $this->createPathResolver(
-            class: Customer::class,
-            alias: 'root',
-        );
-
-        $this->assertEquals(
-            '_a0',
-            $pathResolver->resolve('country.*'),
-        );
-
-        $this->assertEquals(
-            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.country _a0',
-            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
-        );
-    }
-
-    public function testRelatedEntityProperty(): void
-    {
-        $pathResolver = $this->createPathResolver(
-            class: Customer::class,
-            alias: 'root',
-        );
-
-        $this->assertEquals(
-            '_a0.name',
-            $pathResolver->resolve('country.name'),
-        );
-
-        $this->assertEquals(
-            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.country _a0',
-            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
-        );
-    }
-
     public function testRootEntityCast(): void
     {
         $pathResolver = $this->createPathResolver(
@@ -140,7 +95,65 @@ final class PathResolverTest extends KernelTestCase
         );
     }
 
-    public function testRelatedEntityCast(): void
+    //
+    // MANY TO ONE
+    //
+
+    public function testManyToOneEntity(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            'root.country',
+            $pathResolver->resolve('country'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testManyToOneEntityAlias(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0',
+            $pathResolver->resolve('country.*'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.country _a0',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testManyToOneEntityProperty(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0.name',
+            $pathResolver->resolve('country.name'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.country _a0',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testManyToOneEntityCast(): void
     {
         $pathResolver = $this->createPathResolver(
             class: Order::class,
@@ -154,6 +167,122 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 LEFT JOIN Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer _a1 WITH _a1.id = _a0.id',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    //
+    // TWO LEVELS MANY TO ONE
+    //
+
+    public function testTwoLevelManyToOneEntity(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Order::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0.country',
+            $pathResolver->resolve('customer.country'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testTwoLevelManyToOneEntityAlias(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Order::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a1',
+            $pathResolver->resolve('customer.country.*'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 LEFT JOIN _a0.country _a1',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testTwoLevelManyToOneEntityProperty(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Order::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a1.name',
+            $pathResolver->resolve('customer.country.name'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 LEFT JOIN _a0.country _a1',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    //
+    // ONE TO MANY
+    //
+
+    public function testOneToManyEntity(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            'root.orders',
+            $pathResolver->resolve('orders'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testOneToManyEntityAlias(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0',
+            $pathResolver->resolve('orders.*'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.orders _a0',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testOneToManyEntityProperty(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0.time',
+            $pathResolver->resolve('orders.time'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.orders _a0',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }

@@ -51,8 +51,19 @@ final readonly class PathResolver
         return $this->baseEntity->resolve($path);
     }
 
+    /**
+     * @internal
+     */
     public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
+    }
+
+    /**
+     * @internal
+     */
+    public function getContext(): PathContext
+    {
+        return $this->context;
     }
 }
