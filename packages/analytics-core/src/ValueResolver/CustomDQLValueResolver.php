@@ -14,35 +14,53 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class CustomDQLValueResolver implements ValueResolver
 {
-    /**
-     * @param list<string> $fields
-     */
+    private const PATTERN = '/\{\{\s*([a-zA-Z0-9_.*()\\\ ]+)\s*\}\}/';
+
     public function __construct(
         private string $dql,
-        private array $fields = [],
     ) {}
 
     /**
      * Returns only the fields directly on the related entity
+     *
+     * @todo currently returns as is, should be improved to return normalized
+     * values
      */
     #[\Override]
     public function getInvolvedProperties(): array
     {
-        return $this->fields;
+        preg_match_all(self::PATTERN, $this->dql, $matches);
+
+        return array_values(array_unique($matches[1]));
     }
 
     #[\Override]
     public function getDQL(QueryContext $context): string
     {
-        $resolvedParameters = array_map(
-            fn($parameter): string => $context->resolvePath($parameter),
-            $this->fields,
-        );
+        $callback = static function (array $matches) use ($context): string {
+            $path = $matches[1]
+                ?? throw new InvalidArgumentException('Invalid match format');
 
-        return \sprintf($this->dql, ...$resolvedParameters);
+            if (!\is_string($path)) {
+                throw new InvalidArgumentException('Match must be a string');
+            }
+
+            $path = trim($path);
+
+            return $context->resolvePath($path);
+        };
+
+        $result = preg_replace_callback(self::PATTERN, $callback, $this->dql);
+
+        if (null === $result) {
+            throw new InvalidArgumentException('Invalid DQL format');
+        }
+
+        return $result;
     }
 }
