@@ -87,7 +87,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
                 WHEN {{ *customer }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\OrganizationalCustomer
                 THEN 'organizational'
 
-                ELSE REKALOGIKA_NULL()
+                ELSE NULLIF('a','a')
             END
         "),
         label: new TranslatableMessage('Customer Type'),
@@ -101,7 +101,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
                 WHEN {{ *customer }} INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN {{ customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender }}
 
-                ELSE REKALOGIKA_NULL()
+                ELSE NULLIF('a','a')
             END
         "),
         label: new TranslatableMessage('Customer Gender'),
