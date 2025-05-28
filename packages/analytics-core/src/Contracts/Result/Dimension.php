@@ -29,7 +29,8 @@ interface Dimension extends Property
     public function getMember(): mixed;
 
     /**
-     * The raw member of the dimension as returned by Doctrine.
+     * The raw member of the dimension as returned by Doctrine, bypassing
+     * getters.
      */
     public function getRawMember(): mixed;
 

@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Contracts\Summary;
 interface PartitionValueResolver extends ValueResolver
 {
     /**
+     * The property of the source entity that is used as the source value.
      * Unlike ValueResolver, here we return one and only one value.
      *
      * @return list{string}
@@ -23,10 +24,13 @@ interface PartitionValueResolver extends ValueResolver
     #[\Override]
     public function getInvolvedProperties(): array;
 
+    /**
+     * Transforms a source value to the summary value in PHP.
+     */
     public function transformSourceValueToSummaryValue(mixed $value): mixed;
 
     /**
-     * Transform a specific summary table value to source value.
+     * Transforms a summary value to the source value in PHP.
      */
     public function transformSummaryValueToSourceValue(mixed $value): int|string;
 }

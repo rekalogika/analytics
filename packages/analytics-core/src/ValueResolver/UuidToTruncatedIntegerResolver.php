@@ -20,7 +20,7 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 
 /**
- * Truncate source value in UUID format to 64-bit integer.
+ * Truncate the source value in UUID format to 48-bit integer.
  */
 final readonly class UuidToTruncatedIntegerResolver implements PartitionValueResolver
 {

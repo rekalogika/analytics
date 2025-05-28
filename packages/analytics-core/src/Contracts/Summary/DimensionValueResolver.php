@@ -17,7 +17,11 @@ interface DimensionValueResolver
 {
     /**
      * DQL expression to calculate the value to be stored in the dimension
-     * column.
+     * column. This is used inside the embeddable class of a hierarchical
+     * dimension.
+     *
+     * $input is a DQL expression supplied by the ValueResolver of the Dimension
+     * defined in the summary entity.
      */
     public function getDQL(
         string $input,

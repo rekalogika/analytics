@@ -18,7 +18,8 @@ use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 interface ValueResolver
 {
     /**
-     * DQL expression to transform source value to summary table value.
+     * Returns a DQL expression to transform the source value to the value
+     * expected in the summary table.
      */
     public function getDQL(QueryContext $context): string;
 
