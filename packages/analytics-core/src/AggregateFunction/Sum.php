@@ -13,31 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-
-final readonly class Sum implements AggregateFunction
+final readonly class Sum extends AbstractAggregateFunction
 {
-    public function __construct(
-        private string $sourceProperty,
-    ) {}
-
-
     #[\Override]
-    public function getSourceToSummaryDQLFunction(QueryContext $context): string
+    public function getDQLAggregateFunction(): string
     {
-        return \sprintf('SUM(%s)', $context->resolvePath($this->sourceProperty));
-    }
-
-    #[\Override]
-    public function getSummaryToSummaryDQLFunction(): string
-    {
-        return 'SUM(%s)';
-    }
-
-    #[\Override]
-    public function getInvolvedProperties(): array
-    {
-        return [$this->sourceProperty];
+        return 'SUM';
     }
 }
