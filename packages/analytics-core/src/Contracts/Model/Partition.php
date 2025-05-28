@@ -17,7 +17,7 @@ interface Partition extends \Stringable
 {
     /**
      * Returns all the levels of partitioning that can be used.
-     * 
+     *
      * @return non-empty-list<int>
      */
     public static function getAllLevels(): array;
