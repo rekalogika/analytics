@@ -16,14 +16,25 @@ namespace Rekalogika\Analytics\Contracts\Model;
 interface Partition extends \Stringable
 {
     /**
+     * Returns all the levels of partitioning that can be used.
+     * 
      * @return non-empty-list<int>
      */
     public static function getAllLevels(): array;
 
+    /**
+     * Returns the level of this partition.
+     */
     public function getLevel(): int;
 
+    /**
+     * Returns the key of this partition.
+     */
     public function getKey(): int|string;
 
+    /**
+     * Creates a partition from the source value and level.
+     */
     public static function createFromSourceValue(
         mixed $source,
         int $level,
@@ -42,9 +53,20 @@ interface Partition extends \Stringable
      */
     public function getUpperBound(): int|string;
 
+    /**
+     * Returns the higher partition that contains this partition.
+     */
     public function getContaining(): ?static;
 
+    /**
+     * Returns the next neighboring partition on the same level as this
+     * partition.
+     */
     public function getNext(): ?static;
 
+    /**
+     * Returns the previous neighboring partition on the same level as this
+     * partition.
+     */
     public function getPrevious(): ?static;
 }

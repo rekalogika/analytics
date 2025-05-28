@@ -15,6 +15,10 @@ namespace Rekalogika\Analytics\Contracts\Summary;
 
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Implemented by summary entities that needs to modify the query builder used
+ * for rolling-up the source.
+ */
 interface HasQueryBuilderModifier
 {
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void;

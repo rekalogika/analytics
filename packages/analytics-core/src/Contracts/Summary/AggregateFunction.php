@@ -19,7 +19,6 @@ interface AggregateFunction
 {
     /**
      * Get the DQL function to aggregate data from the source table to the summary
-     * table. The string '{alias}' will be replaced with the alias of the source
      * table.
      */
     public function getSourceToSummaryDQLFunction(QueryContext $context): string;
