@@ -181,7 +181,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
      * and convert "field NOT IN (null, a, b, c)" to "(field NOT IN (a, b, c) AND
      * field IS NOT NULL)"
      *
-     * @param Comparison $comparison
      * @return mixed
      */
     private function walkInOrNotInComparison(Comparison $comparison): mixed

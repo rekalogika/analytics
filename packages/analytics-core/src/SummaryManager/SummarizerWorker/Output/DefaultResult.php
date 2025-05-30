@@ -52,7 +52,6 @@ final class DefaultResult implements Result
 
     /**
      * @param class-string $summaryClass
-     * @param SummarizerQuery $summarizerQuery
      */
     public function __construct(
         private TranslatableInterface $label,

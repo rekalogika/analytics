@@ -115,7 +115,6 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
     /**
      * @param class-string $summaryClass
-     * @param string $dimension
      */
     private function isDoctrineRelation(
         string $summaryClass,
