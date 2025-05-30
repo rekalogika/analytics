@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\DimensionValueResolver;
 
 use Rekalogika\Analytics\Contracts\Summary\Context;
-use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-final readonly class TimeDimensionValueResolver implements DimensionValueResolver
+final readonly class TimeDimensionValueResolver implements HierarchicalDimensionValueResolver
 {
     public function __construct(
         private TimeFormat $format,
@@ -24,12 +25,12 @@ final readonly class TimeDimensionValueResolver implements DimensionValueResolve
 
     #[\Override]
     public function getDQL(
-        string $input,
+        ValueResolver $input,
         Context $context,
     ): string {
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
-            $input,
+            $input->getDQL($context),
             $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
             $this->format->value,

@@ -140,14 +140,6 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     $this->sourceClass,
                 ));
 
-            $propertySqlField = $valueResolver->getDQL(
-                context: new Context(
-                    queryBuilder: $this->getSimpleQueryBuilder(),
-                    summaryMetadata: $this->summaryMetadata,
-                    dimensionMetadata: $dimensionMetadata,
-                ),
-            );
-
             // if hierarchical
             if ($dimensionHierarchyMetadata !== null) {
                 $groupingSet = new GroupingSet();
@@ -203,10 +195,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                             $name,
                         ));
 
-                    $valueResolver = $dimensionPropertyMetadata->getValueResolver();
+                    $hierarchicalDimensionValueResolver = $dimensionPropertyMetadata->getValueResolver();
 
-                    $function = $valueResolver->getDQL(
-                        input: $propertySqlField,
+                    $function = $hierarchicalDimensionValueResolver->getDQL(
+                        input: $valueResolver,
                         context: new Context(
                             queryBuilder: $this->getSimpleQueryBuilder(),
                             summaryMetadata: $this->summaryMetadata,
@@ -227,6 +219,14 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 }
             } else {
                 // if not hierarchical
+
+                $propertySqlField = $valueResolver->getDQL(
+                    context: new Context(
+                        queryBuilder: $this->getSimpleQueryBuilder(),
+                        summaryMetadata: $this->summaryMetadata,
+                        dimensionMetadata: $dimensionMetadata,
+                    ),
+                );
 
                 $alias = \sprintf('d%d_', $i++);
 
