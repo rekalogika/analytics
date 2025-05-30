@@ -103,7 +103,7 @@ final class SimpleQueryBuilder
         return $this->queryBuilder;
     }
 
-    public function from(mixed ...$params): self
+    public function from(): self
     {
         throw new BadMethodCallException('The "from" method is not supported in SimpleQueryBuilder.');
     }

@@ -140,7 +140,7 @@ final class DefaultResult implements Result
 
         $orderBy = $this->query->getOrderBy();
 
-        if (\count($orderBy) === 0) {
+        if ($orderBy === []) {
             return $this->hasTieredOrder = true;
         }
 

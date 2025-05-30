@@ -157,15 +157,13 @@ final readonly class BaseEntity
             $baseAlias,
         );
 
-        $baseEntity = new self(
+        return new self(
             basePath: $basePath,
             baseClass: $baseClass,
             baseAlias: $baseAlias,
             queryBuilder: $this->queryBuilder,
             context: $this->context,
         );
-
-        return $baseEntity;
     }
 
     private function createBaseEntityWithCast(
@@ -183,7 +181,7 @@ final readonly class BaseEntity
 
         $baseEntityWithoutCast = $this->createBaseEntityWithoutCast($firstElement);
         $castedAlias = $this->context->getAlias($basePath);
-        $idProperty = $this->getIdOfClass($classCast);
+        $idProperty = $this->getIdOfClass();
 
         $this->queryBuilder->leftJoin(
             $classCast,
@@ -198,15 +196,13 @@ final readonly class BaseEntity
             ),
         );
 
-        $baseEntity = new self(
+        return new self(
             basePath: $basePath,
             baseClass: $classCast,
             baseAlias: $castedAlias,
             queryBuilder: $this->queryBuilder,
             context: $this->context,
         );
-
-        return $baseEntity;
     }
 
     /**
@@ -240,10 +236,7 @@ final readonly class BaseEntity
         }
     }
 
-    /**
-     * @param class-string $class
-     */
-    private function getIdOfClass(string $class): string
+    private function getIdOfClass(): string
     {
         return $this->getClassMetadata()->getSingleIdentifierFieldName();
     }

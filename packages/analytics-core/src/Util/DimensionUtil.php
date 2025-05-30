@@ -63,6 +63,7 @@ final readonly class DimensionUtil
         if ($a->getKey() !== $b->getKey()) {
             return false;
         }
+
         return $a->getRawMember() === $b->getRawMember();
     }
 
