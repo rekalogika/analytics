@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\DimensionValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
-use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolverContext;
 
 final readonly class TimeDimensionValueResolver implements DimensionValueResolver
 {
@@ -25,7 +25,7 @@ final readonly class TimeDimensionValueResolver implements DimensionValueResolve
     #[\Override]
     public function getDQL(
         string $input,
-        DimensionValueResolverContext $context,
+        Context $context,
     ): string {
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",

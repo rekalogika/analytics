@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-
 interface AggregateFunction
 {
     /**
      * Get the DQL function to aggregate data from the source table to the summary
      * table.
      */
-    public function getSourceToSummaryDQLFunction(QueryContext $context): string;
+    public function getSourceToSummaryDQLFunction(Context $context): string;
 
     /**
      * Get the DQL function to roll up data from the summary to a higher level

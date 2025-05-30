@@ -98,7 +98,7 @@ final class SqlFactory
             sourceClass: $sourceClass,
             entityManager: $this->entityManager,
             partitionManager: $this->partitionManager,
-            metadata: $this->summaryMetadata,
+            summaryMetadata: $this->summaryMetadata,
             start: $start,
             end: $end,
         );

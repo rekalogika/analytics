@@ -61,7 +61,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 
         if (\is_array($orderBy)) {
             foreach ($orderBy as $field => $direction) {
-                $dqlField = $this->getQueryContext()->resolvePath($field);
+                $dqlField = $this->resolvePath($field);
 
                 $simpleQueryBuilder->addOrderBy($dqlField, $direction->value);
             }

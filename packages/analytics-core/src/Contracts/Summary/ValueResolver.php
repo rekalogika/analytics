@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-
 interface ValueResolver
 {
     /**
      * Returns a DQL expression to transform the source value to the value
      * expected in the summary table.
      */
-    public function getDQL(QueryContext $context): string;
+    public function getDQL(Context $context): string;
 
     /**
      * The properties of the source entity that are involved in the calculation.

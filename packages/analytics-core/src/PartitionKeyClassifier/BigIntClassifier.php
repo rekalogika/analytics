@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PartitionKeyClassifier;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class BigIntClassifier implements PartitionKeyClassifier
 {
@@ -23,7 +23,7 @@ final readonly class BigIntClassifier implements PartitionKeyClassifier
     public function getDQL(
         PartitionValueResolver $input,
         int $level,
-        QueryContext $context,
+        Context $context,
     ): string {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_BIGINT(%s, %s)',

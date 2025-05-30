@@ -332,9 +332,8 @@ final class SummarizerQuery extends AbstractQuery
         ));
 
         $visitor = new SummaryExpressionVisitor(
-            queryBuilder: $this->getSimpleQueryBuilder()->getQueryBuilder(),
+            queryBuilder: $this->getSimpleQueryBuilder(),
             validFields: $validDimensions,
-            queryContext: $this->getQueryContext(),
         );
 
         foreach ($where as $whereExpression) {
@@ -543,7 +542,7 @@ final class SummarizerQuery extends AbstractQuery
 
             $identity = $joinedClassMetadata->getIdentifierFieldName();
 
-            $dqlField = $this->getQueryContext()->resolvePath(\sprintf(
+            $dqlField = $this->resolvePath(\sprintf(
                 '%s.%s',
                 $dimension,
                 $identity,
@@ -566,12 +565,11 @@ final class SummarizerQuery extends AbstractQuery
                 $this->getSimpleQueryBuilder()->addOrderBy($dqlField, $orderBy->value);
             } else {
                 foreach ($orderBy as $orderField => $order) {
-                    $dqlOrderField = $this->getQueryContext()
-                        ->resolvePath(\sprintf(
-                            '%s.%s',
-                            $dimension,
-                            $orderField,
-                        ));
+                    $dqlOrderField = $this->resolvePath(\sprintf(
+                        '%s.%s',
+                        $dimension,
+                        $orderField,
+                    ));
 
                     $alias = $dimension . '_' . $orderField;
 
@@ -644,7 +642,7 @@ final class SummarizerQuery extends AbstractQuery
                     'root.' . $measureMetadata->getSummaryProperty(),
                 );
             } else {
-                $fieldString = $this->getQueryContext()->resolvePath($field);
+                $fieldString = $this->resolvePath($field);
             }
 
             if ($i === 0) {

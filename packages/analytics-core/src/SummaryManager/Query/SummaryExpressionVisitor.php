@@ -23,11 +23,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Model\ParameterTypeAware;
 use Rekalogika\Analytics\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class SummaryExpressionVisitor extends ExpressionVisitor
 {
@@ -47,9 +47,8 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
      * @param list<string> $validFields
      */
     public function __construct(
-        private readonly QueryBuilder $queryBuilder,
+        private readonly SimpleQueryBuilder $queryBuilder,
         private readonly array $validFields,
-        private readonly QueryContext $queryContext,
     ) {
         $this->rootAlias = $this->queryBuilder->getRootAliases()[0]
             ?? throw new LogicException('No root alias found');
@@ -151,7 +150,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         }
 
         /** @psalm-suppress MixedArgument */
-        $value = $this->queryContext->createNamedParameter(...$param);
+        $value = $this->queryBuilder->createNamedParameter(...$param);
 
         return match ($operator) {
             Comparison::EQ => $this->queryBuilder->expr()->eq($fieldWithAlias, $value),
@@ -231,7 +230,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
 
         // build without null expressions
 
-        $valuesWithoutNullParameter = $this->queryContext->createNamedParameter(
+        $valuesWithoutNullParameter = $this->queryBuilder->createNamedParameter(
             value: $valuesWithoutNull,
             type: $parameterType,
         );

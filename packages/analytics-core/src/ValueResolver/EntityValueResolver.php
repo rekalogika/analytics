@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class EntityValueResolver implements
     ValueResolver
@@ -30,7 +30,7 @@ final readonly class EntityValueResolver implements
     }
 
     #[\Override]
-    public function getDQL(QueryContext $context): string
+    public function getDQL(Context $context): string
     {
         return \sprintf(
             'IDENTITY(%s)',

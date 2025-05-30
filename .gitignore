@@ -6,3 +6,4 @@ tools
 .vscode
 rector.log
 local.mk
+phpstan.neon

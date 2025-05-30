@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\Util\UuidV7Util;
 
 /**
@@ -35,7 +35,7 @@ final readonly class UuidToTruncatedIntegerResolver implements PartitionValueRes
     }
 
     #[\Override]
-    public function getDQL(QueryContext $context): string
+    public function getDQL(Context $context): string
     {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT(%s)',

@@ -17,26 +17,17 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 abstract class AbstractQuery
 {
-    private readonly QueryContext $queryContext;
-
     protected function __construct(
         private readonly SimpleQueryBuilder $simpleQueryBuilder,
-    ) {
-        $this->queryContext = new QueryContext($simpleQueryBuilder);
-    }
+    ) {}
 
     protected function getSimpleQueryBuilder(): SimpleQueryBuilder
     {
         return $this->simpleQueryBuilder;
     }
 
-    protected function getQueryContext(): QueryContext
-    {
-        return $this->queryContext;
-    }
-
     protected function resolvePath(string $path): string
     {
-        return $this->getQueryContext()->resolvePath($path);
+        return $this->simpleQueryBuilder->resolve($path);
     }
 }

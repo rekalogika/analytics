@@ -25,6 +25,6 @@ interface DimensionValueResolver
      */
     public function getDQL(
         string $input,
-        DimensionValueResolverContext $context,
+        Context $context,
     ): string;
 }
