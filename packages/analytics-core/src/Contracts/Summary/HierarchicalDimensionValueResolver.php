@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-interface DimensionValueResolver
+interface HierarchicalDimensionValueResolver
 {
     /**
      * DQL expression to calculate the value to be stored in the dimension
      * column. This is used inside the embeddable class of a hierarchical
      * dimension.
      *
-     * $input is a DQL expression supplied by the ValueResolver of the Dimension
-     * defined in the summary entity.
+     * $input is the ValueResolver of the dimension, defined on the source
+     * entity.
      */
     public function getDQL(
-        string $input,
+        ValueResolver $input,
         Context $context,
     ): string;
 }

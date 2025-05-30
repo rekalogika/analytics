@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\Contracts\Summary\DimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -21,7 +21,7 @@ final readonly class LevelProperty
 {
     public function __construct(
         private int $level,
-        private DimensionValueResolver $valueResolver,
+        private HierarchicalDimensionValueResolver $valueResolver,
         private null|string|TranslatableInterface $label = null,
         private null|string|TranslatableInterface $nullLabel = null,
     ) {}
@@ -36,7 +36,7 @@ final readonly class LevelProperty
         return $this->label;
     }
 
-    public function getValueResolver(): DimensionValueResolver
+    public function getValueResolver(): HierarchicalDimensionValueResolver
     {
         return $this->valueResolver;
     }
