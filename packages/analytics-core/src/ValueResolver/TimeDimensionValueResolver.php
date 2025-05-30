@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 final readonly class TimeDimensionValueResolver implements ValueResolver
 {
@@ -27,7 +27,7 @@ final readonly class TimeDimensionValueResolver implements ValueResolver
     ) {}
 
     #[\Override]
-    public function getDQL(QueryContext $context): string
+    public function getDQL(Context $context): string
     {
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",

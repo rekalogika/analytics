@@ -24,6 +24,11 @@ final readonly class SummaryMetadata
     private array $dimensions;
 
     /**
+     * @var non-empty-array<string,MeasureMetadata>
+     */
+    private array $measures;
+
+    /**
      * @var array<string,FullyQualifiedDimensionMetadata>
      */
     private array $fullyQualifiedDimensions;
@@ -60,10 +65,22 @@ final readonly class SummaryMetadata
         private string $summaryClass,
         private PartitionMetadata $partition,
         array $dimensions,
-        private array $measures,
+        array $measures,
         private string $groupingsProperty,
         private TranslatableInterface $label,
     ) {
+        //
+        // measures
+        //
+
+        $newMeasures = [];
+
+        foreach ($measures as $measureKey => $measure) {
+            $newMeasures[$measureKey] = $measure->withSummaryMetadata($this);
+        }
+
+        $this->measures = $newMeasures;
+
         //
         // dimensions
         //
@@ -221,7 +238,6 @@ final readonly class SummaryMetadata
         }
 
         $this->measureChoices = $measureChoices;
-
     }
 
     /**

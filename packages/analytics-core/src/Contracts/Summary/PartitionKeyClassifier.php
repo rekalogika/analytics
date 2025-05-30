@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
-
 /**
  * Classifies the partitioning key of the entity into the corresponding
  * partition key in the summary table
@@ -24,6 +22,6 @@ interface PartitionKeyClassifier
     public function getDQL(
         PartitionValueResolver $input,
         int $level,
-        QueryContext $context,
+        Context $context,
     ): string;
 }

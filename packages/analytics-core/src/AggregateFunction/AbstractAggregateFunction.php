@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
 abstract readonly class AbstractAggregateFunction implements AggregateFunction
@@ -35,7 +35,7 @@ abstract readonly class AbstractAggregateFunction implements AggregateFunction
     abstract public function getDQLAggregateFunction(): string;
 
     #[\Override]
-    public function getSourceToSummaryDQLFunction(QueryContext $context): string
+    public function getSourceToSummaryDQLFunction(Context $context): string
     {
         return \sprintf(
             '%s(%s)',

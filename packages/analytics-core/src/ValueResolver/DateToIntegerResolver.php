@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\SummaryManager\Query\QueryContext;
 
 /**
  * Convert source date into integer. Epoch is 1970-01-01.
@@ -34,7 +34,7 @@ final readonly class DateToIntegerResolver implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getDQL(QueryContext $context): string
+    public function getDQL(Context $context): string
     {
         return \sprintf(
             "DATE_DIFF(%s, '1970-01-01')",

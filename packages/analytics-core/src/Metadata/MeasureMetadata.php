@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata
@@ -27,7 +28,20 @@ final readonly class MeasureMetadata
         private TranslatableInterface $label,
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
+        private ?SummaryMetadata $summaryMetadata = null,
     ) {}
+
+    public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
+    {
+        return new self(
+            function: $this->function,
+            summaryProperty: $this->summaryProperty,
+            label: $this->label,
+            unit: $this->unit,
+            unitSignature: $this->unitSignature,
+            summaryMetadata: $summaryMetadata,
+        );
+    }
 
     /**
      * @return array<class-string,AggregateFunction>
@@ -84,5 +98,14 @@ final readonly class MeasureMetadata
         }
 
         return $uniqueProperties;
+    }
+
+    public function getSummaryMetadata(): SummaryMetadata
+    {
+        if ($this->summaryMetadata === null) {
+            throw new MetadataException('Summary table metadata is not set');
+        }
+
+        return $this->summaryMetadata;
     }
 }
