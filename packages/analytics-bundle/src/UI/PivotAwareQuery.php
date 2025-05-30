@@ -38,7 +38,7 @@ final class PivotAwareQuery
      */
     private array $filters = [];
 
-    private Filters $filterExpressions;
+    private readonly Filters $filterExpressions;
 
     /**
      * @param array<string,mixed> $parameters

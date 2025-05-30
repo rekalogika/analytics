@@ -26,7 +26,7 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
+final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 {
     public function __construct(
         private LocaleSwitcher $localeSwitcher,

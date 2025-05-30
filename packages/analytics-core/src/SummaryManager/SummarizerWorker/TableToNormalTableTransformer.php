@@ -44,7 +44,7 @@ final class TableToNormalTableTransformer
      */
     private array $measureMemberCache = [];
 
-    private DimensionCollector $dimensionCollector;
+    private readonly DimensionCollector $dimensionCollector;
 
     private function __construct(
         DefaultQuery $query,

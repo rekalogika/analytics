@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Chart\Implementation;
 
 use OzdemirBurak\Iris\Color\Hsl;
 
-final class ColorDispenser
+final readonly class ColorDispenser
 {
     private Hsl $hsl;
 

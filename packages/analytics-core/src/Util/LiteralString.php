@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Translatable that simply returns a string, without translation.
  */
-final class LiteralString implements TranslatableInterface, \Stringable
+final readonly class LiteralString implements TranslatableInterface, \Stringable
 {
     public function __construct(
         private string $string,

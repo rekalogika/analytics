@@ -48,19 +48,19 @@ final class DefaultResult implements Result
 
     private ?bool $hasTieredOrder = null;
 
-    private DefaultTreeNodeFactory $treeNodeFactory;
+    private readonly DefaultTreeNodeFactory $treeNodeFactory;
 
     /**
      * @param class-string $summaryClass
      */
     public function __construct(
-        private TranslatableInterface $label,
-        private string $summaryClass,
-        private DefaultQuery $query,
-        private SummaryMetadata $metadata,
-        private SummarizerQuery $summarizerQuery,
-        private PropertyAccessorInterface $propertyAccessor,
-        private EntityManagerInterface $entityManager,
+        private readonly TranslatableInterface $label,
+        private readonly string $summaryClass,
+        private readonly DefaultQuery $query,
+        private readonly SummaryMetadata $metadata,
+        private readonly SummarizerQuery $summarizerQuery,
+        private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly EntityManagerInterface $entityManager,
         int $fillingNodesLimit,
     ) {
         $this->treeNodeFactory = new DefaultTreeNodeFactory(

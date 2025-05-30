@@ -24,12 +24,12 @@ use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-final class DoctrineDistinctValuesResolver implements DistinctValuesResolver
+final readonly class DoctrineDistinctValuesResolver implements DistinctValuesResolver
 {
     public function __construct(
-        private readonly ManagerRegistry $managerRegistry,
-        private readonly SummaryMetadataFactory $summaryMetadataFactory,
-        private readonly PropertyAccessorInterface $propertyAccessor,
+        private ManagerRegistry $managerRegistry,
+        private SummaryMetadataFactory $summaryMetadataFactory,
+        private PropertyAccessorInterface $propertyAccessor,
     ) {}
 
     #[\Override]

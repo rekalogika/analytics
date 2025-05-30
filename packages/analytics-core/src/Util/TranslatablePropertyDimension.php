@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Util;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class TranslatablePropertyDimension implements TranslatableInterface
+final readonly class TranslatablePropertyDimension implements TranslatableInterface
 {
     public function __construct(
         private TranslatableInterface $propertyLabel,

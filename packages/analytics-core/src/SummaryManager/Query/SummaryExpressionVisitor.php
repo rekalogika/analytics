@@ -31,7 +31,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class SummaryExpressionVisitor extends ExpressionVisitor
 {
-    private string $rootAlias;
+    private readonly string $rootAlias;
 
     /**
      * @var array<string,true>
@@ -41,7 +41,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     /**
      * @var ClassMetadata<object>
      */
-    private ClassMetadata $classMetadata;
+    private readonly ClassMetadata $classMetadata;
 
     /**
      * @param list<string> $validFields

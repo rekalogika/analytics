@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Twig;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 use Twig\Extension\RuntimeExtensionInterface;
 
-final class HtmlifierRuntime implements RuntimeExtensionInterface
+final readonly class HtmlifierRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private Htmlifier $htmlifier,
