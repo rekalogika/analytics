@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder\Path;
 
 use Rekalogika\Analytics\Exception\LogicException;
 
-final readonly class PathElement
+final readonly class PathElement implements \Stringable
 {
     /**
      * @param class-string|null $classCast

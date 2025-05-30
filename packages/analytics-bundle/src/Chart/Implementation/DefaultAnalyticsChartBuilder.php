@@ -197,16 +197,14 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                     if ($numMeasures === 1) {
                         $yTitle = $this->stringifier->toString($measure->getLabel());
                     }
+                } elseif ($numMeasures === 1) {
+                    $yTitle = \sprintf(
+                        '%s - %s',
+                        $this->stringifier->toString($measure->getLabel()),
+                        $this->stringifier->toString($unit),
+                    );
                 } else {
-                    if ($numMeasures === 1) {
-                        $yTitle = \sprintf(
-                            '%s - %s',
-                            $this->stringifier->toString($measure->getLabel()),
-                            $this->stringifier->toString($unit),
-                        );
-                    } else {
-                        $yTitle = $this->stringifier->toString($unit);
-                    }
+                    $yTitle = $this->stringifier->toString($unit);
                 }
             }
         }

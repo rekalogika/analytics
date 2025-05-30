@@ -50,12 +50,10 @@ abstract class Block
         if ($treeNode instanceof LeafNode) {
             if ($context->isPivoted($treeNode)) {
                 return new PivotLeafBlock($treeNode, $level, $context);
+            } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
+                return new SingleNodeLeafBlock($treeNode, $level, $context);
             } else {
-                if (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
-                    return new SingleNodeLeafBlock($treeNode, $level, $context);
-                } else {
-                    return new NormalLeafBlock($treeNode, $level, $context);
-                }
+                return new NormalLeafBlock($treeNode, $level, $context);
             }
         }
 

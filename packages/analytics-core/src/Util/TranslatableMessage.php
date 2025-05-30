@@ -43,7 +43,7 @@ final readonly class TranslatableMessage implements TranslatableInterface, \Stri
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return $translator->trans($this->message, array_map(
-            static fn($parameter) => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,
+            static fn($parameter): mixed => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,
             $this->parameters,
         ), $this->domain, $locale);
     }

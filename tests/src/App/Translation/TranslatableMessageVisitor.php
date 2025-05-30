@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Translation;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Name;
 use PhpParser\NodeVisitor;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Component\Translation\Extractor\Visitor\AbstractVisitor;
@@ -43,11 +45,11 @@ final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVi
     #[\Override]
     public function leaveNode(Node $node): ?Node
     {
-        if (!$node instanceof Node\Expr\New_) {
+        if (!$node instanceof New_) {
             return null;
         }
 
-        if (!($className = $node->class) instanceof Node\Name) {
+        if (!($className = $node->class) instanceof Name) {
             return null;
         }
 
@@ -57,7 +59,7 @@ final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVi
 
         $firstNamedArgumentIndex = $this->nodeFirstNamedArgumentIndex($node);
 
-        if (!$messages = $this->getStringArguments($node, 0 < $firstNamedArgumentIndex ? 0 : 'message')) {
+        if (($messages = $this->getStringArguments($node, 0 < $firstNamedArgumentIndex ? 0 : 'message')) === []) {
             return null;
         }
 

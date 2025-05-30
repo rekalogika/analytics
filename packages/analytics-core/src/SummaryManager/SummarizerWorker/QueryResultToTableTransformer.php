@@ -223,13 +223,11 @@ final readonly class QueryResultToTableTransformer
         $dimensions = new DefaultDimensions($dimensionValues);
         $measures = new DefaultMeasures($measureValues);
 
-        $row = new DefaultRow(
+        return new DefaultRow(
             dimensions: $dimensions,
             measures: $measures,
             groupings: $groupings,
         );
-
-        return $row;
     }
 
     /**
@@ -269,12 +267,10 @@ final readonly class QueryResultToTableTransformer
             return $value;
         }
 
-        if (is_a($propertyClass, \BackedEnum::class, true)) {
-            // for older Doctrine version that don't correctly hydrate
-            // enums with QueryBuilder
-            if ((\is_int($value) || \is_string($value))) {
-                return $propertyClass::from($value);
-            }
+        // for older Doctrine version that don't correctly hydrate
+        // enums with QueryBuilder
+        if (is_a($propertyClass, \BackedEnum::class, true) && (\is_int($value) || \is_string($value))) {
+            return $propertyClass::from($value);
         }
 
         // determine if propertyClass is an entity

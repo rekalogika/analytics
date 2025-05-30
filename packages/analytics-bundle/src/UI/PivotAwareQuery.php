@@ -95,9 +95,9 @@ final class PivotAwareQuery
         //
 
         $filterDimensions = array_merge(
-            $this->getRows(),
-            $this->getColumns(),
-            $this->getFilters(),
+            $this->rows,
+            $this->columns,
+            $this->filters,
         );
 
         $filterDimensions = array_values(array_unique(array_filter(
@@ -387,9 +387,9 @@ final class PivotAwareQuery
     public function getSelectedSubitem(string $item): ?string
     {
         $withSubItems = [
-            ...$this->getRows(),
-            ...$this->getColumns(),
-            ...$this->getFilters(),
+            ...$this->rows,
+            ...$this->columns,
+            ...$this->filters,
         ];
 
         foreach ($withSubItems as $withSubItem) {

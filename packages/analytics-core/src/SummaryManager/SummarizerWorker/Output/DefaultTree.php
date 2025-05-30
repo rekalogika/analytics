@@ -38,10 +38,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         private readonly Items $items,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {
-        if ($childrenKey === null) {
-            if ($children !== []) {
-                throw new UnexpectedValueException('Children key cannot be null if children is not empty');
-            }
+        if ($childrenKey === null && $children !== []) {
+            throw new UnexpectedValueException('Children key cannot be null if children is not empty');
         }
 
         foreach ($children as $child) {

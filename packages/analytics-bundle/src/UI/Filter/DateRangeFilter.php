@@ -22,9 +22,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final class DateRangeFilter implements Filter
 {
     private ?string $rawUpperBound = null;
+
     private ?TimeInterval $upperBound = null;
 
     private ?string $rawLowerBound = null;
+
     private ?TimeInterval $lowerBound = null;
 
     /**

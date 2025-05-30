@@ -180,8 +180,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
      * convert "field IN (null, a, b, c)" to "(field IN (a, b, c) OR field IS NULL)"
      * and convert "field NOT IN (null, a, b, c)" to "(field NOT IN (a, b, c) AND
      * field IS NOT NULL)"
-     *
-     * @return mixed
      */
     private function walkInOrNotInComparison(Comparison $comparison): mixed
     {
@@ -208,7 +206,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         // check if value has null
 
         $hasNull = \in_array(null, $values, true);
-        $valuesWithoutNull = array_values(array_filter($values, fn($v) => $v !== null));
+        $valuesWithoutNull = array_values(array_filter($values, fn($v): bool => $v !== null));
 
         // transform valuesWithoutNull to database value
 
@@ -295,12 +293,10 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
             ->getConnection()
             ->getDatabasePlatform();
 
-        $newValues = array_map(
+        return array_map(
             fn(mixed $value): mixed => $type->convertToDatabaseValue($value, $databasePlatform),
             $values,
         );
-
-        return $newValues;
     }
 
     #[\Override]

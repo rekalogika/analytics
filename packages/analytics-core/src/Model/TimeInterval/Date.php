@@ -74,7 +74,7 @@ final class Date implements TimeInterval
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $locale = $locale ?? $translator->getLocale();
+        $locale ??= $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             locale: $locale,

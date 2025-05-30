@@ -111,9 +111,7 @@ final class TableToNormalTableTransformer
     {
         $measures = array_flip($this->measures);
 
-        return function (DefaultNormalRow $row1, DefaultNormalRow $row2) use ($measures): int {
-            return DefaultNormalRow::compare($row1, $row2, $measures);
-        };
+        return fn(DefaultNormalRow $row1, DefaultNormalRow $row2): int => DefaultNormalRow::compare($row1, $row2, $measures);
     }
 
     /**

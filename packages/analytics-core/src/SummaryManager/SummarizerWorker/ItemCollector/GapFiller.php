@@ -29,6 +29,7 @@ final readonly class GapFiller
     private array $dimensions;
 
     private TranslatableInterface $label;
+
     private string $key;
 
     /**
@@ -136,11 +137,7 @@ final readonly class GapFiller
     ): DefaultDimension {
         $objectId = spl_object_id($member);
 
-        if (isset($this->dimensions[$objectId])) {
-            return $this->dimensions[$objectId];
-        }
-
-        return new DefaultDimension(
+        return $this->dimensions[$objectId] ?? new DefaultDimension(
             label: $this->label,
             key: $this->key,
             member: $member,
@@ -171,7 +168,7 @@ final readonly class GapFiller
         if ($comparison === 0) {
             yield $first;
         } elseif ($class::compare($first, $last) < 0) { // ascending
-            while ($current !== null) {
+            while ($current instanceof SequenceMember) {
                 yield $current;
 
                 if ($current === $last) {
@@ -181,7 +178,7 @@ final readonly class GapFiller
                 $current = $current->getNext();
             }
         } else { // descending
-            while ($current !== null) {
+            while ($current instanceof SequenceMember) {
                 yield $current;
 
                 if ($current === $last) {

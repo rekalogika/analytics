@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Exception\LogicException;
 final readonly class PathResolver
 {
     private PathContext $context;
+
     private BaseEntity $baseEntity;
 
     /**

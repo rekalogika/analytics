@@ -33,7 +33,7 @@ final class DistinctValuesResolverPass implements CompilerPassInterface
         $specificResolvers = [];
         $nonSpecificResolvers = [];
 
-        foreach ($resolvers as $serviceId => $tags) {
+        foreach (array_keys($resolvers) as $serviceId) {
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass()
                 ?? throw new \InvalidArgumentException(\sprintf('Service "%s" does not have a class', $serviceId));

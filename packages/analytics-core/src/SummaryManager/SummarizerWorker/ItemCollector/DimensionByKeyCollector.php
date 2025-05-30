@@ -52,8 +52,6 @@ final class DimensionByKeyCollector
 
         if ($this->hasTieredOrder && $firstDimension->isSequence()) {
             $dimensions = $this->fillGaps($dimensions);
-        } else {
-            $dimensions = $dimensions;
         }
 
         return new DimensionCollection(
