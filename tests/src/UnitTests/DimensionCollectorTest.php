@@ -41,7 +41,7 @@ final class DimensionCollectorTest extends TestCase
     }
 
     #[\Override]
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->addDimension('male', new DefaultDimension(
             label: new TranslatableMessage('Male'),

@@ -41,8 +41,6 @@ interface DistinctValuesResolver
 
     /**
      * @param class-string $class The summary entity class name.
-     * @param string $dimension
-     * @param string $id
      */
     public function getValueFromId(
         string $class,

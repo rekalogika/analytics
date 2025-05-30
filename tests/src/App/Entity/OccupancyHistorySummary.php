@@ -59,7 +59,7 @@ class OccupancyHistorySummary extends Summary
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
         mandatory: true,
     )]
-    private ?Date $date;
+    private ?Date $date = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
@@ -71,7 +71,7 @@ class OccupancyHistorySummary extends Summary
         ),
         label: new TranslatableMessage('Day of Week', domain: 'rekalogika_analytics'),
     )]
-    private ?DayOfWeek $dayOfWeek;
+    private ?DayOfWeek $dayOfWeek = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
@@ -83,7 +83,7 @@ class OccupancyHistorySummary extends Summary
         ),
         label: new TranslatableMessage('Day of Month', domain: 'rekalogika_analytics'),
     )]
-    private ?DayOfMonth $dayOfMonth;
+    private ?DayOfMonth $dayOfMonth = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
@@ -95,7 +95,7 @@ class OccupancyHistorySummary extends Summary
         ),
         label: new TranslatableMessage('Day of Year', domain: 'rekalogika_analytics'),
     )]
-    private ?DayOfYear $dayOfYear;
+    private ?DayOfYear $dayOfYear = null;
 
     #[ORM\Column(enumType: Gender::class, nullable: true)]
     #[Analytics\Dimension(

@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\UI\PivotAwareQuery;
 use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
 
-final class AnalyticsRuntime implements RuntimeExtensionInterface
+final readonly class AnalyticsRuntime implements RuntimeExtensionInterface
 {
     public function __construct(private Environment $twig) {}
 

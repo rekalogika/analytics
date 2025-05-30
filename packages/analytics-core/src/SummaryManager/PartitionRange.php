@@ -20,11 +20,11 @@ use Rekalogika\Analytics\Util\PartitionUtil;
 /**
  * @implements \IteratorAggregate<Partition>
  */
-final class PartitionRange implements \IteratorAggregate, \Countable
+final readonly class PartitionRange implements \IteratorAggregate, \Countable
 {
     public function __construct(
-        private readonly Partition $start,
-        private readonly Partition $end,
+        private Partition $start,
+        private Partition $end,
     ) {
         if ($start->getLevel() !== $end->getLevel()) {
             throw new InvalidArgumentException(\sprintf(

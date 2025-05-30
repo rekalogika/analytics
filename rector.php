@@ -16,7 +16,9 @@ use Rector\CodeQuality\Rector\If_\CombineIfRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodingStyle\Rector\Catch_\CatchExceptionNameMatchingTypeRector;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Node\RemoveNonExistingVarAnnotationRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Strict\Rector\If_\BooleanInIfConditionRuleFixerRector;
@@ -73,10 +75,23 @@ return RectorConfig::configure()
         RemoveConcatAutocastRector::class => [
             // psalm doesn't like it
             __DIR__ . '/packages/analytics-core/src/SummaryManager/Item.php',
+            __DIR__ . '/packages/analytics-core/src/SimpleQueryBuilder/Path/BaseEntity.php',
         ],
 
         RemoveNonExistingVarAnnotationRector::class => [
             // psalm doesn't like it
             __DIR__ . '/packages/analytics-core/src/SummaryManager/DefaultSummaryManager.php',
+            __DIR__ . '/packages/analytics-core/src/Doctrine/ClassMetadataWrapper.php',
+        ],
+
+        RemoveUnusedVariableAssignRector::class => [
+            // removes tests
+            __DIR__ . '/tests/src/IntegrationTests/QueryTest.php',
+        ],
+
+        RemoveAlwaysTrueIfConditionRector::class => [
+            // removes logic
+            __DIR__ . '/packages/analytics-core/src/Model/TimeInterval/RecurringTimeIntervalTrait.php',
+            __DIR__ . '/packages/analytics-core/src/Model/TimeInterval/TimeIntervalTrait.php',
         ],
     ]);

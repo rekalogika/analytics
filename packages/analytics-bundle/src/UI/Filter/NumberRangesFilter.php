@@ -176,7 +176,7 @@ final class NumberRangesFilter implements Filter
     {
         $numbers = $this->getNumbers();
 
-        if (\count($numbers) === 0) {
+        if ($numbers === []) {
             return null;
         }
 

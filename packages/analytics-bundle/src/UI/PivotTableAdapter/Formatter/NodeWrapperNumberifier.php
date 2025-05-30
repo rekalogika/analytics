@@ -31,7 +31,7 @@ final readonly class NodeWrapperNumberifier implements BackendNumberifier, Numbe
             return $this;
         }
 
-        return new static($numberifier);
+        return new self($numberifier);
     }
 
     #[\Override]

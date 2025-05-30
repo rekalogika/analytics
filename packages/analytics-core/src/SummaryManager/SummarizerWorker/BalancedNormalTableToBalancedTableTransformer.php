@@ -24,9 +24,8 @@ final class BalancedNormalTableToBalancedTableTransformer
     public static function transform(DefaultNormalTable $normalTable): DefaultTable
     {
         $transformer = new self($normalTable);
-        $table = $transformer->process();
 
-        return $table;
+        return $transformer->process();
     }
 
     /**

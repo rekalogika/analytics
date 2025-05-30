@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI\Filter\Model;
 
-final class Choice
+final readonly class Choice
 {
     /**
      * Sentinel value to indicate null, used in query strings

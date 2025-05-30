@@ -32,7 +32,7 @@ final readonly class NodeWrapperCellifier implements BackendCellifier, Cellifier
             return $this;
         }
 
-        return new static($cellifier);
+        return new self($cellifier);
     }
 
     #[\Override]

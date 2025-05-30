@@ -22,7 +22,7 @@ use Rekalogika\PivotTable\Table\RowGroup;
 abstract class DefaultRowGroup implements RowGroup, \IteratorAggregate
 {
     public function __construct(
-        private DefaultRows $rows,
+        private readonly DefaultRows $rows,
     ) {}
 
     #[\Override]

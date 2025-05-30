@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
@@ -74,6 +75,7 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
+
         $result = $query->getResult();
 
         // create pivot table
@@ -85,7 +87,7 @@ final class AppController extends AbstractController
         // create chart
         try {
             $chart = $chartBuilder->createChart($result);
-        } catch (UnsupportedData $e) {
+        } catch (UnsupportedData) {
             $chart = null;
         }
 
@@ -128,6 +130,7 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $query = $summaryTableManager->createQuery();
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
+
         $result = $query->getResult();
 
         // create pivot table
@@ -136,10 +139,10 @@ final class AppController extends AbstractController
             pivotedDimensions: $query->getPivotedDimensions(),
         );
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer = new Xlsx($spreadsheet);
 
         $response = new StreamedResponse(
-            function () use ($writer) {
+            function () use ($writer): void {
                 $writer->save('php://output');
             },
         );

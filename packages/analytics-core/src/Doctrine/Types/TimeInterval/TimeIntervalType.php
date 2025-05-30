@@ -68,7 +68,7 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
 
         $class = $this->getClass();
 
-        if (\is_object($value) && is_a($value, $class, true)) {
+        if ($value instanceof $class) {
             /** @var TimeInterval $value */
             return $value->getDatabaseValue();
         }

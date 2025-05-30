@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Nate Wiebe <nate@northern.co>
  */
-final class TranslatableMessage implements TranslatableInterface, \Stringable
+final readonly class TranslatableMessage implements TranslatableInterface, \Stringable
 {
     /**
      * @param array<string,mixed> $parameters
@@ -43,7 +43,7 @@ final class TranslatableMessage implements TranslatableInterface, \Stringable
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return $translator->trans($this->message, array_map(
-            static fn($parameter) => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,
+            static fn($parameter): mixed => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,
             $this->parameters,
         ), $this->domain, $locale);
     }

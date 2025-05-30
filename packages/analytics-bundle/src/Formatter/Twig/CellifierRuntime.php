@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
 use Twig\Extension\RuntimeExtensionInterface;
 
-final class CellifierRuntime implements RuntimeExtensionInterface
+final readonly class CellifierRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private Cellifier $cellifier,

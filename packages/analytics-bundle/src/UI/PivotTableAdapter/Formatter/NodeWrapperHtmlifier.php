@@ -31,7 +31,7 @@ final readonly class NodeWrapperHtmlifier implements BackendHtmlifier, Htmlifier
             return $this;
         }
 
-        return new static($htmlifier);
+        return new self($htmlifier);
     }
 
     #[\Override]

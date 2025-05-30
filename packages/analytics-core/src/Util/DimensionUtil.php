@@ -64,11 +64,7 @@ final readonly class DimensionUtil
             return false;
         }
 
-        if ($a->getRawMember() !== $b->getRawMember()) {
-            return false;
-        }
-
-        return true;
+        return $a->getRawMember() === $b->getRawMember();
     }
 
     public static function isDimensionsSame(Dimensions $a, Dimensions $b): bool

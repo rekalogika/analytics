@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 
-final class ChainDistinctValuesResolver implements DistinctValuesResolver
+final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
 {
     /**
      * @param iterable<DistinctValuesResolver> $nonSpecificResolvers

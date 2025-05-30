@@ -35,7 +35,7 @@ final class GetDistinctValuesFromSummaryQuery extends AbstractQuery
         );
 
         $simpleQueryBuilder
-            ->select("DISTINCT root.$dimension")
+            ->select('DISTINCT root.' . $dimension)
             ->setMaxResults($limit);
 
         parent::__construct($simpleQueryBuilder);

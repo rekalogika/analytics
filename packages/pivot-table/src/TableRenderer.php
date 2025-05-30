@@ -57,9 +57,7 @@ class TableRenderer
             $result .= $this->renderRowGroup($rowGroup);
         }
 
-        $result .= '</table>';
-
-        return $result;
+        return $result . '</table>';
     }
 
     protected function renderNoData(): string

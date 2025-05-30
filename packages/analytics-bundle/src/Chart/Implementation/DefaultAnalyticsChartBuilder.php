@@ -26,7 +26,7 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
+final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
 {
     public function __construct(
         private LocaleSwitcher $localeSwitcher,
@@ -197,16 +197,14 @@ final class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
                     if ($numMeasures === 1) {
                         $yTitle = $this->stringifier->toString($measure->getLabel());
                     }
+                } elseif ($numMeasures === 1) {
+                    $yTitle = \sprintf(
+                        '%s - %s',
+                        $this->stringifier->toString($measure->getLabel()),
+                        $this->stringifier->toString($unit),
+                    );
                 } else {
-                    if ($numMeasures === 1) {
-                        $yTitle = \sprintf(
-                            '%s - %s',
-                            $this->stringifier->toString($measure->getLabel()),
-                            $this->stringifier->toString($unit),
-                        );
-                    } else {
-                        $yTitle = $this->stringifier->toString($unit);
-                    }
+                    $yTitle = $this->stringifier->toString($unit);
                 }
             }
         }

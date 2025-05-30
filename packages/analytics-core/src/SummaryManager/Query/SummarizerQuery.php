@@ -61,7 +61,7 @@ final class SummarizerQuery extends AbstractQuery
         private readonly EntityManagerInterface $entityManager,
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
-        private int $queryResultLimit,
+        private readonly int $queryResultLimit,
     ) {
         $summaryClass = $metadata->getSummaryClass();
 

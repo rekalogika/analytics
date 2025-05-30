@@ -31,7 +31,7 @@ final readonly class NodeWrapperStringifier implements BackendStringifier, Strin
             return $this;
         }
 
-        return new static($stringifier);
+        return new self($stringifier);
     }
 
     #[\Override]

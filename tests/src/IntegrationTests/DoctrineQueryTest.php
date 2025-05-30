@@ -43,7 +43,7 @@ final class DoctrineQueryTest extends KernelTestCase
             ->findBy([], [], 3);
 
         $itemIds = array_map(
-            static fn(Item $item) => $item->getId(),
+            static fn(Item $item): ?int => $item->getId(),
             $items,
         );
 
@@ -153,7 +153,7 @@ final class DoctrineQueryTest extends KernelTestCase
             ->findBy([], [], 3);
 
         $itemIds = array_map(
-            static fn(Item $item) => $item->getId(),
+            static fn(Item $item): ?int => $item->getId(),
             $items,
         );
 

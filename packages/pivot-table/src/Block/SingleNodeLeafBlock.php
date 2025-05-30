@@ -23,19 +23,10 @@ final class SingleNodeLeafBlock extends NodeBlock
     #[\Override]
     protected function createHeaderRows(): DefaultRows
     {
-        if (
-            $this->getContext()->hasSuperfluousLegend($this->getLeafNode())
-        ) {
-            $cell = new DefaultHeaderCell(
-                key: $this->getLeafNode()->getKey(),
-                content: $this->getLeafNode()->getItem(),
-            );
-        } else {
-            $cell = new DefaultHeaderCell(
-                key: $this->getLeafNode()->getKey(),
-                content: $this->getLeafNode()->getItem(),
-            );
-        }
+        $cell = new DefaultHeaderCell(
+            key: $this->getLeafNode()->getKey(),
+            content: $this->getLeafNode()->getItem(),
+        );
 
         $row = new DefaultRow([$cell]);
 
