@@ -20,6 +20,11 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Row
 {
+    /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
     public function getTuple(): Tuple;
 
     public function getMeasures(): Measures;

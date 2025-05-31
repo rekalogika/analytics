@@ -102,6 +102,7 @@ final class TableToNormalTableTransformer
         $uniqueDimensions = $this->dimensionCollector->getResult();
 
         return new DefaultNormalTable(
+            summaryClass: $input->getSummaryClass(),
             rows: $rows,
             uniqueDimensions: $uniqueDimensions,
         );
@@ -119,6 +120,7 @@ final class TableToNormalTableTransformer
      */
     private function unpivotRow(DefaultRow $row): iterable
     {
+        $summaryClass = $row->getSummaryClass();
         $newRow = [];
 
         foreach ($this->dimensions as $dimension) {
@@ -156,6 +158,7 @@ final class TableToNormalTableTransformer
                 );
 
             yield new DefaultNormalRow(
+                summaryClass: $summaryClass,
                 tuple: $tuple,
                 measure: $measure,
                 groupings: $row->getGroupings(),

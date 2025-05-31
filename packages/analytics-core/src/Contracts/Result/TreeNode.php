@@ -23,6 +23,11 @@ namespace Rekalogika\Analytics\Contracts\Result;
 interface TreeNode extends \Traversable, \Countable, Dimension
 {
     /**
+     * @return class-string
+     */
+    public function getSummaryClass(): string;
+
+    /**
      * Get the tuple of this node, which is a collection of dimensions from the
      * root to this node.
      */

@@ -19,11 +19,21 @@ use Rekalogika\Analytics\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow
 {
+    /**
+     * @param class-string $summaryClass
+     */
     public function __construct(
+        private string $summaryClass,
         private DefaultTuple $tuple,
         private DefaultMeasure $measure,
         private string $groupings,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function getTuple(): DefaultTuple

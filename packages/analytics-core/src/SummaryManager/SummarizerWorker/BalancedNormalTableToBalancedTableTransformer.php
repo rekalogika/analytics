@@ -45,6 +45,7 @@ final class BalancedNormalTableToBalancedTableTransformer
     private function process(): DefaultTable
     {
         $lastRow = null;
+        $summaryClass = $this->normalTable->getSummaryClass();
 
         foreach ($this->normalTable as $currentRow) {
             if (
@@ -57,6 +58,7 @@ final class BalancedNormalTableToBalancedTableTransformer
             }
 
             $this->rows[] = new DefaultRow(
+                summaryClass: $summaryClass,
                 tuple: $currentRow->getTuple(),
                 measures: new DefaultMeasures($this->measures),
                 groupings: '',
@@ -66,6 +68,7 @@ final class BalancedNormalTableToBalancedTableTransformer
         }
 
         return new DefaultTable(
+            summaryClass: $summaryClass,
             rows: $this->rows,
         );
     }

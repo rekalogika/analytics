@@ -17,11 +17,21 @@ use Rekalogika\Analytics\Contracts\Result\Row;
 
 final readonly class DefaultRow implements Row
 {
+    /**
+     * @param class-string $summaryClass
+     */
     public function __construct(
+        private string $summaryClass,
         private DefaultTuple $tuple,
         private DefaultMeasures $measures,
         private string $groupings,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function getTuple(): DefaultTuple

@@ -22,12 +22,20 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 final readonly class DefaultNormalTable implements NormalTable, \IteratorAggregate
 {
     /**
+     * @param class-string $summaryClass
      * @param list<DefaultNormalRow> $rows
      */
     public function __construct(
+        private string $summaryClass,
         private array $rows,
         private Items $uniqueDimensions,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function first(): ?DefaultNormalRow
