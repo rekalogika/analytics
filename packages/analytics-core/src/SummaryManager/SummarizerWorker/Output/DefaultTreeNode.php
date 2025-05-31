@@ -33,16 +33,17 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
      */
     private array $children = [];
 
-    private ?DefaultTreeNode $parent = null;
-
     public function __construct(
         private readonly ?string $childrenKey,
+        private readonly null|DefaultTreeNode $parent,
         private readonly DefaultDimension $dimension,
         private ?DefaultMeasure $measure,
         private readonly Items $items,
         private readonly bool $null,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
-    ) {}
+    ) {
+        $parent?->addChild($this);
+    }
 
     #[\Override]
     public function count(): int
@@ -136,12 +137,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         return $this->measure = $measure;
     }
 
-    public function setParent(DefaultTreeNode $parent): void
-    {
-        $this->parent = $parent;
-    }
-
-    public function getParent(): ?DefaultTreeNode
+    public function getParent(): null|DefaultTreeNode
     {
         return $this->parent;
     }
@@ -151,7 +147,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         $this->children = [];
     }
 
-    public function addChild(DefaultTreeNode $node): void
+    private function addChild(DefaultTreeNode $node): void
     {
         if ($this->childrenKey === null) {
             throw new LogicException('Cannot add child to a leaf node');
@@ -164,7 +160,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         }
 
         $this->children[] = $node;
-        $node->setParent($this);
     }
 
     public function getChildrenKey(): ?string

@@ -26,12 +26,14 @@ final class DefaultTreeNodeFactory
 
     public function createBranchNode(
         string $childrenKey,
+        ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
     ): DefaultTreeNode {
         return new DefaultTreeNode(
             childrenKey: $childrenKey,
             dimension: $dimension,
+            parent: $parent,
             measure: null,
             items: $items,
             null: false,
@@ -40,6 +42,7 @@ final class DefaultTreeNodeFactory
     }
 
     public function createLeafNode(
+        ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
         DefaultMeasure $measure,
@@ -47,6 +50,7 @@ final class DefaultTreeNodeFactory
         return new DefaultTreeNode(
             childrenKey: null,
             dimension: $dimension,
+            parent: $parent,
             items: $items,
             measure: $measure,
             null: false,
@@ -56,6 +60,7 @@ final class DefaultTreeNodeFactory
 
     public function createFillingNode(
         ?string $childrenKey,
+        null|DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
         ?DefaultMeasure $measure,
@@ -69,6 +74,7 @@ final class DefaultTreeNodeFactory
         return new DefaultTreeNode(
             childrenKey: $childrenKey,
             dimension: $dimension,
+            parent: $parent,
             items: $items,
             measure: $measure,
             null: true,
