@@ -18,11 +18,11 @@ use Rekalogika\Analytics\Contracts\Model\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultUnit;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -171,9 +171,9 @@ final readonly class QueryResultToTableTransformer
         //
 
         $dimensionValues = [];
-        $dimensions = $this->query->getGroupBy();
+        $tuple = $this->query->getGroupBy();
 
-        foreach ($dimensions as $key) {
+        foreach ($tuple as $key) {
             if ($key === '@values') {
                 continue;
             }
@@ -220,11 +220,11 @@ final readonly class QueryResultToTableTransformer
         // instantiate
         //
 
-        $dimensions = new DefaultDimensions($dimensionValues);
+        $tuple = new DefaultTuple($dimensionValues);
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultRow(
-            dimensions: $dimensions,
+            tuple: $tuple,
             measures: $measures,
             groupings: $groupings,
         );

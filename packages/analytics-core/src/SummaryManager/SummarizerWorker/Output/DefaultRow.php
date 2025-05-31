@@ -18,15 +18,15 @@ use Rekalogika\Analytics\Contracts\Result\Row;
 final readonly class DefaultRow implements Row
 {
     public function __construct(
-        private DefaultDimensions $dimensions,
+        private DefaultTuple $tuple,
         private DefaultMeasures $measures,
         private string $groupings,
     ) {}
 
     #[\Override]
-    public function getDimensions(): DefaultDimensions
+    public function getTuple(): DefaultTuple
     {
-        return $this->dimensions;
+        return $this->tuple;
     }
 
     #[\Override]

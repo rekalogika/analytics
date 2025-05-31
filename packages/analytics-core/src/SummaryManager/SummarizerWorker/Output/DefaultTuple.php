@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Dimensions;
+use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
  */
-final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
+final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 {
     /**
      * @var array<string,DefaultDimension>
@@ -93,7 +93,7 @@ final readonly class DefaultDimensions implements Dimensions, \IteratorAggregate
     }
 
     #[\Override]
-    public function isSame(Dimensions $other): bool
+    public function isSame(Tuple $other): bool
     {
         if ($this->count() !== $other->count()) {
             return false;

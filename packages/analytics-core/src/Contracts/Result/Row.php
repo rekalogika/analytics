@@ -20,7 +20,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Row
 {
-    public function getDimensions(): Dimensions;
+    public function getTuple(): Tuple;
 
     public function getMeasures(): Measures;
 }
