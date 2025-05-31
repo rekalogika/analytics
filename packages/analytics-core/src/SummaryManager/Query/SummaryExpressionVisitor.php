@@ -17,13 +17,10 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
-use Rekalogika\Analytics\Contracts\Model\ParameterTypeAware;
 use Rekalogika\Analytics\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
@@ -66,7 +63,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         return array_keys($this->involvedDimensions);
     }
 
-    private function getFieldType(string $field): mixed
+    private function getFieldType(string $field): ?string
     {
         if (!\in_array($field, $this->validFields, true)) {
             throw new InvalidArgumentException(\sprintf(
@@ -81,8 +78,24 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         } elseif ($this->classMetadata->hasField($field)) {
             $fieldMetadata = $this->classMetadata->getFieldMapping($field);
 
-            /** @psalm-suppress MixedReturnStatement */
-            return $fieldMetadata['type'] ?? null; // @phpstan-ignore-line
+            $result = $fieldMetadata['type'] ?? null;
+
+            if ($result === null) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Field "%s" does not have a type defined in the class metadata',
+                    $field,
+                ));
+            }
+
+            if (!\is_string($result)) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Field "%s" type must be a string, got "%s"',
+                    $field,
+                    get_debug_type($result),
+                ));
+            }
+
+            return $result;
         } else {
             return null;
         }
@@ -119,7 +132,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
 
         /** @psalm-suppress MixedAssignment */
         $value = $comparison->getValue()->getValue();
-        /** @psalm-suppress MixedAssignment */
         $type = $this->getFieldType($field);
 
         if (\is_array($value)) {
@@ -208,44 +220,27 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $hasNull = \in_array(null, $values, true);
         $valuesWithoutNull = array_values(array_filter($values, fn($v): bool => $v !== null));
 
-        // transform valuesWithoutNull to database value
+        // transform valuesWithoutNull to string of named parameters
 
-        $type = $this->getType($field);
-
-        if ($type !== null) {
-            $valuesWithoutNull = $this->transformValuesToDatabaseValues(
-                $valuesWithoutNull,
-                $type,
+        $valuesWithoutNullParameters = $this->queryBuilder
+            ->createArrayNamedParameter(
+                values: $valuesWithoutNull,
+                type: $this->getFieldType($field),
             );
-        }
-
-        if ($type instanceof ParameterTypeAware) {
-            $parameterType = $type->getArrayParameterType();
-        } else {
-            $parameterType = null;
-        }
-
-        // build without null expressions
-
-        $valuesWithoutNullParameter = $this->queryBuilder->createNamedParameter(
-            value: $valuesWithoutNull,
-            type: $parameterType,
-        );
 
         if ($comparisonOperator === Comparison::NIN) {
             $valuesWithoutNullExpression = $this->queryBuilder->expr()->notIn(
                 $fieldWithAlias,
-                $valuesWithoutNullParameter,
+                $valuesWithoutNullParameters,
             );
         } else {
             $valuesWithoutNullExpression = $this->queryBuilder->expr()->in(
                 $fieldWithAlias,
-                $valuesWithoutNullParameter,
+                $valuesWithoutNullParameters,
             );
         }
 
         // if without null, return the expression
-
         if (!$hasNull) {
             return $valuesWithoutNullExpression;
         }
@@ -263,40 +258,6 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
                 $this->queryBuilder->expr()->isNull($fieldWithAlias),
             );
         }
-    }
-
-    private function getType(string $field): ?Type
-    {
-        /** @psalm-suppress MixedAssignment */
-        $type = $this->getFieldType($field);
-
-        if (!\is_string($type)) {
-            return null;
-        }
-
-        try {
-            return Type::getType($type);
-        } catch (Exception) {
-            return null;
-        }
-    }
-
-    /**
-     * @param list<mixed> $values
-     * @return list<mixed>
-     */
-    private function transformValuesToDatabaseValues(
-        array $values,
-        Type $type,
-    ): array {
-        $databasePlatform = $this->queryBuilder->getEntityManager()
-            ->getConnection()
-            ->getDatabasePlatform();
-
-        return array_map(
-            fn(mixed $value): mixed => $type->convertToDatabaseValue($value, $databasePlatform),
-            $values,
-        );
     }
 
     #[\Override]

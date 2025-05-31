@@ -132,4 +132,21 @@ final class SimpleQueryBuilder
 
         return ':' . $name;
     }
+
+    /**
+     * @param list<mixed> $values
+     */
+    public function createArrayNamedParameter(
+        array $values,
+        int|string|ParameterType|ArrayParameterType|null $type = null,
+    ): string {
+        $parameters = [];
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($values as $value) {
+            $parameters[] = $this->createNamedParameter($value, $type);
+        }
+
+        return implode(', ', $parameters);
+    }
 }

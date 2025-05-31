@@ -13,15 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
 
-use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Contracts\Model\ParameterTypeAware;
 use Rekalogika\Analytics\Contracts\Model\TimeInterval;
 use Rekalogika\Analytics\Exception\ConversionException;
 
-abstract class TimeIntervalType extends Type implements ParameterTypeAware
+abstract class TimeIntervalType extends Type
 {
     /**
      * @return class-string<TimeInterval>
@@ -77,12 +74,6 @@ abstract class TimeIntervalType extends Type implements ParameterTypeAware
             'The value must be an instance of "%s".',
             $class,
         ));
-    }
-
-    #[\Override]
-    final public function getArrayParameterType(): ParameterType|ArrayParameterType|string|int|null
-    {
-        return ArrayParameterType::INTEGER;
     }
 
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
