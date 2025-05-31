@@ -3,6 +3,8 @@ name: CI
 on:
   pull_request:
     branches: [ "main" ]
+  schedule:
+    - cron: '13 14 * * *'
 
 permissions:
   contents: read
