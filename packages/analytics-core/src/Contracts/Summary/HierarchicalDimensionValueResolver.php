@@ -20,11 +20,13 @@ interface HierarchicalDimensionValueResolver
      * column. This is used inside the embeddable class of a hierarchical
      * dimension.
      *
-     * $input is the ValueResolver of the dimension, defined on the source
-     * entity.
+     * $input is the definition of the source property defined in the summary
+     * class. It should be a `ValueResolver`, but we accept `object` here for
+     * future extensibility. The implementation should check the type of
+     * `$input` to ensure it is of the expected type.
      */
     public function getDQL(
-        ValueResolver $input,
+        object $input,
         Context $context,
     ): string;
 }
