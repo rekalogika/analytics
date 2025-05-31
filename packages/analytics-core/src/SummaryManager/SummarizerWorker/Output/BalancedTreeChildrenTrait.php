@@ -42,17 +42,14 @@ trait BalancedTreeChildrenTrait
             $child = $this->getChildEqualTo($dimension);
 
             if ($child === null) {
-                // continue;
+                /** @psalm-suppress InaccessibleProperty */
                 $child = $this->treeNodeFactory->createFillingNode(
                     childrenKey: $this->items->getKeyAfter($this->childrenKey),
                     dimension: $dimension,
+                    parent: $this instanceof DefaultTreeNode ? $this : null,
                     measure: null,
                     items: $this->items,
                 );
-            }
-
-            if ($this instanceof DefaultTreeNode) {
-                $child->setParent($this);
             }
 
             $balancedChildren[] = $child;

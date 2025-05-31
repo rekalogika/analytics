@@ -93,6 +93,7 @@ final class NormalTableToTreeTransformer
         int $columnNumber,
         bool $forceCreate,
     ): void {
+        $parent = $this->currentPath[$columnNumber - 1] ?? null;
         $childrenKey = $this->keys[$columnNumber + 1] ?? null;
 
         if ($childrenKey === null) {
@@ -101,6 +102,7 @@ final class NormalTableToTreeTransformer
 
         $node = $this->treeNodeFactory->createBranchNode(
             childrenKey: $childrenKey,
+            parent: $parent,
             dimension: $dimension,
             items: $this->uniqueDimensions,
         );
@@ -118,14 +120,10 @@ final class NormalTableToTreeTransformer
             return;
         }
 
-        $parent = $this->currentPath[$columnNumber - 1];
-
         $currentPath = \array_slice($this->currentPath, 0, $columnNumber);
         $currentPath[$columnNumber] = $node;
 
         $this->currentPath = array_values($currentPath);
-
-        $parent->addChild($node);
     }
 
     private function addMeasure(
@@ -133,8 +131,15 @@ final class NormalTableToTreeTransformer
         DefaultMeasure $measure,
         int $columnNumber,
     ): void {
+        $parent = end($this->currentPath);
+
+        if ($parent === false) {
+            $parent = null;
+        }
+
         $node = $this->treeNodeFactory->createLeafNode(
             dimension: $lastDimension,
+            parent: $parent,
             items: $this->uniqueDimensions,
             measure: $measure,
         );
@@ -146,11 +151,7 @@ final class NormalTableToTreeTransformer
             return;
         }
 
-        $parent = end($this->currentPath);
-
-        if ($parent instanceof DefaultTreeNode) {
-            $parent->addChild($node);
-        } else {
+        if ($parent === null) {
             $this->currentPath = [$node];
             $this->tree[] = $node;
         }
