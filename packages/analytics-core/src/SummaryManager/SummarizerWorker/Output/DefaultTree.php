@@ -61,7 +61,10 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getTuple(): DefaultTuple
     {
-        return new DefaultTuple([]);
+        return new DefaultTuple(
+            summaryTable: $this->summaryClass,
+            dimensions: [],
+        );
     }
 
     #[\Override]

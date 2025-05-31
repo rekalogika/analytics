@@ -150,7 +150,10 @@ final class TableToNormalTableTransformer
             );
 
             /** @var array<string,DefaultDimension> $newRow */
-            $tuple = new DefaultTuple($newRow);
+            $tuple = new DefaultTuple(
+                summaryTable: $summaryClass,
+                dimensions: $newRow,
+            );
 
             $measure = $row->getMeasures()->get($measure)
                 ?? throw new UnexpectedValueException(

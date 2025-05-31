@@ -84,10 +84,15 @@ final class TreeToBalancedNormalTableTransformer
      */
     private function createRow(array $currentRow, DefaultMeasure $measure): void
     {
-        $tuple = new DefaultTuple(array_map(
+        $dimensions = array_map(
             static fn(DefaultTreeNode $node): DefaultDimension => $node->getDimension(),
             $currentRow,
-        ));
+        );
+
+        $tuple = new DefaultTuple(
+            summaryTable: $this->tree->getSummaryClass(),
+            dimensions: $dimensions,
+        );
 
         $this->rows[] = new DefaultNormalRow(
             summaryClass: $this->tree->getSummaryClass(),

@@ -221,7 +221,11 @@ final readonly class QueryResultToTableTransformer
         // instantiate
         //
 
-        $tuple = new DefaultTuple($dimensionValues);
+        $tuple = new DefaultTuple(
+            summaryTable: $this->metadata->getSummaryClass(),
+            dimensions: $dimensionValues,
+        );
+
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultRow(
