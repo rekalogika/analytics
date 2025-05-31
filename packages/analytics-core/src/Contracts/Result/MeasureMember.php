@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a measure within dimensions.
+ * Represent a measure within a tuple.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */

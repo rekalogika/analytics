@@ -76,19 +76,19 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             throw new UnsupportedData('Measures not found');
         }
 
-        $dimensions = $result->getTable()->first()?->getDimensions();
+        $tuple = $result->getTable()->first()?->getTuple();
 
-        if ($dimensions === null) {
+        if ($tuple === null) {
             throw new UnsupportedData('No data found');
         }
 
-        if (\count($dimensions) === 2) {
+        if (\count($tuple) === 2) {
             if ($this->isFirstDimensionSequential($result)) {
                 return $this->createLineChart($result);
             } else {
                 return $this->createBarChart($result);
             }
-        } elseif (\count($dimensions) === 3) {
+        } elseif (\count($tuple) === 3) {
             return $this->createGroupedBarChart($result, 'multiLine');
         }
 
@@ -137,15 +137,15 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createLineChart(Result $result): Chart
     {
-        $dimensions = $result->getTable()->first()?->getDimensions();
+        $tuple = $result->getTable()->first()?->getTuple();
 
-        if ($dimensions === null) {
+        if ($tuple === null) {
             throw new UnsupportedData('No data found');
         }
 
-        if (\count($dimensions) === 2) {
+        if (\count($tuple) === 2) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
-        } elseif (\count($dimensions) === 3) {
+        } elseif (\count($tuple) === 3) {
             return $this->createGroupedBarChart($result, 'multiLine');
         }
 
@@ -212,13 +212,13 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $dimensions = $row->getDimensions();
+            $tuple = $row->getTuple();
 
-            if (\count($dimensions) !== 2) {
+            if (\count($tuple) !== 2) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $dimensions->first();
+            $dimension = $tuple->first();
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -338,7 +338,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
         foreach ($result->getTable() as $row) {
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getDimensions()->getByIndex(1)->getMember();
+            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -532,13 +532,13 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $dimensions = $row->getDimensions();
+            $tuple = $row->getTuple();
 
-            if (\count($dimensions) !== 1) {
+            if (\count($tuple) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $dimensions->first();
+            $dimension = $tuple->first();
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');

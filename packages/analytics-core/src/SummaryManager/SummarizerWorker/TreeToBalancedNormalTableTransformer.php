@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimensions;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class TreeToBalancedNormalTableTransformer
 {
@@ -83,11 +83,11 @@ final class TreeToBalancedNormalTableTransformer
      */
     private function createRow(array $currentRow, DefaultMeasure $measure): void
     {
-        $dimensions = new DefaultDimensions(array_map(
+        $tuple = new DefaultTuple(array_map(
             static fn(DefaultTreeNode $node): DefaultDimension => $node->getDimension(),
             $currentRow,
         ));
 
-        $this->rows[] = new DefaultNormalRow($dimensions, $measure, '');
+        $this->rows[] = new DefaultNormalRow($tuple, $measure, '');
     }
 }

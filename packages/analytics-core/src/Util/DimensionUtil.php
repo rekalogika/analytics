@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Util;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
-use Rekalogika\Analytics\Contracts\Result\Dimensions;
+use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 final readonly class DimensionUtil
 {
@@ -67,7 +67,7 @@ final readonly class DimensionUtil
         return $a->getRawMember() === $b->getRawMember();
     }
 
-    public static function isDimensionsSame(Dimensions $a, Dimensions $b): bool
+    public static function isTupleSame(Tuple $a, Tuple $b): bool
     {
         if ($a->count() !== $b->count()) {
             return false;

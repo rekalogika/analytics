@@ -20,7 +20,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  *
  * @extends \Traversable<string,Dimension>
  */
-interface Dimensions extends \Traversable, \Countable
+interface Tuple extends \Traversable, \Countable
 {
     public function get(string $key): ?Dimension;
 
