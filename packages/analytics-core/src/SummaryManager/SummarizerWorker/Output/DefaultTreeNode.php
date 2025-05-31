@@ -33,6 +33,8 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
      */
     private array $children = [];
 
+    private DefaultTuple $tuple;
+
     public function __construct(
         private readonly ?string $childrenKey,
         private readonly null|DefaultTreeNode $parent,
@@ -43,6 +45,18 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {
         $parent?->addChild($this);
+
+        if ($parent !== null) {
+            $this->tuple = $parent->getTuple()->append($this->dimension);
+        } else {
+            $this->tuple = new DefaultTuple([$this->dimension]);
+        }
+    }
+
+    #[\Override]
+    public function getTuple(): DefaultTuple
+    {
+        return $this->tuple;
     }
 
     #[\Override]

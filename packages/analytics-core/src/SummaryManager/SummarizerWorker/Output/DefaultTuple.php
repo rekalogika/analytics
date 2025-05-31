@@ -41,6 +41,11 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         $this->dimensions = $dimensionsArray;
     }
 
+    public function append(DefaultDimension $dimension): static
+    {
+        return new self([...$this->dimensions, $dimension]);
+    }
+
     #[\Override]
     public function first(): ?DefaultDimension
     {
