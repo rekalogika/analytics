@@ -39,6 +39,7 @@ final class TreeToBalancedNormalTableTransformer
         $rows = $transformer->process();
 
         return new DefaultNormalTable(
+            summaryClass: $tree->getSummaryClass(),
             rows: $rows,
             uniqueDimensions: $tree->getUniqueDimensions(),
         );
@@ -88,6 +89,11 @@ final class TreeToBalancedNormalTableTransformer
             $currentRow,
         ));
 
-        $this->rows[] = new DefaultNormalRow($tuple, $measure, '');
+        $this->rows[] = new DefaultNormalRow(
+            summaryClass: $this->tree->getSummaryClass(),
+            tuple: $tuple,
+            measure: $measure,
+            groupings: '',
+        );
     }
 }

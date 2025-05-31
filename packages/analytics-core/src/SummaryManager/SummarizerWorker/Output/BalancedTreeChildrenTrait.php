@@ -44,6 +44,7 @@ trait BalancedTreeChildrenTrait
             if ($child === null) {
                 /** @psalm-suppress InaccessibleProperty */
                 $child = $this->treeNodeFactory->createFillingNode(
+                    summaryClass: $this->summaryClass,
                     childrenKey: $this->items->getKeyAfter($this->childrenKey),
                     dimension: $dimension,
                     parent: $this instanceof DefaultTreeNode ? $this : null,

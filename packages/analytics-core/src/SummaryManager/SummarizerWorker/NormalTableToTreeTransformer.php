@@ -51,12 +51,15 @@ final class NormalTableToTreeTransformer
         bool $hasTieredOrder,
         DefaultTreeNodeFactory $treeNodeFactory,
     ): DefaultTree {
+        $summaryClass = $normalTable->getSummaryClass();
         // check if empty
 
         $firstRow = $normalTable->first();
 
+
         if ($firstRow === null) {
             return new DefaultTree(
+                summaryClass: $summaryClass,
                 label: $label,
                 childrenKey: null,
                 children: [],
@@ -80,6 +83,7 @@ final class NormalTableToTreeTransformer
         );
 
         return new DefaultTree(
+            summaryClass: $summaryClass,
             label: $label,
             childrenKey: $keys[0],
             children: $transformer->doTransform($normalTable),
@@ -88,7 +92,11 @@ final class NormalTableToTreeTransformer
         );
     }
 
+    /**
+     * @param class-string $summaryClass
+     */
     private function addDimension(
+        string $summaryClass,
         DefaultDimension $dimension,
         int $columnNumber,
         bool $forceCreate,
@@ -101,6 +109,7 @@ final class NormalTableToTreeTransformer
         }
 
         $node = $this->treeNodeFactory->createBranchNode(
+            summaryClass: $summaryClass,
             childrenKey: $childrenKey,
             parent: $parent,
             dimension: $dimension,
@@ -126,7 +135,11 @@ final class NormalTableToTreeTransformer
         $this->currentPath = array_values($currentPath);
     }
 
+    /**
+     * @param class-string $summaryClass
+     */
     private function addMeasure(
+        string $summaryClass,
         DefaultDimension $lastDimension,
         DefaultMeasure $measure,
         int $columnNumber,
@@ -138,6 +151,7 @@ final class NormalTableToTreeTransformer
         }
 
         $node = $this->treeNodeFactory->createLeafNode(
+            summaryClass: $summaryClass,
             dimension: $lastDimension,
             parent: $parent,
             items: $this->uniqueDimensions,
@@ -184,12 +198,22 @@ final class NormalTableToTreeTransformer
             foreach ($tuple as $dimension) {
                 // if last dimension
                 if ($columnNumber === \count($tuple) - 1) {
-                    $this->addMeasure($dimension, $row->getMeasure(), $columnNumber);
+                    $this->addMeasure(
+                        summaryClass: $normalTable->getSummaryClass(),
+                        lastDimension: $dimension,
+                        measure: $row->getMeasure(),
+                        columnNumber: $columnNumber,
+                    );
 
                     break;
                 }
 
-                $this->addDimension($dimension, $columnNumber, false);
+                $this->addDimension(
+                    summaryClass: $normalTable->getSummaryClass(),
+                    dimension: $dimension,
+                    columnNumber: $columnNumber,
+                    forceCreate: false,
+                );
 
                 $columnNumber++;
             }
@@ -216,13 +240,23 @@ final class NormalTableToTreeTransformer
             foreach ($tuple as $dimension) {
                 // if last dimension
                 if ($columnNumber === \count($tuple) - 1) {
-                    $this->addMeasure($dimension, $row->getMeasure(), $columnNumber);
+                    $this->addMeasure(
+                        summaryClass: $normalTable->getSummaryClass(),
+                        lastDimension: $dimension,
+                        measure: $row->getMeasure(),
+                        columnNumber: $columnNumber,
+                    );
 
                     break;
                 }
 
                 if (!$sameAsPrevious) {
-                    $this->addDimension($dimension, $columnNumber, true);
+                    $this->addDimension(
+                        summaryClass: $normalTable->getSummaryClass(),
+                        dimension: $dimension,
+                        columnNumber: $columnNumber,
+                        forceCreate: true,
+                    );
                 }
 
                 $columnNumber++;

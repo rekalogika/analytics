@@ -24,13 +24,18 @@ final class DefaultTreeNodeFactory
         private readonly int $fillingNodesLimit,
     ) {}
 
+    /**
+     * @param class-string $summaryClass
+     */
     public function createBranchNode(
+        string $summaryClass,
         string $childrenKey,
         ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
     ): DefaultTreeNode {
         return new DefaultTreeNode(
+            summaryClass: $summaryClass,
             childrenKey: $childrenKey,
             dimension: $dimension,
             parent: $parent,
@@ -41,13 +46,18 @@ final class DefaultTreeNodeFactory
         );
     }
 
+    /**
+     * @param class-string $summaryClass
+     */
     public function createLeafNode(
+        string $summaryClass,
         ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
         DefaultMeasure $measure,
     ): DefaultTreeNode {
         return new DefaultTreeNode(
+            summaryClass: $summaryClass,
             childrenKey: null,
             dimension: $dimension,
             parent: $parent,
@@ -58,9 +68,13 @@ final class DefaultTreeNodeFactory
         );
     }
 
+    /**
+     * @param class-string $summaryClass
+     */
     public function createFillingNode(
+        string $summaryClass,
         ?string $childrenKey,
-        null|DefaultTreeNode $parent,
+        ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
         Items $items,
         ?DefaultMeasure $measure,
@@ -72,6 +86,7 @@ final class DefaultTreeNodeFactory
         $this->fillingNodesCount++;
 
         return new DefaultTreeNode(
+            summaryClass: $summaryClass,
             childrenKey: $childrenKey,
             dimension: $dimension,
             parent: $parent,

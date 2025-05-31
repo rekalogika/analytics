@@ -60,6 +60,7 @@ final readonly class QueryResultToTableTransformer
         $rows = $transformer->doTransform($input);
 
         return new DefaultTable(
+            summaryClass: $metadata->getSummaryClass(),
             rows: $rows,
         );
     }
@@ -91,8 +92,8 @@ final readonly class QueryResultToTableTransformer
     public function transformOne(array $input): DefaultRow
     {
         // create the object
-        $summaryClassName = $this->metadata->getSummaryClass();
-        $reflectionClass = new \ReflectionClass($summaryClassName);
+        $summaryClass = $this->metadata->getSummaryClass();
+        $reflectionClass = new \ReflectionClass($summaryClass);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
 
         //
@@ -224,6 +225,7 @@ final readonly class QueryResultToTableTransformer
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultRow(
+            summaryClass: $summaryClass,
             tuple: $tuple,
             measures: $measures,
             groupings: $groupings,

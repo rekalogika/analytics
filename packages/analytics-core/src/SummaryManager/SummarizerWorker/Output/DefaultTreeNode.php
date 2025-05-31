@@ -35,7 +35,11 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     private DefaultTuple $tuple;
 
+    /**
+     * @param class-string $summaryClass
+     */
     public function __construct(
+        private readonly string $summaryClass,
         private readonly ?string $childrenKey,
         private readonly null|DefaultTreeNode $parent,
         private readonly DefaultDimension $dimension,
@@ -51,6 +55,12 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         } else {
             $this->tuple = new DefaultTuple([$this->dimension]);
         }
+    }
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
     }
 
     #[\Override]

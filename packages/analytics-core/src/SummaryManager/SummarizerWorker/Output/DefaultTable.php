@@ -21,11 +21,19 @@ use Rekalogika\Analytics\Contracts\Result\Table;
 final readonly class DefaultTable implements Table, \IteratorAggregate
 {
     /**
+     * @param class-string $summaryClass
      * @param list<DefaultRow> $rows
      */
     public function __construct(
+        private string $summaryClass,
         private array $rows,
     ) {}
+
+    #[\Override]
+    public function getSummaryClass(): string
+    {
+        return $this->summaryClass;
+    }
 
     #[\Override]
     public function first(): ?DefaultRow
