@@ -22,6 +22,12 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface TreeNode extends \Traversable, \Countable, Dimension
 {
+    /**
+     * Get the tuple of this node, which is a collection of dimensions from the
+     * root to this node.
+     */
+    public function getTuple(): Tuple;
+
     public function getMeasure(): ?Measure;
 
     public function traverse(mixed ...$members): ?TreeNode;

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
@@ -52,7 +51,13 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getMeasure(): ?Measure
+    public function getTuple(): DefaultTuple
+    {
+        return new DefaultTuple([]);
+    }
+
+    #[\Override]
+    public function getMeasure(): ?DefaultMeasure
     {
         return null;
     }
