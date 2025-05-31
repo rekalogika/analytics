@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\DimensionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 final readonly class TimeDimensionValueResolver implements HierarchicalDimensionValueResolver
 {
@@ -25,9 +26,17 @@ final readonly class TimeDimensionValueResolver implements HierarchicalDimension
 
     #[\Override]
     public function getDQL(
-        ValueResolver $input,
+        object $input,
         Context $context,
     ): string {
+        if (!$input instanceof ValueResolver) {
+            throw new InvalidArgumentException(\sprintf(
+                'Expected instance of "%s", got "%s"',
+                ValueResolver::class,
+                get_debug_type($input),
+            ));
+        }
+
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
             $input->getDQL($context),
@@ -35,6 +44,5 @@ final readonly class TimeDimensionValueResolver implements HierarchicalDimension
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
             $this->format->value,
         );
-
     }
 }
