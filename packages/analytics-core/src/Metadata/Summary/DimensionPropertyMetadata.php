@@ -18,10 +18,15 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata extends PropertyMetadata
 {
+    /**
+     * @param class-string|null $typeClass
+     */
     public function __construct(
         string $summaryProperty,
         string $hierarchyProperty,
         TranslatableInterface $label,
+        private TranslatableInterface $nullLabel,
+        private ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
         SummaryMetadata $summaryMetadata,
     ) {
@@ -35,5 +40,18 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function getDimensionLevelProperty(): DimensionLevelPropertyMetadata
     {
         return $this->dimensionLevelProperty;
+    }
+
+    public function getNullLabel(): TranslatableInterface
+    {
+        return $this->nullLabel;
+    }
+
+    /**
+     * @return null|class-string
+     */
+    public function getTypeClass(): ?string
+    {
+        return $this->typeClass;
     }
 }

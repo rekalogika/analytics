@@ -24,6 +24,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class SummaryMetadata
 {
     /**
+     * All properties: dimensions, dimension properties (subdimension),
+     * measures, partition.
+     *
      * @var array<string,PropertyMetadata>
      */
     private array $properties;
@@ -149,6 +152,8 @@ final readonly class SummaryMetadata
                             propertyLabel: $dimension->getLabel(),
                             dimensionLabel: $dimensionLevelProperty->getLabel(),
                         ),
+                        nullLabel: $dimensionLevelProperty->getNullLabel(),
+                        typeClass: $dimensionLevelProperty->getTypeClass(),
                         dimensionLevelProperty: $dimensionLevelProperty,
                         summaryMetadata: $this,
                     );
@@ -389,17 +394,33 @@ final readonly class SummaryMetadata
         return $this->dimensionProperties;
     }
 
+    public function getDimensionProperty(string $propertyName): DimensionPropertyMetadata
+    {
+        return $this->dimensionProperties[$propertyName]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension property not found: %s',
+                $propertyName,
+            ));
+    }
+
     //
-    // fully qualified dimensions
-    // @deprecated
+    // dimension or dimension property
     //
 
-    public function getFullyQualifiedDimension(
+    public function getDimensionOrDimensionProperty(
         string $dimensionName,
-    ): FullyQualifiedDimensionMetadata {
-        return $this->fullyQualifiedDimensions[$dimensionName]
-            ?? throw new MetadataException(\sprintf('Dimension not found: %s', $dimensionName));
+    ): DimensionMetadata|DimensionPropertyMetadata {
+        return $this->dimensions[$dimensionName]
+            ?? $this->dimensionProperties[$dimensionName]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension or dimension property not found: %s',
+                $dimensionName,
+            ));
     }
+
+    //
+    // fully qualified dimensions
+    //
 
     /**
      * @return array<string,Field>
