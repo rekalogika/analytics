@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
-use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionMetadata extends PropertyMetadata
