@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionMetadata
+final readonly class DimensionMetadata extends PropertyMetadata
 {
     private ?DimensionHierarchyMetadata $hierarchy;
 
@@ -29,8 +29,8 @@ final readonly class DimensionMetadata
      */
     public function __construct(
         private array $source,
-        private string $summaryProperty,
-        private TranslatableInterface $label,
+        string $summaryProperty,
+        TranslatableInterface $label,
         private \DateTimeZone $sourceTimeZone,
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
@@ -38,8 +38,14 @@ final readonly class DimensionMetadata
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
-        private ?SummaryMetadata $summaryMetadata = null,
+        ?SummaryMetadata $summaryMetadata = null,
     ) {
+        parent::__construct(
+            summaryProperty: $summaryProperty,
+            label: $label,
+            summaryMetadata: $summaryMetadata,
+        );
+
         if ($hierarchy !== null && \is_array($orderBy)) {
             throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
@@ -51,8 +57,8 @@ final readonly class DimensionMetadata
     {
         return new self(
             source: $this->source,
-            summaryProperty: $this->summaryProperty,
-            label: $this->label,
+            summaryProperty: $this->getSummaryProperty(),
+            label: $this->getLabel(),
             sourceTimeZone: $this->sourceTimeZone,
             summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
@@ -64,31 +70,12 @@ final readonly class DimensionMetadata
         );
     }
 
-    public function getSummaryMetadata(): SummaryMetadata
-    {
-        if ($this->summaryMetadata === null) {
-            throw new MetadataException('Summary table metadata is not set');
-        }
-
-        return $this->summaryMetadata;
-    }
-
     /**
      * @return array<class-string,ValueResolver>
      */
     public function getSource(): array
     {
         return $this->source;
-    }
-
-    public function getSummaryProperty(): string
-    {
-        return $this->summaryProperty;
-    }
-
-    public function getLabel(): TranslatableInterface
-    {
-        return $this->label;
     }
 
     public function getSourceTimeZone(): \DateTimeZone

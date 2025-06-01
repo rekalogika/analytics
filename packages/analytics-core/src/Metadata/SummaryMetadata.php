@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
 {
+    private PartitionMetadata $partition;
+
     /**
      * @var non-empty-array<string,DimensionMetadata>
      */
@@ -63,12 +65,18 @@ final readonly class SummaryMetadata
     public function __construct(
         private array $sourceClasses,
         private string $summaryClass,
-        private PartitionMetadata $partition,
+        PartitionMetadata $partition,
         array $dimensions,
         array $measures,
         private string $groupingsProperty,
         private TranslatableInterface $label,
     ) {
+        //
+        // partition
+        //
+
+        $this->partition = $partition->withSummaryMetadata($this);
+
         //
         // measures
         //

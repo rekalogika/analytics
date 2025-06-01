@@ -14,29 +14,34 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class MeasureMetadata
+final readonly class MeasureMetadata extends PropertyMetadata
 {
     /**
      * @param non-empty-array<class-string,AggregateFunction> $function
      */
     public function __construct(
         private array $function,
-        private string $summaryProperty,
-        private TranslatableInterface $label,
+        string $summaryProperty,
+        TranslatableInterface $label,
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
-        private ?SummaryMetadata $summaryMetadata = null,
-    ) {}
+        ?SummaryMetadata $summaryMetadata = null,
+    ) {
+        parent::__construct(
+            summaryProperty: $summaryProperty,
+            label: $label,
+            summaryMetadata: $summaryMetadata,
+        );
+    }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
             function: $this->function,
-            summaryProperty: $this->summaryProperty,
-            label: $this->label,
+            summaryProperty: $this->getSummaryProperty(),
+            label: $this->getLabel(),
             unit: $this->unit,
             unitSignature: $this->unitSignature,
             summaryMetadata: $summaryMetadata,
@@ -56,16 +61,6 @@ final readonly class MeasureMetadata
         $function = $this->function;
 
         return reset($function);
-    }
-
-    public function getSummaryProperty(): string
-    {
-        return $this->summaryProperty;
-    }
-
-    public function getLabel(): TranslatableInterface
-    {
-        return $this->label;
     }
 
     public function getUnit(): null|TranslatableInterface
@@ -98,14 +93,5 @@ final readonly class MeasureMetadata
         }
 
         return $uniqueProperties;
-    }
-
-    public function getSummaryMetadata(): SummaryMetadata
-    {
-        if ($this->summaryMetadata === null) {
-            throw new MetadataException('Summary table metadata is not set');
-        }
-
-        return $this->summaryMetadata;
     }
 }
