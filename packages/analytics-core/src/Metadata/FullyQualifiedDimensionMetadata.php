@@ -26,7 +26,7 @@ final readonly class FullyQualifiedDimensionMetadata
      */
     public function __construct(
         private DimensionMetadata $dimension,
-        private ?DimensionLevelPropertyMetadata $dimensionProperty,
+        private ?DimensionLevelPropertyMetadata $dimensionLevelProperty,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
 
@@ -34,33 +34,33 @@ final readonly class FullyQualifiedDimensionMetadata
     {
         return new self(
             dimension: $this->dimension,
-            dimensionProperty: $this->dimensionProperty,
+            dimensionLevelProperty: $this->dimensionLevelProperty,
             summaryMetadata: $summaryMetadata,
         );
     }
 
     public function getFullName(): string
     {
-        if ($this->dimensionProperty === null) {
+        if ($this->dimensionLevelProperty === null) {
             return $this->dimension->getSummaryProperty();
         }
 
         return \sprintf(
             '%s.%s',
             $this->dimension->getSummaryProperty(),
-            $this->dimensionProperty->getName(),
+            $this->dimensionLevelProperty->getName(),
         );
     }
 
     public function getLabel(): TranslatableInterface
     {
-        if ($this->dimensionProperty === null) {
+        if ($this->dimensionLevelProperty === null) {
             return $this->dimension->getLabel();
         }
 
         return new TranslatablePropertyDimension(
             propertyLabel: $this->dimension->getLabel(),
-            dimensionLabel: $this->dimensionProperty->getLabel(),
+            dimensionLabel: $this->dimensionLevelProperty->getLabel(),
         );
     }
 
@@ -69,11 +69,11 @@ final readonly class FullyQualifiedDimensionMetadata
      */
     public function getTypeClass(): ?string
     {
-        if ($this->dimensionProperty === null) {
+        if ($this->dimensionLevelProperty === null) {
             return $this->dimension->getTypeClass();
         }
 
-        return $this->dimensionProperty->getTypeClass();
+        return $this->dimensionLevelProperty->getTypeClass();
     }
 
     public function getDimension(): DimensionMetadata
@@ -83,11 +83,11 @@ final readonly class FullyQualifiedDimensionMetadata
 
     public function getDimensionProperty(): DimensionLevelPropertyMetadata
     {
-        if ($this->dimensionProperty === null) {
+        if ($this->dimensionLevelProperty === null) {
             throw new MetadataException('Dimension property is not set');
         }
 
-        return $this->dimensionProperty;
+        return $this->dimensionLevelProperty;
     }
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -101,10 +101,10 @@ final readonly class FullyQualifiedDimensionMetadata
 
     public function getNullLabel(): TranslatableInterface
     {
-        if ($this->dimensionProperty === null) {
+        if ($this->dimensionLevelProperty === null) {
             return $this->dimension->getNullLabel();
         }
 
-        return $this->dimensionProperty->getNullLabel();
+        return $this->dimensionLevelProperty->getNullLabel();
     }
 }

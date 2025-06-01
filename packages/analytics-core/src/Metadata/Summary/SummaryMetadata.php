@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Metadata\Field;
 use Rekalogika\Analytics\Metadata\FullyQualifiedDimensionMetadata;
 use Rekalogika\Analytics\Metadata\FullyQualifiedPropertyMetadata;
 use Rekalogika\Analytics\Metadata\HierarchicalDimension;
+use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -28,6 +29,11 @@ final readonly class SummaryMetadata
      * @var non-empty-array<string,DimensionMetadata>
      */
     private array $dimensions;
+
+    /**
+     * @var array<string,DimensionPropertyMetadata>
+     */
+    private array $dimensionProperties;
 
     /**
      * @var non-empty-array<string,MeasureMetadata>
@@ -99,6 +105,7 @@ final readonly class SummaryMetadata
 
         $fullyQualifiedDimensions = [];
         $newDimensions = [];
+        $dimensionProperties = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
             $newDimensions[$dimensionKey] = $dimension->withSummaryMetadata($this);
@@ -108,26 +115,40 @@ final readonly class SummaryMetadata
             if ($hierarchy === null) {
                 $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
                     dimension: $dimension,
-                    dimensionProperty: null,
+                    dimensionLevelProperty: null,
                     summaryMetadata: $this,
                 );
 
                 $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
             } else {
-                foreach ($hierarchy->getProperties() as $property) {
+                foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
                     $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
                         dimension: $dimension,
-                        dimensionProperty: $property,
+                        dimensionLevelProperty: $dimensionLevelProperty,
                         summaryMetadata: $this,
                     );
 
                     $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
+
+                    $dimensionProperty = new DimensionPropertyMetadata(
+                        summaryProperty: $dimension->getSummaryProperty(),
+                        hierarchyProperty: $dimensionLevelProperty->getName(),
+                        label: new TranslatablePropertyDimension(
+                            propertyLabel: $dimension->getLabel(),
+                            dimensionLabel: $dimensionLevelProperty->getLabel(),
+                        ),
+                        dimensionLevelProperty: $dimensionLevelProperty,
+                        summaryMetadata: $this,
+                    );
+
+                    $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
                 }
             }
         }
 
         $this->dimensions = $newDimensions;
         $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
+        $this->dimensionProperties = $dimensionProperties;
 
         //
         // fully qualified properties
@@ -178,17 +199,17 @@ final readonly class SummaryMetadata
 
             // if hierarchical
 
-            foreach ($hierarchy->getProperties() as $property) {
+            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
                 $fullProperty = \sprintf(
                     '%s.%s',
                     $dimension->getSummaryProperty(),
-                    $property->getName(),
+                    $dimensionLevelProperty->getName(),
                 );
 
                 $field = new Field(
                     key: $fullProperty,
                     label: $dimension->getLabel(),
-                    subLabel: $property->getLabel(),
+                    subLabel: $dimensionLevelProperty->getLabel(),
                 );
 
                 $dimensionChoices[$field->getKey()] = $field;
@@ -218,8 +239,8 @@ final readonly class SummaryMetadata
 
             $children = [];
 
-            foreach ($hierarchy->getProperties() as $property) {
-                $children[$property->getName()] = $property->getLabel();
+            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
+                $children[$dimensionLevelProperty->getName()] = $dimensionLevelProperty->getLabel();
             }
 
             $hierarchicalDimensionChoices[$dimensionMetadata->getSummaryProperty()] =
@@ -314,6 +335,14 @@ final readonly class SummaryMetadata
                 'Dimension not found: %s',
                 $dimensionName,
             ));
+    }
+
+    /**
+     * @return array<string,DimensionPropertyMetadata>
+     */
+    public function getDimensionProperties(): array
+    {
+        return $this->dimensionProperties;
     }
 
     public function getFullyQualifiedDimension(
