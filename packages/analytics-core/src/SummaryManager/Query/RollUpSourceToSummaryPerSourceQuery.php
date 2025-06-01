@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;

@@ -19,7 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;

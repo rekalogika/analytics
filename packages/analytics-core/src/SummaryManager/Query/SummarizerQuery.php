@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;

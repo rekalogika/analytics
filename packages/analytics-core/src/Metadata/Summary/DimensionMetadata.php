@@ -11,11 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionMetadata extends PropertyMetadata

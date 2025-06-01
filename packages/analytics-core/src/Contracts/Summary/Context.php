@@ -18,12 +18,12 @@ use Doctrine\DBAL\ParameterType;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionLevelMetadata;
-use Rekalogika\Analytics\Metadata\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\DimensionPathMetadata;
 use Rekalogika\Analytics\Metadata\DimensionPropertyMetadata;
-use Rekalogika\Analytics\Metadata\MeasureMetadata;
-use Rekalogika\Analytics\Metadata\PartitionMetadata;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
+use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final readonly class Context

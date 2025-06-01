@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\Query\InsertIntoSummaryQuery;

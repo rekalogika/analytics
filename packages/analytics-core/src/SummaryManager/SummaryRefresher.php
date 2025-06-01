@@ -17,7 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;

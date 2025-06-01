@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Exception\SummaryNotFound;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 interface SummaryMetadataFactory
 {

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\TimeZoneAwareDimensionHierarchy;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;

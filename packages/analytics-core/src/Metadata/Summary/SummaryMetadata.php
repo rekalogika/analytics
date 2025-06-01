@@ -11,9 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\Field;
+use Rekalogika\Analytics\Metadata\FullyQualifiedDimensionMetadata;
+use Rekalogika\Analytics\Metadata\FullyQualifiedPropertyMetadata;
+use Rekalogika\Analytics\Metadata\HierarchicalDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata

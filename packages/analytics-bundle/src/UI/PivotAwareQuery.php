@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI;
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Metadata\Field;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;

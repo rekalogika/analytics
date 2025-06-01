@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**

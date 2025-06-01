@@ -62,7 +62,7 @@ use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
-use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;

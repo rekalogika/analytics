@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class FullyQualifiedPropertyMetadata

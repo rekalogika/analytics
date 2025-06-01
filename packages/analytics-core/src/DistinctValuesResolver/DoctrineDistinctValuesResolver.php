@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
