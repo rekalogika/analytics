@@ -357,7 +357,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 ->getEmbeddedClassOfProperty($summaryProperty);
 
             $dimensionHierarchy = $this->createDimensionHierarchyMetadata(
-                hierarchyPropertyName: $summaryProperty,
                 hierarchyClass: $embeddedClass,
             );
         } else {
@@ -594,7 +593,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
      */
     private function createDimensionHierarchyMetadata(
         string $hierarchyClass,
-        string $hierarchyPropertyName,
     ): DimensionHierarchyMetadata {
         $hierarchyAttribute = AttributeUtil::getClassAttribute(
             class: $hierarchyClass,
@@ -636,7 +634,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
             $dimensionPropertyMetadata = new DimensionPropertyMetadata(
                 name: $name,
-                hierarchyName: $hierarchyPropertyName,
                 label: $label,
                 valueResolver: $valueResolver,
                 typeClass: $typeClass,

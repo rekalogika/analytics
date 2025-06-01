@@ -45,7 +45,11 @@ final readonly class FullyQualifiedDimensionMetadata
             return $this->dimension->getSummaryProperty();
         }
 
-        return $this->dimensionProperty->getFullName();
+        return \sprintf(
+            '%s.%s',
+            $this->dimension->getSummaryProperty(),
+            $this->dimensionProperty->getName(),
+        );
     }
 
     public function getLabel(): TranslatableInterface
