@@ -130,7 +130,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->summaryMetadata->getDimensionMetadatas() as $dimensionMetadata) {
+        foreach ($this->summaryMetadata->getDimensions() as $dimensionMetadata) {
             $summaryProperty = $dimensionMetadata->getSummaryProperty();
             $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -244,7 +244,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processMeasures(): void
     {
-        foreach ($this->summaryMetadata->getMeasureMetadatas() as $measureMetadata) {
+        foreach ($this->summaryMetadata->getMeasures() as $measureMetadata) {
             $function = $measureMetadata->getFunction()[$this->sourceClass]
                 ?? throw new InvalidArgumentException(\sprintf(
                     'Function not found for source class "%s".',

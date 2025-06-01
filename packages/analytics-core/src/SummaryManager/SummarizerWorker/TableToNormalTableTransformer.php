@@ -172,7 +172,7 @@ final class TableToNormalTableTransformer
     private function getMeasureMember(string $measure): DefaultMeasureMember
     {
         return $this->measureMemberCache[$measure] ??= new DefaultMeasureMember(
-            label: $this->metadata->getMeasureMetadata($measure)->getLabel(),
+            label: $this->metadata->getMeasure($measure)->getLabel(),
             property: $measure,
         );
     }

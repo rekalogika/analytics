@@ -358,7 +358,7 @@ final class SummarizerQuery extends AbstractQuery
                 [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
                 $dimensionMetadata = $this->metadata
-                    ->getDimensionMetadata($dimensionProperty);
+                    ->getDimension($dimensionProperty);
 
                 $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -432,7 +432,7 @@ final class SummarizerQuery extends AbstractQuery
         // determine level
 
         $dimensionMetadata = $this->metadata
-            ->getDimensionMetadata($dimensionProperty);
+            ->getDimension($dimensionProperty);
 
         $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -495,7 +495,7 @@ final class SummarizerQuery extends AbstractQuery
 
     private function addMeasuresToQueryBuilder(): void
     {
-        $measureMetadatas = $this->metadata->getMeasureMetadatas();
+        $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $key => $measureMetadata) {
             $function = $measureMetadata->getFirstFunction();
@@ -513,7 +513,7 @@ final class SummarizerQuery extends AbstractQuery
     private function addNonHierarchicalDimensionToQueryBuilder(
         string $dimension,
     ): void {
-        $dimensionMetadata = $this->metadata->getDimensionMetadata($dimension);
+        $dimensionMetadata = $this->metadata->getDimension($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
             manager: $this->entityManager,
@@ -633,7 +633,7 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($orderBy as $field => $order) {
             if ($this->metadata->isMeasure($field)) {
-                $measureMetadata = $this->metadata->getMeasureMetadata($field);
+                $measureMetadata = $this->metadata->getMeasure($field);
                 $function = $measureMetadata->getFirstFunction();
                 $dql = $function->getSummaryToSummaryDQLFunction();
 

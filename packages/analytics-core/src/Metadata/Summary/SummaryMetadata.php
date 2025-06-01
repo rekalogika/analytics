@@ -23,6 +23,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
 {
+    /**
+     * @var array<string,PropertyMetadata>
+     */
+    private array $properties;
+
     private PartitionMetadata $partition;
 
     /**
@@ -81,11 +86,14 @@ final readonly class SummaryMetadata
         private string $groupingsProperty,
         private TranslatableInterface $label,
     ) {
+        $allProperties = [];
+
         //
         // partition
         //
 
         $this->partition = $partition->withSummaryMetadata($this);
+        $allProperties[$partition->getSummaryProperty()] = $partition;
 
         //
         // measures
@@ -94,7 +102,9 @@ final readonly class SummaryMetadata
         $newMeasures = [];
 
         foreach ($measures as $measureKey => $measure) {
-            $newMeasures[$measureKey] = $measure->withSummaryMetadata($this);
+            $measure = $measure->withSummaryMetadata($this);
+            $newMeasures[$measureKey] = $measure;
+            $allProperties[$measureKey] = $measure;
         }
 
         $this->measures = $newMeasures;
@@ -108,7 +118,9 @@ final readonly class SummaryMetadata
         $dimensionProperties = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
-            $newDimensions[$dimensionKey] = $dimension->withSummaryMetadata($this);
+            $dimension = $dimension->withSummaryMetadata($this);
+            $newDimensions[$dimensionKey] = $dimension;
+            $allProperties[$dimension->getSummaryProperty()] = $dimension;
 
             $hierarchy = $dimension->getHierarchy();
 
@@ -142,6 +154,7 @@ final readonly class SummaryMetadata
                     );
 
                     $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+                    $allProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
                 }
             }
         }
@@ -271,6 +284,12 @@ final readonly class SummaryMetadata
         }
 
         $this->measureChoices = $measureChoices;
+
+        //
+        // properties
+        //
+
+        $this->properties = $allProperties;
     }
 
     /**
@@ -292,6 +311,27 @@ final readonly class SummaryMetadata
     public function getLabel(): TranslatableInterface
     {
         return $this->label;
+    }
+
+    //
+    // all properties
+    //
+
+    /**
+     * @return array<string,PropertyMetadata>
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    public function getProperty(string $propertyName): PropertyMetadata
+    {
+        return $this->properties[$propertyName]
+            ?? throw new MetadataException(\sprintf(
+                'Property not found: %s',
+                $propertyName,
+            ));
     }
 
     //
@@ -323,12 +363,12 @@ final readonly class SummaryMetadata
     /**
      * @return non-empty-array<string,DimensionMetadata>
      */
-    public function getDimensionMetadatas(): array
+    public function getDimensions(): array
     {
         return $this->dimensions;
     }
 
-    public function getDimensionMetadata(string $dimensionName): DimensionMetadata
+    public function getDimension(string $dimensionName): DimensionMetadata
     {
         return $this->dimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
@@ -337,6 +377,10 @@ final readonly class SummaryMetadata
             ));
     }
 
+    //
+    // dimension properties
+    //
+
     /**
      * @return array<string,DimensionPropertyMetadata>
      */
@@ -344,6 +388,11 @@ final readonly class SummaryMetadata
     {
         return $this->dimensionProperties;
     }
+
+    //
+    // fully qualified dimensions
+    // @deprecated
+    //
 
     public function getFullyQualifiedDimension(
         string $dimensionName,
@@ -375,12 +424,12 @@ final readonly class SummaryMetadata
     /**
      * @return non-empty-array<string,MeasureMetadata>
      */
-    public function getMeasureMetadatas(): array
+    public function getMeasures(): array
     {
         return $this->measures;
     }
 
-    public function getMeasureMetadata(string $measureName): MeasureMetadata
+    public function getMeasure(string $measureName): MeasureMetadata
     {
         return $this->measures[$measureName]
             ?? throw new MetadataException(\sprintf(
@@ -404,6 +453,7 @@ final readonly class SummaryMetadata
 
     //
     // field (dimension or measure)
+    // @deprecated
     //
 
     public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata

@@ -132,11 +132,11 @@ final readonly class QueryResultToTableTransformer
             $value = $this->propertyAccessor->getValue($summaryObject, $key);
 
             $unit = $this->metadata
-                ->getMeasureMetadata($key)
+                ->getMeasure($key)
                 ->getUnit();
 
             $unitSignature = $this->metadata
-                ->getMeasureMetadata($key)
+                ->getMeasure($key)
                 ->getUnitSignature();
 
             $unit = DefaultUnit::create(
@@ -415,7 +415,7 @@ final readonly class QueryResultToTableTransformer
 
         if ($hierarchyObject instanceof TimeZoneAwareDimensionHierarchy) {
             $timeZone = $this->metadata
-                ->getDimensionMetadata($propertyName)
+                ->getDimension($propertyName)
                 ->getSummaryTimeZone();
 
             $hierarchyObject->setTimeZone($timeZone);

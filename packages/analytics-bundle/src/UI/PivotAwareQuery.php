@@ -353,7 +353,7 @@ final class PivotAwareQuery
         // trim dot and the string after
         $dimension = explode('.', $dimension)[0];
 
-        return $this->metadata->getDimensionMetadata($dimension)->isMandatory();
+        return $this->metadata->getDimension($dimension)->isMandatory();
     }
 
     //
