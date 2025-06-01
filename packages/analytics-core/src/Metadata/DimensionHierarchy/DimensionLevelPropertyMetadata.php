@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionPropertyMetadata
+final readonly class DimensionLevelPropertyMetadata
 {
     /**
      * @param null|class-string $typeClass

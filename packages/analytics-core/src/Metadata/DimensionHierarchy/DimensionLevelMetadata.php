@@ -16,17 +16,17 @@ namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 use Rekalogika\Analytics\Exception\MetadataException;
 
 /**
- * @implements \IteratorAggregate<DimensionPropertyMetadata>
+ * @implements \IteratorAggregate<DimensionLevelPropertyMetadata>
  */
 final readonly class DimensionLevelMetadata implements \IteratorAggregate
 {
     /**
-     * @var non-empty-list<DimensionPropertyMetadata>
+     * @var non-empty-list<DimensionLevelPropertyMetadata>
      */
     private array $properties;
 
     /**
-     * @param non-empty-list<DimensionPropertyMetadata> $properties
+     * @param non-empty-list<DimensionLevelPropertyMetadata> $properties
      */
     public function __construct(
         private int $levelId,
@@ -60,7 +60,7 @@ final readonly class DimensionLevelMetadata implements \IteratorAggregate
         return $this->pathMetadata;
     }
 
-    public function getPrimaryProperty(): DimensionPropertyMetadata
+    public function getPrimaryProperty(): DimensionLevelPropertyMetadata
     {
         return $this->properties[0];
     }
@@ -77,7 +77,7 @@ final readonly class DimensionLevelMetadata implements \IteratorAggregate
     }
 
     /**
-     * @return list<DimensionPropertyMetadata>
+     * @return list<DimensionLevelPropertyMetadata>
      */
     public function getProperties(): array
     {

@@ -33,8 +33,8 @@ use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPathMetadata;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\SourceMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Util\AttributeUtil;
@@ -632,7 +632,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $nullLabel = TranslatableUtil::normalize($dimensionLevelAttribute->getNullLabel())
                 ?? new TranslatableMessage('(None)');
 
-            $dimensionPropertyMetadata = new DimensionPropertyMetadata(
+            $dimensionPropertyMetadata = new DimensionLevelPropertyMetadata(
                 name: $name,
                 label: $label,
                 valueResolver: $valueResolver,

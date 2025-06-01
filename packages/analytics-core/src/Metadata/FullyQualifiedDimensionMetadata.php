@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata;
 
 use Rekalogika\Analytics\Exception\MetadataException;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
@@ -26,7 +26,7 @@ final readonly class FullyQualifiedDimensionMetadata
      */
     public function __construct(
         private DimensionMetadata $dimension,
-        private ?DimensionPropertyMetadata $dimensionProperty,
+        private ?DimensionLevelPropertyMetadata $dimensionProperty,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
 
@@ -81,7 +81,7 @@ final readonly class FullyQualifiedDimensionMetadata
         return $this->dimension;
     }
 
-    public function getDimensionProperty(): DimensionPropertyMetadata
+    public function getDimensionProperty(): DimensionLevelPropertyMetadata
     {
         if ($this->dimensionProperty === null) {
             throw new MetadataException('Dimension property is not set');
