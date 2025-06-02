@@ -85,4 +85,13 @@ final readonly class DefaultDimension implements Dimension
     {
         return $this->rawMember instanceof SequenceMember;
     }
+
+    public function getSignature(): string
+    {
+        if (\is_object($this->rawMember)) {
+            return $this->key . ':' . spl_object_id($this->rawMember);
+        }
+
+        return $this->key . ':' . serialize($this->rawMember);
+    }
 }

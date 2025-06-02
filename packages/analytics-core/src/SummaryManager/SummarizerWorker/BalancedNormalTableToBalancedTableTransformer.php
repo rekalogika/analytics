@@ -18,6 +18,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class BalancedNormalTableToBalancedTableTransformer
 {
@@ -28,43 +29,49 @@ final class BalancedNormalTableToBalancedTableTransformer
         return $transformer->process();
     }
 
+    private function __construct(
+        private readonly DefaultNormalTable $normalTable,
+    ) {}
+
+    /**
+     * @var array<string,DefaultTuple>
+     */
+    private array $signatureToTuple = [];
+
+    /**
+     * @var array<string,list<DefaultMeasure>>
+     */
+    private array $signatureToMeasures = [];
+
     /**
      * @var list<DefaultRow>
      */
     private array $rows = [];
 
-    /**
-     * @var list<DefaultMeasure>
-     */
-    private array $measures = [];
-
-    public function __construct(
-        private readonly DefaultNormalTable $normalTable,
-    ) {}
-
     private function process(): DefaultTable
     {
-        $lastRow = null;
         $summaryClass = $this->normalTable->getSummaryClass();
 
         foreach ($this->normalTable as $currentRow) {
-            if (
-                $lastRow === null
-                || $lastRow->getTuple()->isSame($currentRow->getTuple())
-            ) {
-                $this->measures[] = $currentRow->getMeasure();
-            } else {
-                $this->measures = [$currentRow->getMeasure()];
-            }
+            $tupleWithoutValues = $currentRow->getTuple()->getWithoutValues();
+            $signature = $tupleWithoutValues->getSignature();
 
-            $this->rows[] = new DefaultRow(
+            $this->signatureToTuple[$signature] ??= $tupleWithoutValues;
+            $this->signatureToMeasures[$signature][] = $currentRow->getMeasure();
+        }
+
+        foreach ($this->signatureToTuple as $signature => $tuple) {
+            $measures = $this->signatureToMeasures[$signature] ?? [];
+            $measureValues = new DefaultMeasures($measures);
+
+            $row = new DefaultRow(
                 summaryClass: $summaryClass,
-                tuple: $currentRow->getTuple(),
-                measures: new DefaultMeasures($this->measures),
+                tuple: $tuple,
+                measures: $measureValues,
                 groupings: '',
             );
 
-            $lastRow = $currentRow;
+            $this->rows[] = $row;
         }
 
         return new DefaultTable(
