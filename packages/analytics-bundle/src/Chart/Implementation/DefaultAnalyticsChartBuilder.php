@@ -82,14 +82,15 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             throw new UnsupportedData('No data found');
         }
 
-        if (\count($tuple) === 2) {
+        if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
                 return $this->createLineChart($result);
             } else {
                 return $this->createBarChart($result);
             }
-        } elseif (\count($tuple) === 3) {
-            return $this->createGroupedBarChart($result, 'multiLine');
+        } elseif (\count($tuple) === 2) {
+            // @todo auto detect best chart type
+            return $this->createGroupedBarChart($result, 'groupedBar');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -214,7 +215,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         foreach ($result->getTable() as $row) {
             $tuple = $row->getTuple();
 
-            if (\count($tuple) !== 2) {
+            if (\count($tuple) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 

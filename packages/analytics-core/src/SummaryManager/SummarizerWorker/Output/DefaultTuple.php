@@ -140,4 +140,32 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
         return $members;
     }
+
+    public function getSignature(): string
+    {
+        $signatures = array_map(
+            static fn(DefaultDimension $dimension): string => $dimension->getSignature(),
+            $this->dimensions,
+        );
+
+        return hash('xxh128', serialize($signatures));
+    }
+
+    public function getWithoutValues(): self
+    {
+        $dimensionsWithoutValues = [];
+
+        foreach ($this->dimensions as $dimension) {
+            if ($dimension->getKey() === '@values') {
+                continue;
+            }
+
+            $dimensionsWithoutValues[] = $dimension;
+        }
+
+        return new self(
+            summaryTable: $this->summaryTable,
+            dimensions: $dimensionsWithoutValues,
+        );
+    }
 }
