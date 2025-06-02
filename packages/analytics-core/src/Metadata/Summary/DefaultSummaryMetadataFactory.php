@@ -19,7 +19,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Attribute\Dimension;
 use Rekalogika\Analytics\Attribute\Groupings;
 use Rekalogika\Analytics\Attribute\Hierarchy;
-use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\Attribute\Measure;
 use Rekalogika\Analytics\Attribute\Partition;
 use Rekalogika\Analytics\Attribute\PartitionKey;
@@ -31,10 +30,9 @@ use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DefaultDimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelMetadata;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPathMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\SourceMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Util\AttributeUtil;
@@ -53,9 +51,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
      */
     private array $involvedProperties;
 
+    private DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory;
+
     public function __construct(
         private ManagerRegistry $managerRegistry,
+        ?DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory = null,
     ) {
+        $this->dimensionHierarchyMetadataFactory = $dimensionHierarchyMetadataFactory
+            ?? new DefaultDimensionHierarchyMetadataFactory();
+
         $this->involvedProperties = $this->createInvolvedProperties();
     }
 
@@ -368,9 +372,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $embeddedClass = $summaryClassMetadata
                 ->getEmbeddedClassOfProperty($summaryProperty);
 
-            $dimensionHierarchy = $this->createDimensionHierarchyMetadata(
-                hierarchyClass: $embeddedClass,
-            );
+            $dimensionHierarchy = $this->dimensionHierarchyMetadataFactory
+                ->getDimensionHierarchyMetadata($embeddedClass);
 
             $dimensionProperties = $this->createDimensionProperties(
                 summaryProperty: $summaryProperty,
@@ -629,120 +632,5 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         }
 
         return new ClassMetadataWrapper($classMetadata);
-    }
-
-    /**
-     * @param class-string $hierarchyClass
-     */
-    private function createDimensionHierarchyMetadata(
-        string $hierarchyClass,
-    ): DimensionHierarchyMetadata {
-        $hierarchyAttribute = AttributeUtil::getClassAttribute(
-            class: $hierarchyClass,
-            attributeClass: Hierarchy::class,
-        ) ?? throw new MetadataException('DimensionHierarchy attribute is required, but not found');
-
-        // collect properties & levels
-
-        $properties = AttributeUtil::getPropertiesOfClass($hierarchyClass);
-
-        $levels = [];
-
-        foreach ($properties as $reflectionProperty) {
-            $property = $reflectionProperty->getName();
-
-            $dimensionLevelAttribute = AttributeUtil::getPropertyAttribute(
-                class: $hierarchyClass,
-                property: $property,
-                attributeClass: LevelProperty::class,
-            );
-
-            if ($dimensionLevelAttribute === null) {
-                continue;
-            }
-
-            $level = $dimensionLevelAttribute->getLevel();
-            $name = $property;
-            $label = $dimensionLevelAttribute->getLabel() ?? $name;
-
-            if (\is_string($label)) {
-                $label = new LiteralString($label);
-            }
-
-            $valueResolver = $dimensionLevelAttribute->getValueResolver();
-            $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
-
-            $nullLabel = TranslatableUtil::normalize($dimensionLevelAttribute->getNullLabel())
-                ?? new TranslatableMessage('(None)');
-
-            $dimensionPropertyMetadata = new DimensionLevelPropertyMetadata(
-                name: $name,
-                label: $label,
-                valueResolver: $valueResolver,
-                typeClass: $typeClass,
-                nullLabel: $nullLabel,
-            );
-
-            $levels[$level][] = $dimensionPropertyMetadata;
-        }
-
-        // create levels
-
-        $dimensionLevelsMetadata = [];
-
-        foreach ($levels as $level => $dimensionPropertyMetadatas) {
-            $dimensionLevelsMetadata[$level] = new DimensionLevelMetadata(
-                levelId: $level,
-                properties: $dimensionPropertyMetadatas,
-            );
-        }
-
-        // create paths
-
-        $dimensionPathsMetadata = [];
-
-        foreach ($hierarchyAttribute->getPaths() as $path) {
-            $levels = [];
-
-            foreach ($path as $level) {
-                $levels[] = $dimensionLevelsMetadata[$level]
-                    ?? throw new MetadataException(\sprintf('Level not found: %d', $level));
-            }
-
-            if ($levels === []) {
-                throw new MetadataException('At least one level is required');
-            }
-
-            $dimensionPathsMetadata[] = new DimensionPathMetadata(
-                levels: $levels,
-            );
-        }
-
-        // make sure at least one path is defined
-
-        if ($dimensionPathsMetadata === []) {
-            throw new MetadataException('At least one path is required');
-        }
-
-        // ensure the lowest level of each path is the same
-
-        $lowest = null;
-
-        foreach ($dimensionPathsMetadata as $dimensionPathMetadata) {
-            $lowestLevel = $dimensionPathMetadata->getLowestLevel()->getLevelId();
-
-            if ($lowest === null) {
-                $lowest = $lowestLevel;
-            } elseif ($lowest !== $lowestLevel) {
-                throw new MetadataException('All paths must have the same lowest level');
-            }
-        }
-
-        // return the hierarchy metadata
-
-        return new DimensionHierarchyMetadata(
-            hierarchyClass: $hierarchyClass,
-            paths: $dimensionPathsMetadata,
-        );
     }
 }
