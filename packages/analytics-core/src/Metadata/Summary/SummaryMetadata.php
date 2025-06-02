@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Field;
 use Rekalogika\Analytics\Metadata\FullyQualifiedDimensionMetadata;
-use Rekalogika\Analytics\Metadata\FullyQualifiedPropertyMetadata;
 use Rekalogika\Analytics\Metadata\HierarchicalDimension;
 use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -52,12 +51,6 @@ final readonly class SummaryMetadata
      * @var array<string,FullyQualifiedDimensionMetadata>
      */
     private array $fullyQualifiedDimensions;
-
-
-    /**
-     * @var array<string,FullyQualifiedPropertyMetadata>
-     */
-    private array $fullyQualifiedProperties;
 
     /**
      * @var array<string,Field>
@@ -156,6 +149,7 @@ final readonly class SummaryMetadata
                         typeClass: $dimensionLevelProperty->getTypeClass(),
                         dimensionLevelProperty: $dimensionLevelProperty,
                         summaryMetadata: $this,
+                        dimensionMetadata: $dimension,
                     );
 
                     $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
@@ -167,30 +161,6 @@ final readonly class SummaryMetadata
         $this->dimensions = $newDimensions;
         $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
         $this->dimensionProperties = $dimensionProperties;
-
-        //
-        // fully qualified properties
-        //
-
-        $fullyQualifiedProperties = [];
-
-        foreach ($this->fullyQualifiedDimensions as $dimension) {
-            $fullyQualifiedProperties[$dimension->getFullName()] =
-                new FullyQualifiedPropertyMetadata(
-                    property: $dimension,
-                    summaryMetadata: $this,
-                );
-        }
-
-        foreach ($this->measures as $measure) {
-            $fullyQualifiedProperties[$measure->getSummaryProperty()] =
-                new FullyQualifiedPropertyMetadata(
-                    property: $measure,
-                    summaryMetadata: $this,
-                );
-        }
-
-        $this->fullyQualifiedProperties = $fullyQualifiedProperties;
 
         //
         // dimension choices
@@ -470,38 +440,6 @@ final readonly class SummaryMetadata
     public function getMeasureChoices(): array
     {
         return $this->measureChoices;
-    }
-
-    //
-    // field (dimension or measure)
-    // @deprecated
-    //
-
-    public function getFieldMetadata(string $fieldName): DimensionMetadata|MeasureMetadata
-    {
-        if (!str_contains($fieldName, '.')) {
-            return $this->dimensions[$fieldName]
-                ?? $this->measures[$fieldName]
-                ?? throw new MetadataException(\sprintf(
-                    'Field not found: %s',
-                    $fieldName,
-                ));
-        }
-
-        /** @psalm-suppress PossiblyUndefinedArrayOffset */
-        [$dimensionName, $propertyName] = explode('.', $fieldName, 2);
-
-        return $this->dimensions[$dimensionName]
-            ?? throw new MetadataException(\sprintf(
-                'Dimension not found: %s',
-                $dimensionName,
-            ));
-    }
-
-    public function getFullyQualifiedField(string $propertyName): FullyQualifiedPropertyMetadata
-    {
-        return $this->fullyQualifiedProperties[$propertyName]
-            ?? throw new MetadataException(\sprintf('Property not found: %s', $propertyName));
     }
 
     //

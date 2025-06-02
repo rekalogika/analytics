@@ -29,12 +29,18 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         private ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
         SummaryMetadata $summaryMetadata,
+        private DimensionMetadata $dimensionMetadata,
     ) {
         parent::__construct(
             summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
             label: $label,
             summaryMetadata: $summaryMetadata,
         );
+    }
+
+    public function getDimension(): DimensionMetadata
+    {
+        return $this->dimensionMetadata;
     }
 
     public function getDimensionLevelProperty(): DimensionLevelPropertyMetadata

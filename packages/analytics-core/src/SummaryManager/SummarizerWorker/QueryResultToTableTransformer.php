@@ -467,7 +467,7 @@ final readonly class QueryResultToTableTransformer
     private function getLabel(string $property): TranslatableInterface
     {
         return $this->metadata
-            ->getFullyQualifiedField($property)
+            ->getProperty($property)
             ->getLabel();
     }
 
