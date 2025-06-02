@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Field;
-use Rekalogika\Analytics\Metadata\FullyQualifiedDimensionMetadata;
 use Rekalogika\Analytics\Metadata\HierarchicalDimension;
 use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -43,14 +42,14 @@ final readonly class SummaryMetadata
     private array $dimensionProperties;
 
     /**
+     * @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     */
+    private array $leafDimensions;
+
+    /**
      * @var non-empty-array<string,MeasureMetadata>
      */
     private array $measures;
-
-    /**
-     * @var array<string,FullyQualifiedDimensionMetadata>
-     */
-    private array $fullyQualifiedDimensions;
 
     /**
      * @var array<string,Field>
@@ -109,9 +108,9 @@ final readonly class SummaryMetadata
         // dimensions
         //
 
-        $fullyQualifiedDimensions = [];
         $newDimensions = [];
         $dimensionProperties = [];
+        $leafDimensions = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
             $dimension = $dimension->withSummaryMetadata($this);
@@ -120,47 +119,42 @@ final readonly class SummaryMetadata
 
             $hierarchy = $dimension->getHierarchy();
 
+            // if not hierarchical
             if ($hierarchy === null) {
-                $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
-                    dimension: $dimension,
-                    dimensionLevelProperty: null,
+                $leafDimensions[$dimension->getSummaryProperty()] = $dimension;
+
+                continue;
+            }
+
+            // if hierarchical
+            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
+                $dimensionProperty = new DimensionPropertyMetadata(
+                    summaryProperty: $dimension->getSummaryProperty(),
+                    hierarchyProperty: $dimensionLevelProperty->getName(),
+                    label: new TranslatablePropertyDimension(
+                        propertyLabel: $dimension->getLabel(),
+                        dimensionLabel: $dimensionLevelProperty->getLabel(),
+                    ),
+                    nullLabel: $dimensionLevelProperty->getNullLabel(),
+                    typeClass: $dimensionLevelProperty->getTypeClass(),
+                    dimensionLevelProperty: $dimensionLevelProperty,
                     summaryMetadata: $this,
+                    dimensionMetadata: $dimension,
                 );
 
-                $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
-            } else {
-                foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
-                    $fullyQualifiedDimension = new FullyQualifiedDimensionMetadata(
-                        dimension: $dimension,
-                        dimensionLevelProperty: $dimensionLevelProperty,
-                        summaryMetadata: $this,
-                    );
-
-                    $fullyQualifiedDimensions[$fullyQualifiedDimension->getFullName()] = $fullyQualifiedDimension;
-
-                    $dimensionProperty = new DimensionPropertyMetadata(
-                        summaryProperty: $dimension->getSummaryProperty(),
-                        hierarchyProperty: $dimensionLevelProperty->getName(),
-                        label: new TranslatablePropertyDimension(
-                            propertyLabel: $dimension->getLabel(),
-                            dimensionLabel: $dimensionLevelProperty->getLabel(),
-                        ),
-                        nullLabel: $dimensionLevelProperty->getNullLabel(),
-                        typeClass: $dimensionLevelProperty->getTypeClass(),
-                        dimensionLevelProperty: $dimensionLevelProperty,
-                        summaryMetadata: $this,
-                        dimensionMetadata: $dimension,
-                    );
-
-                    $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
-                    $allProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
-                }
+                $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+                $allProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+                $leafDimensions[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
             }
         }
 
-        $this->dimensions = $newDimensions;
-        $this->fullyQualifiedDimensions = $fullyQualifiedDimensions;
         $this->dimensionProperties = $dimensionProperties;
+
+        /** @var non-empty-array<string,DimensionMetadata> $newDimensions */
+        $this->dimensions = $newDimensions;
+
+        /** @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata> $leafDimensions */
+        $this->leafDimensions = $leafDimensions;
 
         //
         // dimension choices
@@ -328,19 +322,19 @@ final readonly class SummaryMetadata
     //
 
     /**
-     * @return list<string>
-     */
-    public function getDimensionPropertyNames(): array
-    {
-        return array_keys($this->fullyQualifiedDimensions);
-    }
-
-    /**
      * @return non-empty-array<string,DimensionMetadata>
      */
     public function getDimensions(): array
     {
         return $this->dimensions;
+    }
+
+    /**
+     * @return non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     */
+    public function getLeafDimensions(): array
+    {
+        return $this->leafDimensions;
     }
 
     public function getDimension(string $dimensionName): DimensionMetadata
@@ -386,6 +380,14 @@ final readonly class SummaryMetadata
                 'Dimension or dimension property not found: %s',
                 $dimensionName,
             ));
+    }
+
+    /**
+     * @return array<string,DimensionMetadata|DimensionPropertyMetadata>
+     */
+    public function getDimensionsAndDimensionProperties(): array
+    {
+        return array_merge($this->dimensions, $this->dimensionProperties);
     }
 
     //

@@ -147,7 +147,7 @@ final class DefaultResult implements Result
         $orderFields = array_keys($orderBy);
 
         $dimensionWithoutValues = array_filter(
-            $this->metadata->getDimensionPropertyNames(),
+            array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
         );
 

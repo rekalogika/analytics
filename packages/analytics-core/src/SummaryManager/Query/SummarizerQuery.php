@@ -184,7 +184,7 @@ final class SummarizerQuery extends AbstractQuery
             ->setMaxResults($this->queryResultLimit + 1) // safeguard
         ;
 
-        foreach ($this->metadata->getDimensionPropertyNames() as $propertyName) {
+        foreach (array_keys($this->metadata->getLeafDimensions()) as $propertyName) {
             $this->groupings[$propertyName] = true;
         }
     }
@@ -327,7 +327,7 @@ final class SummarizerQuery extends AbstractQuery
         $where = $this->query->getWhere();
 
         $validDimensions = array_values(array_filter(
-            $this->metadata->getDimensionPropertyNames(),
+            array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
         ));
 
