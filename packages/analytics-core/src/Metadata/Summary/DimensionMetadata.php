@@ -24,13 +24,19 @@ final readonly class DimensionMetadata extends PropertyMetadata
     private ?DimensionHierarchyMetadata $hierarchy;
 
     /**
+     * @var array<string,DimensionPropertyMetadata>
+     */
+    private array $properties;
+
+    /**
      * @param array<class-string,ValueResolver> $source
      * @param Order|array<string,Order> $orderBy
      * @param null|class-string $typeClass
+     * @param array<string,DimensionPropertyMetadata> $properties
      */
     public function __construct(
         private array $source,
-        string $summaryProperty,
+        private string $summaryProperty,
         TranslatableInterface $label,
         private \DateTimeZone $sourceTimeZone,
         private \DateTimeZone $summaryTimeZone,
@@ -39,6 +45,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
+        array $properties,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
@@ -47,18 +54,31 @@ final readonly class DimensionMetadata extends PropertyMetadata
             summaryMetadata: $summaryMetadata,
         );
 
+        // hierarchy
+
         if ($hierarchy !== null && \is_array($orderBy)) {
             throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
 
         $this->hierarchy = $hierarchy?->withDimensionMetadata($this);
+
+        // properties
+
+        $newProperties = [];
+
+        foreach ($properties as $property) {
+            $newProperties[$property->getSummaryProperty()] = $property
+                ->withDimensionMetadata($this);
+        }
+
+        $this->properties = $newProperties;
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
             source: $this->source,
-            summaryProperty: $this->getSummaryProperty(),
+            summaryProperty: $this->summaryProperty,
             label: $this->getLabel(),
             sourceTimeZone: $this->sourceTimeZone,
             summaryTimeZone: $this->summaryTimeZone,
@@ -68,6 +88,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
             nullLabel: $this->nullLabel,
             mandatory: $this->mandatory,
             summaryMetadata: $summaryMetadata,
+            properties: $this->properties,
         );
     }
 
@@ -145,5 +166,13 @@ final readonly class DimensionMetadata extends PropertyMetadata
     public function isMandatory(): bool
     {
         return $this->mandatory;
+    }
+
+    /**
+     * @return array<string,DimensionPropertyMetadata>
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
     }
 }

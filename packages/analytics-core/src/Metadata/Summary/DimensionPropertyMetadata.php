@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -22,15 +24,20 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
      * @param class-string|null $typeClass
      */
     public function __construct(
-        string $summaryProperty,
-        string $hierarchyProperty,
+        private string $summaryProperty,
+        private string $hierarchyProperty,
         TranslatableInterface $label,
         private TranslatableInterface $nullLabel,
         private ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
-        SummaryMetadata $summaryMetadata,
-        private DimensionMetadata $dimensionMetadata,
+        private ?DimensionMetadata $dimensionMetadata = null,
     ) {
+        try {
+            $summaryMetadata = $dimensionMetadata?->getSummaryMetadata();
+        } catch (MetadataException) {
+            $summaryMetadata = null;
+        }
+
         parent::__construct(
             summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
             label: $label,
@@ -38,8 +45,25 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         );
     }
 
+    public function withDimensionMetadata(DimensionMetadata $dimensionMetadata): self
+    {
+        return new self(
+            summaryProperty: $this->summaryProperty,
+            hierarchyProperty: $this->hierarchyProperty,
+            label: $this->getLabel(),
+            nullLabel: $this->nullLabel,
+            typeClass: $this->typeClass,
+            dimensionLevelProperty: $this->dimensionLevelProperty,
+            dimensionMetadata: $dimensionMetadata,
+        );
+    }
+
     public function getDimension(): DimensionMetadata
     {
+        if (null === $this->dimensionMetadata) {
+            throw new LogicException('Dimension metadata is not set.');
+        }
+
         return $this->dimensionMetadata;
     }
 

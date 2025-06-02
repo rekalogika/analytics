@@ -40,9 +40,11 @@ use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Rekalogika\Analytics\Util\TranslatableUtil;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
@@ -352,6 +354,16 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $sourceProperty = $newSourceProperty;
 
+        // label
+
+        $label = $dimensionAttribute->getLabel() ?? $summaryProperty;
+        $label = TranslatableUtil::normalize($label);
+
+        $nullLabel = TranslatableUtil::normalize($dimensionAttribute->getNullLabel())
+            ?? new TranslatableMessage('(None)');
+
+        // hierarchy
+
         if ($summaryClassMetadata->isPropertyEmbedded($summaryProperty)) {
             $embeddedClass = $summaryClassMetadata
                 ->getEmbeddedClassOfProperty($summaryProperty);
@@ -359,15 +371,16 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $dimensionHierarchy = $this->createDimensionHierarchyMetadata(
                 hierarchyClass: $embeddedClass,
             );
+
+            $dimensionProperties = $this->createDimensionProperties(
+                summaryProperty: $summaryProperty,
+                dimensionHierarchy: $dimensionHierarchy,
+                dimensionLabel: $label,
+            );
         } else {
             $dimensionHierarchy = null;
+            $dimensionProperties = [];
         }
-
-        $label = $dimensionAttribute->getLabel() ?? $summaryProperty;
-        $label = TranslatableUtil::normalize($label);
-
-        $nullLabel = TranslatableUtil::normalize($dimensionAttribute->getNullLabel())
-            ?? new TranslatableMessage('(None)');
 
         return new DimensionMetadata(
             source: $sourceProperty,
@@ -380,7 +393,37 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             typeClass: $typeClass,
             nullLabel: $nullLabel,
             mandatory: $dimensionAttribute->isMandatory(),
+            properties: $dimensionProperties,
         );
+    }
+
+    /**
+     * @return array<string,DimensionPropertyMetadata>
+     */
+    private function createDimensionProperties(
+        string $summaryProperty,
+        DimensionHierarchyMetadata $dimensionHierarchy,
+        TranslatableInterface $dimensionLabel,
+    ): array {
+        $dimensionProperties = [];
+
+        foreach ($dimensionHierarchy->getProperties() as $dimensionLevelProperty) {
+            $dimensionProperty = new DimensionPropertyMetadata(
+                summaryProperty: $summaryProperty,
+                hierarchyProperty: $dimensionLevelProperty->getName(),
+                label: new TranslatablePropertyDimension(
+                    propertyLabel: $dimensionLabel,
+                    dimensionLabel: $dimensionLevelProperty->getLabel(),
+                ),
+                nullLabel: $dimensionLevelProperty->getNullLabel(),
+                typeClass: $dimensionLevelProperty->getTypeClass(),
+                dimensionLevelProperty: $dimensionLevelProperty,
+            );
+
+            $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+        }
+
+        return $dimensionProperties;
     }
 
     /**

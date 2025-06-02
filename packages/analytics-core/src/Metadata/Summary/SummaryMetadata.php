@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Field;
 use Rekalogika\Analytics\Metadata\HierarchicalDimension;
-use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -114,37 +113,24 @@ final readonly class SummaryMetadata
 
         foreach ($dimensions as $dimensionKey => $dimension) {
             $dimension = $dimension->withSummaryMetadata($this);
+
             $newDimensions[$dimensionKey] = $dimension;
-            $allProperties[$dimension->getSummaryProperty()] = $dimension;
+            $allProperties[$dimensionKey] = $dimension;
 
             $hierarchy = $dimension->getHierarchy();
 
             // if not hierarchical
             if ($hierarchy === null) {
-                $leafDimensions[$dimension->getSummaryProperty()] = $dimension;
+                $leafDimensions[$dimensionKey] = $dimension;
 
                 continue;
             }
 
             // if hierarchical
-            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
-                $dimensionProperty = new DimensionPropertyMetadata(
-                    summaryProperty: $dimension->getSummaryProperty(),
-                    hierarchyProperty: $dimensionLevelProperty->getName(),
-                    label: new TranslatablePropertyDimension(
-                        propertyLabel: $dimension->getLabel(),
-                        dimensionLabel: $dimensionLevelProperty->getLabel(),
-                    ),
-                    nullLabel: $dimensionLevelProperty->getNullLabel(),
-                    typeClass: $dimensionLevelProperty->getTypeClass(),
-                    dimensionLevelProperty: $dimensionLevelProperty,
-                    summaryMetadata: $this,
-                    dimensionMetadata: $dimension,
-                );
-
-                $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
-                $allProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
-                $leafDimensions[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+            foreach ($dimension->getProperties() as $dimensionPropertyKey => $dimensionProperty) {
+                $dimensionProperties[$dimensionPropertyKey] = $dimensionProperty;
+                $allProperties[$dimensionPropertyKey] = $dimensionProperty;
+                $leafDimensions[$dimensionPropertyKey] = $dimensionProperty;
             }
         }
 
