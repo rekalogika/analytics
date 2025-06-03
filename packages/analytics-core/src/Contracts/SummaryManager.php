@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
+use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Result\Query;
+use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
  * @template T of object
@@ -28,4 +30,6 @@ interface SummaryManager
     ): void;
 
     public function createQuery(): Query;
+
+    public function createSourceQueryBuilder(Tuple $tuple): QueryBuilder;
 }
