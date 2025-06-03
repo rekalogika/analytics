@@ -27,7 +27,7 @@ interface SummaryMetadataFactory
     ): SummaryMetadata;
 
     /**
-     * @return array<class-string>
+     * @return list<class-string>
      */
     public function getSummaryClasses(): array;
 

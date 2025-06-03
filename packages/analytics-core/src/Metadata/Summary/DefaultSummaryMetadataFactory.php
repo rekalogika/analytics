@@ -53,7 +53,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     #[\Override]
     public function isSummary(string $className): bool
     {
-        return AttributeUtil::classHasAttribute($className, Summary::class);
+        return in_array($className, $this->getSummaryClasses(), true);
     }
 
     #[\Override]
@@ -71,7 +71,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             foreach ($metadata as $classMetadata) {
                 $class = $classMetadata->getName();
 
-                if (!$this->isSummary($class)) {
+                if (!AttributeUtil::classHasAttribute($class, Summary::class)) {
                     continue;
                 }
 
