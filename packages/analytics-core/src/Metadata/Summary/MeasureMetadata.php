@@ -19,6 +19,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
     /**
+     * @var array<class-string,list<string>>
+     */
+    private array $involvedProperties;
+
+    /**
      * @param non-empty-array<class-string,AggregateFunction> $function
      */
     public function __construct(
@@ -34,6 +39,24 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             label: $label,
             summaryMetadata: $summaryMetadata,
         );
+
+        // involved properties
+
+        $properties = [];
+
+        foreach ($this->function as $class => $aggregateFunction) {
+            foreach ($aggregateFunction->getInvolvedProperties() as $property) {
+                $properties[$class][] = $property;
+            }
+        }
+
+        $uniqueProperties = [];
+
+        foreach ($properties as $class => $listOfProperties) {
+            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
+        }
+
+        $this->involvedProperties = $uniqueProperties;
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -79,20 +102,6 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
     #[\Override]
     public function getInvolvedProperties(): array
     {
-        $properties = [];
-
-        foreach ($this->function as $class => $aggregateFunction) {
-            foreach ($aggregateFunction->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        return $uniqueProperties;
+        return $this->involvedProperties;
     }
 }

@@ -49,6 +49,13 @@ final readonly class SummaryMetadata
     private array $measures;
 
     /**
+     * Source class to the list of its properties that influence this summary.
+     *
+     * @var array<class-string,list<string>>
+     */
+    private array $involvedProperties;
+
+    /**
      * @param non-empty-list<class-string> $sourceClasses
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
@@ -126,10 +133,41 @@ final readonly class SummaryMetadata
         $this->leafDimensions = $leafDimensions;
 
         //
-        // properties
+        // all properties
         //
 
         $this->properties = $allProperties;
+
+        //
+        // involved properties
+        //
+
+        $properties = [];
+        $dimensionsAndMeasures = array_merge($this->dimensions, $this->measures);
+
+        foreach ($dimensionsAndMeasures as $dimensionOrMeasure) {
+            foreach ($dimensionOrMeasure->getInvolvedProperties() as $class => $dimensionOrMeasureProperties) {
+                foreach ($dimensionOrMeasureProperties as $property) {
+                    // normalize property
+                    // - remove everything after dot
+                    $property = explode('.', $property)[0];
+                    // - remove everything after (
+                    $property = explode('(', $property)[0];
+                    // - remove * from the beginning
+                    $property = ltrim($property, '*');
+
+                    $properties[$class][] = $property;
+                }
+            }
+        }
+
+        $uniqueProperties = [];
+
+        foreach ($properties as $class => $listOfProperties) {
+            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
+        }
+
+        $this->involvedProperties = $uniqueProperties;
     }
 
     /**
@@ -303,31 +341,6 @@ final readonly class SummaryMetadata
      */
     public function getInvolvedProperties(): array
     {
-        $properties = [];
-        $dimensionsAndMeasures = array_merge($this->dimensions, $this->measures);
-
-        foreach ($dimensionsAndMeasures as $dimensionOrMeasure) {
-            foreach ($dimensionOrMeasure->getInvolvedProperties() as $class => $dimensionOrMeasureProperties) {
-                foreach ($dimensionOrMeasureProperties as $property) {
-                    // normalize property
-                    // - remove everything after dot
-                    $property = explode('.', $property)[0];
-                    // - remove everything after (
-                    $property = explode('(', $property)[0];
-                    // - remove * from the beginning
-                    $property = ltrim($property, '*');
-
-                    $properties[$class][] = $property;
-                }
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        return $uniqueProperties;
+        return $this->involvedProperties;
     }
 }

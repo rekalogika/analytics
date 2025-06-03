@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Source;
 
-use Rekalogika\Analytics\Attribute\Summary;
 use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;

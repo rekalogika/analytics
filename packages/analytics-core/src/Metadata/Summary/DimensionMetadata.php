@@ -29,6 +29,11 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     private array $properties;
 
     /**
+     * @var array<class-string,list<string>>
+     */
+    private array $involvedProperties;
+
+    /**
      * @param array<class-string,ValueResolver> $source
      * @param Order|array<string,Order> $orderBy
      * @param null|class-string $typeClass
@@ -72,6 +77,24 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         }
 
         $this->properties = $newProperties;
+
+        // involved properties
+
+        $properties = [];
+
+        foreach ($this->source as $class => $valueResolver) {
+            foreach ($valueResolver->getInvolvedProperties() as $property) {
+                $properties[$class][] = $property;
+            }
+        }
+
+        $uniqueProperties = [];
+
+        foreach ($properties as $class => $listOfProperties) {
+            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
+        }
+
+        $this->involvedProperties = $uniqueProperties;
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -126,21 +149,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     #[\Override]
     public function getInvolvedProperties(): array
     {
-        $properties = [];
-
-        foreach ($this->source as $class => $valueResolver) {
-            foreach ($valueResolver->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        return $uniqueProperties;
+        return $this->involvedProperties;
     }
 
     /**
