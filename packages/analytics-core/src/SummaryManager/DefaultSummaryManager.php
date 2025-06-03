@@ -14,8 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SummaryManager\Query\SourceQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -73,5 +77,28 @@ final readonly class DefaultSummaryManager implements SummaryManager
             queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
             fillingNodesLimit: $fillingNodesLimit ?? $this->fillingNodesLimit,
         );
+    }
+
+    #[\Override]
+    public function createSourceQueryBuilder(Tuple $tuple): QueryBuilder
+    {
+        $summaryClass = $this->metadata->getSummaryClass();
+        $tupleSummaryClass = $tuple->getSummaryTable();
+
+        if ($summaryClass !== $tupleSummaryClass) {
+            throw new InvalidArgumentException(\sprintf(
+                'Summary class "%s" does not match the tuple summary class "%s".',
+                $summaryClass,
+                $tupleSummaryClass,
+            ));
+        }
+
+        $sourceQuery = new SourceQuery(
+            entityManager: $this->entityManager,
+            summaryMetadata: $this->metadata,
+            tuple: $tuple,
+        );
+
+        return $sourceQuery->getResult();
     }
 }

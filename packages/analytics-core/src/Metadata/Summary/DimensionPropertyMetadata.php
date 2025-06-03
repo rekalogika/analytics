@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
@@ -100,5 +101,10 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function getPropertyLabel(): TranslatableInterface
     {
         return $this->label;
+    }
+
+    public function getValueResolver(): HierarchicalDimensionValueResolver
+    {
+        return $this->dimensionLevelProperty->getValueResolver();
     }
 }
