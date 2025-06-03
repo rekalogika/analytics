@@ -36,11 +36,9 @@ use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Rekalogika\Analytics\Util\TranslatableUtil;
 use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
@@ -292,7 +290,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $dimensionProperties = $this->createDimensionProperties(
                 summaryProperty: $summaryProperty,
                 dimensionHierarchy: $dimensionHierarchy,
-                dimensionLabel: $label,
             );
         } else {
             $dimensionHierarchy = null;
@@ -320,7 +317,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     private function createDimensionProperties(
         string $summaryProperty,
         DimensionHierarchyMetadata $dimensionHierarchy,
-        TranslatableInterface $dimensionLabel,
     ): array {
         $dimensionProperties = [];
 
@@ -328,10 +324,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $dimensionProperty = new DimensionPropertyMetadata(
                 summaryProperty: $summaryProperty,
                 hierarchyProperty: $dimensionLevelProperty->getName(),
-                label: new TranslatablePropertyDimension(
-                    propertyLabel: $dimensionLabel,
-                    dimensionLabel: $dimensionLevelProperty->getLabel(),
-                ),
+                label: $dimensionLevelProperty->getLabel(),
                 nullLabel: $dimensionLevelProperty->getNullLabel(),
                 typeClass: $dimensionLevelProperty->getTypeClass(),
                 dimensionLevelProperty: $dimensionLevelProperty,

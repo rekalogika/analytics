@@ -16,6 +16,8 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
+use Rekalogika\Analytics\Util\LiteralString;
+use Rekalogika\Analytics\Util\TranslatablePropertyDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata extends PropertyMetadata
@@ -26,7 +28,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function __construct(
         private string $summaryProperty,
         private string $hierarchyProperty,
-        TranslatableInterface $label,
+        private TranslatableInterface $label,
         private TranslatableInterface $nullLabel,
         private ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
@@ -37,6 +39,11 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         } catch (MetadataException) {
             $summaryMetadata = null;
         }
+
+        $label = new TranslatablePropertyDimension(
+            propertyLabel: $dimensionMetadata?->getLabel() ?? new LiteralString('Unknown'),
+            dimensionLabel: $label,
+        );
 
         parent::__construct(
             summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
@@ -50,7 +57,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         return new self(
             summaryProperty: $this->summaryProperty,
             hierarchyProperty: $this->hierarchyProperty,
-            label: $this->getLabel(),
+            label: $this->label,
             nullLabel: $this->nullLabel,
             typeClass: $this->typeClass,
             dimensionLevelProperty: $this->dimensionLevelProperty,
@@ -88,5 +95,10 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function getTypeClass(): ?string
     {
         return $this->typeClass;
+    }
+
+    public function getPropertyLabel(): TranslatableInterface
+    {
+        return $this->label;
     }
 }
