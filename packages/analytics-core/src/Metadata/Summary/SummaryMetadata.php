@@ -323,8 +323,7 @@ final readonly class SummaryMetadata
      * or a DimensionPropertyMetadata. The DimensionMetadata of a
      * DimensionPropertyMetadata is not included in this list.
      *
-     * @return
-     * non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @return non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
      */
     public function getLeafDimensions(): array
     {

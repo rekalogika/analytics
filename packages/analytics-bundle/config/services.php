@@ -62,6 +62,10 @@ use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\EventListener\SummaryEntityListener;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DefaultDimensionHierarchyMetadataFactory;
+use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\DefaultSourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
@@ -86,13 +90,35 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services = $containerConfigurator->services();
 
+    //
+    // metadata
+    //
+
+    $services
+        ->set(DimensionHierarchyMetadataFactory::class)
+        ->class(DefaultDimensionHierarchyMetadataFactory::class)
+    ;
+
     $services
         ->set(SummaryMetadataFactory::class)
         ->class(DefaultSummaryMetadataFactory::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
+            '$dimensionHierarchyMetadataFactory' => service(DimensionHierarchyMetadataFactory::class),
         ])
     ;
+
+    $services
+        ->set(SourceMetadataFactory::class)
+        ->class(DefaultSourceMetadataFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+    ;
+
+    //
+    // partition
+    //
 
     $services
         ->set('rekalogika.analytics.partition_manager_registry')
@@ -102,6 +128,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$propertyAccessor' => service('property_accessor'),
         ])
     ;
+
+    //
+    // summary manager
+    //
 
     $services
         ->set(SummaryManagerRegistry::class)
@@ -131,7 +161,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.dirty_flag_generator')
         ->class(DirtyFlagGenerator::class)
         ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
         ])
     ;

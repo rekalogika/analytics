@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
@@ -25,10 +25,10 @@ final class MetadataTest extends KernelTestCase
 {
     public function testSourceMetadataForOrder(): void
     {
-        $summaryMetadataFactory = static::getContainer()
-            ->get(SummaryMetadataFactory::class);
+        $sourceMetadataFactory = static::getContainer()
+            ->get(SourceMetadataFactory::class);
 
-        $orderMetadata = $summaryMetadataFactory->getSourceMetadata(Order::class);
+        $orderMetadata = $sourceMetadataFactory->getSourceMetadata(Order::class);
 
         $this->assertEquals(Order::class, $orderMetadata->getClass());
 
@@ -50,10 +50,10 @@ final class MetadataTest extends KernelTestCase
 
     public function testSourceMetadataForCustomer(): void
     {
-        $summaryMetadataFactory = static::getContainer()
-            ->get(SummaryMetadataFactory::class);
+        $sourceMetadataFactory = static::getContainer()
+            ->get(SourceMetadataFactory::class);
 
-        $customerMetadata = $summaryMetadataFactory->getSourceMetadata(Customer::class);
+        $customerMetadata = $sourceMetadataFactory->getSourceMetadata(Customer::class);
 
         $this->assertEquals(Customer::class, $customerMetadata->getClass());
 
@@ -70,10 +70,10 @@ final class MetadataTest extends KernelTestCase
 
     public function testSourceMetadataForIndividualCustomer(): void
     {
-        $summaryMetadataFactory = static::getContainer()
-            ->get(SummaryMetadataFactory::class);
+        $sourceMetadataFactory = static::getContainer()
+            ->get(SourceMetadataFactory::class);
 
-        $metadata = $summaryMetadataFactory->getSourceMetadata(IndividualCustomer::class);
+        $metadata = $sourceMetadataFactory->getSourceMetadata(IndividualCustomer::class);
 
         $this->assertEquals(IndividualCustomer::class, $metadata->getClass());
 

@@ -27,19 +27,12 @@ interface SummaryMetadataFactory
     ): SummaryMetadata;
 
     /**
-     * @return iterable<class-string>
+     * @return array<class-string>
      */
-    public function getSummaryClasses(): iterable;
+    public function getSummaryClasses(): array;
 
     /**
      * @param class-string $className
      */
     public function isSummary(string $className): bool;
-
-    /**
-     * @param class-string $sourceClassName
-     */
-    public function getSourceMetadata(
-        string $sourceClassName,
-    ): SourceMetadata;
 }

@@ -30,10 +30,8 @@ use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\SummaryNotFound;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DefaultDimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
-use Rekalogika\Analytics\Metadata\SourceMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\Util\LiteralString;
@@ -46,84 +44,10 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
-    /**
-     * @var array<class-string,array<string,list<class-string>>>
-     */
-    private array $involvedProperties;
-
-    private DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory;
-
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        ?DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory = null,
-    ) {
-        $this->dimensionHierarchyMetadataFactory = $dimensionHierarchyMetadataFactory
-            ?? new DefaultDimensionHierarchyMetadataFactory();
-
-        $this->involvedProperties = $this->createInvolvedProperties();
-    }
-
-
-    /**
-     * Source class to the mapping of its properties to summary classes that
-     * are affected by the change of the source property.
-     *
-     * @return array<class-string,array<string,list<class-string>>>
-     */
-    private function createInvolvedProperties(): array
-    {
-        $involvedProperties = [];
-
-        foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
-            $summaryClass = $summaryMetadata->getSummaryClass();
-            $summaryInvolvedProperties = $summaryMetadata->getInvolvedProperties();
-
-            foreach ($summaryInvolvedProperties as $sourceClass => $sourceProperties) {
-                foreach ($sourceProperties as $sourceProperty) {
-                    $involvedProperties[$sourceClass][$sourceProperty][] = $summaryClass;
-                }
-            }
-        }
-
-        $uniqueInvolvedProperties = [];
-
-        foreach ($involvedProperties as $sourceClass => $sourceProperties) {
-            $uniqueInvolvedProperties[$sourceClass] = [];
-
-            foreach ($sourceProperties as $sourceProperty => $summaryClasses) {
-                $uniqueInvolvedProperties[$sourceClass][$sourceProperty] = array_values(array_unique($summaryClasses));
-            }
-        }
-
-        return $uniqueInvolvedProperties;
-    }
-
-    #[\Override]
-    public function getSourceMetadata(string $sourceClassName): SourceMetadata
-    {
-        $allPropertiesToSummaryClasses = [];
-
-        $parents = class_parents($sourceClassName);
-
-        if ($parents === false) {
-            $parents = [];
-        }
-
-        $classes = [$sourceClassName, ...$parents];
-
-        foreach ($classes as $class) {
-            foreach ($this->involvedProperties[$class] ?? [] as $property => $summaryClasses) {
-                foreach ($summaryClasses as $summaryClass) {
-                    $allPropertiesToSummaryClasses[$property][] = $summaryClass;
-                }
-            }
-        }
-
-        return new SourceMetadata(
-            class: $sourceClassName,
-            propertyToSummaryClasses: $allPropertiesToSummaryClasses,
-        );
-    }
+        private DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory,
+    ) {}
 
     /**
      * @param class-string $className
@@ -134,18 +58,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         return AttributeUtil::classHasAttribute($className, Summary::class);
     }
 
-    /**
-     * @return iterable<string,SummaryMetadata>
-     */
-    private function getAllSummaryMetadata(): iterable
-    {
-        foreach ($this->getSummaryClasses() as $summaryClass) {
-            yield $summaryClass => $this->getSummaryMetadata($summaryClass);
-        }
-    }
-
     #[\Override]
-    public function getSummaryClasses(): iterable
+    public function getSummaryClasses(): array
     {
         $classes = [];
 
@@ -167,7 +81,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
         }
 
-        yield from array_keys($classes);
+        return array_keys($classes);
     }
 
     /**
