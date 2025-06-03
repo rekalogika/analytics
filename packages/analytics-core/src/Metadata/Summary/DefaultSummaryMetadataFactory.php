@@ -53,7 +53,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     #[\Override]
     public function isSummary(string $className): bool
     {
-        return in_array($className, $this->getSummaryClasses(), true);
+        return \in_array($className, $this->getSummaryClasses(), true);
     }
 
     #[\Override]

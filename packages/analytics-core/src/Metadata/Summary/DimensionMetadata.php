@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionMetadata extends PropertyMetadata
+final readonly class DimensionMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
     private ?DimensionHierarchyMetadata $hierarchy;
 
@@ -123,6 +123,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
     /**
      * @return array<class-string,list<string>>
      */
+    #[\Override]
     public function getInvolvedProperties(): array
     {
         $properties = [];

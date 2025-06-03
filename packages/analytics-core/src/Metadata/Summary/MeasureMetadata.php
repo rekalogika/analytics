@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class MeasureMetadata extends PropertyMetadata
+final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
     /**
      * @param non-empty-array<class-string,AggregateFunction> $function
@@ -76,6 +76,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
     /**
      * @return array<class-string,list<string>>
      */
+    #[\Override]
     public function getInvolvedProperties(): array
     {
         $properties = [];
