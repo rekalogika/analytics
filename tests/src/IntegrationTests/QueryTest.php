@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Result\Query;
+use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;

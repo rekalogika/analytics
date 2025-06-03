@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
@@ -31,5 +29,5 @@ interface SummaryManager
 
     public function createQuery(): Query;
 
-    public function createSourceQueryBuilder(Tuple $tuple): QueryBuilder;
+    public function getSource(Tuple $tuple): SourceResult;
 }

@@ -27,7 +27,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 final class SourceQuery extends AbstractQuery
 {
     public function __construct(
-        EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
         private readonly Tuple $tuple,
     ) {
@@ -48,10 +48,11 @@ final class SourceQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
     }
 
-    public function getResult(): QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
         $this->initialize();
         $this->processDimensions();
+        $this->processOrderBy();
 
         return $this->getSimpleQueryBuilder()->getQueryBuilder();
     }
@@ -116,7 +117,7 @@ final class SourceQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()->andWhere(\sprintf(
             '%s = %s',
             $dql,
-            $this->getSimpleQueryBuilder()->createNamedParameter($rawMember),
+            $this->createNamedParameter($rawMember),
         ));
     }
 
@@ -155,7 +156,33 @@ final class SourceQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()->andWhere(\sprintf(
             '%s = %s',
             $dql,
-            $this->getSimpleQueryBuilder()->createNamedParameter($rawMember),
+            $this->createNamedParameter($rawMember),
         ));
+    }
+
+    private function processOrderBy(): void
+    {
+        $identifier = $this->entityManager
+            ->getClassMetadata($this->summaryMetadata->getSourceClasses()[0])
+            ->getSingleIdentifierFieldName();
+
+        $this->getSimpleQueryBuilder()->orderBy(
+            'root.' . $identifier,
+            'ASC',
+        );
+    }
+
+    private function createNamedParameter(mixed $value): string
+    {
+        if (\is_object($value) && $this->entityManager->contains($value)) {
+            // If the value is an entity, we use its identifier, because we do
+            // the same thing in reverse
+            /** @psalm-suppress MixedAssignment */
+            $value = $this->entityManager
+                ->getUnitOfWork()
+                ->getSingleIdentifierValue($value);
+        }
+
+        return $this->getSimpleQueryBuilder()->createNamedParameter($value);
     }
 }

@@ -24,7 +24,11 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Container\ContainerInterface;
+use Rekalogika\Contracts\Rekapager\PageableInterface;
+use Rekalogika\Contracts\Rekapager\PageInterface;
 use Rekalogika\PivotTable\PivotTableTransformer;
+use Rekalogika\Rekapager\Doctrine\ORM\QueryBuilderAdapter;
+use Rekalogika\Rekapager\Keyset\KeysetPageable;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -60,6 +64,12 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
 
+                // rekapager
+                Selector::classname(PageableInterface::class),
+                Selector::classname(PageInterface::class),
+                Selector::classname(QueryBuilderAdapter::class),
+                Selector::classname(KeysetPageable::class),
+
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
@@ -71,6 +81,7 @@ final class ArchitectureTest
                 Selector::classname(\Traversable::class),
                 Selector::classname(\Countable::class),
                 Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Iterator::class),
 
                 // misc
                 Selector::classname(\Stringable::class),

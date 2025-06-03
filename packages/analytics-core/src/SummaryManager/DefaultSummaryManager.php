@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\Query\SourceQuery;
+use Rekalogika\Analytics\SummaryManager\SourceResult\DefaultSourceResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -80,7 +81,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     }
 
     #[\Override]
-    public function createSourceQueryBuilder(Tuple $tuple): QueryBuilder
+    public function getSource(Tuple $tuple): SourceResult
     {
         $summaryClass = $this->metadata->getSummaryClass();
         $tupleSummaryClass = $tuple->getSummaryTable();
@@ -99,6 +100,8 @@ final readonly class DefaultSummaryManager implements SummaryManager
             tuple: $tuple,
         );
 
-        return $sourceQuery->getResult();
+        $queryBuilder = $sourceQuery->getQueryBuilder();
+
+        return new DefaultSourceResult($queryBuilder);
     }
 }

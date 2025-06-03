@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
-use Rekalogika\Analytics\Contracts\Result\Query;
+use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
@@ -59,13 +59,13 @@ final class SourceQueryTest extends KernelTestCase
         $node = $result->traverse('count');
         $this->assertNotNull($node);
 
-        $sourceQuery = $this->getSummaryManager()
-            ->createSourceQueryBuilder($node->getTuple());
+        $sourceResult = $this->getSummaryManager()
+            ->getSource($node->getTuple());
 
-        $dql = $sourceQuery->getQuery()->getDQL();
+        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -81,13 +81,13 @@ final class SourceQueryTest extends KernelTestCase
         $node = $result->traverse('France');
         $this->assertNotNull($node);
 
-        $sourceQuery = $this->getSummaryManager()
-            ->createSourceQueryBuilder($node->getTuple());
+        $sourceResult = $this->getSummaryManager()
+            ->getSource($node->getTuple());
 
-        $dql = $sourceQuery->getQuery()->getDQL();
+        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE IDENTITY(_a0.country) = :boundparameter0',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE IDENTITY(_a0.country) = :boundparameter0 ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -103,13 +103,13 @@ final class SourceQueryTest extends KernelTestCase
         $node = $result->traverse('2024');
         $this->assertNotNull($node);
 
-        $sourceQuery = $this->getSummaryManager()
-            ->createSourceQueryBuilder($node->getTuple());
+        $sourceResult = $this->getSummaryManager()
+            ->getSource($node->getTuple());
 
-        $dql = $sourceQuery->getQuery()->getDQL();
+        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(root.time, 'UTC', 'Asia/Jakarta', 'year') = :boundparameter0",
+            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(root.time, 'UTC', 'Asia/Jakarta', 'year') = :boundparameter0 ORDER BY root.id ASC",
             $dql,
         );
     }

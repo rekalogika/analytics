@@ -11,10 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Result;
+namespace Rekalogika\Analytics\Contracts;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
+use Rekalogika\Analytics\Contracts\Result\Result;
 
 /**
  * A query object for a summary table
