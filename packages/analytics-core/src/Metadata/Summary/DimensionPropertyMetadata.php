@@ -58,6 +58,11 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         );
     }
 
+    public function getHierarchyProperty(): string
+    {
+        return $this->hierarchyProperty;
+    }
+
     public function getDimension(): DimensionMetadata
     {
         if (null === $this->dimensionMetadata) {

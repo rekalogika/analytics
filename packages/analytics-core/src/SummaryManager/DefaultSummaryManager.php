@@ -59,10 +59,10 @@ final readonly class DefaultSummaryManager implements SummaryManager
         ?int $queryResultLimit = null,
         ?int $fillingNodesLimit = null,
     ): DefaultQuery {
-        $dimensionChoices = array_keys($this->metadata->getDimensionChoices());
+        $dimensionChoices = array_keys($this->metadata->getLeafDimensions());
         $dimensionChoices[] = '@values';
 
-        $measureChoices = array_keys($this->metadata->getMeasureChoices());
+        $measureChoices = array_keys($this->metadata->getMeasures());
 
         return new DefaultQuery(
             dimensionChoices: $dimensionChoices,

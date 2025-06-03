@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Exception\MetadataException;
-use Rekalogika\Analytics\Metadata\Field;
-use Rekalogika\Analytics\Metadata\HierarchicalDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -49,21 +47,6 @@ final readonly class SummaryMetadata
      * @var non-empty-array<string,MeasureMetadata>
      */
     private array $measures;
-
-    /**
-     * @var array<string,Field>
-     */
-    private array $dimensionChoices;
-
-    /**
-     * @var array<string,Field>
-     */
-    private array $measureChoices;
-
-    /**
-     * @var non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
-     */
-    private array $hierarchicalDimensionChoices;
 
     /**
      * @param non-empty-list<class-string> $sourceClasses
@@ -141,104 +124,6 @@ final readonly class SummaryMetadata
 
         /** @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata> $leafDimensions */
         $this->leafDimensions = $leafDimensions;
-
-        //
-        // dimension choices
-        //
-
-        $dimensionChoices = [];
-
-        foreach ($dimensions as $dimension) {
-            $hierarchy = $dimension->getHierarchy();
-
-            // if not hierarchical
-
-            if ($hierarchy === null) {
-                $field = new Field(
-                    key: $dimension->getSummaryProperty(),
-                    label: $dimension->getLabel(),
-                    subLabel: null,
-                );
-
-                $dimensionChoices[$field->getKey()] = $field;
-
-                continue;
-            }
-
-            // if hierarchical
-
-            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
-                $fullProperty = \sprintf(
-                    '%s.%s',
-                    $dimension->getSummaryProperty(),
-                    $dimensionLevelProperty->getName(),
-                );
-
-                $field = new Field(
-                    key: $fullProperty,
-                    label: $dimension->getLabel(),
-                    subLabel: $dimensionLevelProperty->getLabel(),
-                );
-
-                $dimensionChoices[$field->getKey()] = $field;
-            }
-        }
-
-        $this->dimensionChoices = $dimensionChoices;
-
-        //
-        // hierarchical dimension choices
-        //
-
-        $hierarchicalDimensionChoices = [];
-
-        foreach ($dimensions as $dimensionMetadata) {
-            $hierarchy = $dimensionMetadata->getHierarchy();
-
-            // if not hierarchical
-
-            if ($hierarchy === null) {
-                $hierarchicalDimensionChoices[$dimensionMetadata->getSummaryProperty()] = $dimensionMetadata->getLabel();
-
-                continue;
-            }
-
-            // if hierarchical
-
-            $children = [];
-
-            foreach ($hierarchy->getProperties() as $dimensionLevelProperty) {
-                $children[$dimensionLevelProperty->getName()] = $dimensionLevelProperty->getLabel();
-            }
-
-            $hierarchicalDimensionChoices[$dimensionMetadata->getSummaryProperty()] =
-                new HierarchicalDimension(
-                    label: $dimensionMetadata->getLabel(),
-                    children: $children,
-                );
-        }
-
-        /** @var non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>> $hierarchicalDimensionChoices */
-
-        $this->hierarchicalDimensionChoices = $hierarchicalDimensionChoices;
-
-        //
-        // measure choices
-        //
-
-        $measureChoices = [];
-
-        foreach ($measures as $measureMetadata) {
-            $field = new Field(
-                key: $measureMetadata->getSummaryProperty(),
-                label: $measureMetadata->getLabel(),
-                subLabel: null,
-            );
-
-            $measureChoices[$field->getKey()] = $field;
-        }
-
-        $this->measureChoices = $measureChoices;
 
         //
         // properties
@@ -382,26 +267,6 @@ final readonly class SummaryMetadata
     }
 
     //
-    // fully qualified dimensions
-    //
-
-    /**
-     * @return array<string,Field>
-     */
-    public function getDimensionChoices(): array
-    {
-        return $this->dimensionChoices;
-    }
-
-    /**
-     * @return non-empty-array<string,TranslatableInterface|iterable<string,TranslatableInterface>>
-     */
-    public function getHierarchicalDimensionChoices(): array
-    {
-        return $this->hierarchicalDimensionChoices;
-    }
-
-    //
     // measures
     //
 
@@ -425,14 +290,6 @@ final readonly class SummaryMetadata
     public function isMeasure(string $fieldName): bool
     {
         return isset($this->measures[$fieldName]);
-    }
-
-    /**
-     * @return array<string,Field>
-     */
-    public function getMeasureChoices(): array
-    {
-        return $this->measureChoices;
     }
 
     //
