@@ -308,6 +308,9 @@ final readonly class SummaryMetadata
     //
 
     /**
+     * Returns all the root dimensions. The DimensionPropertyMetadatas of a
+     * DimensionMetadata are not included in this list.
+     *
      * @return non-empty-array<string,DimensionMetadata>
      */
     public function getDimensions(): array
@@ -316,11 +319,38 @@ final readonly class SummaryMetadata
     }
 
     /**
-     * @return non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * Returns all the leaf dimensions, which can be either a DimensionMetadata
+     * or a DimensionPropertyMetadata. The DimensionMetadata of a
+     * DimensionPropertyMetadata is not included in this list.
+     *
+     * @return
+     * non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
      */
     public function getLeafDimensions(): array
     {
         return $this->leafDimensions;
+    }
+
+    /**
+     * Returns all the dimension properties, which are subdimensions of
+     * DimensionMetadata. The DimensionMetadata itself is not included in this
+     * list.
+     *
+     * @return array<string,DimensionPropertyMetadata>
+     */
+    public function getDimensionProperties(): array
+    {
+        return $this->dimensionProperties;
+    }
+
+    /**
+     * Returns all dimensions and dimension properties.
+     *
+     * @return array<string,DimensionMetadata|DimensionPropertyMetadata>
+     */
+    public function getDimensionsAndDimensionProperties(): array
+    {
+        return array_merge($this->dimensions, $this->dimensionProperties);
     }
 
     public function getDimension(string $dimensionName): DimensionMetadata
@@ -332,18 +362,6 @@ final readonly class SummaryMetadata
             ));
     }
 
-    //
-    // dimension properties
-    //
-
-    /**
-     * @return array<string,DimensionPropertyMetadata>
-     */
-    public function getDimensionProperties(): array
-    {
-        return $this->dimensionProperties;
-    }
-
     public function getDimensionProperty(string $propertyName): DimensionPropertyMetadata
     {
         return $this->dimensionProperties[$propertyName]
@@ -352,10 +370,6 @@ final readonly class SummaryMetadata
                 $propertyName,
             ));
     }
-
-    //
-    // dimension or dimension property
-    //
 
     public function getDimensionOrDimensionProperty(
         string $dimensionName,
@@ -366,14 +380,6 @@ final readonly class SummaryMetadata
                 'Dimension or dimension property not found: %s',
                 $dimensionName,
             ));
-    }
-
-    /**
-     * @return array<string,DimensionMetadata|DimensionPropertyMetadata>
-     */
-    public function getDimensionsAndDimensionProperties(): array
-    {
-        return array_merge($this->dimensions, $this->dimensionProperties);
     }
 
     //
