@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -184,7 +184,7 @@ final class SummarizerQuery extends AbstractQuery
             ->setMaxResults($this->queryResultLimit + 1) // safeguard
         ;
 
-        foreach ($this->metadata->getDimensionPropertyNames() as $propertyName) {
+        foreach (array_keys($this->metadata->getLeafDimensions()) as $propertyName) {
             $this->groupings[$propertyName] = true;
         }
     }
@@ -327,7 +327,7 @@ final class SummarizerQuery extends AbstractQuery
         $where = $this->query->getWhere();
 
         $validDimensions = array_values(array_filter(
-            $this->metadata->getDimensionPropertyNames(),
+            array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
         ));
 
@@ -358,7 +358,7 @@ final class SummarizerQuery extends AbstractQuery
                 [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
                 $dimensionMetadata = $this->metadata
-                    ->getDimensionMetadata($dimensionProperty);
+                    ->getDimension($dimensionProperty);
 
                 $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -432,7 +432,7 @@ final class SummarizerQuery extends AbstractQuery
         // determine level
 
         $dimensionMetadata = $this->metadata
-            ->getDimensionMetadata($dimensionProperty);
+            ->getDimension($dimensionProperty);
 
         $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -495,7 +495,7 @@ final class SummarizerQuery extends AbstractQuery
 
     private function addMeasuresToQueryBuilder(): void
     {
-        $measureMetadatas = $this->metadata->getMeasureMetadatas();
+        $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $key => $measureMetadata) {
             $function = $measureMetadata->getFirstFunction();
@@ -513,7 +513,7 @@ final class SummarizerQuery extends AbstractQuery
     private function addNonHierarchicalDimensionToQueryBuilder(
         string $dimension,
     ): void {
-        $dimensionMetadata = $this->metadata->getDimensionMetadata($dimension);
+        $dimensionMetadata = $this->metadata->getDimension($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
             manager: $this->entityManager,
@@ -633,7 +633,7 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($orderBy as $field => $order) {
             if ($this->metadata->isMeasure($field)) {
-                $measureMetadata = $this->metadata->getMeasureMetadata($field);
+                $measureMetadata = $this->metadata->getMeasure($field);
                 $function = $measureMetadata->getFirstFunction();
                 $dql = $function->getSummaryToSummaryDQLFunction();
 

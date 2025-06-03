@@ -19,7 +19,8 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -67,14 +68,10 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getFieldMetadata($dimension);
+        $dimensionMetadata = $summaryMetadata->getDimensionOrDimensionProperty($dimension);
 
-        if (!$dimensionMetadata instanceof DimensionMetadata) {
-            throw new MetadataException(\sprintf(
-                'The field "%s" in class "%s" is not a dimension',
-                $dimension,
-                $class,
-            ));
+        if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
+            $dimensionMetadata = $dimensionMetadata->getDimension();
         }
 
         // if it is a relation, we get the unique values from the source entity
@@ -141,14 +138,10 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getFieldMetadata($dimension);
+        $dimensionMetadata = $summaryMetadata->getDimensionOrDimensionProperty($dimension);
 
-        if (!$dimensionMetadata instanceof DimensionMetadata) {
-            throw new MetadataException(\sprintf(
-                'The field "%s" in class "%s" is not a dimension',
-                $dimension,
-                $class,
-            ));
+        if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
+            $dimensionMetadata = $dimensionMetadata->getDimension();
         }
 
         // if it is a relation, we get the unique values from the source entity

@@ -11,32 +11,60 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class MeasureMetadata
+final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
+    /**
+     * @var array<class-string,list<string>>
+     */
+    private array $involvedProperties;
+
     /**
      * @param non-empty-array<class-string,AggregateFunction> $function
      */
     public function __construct(
         private array $function,
-        private string $summaryProperty,
-        private TranslatableInterface $label,
+        string $summaryProperty,
+        TranslatableInterface $label,
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
-        private ?SummaryMetadata $summaryMetadata = null,
-    ) {}
+        ?SummaryMetadata $summaryMetadata = null,
+    ) {
+        parent::__construct(
+            summaryProperty: $summaryProperty,
+            label: $label,
+            summaryMetadata: $summaryMetadata,
+        );
+
+        // involved properties
+
+        $properties = [];
+
+        foreach ($this->function as $class => $aggregateFunction) {
+            foreach ($aggregateFunction->getInvolvedProperties() as $property) {
+                $properties[$class][] = $property;
+            }
+        }
+
+        $uniqueProperties = [];
+
+        foreach ($properties as $class => $listOfProperties) {
+            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
+        }
+
+        $this->involvedProperties = $uniqueProperties;
+    }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
             function: $this->function,
-            summaryProperty: $this->summaryProperty,
-            label: $this->label,
+            summaryProperty: $this->getSummaryProperty(),
+            label: $this->getLabel(),
             unit: $this->unit,
             unitSignature: $this->unitSignature,
             summaryMetadata: $summaryMetadata,
@@ -58,16 +86,6 @@ final readonly class MeasureMetadata
         return reset($function);
     }
 
-    public function getSummaryProperty(): string
-    {
-        return $this->summaryProperty;
-    }
-
-    public function getLabel(): TranslatableInterface
-    {
-        return $this->label;
-    }
-
     public function getUnit(): null|TranslatableInterface
     {
         return $this->unit;
@@ -81,31 +99,9 @@ final readonly class MeasureMetadata
     /**
      * @return array<class-string,list<string>>
      */
+    #[\Override]
     public function getInvolvedProperties(): array
     {
-        $properties = [];
-
-        foreach ($this->function as $class => $aggregateFunction) {
-            foreach ($aggregateFunction->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        return $uniqueProperties;
-    }
-
-    public function getSummaryMetadata(): SummaryMetadata
-    {
-        if ($this->summaryMetadata === null) {
-            throw new MetadataException('Summary table metadata is not set');
-        }
-
-        return $this->summaryMetadata;
+        return $this->involvedProperties;
     }
 }

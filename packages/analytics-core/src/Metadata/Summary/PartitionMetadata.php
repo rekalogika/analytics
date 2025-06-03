@@ -11,13 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Util\LiteralString;
 
-final readonly class PartitionMetadata
+final readonly class PartitionMetadata extends PropertyMetadata
 {
     /**
      * @param array<class-string,PartitionValueResolver> $source
@@ -25,12 +26,32 @@ final readonly class PartitionMetadata
      */
     public function __construct(
         private array $source,
-        private string $summaryProperty,
+        string $summaryProperty,
         private string $partitionClass,
         private string $partitionLevelProperty,
         private string $partitionKeyProperty,
         private PartitionKeyClassifier $partitionKeyClassifier,
-    ) {}
+        ?SummaryMetadata $summaryMetadata = null,
+    ) {
+        parent::__construct(
+            summaryProperty: $summaryProperty,
+            label: new LiteralString('Partition'),
+            summaryMetadata: $summaryMetadata,
+        );
+    }
+
+    public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
+    {
+        return new self(
+            source: $this->source,
+            summaryProperty: $this->getSummaryProperty(),
+            partitionClass: $this->partitionClass,
+            partitionLevelProperty: $this->partitionLevelProperty,
+            partitionKeyProperty: $this->partitionKeyProperty,
+            partitionKeyClassifier: $this->partitionKeyClassifier,
+            summaryMetadata: $summaryMetadata,
+        );
+    }
 
     /**
      * @return array<class-string,PartitionValueResolver>
@@ -38,11 +59,6 @@ final readonly class PartitionMetadata
     public function getSource(): array
     {
         return $this->source;
-    }
-
-    public function getSummaryProperty(): string
-    {
-        return $this->summaryProperty;
     }
 
     /**

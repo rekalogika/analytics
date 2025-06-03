@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 
@@ -24,7 +24,7 @@ use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistr
 final readonly class DirtyFlagGenerator
 {
     public function __construct(
-        private SummaryMetadataFactory $summaryMetadataFactory,
+        private SourceMetadataFactory $sourceMetadataFactory,
         private PartitionManagerRegistry $partitionManagerRegistry,
     ) {}
 
@@ -33,7 +33,7 @@ final readonly class DirtyFlagGenerator
      */
     public function generateForEntityCreation(object $entity): iterable
     {
-        $sourceMetadata = $this->summaryMetadataFactory
+        $sourceMetadata = $this->sourceMetadataFactory
             ->getSourceMetadata($entity::class);
 
         $summaryClasses = $sourceMetadata->getAllInvolvedSummaryClasses();
@@ -48,7 +48,7 @@ final readonly class DirtyFlagGenerator
      */
     public function generateForEntityDeletion(object $entity): iterable
     {
-        $sourceMetadata = $this->summaryMetadataFactory
+        $sourceMetadata = $this->sourceMetadataFactory
             ->getSourceMetadata($entity::class);
 
         $summaryClasses = $sourceMetadata->getAllInvolvedSummaryClasses();
@@ -70,7 +70,7 @@ final readonly class DirtyFlagGenerator
         object $entity,
         array $modifiedProperties,
     ): iterable {
-        $sourceMetadata = $this->summaryMetadataFactory
+        $sourceMetadata = $this->sourceMetadataFactory
             ->getSourceMetadata($entity::class);
 
         $summaryClasses = $sourceMetadata

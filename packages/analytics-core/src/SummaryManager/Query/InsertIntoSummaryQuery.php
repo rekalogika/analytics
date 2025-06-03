@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class InsertIntoSummaryQuery
 {
@@ -46,7 +46,7 @@ final readonly class InsertIntoSummaryQuery
 
         // add dimension columns
 
-        foreach ($this->summaryMetadata->getDimensionMetadatas() as $dimensionMetadata) {
+        foreach ($this->summaryMetadata->getDimensions() as $dimensionMetadata) {
             $property = $dimensionMetadata->getSummaryProperty();
             $hierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -73,7 +73,7 @@ final readonly class InsertIntoSummaryQuery
 
         // add measure columns
 
-        foreach (array_keys($this->summaryMetadata->getMeasureMetadatas()) as $property) {
+        foreach (array_keys($this->summaryMetadata->getMeasures()) as $property) {
             $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
         }
 

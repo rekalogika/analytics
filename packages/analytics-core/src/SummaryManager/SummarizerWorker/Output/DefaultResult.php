@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
@@ -147,7 +147,7 @@ final class DefaultResult implements Result
         $orderFields = array_keys($orderBy);
 
         $dimensionWithoutValues = array_filter(
-            $this->metadata->getDimensionPropertyNames(),
+            array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
         );
 

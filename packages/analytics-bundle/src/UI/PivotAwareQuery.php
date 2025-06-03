@@ -15,9 +15,8 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Contracts\Result\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Metadata\Field;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
-use Rekalogika\Analytics\Util\LiteralString;
+use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -72,7 +71,7 @@ final class PivotAwareQuery
 
         $mandatoryDimensions = [];
 
-        foreach ($this->metadata->getDimensionChoices() as $key => $dimension) {
+        foreach ($this->metadata->getLeafDimensions() as $key => $dimension) {
             if ($key === '@values') {
                 continue;
             }
@@ -162,35 +161,28 @@ final class PivotAwareQuery
 
         $result = [];
 
-        foreach ($this->metadata->getHierarchicalDimensionChoices() as $key => $dimension) {
+        foreach ($this->metadata->getDimensions() as $key => $dimension) {
             $result[$key]['key'] = $key;
             $result[$key]['choices'] = null;
 
-            if ($this->isDimensionMandatory($key)) {
+            if ($dimension->isMandatory()) {
                 $result[$key]['type'] = 'mandatorydimension';
             } else {
                 $result[$key]['type'] = 'dimension';
             }
 
-            if (is_iterable($dimension)) {
-                /** @var iterable<string,TranslatableInterface> $dimension */
-                foreach ($dimension as $childKey => $child) {
-                    $result[$key]['choices'][$childKey] = $child;
-                }
+            foreach ($dimension->getProperties() as $child) {
+                $result[$key]['choices'][$child->getHierarchyProperty()] = $child->getPropertyLabel();
             }
 
-            if ($dimension instanceof TranslatableInterface) {
-                $result[$key]['label'] = $dimension;
-            } else {
-                $result[$key]['label'] = new LiteralString('(unknown)');
-            }
+            $result[$key]['label'] = $dimension->getLabel();
         }
 
-        foreach ($this->metadata->getMeasureChoices() as $key => $measure) {
+        foreach ($this->metadata->getMeasures() as $key => $measure) {
             $result[$key] = [
                 'key' => $key,
                 'type' => 'measure',
-                'label' => $measure,
+                'label' => $measure->getLabel(),
                 'choices' => null,
             ];
         }
@@ -221,8 +213,8 @@ final class PivotAwareQuery
     private function getAllItems(): array
     {
         return [
-            ...array_keys($this->metadata->getHierarchicalDimensionChoices()),
-            ...array_keys($this->metadata->getMeasureChoices()),
+            ...array_keys($this->metadata->getDimensions()),
+            ...array_keys($this->metadata->getMeasures()),
             '@values',
         ];
     }
@@ -316,19 +308,19 @@ final class PivotAwareQuery
     //
 
     /**
-     * @return array<string,Field>
+     * @return array<string,PropertyMetadata>
      */
     public function getDimensionChoices(): array
     {
-        return $this->metadata->getDimensionChoices();
+        return $this->metadata->getLeafDimensions();
     }
 
     /**
-     * @return array<string,Field>
+     * @return array<string,PropertyMetadata>
      */
     public function getMeasureChoices(): array
     {
-        return $this->metadata->getMeasureChoices();
+        return $this->metadata->getMeasures();
     }
 
     public function getResult(): Result
@@ -353,7 +345,7 @@ final class PivotAwareQuery
         // trim dot and the string after
         $dimension = explode('.', $dimension)[0];
 
-        return $this->metadata->getDimensionMetadata($dimension)->isMandatory();
+        return $this->metadata->getDimension($dimension)->isMandatory();
     }
 
     //

@@ -16,14 +16,14 @@ namespace Rekalogika\Analytics\Contracts\Summary;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Rekalogika\Analytics\Exception\MetadataException;
-use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadata;
-use Rekalogika\Analytics\Metadata\DimensionLevelMetadata;
-use Rekalogika\Analytics\Metadata\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\DimensionPathMetadata;
-use Rekalogika\Analytics\Metadata\DimensionPropertyMetadata;
-use Rekalogika\Analytics\Metadata\MeasureMetadata;
-use Rekalogika\Analytics\Metadata\PartitionMetadata;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPathMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
+use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final readonly class Context
@@ -34,7 +34,7 @@ final readonly class Context
         private ?PartitionMetadata $partitionMetadata = null,
         private ?DimensionMetadata $dimensionMetadata = null,
         private ?MeasureMetadata $measureMetadata = null,
-        private ?DimensionPropertyMetadata $dimensionPropertyMetadata = null,
+        private ?DimensionLevelPropertyMetadata $dimensionPropertyMetadata = null,
     ) {}
 
     /**
@@ -91,7 +91,7 @@ final readonly class Context
         return $this->summaryMetadata;
     }
 
-    public function getDimensionPropertyMetadata(): DimensionPropertyMetadata
+    public function getDimensionPropertyMetadata(): DimensionLevelPropertyMetadata
     {
         if (null === $this->dimensionPropertyMetadata) {
             throw new MetadataException('Dimension property metadata is not set, probably because the context is not created for a property inside a hierarchical dimension.');

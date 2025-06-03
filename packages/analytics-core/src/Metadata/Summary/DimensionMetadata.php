@@ -11,26 +11,38 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionMetadata
+final readonly class DimensionMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
     private ?DimensionHierarchyMetadata $hierarchy;
+
+    /**
+     * @var array<string,DimensionPropertyMetadata>
+     */
+    private array $properties;
+
+    /**
+     * @var array<class-string,list<string>>
+     */
+    private array $involvedProperties;
 
     /**
      * @param array<class-string,ValueResolver> $source
      * @param Order|array<string,Order> $orderBy
      * @param null|class-string $typeClass
+     * @param array<string,DimensionPropertyMetadata> $properties
      */
     public function __construct(
         private array $source,
         private string $summaryProperty,
-        private TranslatableInterface $label,
+        TranslatableInterface $label,
         private \DateTimeZone $sourceTimeZone,
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
@@ -38,13 +50,51 @@ final readonly class DimensionMetadata
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
-        private ?SummaryMetadata $summaryMetadata = null,
+        array $properties,
+        ?SummaryMetadata $summaryMetadata = null,
     ) {
+        parent::__construct(
+            summaryProperty: $summaryProperty,
+            label: $label,
+            summaryMetadata: $summaryMetadata,
+        );
+
+        // hierarchy
+
         if ($hierarchy !== null && \is_array($orderBy)) {
             throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
 
         $this->hierarchy = $hierarchy?->withDimensionMetadata($this);
+
+        // properties
+
+        $newProperties = [];
+
+        foreach ($properties as $property) {
+            $newProperties[$property->getSummaryProperty()] = $property
+                ->withDimensionMetadata($this);
+        }
+
+        $this->properties = $newProperties;
+
+        // involved properties
+
+        $properties = [];
+
+        foreach ($this->source as $class => $valueResolver) {
+            foreach ($valueResolver->getInvolvedProperties() as $property) {
+                $properties[$class][] = $property;
+            }
+        }
+
+        $uniqueProperties = [];
+
+        foreach ($properties as $class => $listOfProperties) {
+            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
+        }
+
+        $this->involvedProperties = $uniqueProperties;
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -52,7 +102,7 @@ final readonly class DimensionMetadata
         return new self(
             source: $this->source,
             summaryProperty: $this->summaryProperty,
-            label: $this->label,
+            label: $this->getLabel(),
             sourceTimeZone: $this->sourceTimeZone,
             summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
@@ -61,16 +111,8 @@ final readonly class DimensionMetadata
             nullLabel: $this->nullLabel,
             mandatory: $this->mandatory,
             summaryMetadata: $summaryMetadata,
+            properties: $this->properties,
         );
-    }
-
-    public function getSummaryMetadata(): SummaryMetadata
-    {
-        if ($this->summaryMetadata === null) {
-            throw new MetadataException('Summary table metadata is not set');
-        }
-
-        return $this->summaryMetadata;
     }
 
     /**
@@ -79,16 +121,6 @@ final readonly class DimensionMetadata
     public function getSource(): array
     {
         return $this->source;
-    }
-
-    public function getSummaryProperty(): string
-    {
-        return $this->summaryProperty;
-    }
-
-    public function getLabel(): TranslatableInterface
-    {
-        return $this->label;
     }
 
     public function getSourceTimeZone(): \DateTimeZone
@@ -114,23 +146,10 @@ final readonly class DimensionMetadata
     /**
      * @return array<class-string,list<string>>
      */
+    #[\Override]
     public function getInvolvedProperties(): array
     {
-        $properties = [];
-
-        foreach ($this->source as $class => $valueResolver) {
-            foreach ($valueResolver->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        return $uniqueProperties;
+        return $this->involvedProperties;
     }
 
     /**
@@ -157,5 +176,13 @@ final readonly class DimensionMetadata
     public function isMandatory(): bool
     {
         return $this->mandatory;
+    }
+
+    /**
+     * @return array<string,DimensionPropertyMetadata>
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
     }
 }

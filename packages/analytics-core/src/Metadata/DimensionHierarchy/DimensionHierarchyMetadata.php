@@ -11,9 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
 use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 
 /**
  * @implements \IteratorAggregate<DimensionPathMetadata>
@@ -33,7 +34,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     private DimensionLevelMetadata $lowestLevel;
 
     /**
-     * @var array<string,DimensionPropertyMetadata> $properties
+     * @var array<string,DimensionLevelPropertyMetadata> $properties
      */
     private array $properties;
 
@@ -148,14 +149,14 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     }
 
     /**
-     * @return list<DimensionPropertyMetadata>
+     * @return list<DimensionLevelPropertyMetadata>
      */
     public function getProperties(): array
     {
         return array_values($this->properties);
     }
 
-    public function getProperty(string $name): DimensionPropertyMetadata
+    public function getProperty(string $name): DimensionLevelPropertyMetadata
     {
         return $this->properties[$name]
             ?? throw new MetadataException(\sprintf('Property not found: %s', $name));

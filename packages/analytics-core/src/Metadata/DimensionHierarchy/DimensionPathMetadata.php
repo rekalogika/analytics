@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
 use Rekalogika\Analytics\Exception\MetadataException;
 
@@ -26,7 +26,7 @@ final readonly class DimensionPathMetadata implements \IteratorAggregate
     private array $levels;
 
     /**
-     * @var list<DimensionPropertyMetadata> $properties
+     * @var list<DimensionLevelPropertyMetadata> $properties
      */
     private array $properties;
 
@@ -77,7 +77,7 @@ final readonly class DimensionPathMetadata implements \IteratorAggregate
     }
 
     /**
-     * @return list<DimensionPropertyMetadata>
+     * @return list<DimensionLevelPropertyMetadata>
      */
     public function getProperties(): array
     {

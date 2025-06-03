@@ -54,12 +54,12 @@ final readonly class DefaultFilterFactory implements FilterFactory
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
-        $dimension = $metadata->getFullyQualifiedDimension($dimension);
+        $dimension = $metadata->getDimensionOrDimensionProperty($dimension);
         $typeClass = $dimension->getTypeClass();
 
         if (
             $typeClass === null
-            || $this->isDoctrineRelation($summaryClass, $dimension->getFullName())
+            || $this->isDoctrineRelation($summaryClass, $dimension->getSummaryProperty())
         ) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
         } elseif (\in_array($typeClass, [
@@ -86,7 +86,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
         return $filterFactory->createFilter(
             summaryClass: $summaryClass,
-            dimension: $dimension->getFullName(),
+            dimension: $dimension->getSummaryProperty(),
             inputArray: $inputArray,
         );
     }

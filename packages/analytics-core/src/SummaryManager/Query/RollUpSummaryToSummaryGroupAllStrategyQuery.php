@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
@@ -106,7 +106,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getDimensionMetadatas() as $levelProperty => $metadata) {
+        foreach ($this->metadata->getDimensions() as $levelProperty => $metadata) {
             $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())
@@ -163,7 +163,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
     private function processMeasures(): void
     {
-        foreach ($this->metadata->getMeasureMetadatas() as $field => $metadata) {
+        foreach ($this->metadata->getMeasures() as $field => $metadata) {
             $function = $metadata->getFunction();
             $function = reset($function);
 

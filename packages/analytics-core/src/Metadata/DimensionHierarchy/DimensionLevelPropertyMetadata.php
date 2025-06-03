@@ -11,20 +11,19 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
 use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionPropertyMetadata
+final readonly class DimensionLevelPropertyMetadata
 {
     /**
      * @param null|class-string $typeClass
      */
     public function __construct(
         private string $name,
-        private string $hierarchyName,
         private TranslatableInterface $label,
         private HierarchicalDimensionValueResolver $valueResolver,
         private ?string $typeClass,
@@ -36,7 +35,6 @@ final readonly class DimensionPropertyMetadata
     {
         return new self(
             name: $this->name,
-            hierarchyName: $this->hierarchyName,
             label: $this->label,
             valueResolver: $this->valueResolver,
             typeClass: $this->typeClass,
@@ -48,16 +46,6 @@ final readonly class DimensionPropertyMetadata
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getHierarchyName(): string
-    {
-        return $this->hierarchyName;
-    }
-
-    public function getFullName(): string
-    {
-        return $this->hierarchyName . '.' . $this->name;
     }
 
     public function getLabel(): TranslatableInterface

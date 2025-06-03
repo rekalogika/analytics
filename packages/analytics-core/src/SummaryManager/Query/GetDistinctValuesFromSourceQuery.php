@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Metadata\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

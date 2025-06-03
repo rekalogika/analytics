@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Metadata\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class DeleteExistingSummaryQuery
 {
