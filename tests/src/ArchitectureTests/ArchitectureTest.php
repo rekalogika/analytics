@@ -101,6 +101,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCoreException(),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
+                Selector::classname(\Throwable::class),
                 Selector::classname(\InvalidArgumentException::class),
 
                 // intl
