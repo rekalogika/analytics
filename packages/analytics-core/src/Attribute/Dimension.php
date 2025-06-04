@@ -21,11 +21,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class Dimension
 {
     /**
-     * @param null|string|ValueResolver|array<class-string,string|ValueResolver> $source
+     * @param null|string|ValueResolver $source
      * @param Order|array<string,Order> $orderBy
      */
     public function __construct(
-        private null|string|ValueResolver|array $source = null,
+        private null|string|ValueResolver $source = null,
         private null|string|TranslatableInterface $label = null,
         private \DateTimeZone $sourceTimeZone = new \DateTimeZone('UTC'),
         private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
@@ -35,9 +35,9 @@ final readonly class Dimension
     ) {}
 
     /**
-     * @return null|string|ValueResolver|array<class-string,string|ValueResolver>
+     * @return null|string|ValueResolver
      */
-    public function getSource(): null|string|ValueResolver|array
+    public function getSource(): null|string|ValueResolver
     {
         return $this->source;
     }
