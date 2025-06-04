@@ -19,30 +19,19 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class Summary
 {
     /**
-     * @var non-empty-list<class-string>
-     */
-    private array $sourceClasses;
-
-    /**
-     * @param class-string|non-empty-list<class-string> $sourceClass
+     * @param class-string $sourceClass
      */
     public function __construct(
-        string|array $sourceClass,
+        private string $sourceClass,
         private null|string|TranslatableInterface $label = null,
-    ) {
-        if (\is_string($sourceClass)) {
-            $this->sourceClasses = [$sourceClass];
-        } else {
-            $this->sourceClasses = $sourceClass;
-        }
-    }
+    ) {}
 
     /**
-     * @return non-empty-list<class-string>
+     * @return class-string
      */
-    public function getSourceClasses(): array
+    public function getSourceClass(): string
     {
-        return $this->sourceClasses;
+        return $this->sourceClass;
     }
 
     public function getLabel(): null|string|TranslatableInterface

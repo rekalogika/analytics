@@ -19,16 +19,16 @@ use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 final readonly class Partition
 {
     /**
-     * @param null|string|PartitionValueResolver|array<class-string,string|PartitionValueResolver> $source
+     * @param null|string|PartitionValueResolver $source
      */
     public function __construct(
-        private null|string|PartitionValueResolver|array $source = null,
+        private null|string|PartitionValueResolver $source = null,
     ) {}
 
     /**
-     * @return null|string|PartitionValueResolver|array<class-string,string|PartitionValueResolver>
+     * @return null|string|PartitionValueResolver
      */
-    public function getSource(): null|string|PartitionValueResolver|array
+    public function getSource(): null|string|PartitionValueResolver
     {
         return $this->source;
     }

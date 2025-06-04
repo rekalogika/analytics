@@ -84,6 +84,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
+     * @todo remove $sourceClasses remnant, change to single $sourceClass
+     * instead
      * @param class-string $summaryClassName
      */
     #[\Override]
@@ -98,7 +100,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             attributeClass: Summary::class,
         ) ?? throw new SummaryNotFound($summaryClassName);
 
-        $sourceClasses = $summaryAttribute->getSourceClasses();
+        $sourceClasses = [$summaryAttribute->getSourceClass()];
         $sourceClassMetadata = [];
 
         foreach ($sourceClasses as $sourceClass) {
@@ -209,6 +211,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
+     * @todo change $sourceProperty to be a single ValueResolver instead of an
+     * array
      * @param non-empty-list<class-string> $sourceClasses
      * @param array<class-string,ClassMetadataWrapper> $sourceClassesMetadata
      * @param class-string|null $typeClass
@@ -230,17 +234,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $sourceProperty = $summaryProperty;
         }
 
-        // handle cases if source property is scalar
+        // change scalar source to array
 
-        if (!\is_array($sourceProperty)) {
-            $newSourceProperty = [];
+        $newSourceProperty = [];
 
-            foreach ($sourceClasses as $sourceClass) {
-                $newSourceProperty[$sourceClass] = $sourceProperty;
-            }
-
-            $sourceProperty = $newSourceProperty;
+        foreach ($sourceClasses as $sourceClass) {
+            $newSourceProperty[$sourceClass] = $sourceProperty;
         }
+
+        $sourceProperty = $newSourceProperty;
 
         // normalize source property
 
@@ -338,6 +340,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
+     * @todo change $sourceProperty to be a single ValueResolver instead of an
+     * array
      * @param non-empty-list<class-string> $sourceClasses
      * @param array<class-string,ClassMetadataWrapper> $sourceClassesMetadata
      */
@@ -357,17 +361,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $sourceProperty = $summaryProperty;
         }
 
-        // handle cases if source property is scalar
+        // change scalar source to array
 
-        if (!\is_array($sourceProperty)) {
-            $newSourceProperty = [];
+        $newSourceProperty = [];
 
-            foreach ($sourceClasses as $sourceClass) {
-                $newSourceProperty[$sourceClass] = $sourceProperty;
-            }
-
-            $sourceProperty = $newSourceProperty;
+        foreach ($sourceClasses as $sourceClass) {
+            $newSourceProperty[$sourceClass] = $sourceProperty;
         }
+
+        $sourceProperty = $newSourceProperty;
 
         // normalize source property
 
@@ -488,15 +490,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $unit = TranslatableUtil::normalize($unit);
 
-        if (!\is_array($function)) {
-            $newFunction = [];
+        // change scalar function to array
 
-            foreach ($sourceClasses as $sourceClass) {
-                $newFunction[$sourceClass] = $function;
-            }
+        $newFunction = [];
 
-            $function = $newFunction;
+        foreach ($sourceClasses as $sourceClass) {
+            $newFunction[$sourceClass] = $function;
         }
+
+        $function = $newFunction;
 
         // verify aggregate functions
 
