@@ -499,12 +499,20 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($measureMetadatas as $key => $measureMetadata) {
             $function = $measureMetadata->getFirstFunction();
-            $dql = $function->getSummaryToSummaryDQLFunction();
+
+            $summaryToSummaryDQL = \sprintf(
+                $function->getSummaryToSummaryDQLFunction(),
+                'root.' . $measureMetadata->getSummaryProperty(),
+            );
+
+            $summaryReaderDQL = \sprintf(
+                $function->getSummaryReaderDQLFunction(),
+                $summaryToSummaryDQL,
+            );
 
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
-                    $dql . ' AS %s',
-                    'root.' . $measureMetadata->getSummaryProperty(),
+                    $summaryReaderDQL . ' AS %s',
                     $key,
                 ));
         }

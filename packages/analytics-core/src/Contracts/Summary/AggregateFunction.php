@@ -28,6 +28,12 @@ interface AggregateFunction
     public function getSummaryToSummaryDQLFunction(): string;
 
     /**
+     * Reads the field from the summary table and convert for human consumption.
+     * The template '%s' will be replaced with the field name.
+     */
+    public function getSummaryReaderDQLFunction(): string;
+
+    /**
      * The properties of the source entity that are involved in the calculation.
      * Used by Analytics to determine if a change in the source entity requires
      * a recalculation of the summary.

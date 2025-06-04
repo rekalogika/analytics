@@ -51,6 +51,12 @@ abstract readonly class AbstractAggregateFunction implements AggregateFunction
     }
 
     #[\Override]
+    public function getSummaryReaderDQLFunction(): string
+    {
+        return '%s';
+    }
+
+    #[\Override]
     public function getInvolvedProperties(): array
     {
         return $this->property->getInvolvedProperties();
