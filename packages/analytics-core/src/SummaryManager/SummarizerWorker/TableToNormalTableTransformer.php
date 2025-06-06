@@ -155,7 +155,7 @@ final class TableToNormalTableTransformer
                 dimensions: $newRow,
             );
 
-            $measure = $row->getMeasures()->get($measure)
+            $measure = $row->getMeasures()->getByName($measure)
                 ?? throw new UnexpectedValueException(
                     \sprintf('Measure "%s" not found in row', $measure),
                 );

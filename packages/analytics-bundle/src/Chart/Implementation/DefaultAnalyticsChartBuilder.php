@@ -177,7 +177,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate labels
 
         foreach ($selectedMeasures as $name) {
-            $measure = $measures->get($name)
+            $measure = $measures->getByName($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
                     $name,
@@ -238,7 +238,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $measures = $row->getMeasures();
 
             foreach ($selectedMeasures as $name) {
-                $measure = $measures->get($name);
+                $measure = $measures->getByName($name);
 
                 $dataSets[$name]['data'][] = $this->numberifier->toNumber($measure?->getValue());
             }
@@ -320,7 +320,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measure = $result->getTable()->first()?->getMeasures()->first();
+        $measure = $result->getTable()->first()?->getMeasures()->getByIndex(0);
 
         if ($measure === null) {
             throw new UnsupportedData('Measures not found');
@@ -524,7 +524,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate labels
 
         $name = $selectedMeasures[0];
-        $measure = $measures->get($name);
+        $measure = $measures->getByName($name);
 
         $labels = [];
         $dataSet = [];
@@ -562,7 +562,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->get($name);
+            $measure = $measures->getByName($name);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 

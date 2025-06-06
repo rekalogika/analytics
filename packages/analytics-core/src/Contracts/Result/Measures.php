@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Collection of measures
+ * Collection of measures, in no particular order.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
@@ -22,9 +22,9 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Measures extends \Traversable, \Countable
 {
-    public function get(string $name): ?Measure;
+    public function getByName(string $name): ?Measure;
 
-    public function first(): ?Measure;
+    public function getByIndex(int $index): ?Measure;
 
     public function has(string $name): bool;
 }
