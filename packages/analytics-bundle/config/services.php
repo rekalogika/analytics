@@ -110,7 +110,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->alias(
         SummaryMetadataFactory::class,
-        'rekalogika.analytics.summary_metadata_factory'
+        'rekalogika.analytics.summary_metadata_factory',
     );
 
     $services
@@ -128,7 +128,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->alias(
         SourceMetadataFactory::class,
-        'rekalogika.analytics.source_metadata_factory'
+        'rekalogika.analytics.source_metadata_factory',
     );
 
     $services
@@ -158,7 +158,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->alias(
         SummaryManager::class,
-        'rekalogika.analytics.summary_manager'
+        'rekalogika.analytics.summary_manager',
     );
 
     $services
