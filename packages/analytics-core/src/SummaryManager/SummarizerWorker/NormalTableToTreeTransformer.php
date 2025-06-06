@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Exception\EmptyResultException;
-use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;

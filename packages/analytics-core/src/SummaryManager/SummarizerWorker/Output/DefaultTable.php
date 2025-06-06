@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Exception\EmptyResultException;
-use Rekalogika\Analytics\Exception\LogicException;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>
