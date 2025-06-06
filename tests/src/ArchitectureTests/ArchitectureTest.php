@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query\QueryException;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
@@ -206,6 +207,7 @@ final class ArchitectureTest
                 // doctrine
                 Selector::classname(Criteria::class),
                 Selector::classname(Expression::class),
+                Selector::classname(Type::class),
 
                 // Chartjs
                 Selector::classname(ChartBuilderInterface::class),

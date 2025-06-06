@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\AggregateFunction\Count;
+use Rekalogika\Analytics\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\AggregateFunction\Sum;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
@@ -145,6 +146,13 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private ?int $count = null;
 
+    #[ORM\Column(type: 'rekalogika_hll')]
+    #[Analytics\Measure(
+        function: new CountDistinct(new EntityValueResolver('customer')),
+        label: new TranslatableMessage('Unique customers'),
+    )]
+    private ?int $uniqueCustomers = null;
+
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
@@ -207,5 +215,10 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     public function getCount(): ?int
     {
         return $this->count;
+    }
+
+    public function getUniqueCustomers(): ?int
+    {
+        return $this->uniqueCustomers;
     }
 }
