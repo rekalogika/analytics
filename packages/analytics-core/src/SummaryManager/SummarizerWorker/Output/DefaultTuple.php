@@ -27,11 +27,11 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     private array $dimensions;
 
     /**
-     * @param class-string $summaryTable
+     * @param class-string $summaryClass
      * @param iterable<DefaultDimension> $dimensions
      */
     public function __construct(
-        private string $summaryTable,
+        private string $summaryClass,
         iterable $dimensions,
     ) {
         $dimensionsArray = [];
@@ -44,15 +44,15 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getSummaryTable(): string
+    public function getSummaryClass(): string
     {
-        return $this->summaryTable;
+        return $this->summaryClass;
     }
 
     public function append(DefaultDimension $dimension): static
     {
         return new self(
-            summaryTable: $this->summaryTable,
+            summaryClass: $this->summaryClass,
             dimensions: [...$this->dimensions, $dimension],
         );
     }
@@ -164,7 +164,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         }
 
         return new self(
-            summaryTable: $this->summaryTable,
+            summaryClass: $this->summaryClass,
             dimensions: $dimensionsWithoutValues,
         );
     }

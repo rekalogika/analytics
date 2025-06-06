@@ -70,7 +70,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
     #[\Override]
     public function getSource(Tuple $tuple): SourceResult
     {
-        $summaryClass = $tuple->getSummaryTable();
+        $summaryClass = $tuple->getSummaryClass();
         $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
         $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
 

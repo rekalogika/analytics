@@ -54,7 +54,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             $this->tuple = $parent->getTuple()->append($this->dimension);
         } else {
             $this->tuple = new DefaultTuple(
-                summaryTable: $this->summaryClass,
+                summaryClass: $this->summaryClass,
                 dimensions: [$this->dimension],
             );
         }

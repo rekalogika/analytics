@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Model\Entity\SummaryTableProperties;
+use Rekalogika\Analytics\Model\Entity\SummaryProperties;
 
 final readonly class SummaryPropertiesManager
 {
@@ -29,7 +29,7 @@ final readonly class SummaryPropertiesManager
         string $summaryClass,
     ): int|string|null {
         $properties = $this->entityManager
-            ->getRepository(SummaryTableProperties::class)
+            ->getRepository(SummaryProperties::class)
             ->find($summaryClass);
 
         if ($properties !== null) {
@@ -51,7 +51,7 @@ final readonly class SummaryPropertiesManager
     ): void {
         $connection = $this->entityManager->getConnection();
         $metadata = $this->entityManager
-            ->getClassMetadata(SummaryTableProperties::class);
+            ->getClassMetadata(SummaryProperties::class);
 
         $tableName = $metadata->getTableName();
         $summaryClassColumn = $metadata->getColumnName('summaryClass');
