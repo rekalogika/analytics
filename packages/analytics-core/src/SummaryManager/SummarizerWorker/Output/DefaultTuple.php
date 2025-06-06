@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
@@ -58,33 +57,18 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultDimension
-    {
-        $firstKey = array_key_first($this->dimensions);
-
-        if ($firstKey === null) {
-            return null;
-        }
-
-        return $this->dimensions[$firstKey] ?? null;
-    }
-
-    #[\Override]
     public function get(string $key): ?DefaultDimension
     {
         return $this->dimensions[$key] ?? null;
     }
 
     #[\Override]
-    public function getByIndex(int $index): DefaultDimension
+    public function getByIndex(int $index): ?DefaultDimension
     {
         $keys = array_keys($this->dimensions);
 
         if (!isset($keys[$index])) {
-            throw new InvalidArgumentException(\sprintf(
-                'Dimension at index "%d" not found',
-                $index,
-            ));
+            return null;
         }
 
         return $this->dimensions[$keys[$index]];

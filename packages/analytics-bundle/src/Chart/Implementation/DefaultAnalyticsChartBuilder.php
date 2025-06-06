@@ -219,7 +219,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->first();
+            $dimension = $tuple->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -338,8 +338,14 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         $secondDimensions = [];
 
         foreach ($result->getTable() as $row) {
+            $secondDimension = $row->getTuple()->getByIndex(1);
+
+            if ($secondDimension === null) {
+                throw new UnsupportedData('Expected a second dimension');
+            }
+
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
+            $secondDimensions[] = $secondDimension->getMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -539,7 +545,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->first();
+            $dimension = $tuple->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
