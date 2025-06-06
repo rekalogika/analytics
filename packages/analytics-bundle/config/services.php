@@ -91,16 +91,30 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
 
     //
-    // metadata
+    // dimension hierarchy metadata factory
     //
 
+    $services->alias(
+        DimensionHierarchyMetadataFactory::class,
+        'rekalogika.analytics.dimension_hierarchy_metadata_factory',
+    );
+
     $services
-        ->set(DimensionHierarchyMetadataFactory::class)
+        ->set('rekalogika.analytics.dimension_hierarchy_metadata_factory')
         ->class(DefaultDimensionHierarchyMetadataFactory::class)
     ;
 
+    //
+    // summary metadata factory
+    //
+
+    $services->alias(
+        SummaryMetadataFactory::class,
+        'rekalogika.analytics.summary_metadata_factory'
+    );
+
     $services
-        ->set(SummaryMetadataFactory::class)
+        ->set('rekalogika.analytics.summary_metadata_factory')
         ->class(DefaultSummaryMetadataFactory::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
@@ -108,8 +122,17 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
     ;
 
+    //
+    // source metadata factory
+    //
+
+    $services->alias(
+        SourceMetadataFactory::class,
+        'rekalogika.analytics.source_metadata_factory'
+    );
+
     $services
-        ->set(SourceMetadataFactory::class)
+        ->set('rekalogika.analytics.source_metadata_factory')
         ->class(DefaultSourceMetadataFactory::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
@@ -133,8 +156,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // summary manager
     //
 
+    $services->alias(
+        SummaryManager::class,
+        'rekalogika.analytics.summary_manager'
+    );
+
     $services
-        ->set(SummaryManager::class)
+        ->set('rekalogika.analytics.summary_manager')
         ->class(DefaultSummaryManager::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
@@ -346,18 +374,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set(AnalyticsRuntime::class)
+        ->set('rekalogika.analytics.twig.runtime.analytics')
+        ->class(AnalyticsRuntime::class)
         ->tag('twig.runtime')
         ->args([
             '$twig' => service('twig'),
         ]);
 
     $services
-        ->set(AnalyticsExtension::class)
+        ->set('rekalogika.analytics.twig.extension.analytics')
+        ->class(AnalyticsExtension::class)
         ->tag('twig.extension');
 
     $services
-        ->set(HtmlifierRuntime::class)
+        ->set('rekalogika.analytics.twig.runtime.htmlifier')
+        ->class(HtmlifierRuntime::class)
         ->tag('twig.runtime')
         ->args([
             '$htmlifier' => service(Htmlifier::class),
@@ -365,7 +396,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(CellifierRuntime::class)
+        ->set('rekalogika.analytics.twig.runtime.cellifier')
+        ->class(CellifierRuntime::class)
         ->tag('twig.runtime')
         ->args([
             '$cellifier' => service(Cellifier::class),
@@ -373,27 +405,50 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(FormatterExtension::class)
+        ->set('rekalogika.analytics.twig.extension.formatter')
+        ->class(FormatterExtension::class)
         ->tag('twig.extension')
     ;
 
+    //
+    // pivot table
+    //
+
+    $services->alias(
+        PivotAwareQueryFactory::class,
+        'rekalogika.analytics.pivot_aware_query_factory',
+    );
+
     $services
-        ->set(PivotAwareQueryFactory::class)
+        ->set('rekalogika.analytics.pivot_aware_query_factory')
+        ->class(PivotAwareQueryFactory::class)
         ->args([
             '$filterFactory' => service(FilterFactory::class),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
     ;
 
+    $services->alias(
+        PivotTableRenderer::class,
+        'rekalogika.analytics.pivot_table_renderer',
+    );
+
     $services
-        ->set(PivotTableRenderer::class)
+        ->set('rekalogika.analytics.pivot_table_renderer')
+        ->class(PivotTableRenderer::class)
         ->args([
             '$twig' => service('twig'),
         ])
     ;
 
+    $services->alias(
+        SpreadsheetRenderer::class,
+        'rekalogika.analytics.spreadsheet_renderer',
+    );
+
     $services
-        ->set(SpreadsheetRenderer::class)
+        ->set('rekalogika.analytics.spreadsheet_renderer')
+        ->class(SpreadsheetRenderer::class)
         ->args([
             '$twig' => service('twig'),
         ])
@@ -403,8 +458,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // chart
     //
 
+    $services->alias(
+        AnalyticsChartBuilder::class,
+        'rekalogika.analytics.chart_builder',
+    );
+
     $services
-        ->set(AnalyticsChartBuilder::class)
+        ->set('rekalogika.analytics.chart_builder')
         ->class(DefaultAnalyticsChartBuilder::class)
         ->args([
             '$localeSwitcher' => service('translation.locale_switcher'),
