@@ -18,14 +18,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Row
+interface Row extends Tuple
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getTuple(): Tuple;
-
     public function getMeasures(): Measures;
 }

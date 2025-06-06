@@ -129,7 +129,7 @@ final class TableToNormalTableTransformer
                 // be set in the next loop
                 $newRow['@values'] = true;
             } else {
-                $newRow[$dimension] = $row->getTuple()->getByName($dimension);
+                $newRow[$dimension] = $row->getByName($dimension);
             }
         }
 

@@ -76,7 +76,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             throw new UnsupportedData('Measures not found');
         }
 
-        $tuple = $result->getTable()->first()?->getTuple();
+        $tuple = $result->getTable()->first();
 
         if ($tuple === null) {
             throw new UnsupportedData('No data found');
@@ -138,7 +138,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createLineChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->first()?->getTuple();
+        $tuple = $result->getTable()->first();
 
         if ($tuple === null) {
             throw new UnsupportedData('No data found');
@@ -213,13 +213,11 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
-
-            if (\count($tuple) !== 1) {
+            if (\count($row) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->getByIndex(0);
+            $dimension = $row->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -338,7 +336,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         $secondDimensions = [];
 
         foreach ($result->getTable() as $row) {
-            $secondDimension = $row->getTuple()->getByIndex(1);
+            $secondDimension = $row->getByIndex(1);
 
             if ($secondDimension === null) {
                 throw new UnsupportedData('Expected a second dimension');
@@ -539,13 +537,11 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
-
-            if (\count($tuple) !== 1) {
+            if (\count($row) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->getByIndex(0);
+            $dimension = $row->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
