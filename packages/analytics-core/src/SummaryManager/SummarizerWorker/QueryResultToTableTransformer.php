@@ -222,7 +222,7 @@ final readonly class QueryResultToTableTransformer
         //
 
         $tuple = new DefaultTuple(
-            summaryTable: $this->metadata->getSummaryClass(),
+            summaryClass: $this->metadata->getSummaryClass(),
             dimensions: $dimensionValues,
         );
 

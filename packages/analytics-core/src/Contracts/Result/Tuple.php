@@ -25,7 +25,7 @@ interface Tuple extends \Traversable, \Countable
     /**
      * @return class-string
      */
-    public function getSummaryTable(): string;
+    public function getSummaryClass(): string;
 
     public function get(string $key): ?Dimension;
 

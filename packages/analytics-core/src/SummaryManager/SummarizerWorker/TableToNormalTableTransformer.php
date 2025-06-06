@@ -151,7 +151,7 @@ final class TableToNormalTableTransformer
 
             /** @var array<string,DefaultDimension> $newRow */
             $tuple = new DefaultTuple(
-                summaryTable: $summaryClass,
+                summaryClass: $summaryClass,
                 dimensions: $newRow,
             );
 
