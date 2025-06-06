@@ -27,7 +27,7 @@ final readonly class UIPivotTableBranch implements BranchNode
     #[\Override]
     public function getKey(): string
     {
-        return $this->node->getKey();
+        return $this->node->getName();
     }
 
     #[\Override]

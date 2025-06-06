@@ -30,7 +30,7 @@ final readonly class PivotTableLeaf implements LeafNode
         if ($measure === null) {
             throw new UnexpectedValueException(\sprintf(
                 'Leaf node "%s" does not have a measure',
-                $node->getKey(),
+                $node->getName(),
             ));
         }
 
@@ -46,7 +46,7 @@ final readonly class PivotTableLeaf implements LeafNode
     #[\Override]
     public function getKey(): string
     {
-        return $this->node->getKey();
+        return $this->node->getName();
     }
 
     #[\Override]

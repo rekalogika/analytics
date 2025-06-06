@@ -33,16 +33,16 @@ interface Tuple extends \Traversable, \Countable
     public function getSummaryClass(): string;
 
     /**
-     * Gets a dimension by its key.
+     * Gets a dimension by its name.
      */
-    public function get(string $key): ?Dimension;
+    public function getByName(string $name): ?Dimension;
 
     /**
      * Gets a dimension by its index. 0 is the first dimension.
      */
     public function getByIndex(int $index): ?Dimension;
 
-    public function has(string $key): bool;
+    public function has(string $name): bool;
 
     /**
      * @return array<string,mixed>

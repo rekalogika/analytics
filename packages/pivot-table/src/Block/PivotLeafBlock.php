@@ -27,12 +27,12 @@ final class PivotLeafBlock extends NodeBlock
             $this->getContext()->hasSuperfluousLegend($this->getLeafNode())
         ) {
             $cell = new DefaultHeaderCell(
-                key: $this->getLeafNode()->getKey(),
+                name: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
             );
         } else {
             $cell = new DefaultDataCell(
-                key: $this->getLeafNode()->getKey(),
+                name: $this->getLeafNode()->getKey(),
                 content: $this->getLeafNode()->getItem(),
             );
         }
@@ -46,7 +46,7 @@ final class PivotLeafBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
         );
 

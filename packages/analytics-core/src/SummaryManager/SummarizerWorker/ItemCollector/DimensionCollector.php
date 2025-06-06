@@ -19,7 +19,7 @@ use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 final class DimensionCollector
 {
     /**
-     * @var array<string,DimensionByKeyCollector>
+     * @var array<string,DimensionByNameCollector>
      */
     private array $collectors = [];
 
@@ -36,8 +36,8 @@ final class DimensionCollector
     {
         $uniqueDimensionsByKey = [];
 
-        foreach ($this->collectors as $key => $collector) {
-            $uniqueDimensionsByKey[$key] = $collector->getResult();
+        foreach ($this->collectors as $name => $collector) {
+            $uniqueDimensionsByKey[$name] = $collector->getResult();
         }
 
         return new Items(
@@ -46,10 +46,10 @@ final class DimensionCollector
         );
     }
 
-    private function getCollectorForKey(string $key): DimensionByKeyCollector
+    private function getCollectorForName(string $name): DimensionByNameCollector
     {
-        return $this->collectors[$key] ??= new DimensionByKeyCollector(
-            key: $key,
+        return $this->collectors[$name] ??= new DimensionByNameCollector(
+            name: $name,
             hasTieredOrder: $this->hasTieredOrder,
         );
     }
@@ -59,9 +59,9 @@ final class DimensionCollector
         $earlierDimensions = [];
 
         foreach ($dimensions as $dimension) {
-            $key = $dimension->getKey();
+            $name = $dimension->getName();
 
-            $this->getCollectorForKey($key)->addDimension(
+            $this->getCollectorForName($name)->addDimension(
                 earlierDimensionsInDimensions: $earlierDimensions,
                 dimension: $dimension,
             );
@@ -72,7 +72,7 @@ final class DimensionCollector
 
     public function processMeasure(DefaultMeasure $measure): void
     {
-        $this->measures[$measure->getKey()]
+        $this->measures[$measure->getName()]
             ??= DefaultMeasure::createNullFromSelf($measure);
     }
 }

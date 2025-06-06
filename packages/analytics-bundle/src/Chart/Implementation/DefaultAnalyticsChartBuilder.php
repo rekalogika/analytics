@@ -176,20 +176,20 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
         // populate labels
 
-        foreach ($selectedMeasures as $key) {
-            $measure = $measures->get($key)
+        foreach ($selectedMeasures as $name) {
+            $measure = $measures->get($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
-                    $key,
+                    $name,
                 ));
 
-            $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
-            $dataSets[$key]['data'] = [];
+            $dataSets[$name]['label'] = $this->stringifier->toString($measure->getLabel());
+            $dataSets[$name]['data'] = [];
 
             $color = $colorDispenser->dispenseColor();
-            $dataSets[$key]['backgroundColor'] = $color . $this->configuration->areaTransparency;
-            $dataSets[$key]['borderColor'] = $color;
-            $dataSets[$key]['borderWidth'] = $this->configuration->areaBorderWidth;
+            $dataSets[$name]['backgroundColor'] = $color . $this->configuration->areaTransparency;
+            $dataSets[$name]['borderColor'] = $color;
+            $dataSets[$name]['borderWidth'] = $this->configuration->areaBorderWidth;
 
             if ($yTitle === null) {
                 $unit = $measure->getUnit();
@@ -237,10 +237,10 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
             $measures = $row->getMeasures();
 
-            foreach ($selectedMeasures as $key) {
-                $measure = $measures->get($key);
+            foreach ($selectedMeasures as $name) {
+                $measure = $measures->get($name);
 
-                $dataSets[$key]['data'][] = $this->numberifier->toNumber($measure?->getValue());
+                $dataSets[$name]['data'][] = $this->numberifier->toNumber($measure?->getValue());
             }
         }
 
@@ -523,8 +523,8 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
         // populate labels
 
-        $key = $selectedMeasures[0];
-        $measure = $measures->get($key);
+        $name = $selectedMeasures[0];
+        $measure = $measures->get($name);
 
         $labels = [];
         $dataSet = [];
@@ -562,7 +562,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->get($key);
+            $measure = $measures->get($name);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 
@@ -599,7 +599,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $unit = $measure->getUnit();
 
             if ($selectedMeasures === [] && $unit === null) {
-                return [$measure->getKey()];
+                return [$measure->getName()];
             }
 
             if ($selectedUnit === null) {
@@ -610,7 +610,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                 $selectedUnit !== null &&
                 $selectedUnit->getSignature() === $unit?->getSignature()
             ) {
-                $selectedMeasures[] = $measure->getKey();
+                $selectedMeasures[] = $measure->getName();
             }
         }
 

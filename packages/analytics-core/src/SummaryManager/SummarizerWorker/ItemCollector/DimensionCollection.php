@@ -24,7 +24,7 @@ final readonly class DimensionCollection implements \IteratorAggregate, \Countab
      * @param list<DefaultDimension> $dimensions
      */
     public function __construct(
-        private string $key,
+        private string $name,
         private array $dimensions,
     ) {}
 
@@ -34,9 +34,9 @@ final readonly class DimensionCollection implements \IteratorAggregate, \Countab
         yield from $this->dimensions;
     }
 
-    public function getKey(): string
+    public function getName(): string
     {
-        return $this->key;
+        return $this->name;
     }
 
     #[\Override]

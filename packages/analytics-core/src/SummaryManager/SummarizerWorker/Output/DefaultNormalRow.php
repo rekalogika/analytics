@@ -61,10 +61,10 @@ final readonly class DefaultNormalRow implements NormalRow
         $tuple1 = $row1->getTuple();
         $tuple2 = $row2->getTuple();
 
-        foreach ($tuple1 as $key => $value1) {
-            $value2 = $tuple2->get($key);
+        foreach ($tuple1 as $name => $value1) {
+            $value2 = $tuple2->getByName($name);
 
-            if ($key === '@values') {
+            if ($name === '@values') {
                 break;
             }
 
@@ -73,10 +73,10 @@ final readonly class DefaultNormalRow implements NormalRow
             }
         }
 
-        $measure1Order = $measures[$row1->getMeasure()->getKey()]
+        $measure1Order = $measures[$row1->getMeasure()->getName()]
             ?? throw new LogicException('Measure not found');
 
-        $measure2Order = $measures[$row2->getMeasure()->getKey()]
+        $measure2Order = $measures[$row2->getMeasure()->getName()]
             ?? throw new LogicException('Measure not found');
 
         return $measure1Order <=> $measure2Order;

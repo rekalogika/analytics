@@ -22,18 +22,18 @@ final readonly class DimensionUtil
 
     public static function getDimensionSignature(Dimension $dimension): string
     {
-        $key = $dimension->getKey();
+        $name = $dimension->getName();
         /** @psalm-suppress MixedAssignment */
         $rawMember = $dimension->getRawMember();
 
         if (\is_object($rawMember)) {
             return hash('xxh128', serialize([
-                $key,
+                $name,
                 spl_object_id($rawMember),
             ]));
         }
 
-        return hash('xxh128', serialize([$key, $rawMember]));
+        return hash('xxh128', serialize([$name, $rawMember]));
     }
 
     /**
@@ -60,7 +60,7 @@ final readonly class DimensionUtil
             return false;
         }
 
-        if ($a->getKey() !== $b->getKey()) {
+        if ($a->getName() !== $b->getName()) {
             return false;
         }
 
@@ -73,12 +73,12 @@ final readonly class DimensionUtil
             return false;
         }
 
-        foreach ($a as $key => $dimension) {
-            if (! $b->has($key)) {
+        foreach ($a as $name => $dimension) {
+            if (! $b->has($name)) {
                 return false;
             }
 
-            if (! self::isDimensionSame($dimension, $b->get($key))) {
+            if (! self::isDimensionSame($dimension, $b->getByName($name))) {
                 return false;
             }
         }
@@ -96,12 +96,12 @@ final readonly class DimensionUtil
             return false;
         }
 
-        foreach ($a as $key => $dimension) {
-            if (! isset($b[$key])) {
+        foreach ($a as $name => $dimension) {
+            if (! isset($b[$name])) {
                 return false;
             }
 
-            if (! self::isDimensionSame($dimension, $b[$key])) {
+            if (! self::isDimensionSame($dimension, $b[$name])) {
                 return false;
             }
         }

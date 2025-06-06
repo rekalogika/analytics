@@ -193,8 +193,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $key = \sprintf('%s.%s', $summaryProperty, $name);
-                    $this->groupings[$key] = \sprintf(
+                    $name = \sprintf('%s.%s', $summaryProperty, $name);
+                    $this->groupings[$name] = \sprintf(
                         'root.%s.%s',
                         $dimensionProperty,
                         $name,

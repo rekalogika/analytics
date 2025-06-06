@@ -20,7 +20,7 @@ final readonly class DefaultMeasure implements Measure
 {
     public function __construct(
         private TranslatableInterface $label,
-        private string $key,
+        private string $name,
         private mixed $value,
         private mixed $rawValue,
         private ?DefaultUnit $unit,
@@ -28,12 +28,12 @@ final readonly class DefaultMeasure implements Measure
 
     public static function createNull(
         TranslatableInterface $label,
-        string $key,
+        string $name,
         ?DefaultUnit $unit,
     ): self {
         return new self(
             label: $label,
-            key: $key,
+            name: $name,
             value: null,
             rawValue: null,
             unit: $unit,
@@ -44,7 +44,7 @@ final readonly class DefaultMeasure implements Measure
     {
         return self::createNull(
             label: $measure->label,
-            key: $measure->key,
+            name: $measure->name,
             unit: $measure->unit,
         );
     }
@@ -56,9 +56,9 @@ final readonly class DefaultMeasure implements Measure
     }
 
     #[\Override]
-    public function getKey(): string
+    public function getName(): string
     {
-        return $this->key;
+        return $this->name;
     }
 
     #[\Override]

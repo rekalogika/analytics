@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Util\DimensionUtil;
 /**
  * Get unique dimensions while preserving the order of the dimensions.
  */
-final class DimensionByKeyCollector
+final class DimensionByNameCollector
 {
     /**
      * @var array<string,DefaultDimension>
@@ -33,7 +33,7 @@ final class DimensionByKeyCollector
     private ?DefaultDimension $previousDimension = null;
 
     public function __construct(
-        private readonly string $key,
+        private readonly string $name,
         private readonly bool $hasTieredOrder,
     ) {}
 
@@ -45,7 +45,7 @@ final class DimensionByKeyCollector
 
         if ($dimensions === []) {
             return new DimensionCollection(
-                key: $this->key,
+                name: $this->name,
                 dimensions: [],
             );
         }
@@ -55,7 +55,7 @@ final class DimensionByKeyCollector
         }
 
         return new DimensionCollection(
-            key: $this->key,
+            name: $this->name,
             dimensions: $dimensions,
         );
     }
@@ -72,11 +72,11 @@ final class DimensionByKeyCollector
 
         // ensure the dimensions has the correct key
 
-        if ($dimension->getKey() !== $this->key) {
+        if ($dimension->getName() !== $this->name) {
             throw new UnexpectedValueException(\sprintf(
                 'Dimension key "%s" does not match the collector key "%s"',
-                $dimension->getKey(),
-                $this->key,
+                $dimension->getName(),
+                $this->name,
             ));
         }
 

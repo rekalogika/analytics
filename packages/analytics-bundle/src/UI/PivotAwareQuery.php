@@ -71,13 +71,13 @@ final class PivotAwareQuery
 
         $mandatoryDimensions = [];
 
-        foreach ($this->metadata->getLeafDimensions() as $key => $dimension) {
-            if ($key === '@values') {
+        foreach ($this->metadata->getLeafDimensions() as $name => $dimension) {
+            if ($name === '@values') {
                 continue;
             }
 
-            if ($this->isDimensionMandatory($key)) {
-                $mandatoryDimensions[] = $key;
+            if ($this->isDimensionMandatory($name)) {
+                $mandatoryDimensions[] = $name;
             }
         }
 
@@ -161,26 +161,26 @@ final class PivotAwareQuery
 
         $result = [];
 
-        foreach ($this->metadata->getDimensions() as $key => $dimension) {
-            $result[$key]['key'] = $key;
-            $result[$key]['choices'] = null;
+        foreach ($this->metadata->getDimensions() as $name => $dimension) {
+            $result[$name]['key'] = $name;
+            $result[$name]['choices'] = null;
 
             if ($dimension->isMandatory()) {
-                $result[$key]['type'] = 'mandatorydimension';
+                $result[$name]['type'] = 'mandatorydimension';
             } else {
-                $result[$key]['type'] = 'dimension';
+                $result[$name]['type'] = 'dimension';
             }
 
             foreach ($dimension->getProperties() as $child) {
-                $result[$key]['choices'][$child->getHierarchyProperty()] = $child->getPropertyLabel();
+                $result[$name]['choices'][$child->getHierarchyProperty()] = $child->getPropertyLabel();
             }
 
-            $result[$key]['label'] = $dimension->getLabel();
+            $result[$name]['label'] = $dimension->getLabel();
         }
 
-        foreach ($this->metadata->getMeasures() as $key => $measure) {
-            $result[$key] = [
-                'key' => $key,
+        foreach ($this->metadata->getMeasures() as $name => $measure) {
+            $result[$name] = [
+                'key' => $name,
                 'type' => 'measure',
                 'label' => $measure->getLabel(),
                 'choices' => null,

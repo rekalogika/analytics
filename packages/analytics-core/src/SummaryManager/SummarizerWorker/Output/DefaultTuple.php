@@ -36,7 +36,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         $dimensionsArray = [];
 
         foreach ($dimensions as $dimension) {
-            $dimensionsArray[$dimension->getKey()] = $dimension;
+            $dimensionsArray[$dimension->getName()] = $dimension;
         }
 
         $this->dimensions = $dimensionsArray;
@@ -57,27 +57,27 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(string $key): ?DefaultDimension
+    public function getByName(string $name): ?DefaultDimension
     {
-        return $this->dimensions[$key] ?? null;
+        return $this->dimensions[$name] ?? null;
     }
 
     #[\Override]
     public function getByIndex(int $index): ?DefaultDimension
     {
-        $keys = array_keys($this->dimensions);
+        $names = array_keys($this->dimensions);
 
-        if (!isset($keys[$index])) {
+        if (!isset($names[$index])) {
             return null;
         }
 
-        return $this->dimensions[$keys[$index]];
+        return $this->dimensions[$names[$index]];
     }
 
     #[\Override]
-    public function has(string $key): bool
+    public function has(string $name): bool
     {
-        return isset($this->dimensions[$key]);
+        return isset($this->dimensions[$name]);
     }
 
     #[\Override]
@@ -99,12 +99,12 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
             return false;
         }
 
-        foreach ($this->dimensions as $key => $dimension) {
-            if (!$other->has($key)) {
+        foreach ($this->dimensions as $name => $dimension) {
+            if (!$other->has($name)) {
                 return false;
             }
 
-            if (!$dimension->isSame($other->get($key))) {
+            if (!$dimension->isSame($other->getByName($name))) {
                 return false;
             }
         }
@@ -119,7 +119,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
         foreach ($this->dimensions as $dimension) {
             /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getKey()] = $dimension->getMember();
+            $members[$dimension->getName()] = $dimension->getMember();
         }
 
         return $members;
@@ -140,7 +140,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         $dimensionsWithoutValues = [];
 
         foreach ($this->dimensions as $dimension) {
-            if ($dimension->getKey() === '@values') {
+            if ($dimension->getName() === '@values') {
                 continue;
             }
 

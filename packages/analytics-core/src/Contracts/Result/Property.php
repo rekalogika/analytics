@@ -25,7 +25,7 @@ interface Property
     /**
      * Property name (e.g. country, time.hour, count, etc)
      */
-    public function getKey(): string;
+    public function getName(): string;
 
     /**
      * Description of the property (e.g. Country, Hour of the day)

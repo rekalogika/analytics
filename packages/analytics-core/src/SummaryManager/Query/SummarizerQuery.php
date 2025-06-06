@@ -162,13 +162,13 @@ final class SummarizerQuery extends AbstractQuery
             $newRow = [];
 
             /** @var mixed $value */
-            foreach ($row as $key => $value) {
-                if (\array_key_exists($key, $this->dimensionAliases)) {
+            foreach ($row as $name => $value) {
+                if (\array_key_exists($name, $this->dimensionAliases)) {
                     /** @psalm-suppress MixedAssignment */
-                    $newRow[$this->dimensionAliases[$key]] = $value;
+                    $newRow[$this->dimensionAliases[$name]] = $value;
                 } else {
                     /** @psalm-suppress MixedAssignment */
-                    $newRow[$key] = $value;
+                    $newRow[$name] = $value;
                 }
             }
 
@@ -449,9 +449,9 @@ final class SummarizerQuery extends AbstractQuery
             ->getGroupingsByPropertyForSelect($hierarchyProperty);
 
         foreach ($dimensionHierarchyMetadata->getProperties() as $property) {
-            $key = \sprintf('%s.%s', $dimensionProperty, $property->getName());
+            $name = \sprintf('%s.%s', $dimensionProperty, $property->getName());
 
-            $this->groupings[$key] = $groupings[$property->getName()];
+            $this->groupings[$name] = $groupings[$property->getName()];
         }
 
         // add select
@@ -497,7 +497,7 @@ final class SummarizerQuery extends AbstractQuery
     {
         $measureMetadatas = $this->metadata->getMeasures();
 
-        foreach ($measureMetadatas as $key => $measureMetadata) {
+        foreach ($measureMetadatas as $name => $measureMetadata) {
             $function = $measureMetadata->getFirstFunction();
 
             $summaryToSummaryDQL = \sprintf(
@@ -513,7 +513,7 @@ final class SummarizerQuery extends AbstractQuery
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     $summaryReaderDQL . ' AS %s',
-                    $key,
+                    $name,
                 ));
         }
     }

@@ -34,22 +34,22 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
         $measuresArray = [];
 
         foreach ($measures as $measure) {
-            $measuresArray[$measure->getKey()] = $measure;
+            $measuresArray[$measure->getName()] = $measure;
         }
 
         $this->measures = $measuresArray;
     }
 
     #[\Override]
-    public function get(string $key): ?DefaultMeasure
+    public function get(string $name): ?DefaultMeasure
     {
-        return $this->measures[$key] ?? null;
+        return $this->measures[$name] ?? null;
     }
 
     #[\Override]
-    public function has(string $key): bool
+    public function has(string $name): bool
     {
-        return isset($this->measures[$key]);
+        return isset($this->measures[$name]);
     }
 
     #[\Override]

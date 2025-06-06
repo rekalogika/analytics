@@ -24,7 +24,7 @@ final class SingleNodeLeafBlock extends NodeBlock
     protected function createHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getItem(),
         );
 
@@ -37,7 +37,7 @@ final class SingleNodeLeafBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
         );
 

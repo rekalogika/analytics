@@ -88,14 +88,14 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     public function isEqual(self|DefaultDimension $other): bool
     {
-        return $this->getKey() === $other->getKey()
+        return $this->getName() === $other->getName()
             && $this->getRawMember() === $other->getRawMember();
     }
 
     #[\Override]
-    public function getKey(): string
+    public function getName(): string
     {
-        return $this->dimension->getKey();
+        return $this->dimension->getName();
     }
 
     #[\Override]
@@ -180,9 +180,9 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             throw new LogicException('Cannot add child to a leaf node');
         }
 
-        if ($node->getKey() !== $this->childrenKey) {
+        if ($node->getName() !== $this->childrenKey) {
             throw new UnexpectedValueException(
-                \sprintf('Invalid child key "%s", expected "%s"', $node->getKey(), $this->childrenKey),
+                \sprintf('Invalid child key "%s", expected "%s"', $node->getName(), $this->childrenKey),
             );
         }
 

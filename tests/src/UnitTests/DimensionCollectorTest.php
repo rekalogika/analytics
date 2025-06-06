@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\DimensionByKeyCollector;
+use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -45,7 +45,7 @@ final class DimensionCollectorTest extends TestCase
     {
         $this->addDimension('male', new DefaultDimension(
             label: new TranslatableMessage('Male'),
-            key: 'gender',
+            name: 'gender',
             rawMember: Gender::Male,
             member: Gender::Male,
             displayMember: Gender::Male,
@@ -53,7 +53,7 @@ final class DimensionCollectorTest extends TestCase
 
         $this->addDimension('female', new DefaultDimension(
             label: new TranslatableMessage('Female'),
-            key: 'gender',
+            name: 'gender',
             rawMember: Gender::Female,
             member: Gender::Female,
             displayMember: Gender::Female,
@@ -61,7 +61,7 @@ final class DimensionCollectorTest extends TestCase
 
         $this->addDimension('other', new DefaultDimension(
             label: new TranslatableMessage('Other'),
-            key: 'gender',
+            name: 'gender',
             rawMember: Gender::Other,
             member: Gender::Other,
             displayMember: Gender::Other,
@@ -69,7 +69,7 @@ final class DimensionCollectorTest extends TestCase
 
         $this->addDimension('null', new DefaultDimension(
             label: new TranslatableMessage('Unknown'),
-            key: 'gender',
+            name: 'gender',
             rawMember: null,
             member: null,
             displayMember: 'Unknown',
@@ -78,7 +78,7 @@ final class DimensionCollectorTest extends TestCase
 
     public function testDimensionCollector(): void
     {
-        $collector = new DimensionByKeyCollector('gender', true);
+        $collector = new DimensionByNameCollector('gender', true);
 
         $collector->addDimension([], $this->getDimension('female'));
         $collector->addDimension([], $this->getDimension('male'));

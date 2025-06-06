@@ -22,9 +22,9 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Measures extends \Traversable, \Countable
 {
-    public function get(string $key): ?Measure;
+    public function get(string $name): ?Measure;
 
     public function first(): ?Measure;
 
-    public function has(string $key): bool;
+    public function has(string $name): bool;
 }

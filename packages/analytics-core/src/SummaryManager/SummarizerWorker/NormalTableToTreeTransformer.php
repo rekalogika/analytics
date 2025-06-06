@@ -36,10 +36,10 @@ final class NormalTableToTreeTransformer
     private array $tree = [];
 
     /**
-     * @param list<string> $keys
+     * @param list<string> $names
      */
     public function __construct(
-        private readonly array $keys,
+        private readonly array $names,
         private readonly Items $uniqueDimensions,
         private readonly bool $hasTieredOrder,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
@@ -71,12 +71,12 @@ final class NormalTableToTreeTransformer
         // get keys from the first row
 
         $members = $firstRow->getTuple()->getMembers();
-        $keys = array_keys($members);
+        $names = array_keys($members);
 
         // instantiate and process
 
         $transformer = new self(
-            keys: $keys,
+            names: $names,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
             hasTieredOrder: $hasTieredOrder,
             treeNodeFactory: $treeNodeFactory,
@@ -85,7 +85,7 @@ final class NormalTableToTreeTransformer
         return new DefaultTree(
             summaryClass: $summaryClass,
             label: $label,
-            childrenKey: $keys[0],
+            childrenKey: $names[0],
             children: $transformer->doTransform($normalTable),
             items: $normalTable->getUniqueDimensions(),
             treeNodeFactory: $treeNodeFactory,
@@ -102,7 +102,7 @@ final class NormalTableToTreeTransformer
         bool $forceCreate,
     ): void {
         $parent = $this->currentPath[$columnNumber - 1] ?? null;
-        $childrenKey = $this->keys[$columnNumber + 1] ?? null;
+        $childrenKey = $this->names[$columnNumber + 1] ?? null;
 
         if ($childrenKey === null) {
             throw new UnexpectedValueException('Children key cannot be null');

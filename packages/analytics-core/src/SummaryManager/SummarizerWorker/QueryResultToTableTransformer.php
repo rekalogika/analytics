@@ -103,40 +103,40 @@ final readonly class QueryResultToTableTransformer
         $measures = $this->query->getSelect();
         $measureValues = [];
 
-        foreach ($measures as $key) {
-            if (!\array_key_exists($key, $input)) {
+        foreach ($measures as $name) {
+            if (!\array_key_exists($name, $input)) {
                 throw new LogicException(\sprintf(
                     'Measure "%s" not found',
-                    $key,
+                    $name,
                 ));
             }
 
             /** @psalm-suppress MixedAssignment */
-            $rawValue = $input[$key];
+            $rawValue = $input[$name];
 
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->resolveValue(
                 reflectionClass: $reflectionClass,
-                propertyName: $key,
+                propertyName: $name,
                 value: $rawValue,
             );
 
             $this->injectValueToObject(
                 object: $summaryObject,
                 reflectionClass: $reflectionClass,
-                propertyName: $key,
+                propertyName: $name,
                 value: $rawValue,
             );
 
             /** @psalm-suppress MixedAssignment */
-            $value = $this->propertyAccessor->getValue($summaryObject, $key);
+            $value = $this->propertyAccessor->getValue($summaryObject, $name);
 
             $unit = $this->metadata
-                ->getMeasure($key)
+                ->getMeasure($name)
                 ->getUnit();
 
             $unitSignature = $this->metadata
-                ->getMeasure($key)
+                ->getMeasure($name)
                 ->getUnitSignature();
 
             $unit = DefaultUnit::create(
@@ -145,14 +145,14 @@ final readonly class QueryResultToTableTransformer
             );
 
             $measure = new DefaultMeasure(
-                label: $this->getLabel($key),
-                key: $key,
+                label: $this->getLabel($name),
+                name: $name,
                 value: $value,
                 rawValue: $rawValue,
                 unit: $unit,
             );
 
-            $measureValues[$key] = $measure;
+            $measureValues[$name] = $measure;
         }
 
         //
@@ -174,47 +174,47 @@ final readonly class QueryResultToTableTransformer
         $dimensionValues = [];
         $tuple = $this->query->getGroupBy();
 
-        foreach ($tuple as $key) {
-            if ($key === '@values') {
+        foreach ($tuple as $name) {
+            if ($name === '@values') {
                 continue;
             }
 
-            if (!\array_key_exists($key, $input)) {
-                throw new LogicException(\sprintf('Dimension "%s" not found', $key));
+            if (!\array_key_exists($name, $input)) {
+                throw new LogicException(\sprintf('Dimension "%s" not found', $name));
             }
 
             /** @psalm-suppress MixedAssignment */
-            $rawValue = $input[$key];
+            $rawValue = $input[$name];
 
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->resolveValue(
                 reflectionClass: $reflectionClass,
-                propertyName: $key,
+                propertyName: $name,
                 value: $rawValue,
             );
 
             $this->injectValueToObject(
                 object: $summaryObject,
                 reflectionClass: $reflectionClass,
-                propertyName: $key,
+                propertyName: $name,
                 value: $rawValue,
             );
 
             /** @psalm-suppress MixedAssignment */
-            $value = $this->propertyAccessor->getValue($summaryObject, $key);
+            $value = $this->propertyAccessor->getValue($summaryObject, $name);
 
             /** @psalm-suppress MixedAssignment */
-            $displayValue = $value ?? $this->getNullValue($key);
+            $displayValue = $value ?? $this->getNullValue($name);
 
             $dimension = $this->dimensionFactory->createDimension(
-                label: $this->getLabel($key),
-                key: $key,
+                label: $this->getLabel($name),
+                name: $name,
                 member: $value,
                 rawMember: $rawValue,
                 displayMember: $displayValue,
             );
 
-            $dimensionValues[$key] = $dimension;
+            $dimensionValues[$name] = $dimension;
         }
 
         //
