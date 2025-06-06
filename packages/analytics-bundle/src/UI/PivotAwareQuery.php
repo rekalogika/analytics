@@ -108,7 +108,7 @@ final class PivotAwareQuery
          * @psalm-suppress MixedArgument
          */
         $this->filterExpressions = new Filters(
-            summaryClass: $this->query->getSummaryClass(),
+            summaryClass: $this->query->getFrom(),
             dimensions: $filterDimensions,
             // @phpstan-ignore argument.type
             arrayExpressions: $parameters['filterExpressions'] ?? [],

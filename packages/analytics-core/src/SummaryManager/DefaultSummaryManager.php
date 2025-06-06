@@ -14,28 +14,21 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\SourceQuery;
 use Rekalogika\Analytics\SummaryManager\SourceResult\DefaultSourceResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-/**
- * @template T of object
- * @implements SummaryManager<T>
- */
 final readonly class DefaultSummaryManager implements SummaryManager
 {
-    /**
-     * @param class-string<T> $class
-     */
     public function __construct(
-        private string $class,
-        private EntityManagerInterface $entityManager,
-        private SummaryMetadata $metadata,
+        private ManagerRegistry $managerRegistry,
+        private SummaryMetadataFactory $metadataFactory,
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
         private int $queryResultLimit,
@@ -43,14 +36,15 @@ final readonly class DefaultSummaryManager implements SummaryManager
     ) {}
 
     #[\Override]
-    public function updateBySourceRange(
+    public function refresh(
+        string $class,
         int|string|null $start,
         int|string|null $end,
         int $batchSize = 1,
         ?string $resumeId = null,
     ): void {
         $this->refresherFactory
-            ->createSummaryRefresher($this->class)
+            ->createSummaryRefresher($class)
             ->manualRefresh(
                 start: $start,
                 end: $end,
@@ -64,16 +58,9 @@ final readonly class DefaultSummaryManager implements SummaryManager
         ?int $queryResultLimit = null,
         ?int $fillingNodesLimit = null,
     ): DefaultQuery {
-        $dimensionChoices = array_keys($this->metadata->getLeafDimensions());
-        $dimensionChoices[] = '@values';
-
-        $measureChoices = array_keys($this->metadata->getMeasures());
-
         return new DefaultQuery(
-            dimensionChoices: $dimensionChoices,
-            measureChoices: $measureChoices,
-            entityManager: $this->entityManager,
-            metadata: $this->metadata,
+            managerRegistry: $this->managerRegistry,
+            summaryMetadataFactory: $this->metadataFactory,
             propertyAccessor: $this->propertyAccessor,
             queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
             fillingNodesLimit: $fillingNodesLimit ?? $this->fillingNodesLimit,
@@ -83,20 +70,20 @@ final readonly class DefaultSummaryManager implements SummaryManager
     #[\Override]
     public function getSource(Tuple $tuple): SourceResult
     {
-        $summaryClass = $this->metadata->getSummaryClass();
-        $tupleSummaryClass = $tuple->getSummaryTable();
+        $summaryClass = $tuple->getSummaryTable();
+        $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
+        $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
 
-        if ($summaryClass !== $tupleSummaryClass) {
-            throw new InvalidArgumentException(\sprintf(
-                'Summary class "%s" does not match the tuple summary class "%s".',
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new LogicException(\sprintf(
+                'The entity manager for class "%s" is not an instance of "EntityManagerInterface".',
                 $summaryClass,
-                $tupleSummaryClass,
             ));
         }
 
         $sourceQuery = new SourceQuery(
-            entityManager: $this->entityManager,
-            summaryMetadata: $this->metadata,
+            entityManager: $entityManager,
+            summaryMetadata: $metadata,
             tuple: $tuple,
         );
 

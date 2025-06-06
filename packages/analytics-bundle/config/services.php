@@ -56,7 +56,7 @@ use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
 use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\EventListener\NewDirtyFlagListener;
@@ -69,7 +69,7 @@ use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
-use Rekalogika\Analytics\SummaryManager\DefaultSummaryManagerRegistry;
+use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\SummaryManager\DirtyFlagGenerator;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
@@ -134,8 +134,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set(SummaryManagerRegistry::class)
-        ->class(DefaultSummaryManagerRegistry::class)
+        ->set(SummaryManager::class)
+        ->class(DefaultSummaryManager::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
@@ -245,7 +245,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.command.refresh_summary')
         ->class(RefreshSummaryCommand::class)
         ->args([
-            '$summaryManagerRegistry' => service(SummaryManagerRegistry::class),
+            '$summaryManager' => service(SummaryManager::class),
             '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
         ])
         ->tag('console.command')

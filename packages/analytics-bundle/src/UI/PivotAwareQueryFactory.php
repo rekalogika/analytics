@@ -30,7 +30,7 @@ final readonly class PivotAwareQueryFactory
         Query $query,
         array $parameters,
     ): PivotAwareQuery {
-        $summaryClass = $query->getSummaryClass();
+        $summaryClass = $query->getFrom();
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 

@@ -15,12 +15,13 @@ namespace Rekalogika\Analytics\Contracts;
 
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
-/**
- * @template T of object
- */
 interface SummaryManager
 {
-    public function updateBySourceRange(
+    /**
+     * @param class-string $class
+     */
+    public function refresh(
+        string $class,
         int|string|null $start,
         int|string|null $end,
         int $batchSize = 1,

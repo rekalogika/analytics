@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
@@ -51,10 +51,10 @@ final class SourceChangeTest extends KernelTestCase
     private function getOrderCount(): int
     {
         $summaryManager = static::getContainer()
-            ->get(SummaryManagerRegistry::class)
-            ->getManager(OrderSummary::class);
+            ->get(SummaryManager::class);
 
         $result = $summaryManager->createQuery()
+            ->from(OrderSummary::class)
             ->select('count')
             ->getResult()
             ->getTree();
@@ -67,11 +67,10 @@ final class SourceChangeTest extends KernelTestCase
 
     private function getOrderCountIn2030(): int
     {
-        $summaryManager = static::getContainer()
-            ->get(SummaryManagerRegistry::class)
-            ->getManager(OrderSummary::class);
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
 
         $result = $summaryManager->createQuery()
+            ->from(OrderSummary::class)
             ->groupBy('time.year')
             ->select('count')
             ->getResult()

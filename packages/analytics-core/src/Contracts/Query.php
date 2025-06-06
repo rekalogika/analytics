@@ -24,10 +24,19 @@ use Rekalogika\Analytics\Contracts\Result\Result;
  */
 interface Query
 {
+    //
+    // from
+    //
+
     /**
      * @return class-string
      */
-    public function getSummaryClass(): string;
+    public function getFrom(): string;
+
+    /**
+     * @param class-string $class
+     */
+    public function from(string $class): static;
 
     //
     // group by
@@ -87,7 +96,9 @@ interface Query
         Order $direction = Order::Ascending,
     ): static;
 
-
+    //
+    // result
+    //
 
     public function getResult(): Result;
 }
