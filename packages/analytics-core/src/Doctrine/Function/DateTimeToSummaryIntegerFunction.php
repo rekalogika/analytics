@@ -23,7 +23,7 @@ use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Exception\QueryException;
 
 /**
- * REKALOGIKA_DATETIME_TO_INTEGER
+ * REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER
  *
  * arguments:
  *
@@ -32,7 +32,7 @@ use Rekalogika\Analytics\Exception\QueryException;
  * * summary time zone
  * * output format (same as the values of TimeGranularity)
  */
-final class DateTimeToIntegerFunction extends FunctionNode
+final class DateTimeToSummaryIntegerFunction extends FunctionNode
 {
     public null|Node|string $sourceDatetime = null;
 
