@@ -36,45 +36,45 @@ final readonly class Items implements \IteratorAggregate, \Countable
         yield from $this->dimensions;
     }
 
-    public function getDimensions(string $key): DimensionCollection
+    public function getDimensions(string $name): DimensionCollection
     {
-        return $this->dimensions[$key]
+        return $this->dimensions[$name]
             ?? throw new InvalidArgumentException(\sprintf(
                 'Dimension "%s" not found',
-                $key,
+                $name,
             ));
     }
 
-    public function getMeasure(string $key): DefaultMeasure
+    public function getMeasure(string $name): DefaultMeasure
     {
-        return $this->measures[$key]
+        return $this->measures[$name]
             ?? throw new InvalidArgumentException(\sprintf(
                 'Measure "%s" not found',
-                $key,
+                $name,
             ));
     }
 
-    public function getKeyAfter(?string $key): ?string
+    public function getKeyAfter(?string $name): ?string
     {
-        $keys = array_keys($this->dimensions);
+        $names = array_keys($this->dimensions);
 
-        if ($key === null) {
-            return $keys[0] ?? null;
+        if ($name === null) {
+            return $names[0] ?? null;
         }
 
-        $keyIndex = array_search($key, $keys, true);
+        $nameIndex = array_search($name, $names, true);
 
-        if ($keyIndex === false) {
+        if ($nameIndex === false) {
             return null;
         }
 
-        $nextKeyIndex = $keyIndex + 1;
+        $nextKeyIndex = $nameIndex + 1;
 
-        if (!isset($keys[$nextKeyIndex])) {
+        if (!isset($names[$nextKeyIndex])) {
             return null;
         }
 
-        return $keys[$nextKeyIndex];
+        return $names[$nextKeyIndex];
     }
 
 

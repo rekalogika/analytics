@@ -22,7 +22,7 @@ final readonly class DefaultDimension implements Dimension
 {
     public function __construct(
         private TranslatableInterface $label,
-        private string $key,
+        private string $name,
         private mixed $member,
         private mixed $rawMember,
         private mixed $displayMember,
@@ -34,7 +34,7 @@ final readonly class DefaultDimension implements Dimension
     ): self {
         return new self(
             label: $label,
-            key: '@values',
+            name: '@values',
             member: $measureMember,
             rawMember: $measureMember,
             displayMember: $measureMember,
@@ -48,9 +48,9 @@ final readonly class DefaultDimension implements Dimension
     }
 
     #[\Override]
-    public function getKey(): string
+    public function getName(): string
     {
-        return $this->key;
+        return $this->name;
     }
 
     #[\Override]
@@ -77,7 +77,7 @@ final readonly class DefaultDimension implements Dimension
             return false;
         }
 
-        return $this->key === $dimension->getKey()
+        return $this->name === $dimension->getName()
             && $this->rawMember === $dimension->getRawMember();
     }
 
@@ -89,9 +89,9 @@ final readonly class DefaultDimension implements Dimension
     public function getSignature(): string
     {
         if (\is_object($this->rawMember)) {
-            return $this->key . ':' . spl_object_id($this->rawMember);
+            return $this->name . ':' . spl_object_id($this->rawMember);
         }
 
-        return $this->key . ':' . serialize($this->rawMember);
+        return $this->name . ':' . serialize($this->rawMember);
     }
 }

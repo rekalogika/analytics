@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Exception\EmptyResultException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -41,28 +42,32 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         Result $result,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
-        if ($chartType === ChartType::Auto) {
-            return $this->createAutoChart($result);
-        }
+        try {
+            if ($chartType === ChartType::Auto) {
+                return $this->createAutoChart($result);
+            }
 
-        if ($chartType === ChartType::Bar) {
-            return $this->createBarChart($result);
-        }
+            if ($chartType === ChartType::Bar) {
+                return $this->createBarChart($result);
+            }
 
-        if ($chartType === ChartType::Line) {
-            return $this->createLineChart($result);
-        }
+            if ($chartType === ChartType::Line) {
+                return $this->createLineChart($result);
+            }
 
-        if ($chartType === ChartType::StackedBar) {
-            return $this->createGroupedBarChart($result, 'stackedBar');
-        }
+            if ($chartType === ChartType::StackedBar) {
+                return $this->createGroupedBarChart($result, 'stackedBar');
+            }
 
-        if ($chartType === ChartType::GroupedBar) {
-            return $this->createGroupedBarChart($result, 'groupedBar');
-        }
+            if ($chartType === ChartType::GroupedBar) {
+                return $this->createGroupedBarChart($result, 'groupedBar');
+            }
 
-        if ($chartType === ChartType::Pie) {
-            return $this->createPieChart($result);
+            if ($chartType === ChartType::Pie) {
+                return $this->createPieChart($result);
+            }
+        } catch (EmptyResultException $e) {
+            throw new UnsupportedData('Result is empty', previous: $e);
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -70,17 +75,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createAutoChart(Result $result): Chart
     {
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
-        $tuple = $result->getTable()->first()?->getTuple();
-
-        if ($tuple === null) {
-            throw new UnsupportedData('No data found');
-        }
+        $tuple = $result->getTable()->getRowPrototype();
 
         if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
@@ -138,11 +133,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createLineChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->first()?->getTuple();
-
-        if ($tuple === null) {
-            throw new UnsupportedData('No data found');
-        }
+        $tuple = $result->getTable()->getRowPrototype();
 
         if (\count($tuple) === 2) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
@@ -159,12 +150,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createBarOrLineChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
+        $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 
@@ -176,20 +162,20 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
         // populate labels
 
-        foreach ($selectedMeasures as $key) {
-            $measure = $measures->get($key)
+        foreach ($selectedMeasures as $name) {
+            $measure = $measures->getByName($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
-                    $key,
+                    $name,
                 ));
 
-            $dataSets[$key]['label'] = $this->stringifier->toString($measure->getLabel());
-            $dataSets[$key]['data'] = [];
+            $dataSets[$name]['label'] = $this->stringifier->toString($measure->getLabel());
+            $dataSets[$name]['data'] = [];
 
             $color = $colorDispenser->dispenseColor();
-            $dataSets[$key]['backgroundColor'] = $color . $this->configuration->areaTransparency;
-            $dataSets[$key]['borderColor'] = $color;
-            $dataSets[$key]['borderWidth'] = $this->configuration->areaBorderWidth;
+            $dataSets[$name]['backgroundColor'] = $color . $this->configuration->areaTransparency;
+            $dataSets[$name]['borderColor'] = $color;
+            $dataSets[$name]['borderWidth'] = $this->configuration->areaBorderWidth;
 
             if ($yTitle === null) {
                 $unit = $measure->getUnit();
@@ -213,13 +199,11 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
-
-            if (\count($tuple) !== 1) {
+            if (\count($row) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->first();
+            $dimension = $row->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -237,10 +221,10 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
             $measures = $row->getMeasures();
 
-            foreach ($selectedMeasures as $key) {
-                $measure = $measures->get($key);
+            foreach ($selectedMeasures as $name) {
+                $measure = $measures->getByName($name);
 
-                $dataSets[$key]['data'][] = $this->numberifier->toNumber($measure?->getValue());
+                $dataSets[$name]['data'][] = $this->numberifier->toNumber($measure?->getValue());
             }
         }
 
@@ -320,7 +304,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measure = $result->getTable()->first()?->getMeasures()->first();
+        $measure = $result->getTable()->getRowPrototype()->getMeasures()->getByIndex(0);
 
         if ($measure === null) {
             throw new UnsupportedData('Measures not found');
@@ -338,8 +322,14 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         $secondDimensions = [];
 
         foreach ($result->getTable() as $row) {
+            $secondDimension = $row->getByIndex(1);
+
+            if ($secondDimension === null) {
+                throw new UnsupportedData('Expected a second dimension');
+            }
+
             /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $row->getTuple()->getByIndex(1)->getMember();
+            $secondDimensions[] = $secondDimension->getMember();
         }
 
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
@@ -502,12 +492,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createPieChart(Result $result): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
+        $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 
@@ -517,8 +502,8 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
         // populate labels
 
-        $key = $selectedMeasures[0];
-        $measure = $measures->get($key);
+        $name = $selectedMeasures[0];
+        $measure = $measures->getByName($name);
 
         $labels = [];
         $dataSet = [];
@@ -533,13 +518,11 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         // populate data
 
         foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
-
-            if (\count($tuple) !== 1) {
+            if (\count($row) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $tuple->first();
+            $dimension = $row->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -556,7 +539,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->get($key);
+            $measure = $measures->getByName($name);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 
@@ -593,7 +576,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $unit = $measure->getUnit();
 
             if ($selectedMeasures === [] && $unit === null) {
-                return [$measure->getKey()];
+                return [$measure->getName()];
             }
 
             if ($selectedUnit === null) {
@@ -604,7 +587,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                 $selectedUnit !== null &&
                 $selectedUnit->getSignature() === $unit?->getSignature()
             ) {
-                $selectedMeasures[] = $measure->getKey();
+                $selectedMeasures[] = $measure->getName();
             }
         }
 

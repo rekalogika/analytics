@@ -44,7 +44,7 @@ final class NodeWrapperFactory
             $objectSeed = serialize($item);
         }
 
-        return hash('xxh128', $objectSeed . $treeNode->getKey());
+        return hash('xxh128', $objectSeed . $treeNode->getName());
     }
 
     public function getLabel(TreeNode $treeNode): NodeLabel

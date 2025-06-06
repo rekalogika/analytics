@@ -26,12 +26,12 @@ final class PivotBlock extends NodeBlock
             $this->getContext()->hasSuperfluousLegend($this->getBranchNode())
         ) {
             $valueCell = new DefaultHeaderCell(
-                key: $this->getBranchNode()->getKey(),
+                name: $this->getBranchNode()->getKey(),
                 content: $this->getBranchNode()->getItem(),
             );
         } else {
             $valueCell = new DefaultDataCell(
-                key: $this->getBranchNode()->getKey(),
+                name: $this->getBranchNode()->getKey(),
                 content: $this->getBranchNode()->getItem(),
             );
         }

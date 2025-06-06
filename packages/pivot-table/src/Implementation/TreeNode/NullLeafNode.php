@@ -18,7 +18,7 @@ use Rekalogika\PivotTable\Contracts\LeafNode;
 final readonly class NullLeafNode implements LeafNode
 {
     public function __construct(
-        private string $key,
+        private string $name,
         private mixed $legend,
         private mixed $item,
     ) {}
@@ -26,7 +26,7 @@ final readonly class NullLeafNode implements LeafNode
     public static function fromInterface(LeafNode $branchNode): self
     {
         return new self(
-            key: $branchNode->getKey(),
+            name: $branchNode->getKey(),
             legend: $branchNode->getLegend(),
             item: $branchNode->getItem(),
         );
@@ -35,7 +35,7 @@ final readonly class NullLeafNode implements LeafNode
     #[\Override]
     public function getKey(): string
     {
-        return $this->key;
+        return $this->name;
     }
 
     #[\Override]

@@ -14,18 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a normalized row in a table
+ * Represent a normalized row in a table. A normal row is a tuple that has a
+ * measure associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface NormalRow
+interface NormalRow extends Tuple
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getTuple(): Tuple;
-
     public function getMeasure(): Measure;
 }

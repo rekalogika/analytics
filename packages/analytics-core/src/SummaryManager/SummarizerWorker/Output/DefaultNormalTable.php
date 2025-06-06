@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
+use Rekalogika\Analytics\Exception\EmptyResultException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 
 /**
@@ -38,9 +39,10 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     }
 
     #[\Override]
-    public function first(): ?DefaultNormalRow
+    public function getRowPrototype(): DefaultNormalRow
     {
-        return $this->rows[0] ?? null;
+        return $this->rows[0]
+            ?? throw new EmptyResultException('No rows in the table to get prototype from.');
     }
 
     #[\Override]

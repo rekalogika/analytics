@@ -91,7 +91,7 @@ final class TableToNormalTableTransformer
 
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
-                $this->dimensionCollector->processDimensions($row2->getTuple());
+                $this->dimensionCollector->processDimensions($row2);
                 $this->dimensionCollector->processMeasure($row2->getMeasure());
             }
         }
@@ -129,7 +129,7 @@ final class TableToNormalTableTransformer
                 // be set in the next loop
                 $newRow['@values'] = true;
             } else {
-                $newRow[$dimension] = $row->getTuple()->get($dimension);
+                $newRow[$dimension] = $row->getByName($dimension);
             }
         }
 
@@ -155,13 +155,12 @@ final class TableToNormalTableTransformer
                 dimensions: $newRow,
             );
 
-            $measure = $row->getMeasures()->get($measure)
+            $measure = $row->getMeasures()->getByName($measure)
                 ?? throw new UnexpectedValueException(
                     \sprintf('Measure "%s" not found in row', $measure),
                 );
 
             yield new DefaultNormalRow(
-                summaryClass: $summaryClass,
                 tuple: $tuple,
                 measure: $measure,
                 groupings: $row->getGroupings(),

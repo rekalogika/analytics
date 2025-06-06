@@ -38,7 +38,7 @@ final readonly class UIPivotTableLeaf implements LeafNode
     #[\Override]
     public function getKey(): string
     {
-        return $this->node->getKey();
+        return $this->node->getName();
     }
 
     #[\Override]

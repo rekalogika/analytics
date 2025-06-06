@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Exception\EmptyResultException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -36,10 +37,10 @@ final class NormalTableToTreeTransformer
     private array $tree = [];
 
     /**
-     * @param list<string> $keys
+     * @param list<string> $names
      */
     public function __construct(
-        private readonly array $keys,
+        private readonly array $names,
         private readonly Items $uniqueDimensions,
         private readonly bool $hasTieredOrder,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
@@ -54,10 +55,9 @@ final class NormalTableToTreeTransformer
         $summaryClass = $normalTable->getSummaryClass();
         // check if empty
 
-        $firstRow = $normalTable->first();
-
-
-        if ($firstRow === null) {
+        try {
+            $firstRow = $normalTable->getRowPrototype();
+        } catch (EmptyResultException) {
             return new DefaultTree(
                 summaryClass: $summaryClass,
                 label: $label,
@@ -70,13 +70,13 @@ final class NormalTableToTreeTransformer
 
         // get keys from the first row
 
-        $members = $firstRow->getTuple()->getMembers();
-        $keys = array_keys($members);
+        $members = $firstRow->getMembers();
+        $names = array_keys($members);
 
         // instantiate and process
 
         $transformer = new self(
-            keys: $keys,
+            names: $names,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
             hasTieredOrder: $hasTieredOrder,
             treeNodeFactory: $treeNodeFactory,
@@ -85,7 +85,7 @@ final class NormalTableToTreeTransformer
         return new DefaultTree(
             summaryClass: $summaryClass,
             label: $label,
-            childrenKey: $keys[0],
+            childrenKey: $names[0],
             children: $transformer->doTransform($normalTable),
             items: $normalTable->getUniqueDimensions(),
             treeNodeFactory: $treeNodeFactory,
@@ -102,7 +102,7 @@ final class NormalTableToTreeTransformer
         bool $forceCreate,
     ): void {
         $parent = $this->currentPath[$columnNumber - 1] ?? null;
-        $childrenKey = $this->keys[$columnNumber + 1] ?? null;
+        $childrenKey = $this->names[$columnNumber + 1] ?? null;
 
         if ($childrenKey === null) {
             throw new UnexpectedValueException('Children key cannot be null');
@@ -192,12 +192,11 @@ final class NormalTableToTreeTransformer
         $this->tree = [];
 
         foreach ($normalTable as $row) {
-            $tuple = $row->getTuple();
             $columnNumber = 0;
 
-            foreach ($tuple as $dimension) {
+            foreach ($row as $dimension) {
                 // if last dimension
-                if ($columnNumber === \count($tuple) - 1) {
+                if ($columnNumber === \count($row) - 1) {
                     $this->addMeasure(
                         summaryClass: $normalTable->getSummaryClass(),
                         lastDimension: $dimension,
@@ -232,14 +231,12 @@ final class NormalTableToTreeTransformer
         $previousRow = null;
 
         foreach ($normalTable as $row) {
-            $tuple = $row->getTuple();
-
             $columnNumber = 0;
             $sameAsPrevious = $previousRow !== null && $previousRow->hasSameDimensions($row);
 
-            foreach ($tuple as $dimension) {
+            foreach ($row as $dimension) {
                 // if last dimension
-                if ($columnNumber === \count($tuple) - 1) {
+                if ($columnNumber === \count($row) - 1) {
                     $this->addMeasure(
                         summaryClass: $normalTable->getSummaryClass(),
                         lastDimension: $dimension,

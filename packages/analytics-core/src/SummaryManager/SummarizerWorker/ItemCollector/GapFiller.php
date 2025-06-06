@@ -30,7 +30,7 @@ final readonly class GapFiller
 
     private TranslatableInterface $label;
 
-    private string $key;
+    private string $name;
 
     /**
      * @param non-empty-list<DefaultDimension> $dimensions
@@ -41,13 +41,13 @@ final readonly class GapFiller
         $newDimensions = [];
         $class = null;
         $label = null;
-        $key = null;
+        $name = null;
 
         foreach ($dimensions as $dimension) {
             $rawMember = $dimension->getRawMember();
 
             $label ??= $dimension->getLabel();
-            $key ??= $dimension->getKey();
+            $name ??= $dimension->getName();
 
             // @todo we skip null value if there is a null value in the dimensions
             if ($rawMember === null) {
@@ -82,12 +82,12 @@ final readonly class GapFiller
             $label = new LiteralString('-');
         }
 
-        if ($key === null) {
-            $key = '?';
+        if ($name === null) {
+            $name = '?';
         }
 
         $this->label = $label;
-        $this->key = $key;
+        $this->name = $name;
     }
 
     /**
@@ -139,7 +139,7 @@ final readonly class GapFiller
 
         return $this->dimensions[$objectId] ?? new DefaultDimension(
             label: $this->label,
-            key: $this->key,
+            name: $this->name,
             member: $member,
             rawMember: $member,
             displayMember: $member,

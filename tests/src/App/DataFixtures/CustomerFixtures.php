@@ -35,8 +35,8 @@ final class CustomerFixtures extends Fixture implements DependentFixtureInterfac
     public function load(ObjectManager $manager): void
     {
         flush_after(function (): void {
-            IndividualCustomerFactory::createMany(10);
-            OrganizationalCustomerFactory::createMany(5);
+            IndividualCustomerFactory::createMany(100);
+            OrganizationalCustomerFactory::createMany(50);
         });
 
         $manager->flush();

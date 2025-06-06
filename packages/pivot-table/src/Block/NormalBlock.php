@@ -23,7 +23,7 @@ final class NormalBlock extends NodeBlock
     protected function createHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
-            key: $this->getTreeNode()->getKey(),
+            name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
         );
 
@@ -36,7 +36,7 @@ final class NormalBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
-            key: $this->getTreeNode()->getKey(),
+            name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
         );
 

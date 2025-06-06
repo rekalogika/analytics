@@ -24,7 +24,7 @@ final class DimensionFactory
     private array $dimensions = [];
 
     public function createDimension(
-        string $key,
+        string $name,
         TranslatableInterface $label,
         mixed $member,
         mixed $rawMember,
@@ -33,17 +33,17 @@ final class DimensionFactory
         if (\is_object($rawMember)) {
             $signature = hash(
                 'xxh128',
-                serialize([$key, spl_object_id($rawMember)]),
+                serialize([$name, spl_object_id($rawMember)]),
             );
         } else {
             $signature = hash(
                 'xxh128',
-                serialize([$key, $rawMember]),
+                serialize([$name, $rawMember]),
             );
         }
 
         return $this->dimensions[$signature] ??= new DefaultDimension(
-            key: $key,
+            name: $name,
             label: $label,
             member: $member,
             rawMember: $rawMember,

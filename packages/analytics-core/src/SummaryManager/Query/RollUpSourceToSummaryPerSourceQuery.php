@@ -214,8 +214,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $key = \sprintf('%s.%s', $summaryProperty, $name);
-                    $this->groupings[$key] = $function;
+                    $name = \sprintf('%s.%s', $summaryProperty, $name);
+                    $this->groupings[$name] = $function;
                 }
             } else {
                 // if not hierarchical

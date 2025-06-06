@@ -14,18 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a row in a table
+ * Represent a row in a table. A row is a tuple that has one or more measures
+ * associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Row
+interface Row extends Tuple
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getTuple(): Tuple;
-
     public function getMeasures(): Measures;
 }

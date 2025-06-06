@@ -36,7 +36,7 @@ final class HorizontalBlockGroup extends BlockGroup
             !$this->getContext()->hasSuperfluousLegend($firstChild)
         ) {
             $nameCell = new DefaultHeaderCell(
-                key: $firstChild->getKey(),
+                name: $firstChild->getKey(),
                 content: $firstChild->getLegend(),
             );
 

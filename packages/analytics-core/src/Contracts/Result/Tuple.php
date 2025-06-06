@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * A tuple of dimensions
+ * A tuple of dimensions. A collection of dimensions that identifies a unique
+ * intersection of members from different dimensions in the cube. A tuple is
+ * ordered, the order of dimensions is significant. The members of a tuple must
+ * be from unique dimensions from the same summary class.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
@@ -23,17 +26,23 @@ namespace Rekalogika\Analytics\Contracts\Result;
 interface Tuple extends \Traversable, \Countable
 {
     /**
+     * The summary class that this tuple belongs to.
+     *
      * @return class-string
      */
     public function getSummaryClass(): string;
 
-    public function get(string $key): ?Dimension;
+    /**
+     * Gets a dimension by its name.
+     */
+    public function getByName(string $name): ?Dimension;
 
-    public function getByIndex(int $index): Dimension;
+    /**
+     * Gets a dimension by its index. 0 is the first dimension.
+     */
+    public function getByIndex(int $index): ?Dimension;
 
-    public function first(): ?Dimension;
-
-    public function has(string $key): bool;
+    public function has(string $name): bool;
 
     /**
      * @return array<string,mixed>

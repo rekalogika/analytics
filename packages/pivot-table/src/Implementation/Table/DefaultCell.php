@@ -18,7 +18,7 @@ use Rekalogika\PivotTable\Table\Cell;
 abstract readonly class DefaultCell implements Cell
 {
     final public function __construct(
-        private string $key,
+        private string $name,
         private mixed $content,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
@@ -26,7 +26,7 @@ abstract readonly class DefaultCell implements Cell
 
     final public function getKey(): string
     {
-        return $this->key;
+        return $this->name;
     }
 
     #[\Override]
@@ -44,7 +44,7 @@ abstract readonly class DefaultCell implements Cell
     final public function withColumnSpan(int $columnSpan): static
     {
         return new static(
-            key: $this->key,
+            name: $this->name,
             content: $this->content,
             columnSpan: $columnSpan,
             rowSpan: $this->rowSpan,
@@ -60,7 +60,7 @@ abstract readonly class DefaultCell implements Cell
     final public function withRowSpan(int $rowSpan): static
     {
         return new static(
-            key: $this->key,
+            name: $this->name,
             content: $this->content,
             columnSpan: $this->columnSpan,
             rowSpan: $rowSpan,

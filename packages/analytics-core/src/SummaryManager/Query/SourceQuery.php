@@ -65,9 +65,9 @@ final class SourceQuery extends AbstractQuery
     private function processDimensions(): void
     {
         foreach ($this->tuple as $dimension) {
-            $key = $dimension->getKey();
+            $name = $dimension->getName();
 
-            if ($key === '@values') {
+            if ($name === '@values') {
                 // Skip the @values key, it is not a dimension
                 continue;
             }
@@ -75,13 +75,13 @@ final class SourceQuery extends AbstractQuery
             /** @psalm-suppress MixedAssignment */
             $rawMember = $dimension->getRawMember();
 
-            $this->processDimension($key, $rawMember);
+            $this->processDimension($name, $rawMember);
         }
     }
 
-    private function processDimension(string $key, mixed $rawMember): void
+    private function processDimension(string $name, mixed $rawMember): void
     {
-        $dimensionMetadata = $this->summaryMetadata->getProperty($key);
+        $dimensionMetadata = $this->summaryMetadata->getProperty($name);
 
         if ($dimensionMetadata instanceof DimensionMetadata) {
             $this->processStandaloneDimension($dimensionMetadata, $rawMember);
@@ -89,7 +89,7 @@ final class SourceQuery extends AbstractQuery
             $this->processDimensionProperty($dimensionMetadata, $rawMember);
         } else {
             throw new UnexpectedValueException(
-                \sprintf('Invalid dimension metadata for key "%s"', $key),
+                \sprintf('Invalid dimension metadata for key "%s"', $name),
             );
         }
     }

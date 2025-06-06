@@ -13,17 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
+use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Util\DimensionUtil;
 
-final readonly class DefaultNormalRow implements NormalRow
+/**
+ * @implements \IteratorAggregate<string,DefaultDimension>
+ */
+final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
 {
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
-        private string $summaryClass,
         private DefaultTuple $tuple,
         private DefaultMeasure $measure,
         private string $groupings,
@@ -32,13 +33,7 @@ final readonly class DefaultNormalRow implements NormalRow
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->summaryClass;
-    }
-
-    #[\Override]
-    public function getTuple(): DefaultTuple
-    {
-        return $this->tuple;
+        return $this->tuple->getSummaryClass();
     }
 
     #[\Override]
@@ -58,13 +53,10 @@ final readonly class DefaultNormalRow implements NormalRow
      */
     public static function compare(self $row1, self $row2, array $measures): int
     {
-        $tuple1 = $row1->getTuple();
-        $tuple2 = $row2->getTuple();
+        foreach ($row1 as $name => $value1) {
+            $value2 = $row2->getByName($name);
 
-        foreach ($tuple1 as $key => $value1) {
-            $value2 = $tuple2->get($key);
-
-            if ($key === '@values') {
+            if ($name === '@values') {
                 break;
             }
 
@@ -73,10 +65,10 @@ final readonly class DefaultNormalRow implements NormalRow
             }
         }
 
-        $measure1Order = $measures[$row1->getMeasure()->getKey()]
+        $measure1Order = $measures[$row1->getMeasure()->getName()]
             ?? throw new LogicException('Measure not found');
 
-        $measure2Order = $measures[$row2->getMeasure()->getKey()]
+        $measure2Order = $measures[$row2->getMeasure()->getName()]
             ?? throw new LogicException('Measure not found');
 
         return $measure1Order <=> $measure2Order;
@@ -85,5 +77,56 @@ final readonly class DefaultNormalRow implements NormalRow
     public function hasSameDimensions(self $other): bool
     {
         return $this->tuple->isSame($other->tuple);
+    }
+
+    public function getWithoutValues(): DefaultTuple
+    {
+        return $this->tuple->getWithoutValues();
+    }
+
+    #[\Override]
+    public function getByName(string $name): ?Dimension
+    {
+        return $this->tuple->getByName($name);
+    }
+
+    #[\Override]
+    public function getByIndex(int $index): ?Dimension
+    {
+        return $this->tuple->getByIndex($index);
+    }
+
+    #[\Override]
+    public function has(string $name): bool
+    {
+        return $this->tuple->has($name);
+    }
+
+    #[\Override]
+    public function getMembers(): array
+    {
+        return $this->tuple->getMembers();
+    }
+
+    #[\Override]
+    public function isSame(Tuple $other): bool
+    {
+        if (!$other instanceof self) {
+            return false;
+        }
+
+        return $this->tuple->isSame($other->tuple);
+    }
+
+    #[\Override]
+    public function count(): int
+    {
+        return $this->tuple->count();
+    }
+
+    #[\Override]
+    public function getIterator(): \Traversable
+    {
+        return $this->tuple->getIterator();
     }
 }

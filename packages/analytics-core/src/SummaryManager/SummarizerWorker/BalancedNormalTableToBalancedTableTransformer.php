@@ -53,7 +53,7 @@ final class BalancedNormalTableToBalancedTableTransformer
         $summaryClass = $this->normalTable->getSummaryClass();
 
         foreach ($this->normalTable as $currentRow) {
-            $tupleWithoutValues = $currentRow->getTuple()->getWithoutValues();
+            $tupleWithoutValues = $currentRow->getWithoutValues();
             $signature = $tupleWithoutValues->getSignature();
 
             $this->signatureToTuple[$signature] ??= $tupleWithoutValues;
@@ -65,7 +65,6 @@ final class BalancedNormalTableToBalancedTableTransformer
             $measureValues = new DefaultMeasures($measures);
 
             $row = new DefaultRow(
-                summaryClass: $summaryClass,
                 tuple: $tuple,
                 measures: $measureValues,
                 groupings: '',

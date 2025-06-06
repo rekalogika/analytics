@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Table;
+use Rekalogika\Analytics\Exception\EmptyResultException;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>
@@ -36,9 +37,10 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultRow
+    public function getRowPrototype(): DefaultRow
     {
-        return $this->rows[0] ?? null;
+        return $this->rows[0]
+            ?? throw new EmptyResultException('No rows in the table to get prototype from.');
     }
 
     #[\Override]

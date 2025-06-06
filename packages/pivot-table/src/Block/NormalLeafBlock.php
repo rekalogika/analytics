@@ -24,7 +24,7 @@ final class NormalLeafBlock extends NodeBlock
     protected function createHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getLegend(),
             columnSpan: 2,
         );
@@ -38,12 +38,12 @@ final class NormalLeafBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $name = new DefaultDataCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getItem(),
         );
 
         $value = new DefaultDataCell(
-            key: $this->getLeafNode()->getKey(),
+            name: $this->getLeafNode()->getKey(),
             content: $this->getLeafNode()->getValue(),
         );
 
