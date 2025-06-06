@@ -19,14 +19,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface NormalRow
+interface NormalRow extends Tuple
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getTuple(): Tuple;
-
     public function getMeasure(): Measure;
 }

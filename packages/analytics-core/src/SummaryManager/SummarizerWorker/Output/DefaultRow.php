@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
@@ -22,11 +21,7 @@ use Rekalogika\Analytics\Contracts\Result\Tuple;
  */
 final readonly class DefaultRow implements Row, \IteratorAggregate
 {
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
-        private string $summaryClass,
         private DefaultTuple $tuple,
         private DefaultMeasures $measures,
         private string $groupings,
@@ -41,7 +36,7 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->summaryClass;
+        return $this->tuple->getSummaryClass();
     }
 
     #[\Override]
@@ -61,13 +56,13 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?Dimension
+    public function getByName(string $name): ?DefaultDimension
     {
         return $this->tuple->getByName($name);
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?Dimension
+    public function getByIndex(int $index): ?DefaultDimension
     {
         return $this->tuple->getByIndex($index);
     }

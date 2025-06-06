@@ -229,7 +229,6 @@ final readonly class QueryResultToTableTransformer
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultRow(
-            summaryClass: $summaryClass,
             tuple: $tuple,
             measures: $measures,
             groupings: $groupings,

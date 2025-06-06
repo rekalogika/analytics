@@ -91,7 +91,7 @@ final class TableToNormalTableTransformer
 
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
-                $this->dimensionCollector->processDimensions($row2->getTuple());
+                $this->dimensionCollector->processDimensions($row2);
                 $this->dimensionCollector->processMeasure($row2->getMeasure());
             }
         }
@@ -161,7 +161,6 @@ final class TableToNormalTableTransformer
                 );
 
             yield new DefaultNormalRow(
-                summaryClass: $summaryClass,
                 tuple: $tuple,
                 measure: $measure,
                 groupings: $row->getGroupings(),

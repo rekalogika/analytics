@@ -95,7 +95,6 @@ final class TreeToBalancedNormalTableTransformer
         );
 
         $this->rows[] = new DefaultNormalRow(
-            summaryClass: $this->tree->getSummaryClass(),
             tuple: $tuple,
             measure: $measure,
             groupings: '',
