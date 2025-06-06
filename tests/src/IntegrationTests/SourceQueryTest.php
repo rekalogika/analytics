@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -27,23 +26,14 @@ final class SourceQueryTest extends KernelTestCase
     ): Query {
         $summaryManager = $this->getSummaryManager();
 
-        $this->assertInstanceOf(DefaultSummaryManager::class, $summaryManager);
-
         /** @psalm-suppress InvalidNamedArgument */
-        return $summaryManager->createQuery(
-            queryResultLimit: $queryResultLimit,
-        );
+        return $summaryManager
+            ->createQuery(queryResultLimit: $queryResultLimit);
     }
 
-    /**
-     * @return SummaryManager<object>
-     */
-    private function getSummaryManager(): SummaryManager
+    private function getSummaryManager(): DefaultSummaryManager
     {
-        $summaryManager = static::getContainer()
-            ->get(SummaryManagerRegistry::class)
-            ->getManager(OrderSummary::class);
-
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(DefaultSummaryManager::class, $summaryManager);
 
         return $summaryManager;
@@ -52,6 +42,7 @@ final class SourceQueryTest extends KernelTestCase
     public function testNoDimension(): void
     {
         $result = $this->getQuery()
+            ->from(OrderSummary::class)
             ->select('count')
             ->getResult()
             ->getTree();
@@ -73,6 +64,7 @@ final class SourceQueryTest extends KernelTestCase
     public function testDimension(): void
     {
         $result = $this->getQuery()
+            ->from(OrderSummary::class)
             ->groupBy('customerCountry')
             ->select('count')
             ->getResult()
@@ -95,6 +87,7 @@ final class SourceQueryTest extends KernelTestCase
     public function testDimensionProperty(): void
     {
         $result = $this->getQuery()
+            ->from(OrderSummary::class)
             ->groupBy('time.year')
             ->select('count')
             ->getResult()

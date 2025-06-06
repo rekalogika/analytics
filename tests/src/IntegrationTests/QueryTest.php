@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
-use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Exception\OverflowException;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
@@ -33,15 +33,13 @@ final class QueryTest extends KernelTestCase
     private function getQuery(
         ?int $queryResultLimit = null,
     ): Query {
-        $summaryManager = static::getContainer()->get(SummaryManagerRegistry::class)
-            ->getManager(OrderSummary::class);
-
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(DefaultSummaryManager::class, $summaryManager);
 
         /** @psalm-suppress InvalidNamedArgument */
-        return $summaryManager->createQuery(
-            queryResultLimit: $queryResultLimit,
-        );
+        return $summaryManager
+            ->createQuery(queryResultLimit: $queryResultLimit)
+            ->from(OrderSummary::class);
     }
 
     public function testEmptyQuery(): void

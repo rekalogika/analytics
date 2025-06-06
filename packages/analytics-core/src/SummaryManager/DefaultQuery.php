@@ -16,16 +16,25 @@ namespace Rekalogika\Analytics\SummaryManager;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultResult;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class DefaultQuery implements Query
 {
+    /**
+     * The class of the summary table.
+     *
+     * @var null|class-string
+     */
+    private ?string $from = null;
+
     /**
      * @var list<string>
      */
@@ -49,24 +58,26 @@ final class DefaultQuery implements Query
     private ?Result $result = null;
 
     /**
-     * @param non-empty-list<string> $dimensionChoices
-     * @param list<string> $measureChoices
+     * @var list<string>|null
      */
+    private ?array $dimensionChoices = null;
+
+    /**
+     * @var list<string>|null
+     */
+    private ?array $measureChoices = null;
+
+    private ?SummaryMetadata $summaryMetadata = null;
+
+    private ?EntityManagerInterface $entityManager = null;
+
     public function __construct(
-        private readonly array $dimensionChoices,
-        private readonly array $measureChoices,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly SummaryMetadata $metadata,
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly int $queryResultLimit,
         private readonly int $fillingNodesLimit,
     ) {}
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->metadata->getSummaryClass();
-    }
 
     #[\Override]
     public function getResult(): Result
@@ -76,22 +87,55 @@ final class DefaultQuery implements Query
         }
 
         $summarizerQuery = new SummarizerQuery(
-            entityManager: $this->entityManager,
+            entityManager: $this->getEntityManager(),
             query: $this,
-            metadata: $this->metadata,
+            metadata: $this->getSummaryMetadata(),
             queryResultLimit: $this->queryResultLimit,
         );
 
         return $this->result = new DefaultResult(
-            label: $this->metadata->getLabel(),
-            summaryClass: $this->metadata->getSummaryClass(),
+            label: $this->getSummaryMetadata()->getLabel(),
+            summaryClass: $this->getSummaryMetadata()->getSummaryClass(),
             query: $this,
-            metadata: $this->metadata,
+            metadata: $this->getSummaryMetadata(),
             summarizerQuery: $summarizerQuery,
             propertyAccessor: $this->propertyAccessor,
-            entityManager: $this->entityManager,
+            entityManager: $this->getEntityManager(),
             fillingNodesLimit: $this->fillingNodesLimit,
         );
+    }
+
+    //
+    // metadata
+    //
+
+    private function getSummaryMetadata(): SummaryMetadata
+    {
+        return $this->summaryMetadata
+            ??= $this->summaryMetadataFactory
+            ->getSummaryMetadata($this->getFrom());
+    }
+
+    //
+    // doctrine
+    //
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        if ($this->entityManager === null) {
+            $entityManager = $this->managerRegistry->getManagerForClass($this->getFrom());
+
+            if (!$entityManager instanceof EntityManagerInterface) {
+                throw new InvalidArgumentException(\sprintf(
+                    'The class "%s" is not managed by Doctrine ORM.',
+                    $this->getFrom(),
+                ));
+            }
+
+            $this->entityManager = $entityManager;
+        }
+
+        return $this->entityManager;
     }
 
     //
@@ -106,9 +150,9 @@ final class DefaultQuery implements Query
     {
         $invalid = [];
         $type = match ($type) {
-            'dimension' => $this->dimensionChoices,
-            'measure' => $this->measureChoices,
-            'both' => array_merge($this->dimensionChoices, $this->measureChoices),
+            'dimension' => $this->getDimensionChoices(),
+            'measure' => $this->getMeasureChoices(),
+            'both' => array_merge($this->getDimensionChoices(), $this->getMeasureChoices()),
         };
 
         foreach ($fields as $field) {
@@ -123,6 +167,60 @@ final class DefaultQuery implements Query
                 implode(', ', $invalid),
             ));
         }
+    }
+
+    //
+    // choices
+    //
+
+    /**
+     * @return list<string>
+     */
+    private function getDimensionChoices(): array
+    {
+        return $this->dimensionChoices
+            ??= array_merge(
+                array_keys($this->getSummaryMetadata()->getLeafDimensions()),
+                ['@values'],
+            );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getMeasureChoices(): array
+    {
+        return $this->measureChoices
+            ??= array_keys($this->getSummaryMetadata()->getMeasures());
+    }
+
+    //
+    // from
+    //
+
+    /**
+     * @return class-string
+     */
+    #[\Override]
+    public function getFrom(): string
+    {
+        if ($this->from === null) {
+            throw new InvalidArgumentException('Query must be initialized with from() method.');
+        }
+
+        return $this->from;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    #[\Override]
+    public function from(string $class): static
+    {
+        $this->result = null;
+        $this->from = $class;
+
+        return $this;
     }
 
     //

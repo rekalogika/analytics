@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
-use Rekalogika\Analytics\Contracts\SummaryManagerRegistry;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -34,7 +34,7 @@ final class RefreshSummaryCommand extends Command implements SignalableCommandIn
     private ?SymfonyStyle $io = null;
 
     public function __construct(
-        private readonly SummaryManagerRegistry $summaryManagerRegistry,
+        private readonly SummaryManager $summaryManager,
         private readonly RefreshCommandOutputEventSubscriber $refreshCommandOutputEventSubscriber,
     ) {
         parent::__construct();
@@ -168,14 +168,13 @@ final class RefreshSummaryCommand extends Command implements SignalableCommandIn
 
         $batchSize = (int) $batchSize;
 
-        $this->summaryManagerRegistry
-            ->getManager($class)
-            ->updateBySourceRange(
-                start: $start,
-                end: $end,
-                resumeId: $resume,
-                batchSize: $batchSize,
-            );
+        $this->summaryManager->refresh(
+            class: $class,
+            start: $start,
+            end: $end,
+            resumeId: $resume,
+            batchSize: $batchSize,
+        );
 
         return Command::SUCCESS;
     }
