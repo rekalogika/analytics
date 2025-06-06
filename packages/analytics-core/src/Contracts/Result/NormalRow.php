@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a normalized row in a table. A normal row has a tuple and a
- * measure.
+ * Represent a normalized row in a table. A normal row is a tuple that has a
+ * measure associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
