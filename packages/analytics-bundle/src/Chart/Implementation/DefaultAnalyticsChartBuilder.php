@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Exception\EmptyResultException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -41,28 +42,32 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         Result $result,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
-        if ($chartType === ChartType::Auto) {
-            return $this->createAutoChart($result);
-        }
+        try {
+            if ($chartType === ChartType::Auto) {
+                return $this->createAutoChart($result);
+            }
 
-        if ($chartType === ChartType::Bar) {
-            return $this->createBarChart($result);
-        }
+            if ($chartType === ChartType::Bar) {
+                return $this->createBarChart($result);
+            }
 
-        if ($chartType === ChartType::Line) {
-            return $this->createLineChart($result);
-        }
+            if ($chartType === ChartType::Line) {
+                return $this->createLineChart($result);
+            }
 
-        if ($chartType === ChartType::StackedBar) {
-            return $this->createGroupedBarChart($result, 'stackedBar');
-        }
+            if ($chartType === ChartType::StackedBar) {
+                return $this->createGroupedBarChart($result, 'stackedBar');
+            }
 
-        if ($chartType === ChartType::GroupedBar) {
-            return $this->createGroupedBarChart($result, 'groupedBar');
-        }
+            if ($chartType === ChartType::GroupedBar) {
+                return $this->createGroupedBarChart($result, 'groupedBar');
+            }
 
-        if ($chartType === ChartType::Pie) {
-            return $this->createPieChart($result);
+            if ($chartType === ChartType::Pie) {
+                return $this->createPieChart($result);
+            }
+        } catch (EmptyResultException $e) {
+            throw new UnsupportedData('Result is empty', previous: $e);
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -70,17 +75,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createAutoChart(Result $result): Chart
     {
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
-        $tuple = $result->getTable()->first();
-
-        if ($tuple === null) {
-            throw new UnsupportedData('No data found');
-        }
+        $tuple = $result->getTable()->getRowPrototype();
 
         if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
@@ -138,11 +133,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createLineChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->first();
-
-        if ($tuple === null) {
-            throw new UnsupportedData('No data found');
-        }
+        $tuple = $result->getTable()->getRowPrototype();
 
         if (\count($tuple) === 2) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
@@ -159,12 +150,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createBarOrLineChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
+        $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 
@@ -318,7 +304,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measure = $result->getTable()->first()?->getMeasures()->getByIndex(0);
+        $measure = $result->getTable()->getRowPrototype()->getMeasures()->getByIndex(0);
 
         if ($measure === null) {
             throw new UnsupportedData('Measures not found');
@@ -506,12 +492,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     private function createPieChart(Result $result): Chart
     {
         $colorDispenser = $this->createColorDispenser();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
-
+        $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 

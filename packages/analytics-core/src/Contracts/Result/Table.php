@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Rekalogika\Analytics\Exception\EmptyResultException;
+
 /**
  * A query result in tabular format
  *
@@ -27,5 +29,8 @@ interface Table extends \Traversable, \Countable
      */
     public function getSummaryClass(): string;
 
-    public function first(): ?Row;
+    /**
+     * @throws EmptyResultException
+     */
+    public function getRowPrototype(): Row;
 }

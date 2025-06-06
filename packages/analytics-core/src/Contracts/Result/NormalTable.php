@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Rekalogika\Analytics\Exception\EmptyResultException;
+
 /**
  * A query result in normalized tabular format. Each row in a normal table
  * contains one measure.
@@ -28,5 +30,8 @@ interface NormalTable extends \Traversable, \Countable
      */
     public function getSummaryClass(): string;
 
-    public function first(): ?NormalRow;
+    /**
+     * @throws EmptyResultException
+     */
+    public function getRowPrototype(): NormalRow;
 }

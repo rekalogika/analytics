@@ -123,6 +123,7 @@ final class ArchitectureTest
                 Selector::classname(\BadMethodCallException::class),
                 Selector::classname(\UnexpectedValueException::class),
                 Selector::classname(\OverflowException::class),
+                Selector::classname(\UnderflowException::class),
                 Selector::classname(\DomainException::class),
                 Selector::classname(QueryException::class),
                 Selector::classname(ConversionException::class),

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
+use Rekalogika\Analytics\Exception\EmptyResultException;
+use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -54,10 +56,9 @@ final class NormalTableToTreeTransformer
         $summaryClass = $normalTable->getSummaryClass();
         // check if empty
 
-        $firstRow = $normalTable->first();
-
-
-        if ($firstRow === null) {
+        try {
+            $firstRow = $normalTable->getRowPrototype();
+        } catch (EmptyResultException) {
             return new DefaultTree(
                 summaryClass: $summaryClass,
                 label: $label,
