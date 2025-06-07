@@ -19,11 +19,11 @@ use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
-abstract readonly class SimpleAggregateFunction implements AggregateFunction
+final readonly class SumSquare implements AggregateFunction
 {
     private ValueResolver $property;
 
-    final public function __construct(
+    public function __construct(
         string|ValueResolver $property,
     ) {
         if (\is_string($property)) {
@@ -33,18 +33,23 @@ abstract readonly class SimpleAggregateFunction implements AggregateFunction
         $this->property = $property;
     }
 
-    abstract public function getDQLAggregateFunction(string $input): string;
-
     #[\Override]
     public function getSourceToAggregateDQLExpression(Context $context): string
     {
-        return $this->getDQLAggregateFunction($this->property->getDQL($context));
+        $expression = $this->property->getDQL($context);
+
+        return \sprintf(
+            'SUM(%s * %s)',
+            $expression,
+            $expression,
+        );
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $fieldName): string
-    {
-        return $this->getDQLAggregateFunction($fieldName);
+    public function getAggregateToAggregateDQLExpression(
+        string $fieldName,
+    ): string {
+        return \sprintf('SUM(%s)', $fieldName);
     }
 
     #[\Override]

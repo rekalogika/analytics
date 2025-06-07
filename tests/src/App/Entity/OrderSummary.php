@@ -24,7 +24,9 @@ use Rekalogika\Analytics\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\AggregateFunction\Max;
 use Rekalogika\Analytics\AggregateFunction\Min;
 use Rekalogika\Analytics\AggregateFunction\Range;
+use Rekalogika\Analytics\AggregateFunction\StdDev;
 use Rekalogika\Analytics\AggregateFunction\Sum;
+use Rekalogika\Analytics\AggregateFunction\SumSquare;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
@@ -159,6 +161,13 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private ?int $maxPrice = null;
 
+    #[ORM\Column(type: Types::FLOAT)]
+    #[Analytics\Measure(
+        function: new SumSquare('item.price'),
+        label: new TranslatableMessage('Price Sum Square'),
+    )]
+    private ?float $priceSumSquare = null;
+
     #[Analytics\Measure(
         function: new Range(
             minProperty: 'minPrice',
@@ -190,6 +199,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
             countProperty: 'uniqueCustomers',
         ),
         label: new TranslatableMessage('Average spending per customer'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
     private ?int $averageSpendingPerCustomer = null; // @phpstan-ignore property.unusedType
 
@@ -199,8 +209,20 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
             countProperty: 'count',
         ),
         label: new TranslatableMessage('Average order value'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
     private ?int $averageOrderValue = null; // @phpstan-ignore property.unusedType
+
+    #[Analytics\Measure(
+        function: new StdDev(
+            sumSquareProperty: 'priceSumSquare',
+            countProperty: 'count',
+            sumProperty: 'price',
+        ),
+        label: new TranslatableMessage('Price StdDev'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
+    )]
+    private ?int $priceStdDev = null;  // @phpstan-ignore property.unusedType
 
 
     #[\Override]
@@ -315,5 +337,19 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         }
 
         return Money::ofMinor($this->priceRange, 'EUR');
+    }
+
+    public function getPriceStdDev(): ?Money
+    {
+        if ($this->priceStdDev === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->priceStdDev, 'EUR');
+    }
+
+    public function getPriceSumSquare(): ?float
+    {
+        return $this->priceSumSquare;
     }
 }
