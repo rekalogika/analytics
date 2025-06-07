@@ -32,6 +32,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         TranslatableInterface $label,
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
+        private bool $virtual,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
@@ -67,6 +68,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             label: $this->getLabel(),
             unit: $this->unit,
             unitSignature: $this->unitSignature,
+            virtual: $this->virtual,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -94,6 +96,11 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
     public function getUnitSignature(): ?string
     {
         return $this->unitSignature;
+    }
+
+    public function isVirtual(): bool
+    {
+        return $this->virtual;
     }
 
     /**

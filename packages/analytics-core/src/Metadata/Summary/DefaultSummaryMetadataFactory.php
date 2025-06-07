@@ -162,6 +162,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             } elseif ($measureAttribute !== null) {
                 $measureMetadatas[$property] =
                     $this->createMeasureMetadata(
+                        summaryClassName: $summaryClassName,
                         sourceClasses: $sourceClasses,
                         property: $property,
                         measureAttribute: $measureAttribute,
@@ -470,9 +471,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
+     * @param class-string $summaryClassName
      * @param non-empty-list<class-string> $sourceClasses
      */
     private function createMeasureMetadata(
+        string $summaryClassName,
         array $sourceClasses,
         string $property,
         Measure $measureAttribute,
@@ -511,6 +514,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
         }
 
+        // determine whether the measure is virtual or not
+
+        $classMetadata = $this->getDoctrineClassMetadata($summaryClassName);
+        $virtual = !$classMetadata->hasProperty($property);
+
         $label = TranslatableUtil::normalize($measureAttribute->getLabel())
             ?? new LiteralString($property);
 
@@ -520,6 +528,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             label: $label,
             unit: $unit,
             unitSignature: $unitSignature,
+            virtual: $virtual,
         );
     }
 

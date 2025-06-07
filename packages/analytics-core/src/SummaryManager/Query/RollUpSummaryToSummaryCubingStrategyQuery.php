@@ -243,6 +243,10 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     private function processMeasures(): void
     {
         foreach ($this->metadata->getMeasures() as $field => $metadata) {
+            if ($metadata->isVirtual()) {
+                continue;
+            }
+
             $function = $metadata->getFunction();
             $function = reset($function);
 
