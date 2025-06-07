@@ -176,6 +176,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 
             $function = $function->getSummaryToSummaryDQLFunction();
 
+            if ($function === null) {
+                continue;
+            }
+
             $function = \sprintf(
                 $function,
                 \sprintf('root.%s', $field),

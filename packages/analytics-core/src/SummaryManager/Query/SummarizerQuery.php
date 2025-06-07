@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
@@ -500,10 +501,27 @@ final class SummarizerQuery extends AbstractQuery
         foreach ($measureMetadatas as $name => $measureMetadata) {
             $function = $measureMetadata->getFirstFunction();
 
-            $summaryToSummaryDQL = \sprintf(
-                $function->getSummaryToSummaryDQLFunction(),
-                'root.' . $measureMetadata->getSummaryProperty(),
+            // get summary to summary DQL
+
+            $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
+
+            if ($summaryToSummaryDQLFunction === null) {
+                $summaryToSummaryDQL = null;
+            } else {
+                $summaryToSummaryDQL = \sprintf(
+                    $summaryToSummaryDQLFunction,
+                    'root.' . $measureMetadata->getSummaryProperty(),
+                );
+            }
+
+            // create context
+
+            $context = new Context(
+                queryBuilder: $this->getSimpleQueryBuilder(),
+                summaryMetadata: $this->metadata,
+                measureMetadata: $measureMetadata,
             );
+
 
             $summaryReaderDQL = \sprintf(
                 $function->getSummaryReaderDQLFunction(),

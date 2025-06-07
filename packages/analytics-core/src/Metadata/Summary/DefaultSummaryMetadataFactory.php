@@ -533,7 +533,13 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     private function verifyAggregateFunction(AggregateFunction $function): void
     {
         try {
-            $x = \sprintf($function->getSummaryToSummaryDQLFunction(), 'x');
+            $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
+
+            if ($summaryToSummaryDQLFunction !== null) {
+                // verify that the function can be used in DQL
+                $x = \sprintf($summaryToSummaryDQLFunction, 'x');
+            }
+            
             $x = \sprintf($function->getSummaryReaderDQLFunction(), 'x');
         } catch (\Throwable $e) {
             throw new MetadataException(

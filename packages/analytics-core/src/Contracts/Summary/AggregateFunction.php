@@ -19,13 +19,13 @@ interface AggregateFunction
      * Get the DQL function to aggregate data from the source table to the summary
      * table.
      */
-    public function getSourceToSummaryDQLFunction(Context $context): string;
+    public function getSourceToSummaryDQLFunction(Context $context): ?string;
 
     /**
      * Get the DQL function to roll up data from the summary to a higher level
      * in partitioning. The template '%s' will be replaced with the field name.
      */
-    public function getSummaryToSummaryDQLFunction(): string;
+    public function getSummaryToSummaryDQLFunction(): ?string;
 
     /**
      * Reads the field from the summary table and convert for human consumption.
