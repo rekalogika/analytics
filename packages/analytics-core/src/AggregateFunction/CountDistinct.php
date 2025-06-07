@@ -22,12 +22,9 @@ final readonly class CountDistinct implements AggregateFunction
 {
     private ValueResolver $property;
 
-    /**
-     * @param 'boolean'|'smallint'|'integer'|'bigint'|'bytea'|'text'|'any' $hashType
-     */
     public function __construct(
         string|ValueResolver $property,
-        private string $hashType = 'any',
+        private CountDistinctHashType $hashType = CountDistinctHashType::Any,
     ) {
         if (\is_string($property)) {
             $property = new PropertyValueResolver($property);
@@ -42,7 +39,7 @@ final readonly class CountDistinct implements AggregateFunction
         return \sprintf(
             "REKALOGIKA_HLL_ADD_AGG(REKALOGIKA_HLL_HASH(%s, '%s'))",
             $this->property->getDQL($context),
-            $this->hashType,
+            $this->hashType->value,
         );
     }
 
