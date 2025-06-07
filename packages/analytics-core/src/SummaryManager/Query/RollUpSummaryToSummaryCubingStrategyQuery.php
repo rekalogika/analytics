@@ -257,7 +257,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 ));
             }
 
-            $function = $function->getSummaryToSummaryDQLFunction();
+            $function = $function->getAggregateToAggregateDQLExpression();
 
             if ($function === null) {
                 continue;

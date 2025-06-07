@@ -25,19 +25,19 @@ final readonly class Average implements AggregateFunction
     ) {}
 
     #[\Override]
-    public function getSourceToSummaryDQLFunction(Context $context): null
+    public function getSourceToAggregateDQLExpression(Context $context): null
     {
         return null;
     }
 
     #[\Override]
-    public function getSummaryToSummaryDQLFunction(): null
+    public function getAggregateToAggregateDQLExpression(): null
     {
         return null;
     }
 
     #[\Override]
-    public function getSummaryReaderDQLFunction(SummaryContext $context): string
+    public function getAggregateToResultDQLExpression(SummaryContext $context): string
     {
         return \sprintf(
             '%s / %s',

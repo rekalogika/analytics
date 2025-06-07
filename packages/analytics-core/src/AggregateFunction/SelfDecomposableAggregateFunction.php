@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
-abstract readonly class AbstractAggregateFunction implements AggregateFunction
+abstract readonly class SelfDecomposableAggregateFunction implements AggregateFunction
 {
     private ValueResolver $property;
 
@@ -36,7 +36,7 @@ abstract readonly class AbstractAggregateFunction implements AggregateFunction
     abstract public function getDQLAggregateFunction(): string;
 
     #[\Override]
-    public function getSourceToSummaryDQLFunction(Context $context): string
+    public function getSourceToAggregateDQLExpression(Context $context): string
     {
         return \sprintf(
             '%s(%s)',
@@ -46,13 +46,13 @@ abstract readonly class AbstractAggregateFunction implements AggregateFunction
     }
 
     #[\Override]
-    public function getSummaryToSummaryDQLFunction(): string
+    public function getAggregateToAggregateDQLExpression(): string
     {
         return $this->getDQLAggregateFunction() . '(%s)';
     }
 
     #[\Override]
-    public function getSummaryReaderDQLFunction(SummaryContext $context): string
+    public function getAggregateToResultDQLExpression(SummaryContext $context): string
     {
         return '%s';
     }

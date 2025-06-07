@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-final readonly class Min extends AbstractAggregateFunction
+final readonly class Min extends SelfDecomposableAggregateFunction
 {
     #[\Override]
     public function getDQLAggregateFunction(): string

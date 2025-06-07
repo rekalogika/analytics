@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-final readonly class Count extends AbstractAggregateFunction
+final readonly class Count extends SelfDecomposableAggregateFunction
 {
     #[\Override]
     public function getDQLAggregateFunction(): string
@@ -22,7 +22,7 @@ final readonly class Count extends AbstractAggregateFunction
     }
 
     #[\Override]
-    public function getSummaryToSummaryDQLFunction(): string
+    public function getAggregateToAggregateDQLExpression(): string
     {
         return 'SUM(%s)';
     }
