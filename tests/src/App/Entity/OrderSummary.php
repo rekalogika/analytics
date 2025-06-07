@@ -163,6 +163,16 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private ?int $averageSpendingPerCustomer = null; // @phpstan-ignore property.unusedType
 
+    #[Analytics\Measure(
+        function: new Average(
+            sumProperty: 'price',
+            countProperty: 'count',
+        ),
+        label: new TranslatableMessage('Average order value'),
+    )]
+    private ?int $averageOrderValue = null; // @phpstan-ignore property.unusedType
+
+
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
@@ -239,5 +249,14 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         }
 
         return Money::ofMinor($this->averageSpendingPerCustomer, 'EUR');
+    }
+
+    public function getAverageOrderValue(): ?Money
+    {
+        if ($this->averageOrderValue === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->averageOrderValue, 'EUR');
     }
 }
