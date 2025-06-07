@@ -31,7 +31,7 @@ interface AggregateFunction
      * Reads the field from the summary table and convert for human consumption.
      * The template '%s' will be replaced with the field name.
      */
-    public function getSummaryReaderDQLFunction(): string;
+    public function getSummaryReaderDQLFunction(SummaryContext $context): string;
 
     /**
      * The properties of the source entity that are involved in the calculation.

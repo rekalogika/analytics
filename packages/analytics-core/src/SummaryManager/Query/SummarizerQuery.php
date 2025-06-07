@@ -19,6 +19,7 @@ use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\OverflowException;
@@ -499,38 +500,38 @@ final class SummarizerQuery extends AbstractQuery
         $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $name => $measureMetadata) {
-            $function = $measureMetadata->getFirstFunction();
+            // $function = $measureMetadata->getFirstFunction();
 
-            // get summary to summary DQL
+            // // get summary to summary DQL
 
-            $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
+            // $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
 
-            if ($summaryToSummaryDQLFunction === null) {
-                $summaryToSummaryDQL = null;
-            } else {
-                $summaryToSummaryDQL = \sprintf(
-                    $summaryToSummaryDQLFunction,
-                    'root.' . $measureMetadata->getSummaryProperty(),
-                );
-            }
+            // if ($summaryToSummaryDQLFunction === null) {
+            //     $summaryToSummaryDQL = null;
+            // } else {
+            //     $summaryToSummaryDQL = \sprintf(
+            //         $summaryToSummaryDQLFunction,
+            //         'root.' . $measureMetadata->getSummaryProperty(),
+            //     );
+            // }
 
-            // create context
+            // // create context
 
-            $context = new Context(
+
+            // $summaryReaderDQL = \sprintf(
+            //     $function->getSummaryReaderDQLFunction(),
+            //     $summaryToSummaryDQL,
+            // );
+
+            $summaryContext = SummaryContext::create(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,
-                measureMetadata: $measureMetadata,
-            );
-
-
-            $summaryReaderDQL = \sprintf(
-                $function->getSummaryReaderDQLFunction(),
-                $summaryToSummaryDQL,
             );
 
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
-                    $summaryReaderDQL . ' AS %s',
+                    '%s AS %s',
+                    $summaryContext->getMeasureDQL($name),
                     $name,
                 ));
         }
@@ -659,14 +660,12 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($orderBy as $field => $order) {
             if ($this->metadata->isMeasure($field)) {
-                $measureMetadata = $this->metadata->getMeasure($field);
-                $function = $measureMetadata->getFirstFunction();
-                $dql = $function->getSummaryToSummaryDQLFunction();
-
-                $fieldString = \sprintf(
-                    $dql,
-                    'root.' . $measureMetadata->getSummaryProperty(),
+                $summaryContext = SummaryContext::create(
+                    queryBuilder: $this->getSimpleQueryBuilder(),
+                    summaryMetadata: $this->metadata,
                 );
+
+                $fieldString = $summaryContext->getMeasureDQL($field);
             } else {
                 $fieldString = $this->resolvePath($field);
             }

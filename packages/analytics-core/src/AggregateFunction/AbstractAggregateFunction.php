@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
@@ -51,7 +52,7 @@ abstract readonly class AbstractAggregateFunction implements AggregateFunction
     }
 
     #[\Override]
-    public function getSummaryReaderDQLFunction(): string
+    public function getSummaryReaderDQLFunction(SummaryContext $context): string
     {
         return '%s';
     }

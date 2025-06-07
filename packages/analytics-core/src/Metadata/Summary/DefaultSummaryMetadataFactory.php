@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Attribute\Summary;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
@@ -500,12 +499,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $function = $newFunction;
 
-        // verify aggregate functions
-
-        foreach ($function as $sourceClass => $curFunction) {
-            $this->verifyAggregateFunction($curFunction);
-        }
-
         // make sure all functions are of the same class
 
         $class = null;
@@ -528,29 +521,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             unit: $unit,
             unitSignature: $unitSignature,
         );
-    }
-
-    private function verifyAggregateFunction(AggregateFunction $function): void
-    {
-        try {
-            $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
-
-            if ($summaryToSummaryDQLFunction !== null) {
-                // verify that the function can be used in DQL
-                $x = \sprintf($summaryToSummaryDQLFunction, 'x');
-            }
-            
-            $x = \sprintf($function->getSummaryReaderDQLFunction(), 'x');
-        } catch (\Throwable $e) {
-            throw new MetadataException(
-                \sprintf(
-                    'Invalid aggregate function %s: %s',
-                    $function::class,
-                    $e->getMessage(),
-                ),
-                previous: $e,
-            );
-        }
     }
 
     /**
