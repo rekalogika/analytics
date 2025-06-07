@@ -46,9 +46,13 @@ abstract readonly class SelfDecomposableAggregateFunction implements AggregateFu
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(): string
+    public function getAggregateToAggregateDQLExpression(string $field): string
     {
-        return $this->getDQLAggregateFunction() . '(%s)';
+        return \sprintf(
+            '%s(%s)',
+            $this->getDQLAggregateFunction(),
+            $field,
+        );
     }
 
     #[\Override]
