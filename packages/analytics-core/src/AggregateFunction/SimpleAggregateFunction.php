@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
-abstract readonly class SelfDecomposableAggregateFunction implements AggregateFunction
+abstract readonly class SimpleAggregateFunction implements AggregateFunction
 {
     private ValueResolver $property;
 
@@ -46,19 +46,21 @@ abstract readonly class SelfDecomposableAggregateFunction implements AggregateFu
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $field): string
+    public function getAggregateToAggregateDQLExpression(string $fieldName): string
     {
         return \sprintf(
             '%s(%s)',
             $this->getDQLAggregateFunction(),
-            $field,
+            $fieldName,
         );
     }
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(SummaryContext $context): string
-    {
-        return '%s';
+    public function getAggregateToResultDQLExpression(
+        string $inputExpression,
+        SummaryContext $context,
+    ): string {
+        return $inputExpression;
     }
 
     #[\Override]

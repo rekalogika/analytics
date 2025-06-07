@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-final readonly class Count extends SelfDecomposableAggregateFunction
+final readonly class Count extends SimpleAggregateFunction
 {
     #[\Override]
     public function getDQLAggregateFunction(): string
@@ -22,8 +22,9 @@ final readonly class Count extends SelfDecomposableAggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $field): string
-    {
-        return \sprintf('SUM(%s)', $field);
+    public function getAggregateToAggregateDQLExpression(
+        string $fieldName,
+    ): string {
+        return \sprintf('SUM(%s)', $fieldName);
     }
 }
