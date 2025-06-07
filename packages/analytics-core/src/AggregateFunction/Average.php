@@ -31,7 +31,7 @@ final readonly class Average implements AggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(): null
+    public function getAggregateToAggregateDQLExpression(string $field): null
     {
         return null;
     }

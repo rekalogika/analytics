@@ -45,9 +45,9 @@ final readonly class CountDistinct implements AggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(): string
+    public function getAggregateToAggregateDQLExpression(string $field): string
     {
-        return 'REKALOGIKA_HLL_UNION_AGG(%s)';
+        return \sprintf('REKALOGIKA_HLL_UNION_AGG(%s)', $field);
     }
 
     #[\Override]

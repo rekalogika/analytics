@@ -257,16 +257,12 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 ));
             }
 
-            $function = $function->getAggregateToAggregateDQLExpression();
+            $sqlField = $this->getSimpleQueryBuilder()->resolve($field);
+            $function = $function->getAggregateToAggregateDQLExpression($sqlField);
 
             if ($function === null) {
                 continue;
             }
-
-            $function = \sprintf(
-                $function,
-                \sprintf('root.%s', $field),
-            );
 
             $this->getSimpleQueryBuilder()->addSelect($function);
         }

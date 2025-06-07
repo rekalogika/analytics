@@ -22,8 +22,8 @@ final readonly class Count extends SelfDecomposableAggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(): string
+    public function getAggregateToAggregateDQLExpression(string $field): string
     {
-        return 'SUM(%s)';
+        return \sprintf('SUM(%s)', $field);
     }
 }

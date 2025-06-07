@@ -23,8 +23,12 @@ interface AggregateFunction
     /**
      * Gets the DQL expression to roll up data from multiple aggregate fields
      * into a larger aggregate.
+     *
+     * @param string $field The field name of the aggregate.
+     * @return string|null The DQL expression to roll up the aggregate. Returns
+     * null if not applicable.
      */
-    public function getAggregateToAggregateDQLExpression(): ?string;
+    public function getAggregateToAggregateDQLExpression(string $field): ?string;
 
     /**
      * Gets the DQL expression to convert an aggregate field into a value for
