@@ -31,14 +31,17 @@ final readonly class Average implements AggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $field): null
-    {
+    public function getAggregateToAggregateDQLExpression(
+        string $fieldName,
+    ): null {
         return null;
     }
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(SummaryContext $context): string
-    {
+    public function getAggregateToResultDQLExpression(
+        string $inputExpression,
+        SummaryContext $context,
+    ): string {
         return \sprintf(
             '%s / %s',
             $context->getMeasureDQL($this->sumProperty),

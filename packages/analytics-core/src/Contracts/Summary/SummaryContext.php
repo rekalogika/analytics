@@ -69,15 +69,10 @@ final readonly class SummaryContext
 
         // create summary to result DQL
 
-        $aggregateToResultDQLExpression =
-            $function->getAggregateToResultDQLExpression($context);
-
-        if ($aggregateToAggregateDQLExpression !== null) {
-            $aggregateToResultDQLExpression = \sprintf(
-                $aggregateToResultDQLExpression,
-                $aggregateToAggregateDQLExpression,
-            );
-        }
+        $aggregateToResultDQLExpression = $function->getAggregateToResultDQLExpression(
+            inputExpression: $aggregateToAggregateDQLExpression ?? '',
+            context: $context,
+        );
 
         return $aggregateToResultDQLExpression;
     }
