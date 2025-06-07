@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Attribute\Summary;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
@@ -163,6 +162,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             } elseif ($measureAttribute !== null) {
                 $measureMetadatas[$property] =
                     $this->createMeasureMetadata(
+                        summaryClassName: $summaryClassName,
                         sourceClasses: $sourceClasses,
                         property: $property,
                         measureAttribute: $measureAttribute,
@@ -471,9 +471,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
+     * @param class-string $summaryClassName
      * @param non-empty-list<class-string> $sourceClasses
      */
     private function createMeasureMetadata(
+        string $summaryClassName,
         array $sourceClasses,
         string $property,
         Measure $measureAttribute,
@@ -500,12 +502,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $function = $newFunction;
 
-        // verify aggregate functions
-
-        foreach ($function as $sourceClass => $curFunction) {
-            $this->verifyAggregateFunction($curFunction);
-        }
-
         // make sure all functions are of the same class
 
         $class = null;
@@ -518,6 +514,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             }
         }
 
+        // determine whether the measure is virtual or not
+
+        $classMetadata = $this->getDoctrineClassMetadata($summaryClassName);
+        $virtual = !$classMetadata->hasProperty($property);
+
         $label = TranslatableUtil::normalize($measureAttribute->getLabel())
             ?? new LiteralString($property);
 
@@ -527,24 +528,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             label: $label,
             unit: $unit,
             unitSignature: $unitSignature,
+            virtual: $virtual,
         );
-    }
-
-    private function verifyAggregateFunction(AggregateFunction $function): void
-    {
-        try {
-            $x = \sprintf($function->getSummaryToSummaryDQLFunction(), 'x');
-            $x = \sprintf($function->getSummaryReaderDQLFunction(), 'x');
-        } catch (\Throwable $e) {
-            throw new MetadataException(
-                \sprintf(
-                    'Invalid aggregate function %s: %s',
-                    $function::class,
-                    $e->getMessage(),
-                ),
-                previous: $e,
-            );
-        }
     }
 
     /**

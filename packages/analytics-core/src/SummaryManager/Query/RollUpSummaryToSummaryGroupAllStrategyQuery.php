@@ -164,6 +164,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     private function processMeasures(): void
     {
         foreach ($this->metadata->getMeasures() as $field => $metadata) {
+            if ($metadata->isVirtual()) {
+                continue;
+            }
+
             $function = $metadata->getFunction();
             $function = reset($function);
 
@@ -175,6 +179,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             }
 
             $function = $function->getSummaryToSummaryDQLFunction();
+
+            if ($function === null) {
+                continue;
+            }
 
             $function = \sprintf(
                 $function,

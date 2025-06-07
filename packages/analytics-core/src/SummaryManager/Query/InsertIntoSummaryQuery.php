@@ -73,7 +73,11 @@ final readonly class InsertIntoSummaryQuery
 
         // add measure columns
 
-        foreach (array_keys($this->summaryMetadata->getMeasures()) as $property) {
+        foreach ($this->summaryMetadata->getMeasures() as $property => $measureMetadata) {
+            if ($measureMetadata->isVirtual()) {
+                continue;
+            }
+
             $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
         }
 

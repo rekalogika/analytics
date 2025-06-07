@@ -245,6 +245,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     private function processMeasures(): void
     {
         foreach ($this->summaryMetadata->getMeasures() as $measureMetadata) {
+            if ($measureMetadata->isVirtual()) {
+                continue;
+            }
+
             $function = $measureMetadata->getFunction()[$this->sourceClass]
                 ?? throw new InvalidArgumentException(\sprintf(
                     'Function not found for source class "%s".',

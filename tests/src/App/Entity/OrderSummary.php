@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\AggregateFunction\Average;
 use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\AggregateFunction\Sum;
@@ -153,6 +154,25 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private ?int $uniqueCustomers = null;
 
+    #[Analytics\Measure(
+        function: new Average(
+            sumProperty: 'price',
+            countProperty: 'uniqueCustomers',
+        ),
+        label: new TranslatableMessage('Average spending per customer'),
+    )]
+    private ?int $averageSpendingPerCustomer = null; // @phpstan-ignore property.unusedType
+
+    #[Analytics\Measure(
+        function: new Average(
+            sumProperty: 'price',
+            countProperty: 'count',
+        ),
+        label: new TranslatableMessage('Average order value'),
+    )]
+    private ?int $averageOrderValue = null; // @phpstan-ignore property.unusedType
+
+
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
@@ -220,5 +240,23 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     public function getUniqueCustomers(): ?int
     {
         return $this->uniqueCustomers;
+    }
+
+    public function getAverageSpendingPerCustomer(): ?Money
+    {
+        if ($this->averageSpendingPerCustomer === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->averageSpendingPerCustomer, 'EUR');
+    }
+
+    public function getAverageOrderValue(): ?Money
+    {
+        if ($this->averageOrderValue === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->averageOrderValue, 'EUR');
     }
 }
