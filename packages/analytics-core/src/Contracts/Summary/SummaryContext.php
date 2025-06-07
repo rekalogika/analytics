@@ -53,13 +53,13 @@ final readonly class SummaryContext
 
         // create summary to summary DQL
 
-        $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
+        $aggregateToAggregateDQLExpression = $function->getAggregateToAggregateDQLExpression();
 
-        if ($summaryToSummaryDQLFunction === null) {
-            $summaryToSummaryDQL = null;
+        if ($aggregateToAggregateDQLExpression === null) {
+            $aggregateToAggregateDQL = null;
         } else {
-            $summaryToSummaryDQL = \sprintf(
-                $summaryToSummaryDQLFunction,
+            $aggregateToAggregateDQL = \sprintf(
+                $aggregateToAggregateDQLExpression,
                 $this->queryBuilder->resolve($measureMetadata->getSummaryProperty()),
             );
         }
@@ -74,16 +74,16 @@ final readonly class SummaryContext
 
         // create summary to result DQL
 
-        $summaryToResultDQLFunction =
-            $function->getSummaryReaderDQLFunction($context);
+        $aggregateToResultDQLExpression =
+            $function->getAggregateToResultDQLExpression($context);
 
-        if ($summaryToSummaryDQL !== null) {
-            $summaryToResultDQLFunction = \sprintf(
-                $summaryToResultDQLFunction,
-                $summaryToSummaryDQL,
+        if ($aggregateToAggregateDQL !== null) {
+            $aggregateToResultDQLExpression = \sprintf(
+                $aggregateToResultDQLExpression,
+                $aggregateToAggregateDQL,
             );
         }
 
-        return $summaryToResultDQLFunction;
+        return $aggregateToResultDQLExpression;
     }
 }

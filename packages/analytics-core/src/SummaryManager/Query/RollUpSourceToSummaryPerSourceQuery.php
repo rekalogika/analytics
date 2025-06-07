@@ -255,7 +255,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     $this->sourceClass,
                 ));
 
-            $function = $function->getSourceToSummaryDQLFunction(
+            $dql = $function->getSourceToAggregateDQLExpression(
                 context: new Context(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
@@ -263,7 +263,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 ),
             );
 
-            $this->getSimpleQueryBuilder()->addSelect($function);
+            $this->getSimpleQueryBuilder()->addSelect($dql);
         }
     }
 

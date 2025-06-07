@@ -35,7 +35,7 @@ final readonly class CountDistinct implements AggregateFunction
     }
 
     #[\Override]
-    public function getSourceToSummaryDQLFunction(Context $context): string
+    public function getSourceToAggregateDQLExpression(Context $context): string
     {
         return \sprintf(
             "REKALOGIKA_HLL_ADD_AGG(REKALOGIKA_HLL_HASH(%s, '%s'))",
@@ -45,13 +45,13 @@ final readonly class CountDistinct implements AggregateFunction
     }
 
     #[\Override]
-    public function getSummaryToSummaryDQLFunction(): string
+    public function getAggregateToAggregateDQLExpression(): string
     {
         return 'REKALOGIKA_HLL_UNION_AGG(%s)';
     }
 
     #[\Override]
-    public function getSummaryReaderDQLFunction(SummaryContext $context): string
+    public function getAggregateToResultDQLExpression(SummaryContext $context): string
     {
         return 'REKALOGIKA_HLL_CARDINALITY(%s)';
     }

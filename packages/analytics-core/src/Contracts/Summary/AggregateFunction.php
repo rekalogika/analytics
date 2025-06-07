@@ -16,22 +16,21 @@ namespace Rekalogika\Analytics\Contracts\Summary;
 interface AggregateFunction
 {
     /**
-     * Get the DQL function to aggregate data from the source table to the summary
-     * table.
+     * Gets the DQL expression to transform source values into an aggregate.
      */
-    public function getSourceToSummaryDQLFunction(Context $context): ?string;
+    public function getSourceToAggregateDQLExpression(Context $context): ?string;
 
     /**
-     * Get the DQL function to roll up data from the summary to a higher level
-     * in partitioning. The template '%s' will be replaced with the field name.
+     * Gets the DQL expression to roll up data from multiple aggregate fields
+     * into a larger aggregate.
      */
-    public function getSummaryToSummaryDQLFunction(): ?string;
+    public function getAggregateToAggregateDQLExpression(): ?string;
 
     /**
-     * Reads the field from the summary table and convert for human consumption.
-     * The template '%s' will be replaced with the field name.
+     * Gets the DQL expression to convert an aggregate field into a value for
+     * human consumption.
      */
-    public function getSummaryReaderDQLFunction(SummaryContext $context): string;
+    public function getAggregateToResultDQLExpression(SummaryContext $context): string;
 
     /**
      * The properties of the source entity that are involved in the calculation.
