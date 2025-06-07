@@ -21,6 +21,9 @@ use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\AggregateFunction\Average;
 use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\AggregateFunction\CountDistinct;
+use Rekalogika\Analytics\AggregateFunction\Max;
+use Rekalogika\Analytics\AggregateFunction\Min;
+use Rekalogika\Analytics\AggregateFunction\Range;
 use Rekalogika\Analytics\AggregateFunction\Sum;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
@@ -142,6 +145,33 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(type: Types::INTEGER)]
     #[Analytics\Measure(
+        function: new Min('item.price'),
+        label: new TranslatableMessage('Minimum Price'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
+    )]
+    private ?int $minPrice = null;
+
+    #[ORM\Column(type: Types::INTEGER)]
+    #[Analytics\Measure(
+        function: new Max('item.price'),
+        label: new TranslatableMessage('Maximum Price'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
+    )]
+    private ?int $maxPrice = null;
+
+    #[Analytics\Measure(
+        function: new Range(
+            minProperty: 'minPrice',
+            maxProperty: 'maxPrice',
+        ),
+        label: new TranslatableMessage('Price Range'),
+        unit: new TranslatableMessage('Monetary Value (EUR)'),
+    )]
+    private ?int $priceRange = null;  // @phpstan-ignore property.unusedType
+
+
+    #[ORM\Column(type: Types::INTEGER)]
+    #[Analytics\Measure(
         function: new Count('id'),
         label: new TranslatableMessage('Count'),
     )]
@@ -232,6 +262,24 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         return Money::ofMinor($this->price, 'EUR');
     }
 
+    public function getMinPrice(): ?Money
+    {
+        if ($this->minPrice === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->minPrice, 'EUR');
+    }
+
+    public function getMaxPrice(): ?Money
+    {
+        if ($this->maxPrice === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->maxPrice, 'EUR');
+    }
+
     public function getCount(): ?int
     {
         return $this->count;
@@ -258,5 +306,14 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         }
 
         return Money::ofMinor($this->averageOrderValue, 'EUR');
+    }
+
+    public function getPriceRange(): ?Money
+    {
+        if ($this->priceRange === null) {
+            return null;
+        }
+
+        return Money::ofMinor($this->priceRange, 'EUR');
     }
 }
