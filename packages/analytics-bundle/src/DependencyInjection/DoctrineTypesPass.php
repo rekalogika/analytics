@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
+use Doctrine\DBAL\Types\Type;
+use Rekalogika\Analytics\Doctrine\HyperLogLog\HllType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\DateType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\HourType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\MonthType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\QuarterType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\TimeIntervalType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekDateType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekType;
 use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekYearType;
@@ -53,7 +54,7 @@ final class DoctrineTypesPass implements CompilerPassInterface
     }
 
     /**
-     * @return \Traversable<string,class-string<TimeIntervalType>>
+     * @return \Traversable<string,class-string<Type>>
      */
     private function getTypes(): \Traversable
     {
@@ -65,5 +66,6 @@ final class DoctrineTypesPass implements CompilerPassInterface
         yield 'rekalogika_analytics_week' => WeekType::class;
         yield 'rekalogika_analytics_week_year' => WeekYearType::class;
         yield 'rekalogika_analytics_year' => YearType::class;
+        yield 'rekalogika_hll' => HllType::class;
     }
 }
