@@ -43,7 +43,7 @@ final readonly class Average implements AggregateFunction
         SummaryContext $context,
     ): string {
         return \sprintf(
-            '%s / %s',
+            '%s / NULLIF(%s, 0)',
             $context->getMeasureDQL($this->sumProperty),
             $context->getMeasureDQL($this->countProperty),
         );
