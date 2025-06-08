@@ -13,34 +13,59 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
+use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
-final readonly class TimeDimensionValueResolver implements ValueResolver
+final readonly class TimeDimensionValueResolver implements HierarchyAwareValueResolver
 {
+    private ?ValueResolver $input;
+
     public function __construct(
-        private string $property,
         private TimeFormat $format,
-        private \DateTimeZone $sourceTimeZone = new \DateTimeZone('UTC'),
-        private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
-    ) {}
+        null|string|ValueResolver $input = null,
+    ) {
+        if (\is_string($input)) {
+            $input = new PropertyValueResolver($input);
+        }
+
+        $this->input = $input;
+    }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function withInput(ValueResolver $input): static
     {
-        return \sprintf(
-            "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
-            $context->resolve($this->property),
-            $this->sourceTimeZone->getName(),
-            $this->summaryTimeZone->getName(),
-            $this->format->value,
+        return new static(
+            format: $this->format,
+            input: $input,
         );
     }
 
     #[\Override]
     public function getInvolvedProperties(): array
     {
-        return [$this->property];
+        return $this->input?->getInvolvedProperties() ?? [];
+    }
+
+    #[\Override]
+    public function getDQL(
+        SourceContext $context,
+    ): string {
+        if (!$this->input instanceof ValueResolver) {
+            throw new InvalidArgumentException(\sprintf(
+                'TimeDimensionValueResolver requires an input ValueResolver, but got %s',
+                get_debug_type($this->input),
+            ));
+        }
+
+        return \sprintf(
+            "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
+            $this->input->getDQL($context),
+            $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
+            $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
+            $this->format->value,
+        );
     }
 }
