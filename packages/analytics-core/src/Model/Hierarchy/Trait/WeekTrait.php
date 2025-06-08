@@ -16,12 +16,12 @@ namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
-use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
-use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\Model\TimeInterval\Week;
 use Rekalogika\Analytics\Model\TimeInterval\WeekOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\WeekOfYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait WeekTrait
 {

@@ -15,10 +15,10 @@ namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
-use Rekalogika\Analytics\DimensionValueResolver\TimeDimensionValueResolver;
-use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait WeekYearTrait
 {

@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\AggregateFunction\Sum;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\DimensionValueResolver\TimeFormat;
 use Rekalogika\Analytics\Model\Partition\SingleLevelIntegerPartition;
 use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\Model\TimeInterval\Date;
@@ -27,6 +26,7 @@ use Rekalogika\Analytics\Model\TimeInterval\DayOfWeek;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
 use Rekalogika\Analytics\ValueResolver\DateToIntegerResolver;
 use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeFormat;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]
@@ -51,11 +51,11 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[Analytics\Dimension(
         source: new TimeDimensionValueResolver(
-            property: 'date',
+            input: 'date',
             format: TimeFormat::Date,
-            sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
-            summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         ),
+        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
         mandatory: true,
     )]
@@ -64,11 +64,11 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeDimensionValueResolver(
-            property: 'date',
+            input: 'date',
             format: TimeFormat::DayOfWeek,
-            sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
-            summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         ),
+        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Day of Week', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfWeek $dayOfWeek = null;
@@ -76,11 +76,11 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeDimensionValueResolver(
-            property: 'date',
+            input: 'date',
             format: TimeFormat::DayOfMonth,
-            sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
-            summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         ),
+        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Day of Month', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfMonth $dayOfMonth = null;
@@ -88,11 +88,11 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeDimensionValueResolver(
-            property: 'date',
+            input: 'date',
             format: TimeFormat::DayOfYear,
-            sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
-            summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         ),
+        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Day of Year', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfYear $dayOfYear = null;
