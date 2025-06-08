@@ -300,14 +300,14 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                "%s >= '%s'",
+                "%s >= %s",
                 $this->resolvePath($property),
-                $start,
+                $this->getSimpleQueryBuilder()->createNamedParameter($start),
             ))
             ->andWhere(\sprintf(
-                "%s < '%s'",
+                "%s < %s",
                 $this->resolvePath($property),
-                $end,
+                $this->getSimpleQueryBuilder()->createNamedParameter($end),
             ));
     }
 
