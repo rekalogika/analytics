@@ -45,11 +45,11 @@ final readonly class StdDev implements AggregateFunction
     ): string {
         return \sprintf(
             'SQRT((%s - (%s * %s / NULLIF(%s, 0))) / NULLIF(%s, 0))',
-            $context->getMeasureDQL($this->sumSquareProperty),
-            $context->getMeasureDQL($this->sumProperty),
-            $context->getMeasureDQL($this->sumProperty),
-            $context->getMeasureDQL($this->countProperty),
-            $context->getMeasureDQL($this->countProperty),
+            $context->resolve($this->sumSquareProperty),
+            $context->resolve($this->sumProperty),
+            $context->resolve($this->sumProperty),
+            $context->resolve($this->countProperty),
+            $context->resolve($this->countProperty),
         );
     }
 

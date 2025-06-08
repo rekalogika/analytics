@@ -44,8 +44,8 @@ final readonly class Range implements AggregateFunction
     ): string {
         return \sprintf(
             '%s - %s',
-            $context->getMeasureDQL($this->maxProperty),
-            $context->getMeasureDQL($this->minProperty),
+            $context->resolve($this->maxProperty),
+            $context->resolve($this->minProperty),
         );
     }
 
