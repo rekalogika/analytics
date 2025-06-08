@@ -42,14 +42,12 @@ final class NormalTableToTreeTransformer
     public function __construct(
         private readonly array $names,
         private readonly Items $uniqueDimensions,
-        private readonly bool $hasTieredOrder,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {}
 
     public static function transform(
         TranslatableInterface $label,
         DefaultNormalTable $normalTable,
-        bool $hasTieredOrder,
         DefaultTreeNodeFactory $treeNodeFactory,
     ): DefaultTree {
         $summaryClass = $normalTable->getSummaryClass();
@@ -78,7 +76,6 @@ final class NormalTableToTreeTransformer
         $transformer = new self(
             names: $names,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
-            hasTieredOrder: $hasTieredOrder,
             treeNodeFactory: $treeNodeFactory,
         );
 
@@ -176,18 +173,6 @@ final class NormalTableToTreeTransformer
      */
     private function doTransform(DefaultNormalTable $normalTable): array
     {
-        if ($this->hasTieredOrder) {
-            return $this->transformToTree($normalTable);
-        } else {
-            return $this->transformToTable($normalTable);
-        }
-    }
-
-    /**
-     * @return list<DefaultTreeNode>
-     */
-    private function transformToTree(DefaultNormalTable $normalTable): array
-    {
         $this->currentPath = [];
         $this->tree = [];
 
@@ -216,50 +201,6 @@ final class NormalTableToTreeTransformer
 
                 $columnNumber++;
             }
-        }
-
-        return $this->tree;
-    }
-
-    /**
-     * @return list<DefaultTreeNode>
-     */
-    private function transformToTable(DefaultNormalTable $normalTable): array
-    {
-        $this->currentPath = [];
-        $this->tree = [];
-        $previousRow = null;
-
-        foreach ($normalTable as $row) {
-            $columnNumber = 0;
-            $sameAsPrevious = $previousRow !== null && $previousRow->hasSameDimensions($row);
-
-            foreach ($row as $dimension) {
-                // if last dimension
-                if ($columnNumber === \count($row) - 1) {
-                    $this->addMeasure(
-                        summaryClass: $normalTable->getSummaryClass(),
-                        lastDimension: $dimension,
-                        measure: $row->getMeasure(),
-                        columnNumber: $columnNumber,
-                    );
-
-                    break;
-                }
-
-                if (!$sameAsPrevious) {
-                    $this->addDimension(
-                        summaryClass: $normalTable->getSummaryClass(),
-                        dimension: $dimension,
-                        columnNumber: $columnNumber,
-                        forceCreate: true,
-                    );
-                }
-
-                $columnNumber++;
-            }
-
-            $previousRow = $row;
         }
 
         return $this->tree;

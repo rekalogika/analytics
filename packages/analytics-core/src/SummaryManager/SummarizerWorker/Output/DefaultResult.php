@@ -115,7 +115,6 @@ final class DefaultResult implements Result
         return $this->tree ??= NormalTableToTreeTransformer::transform(
             label: $this->label,
             normalTable: $this->getUnbalancedNormalTable(),
-            hasTieredOrder: $this->hasTieredOrder(),
             treeNodeFactory: $this->treeNodeFactory,
         );
     }
