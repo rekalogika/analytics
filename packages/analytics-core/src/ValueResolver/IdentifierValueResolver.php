@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-final readonly class EntityValueResolver implements
+final readonly class IdentifierValueResolver implements
     ValueResolver
 {
     public function __construct(
