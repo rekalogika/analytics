@@ -482,12 +482,13 @@ final class SummarizerQuery extends AbstractQuery
             $summaryContext = SummaryContext::create(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,
+                measureMetadata: $measureMetadata,
             );
 
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     '%s AS %s',
-                    $summaryContext->getMeasureDQL($name),
+                    $summaryContext->resolve($name),
                     $name,
                 ));
         }
@@ -615,9 +616,10 @@ final class SummarizerQuery extends AbstractQuery
                 $summaryContext = SummaryContext::create(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->metadata,
+                    measureMetadata: $this->metadata->getMeasure($field),
                 );
 
-                $fieldString = $summaryContext->getMeasureDQL($field);
+                $fieldString = $summaryContext->resolve($field);
             } else {
                 $fieldString = $this->resolve($field);
             }

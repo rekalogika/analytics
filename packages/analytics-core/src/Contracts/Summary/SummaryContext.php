@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Summary;
 
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
@@ -22,10 +23,12 @@ final readonly class SummaryContext
     public static function create(
         SimpleQueryBuilder $queryBuilder,
         SummaryMetadata $summaryMetadata,
+        MeasureMetadata $measureMetadata,
     ): self {
         return new self(
             queryBuilder: $queryBuilder,
             summaryMetadata: $summaryMetadata,
+            measureMetadata: $measureMetadata,
             calledMeasures: [],
         );
     }
@@ -36,19 +39,20 @@ final readonly class SummaryContext
     private function __construct(
         private SimpleQueryBuilder $queryBuilder,
         private SummaryMetadata $summaryMetadata,
+        private MeasureMetadata $measureMetadata,
         private array $calledMeasures,
     ) {}
 
-    public function getMeasureDQL(string $measure): string
+    public function resolve(string $property): string
     {
-        if (\in_array($measure, $this->calledMeasures, true)) {
+        if (\in_array($property, $this->calledMeasures, true)) {
             throw new UnexpectedValueException(\sprintf(
                 'Loop detected, measure "%s" is already called in this context.',
-                $measure,
+                $property,
             ));
         }
 
-        $measureMetadata = $this->summaryMetadata->getMeasure($measure);
+        $measureMetadata = $this->summaryMetadata->getMeasure($property);
         $function = $measureMetadata->getFirstFunction();
 
         // create summary to summary DQL
@@ -64,7 +68,8 @@ final readonly class SummaryContext
         $context = new SummaryContext(
             queryBuilder: $this->queryBuilder,
             summaryMetadata: $this->summaryMetadata,
-            calledMeasures: [...$this->calledMeasures, $measure],
+            calledMeasures: [...$this->calledMeasures, $property],
+            measureMetadata: $measureMetadata,
         );
 
         // create summary to result DQL
@@ -75,5 +80,10 @@ final readonly class SummaryContext
         );
 
         return $aggregateToResultDQLExpression;
+    }
+
+    public function getMeasureMetadata(): MeasureMetadata
+    {
+        return $this->measureMetadata;
     }
 }
