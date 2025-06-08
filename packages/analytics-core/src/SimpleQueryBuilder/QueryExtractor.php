@@ -157,6 +157,7 @@ final readonly class QueryExtractor
             sql: $this->getSqlStatement(),
             parameters: $this->getParameters(),
             types: $this->types,
+            resultSetMapping: $this->getResultSetMapping(),
         );
     }
 }

@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 final readonly class DecomposedQuery
 {
@@ -27,6 +28,7 @@ final readonly class DecomposedQuery
         private string $sql,
         private array $parameters,
         private array $types,
+        private ResultSetMapping $resultSetMapping,
     ) {}
 
     public function getSql(): string
@@ -66,6 +68,7 @@ final readonly class DecomposedQuery
             sql: $sql . ' ' . $this->sql,
             parameters: $this->parameters,
             types: $this->types,
+            resultSetMapping: $this->resultSetMapping,
         );
     }
 
@@ -75,6 +78,7 @@ final readonly class DecomposedQuery
             sql: $this->sql . ' ' . $sql,
             parameters: $this->parameters,
             types: $this->types,
+            resultSetMapping: $this->resultSetMapping,
         );
     }
 
@@ -84,6 +88,7 @@ final readonly class DecomposedQuery
             sql: $sql,
             parameters: $this->parameters,
             types: $this->types,
+            resultSetMapping: $this->resultSetMapping,
         );
     }
 }
