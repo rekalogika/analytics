@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
@@ -42,7 +42,7 @@ final readonly class CustomDQLValueResolver implements ValueResolver
     }
 
     #[\Override]
-    public function getDQL(Context $context): string
+    public function getDQL(SourceContext $context): string
     {
         $callback = static function (array $matches) use ($context): string {
             $path = $matches[1]
@@ -54,7 +54,7 @@ final readonly class CustomDQLValueResolver implements ValueResolver
 
             $path = trim($path);
 
-            return $context->resolvePath($path);
+            return $context->resolve($path);
         };
 
         $result = preg_replace_callback($this->pattern, $callback, $this->dql);

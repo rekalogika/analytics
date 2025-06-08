@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
@@ -107,7 +107,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $function = $classifier->getDQL(
             input: $valueResolver,
             level: $lowestLevel,
-            context: new Context(
+            context: new SourceContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->summaryMetadata,
                 partitionMetadata: $partitionMetadata,
@@ -201,7 +201,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
                     $function = $hierarchicalDimensionValueResolver->getDQL(
                         input: $valueResolver,
-                        context: new Context(
+                        context: new SourceContext(
                             queryBuilder: $this->getSimpleQueryBuilder(),
                             summaryMetadata: $this->summaryMetadata,
                             dimensionMetadata: $dimensionMetadata,
@@ -223,7 +223,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 // if not hierarchical
 
                 $propertySqlField = $valueResolver->getDQL(
-                    context: new Context(
+                    context: new SourceContext(
                         queryBuilder: $this->getSimpleQueryBuilder(),
                         summaryMetadata: $this->summaryMetadata,
                         dimensionMetadata: $dimensionMetadata,
@@ -258,7 +258,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 ));
 
             $dql = $function->getSourceToAggregateDQLExpression(
-                context: new Context(
+                context: new SourceContext(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
                     measureMetadata: $measureMetadata,
@@ -301,12 +301,12 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
                 "%s >= %s",
-                $this->resolvePath($property),
+                $this->resolve($property),
                 $this->getSimpleQueryBuilder()->createNamedParameter($start),
             ))
             ->andWhere(\sprintf(
                 "%s < %s",
-                $this->resolvePath($property),
+                $this->resolve($property),
                 $this->getSimpleQueryBuilder()->createNamedParameter($end),
             ));
     }

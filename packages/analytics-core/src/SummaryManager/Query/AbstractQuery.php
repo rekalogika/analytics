@@ -26,7 +26,7 @@ abstract class AbstractQuery
         return $this->simpleQueryBuilder;
     }
 
-    protected function resolvePath(string $path): string
+    protected function resolve(string $path): string
     {
         return $this->simpleQueryBuilder->resolve($path);
     }

@@ -22,6 +22,6 @@ interface PartitionKeyClassifier
     public function getDQL(
         PartitionValueResolver $input,
         int $level,
-        Context $context,
+        SourceContext $context,
     ): string;
 }

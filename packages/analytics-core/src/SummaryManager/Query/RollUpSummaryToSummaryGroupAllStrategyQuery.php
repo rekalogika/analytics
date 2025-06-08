@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -82,7 +82,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $function = $classifier->getDQL(
             input: $valueResolver,
             level: $this->start->getLevel(),
-            context: new Context(
+            context: new SourceContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,
                 partitionMetadata: $partitionMetadata,

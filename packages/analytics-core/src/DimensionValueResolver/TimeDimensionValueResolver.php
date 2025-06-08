@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\DimensionValueResolver;
 
-use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
@@ -27,7 +27,7 @@ final readonly class TimeDimensionValueResolver implements HierarchicalDimension
     #[\Override]
     public function getDQL(
         object $input,
-        Context $context,
+        SourceContext $context,
     ): string {
         if (!$input instanceof ValueResolver) {
             throw new InvalidArgumentException(\sprintf(

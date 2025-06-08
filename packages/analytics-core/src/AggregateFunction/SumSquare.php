@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
@@ -34,7 +34,7 @@ final readonly class SumSquare implements AggregateFunction
     }
 
     #[\Override]
-    public function getSourceToAggregateDQLExpression(Context $context): string
+    public function getSourceToAggregateDQLExpression(SourceContext $context): string
     {
         $expression = $this->property->getDQL($context);
 

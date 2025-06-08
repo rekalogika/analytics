@@ -19,7 +19,7 @@ interface AggregateFunction
      * Gets the DQL expression to transform source values into an aggregate.
      */
     public function getSourceToAggregateDQLExpression(
-        Context $context,
+        SourceContext $context,
     ): ?string;
 
     /**
