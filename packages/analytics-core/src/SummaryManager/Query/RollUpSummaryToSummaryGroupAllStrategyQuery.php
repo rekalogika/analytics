@@ -16,13 +16,11 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\Util\PartitionUtil;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
 /**
  * Roll up lower level summary to higher level by grouping by the entire row set
@@ -71,28 +69,14 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     private function processPartition(): void
     {
         $partitionMetadata = $this->metadata->getPartition();
-        $classifier = $partitionMetadata->getKeyClassifier();
 
-        $valueResolver = new PropertyValueResolver(\sprintf(
-            "%s.%s",
-            $partitionMetadata->getSummaryProperty(),
-            $partitionMetadata->getPartitionKeyProperty(),
-        ));
-
-        $function = $classifier->getDQL(
-            input: $valueResolver,
-            level: $this->start->getLevel(),
-            context: new SourceContext(
-                queryBuilder: $this->getSimpleQueryBuilder(),
-                summaryMetadata: $this->metadata,
-                partitionMetadata: $partitionMetadata,
-            ),
-        );
+        $partitionKeyProperty = $this->getSimpleQueryBuilder()
+            ->resolve($partitionMetadata->getFullyQualifiedPartitionKeyProperty());
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 'MIN(%s) AS p_key',
-                $function,
+                $partitionKeyProperty,
             ))
             ->addSelect(\sprintf(
                 '%s AS p_level',

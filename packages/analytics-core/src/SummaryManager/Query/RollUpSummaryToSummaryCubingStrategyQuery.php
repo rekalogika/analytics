@@ -16,13 +16,11 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\Util\PartitionUtil;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -87,28 +85,14 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     private function processPartition(): void
     {
         $partitionMetadata = $this->metadata->getPartition();
-        $classifier = $partitionMetadata->getKeyClassifier();
 
-        $valueResolver = new PropertyValueResolver(\sprintf(
-            "%s.%s",
-            $partitionMetadata->getSummaryProperty(),
-            $partitionMetadata->getPartitionKeyProperty(),
-        ));
-
-        $function = $classifier->getDQL(
-            input: $valueResolver,
-            level: $this->start->getLevel(),
-            context: new SourceContext(
-                queryBuilder: $this->getSimpleQueryBuilder(),
-                summaryMetadata: $this->metadata,
-                partitionMetadata: $partitionMetadata,
-            ),
-        );
+        $partitionKeyProperty = $this->getSimpleQueryBuilder()
+            ->resolve($partitionMetadata->getFullyQualifiedPartitionKeyProperty());
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS p_key',
-                $function,
+                $partitionKeyProperty,
             ))
             ->addSelect(\sprintf(
                 '%s AS p_level',
