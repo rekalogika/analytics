@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\AggregateFunction;
 final readonly class Max extends SimpleAggregateFunction
 {
     #[\Override]
-    public function getDQLAggregateFunction(): string
+    public function getDQLAggregateFunction(string $input): string
     {
-        return 'MAX';
+        return \sprintf('MAX(%s)', $input);
     }
 }

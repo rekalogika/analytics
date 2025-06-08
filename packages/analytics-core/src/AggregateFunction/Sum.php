@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\AggregateFunction;
 final readonly class Sum extends SimpleAggregateFunction
 {
     #[\Override]
-    public function getDQLAggregateFunction(): string
+    public function getDQLAggregateFunction(string $input): string
     {
-        return 'SUM';
+        return \sprintf('SUM(%s)', $input);
     }
 }
