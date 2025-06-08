@@ -50,12 +50,14 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
+        bool $hidden,
         array $properties,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: $label,
+            hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
 
@@ -110,6 +112,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             typeClass: $this->typeClass,
             nullLabel: $this->nullLabel,
             mandatory: $this->mandatory,
+            hidden: $this->isHidden(),
             summaryMetadata: $summaryMetadata,
             properties: $this->properties,
         );

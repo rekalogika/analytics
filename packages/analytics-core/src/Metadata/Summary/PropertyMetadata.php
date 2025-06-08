@@ -22,6 +22,7 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
     protected function __construct(
         private string $summaryProperty,
         private TranslatableInterface $label,
+        private bool $hidden,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
 
@@ -50,5 +51,10 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
     public function getLabel(): TranslatableInterface
     {
         return $this->label;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 }

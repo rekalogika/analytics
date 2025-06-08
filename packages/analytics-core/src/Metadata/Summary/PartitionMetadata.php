@@ -37,6 +37,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
             summaryProperty: $summaryProperty,
             label: new LiteralString('Partition'),
             summaryMetadata: $summaryMetadata,
+            hidden: true,
         );
     }
 

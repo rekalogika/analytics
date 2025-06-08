@@ -33,6 +33,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         private TranslatableInterface $nullLabel,
         private ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
+        bool $hidden,
         private ?DimensionMetadata $dimensionMetadata = null,
     ) {
         try {
@@ -49,6 +50,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         parent::__construct(
             summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
             label: $label,
+            hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -62,6 +64,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
             nullLabel: $this->nullLabel,
             typeClass: $this->typeClass,
             dimensionLevelProperty: $this->dimensionLevelProperty,
+            hidden: $this->isHidden(),
             dimensionMetadata: $dimensionMetadata,
         );
     }

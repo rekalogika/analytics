@@ -39,15 +39,19 @@ final class PivotAwareQuery
 
     private readonly Filters $filterExpressions;
 
+    private readonly PivotAwareMetadataProxy $metadata;
+
     /**
      * @param array<string,mixed> $parameters
      */
     public function __construct(
         private readonly Query $query,
-        private readonly SummaryMetadata $metadata,
+        SummaryMetadata $metadata,
         array $parameters,
         FilterFactory $filterFactory,
     ) {
+        $this->metadata = new PivotAwareMetadataProxy($metadata);
+
         $this->setRows(
             $this->getListOfStringFromArray($parameters['rows'] ?? null),
         );

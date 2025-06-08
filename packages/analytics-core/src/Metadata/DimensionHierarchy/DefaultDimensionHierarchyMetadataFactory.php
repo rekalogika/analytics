@@ -75,6 +75,7 @@ final readonly class DefaultDimensionHierarchyMetadataFactory implements Dimensi
                 valueResolver: $valueResolver,
                 typeClass: $typeClass,
                 nullLabel: $nullLabel,
+                hidden: $dimensionLevelAttribute->isHidden(),
             );
 
             $levels[$level][] = $dimensionPropertyMetadata;

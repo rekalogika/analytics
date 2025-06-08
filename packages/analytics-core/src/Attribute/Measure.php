@@ -26,6 +26,7 @@ final readonly class Measure
         private AggregateFunction $function,
         private null|string|TranslatableInterface $label = null,
         private null|string|TranslatableInterface $unit = null,
+        private bool $hidden = false,
     ) {}
 
     /**
@@ -44,5 +45,10 @@ final readonly class Measure
     public function getUnit(): null|string|TranslatableInterface
     {
         return $this->unit;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 }

@@ -32,6 +32,7 @@ final readonly class Dimension
         private Order|array $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
         private bool $mandatory = false,
+        private bool $hidden = false,
     ) {}
 
     /**
@@ -73,5 +74,10 @@ final readonly class Dimension
     public function isMandatory(): bool
     {
         return $this->mandatory;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 }

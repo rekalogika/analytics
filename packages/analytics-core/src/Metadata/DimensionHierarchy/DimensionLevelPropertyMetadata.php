@@ -28,6 +28,7 @@ final readonly class DimensionLevelPropertyMetadata
         private HierarchicalDimensionValueResolver $valueResolver,
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
+        private bool $hidden,
         private ?DimensionLevelMetadata $levelMetadata = null,
     ) {}
 
@@ -39,6 +40,7 @@ final readonly class DimensionLevelPropertyMetadata
             valueResolver: $this->valueResolver,
             typeClass: $this->typeClass,
             nullLabel: $this->nullLabel,
+            hidden: $this->hidden,
             levelMetadata: $levelMetadata,
         );
     }
@@ -78,5 +80,10 @@ final readonly class DimensionLevelPropertyMetadata
     public function getNullLabel(): TranslatableInterface
     {
         return $this->nullLabel;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 }

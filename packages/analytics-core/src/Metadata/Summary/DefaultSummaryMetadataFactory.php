@@ -310,6 +310,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             typeClass: $typeClass,
             nullLabel: $nullLabel,
             mandatory: $dimensionAttribute->isMandatory(),
+            hidden: $dimensionAttribute->isHidden(),
             properties: $dimensionProperties,
         );
     }
@@ -331,6 +332,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 nullLabel: $dimensionLevelProperty->getNullLabel(),
                 typeClass: $dimensionLevelProperty->getTypeClass(),
                 dimensionLevelProperty: $dimensionLevelProperty,
+                hidden: $dimensionLevelProperty->isHidden(),
             );
 
             $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
@@ -529,6 +531,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             unit: $unit,
             unitSignature: $unitSignature,
             virtual: $virtual,
+            hidden: $measureAttribute->isHidden(),
         );
     }
 
