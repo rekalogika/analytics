@@ -19,6 +19,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Model\Entity\DirtyFlag;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\SummaryManager\Event\RefreshStartEvent;
@@ -64,12 +65,16 @@ final class SummaryRefresher
     }
 
     /**
-     * @param iterable<string> $queries
+     * @param iterable<string|DecomposedQuery> $queries
      */
     private function executeQueries(iterable $queries): void
     {
         foreach ($queries as $query) {
-            $this->getConnection()->executeStatement($query);
+            if (\is_string($query)) {
+                $this->getConnection()->executeStatement($query);
+            } else {
+                $query->execute($this->getConnection());
+            }
         }
     }
 

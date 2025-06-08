@@ -21,6 +21,8 @@ use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryExtractor;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
@@ -62,9 +64,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     }
 
     /**
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
-    public function getSQL(): iterable
+    public function getQuery(): iterable
     {
         $this->initialize();
         $this->processPartition();
@@ -74,7 +76,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $this->processGroupings();
         $this->processQueryBuilderModifier();
 
-        return $this->createSqlStatement();
+        yield $this->createSqlStatement();
     }
 
     private function initialize(): void
@@ -330,19 +332,13 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         ));
     }
 
-    /**
-     * @return iterable<string>
-     */
-    private function createSqlStatement(): iterable
+    private function createSqlStatement(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
         $this->groupBy->apply($query);
-        $result = $query->getSQL();
 
-        if (\is_array($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        $extractor = new QueryExtractor($query);
+
+        return $extractor->createQuery();
     }
 }

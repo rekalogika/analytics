@@ -229,7 +229,9 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {
-        $queryBuilder->andWhere('root.id > 10');
+        $queryBuilder
+            ->andWhere('root.id > :minId')
+            ->setParameter('minId', 10);
     }
 
     //

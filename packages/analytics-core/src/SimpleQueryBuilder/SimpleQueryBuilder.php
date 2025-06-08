@@ -103,6 +103,11 @@ final class SimpleQueryBuilder
         return $this->queryBuilder;
     }
 
+    public function getQueryComponents(): QueryExtractor
+    {
+        return new QueryExtractor($this->queryBuilder->getQuery());
+    }
+
     public function from(): self
     {
         throw new BadMethodCallException('The "from" method is not supported in SimpleQueryBuilder.');
