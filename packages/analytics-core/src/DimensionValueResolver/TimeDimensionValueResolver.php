@@ -13,33 +13,47 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\DimensionValueResolver;
 
-use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-final readonly class TimeDimensionValueResolver implements HierarchicalDimensionValueResolver
+final readonly class TimeDimensionValueResolver implements HierarchyAwareValueResolver
 {
     public function __construct(
         private TimeFormat $format,
+        private ?ValueResolver $input = null,
     ) {}
 
     #[\Override]
+    public function withInput(ValueResolver $input): static
+    {
+        return new static(
+            format: $this->format,
+            input: $input,
+        );
+    }
+
+    #[\Override]
+    public function getInvolvedProperties(): array
+    {
+        return $this->input?->getInvolvedProperties() ?? [];
+    }
+
+    #[\Override]
     public function getDQL(
-        object $input,
         SourceContext $context,
     ): string {
-        if (!$input instanceof ValueResolver) {
+        if (!$this->input instanceof ValueResolver) {
             throw new InvalidArgumentException(\sprintf(
-                'Expected instance of "%s", got "%s"',
-                ValueResolver::class,
-                get_debug_type($input),
+                'TimeDimensionValueResolver requires an input ValueResolver, but got %s',
+                get_debug_type($this->input),
             ));
         }
 
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
-            $input->getDQL($context),
+            $this->input->getDQL($context),
             $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
             $this->format->value,

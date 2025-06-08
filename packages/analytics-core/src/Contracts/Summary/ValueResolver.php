@@ -26,6 +26,9 @@ interface ValueResolver
      * Used by Analytics to determine if a change in the source entity requires
      * a recalculation of the summary.
      *
+     * If the value resolver takes another value resolver as input, it should
+     * return the involved properties of the input value resolver.
+     *
      * @return list<string>
      */
     public function getInvolvedProperties(): array;

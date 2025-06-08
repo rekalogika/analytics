@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
-use Rekalogika\Analytics\Contracts\Summary\HierarchicalDimensionValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -25,7 +25,7 @@ final readonly class DimensionLevelPropertyMetadata
     public function __construct(
         private string $name,
         private TranslatableInterface $label,
-        private HierarchicalDimensionValueResolver $valueResolver,
+        private HierarchyAwareValueResolver $valueResolver,
         private ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $hidden,
@@ -64,7 +64,7 @@ final readonly class DimensionLevelPropertyMetadata
         return $this->levelMetadata;
     }
 
-    public function getValueResolver(): HierarchicalDimensionValueResolver
+    public function getValueResolver(): HierarchyAwareValueResolver
     {
         return $this->valueResolver;
     }

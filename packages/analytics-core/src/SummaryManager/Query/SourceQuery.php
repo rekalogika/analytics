@@ -141,15 +141,16 @@ final class SourceQuery extends AbstractQuery
 
         $hierarchicalDimensionValueResolver = $dimensionProperty->getValueResolver();
 
-        $dql = $hierarchicalDimensionValueResolver->getDQL(
-            input: $valueResolver,
-            context: new SourceContext(
-                queryBuilder: $this->getSimpleQueryBuilder(),
-                summaryMetadata: $this->summaryMetadata,
-                dimensionMetadata: $dimension,
-                dimensionPropertyMetadata: $dimensionProperty->getDimensionLevelProperty(),
-            ),
-        );
+        $dql = $hierarchicalDimensionValueResolver
+            ->withInput($valueResolver)
+            ->getDQL(
+                context: new SourceContext(
+                    queryBuilder: $this->getSimpleQueryBuilder(),
+                    summaryMetadata: $this->summaryMetadata,
+                    dimensionMetadata: $dimension,
+                    dimensionPropertyMetadata: $dimensionProperty->getDimensionLevelProperty(),
+                ),
+            );
 
         // add to query
 
