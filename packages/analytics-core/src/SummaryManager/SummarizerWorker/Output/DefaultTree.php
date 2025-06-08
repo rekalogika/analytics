@@ -46,7 +46,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         foreach ($children as $child) {
             if ($child->getName() !== $childrenKey) {
                 throw new UnexpectedValueException(
-                    \sprintf('Invalid child key "%s", expected "%s"', $child->getName(), get_debug_type($childrenKey)),
+                    \sprintf('Invalid child key "%s", expected "%s"', $child->getName(), (string) $childrenKey),
                 );
             }
         }
