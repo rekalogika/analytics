@@ -11,11 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine;
+namespace Rekalogika\Analytics\SimpleQueryBuilder;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\Query as DoctrineQuery;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -35,11 +35,16 @@ final readonly class QueryExtractor
     private ResultSetMapping $resultSetMapping;
 
     /**
-     * @var array<int,array{mixed,int|string|ParameterType|ArrayParameterType}>
+     * @var array<int<0,max>,mixed>
      */
     private array $parameters;
 
-    public function __construct(Query $query)
+    /**
+     * @var array<int<0,max>,int|string|ParameterType|ArrayParameterType>
+     */
+    private array $types;
+
+    public function __construct(DoctrineQuery $query)
     {
         $parser = new Parser($query);
         $parserResult = $parser->parse();
@@ -91,7 +96,21 @@ final readonly class QueryExtractor
 
         ksort($bindValues);
 
-        $this->parameters = $bindValues;
+        $parameters = [];
+        $types = [];
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($bindValues as $position => [$value, $type]) {
+            if ($position < 0) {
+                throw new LogicException('Parameter position must be non-negative');
+            }
+
+            $parameters[$position] = $value;
+            $types[$position] = $type;
+        }
+
+        $this->parameters = $parameters;
+        $this->types = $types;
     }
 
     /**
@@ -117,10 +136,28 @@ final readonly class QueryExtractor
     }
 
     /**
-     * @return array<int,array{mixed,int|string|ParameterType|ArrayParameterType}>
+     * @return array<int<0,max>,mixed>
      */
     public function getParameters(): array
     {
         return $this->parameters;
+    }
+
+    /**
+     * @return array<int<0,max>,int|string|ParameterType|ArrayParameterType>
+     */
+    public function getTypes(): array
+    {
+        return $this->types;
+    }
+
+    public function createQuery(): DecomposedQuery
+    {
+        return new DecomposedQuery(
+            sql: $this->getSqlStatement(),
+            parameters: $this->getParameters(),
+            types: $this->types,
+            resultSetMapping: $this->getResultSetMapping(),
+        );
     }
 }

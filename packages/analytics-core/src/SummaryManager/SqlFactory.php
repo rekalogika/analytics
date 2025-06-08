@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\SummaryManager\Query\InsertIntoSummaryQuery;
@@ -87,7 +88,7 @@ final class SqlFactory
 
     /**
      * @param class-string $sourceClass
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
     private function createSelectForRollingUpSingleSourceToSummaryQuery(
         string $sourceClass,
@@ -103,12 +104,12 @@ final class SqlFactory
             end: $end,
         );
 
-        yield from $query->getSQL();
+        yield from $query->getQuery();
     }
 
     /**
      * @param class-string $sourceClass
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
     private function createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
         string $sourceClass,
@@ -124,12 +125,12 @@ final class SqlFactory
         $insertInto = $this->createInsertIntoSummaryQuery();
 
         foreach ($selects as $select) {
-            yield $insertInto . ' ' . $select;
+            yield $select->prependSql($insertInto);
         }
     }
 
     /**
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
     public function createInsertIntoSelectForRollingUpSourceToSummaryQuery(
         Partition $start,

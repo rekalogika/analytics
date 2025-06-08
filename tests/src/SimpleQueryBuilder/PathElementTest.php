@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Tests\UnitTests\Path;
+namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathElement;
