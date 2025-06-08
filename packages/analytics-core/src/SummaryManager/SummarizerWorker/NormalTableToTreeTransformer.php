@@ -37,9 +37,11 @@ final class NormalTableToTreeTransformer
     private array $tree = [];
 
     /**
+     * @param class-string $summaryClass
      * @param list<string> $names
      */
     public function __construct(
+        private readonly string $summaryClass,
         private readonly array $names,
         private readonly Items $uniqueDimensions,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
@@ -74,6 +76,7 @@ final class NormalTableToTreeTransformer
         // instantiate and process
 
         $transformer = new self(
+            summaryClass: $summaryClass,
             names: $names,
             uniqueDimensions: $normalTable->getUniqueDimensions(),
             treeNodeFactory: $treeNodeFactory,
