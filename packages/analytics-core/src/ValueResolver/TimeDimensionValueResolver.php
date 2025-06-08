@@ -17,7 +17,6 @@ use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
 final readonly class TimeDimensionValueResolver implements HierarchyAwareValueResolver
 {
