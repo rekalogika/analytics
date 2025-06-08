@@ -33,11 +33,13 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
         private bool $virtual,
+        bool $hidden,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: $label,
+            hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
 
@@ -69,6 +71,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             unit: $this->unit,
             unitSignature: $this->unitSignature,
             virtual: $this->virtual,
+            hidden: $this->isHidden(),
             summaryMetadata: $summaryMetadata,
         );
     }

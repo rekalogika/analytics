@@ -24,6 +24,7 @@ final readonly class LevelProperty
         private HierarchicalDimensionValueResolver $valueResolver,
         private null|string|TranslatableInterface $label = null,
         private null|string|TranslatableInterface $nullLabel = null,
+        private bool $hidden = false,
     ) {}
 
     public function getLevel(): int
@@ -44,5 +45,10 @@ final readonly class LevelProperty
     public function getNullLabel(): null|string|TranslatableInterface
     {
         return $this->nullLabel;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->hidden;
     }
 }

@@ -165,6 +165,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Measure(
         function: new SumSquare('item.price'),
         label: new TranslatableMessage('Price Sum Square'),
+        hidden: true,
     )]
     private ?float $priceSumSquare = null;
 
