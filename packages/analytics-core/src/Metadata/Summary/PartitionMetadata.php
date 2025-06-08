@@ -84,4 +84,14 @@ final readonly class PartitionMetadata extends PropertyMetadata
     {
         return $this->partitionKeyClassifier;
     }
+
+    public function getFullyQualifiedPartitionKeyProperty(): string
+    {
+        return $this->getSummaryProperty() . '.' . $this->partitionKeyProperty;
+    }
+
+    public function getFullyQualifiedPartitionLevelProperty(): string
+    {
+        return $this->getSummaryProperty() . '.' . $this->partitionLevelProperty;
+    }
 }

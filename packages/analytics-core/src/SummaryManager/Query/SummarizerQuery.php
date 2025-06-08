@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\Context;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
@@ -196,31 +195,18 @@ final class SummarizerQuery extends AbstractQuery
      */
     private function getRangeConditions(Partition $partition): iterable
     {
-        $summaryProperty = $this->metadata
-            ->getPartition()
-            ->getSummaryProperty();
-
         $partitionLevelProperty = $this->metadata
             ->getPartition()
-            ->getPartitionLevelProperty();
+            ->getFullyQualifiedPartitionLevelProperty();
 
         $partitionKeyProperty = $this->metadata
             ->getPartition()
-            ->getPartitionKeyProperty();
+            ->getFullyQualifiedPartitionKeyProperty();
 
         $higherPartition = $partition->getContaining();
 
-        $levelProperty = \sprintf(
-            'root.%s.%s',
-            $summaryProperty,
-            $partitionLevelProperty,
-        );
-
-        $keyProperty = \sprintf(
-            'root.%s.%s',
-            $summaryProperty,
-            $partitionKeyProperty,
-        );
+        $levelProperty = $this->resolvePath($partitionLevelProperty);
+        $keyProperty = $this->resolvePath($partitionKeyProperty);
 
         if ($higherPartition === null) {
             // if the partition is at the top level, return all top partitions
@@ -317,9 +303,10 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                "root.%s = '%s'",
-                $groupingsProperty,
-                $groupingsString,
+                "%s = %s",
+                $this->resolvePath($groupingsProperty),
+                $this->getSimpleQueryBuilder()
+                    ->createNamedParameter($groupingsString),
             ))
         ;
     }
@@ -460,9 +447,8 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
-                "root.%s.%s AS %s",
-                $dimensionProperty,
-                $hierarchyProperty,
+                "%s AS %s",
+                $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
                 $alias,
             ))
         ;
@@ -476,11 +462,7 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         $this->getSimpleQueryBuilder()->addOrderBy(
-            \sprintf(
-                'root.%s.%s',
-                $dimensionProperty,
-                $hierarchyProperty,
-            ),
+            $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
             $orderBy->value,
         );
 
@@ -488,11 +470,8 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->rollUpFields[] = $alias;
 
-        $this->groupingFields[] = \sprintf(
-            'root.%s.%s',
-            $dimensionProperty,
-            $hierarchyProperty,
-        );
+        $this->groupingFields[] =
+            $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty));
     }
 
     private function addMeasuresToQueryBuilder(): void
@@ -500,29 +479,6 @@ final class SummarizerQuery extends AbstractQuery
         $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $name => $measureMetadata) {
-            // $function = $measureMetadata->getFirstFunction();
-
-            // // get summary to summary DQL
-
-            // $summaryToSummaryDQLFunction = $function->getSummaryToSummaryDQLFunction();
-
-            // if ($summaryToSummaryDQLFunction === null) {
-            //     $summaryToSummaryDQL = null;
-            // } else {
-            //     $summaryToSummaryDQL = \sprintf(
-            //         $summaryToSummaryDQLFunction,
-            //         'root.' . $measureMetadata->getSummaryProperty(),
-            //     );
-            // }
-
-            // // create context
-
-
-            // $summaryReaderDQL = \sprintf(
-            //     $function->getSummaryReaderDQLFunction(),
-            //     $summaryToSummaryDQL,
-            // );
-
             $summaryContext = SummaryContext::create(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,
@@ -628,24 +584,20 @@ final class SummarizerQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
-                'root.%s AS %s',
-                $dimensionMetadata->getSummaryProperty(),
+                '%s AS %s',
+                $this->resolvePath($dimensionMetadata->getSummaryProperty()),
                 $dimension,
             ))
             ->addOrderBy(
-                \sprintf(
-                    'root.%s',
-                    $dimensionMetadata->getSummaryProperty(),
-                ),
+                $this->resolvePath($dimensionMetadata->getSummaryProperty()),
                 $orderBy->value,
             )
         ;
 
         $this->rollUpFields[] = $dimension;
-        $this->groupingFields[] = \sprintf(
-            'root.%s',
-            $dimensionMetadata->getSummaryProperty(),
-        );
+
+        $this->groupingFields[] =
+            $this->resolvePath($dimensionMetadata->getSummaryProperty());
     }
 
     private function addUserSuppliedOrderBy(): void
