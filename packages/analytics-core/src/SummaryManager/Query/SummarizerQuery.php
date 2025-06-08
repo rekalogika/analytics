@@ -205,8 +205,8 @@ final class SummarizerQuery extends AbstractQuery
 
         $higherPartition = $partition->getContaining();
 
-        $levelProperty = $this->resolvePath($partitionLevelProperty);
-        $keyProperty = $this->resolvePath($partitionKeyProperty);
+        $levelProperty = $this->resolve($partitionLevelProperty);
+        $keyProperty = $this->resolve($partitionKeyProperty);
 
         if ($higherPartition === null) {
             // if the partition is at the top level, return all top partitions
@@ -304,7 +304,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
                 "%s = %s",
-                $this->resolvePath($groupingsProperty),
+                $this->resolve($groupingsProperty),
                 $this->getSimpleQueryBuilder()
                     ->createNamedParameter($groupingsString),
             ))
@@ -448,7 +448,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 "%s AS %s",
-                $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
+                $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
                 $alias,
             ))
         ;
@@ -462,7 +462,7 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         $this->getSimpleQueryBuilder()->addOrderBy(
-            $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
+            $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
             $orderBy->value,
         );
 
@@ -471,7 +471,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->rollUpFields[] = $alias;
 
         $this->groupingFields[] =
-            $this->resolvePath(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty));
+            $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty));
     }
 
     private function addMeasuresToQueryBuilder(): void
@@ -525,7 +525,7 @@ final class SummarizerQuery extends AbstractQuery
 
             $identity = $joinedClassMetadata->getIdentifierFieldName();
 
-            $dqlField = $this->resolvePath(\sprintf(
+            $dqlField = $this->resolve(\sprintf(
                 '%s.%s',
                 $dimension,
                 $identity,
@@ -548,7 +548,7 @@ final class SummarizerQuery extends AbstractQuery
                 $this->getSimpleQueryBuilder()->addOrderBy($dqlField, $orderBy->value);
             } else {
                 foreach ($orderBy as $orderField => $order) {
-                    $dqlOrderField = $this->resolvePath(\sprintf(
+                    $dqlOrderField = $this->resolve(\sprintf(
                         '%s.%s',
                         $dimension,
                         $orderField,
@@ -585,11 +585,11 @@ final class SummarizerQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS %s',
-                $this->resolvePath($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getSummaryProperty()),
                 $dimension,
             ))
             ->addOrderBy(
-                $this->resolvePath($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getSummaryProperty()),
                 $orderBy->value,
             )
         ;
@@ -597,7 +597,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->rollUpFields[] = $dimension;
 
         $this->groupingFields[] =
-            $this->resolvePath($dimensionMetadata->getSummaryProperty());
+            $this->resolve($dimensionMetadata->getSummaryProperty());
     }
 
     private function addUserSuppliedOrderBy(): void
@@ -619,7 +619,7 @@ final class SummarizerQuery extends AbstractQuery
 
                 $fieldString = $summaryContext->getMeasureDQL($field);
             } else {
-                $fieldString = $this->resolvePath($field);
+                $fieldString = $this->resolve($field);
             }
 
             if ($i === 0) {

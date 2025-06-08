@@ -26,7 +26,7 @@ use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final readonly class Context
+final readonly class SourceContext
 {
     public function __construct(
         private SimpleQueryBuilder $queryBuilder,
@@ -43,7 +43,7 @@ final readonly class Context
      * necessary tables. If the path resolves to a related entity, you can
      * prefix the path with * to force a join, and return the alias.
      */
-    public function resolvePath(string $path): string
+    public function resolve(string $path): string
     {
         return $this->queryBuilder->resolve($path);
     }

@@ -19,7 +19,7 @@ interface ValueResolver
      * Returns a DQL expression to transform the source value to the value
      * expected in the summary table.
      */
-    public function getDQL(Context $context): string;
+    public function getDQL(SourceContext $context): string;
 
     /**
      * The properties of the source entity that are involved in the calculation.

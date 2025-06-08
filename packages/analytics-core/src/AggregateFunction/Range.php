@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\Context;
+use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 
 final readonly class Range implements AggregateFunction
@@ -25,7 +25,7 @@ final readonly class Range implements AggregateFunction
     ) {}
 
     #[\Override]
-    public function getSourceToAggregateDQLExpression(Context $context): null
+    public function getSourceToAggregateDQLExpression(SourceContext $context): null
     {
         return null;
     }

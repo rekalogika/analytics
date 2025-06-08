@@ -27,6 +27,6 @@ interface HierarchicalDimensionValueResolver
      */
     public function getDQL(
         object $input,
-        Context $context,
+        SourceContext $context,
     ): string;
 }
