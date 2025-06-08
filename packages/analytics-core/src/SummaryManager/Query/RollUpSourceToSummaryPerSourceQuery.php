@@ -197,17 +197,18 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                             $name,
                         ));
 
-                    $hierarchicalDimensionValueResolver = $dimensionPropertyMetadata->getValueResolver();
+                    $hierarchyAwareValueResolver = $dimensionPropertyMetadata->getValueResolver();
 
-                    $function = $hierarchicalDimensionValueResolver->getDQL(
-                        input: $valueResolver,
-                        context: new SourceContext(
-                            queryBuilder: $this->getSimpleQueryBuilder(),
-                            summaryMetadata: $this->summaryMetadata,
-                            dimensionMetadata: $dimensionMetadata,
-                            dimensionPropertyMetadata: $dimensionPropertyMetadata,
-                        ),
-                    );
+                    $function = $hierarchyAwareValueResolver
+                        ->withInput($valueResolver)
+                        ->getDQL(
+                            context: new SourceContext(
+                                queryBuilder: $this->getSimpleQueryBuilder(),
+                                summaryMetadata: $this->summaryMetadata,
+                                dimensionMetadata: $dimensionMetadata,
+                                dimensionPropertyMetadata: $dimensionPropertyMetadata,
+                            ),
+                        );
 
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
