@@ -37,7 +37,7 @@ use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Rekalogika\Analytics\Util\TranslatableUtil;
-use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
+use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
@@ -262,7 +262,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $isField = $sourceClassMetadata->isPropertyField($curProperty);
 
             if ($isEntity) {
-                $newSourceProperty[$sourceClass] = new EntityValueResolver($curProperty);
+                $newSourceProperty[$sourceClass] = new IdentifierValueResolver($curProperty);
             } elseif ($isField) {
                 $newSourceProperty[$sourceClass] = new PropertyValueResolver($curProperty);
             } else {

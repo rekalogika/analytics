@@ -33,7 +33,7 @@ use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\ValueResolver\CustomDQLValueResolver;
-use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
+use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -69,7 +69,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('customer.country'),
+        source: new IdentifierValueResolver('customer.country'),
         label: new TranslatableMessage('Customer country'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -78,7 +78,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('customer.country.region'),
+        source: new IdentifierValueResolver('customer.country.region'),
         label: new TranslatableMessage('Customer Region'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -119,7 +119,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('item.category'),
+        source: new IdentifierValueResolver('item.category'),
         label: new TranslatableMessage('Item Category'),
     )]
     private ?Category $itemCategory = null;
@@ -127,7 +127,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('item.countryOfOrigin'),
+        source: new IdentifierValueResolver('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -189,7 +189,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(type: 'rekalogika_hll')]
     #[Analytics\Measure(
-        function: new CountDistinct(new EntityValueResolver('customer')),
+        function: new CountDistinct(new IdentifierValueResolver('customer')),
         label: new TranslatableMessage('Unique customers'),
     )]
     private ?int $uniqueCustomers = null;

@@ -19,7 +19,7 @@ use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\ValueResolver\EntityValueResolver;
+use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
 use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -54,7 +54,7 @@ class CustomerSummary extends Summary
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new EntityValueResolver('country.region'),
+        source: new IdentifierValueResolver('country.region'),
         label: new TranslatableMessage('Region'),
     )]
     private ?Region $region = null;
