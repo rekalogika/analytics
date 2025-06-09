@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\HourOfDay;
 use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait HourTrait
@@ -30,7 +30,7 @@ trait HourTrait
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour'),
-        valueResolver: new TimeDimensionValueResolver(TimeFormat::Hour),
+        valueResolver: new TimeBin(TimeFormat::Hour),
     )]
     private ?Hour $hour = null;
 
@@ -38,7 +38,7 @@ trait HourTrait
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour of Day'),
-        valueResolver: new TimeDimensionValueResolver(TimeFormat::HourOfDay),
+        valueResolver: new TimeBin(TimeFormat::HourOfDay),
     )]
     private ?HourOfDay $hourOfDay = null;
 

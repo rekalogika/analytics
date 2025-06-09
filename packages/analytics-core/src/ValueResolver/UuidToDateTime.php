@@ -16,13 +16,10 @@ namespace Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Util\UuidV7Util;
+use Symfony\Component\Uid\UuidV7;
 
-/**
- * Truncate the source value in UUID format to 48-bit integer.
- */
-final readonly class UuidToTruncatedIntegerResolver implements PartitionValueResolver
+final readonly class UuidToDateTime implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -38,49 +35,36 @@ final readonly class UuidToTruncatedIntegerResolver implements PartitionValueRes
     public function getDQL(SourceContext $context): string
     {
         return \sprintf(
-            'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT(%s)',
+            'REKALOGIKA_UUID_TO_DATETIME(%s)',
             $context->resolve($this->property),
         );
     }
 
-    /**
-     * transform from source value to summary value (uuid to integer)
-     */
+    #[\Override]
+    public function transformSummaryValueToSourceValue(mixed $value): string
+    {
+        if (!$value instanceof \DateTimeInterface) {
+            throw new InvalidArgumentException(\sprintf(
+                'Value must be an instance of DateTimeInterface, "%s" given.',
+                get_debug_type($value),
+            ));
+        }
+
+        return UuidV7Util::getNilOfDateTime($value);
+    }
+
     #[\Override]
     public function transformSourceValueToSummaryValue(mixed $value): mixed
     {
         if (!\is_string($value)) {
             throw new InvalidArgumentException(\sprintf(
-                'Value must be a string, got "%s".',
+                'Value must be a string, "%s" given.',
                 get_debug_type($value),
             ));
         }
 
-        $value = str_replace('-', '', $value);
-        $value = hexdec(substr($value, 0, 12)); // first 48 bits
+        $uuid = new UuidV7($value);
 
-        if (\is_float($value)) {
-            throw new LogicException('Cannot convert UUID to integer. Make sure you are using a 64-bit system.');
-        }
-
-        return $value;
-    }
-
-    /**
-     * Transform from summary value to source value (integer to uuid)
-     */
-    #[\Override]
-    public function transformSummaryValueToSourceValue(mixed $value): string
-    {
-        if (!\is_int($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be an integer, got "%s".',
-                get_debug_type($value),
-            ));
-        }
-
-        $value <<= 16;
-
-        return UuidV7Util::getNilOfInteger($value);
+        return $uuid->getDateTime();
     }
 }

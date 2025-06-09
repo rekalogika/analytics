@@ -37,8 +37,8 @@ use Rekalogika\Analytics\Util\AttributeUtil;
 use Rekalogika\Analytics\Util\LiteralString;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Rekalogika\Analytics\Util\TranslatableUtil;
-use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
+use Rekalogika\Analytics\ValueResolver\IdentifierValue;
+use Rekalogika\Analytics\ValueResolver\PropertyValue;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
@@ -262,12 +262,12 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $isField = $sourceClassMetadata->isPropertyField($curProperty);
 
             if ($isEntity) {
-                $newSourceProperty[$sourceClass] = new IdentifierValueResolver($curProperty);
+                $newSourceProperty[$sourceClass] = new IdentifierValue($curProperty);
             } elseif ($isField) {
-                $newSourceProperty[$sourceClass] = new PropertyValueResolver($curProperty);
+                $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
             } else {
                 // @todo ensure validity
-                $newSourceProperty[$sourceClass] = new PropertyValueResolver($curProperty);
+                $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
             }
         }
 
@@ -393,7 +393,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 throw new MetadataException('Partition property must be field');
             }
 
-            $newSourceProperty[$sourceClass] = new PropertyValueResolver($curProperty);
+            $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
         }
 
         $sourceProperty = $newSourceProperty;

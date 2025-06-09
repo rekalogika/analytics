@@ -32,9 +32,9 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\ValueResolver\CustomDQLValueResolver;
-use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
+use Rekalogika\Analytics\ValueResolver\CustomDQL;
+use Rekalogika\Analytics\ValueResolver\IdentifierValue;
+use Rekalogika\Analytics\ValueResolver\PropertyValue;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]
@@ -49,7 +49,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     //
 
     #[ORM\Embedded()]
-    #[Analytics\Partition(new PropertyValueResolver('id'))]
+    #[Analytics\Partition(new PropertyValue('id'))]
     private TestIntegerPartition $partition;
 
     //
@@ -58,7 +58,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Embedded()]
     #[Analytics\Dimension(
-        source: new PropertyValueResolver('time'),
+        source: new PropertyValue('time'),
         label: new TranslatableMessage('Placed Time'),
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -69,7 +69,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new IdentifierValueResolver('customer.country'),
+        source: new IdentifierValue('customer.country'),
         label: new TranslatableMessage('Customer country'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -78,7 +78,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new IdentifierValueResolver('customer.country.region'),
+        source: new IdentifierValue('customer.country.region'),
         label: new TranslatableMessage('Customer Region'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -86,7 +86,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(enumType: CustomerType::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQLValueResolver("
+        source: new CustomDQL("
             CASE
                 WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN 'individual'
@@ -103,7 +103,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(enumType: Gender::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQLValueResolver("
+        source: new CustomDQL("
             CASE
                 WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN [customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender]
@@ -119,7 +119,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new IdentifierValueResolver('item.category'),
+        source: new IdentifierValue('item.category'),
         label: new TranslatableMessage('Item Category'),
     )]
     private ?Category $itemCategory = null;
@@ -127,7 +127,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new IdentifierValueResolver('item.countryOfOrigin'),
+        source: new IdentifierValue('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
         orderBy: ['name' => DoctrineOrder::Ascending],
     )]
@@ -189,7 +189,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(type: 'rekalogika_hll')]
     #[Analytics\Measure(
-        function: new CountDistinct(new IdentifierValueResolver('customer')),
+        function: new CountDistinct(new IdentifierValue('customer')),
         label: new TranslatableMessage('Unique customers'),
     )]
     private ?int $uniqueCustomers = null;

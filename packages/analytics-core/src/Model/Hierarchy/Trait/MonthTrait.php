@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
 use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait MonthTrait
@@ -30,7 +30,7 @@ trait MonthTrait
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month'),
-        valueResolver: new TimeDimensionValueResolver(TimeFormat::Month),
+        valueResolver: new TimeBin(TimeFormat::Month),
     )]
     private ?Month $month = null;
 
@@ -38,7 +38,7 @@ trait MonthTrait
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month of Year'),
-        valueResolver: new TimeDimensionValueResolver(TimeFormat::MonthOfYear),
+        valueResolver: new TimeBin(TimeFormat::MonthOfYear),
     )]
     private ?MonthOfYear $monthOfYear = null;
 

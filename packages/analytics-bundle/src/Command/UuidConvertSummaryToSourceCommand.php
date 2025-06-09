@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
+use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -53,7 +53,7 @@ final class UuidConvertSummaryToSourceCommand extends Command
 
         $integerKey = (int) $integerKey;
 
-        $resolver = new UuidToTruncatedIntegerResolver('foo');
+        $resolver = new UuidToTruncatedInteger('foo');
         $uuid = $resolver->transformSummaryValueToSourceValue($integerKey);
 
         $output->writeln($uuid);

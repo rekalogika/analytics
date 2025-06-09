@@ -24,8 +24,8 @@ use Rekalogika\Analytics\Model\TimeInterval\Date;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfWeek;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
-use Rekalogika\Analytics\ValueResolver\DateToIntegerResolver;
-use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\DateToInteger;
+use Rekalogika\Analytics\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\TimeFormat;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -41,7 +41,7 @@ class OccupancyHistorySummary extends Summary
     //
 
     #[ORM\Embedded()]
-    #[Analytics\Partition(new DateToIntegerResolver('date'))]
+    #[Analytics\Partition(new DateToInteger('date'))]
     private SingleLevelIntegerPartition $partition;
 
     //
@@ -50,7 +50,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeDimensionValueResolver(
+        source: new TimeBin(
             input: 'date',
             format: TimeFormat::Date,
         ),
@@ -63,7 +63,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeDimensionValueResolver(
+        source: new TimeBin(
             input: 'date',
             format: TimeFormat::DayOfWeek,
         ),
@@ -75,7 +75,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeDimensionValueResolver(
+        source: new TimeBin(
             input: 'date',
             format: TimeFormat::DayOfMonth,
         ),
@@ -87,7 +87,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeDimensionValueResolver(
+        source: new TimeBin(
             input: 'date',
             format: TimeFormat::DayOfYear,
         ),

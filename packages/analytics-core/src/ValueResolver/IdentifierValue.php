@@ -16,8 +16,7 @@ namespace Rekalogika\Analytics\ValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-final readonly class IdentifierValueResolver implements
-    ValueResolver
+final readonly class IdentifierValue implements ValueResolver
 {
     public function __construct(
         private string $property,

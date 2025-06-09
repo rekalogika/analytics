@@ -19,8 +19,8 @@ use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\ValueResolver\IdentifierValueResolver;
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
+use Rekalogika\Analytics\ValueResolver\IdentifierValue;
+use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]
@@ -35,7 +35,7 @@ class CustomerSummary extends Summary
     //
 
     #[ORM\Embedded()]
-    #[Analytics\Partition(new UuidToTruncatedIntegerResolver('id'))]
+    #[Analytics\Partition(new UuidToTruncatedInteger('id'))]
     private UuidV7IntegerPartition $partition;
 
     //
@@ -54,7 +54,7 @@ class CustomerSummary extends Summary
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
     #[Analytics\Dimension(
-        source: new IdentifierValueResolver('country.region'),
+        source: new IdentifierValue('country.region'),
         label: new TranslatableMessage('Region'),
     )]
     private ?Region $region = null;

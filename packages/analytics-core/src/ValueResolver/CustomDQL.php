@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-final readonly class CustomDQLValueResolver implements ValueResolver
+final readonly class CustomDQL implements ValueResolver
 {
     /**
      * @param non-empty-string $pattern
