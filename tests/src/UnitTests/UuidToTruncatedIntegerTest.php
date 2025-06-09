@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedIntegerResolver;
+use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
 
 final class UuidToTruncatedIntegerTest extends TestCase
 {
     public function testTransform(): void
     {
-        $resolver = new UuidToTruncatedIntegerResolver('foo');
+        $resolver = new UuidToTruncatedInteger('foo');
         $uuid = '01943d05-942a-7e95-a9a1-bed59b37c877';
 
         /** @var mixed */
@@ -33,7 +33,7 @@ final class UuidToTruncatedIntegerTest extends TestCase
 
     public function testTransform2(): void
     {
-        $resolver = new UuidToTruncatedIntegerResolver('foo');
+        $resolver = new UuidToTruncatedInteger('foo');
         $uuid = '01963250-b507-74c8-8f78-f6bac13088ec';
 
         /** @var mixed */

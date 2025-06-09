@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\ValueResolver\PropertyValueResolver;
+use Rekalogika\Analytics\ValueResolver\PropertyValue;
 
 final readonly class SumSquare implements AggregateFunction
 {
@@ -27,7 +27,7 @@ final readonly class SumSquare implements AggregateFunction
         string|ValueResolver $property,
     ) {
         if (\is_string($property)) {
-            $property = new PropertyValueResolver($property);
+            $property = new PropertyValue($property);
         }
 
         $this->property = $property;

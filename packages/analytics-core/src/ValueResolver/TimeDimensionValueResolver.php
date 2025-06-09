@@ -27,7 +27,7 @@ final readonly class TimeDimensionValueResolver implements HierarchyAwareValueRe
         null|string|ValueResolver $input = null,
     ) {
         if (\is_string($input)) {
-            $input = new PropertyValueResolver($input);
+            $input = new PropertyValue($input);
         }
 
         $this->input = $input;

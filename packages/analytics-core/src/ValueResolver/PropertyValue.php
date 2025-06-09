@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-final readonly class PropertyValueResolver implements PartitionValueResolver
+final readonly class PropertyValue implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
