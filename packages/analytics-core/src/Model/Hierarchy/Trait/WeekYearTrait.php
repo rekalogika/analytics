@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
 use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
 use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\ValueResolver\TimeDimensionValueResolver;
+use Rekalogika\Analytics\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait WeekYearTrait
@@ -28,7 +28,7 @@ trait WeekYearTrait
     #[LevelProperty(
         level: 700,
         label: new TranslatableMessage('Week Year'),
-        valueResolver: new TimeDimensionValueResolver(TimeFormat::WeekYear),
+        valueResolver: new TimeBin(TimeFormat::WeekYear),
     )]
     private ?WeekYear $weekYear = null;
 

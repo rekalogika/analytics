@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-final readonly class TimeDimensionValueResolver implements HierarchyAwareValueResolver
+final readonly class TimeBin implements HierarchyAwareValueResolver
 {
     private ?ValueResolver $input;
 
@@ -54,7 +54,7 @@ final readonly class TimeDimensionValueResolver implements HierarchyAwareValueRe
     ): string {
         if (!$this->input instanceof ValueResolver) {
             throw new InvalidArgumentException(\sprintf(
-                'TimeDimensionValueResolver requires an input ValueResolver, but got %s',
+                'TimeBin requires an input ValueResolver, but got %s',
                 get_debug_type($this->input),
             ));
         }
