@@ -44,14 +44,6 @@ final class WeekDate implements TimeBin
         $this->end = $this->start->modify('+1 day');
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingWeek(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

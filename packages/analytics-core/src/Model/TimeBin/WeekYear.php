@@ -38,12 +38,6 @@ final class WeekYear implements TimeBin
         $this->end = $this->start->setISODate($databaseValue + 1, 1);
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

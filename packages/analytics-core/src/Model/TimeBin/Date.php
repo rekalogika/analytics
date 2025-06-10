@@ -44,15 +44,6 @@ final class Date implements TimeBin
         $this->end = $this->start->modify('+1 day');
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingWeek(),
-    //         $this->getContainingMonth(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

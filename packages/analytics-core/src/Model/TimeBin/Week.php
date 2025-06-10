@@ -43,14 +43,6 @@ final class Week implements TimeBin
         $this->end = $this->start->modify('+1 week');
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingWeekYear(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

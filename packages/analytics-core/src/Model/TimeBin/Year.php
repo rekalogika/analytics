@@ -55,12 +55,6 @@ final class Year implements TimeBin
             ->setTime(0, 0, 0);
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

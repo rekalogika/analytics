@@ -59,14 +59,6 @@ final class Quarter implements TimeBin
             ->setTime(0, 0, 0);
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingYear(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

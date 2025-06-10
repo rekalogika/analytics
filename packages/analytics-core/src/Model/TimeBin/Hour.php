@@ -45,15 +45,6 @@ final class Hour implements TimeBin
         $this->end = $this->start->modify('+1 hour');
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingDate(),
-    //         $this->getContainingWeekDate(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

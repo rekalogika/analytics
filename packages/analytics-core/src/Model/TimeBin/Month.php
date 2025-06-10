@@ -56,14 +56,6 @@ final class Month implements TimeBin
             ->setTime(0, 0, 0);
     }
 
-    // #[\Override]
-    // public function getContainingIntervals(): array
-    // {
-    //     return [
-    //         $this->getContainingQuarter(),
-    //     ];
-    // }
-
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
