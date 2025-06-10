@@ -31,7 +31,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         private string $hierarchyProperty,
         private TranslatableInterface $label,
         private TranslatableInterface $nullLabel,
-        private ?string $typeClass,
+        ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
         bool $hidden,
         private ?DimensionMetadata $dimensionMetadata = null,
@@ -50,6 +50,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         parent::__construct(
             summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
             label: $label,
+            typeClass: $typeClass,
             hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
@@ -62,7 +63,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
             hierarchyProperty: $this->hierarchyProperty,
             label: $this->label,
             nullLabel: $this->nullLabel,
-            typeClass: $this->typeClass,
+            typeClass: $this->getTypeClass(),
             dimensionLevelProperty: $this->dimensionLevelProperty,
             hidden: $this->isHidden(),
             dimensionMetadata: $dimensionMetadata,
@@ -91,14 +92,6 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function getNullLabel(): TranslatableInterface
     {
         return $this->nullLabel;
-    }
-
-    /**
-     * @return null|class-string
-     */
-    public function getTypeClass(): ?string
-    {
-        return $this->typeClass;
     }
 
     public function getPropertyLabel(): TranslatableInterface

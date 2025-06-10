@@ -166,6 +166,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                         sourceClasses: $sourceClasses,
                         property: $property,
                         measureAttribute: $measureAttribute,
+                        typeClass: $typeClass,
                     );
             } elseif ($partitionAttribute !== null) {
                 $partitionMetadata = $this->createPartitionMetadata(
@@ -475,12 +476,14 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     /**
      * @param class-string $summaryClassName
      * @param non-empty-list<class-string> $sourceClasses
+     * @param class-string|null $typeClass
      */
     private function createMeasureMetadata(
         string $summaryClassName,
         array $sourceClasses,
         string $property,
         Measure $measureAttribute,
+        ?string $typeClass,
     ): MeasureMetadata {
         $function = $measureAttribute->getFunction();
 
@@ -528,6 +531,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             function: $function,
             summaryProperty: $property,
             label: $label,
+            typeClass: $typeClass,
             unit: $unit,
             unitSignature: $unitSignature,
             virtual: $virtual,

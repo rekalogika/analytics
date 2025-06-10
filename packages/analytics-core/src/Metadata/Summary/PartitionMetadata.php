@@ -18,6 +18,9 @@ use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Util\LiteralString;
 
+/**
+ * @todo improve naming
+ */
 final readonly class PartitionMetadata extends PropertyMetadata
 {
     /**
@@ -36,6 +39,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: new LiteralString('Partition'),
+            typeClass: $partitionClass,
             summaryMetadata: $summaryMetadata,
             hidden: true,
         );
