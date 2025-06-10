@@ -15,7 +15,15 @@ namespace Rekalogika\Analytics\Contracts\Hierarchy;
 
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
+/**
+ * Allows a value resolver to be used inside a hierarchy. The framework will
+ * call `withInput()` method with the input value resolver of the dimension as
+ * defined in the summary class.
+ */
 interface HierarchyAware
 {
+    /**
+     * Sets the input value resolver defined in the dimension.
+     */
     public function withInput(ValueResolver $input): static;
 }

@@ -15,6 +15,10 @@ namespace Rekalogika\Analytics\Contracts\Hierarchy;
 
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 
+/**
+ * If a hierarchy is context-aware, it will get an instance of HierarchyContext
+ * when the hierarchy is created.
+ */
 interface ContextAwareHierarchy
 {
     public function setContext(HierarchyContext $context): void;
