@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAwareValueResolver;
+use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
@@ -21,7 +22,7 @@ final readonly class LevelProperty
 {
     public function __construct(
         private int $level,
-        private HierarchyAwareValueResolver $valueResolver,
+        private ValueResolver&HierarchyAware $valueResolver,
         private null|string|TranslatableInterface $label = null,
         private null|string|TranslatableInterface $nullLabel = null,
         private bool $hidden = false,
@@ -37,7 +38,7 @@ final readonly class LevelProperty
         return $this->label;
     }
 
-    public function getValueResolver(): HierarchyAwareValueResolver
+    public function getValueResolver(): ValueResolver&HierarchyAware
     {
         return $this->valueResolver;
     }

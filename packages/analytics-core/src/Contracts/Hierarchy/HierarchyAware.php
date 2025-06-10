@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Contracts\Hierarchy;
 
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-interface HierarchyAwareValueResolver extends ValueResolver
+interface HierarchyAware
 {
     public function withInput(ValueResolver $input): static;
 }
