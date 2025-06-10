@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Model;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\Attribute as Analytics;
+use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 
 /**
  * Super class for summary entity. Contains properties that exist in all summary
@@ -23,8 +24,10 @@ use Rekalogika\Analytics\Attribute as Analytics;
  * required to have the properties defined in this class.
  */
 #[ORM\MappedSuperclass()]
-abstract class Summary
+abstract class Summary implements ContextAwareSummary
 {
+    use ContextAwareSummaryTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::BIGINT, nullable: false)]

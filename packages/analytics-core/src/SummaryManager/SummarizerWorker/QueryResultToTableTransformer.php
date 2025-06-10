@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
@@ -98,6 +100,15 @@ final readonly class QueryResultToTableTransformer
         $summaryClass = $this->metadata->getSummaryClass();
         $reflectionClass = new \ReflectionClass($summaryClass);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
+
+        // contextawareness init
+        if ($summaryObject instanceof ContextAwareSummary) {
+            $summaryObject->setContext(
+                context: new SummaryContext(
+                    summaryMetadata: $this->metadata,
+                ),
+            );
+        }
 
         // populate dimensions
         $this->populateDimensions(
