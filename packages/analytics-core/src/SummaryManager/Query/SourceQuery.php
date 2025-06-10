@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Exception\QueryException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
@@ -107,7 +107,7 @@ final class SourceQuery extends AbstractQuery
         $valueResolver = reset($valueResolvers);
 
         $expression = $valueResolver->getExpression(
-            context: new SourceContext(
+            context: new SourceQueryContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->summaryMetadata,
                 dimensionMetadata: $dimension,
@@ -144,7 +144,7 @@ final class SourceQuery extends AbstractQuery
         $expression = $hierarchicalDimensionValueResolver
             ->withInput($valueResolver)
             ->getExpression(
-                context: new SourceContext(
+                context: new SourceQueryContext(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
                     dimensionMetadata: $dimension,

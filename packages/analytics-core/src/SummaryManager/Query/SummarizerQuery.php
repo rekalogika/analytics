@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
-use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
@@ -479,7 +479,7 @@ final class SummarizerQuery extends AbstractQuery
         $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $name => $measureMetadata) {
-            $summaryContext = SummaryContext::create(
+            $summaryContext = SummaryQueryContext::create(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,
                 measureMetadata: $measureMetadata,
@@ -613,7 +613,7 @@ final class SummarizerQuery extends AbstractQuery
 
         foreach ($orderBy as $field => $order) {
             if ($this->metadata->isMeasure($field)) {
-                $summaryContext = SummaryContext::create(
+                $summaryContext = SummaryQueryContext::create(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->metadata,
                     measureMetadata: $this->metadata->getMeasure($field),

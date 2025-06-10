@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
@@ -50,7 +50,7 @@ final readonly class TimeBin implements HierarchyAwareValueResolver
 
     #[\Override]
     public function getExpression(
-        SourceContext $context,
+        SourceQueryContext $context,
     ): string {
         if (!$this->input instanceof ValueResolver) {
             throw new InvalidArgumentException(\sprintf(

@@ -26,7 +26,7 @@ use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final readonly class SourceContext
+final readonly class SourceQueryContext
 {
     public function __construct(
         private SimpleQueryBuilder $queryBuilder,

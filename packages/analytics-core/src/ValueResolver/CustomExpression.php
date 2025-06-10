@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
@@ -42,7 +42,7 @@ final readonly class CustomExpression implements ValueResolver
     }
 
     #[\Override]
-    public function getExpression(SourceContext $context): string
+    public function getExpression(SourceQueryContext $context): string
     {
         $callback = static function (array $matches) use ($context): string {
             $path = $matches[1]
