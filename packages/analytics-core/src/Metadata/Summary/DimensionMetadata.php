@@ -47,7 +47,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
         private Order|array $orderBy,
-        private ?string $typeClass,
+        ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
         bool $hidden,
@@ -57,6 +57,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: $label,
+            typeClass: $typeClass,
             hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
@@ -109,7 +110,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
             orderBy: $this->orderBy,
-            typeClass: $this->typeClass,
+            typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
             mandatory: $this->mandatory,
             hidden: $this->isHidden(),
@@ -161,14 +162,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     public function getOrderBy(): Order|array
     {
         return $this->orderBy;
-    }
-
-    /**
-     * @return class-string|null
-     */
-    public function getTypeClass(): ?string
-    {
-        return $this->typeClass;
     }
 
     public function getNullLabel(): TranslatableInterface

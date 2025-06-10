@@ -19,9 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract readonly class PropertyMetadata implements TranslatableInterface
 {
+    /**
+     * @param class-string|null $typeClass
+     */
     protected function __construct(
         private string $summaryProperty,
         private TranslatableInterface $label,
+        private ?string $typeClass,
         private bool $hidden,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
@@ -46,6 +50,14 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
         }
 
         return $this->summaryMetadata;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getTypeClass(): ?string
+    {
+        return $this->typeClass;
     }
 
     public function getLabel(): TranslatableInterface

@@ -26,11 +26,13 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
 
     /**
      * @param non-empty-array<class-string,AggregateFunction> $function
+     * @param class-string $typeClass
      */
     public function __construct(
         private array $function,
         string $summaryProperty,
         TranslatableInterface $label,
+        ?string $typeClass,
         private null|TranslatableInterface $unit,
         private ?string $unitSignature,
         private bool $virtual,
@@ -40,6 +42,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: $label,
+            typeClass: $typeClass,
             hidden: $hidden,
             summaryMetadata: $summaryMetadata,
         );
@@ -71,6 +74,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             function: $this->function,
             summaryProperty: $this->getSummaryProperty(),
             label: $this->getLabel(),
+            typeClass: $this->getTypeClass(),
             unit: $this->unit,
             unitSignature: $this->unitSignature,
             virtual: $this->virtual,
