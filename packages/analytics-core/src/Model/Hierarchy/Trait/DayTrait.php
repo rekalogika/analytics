@@ -27,7 +27,7 @@ use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait DayTrait
 {
-    abstract public function getTimeZone(): \DateTimeZone;
+    abstract private function getTimeZone(): \DateTimeZone;
 
     #[Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[LevelProperty(

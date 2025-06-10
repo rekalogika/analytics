@@ -22,7 +22,7 @@ use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait YearTrait
 {
-    abstract public function getTimeZone(): \DateTimeZone;
+    abstract private function getTimeZone(): \DateTimeZone;
 
     #[Column(type: 'rekalogika_analytics_year', nullable: true)]
     #[LevelProperty(

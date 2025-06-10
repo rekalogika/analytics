@@ -11,9 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Summary;
+namespace Rekalogika\Analytics\Contracts\Hierarchy;
 
-interface HierarchyAwareValueResolver extends ValueResolver
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
+
+interface ContextAwareHierarchy
 {
-    public function withInput(ValueResolver $input): static;
+    public function setContext(HierarchyContext $context): void;
 }

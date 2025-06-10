@@ -14,15 +14,22 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
+use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 
-trait TimeZoneTrait
+/**
+ * @phpstan-require-implements ContextAwareHierarchy
+ */
+trait ContextAwareHierarchyTrait
 {
-    abstract private function getContext(): HierarchyContext;
+    private HierarchyContext $context;
 
-    private function getTimeZone(): \DateTimeZone
+    final public function setContext(HierarchyContext $context): void
     {
-        return $this->getContext()
-            ->getDimensionMetadata()
-            ->getSummaryTimeZone();
+        $this->context = $context;
+    }
+
+    protected function getContext(): HierarchyContext
+    {
+        return $this->context;
     }
 }

@@ -11,9 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Model;
+namespace Rekalogika\Analytics\Contracts\Hierarchy;
 
-interface TimeZoneAwareDimensionHierarchy
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+
+interface HierarchyAwareValueResolver extends ValueResolver
 {
-    public function setTimeZone(\DateTimeZone $timeZone): void;
+    public function withInput(ValueResolver $input): static;
 }
