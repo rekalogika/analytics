@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
@@ -48,8 +49,10 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         $properties = [];
 
         foreach ($this->function as $class => $aggregateFunction) {
-            foreach ($aggregateFunction->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
+            if ($aggregateFunction instanceof SummarizableAggregateFunction) {
+                foreach ($aggregateFunction->getInvolvedProperties() as $property) {
+                    $properties[$class][] = $property;
+                }
             }
         }
 

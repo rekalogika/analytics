@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
@@ -257,6 +258,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     'Function not found for source class "%s".',
                     $this->sourceClass,
                 ));
+
+            if (!$function instanceof SummarizableAggregateFunction) {
+                continue;
+            }
 
             $dql = $function->getSourceToAggregateDQLExpression(
                 context: new SourceContext(

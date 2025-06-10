@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
-use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 
 final readonly class StdDev implements AggregateFunction
@@ -24,19 +23,6 @@ final readonly class StdDev implements AggregateFunction
         private string $countProperty,
         private string $sumProperty,
     ) {}
-
-    #[\Override]
-    public function getSourceToAggregateDQLExpression(SourceContext $context): null
-    {
-        return null;
-    }
-
-    #[\Override]
-    public function getAggregateToAggregateDQLExpression(
-        string $fieldName,
-    ): null {
-        return null;
-    }
 
     #[\Override]
     public function getAggregateToResultDQLExpression(
@@ -51,11 +37,5 @@ final readonly class StdDev implements AggregateFunction
             $context->resolve($this->countProperty),
             $context->resolve($this->countProperty),
         );
-    }
-
-    #[\Override]
-    public function getInvolvedProperties(): array
-    {
-        return [];
     }
 }
