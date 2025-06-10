@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -234,19 +234,12 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
             $function = $metadata->getFunction();
             $function = reset($function);
 
-            if (!$function instanceof AggregateFunction) {
-                throw new InvalidArgumentException(\sprintf(
-                    'The function "%s" is not an instance of AggregateFunction',
-                    get_debug_type($function),
-                ));
+            if (!$function instanceof SummarizableAggregateFunction) {
+                continue;
             }
 
             $sqlField = $this->getSimpleQueryBuilder()->resolve($field);
             $function = $function->getAggregateToAggregateDQLExpression($sqlField);
-
-            if ($function === null) {
-                continue;
-            }
 
             $this->getSimpleQueryBuilder()->addSelect($function);
         }

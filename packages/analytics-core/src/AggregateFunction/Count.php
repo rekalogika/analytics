@@ -23,8 +23,8 @@ final readonly class Count extends SimpleAggregateFunction
 
     #[\Override]
     public function getAggregateToAggregateDQLExpression(
-        string $fieldName,
+        string $inputExpression,
     ): string {
-        return \sprintf('SUM(%s)', $fieldName);
+        return \sprintf('SUM(%s)', $inputExpression);
     }
 }

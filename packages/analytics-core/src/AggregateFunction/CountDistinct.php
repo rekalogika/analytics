@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\SourceContext;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
 
-final readonly class CountDistinct implements AggregateFunction
+final readonly class CountDistinct implements SummarizableAggregateFunction
 {
     private ValueResolver $property;
 
@@ -45,9 +45,9 @@ final readonly class CountDistinct implements AggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $fieldName): string
+    public function getAggregateToAggregateDQLExpression(string $inputExpression): string
     {
-        return \sprintf('REKALOGIKA_HLL_UNION_AGG(%s)', $fieldName);
+        return \sprintf('REKALOGIKA_HLL_UNION_AGG(%s)', $inputExpression);
     }
 
     #[\Override]

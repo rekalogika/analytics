@@ -15,9 +15,8 @@ namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\Util\PartitionUtil;
@@ -155,19 +154,12 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             $function = $metadata->getFunction();
             $function = reset($function);
 
-            if (!$function instanceof AggregateFunction) {
-                throw new UnexpectedValueException(\sprintf(
-                    'Function must be an instance of AggregateFunction, got "%s".',
-                    get_debug_type($function),
-                ));
+            if (!$function instanceof SummarizableAggregateFunction) {
+                continue;
             }
 
             $sqlField = $this->getSimpleQueryBuilder()->resolve($field);
             $function = $function->getAggregateToAggregateDQLExpression($sqlField);
-
-            if ($function === null) {
-                continue;
-            }
 
             $this->getSimpleQueryBuilder()->addSelect($function);
         }
