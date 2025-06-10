@@ -24,7 +24,7 @@ final readonly class Average implements AggregateFunction
     ) {}
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(
+    public function getAggregateToResultExpression(
         string $inputExpression,
         SummaryContext $context,
     ): string {

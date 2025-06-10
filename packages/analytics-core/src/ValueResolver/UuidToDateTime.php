@@ -32,7 +32,7 @@ final readonly class UuidToDateTime implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function getExpression(SourceContext $context): string
     {
         return \sprintf(
             'REKALOGIKA_UUID_TO_DATETIME(%s)',

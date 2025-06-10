@@ -21,7 +21,7 @@ interface SummarizableAggregateFunction extends AggregateFunction
      *
      * @return string The DQL expression for transforming source values.
      */
-    public function getSourceToAggregateDQLExpression(
+    public function getSourceToAggregateExpression(
         SourceContext $context,
     ): string;
 
@@ -33,7 +33,7 @@ interface SummarizableAggregateFunction extends AggregateFunction
      * function. This is usually the field name.
      * @return string The DQL expression for combining the aggregate.
      */
-    public function getAggregateToAggregateDQLExpression(
+    public function getAggregateToAggregateExpression(
         string $inputExpression,
     ): string;
 

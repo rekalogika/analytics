@@ -49,7 +49,7 @@ final readonly class TimeBin implements HierarchyAwareValueResolver
     }
 
     #[\Override]
-    public function getDQL(
+    public function getExpression(
         SourceContext $context,
     ): string {
         if (!$this->input instanceof ValueResolver) {
@@ -61,7 +61,7 @@ final readonly class TimeBin implements HierarchyAwareValueResolver
 
         return \sprintf(
             "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
-            $this->input->getDQL($context),
+            $this->input->getExpression($context),
             $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
             $this->format->value,

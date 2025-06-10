@@ -32,7 +32,7 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\ValueResolver\CustomDQL;
+use Rekalogika\Analytics\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -86,7 +86,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(enumType: CustomerType::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQL("
+        source: new CustomExpression("
             CASE
                 WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN 'individual'
@@ -103,7 +103,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     #[ORM\Column(enumType: Gender::class, nullable: true)]
     #[Analytics\Dimension(
-        source: new CustomDQL("
+        source: new CustomExpression("
             CASE
                 WHEN [customer.*] INSTANCE OF Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer
                 THEN [customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender]

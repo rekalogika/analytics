@@ -35,23 +35,23 @@ final readonly class CountDistinct implements SummarizableAggregateFunction
     }
 
     #[\Override]
-    public function getSourceToAggregateDQLExpression(SourceContext $context): string
+    public function getSourceToAggregateExpression(SourceContext $context): string
     {
         return \sprintf(
             "REKALOGIKA_HLL_ADD_AGG(REKALOGIKA_HLL_HASH(%s, '%s'))",
-            $this->property->getDQL($context),
+            $this->property->getExpression($context),
             $this->hashType->value,
         );
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $inputExpression): string
+    public function getAggregateToAggregateExpression(string $inputExpression): string
     {
         return \sprintf('REKALOGIKA_HLL_UNION_AGG(%s)', $inputExpression);
     }
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(
+    public function getAggregateToResultExpression(
         string $inputExpression,
         SummaryContext $context,
     ): string {

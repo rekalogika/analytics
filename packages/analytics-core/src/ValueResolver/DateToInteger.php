@@ -34,7 +34,7 @@ final readonly class DateToInteger implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function getExpression(SourceContext $context): string
     {
         return \sprintf(
             "DATE_DIFF(%s, '1970-01-01')",

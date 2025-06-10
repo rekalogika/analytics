@@ -35,7 +35,7 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function getExpression(SourceContext $context): string
     {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT(%s)',

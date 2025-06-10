@@ -54,7 +54,7 @@ final readonly class SummaryContext
 
         $measureMetadata = $this->summaryMetadata->getMeasure($property);
 
-        // create summary to summary DQL
+        // create summary to summary DQL expression
 
         $field = $this->queryBuilder
             ->resolve($measureMetadata->getSummaryProperty());
@@ -62,10 +62,10 @@ final readonly class SummaryContext
         $function = $measureMetadata->getFirstFunction();
 
         if ($function instanceof SummarizableAggregateFunction) {
-            $aggregateToAggregateDQLExpression =
-                $function->getAggregateToAggregateDQLExpression($field);
+            $aggregateToAggregateExpression =
+                $function->getAggregateToAggregateExpression($field);
         } else {
-            $aggregateToAggregateDQLExpression = '';
+            $aggregateToAggregateExpression = '';
         }
 
         // create context
@@ -77,14 +77,14 @@ final readonly class SummaryContext
             measureMetadata: $measureMetadata,
         );
 
-        // create summary to result DQL
+        // create summary to result DQL expression
 
-        $aggregateToResultDQLExpression = $function->getAggregateToResultDQLExpression(
-            inputExpression: $aggregateToAggregateDQLExpression,
+        $aggregateToResultExpression = $function->getAggregateToResultExpression(
+            inputExpression: $aggregateToAggregateExpression,
             context: $context,
         );
 
-        return $aggregateToResultDQLExpression;
+        return $aggregateToResultExpression;
     }
 
     public function getMeasureMetadata(): MeasureMetadata
