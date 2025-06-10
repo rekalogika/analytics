@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAwareValueResolver;
+use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-final readonly class TimeBin implements HierarchyAwareValueResolver
+final readonly class TimeBin implements ValueResolver, HierarchyAware
 {
     private ?ValueResolver $input;
 
