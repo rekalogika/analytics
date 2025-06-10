@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 
 interface SummarizableAggregateFunction extends AggregateFunction
 {
@@ -24,7 +24,7 @@ interface SummarizableAggregateFunction extends AggregateFunction
      * @return string The DQL expression for transforming source values.
      */
     public function getSourceToAggregateExpression(
-        SourceContext $context,
+        SourceQueryContext $context,
     ): string;
 
     /**

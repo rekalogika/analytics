@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
-use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
@@ -36,7 +36,7 @@ abstract readonly class SimpleAggregateFunction implements SummarizableAggregate
     abstract public function getAggregateFunction(string $input): string;
 
     #[\Override]
-    public function getSourceToAggregateExpression(SourceContext $context): string
+    public function getSourceToAggregateExpression(SourceQueryContext $context): string
     {
         return $this->getAggregateFunction($this->property->getExpression($context));
     }
@@ -50,7 +50,7 @@ abstract readonly class SimpleAggregateFunction implements SummarizableAggregate
     #[\Override]
     public function getAggregateToResultExpression(
         string $inputExpression,
-        SummaryContext $context,
+        SummaryQueryContext $context,
     ): string {
         return $inputExpression;
     }

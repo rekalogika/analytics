@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 
 /**
  * Classifies the partitioning key of the entity into the corresponding
@@ -24,6 +24,6 @@ interface PartitionKeyClassifier
     public function getExpression(
         PartitionValueResolver $input,
         int $level,
-        SourceContext $context,
+        SourceQueryContext $context,
     ): string;
 }

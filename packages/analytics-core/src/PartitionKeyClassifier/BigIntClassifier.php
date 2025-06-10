@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PartitionKeyClassifier;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
@@ -23,7 +23,7 @@ final readonly class BigIntClassifier implements PartitionKeyClassifier
     public function getExpression(
         PartitionValueResolver $input,
         int $level,
-        SourceContext $context,
+        SourceQueryContext $context,
     ): string {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_BIGINT(%s, %s)',

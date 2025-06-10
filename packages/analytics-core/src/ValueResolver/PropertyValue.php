@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
@@ -30,7 +30,7 @@ final readonly class PropertyValue implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getExpression(SourceContext $context): string
+    public function getExpression(SourceQueryContext $context): string
     {
         return $context->resolve($this->property);
     }

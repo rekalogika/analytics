@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final readonly class SummaryContext
+final readonly class SummaryQueryContext
 {
     public static function create(
         SimpleQueryBuilder $queryBuilder,
@@ -71,7 +71,7 @@ final readonly class SummaryContext
 
         // create context
 
-        $context = new SummaryContext(
+        $context = new SummaryQueryContext(
             queryBuilder: $this->queryBuilder,
             summaryMetadata: $this->summaryMetadata,
             calledMeasures: [...$this->calledMeasures, $property],

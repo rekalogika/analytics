@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
@@ -108,7 +108,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $function = $classifier->getExpression(
             input: $valueResolver,
             level: $lowestLevel,
-            context: new SourceContext(
+            context: new SourceQueryContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->summaryMetadata,
                 partitionMetadata: $partitionMetadata,
@@ -203,7 +203,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     $function = $hierarchyAwareValueResolver
                         ->withInput($valueResolver)
                         ->getExpression(
-                            context: new SourceContext(
+                            context: new SourceQueryContext(
                                 queryBuilder: $this->getSimpleQueryBuilder(),
                                 summaryMetadata: $this->summaryMetadata,
                                 dimensionMetadata: $dimensionMetadata,
@@ -225,7 +225,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 // if not hierarchical
 
                 $propertySqlField = $valueResolver->getExpression(
-                    context: new SourceContext(
+                    context: new SourceQueryContext(
                         queryBuilder: $this->getSimpleQueryBuilder(),
                         summaryMetadata: $this->summaryMetadata,
                         dimensionMetadata: $dimensionMetadata,
@@ -264,7 +264,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             }
 
             $expression = $function->getSourceToAggregateExpression(
-                context: new SourceContext(
+                context: new SourceQueryContext(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
                     measureMetadata: $measureMetadata,

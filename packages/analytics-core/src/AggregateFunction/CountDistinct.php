@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
-use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
@@ -35,7 +35,7 @@ final readonly class CountDistinct implements SummarizableAggregateFunction
     }
 
     #[\Override]
-    public function getSourceToAggregateExpression(SourceContext $context): string
+    public function getSourceToAggregateExpression(SourceQueryContext $context): string
     {
         return \sprintf(
             "REKALOGIKA_HLL_ADD_AGG(REKALOGIKA_HLL_HASH(%s, '%s'))",
@@ -53,7 +53,7 @@ final readonly class CountDistinct implements SummarizableAggregateFunction
     #[\Override]
     public function getAggregateToResultExpression(
         string $inputExpression,
-        SummaryContext $context,
+        SummaryQueryContext $context,
     ): string {
         return \sprintf('REKALOGIKA_HLL_CARDINALITY(%s)', $inputExpression);
     }

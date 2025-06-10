@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
-use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 
 interface AggregateFunction
 {
@@ -29,6 +29,6 @@ interface AggregateFunction
      */
     public function getAggregateToResultExpression(
         string $inputExpression,
-        SummaryContext $context,
+        SummaryQueryContext $context,
     ): string;
 }

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
-use Rekalogika\Analytics\Contracts\Context\SourceContext;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
 final readonly class IdentifierValue implements ValueResolver
@@ -29,7 +29,7 @@ final readonly class IdentifierValue implements ValueResolver
     }
 
     #[\Override]
-    public function getExpression(SourceContext $context): string
+    public function getExpression(SourceQueryContext $context): string
     {
         return \sprintf(
             'IDENTITY(%s)',

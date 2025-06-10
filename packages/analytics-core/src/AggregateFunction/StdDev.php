@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\AggregateFunction;
 
-use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 
 final readonly class StdDev implements AggregateFunction
@@ -27,7 +27,7 @@ final readonly class StdDev implements AggregateFunction
     #[\Override]
     public function getAggregateToResultExpression(
         string $inputExpression,
-        SummaryContext $context,
+        SummaryQueryContext $context,
     ): string {
         return \sprintf(
             'SQRT((%s - (%s * %s / NULLIF(%s, 0))) / NULLIF(%s, 0))',
