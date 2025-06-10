@@ -21,12 +21,11 @@ interface AggregateFunction
      *
      * @param string $inputExpression The DQL expression that gives the
      * aggregate value. The framework will usually pass the output of
-     * `getAggregateToAggregateDQLExpression()` method above, but not
-     * necessarily. If this is not a summarizable aggregate function, the value
-     * will be an empty string, and the implementation should ignore this
-     * parameter.
+     * `getAggregateToAggregateExpression()` method above, but not necessarily.
+     * If this is not a summarizable aggregate function, the value will be an
+     * empty string, and the implementation should ignore this parameter.
      */
-    public function getAggregateToResultDQLExpression(
+    public function getAggregateToResultExpression(
         string $inputExpression,
         SummaryContext $context,
     ): string;

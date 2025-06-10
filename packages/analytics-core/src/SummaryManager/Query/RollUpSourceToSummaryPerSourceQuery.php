@@ -105,7 +105,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $classifier = $partitionMetadata->getKeyClassifier();
 
-        $function = $classifier->getDQL(
+        $function = $classifier->getExpression(
             input: $valueResolver,
             level: $lowestLevel,
             context: new SourceContext(
@@ -202,7 +202,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
                     $function = $hierarchyAwareValueResolver
                         ->withInput($valueResolver)
-                        ->getDQL(
+                        ->getExpression(
                             context: new SourceContext(
                                 queryBuilder: $this->getSimpleQueryBuilder(),
                                 summaryMetadata: $this->summaryMetadata,
@@ -224,7 +224,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             } else {
                 // if not hierarchical
 
-                $propertySqlField = $valueResolver->getDQL(
+                $propertySqlField = $valueResolver->getExpression(
                     context: new SourceContext(
                         queryBuilder: $this->getSimpleQueryBuilder(),
                         summaryMetadata: $this->summaryMetadata,
@@ -263,7 +263,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 continue;
             }
 
-            $dql = $function->getSourceToAggregateDQLExpression(
+            $expression = $function->getSourceToAggregateExpression(
                 context: new SourceContext(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
@@ -271,7 +271,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 ),
             );
 
-            $this->getSimpleQueryBuilder()->addSelect($dql);
+            $this->getSimpleQueryBuilder()->addSelect($expression);
         }
     }
 

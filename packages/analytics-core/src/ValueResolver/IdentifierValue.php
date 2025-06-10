@@ -29,7 +29,7 @@ final readonly class IdentifierValue implements ValueResolver
     }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function getExpression(SourceContext $context): string
     {
         return \sprintf(
             'IDENTITY(%s)',

@@ -19,7 +19,7 @@ namespace Rekalogika\Analytics\Contracts\Summary;
  */
 interface PartitionKeyClassifier
 {
-    public function getDQL(
+    public function getExpression(
         PartitionValueResolver $input,
         int $level,
         SourceContext $context,

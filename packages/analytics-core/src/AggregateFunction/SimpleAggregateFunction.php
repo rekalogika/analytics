@@ -33,22 +33,22 @@ abstract readonly class SimpleAggregateFunction implements SummarizableAggregate
         $this->property = $property;
     }
 
-    abstract public function getDQLAggregateFunction(string $input): string;
+    abstract public function getAggregateFunction(string $input): string;
 
     #[\Override]
-    public function getSourceToAggregateDQLExpression(SourceContext $context): string
+    public function getSourceToAggregateExpression(SourceContext $context): string
     {
-        return $this->getDQLAggregateFunction($this->property->getDQL($context));
+        return $this->getAggregateFunction($this->property->getExpression($context));
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(string $inputExpression): string
+    public function getAggregateToAggregateExpression(string $inputExpression): string
     {
-        return $this->getDQLAggregateFunction($inputExpression);
+        return $this->getAggregateFunction($inputExpression);
     }
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(
+    public function getAggregateToResultExpression(
         string $inputExpression,
         SummaryContext $context,
     ): string {

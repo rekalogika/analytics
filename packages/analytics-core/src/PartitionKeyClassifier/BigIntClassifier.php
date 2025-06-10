@@ -20,14 +20,14 @@ use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 final readonly class BigIntClassifier implements PartitionKeyClassifier
 {
     #[\Override]
-    public function getDQL(
+    public function getExpression(
         PartitionValueResolver $input,
         int $level,
         SourceContext $context,
     ): string {
         return \sprintf(
             'REKALOGIKA_TRUNCATE_BIGINT(%s, %s)',
-            $input->getDQL($context),
+            $input->getExpression($context),
             $level,
         );
     }

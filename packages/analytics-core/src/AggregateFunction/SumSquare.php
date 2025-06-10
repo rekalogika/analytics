@@ -34,9 +34,9 @@ final readonly class SumSquare implements SummarizableAggregateFunction
     }
 
     #[\Override]
-    public function getSourceToAggregateDQLExpression(SourceContext $context): string
+    public function getSourceToAggregateExpression(SourceContext $context): string
     {
-        $expression = $this->property->getDQL($context);
+        $expression = $this->property->getExpression($context);
 
         return \sprintf(
             'SUM(%s * %s)',
@@ -46,14 +46,14 @@ final readonly class SumSquare implements SummarizableAggregateFunction
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(
+    public function getAggregateToAggregateExpression(
         string $inputExpression,
     ): string {
         return \sprintf('SUM(%s)', $inputExpression);
     }
 
     #[\Override]
-    public function getAggregateToResultDQLExpression(
+    public function getAggregateToResultExpression(
         string $inputExpression,
         SummaryContext $context,
     ): string {

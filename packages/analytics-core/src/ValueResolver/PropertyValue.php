@@ -30,7 +30,7 @@ final readonly class PropertyValue implements PartitionValueResolver
     }
 
     #[\Override]
-    public function getDQL(SourceContext $context): string
+    public function getExpression(SourceContext $context): string
     {
         return $context->resolve($this->property);
     }

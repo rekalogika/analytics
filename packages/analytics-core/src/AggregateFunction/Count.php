@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\AggregateFunction;
 final readonly class Count extends SimpleAggregateFunction
 {
     #[\Override]
-    public function getDQLAggregateFunction(string $input): string
+    public function getAggregateFunction(string $input): string
     {
         return \sprintf('COUNT(%s)', $input);
     }
 
     #[\Override]
-    public function getAggregateToAggregateDQLExpression(
+    public function getAggregateToAggregateExpression(
         string $inputExpression,
     ): string {
         return \sprintf('SUM(%s)', $inputExpression);

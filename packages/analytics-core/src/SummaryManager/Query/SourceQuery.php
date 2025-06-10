@@ -106,7 +106,7 @@ final class SourceQuery extends AbstractQuery
 
         $valueResolver = reset($valueResolvers);
 
-        $dql = $valueResolver->getDQL(
+        $expression = $valueResolver->getExpression(
             context: new SourceContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->summaryMetadata,
@@ -116,7 +116,7 @@ final class SourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()->andWhere(\sprintf(
             '%s = %s',
-            $dql,
+            $expression,
             $this->createNamedParameter($rawMember),
         ));
     }
@@ -141,9 +141,9 @@ final class SourceQuery extends AbstractQuery
 
         $hierarchicalDimensionValueResolver = $dimensionProperty->getValueResolver();
 
-        $dql = $hierarchicalDimensionValueResolver
+        $expression = $hierarchicalDimensionValueResolver
             ->withInput($valueResolver)
-            ->getDQL(
+            ->getExpression(
                 context: new SourceContext(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
@@ -156,7 +156,7 @@ final class SourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()->andWhere(\sprintf(
             '%s = %s',
-            $dql,
+            $expression,
             $this->createNamedParameter($rawMember),
         ));
     }

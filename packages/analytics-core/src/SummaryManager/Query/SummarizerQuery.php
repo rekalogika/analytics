@@ -526,7 +526,7 @@ final class SummarizerQuery extends AbstractQuery
 
             $identity = $joinedClassMetadata->getIdentifierFieldName();
 
-            $dqlField = $this->resolve(\sprintf(
+            $fieldExpression = $this->resolve(\sprintf(
                 '%s.%s',
                 $dimension,
                 $identity,
@@ -537,7 +537,7 @@ final class SummarizerQuery extends AbstractQuery
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     '%s AS %s',
-                    $dqlField,
+                    $fieldExpression,
                     $dimension,
                 ));
 
@@ -546,10 +546,10 @@ final class SummarizerQuery extends AbstractQuery
             $orderBy = $dimensionMetadata->getOrderBy();
 
             if (!\is_array($orderBy)) {
-                $this->getSimpleQueryBuilder()->addOrderBy($dqlField, $orderBy->value);
+                $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
             } else {
                 foreach ($orderBy as $orderField => $order) {
-                    $dqlOrderField = $this->resolve(\sprintf(
+                    $orderExpression = $this->resolve(\sprintf(
                         '%s.%s',
                         $dimension,
                         $orderField,
@@ -560,7 +560,7 @@ final class SummarizerQuery extends AbstractQuery
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             'MIN(%s) AS HIDDEN %s',
-                            $dqlOrderField,
+                            $orderExpression,
                             $alias,
                         ))
                         ->addOrderBy($alias, $order->value);
@@ -570,7 +570,7 @@ final class SummarizerQuery extends AbstractQuery
             // group by and grouping fields
 
             $this->rollUpFields[] = $dimension;
-            $this->groupingFields[] = $dqlField;
+            $this->groupingFields[] = $fieldExpression;
 
             return;
         }

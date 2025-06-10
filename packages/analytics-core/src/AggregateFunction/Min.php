@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\AggregateFunction;
 final readonly class Min extends SimpleAggregateFunction
 {
     #[\Override]
-    public function getDQLAggregateFunction(string $input): string
+    public function getAggregateFunction(string $input): string
     {
         return \sprintf('MIN(%s)', $input);
     }
