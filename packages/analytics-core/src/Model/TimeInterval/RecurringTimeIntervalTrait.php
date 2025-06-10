@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Contracts\Model\Bin;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
 trait RecurringTimeIntervalTrait
@@ -27,13 +27,13 @@ trait RecurringTimeIntervalTrait
      * @return -1|0|1
      */
     public static function compare(
-        SequenceMember $a,
-        SequenceMember $b,
+        Bin $a,
+        Bin $b,
     ): int {
         if (
             $a::class !== $b::class
-            || !$a instanceof static
-            || !$b instanceof static
+            || !$a instanceof static // @phpstan-ignore instanceof.alwaysTrue
+            || !$b instanceof static // @phpstan-ignore instanceof.alwaysTrue
         ) {
             throw new InvalidArgumentException(\sprintf(
                 'Cannot compare "%s" with "%s".',

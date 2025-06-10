@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Week implements TimeInterval
+final class Week implements TimeBin
 {
-    use TimeIntervalTrait;
+    use TimeBinTrait;
 
     private readonly \DateTimeImmutable $start;
 

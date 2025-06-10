@@ -14,19 +14,24 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Model;
 
 /**
- * Represents a member of a sequence.
+ * Represents a bin, which is the result of a data binning operation.
+ *
+ * @template T
  */
-interface SequenceMember
+interface Bin
 {
     public function getNext(): ?static;
 
     public function getPrevious(): ?static;
 
     /**
+     * @template U of Bin
+     * @param U $a
+     * @param U $b
      * @return -1|0|1
      */
     public static function compare(
-        self $a,
-        self $b,
+        Bin $a,
+        Bin $b,
     ): int;
 }

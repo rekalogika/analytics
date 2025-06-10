@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Exception\ConversionException;
 
 abstract class TimeIntervalType extends Type
 {
     /**
-     * @return class-string<TimeInterval>
+     * @return class-string<TimeBin>
      */
     abstract protected function getClass(): string;
 
@@ -66,7 +66,7 @@ abstract class TimeIntervalType extends Type
         $class = $this->getClass();
 
         if ($value instanceof $class) {
-            /** @var TimeInterval $value */
+            /** @var TimeBin $value */
             return $value->getDatabaseValue();
         }
 

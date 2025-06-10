@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
@@ -78,7 +78,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
             $filterFactory = $this->getSpecificFilterFactory(NumberRangesFilter::class);
         } elseif (enum_exists($typeClass)) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
-        } elseif (is_a($typeClass, TimeInterval::class, true)) {
+        } elseif (is_a($typeClass, TimeBin::class, true)) {
             $filterFactory = $this->getSpecificFilterFactory(DateRangeFilter::class);
         } else {
             $filterFactory = $this->getSpecificFilterFactory(NullFilter::class);

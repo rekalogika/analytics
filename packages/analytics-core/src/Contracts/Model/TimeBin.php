@@ -15,7 +15,10 @@ namespace Rekalogika\Analytics\Contracts\Model;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface TimeInterval extends \Stringable, TranslatableInterface, SequenceMember
+/**
+ * @extends Bin<\DateTimeInterface>
+ */
+interface TimeBin extends \Stringable, TranslatableInterface, Bin
 {
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

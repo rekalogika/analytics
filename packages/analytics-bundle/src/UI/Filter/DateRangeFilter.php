@@ -16,21 +16,21 @@ namespace Rekalogika\Analytics\Bundle\UI\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DateRangeFilter implements Filter
 {
     private ?string $rawUpperBound = null;
 
-    private ?TimeInterval $upperBound = null;
+    private ?TimeBin $upperBound = null;
 
     private ?string $rawLowerBound = null;
 
-    private ?TimeInterval $lowerBound = null;
+    private ?TimeBin $lowerBound = null;
 
     /**
-     * @param class-string<TimeInterval> $typeClass
+     * @param class-string<TimeBin> $typeClass
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
@@ -106,7 +106,7 @@ final class DateRangeFilter implements Filter
         return \sprintf('%s - %s', $start, $end);
     }
 
-    public function getStart(): ?TimeInterval
+    public function getStart(): ?TimeBin
     {
         if ($this->lowerBound !== null) {
             return $this->lowerBound;
@@ -123,7 +123,7 @@ final class DateRangeFilter implements Filter
         return $this->lowerBound = ($this->typeClass)::createFromDateTime($dateTime);
     }
 
-    public function getEnd(): ?TimeInterval
+    public function getEnd(): ?TimeBin
     {
         if ($this->upperBound !== null) {
             return $this->upperBound;

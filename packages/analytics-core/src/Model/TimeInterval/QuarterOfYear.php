@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum QuarterOfYear: int implements RecurringTimeInterval
+enum QuarterOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeIntervalTrait;
 

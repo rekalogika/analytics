@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Month implements TimeInterval
+final class Month implements TimeBin
 {
-    use TimeIntervalTrait;
+    use TimeBinTrait;
 
     private readonly \DateTimeImmutable $start;
 

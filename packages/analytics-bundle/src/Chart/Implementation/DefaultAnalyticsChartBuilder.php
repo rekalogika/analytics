@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Bundle\Chart\ChartType;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Contracts\Model\Bin;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Exception\EmptyResultException;
@@ -102,7 +102,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             /** @psalm-suppress MixedAssignment */
             $rawMember = $child->getRawMember();
 
-            if (!$rawMember instanceof SequenceMember) {
+            if (!$rawMember instanceof Bin) {
                 return false;
             }
 

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Model\TimeInterval;
 
-use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Contracts\Model\Bin;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-trait TimeIntervalTrait
+trait TimeBinTrait
 {
     /**
      * @var array<string,self>
@@ -68,8 +68,8 @@ trait TimeIntervalTrait
      * @return -1|0|1
      */
     public static function compare(
-        SequenceMember $a,
-        SequenceMember $b,
+        Bin $a,
+        Bin $b,
     ): int {
         if (
             !$a instanceof self

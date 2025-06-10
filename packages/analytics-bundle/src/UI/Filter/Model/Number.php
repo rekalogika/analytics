@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Bundle\UI\Filter\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 
 final readonly class Number implements \Stringable
 {
     /**
-     * @param class-string<TimeInterval|RecurringTimeInterval> $typeClass
+     * @param class-string<TimeBin|RecurringTimeBin> $typeClass
      */
     public function __construct(
         private readonly string $dimension,
@@ -35,7 +35,7 @@ final readonly class Number implements \Stringable
         return (string) $this->number;
     }
 
-    private function getObject(): TimeInterval|RecurringTimeInterval
+    private function getObject(): TimeBin|RecurringTimeBin
     {
         return ($this->typeClass)::createFromDatabaseValue($this->number);
     }

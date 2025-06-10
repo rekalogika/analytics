@@ -15,7 +15,10 @@ namespace Rekalogika\Analytics\Contracts\Model;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-interface RecurringTimeInterval extends TranslatableInterface, SequenceMember
+/**
+ * @extends Bin<\DateTimeInterface>
+ */
+interface RecurringTimeBin extends TranslatableInterface, Bin
 {
     public static function createFromDatabaseValue(int $databaseValue): static;
 }

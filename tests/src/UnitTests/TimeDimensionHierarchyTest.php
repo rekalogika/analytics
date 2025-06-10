@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Model\TimeInterval\Date;
 use Rekalogika\Analytics\Model\TimeInterval\Hour;
 use Rekalogika\Analytics\Model\TimeInterval\Month;
@@ -30,7 +30,7 @@ final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
      * @dataProvider intervalProvider
-     * @param class-string<TimeInterval> $class
+     * @param class-string<TimeBin> $class
      */
     public function testInterval(
         int $databaseInput,
@@ -55,7 +55,7 @@ final class TimeDimensionHierarchyTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<TimeInterval>,\DateTimeInterface,\DateTimeInterface,string,string}>
+     * @return iterable<array-key,array{int,class-string<TimeBin>,\DateTimeInterface,\DateTimeInterface,string,string}>
      */
     public static function intervalProvider(): iterable
     {

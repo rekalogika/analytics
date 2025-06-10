@@ -18,8 +18,8 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Number;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\NumberRange;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfWeek;
 use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
@@ -49,7 +49,7 @@ final class NumberRangesFilter implements Filter
     private ?array $numbers = null;
 
     /**
-     * @param class-string<TimeInterval|RecurringTimeInterval> $typeClass
+     * @param class-string<TimeBin|RecurringTimeBin> $typeClass
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
