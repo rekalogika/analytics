@@ -18,22 +18,22 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Number;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\NumberRange;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeInterval;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
-use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
-use Rekalogika\Analytics\Model\TimeInterval\DayOfWeek;
-use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\HourOfDay;
-use Rekalogika\Analytics\Model\TimeInterval\Month;
-use Rekalogika\Analytics\Model\TimeInterval\MonthOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\Quarter;
-use Rekalogika\Analytics\Model\TimeInterval\QuarterOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\Week;
-use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
-use Rekalogika\Analytics\Model\TimeInterval\WeekOfMonth;
-use Rekalogika\Analytics\Model\TimeInterval\WeekOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
-use Rekalogika\Analytics\Model\TimeInterval\Year;
+use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
+use Rekalogika\Analytics\Model\TimeBin\DayOfMonth;
+use Rekalogika\Analytics\Model\TimeBin\DayOfWeek;
+use Rekalogika\Analytics\Model\TimeBin\DayOfYear;
+use Rekalogika\Analytics\Model\TimeBin\HourOfDay;
+use Rekalogika\Analytics\Model\TimeBin\Month;
+use Rekalogika\Analytics\Model\TimeBin\MonthOfYear;
+use Rekalogika\Analytics\Model\TimeBin\Quarter;
+use Rekalogika\Analytics\Model\TimeBin\QuarterOfYear;
+use Rekalogika\Analytics\Model\TimeBin\Week;
+use Rekalogika\Analytics\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Model\TimeBin\WeekOfMonth;
+use Rekalogika\Analytics\Model\TimeBin\WeekOfYear;
+use Rekalogika\Analytics\Model\TimeBin\WeekYear;
+use Rekalogika\Analytics\Model\TimeBin\Year;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -49,7 +49,7 @@ final class NumberRangesFilter implements Filter
     private ?array $numbers = null;
 
     /**
-     * @param class-string<TimeInterval|RecurringTimeInterval> $typeClass
+     * @param class-string<TimeBin|RecurringTimeBin> $typeClass
      * @param array<string,mixed> $inputArray
      */
     public function __construct(

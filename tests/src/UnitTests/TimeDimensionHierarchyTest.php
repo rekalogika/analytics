@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
-use Rekalogika\Analytics\Model\TimeInterval\Date;
-use Rekalogika\Analytics\Model\TimeInterval\Hour;
-use Rekalogika\Analytics\Model\TimeInterval\Month;
-use Rekalogika\Analytics\Model\TimeInterval\Quarter;
-use Rekalogika\Analytics\Model\TimeInterval\Week;
-use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
-use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
-use Rekalogika\Analytics\Model\TimeInterval\Year;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
+use Rekalogika\Analytics\Model\TimeBin\Date;
+use Rekalogika\Analytics\Model\TimeBin\Hour;
+use Rekalogika\Analytics\Model\TimeBin\Month;
+use Rekalogika\Analytics\Model\TimeBin\Quarter;
+use Rekalogika\Analytics\Model\TimeBin\Week;
+use Rekalogika\Analytics\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Model\TimeBin\WeekYear;
+use Rekalogika\Analytics\Model\TimeBin\Year;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 
@@ -30,7 +30,7 @@ final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
      * @dataProvider intervalProvider
-     * @param class-string<TimeInterval> $class
+     * @param class-string<TimeBin> $class
      */
     public function testInterval(
         int $databaseInput,
@@ -55,7 +55,7 @@ final class TimeDimensionHierarchyTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<TimeInterval>,\DateTimeInterface,\DateTimeInterface,string,string}>
+     * @return iterable<array-key,array{int,class-string<TimeBin>,\DateTimeInterface,\DateTimeInterface,string,string}>
      */
     public static function intervalProvider(): iterable
     {

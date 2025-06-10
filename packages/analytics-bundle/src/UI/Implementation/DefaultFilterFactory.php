@@ -22,19 +22,19 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Contracts\Model\TimeInterval;
+use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\Model\TimeInterval\DayOfMonth;
-use Rekalogika\Analytics\Model\TimeInterval\DayOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\HourOfDay;
-use Rekalogika\Analytics\Model\TimeInterval\Month;
-use Rekalogika\Analytics\Model\TimeInterval\Quarter;
-use Rekalogika\Analytics\Model\TimeInterval\Week;
-use Rekalogika\Analytics\Model\TimeInterval\WeekDate;
-use Rekalogika\Analytics\Model\TimeInterval\WeekOfMonth;
-use Rekalogika\Analytics\Model\TimeInterval\WeekOfYear;
-use Rekalogika\Analytics\Model\TimeInterval\WeekYear;
-use Rekalogika\Analytics\Model\TimeInterval\Year;
+use Rekalogika\Analytics\Model\TimeBin\DayOfMonth;
+use Rekalogika\Analytics\Model\TimeBin\DayOfYear;
+use Rekalogika\Analytics\Model\TimeBin\HourOfDay;
+use Rekalogika\Analytics\Model\TimeBin\Month;
+use Rekalogika\Analytics\Model\TimeBin\Quarter;
+use Rekalogika\Analytics\Model\TimeBin\Week;
+use Rekalogika\Analytics\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Model\TimeBin\WeekOfMonth;
+use Rekalogika\Analytics\Model\TimeBin\WeekOfYear;
+use Rekalogika\Analytics\Model\TimeBin\WeekYear;
+use Rekalogika\Analytics\Model\TimeBin\Year;
 
 final readonly class DefaultFilterFactory implements FilterFactory
 {
@@ -78,7 +78,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
             $filterFactory = $this->getSpecificFilterFactory(NumberRangesFilter::class);
         } elseif (enum_exists($typeClass)) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
-        } elseif (is_a($typeClass, TimeInterval::class, true)) {
+        } elseif (is_a($typeClass, TimeBin::class, true)) {
             $filterFactory = $this->getSpecificFilterFactory(DateRangeFilter::class);
         } else {
             $filterFactory = $this->getSpecificFilterFactory(NullFilter::class);

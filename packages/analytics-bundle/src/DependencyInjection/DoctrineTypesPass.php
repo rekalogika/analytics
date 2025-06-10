@@ -15,14 +15,14 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\Doctrine\HyperLogLog\HllType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\DateType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\HourType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\MonthType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\QuarterType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekDateType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\WeekYearType;
-use Rekalogika\Analytics\Doctrine\Types\TimeInterval\YearType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\DateType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\HourType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\MonthType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\QuarterType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\WeekDateType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\WeekType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\WeekYearType;
+use Rekalogika\Analytics\Doctrine\Types\TimeBin\YearType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
