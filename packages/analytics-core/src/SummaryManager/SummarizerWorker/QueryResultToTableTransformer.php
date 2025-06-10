@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Model\TimeZoneAwareDimensionHierarchy;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
+use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SummaryManager\DefaultQuery;
@@ -411,13 +412,21 @@ final readonly class QueryResultToTableTransformer
         }
 
         // inject time zone if applicable
+        // @todo optimize
 
-        if ($hierarchyObject instanceof TimeZoneAwareDimensionHierarchy) {
-            $timeZone = $this->metadata
-                ->getDimension($propertyName)
-                ->getSummaryTimeZone();
+        if ($hierarchyObject instanceof ContextAwareHierarchy) {
+            $hierarchyContext = new HierarchyContext(
+                summaryMetadata: $this->metadata,
+                dimensionMetadata: $this->metadata
+                    ->getDimension($propertyName),
+                dimensionHierarchyMetadata: $this->metadata
+                    ->getDimension($propertyName)
+                    ->getHierarchy() ?? throw new LogicException(
+                        \sprintf('Dimension "%s" does not have a hierarchy', $propertyName),
+                    ),
+            );
 
-            $hierarchyObject->setTimeZone($timeZone);
+            $hierarchyObject->setContext($hierarchyContext);
         }
 
         // inject value to hierarchy object

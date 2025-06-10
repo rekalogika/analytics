@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Attribute;
 
-use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
+use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAwareValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]

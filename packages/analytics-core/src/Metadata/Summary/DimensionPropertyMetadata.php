@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
-use Rekalogika\Analytics\Contracts\Summary\HierarchyAwareValueResolver;
+use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAwareValueResolver;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;

@@ -22,7 +22,7 @@ use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait WeekYearTrait
 {
-    abstract public function getTimeZone(): \DateTimeZone;
+    abstract private function getTimeZone(): \DateTimeZone;
 
     #[Column(type: 'rekalogika_analytics_week_year', nullable: true)]
     #[LevelProperty(

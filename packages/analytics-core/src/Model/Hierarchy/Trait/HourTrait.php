@@ -24,7 +24,7 @@ use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait HourTrait
 {
-    abstract public function getTimeZone(): \DateTimeZone;
+    abstract private function getTimeZone(): \DateTimeZone;
 
     #[Column(type: 'rekalogika_analytics_hour', nullable: true)]
     #[LevelProperty(

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
+use Rekalogika\Analytics\Contracts\Context\SourceContext;
+
 interface ValueResolver
 {
     /**

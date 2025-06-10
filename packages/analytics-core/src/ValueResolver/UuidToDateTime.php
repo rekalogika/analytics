@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\ValueResolver;
 
+use Rekalogika\Analytics\Contracts\Context\SourceContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Contracts\Summary\SourceContext;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Util\UuidV7Util;
 use Symfony\Component\Uid\UuidV7;
