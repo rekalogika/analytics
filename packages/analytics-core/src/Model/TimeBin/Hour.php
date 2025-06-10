@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeBin;
 
 use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WeekDate implements TimeBin
+final class Hour implements TimeBin
 {
     use TimeBinTrait;
 
@@ -30,25 +30,27 @@ final class WeekDate implements TimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
-        $string = \sprintf('%07d', $databaseValue);
+        $ymdh = \sprintf('%010d', $databaseValue);
 
-        $y = (int) substr($string, 0, 4);
-        $w = (int) substr($string, 4, 2);
-        $d = (int) substr($string, 6, 1);
+        $y = (int) substr($ymdh, 0, 4);
+        $m = (int) substr($ymdh, 4, 2);
+        $d = (int) substr($ymdh, 6, 2);
+        $h = (int) substr($ymdh, 8, 2);
 
-        $this->start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
-            ->setISODate($y, $w, $d)
-            ->setTime(0, 0, 0);
+        $this->start = new \DateTimeImmutable(
+            \sprintf('%04d-%02d-%02d %02d:00:00', $y, $m, $d, $h),
+            $timeZone,
+        );
 
-        $this->end = $this->start->modify('+1 day');
+        $this->end = $this->start->modify('+1 hour');
     }
 
     // #[\Override]
     // public function getContainingIntervals(): array
     // {
     //     return [
-    //         $this->getContainingWeek(),
+    //         $this->getContainingDate(),
+    //         $this->getContainingWeekDate(),
     //     ];
     // }
 
@@ -57,7 +59,7 @@ final class WeekDate implements TimeBin
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('oWN'),
+            (int) $dateTime->format('YmdH'),
             $dateTime->getTimezone(),
         );
     }
@@ -65,7 +67,7 @@ final class WeekDate implements TimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o-\WW-N');
+        return $this->start->format('Y-m-d H:00');
     }
 
     #[\Override]
@@ -73,7 +75,7 @@ final class WeekDate implements TimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->start->format('o-\WW-N');
+        return $this->start->format('Y-m-d H:00');
     }
 
     #[\Override]
@@ -90,18 +92,26 @@ final class WeekDate implements TimeBin
 
     // public function getStartDatabaseValue(): int
     // {
-    //     return (int) $this->start->format('oWN');
+    //     return (int) $this->start->format('YmdH');
     // }
 
     // public function getEndDatabaseValue(): int
     // {
-    //     return (int) $this->end->format('oWN');
+    //     return (int) $this->end->format('YmdH');
     // }
 
-    // private function getContainingWeek(): Week
+    // private function getContainingDate(): Date
     // {
-    //     return Week::createFromDatabaseValue(
-    //         (int) $this->start->format('oW'),
+    //     return Date::createFromDatabaseValue(
+    //         (int) $this->start->format('Ymd'),
+    //         $this->start->getTimezone(),
+    //     );
+    // }
+
+    // private function getContainingWeekDate(): WeekDate
+    // {
+    //     return WeekDate::createFromDatabaseValue(
+    //         (int) $this->start->format('oWw'),
     //         $this->start->getTimezone(),
     //     );
     // }
@@ -109,16 +119,22 @@ final class WeekDate implements TimeBin
     #[\Override]
     public function getNext(): static
     {
-        $nextDateTime = $this->start->modify('+1 day');
+        $next = $this->start->modify('+1 hour');
 
-        return self::createFromDateTime($nextDateTime);
+        return self::create(
+            (int) $next->format('YmdH'),
+            $next->getTimezone(),
+        );
     }
 
     #[\Override]
     public function getPrevious(): static
     {
-        $previousDateTime = $this->start->modify('-1 day');
+        $previous = $this->start->modify('-1 hour');
 
-        return self::createFromDateTime($previousDateTime);
+        return self::create(
+            (int) $previous->format('YmdH'),
+            $previous->getTimezone(),
+        );
     }
 }

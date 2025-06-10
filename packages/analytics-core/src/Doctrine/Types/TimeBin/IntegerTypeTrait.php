@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeBin;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-trait SmallintTypeTrait
+trait IntegerTypeTrait
 {
     public function getSQLDeclaration(
         array $column,
         AbstractPlatform $platform,
     ): string {
-        return $platform->getSmallIntTypeDeclarationSQL($column);
+        return $platform->getIntegerTypeDeclarationSQL($column);
     }
 }

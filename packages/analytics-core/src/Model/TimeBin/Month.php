@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeBin;
 
 use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;

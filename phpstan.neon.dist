@@ -21,10 +21,12 @@ parameters:
             path: tests/src/App/Entity/*
         -
             identifier: property.unusedType
-            path: packages/analytics-core/src/Model/Hierarchy/*
+            paths:
+                - packages/analytics-core/src/Model/Hierarchy/*
+                - tests/src/App/Entity/OrderSummary.php
         -
             identifier: return.unusedType
-            path: packages/analytics-core/src/Doctrine/Types/TimeInterval/TimeIntervalType.php
+            path: packages/analytics-core/src/Doctrine/Types/TimeBin/TimeBinType.php
         -   '#Doctrine\\ORM\\Query but does not specify its types: TKey, TResult#'
         -
             message: '#of internal class Symfony\\Polyfill\\Intl\\Icu\\IntlDateFormatter from outside its root#'

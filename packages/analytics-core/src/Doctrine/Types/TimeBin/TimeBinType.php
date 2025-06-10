@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeBin;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Exception\ConversionException;
 
-abstract class TimeIntervalType extends Type
+abstract class TimeBinType extends Type
 {
     /**
      * @return class-string<TimeBin>

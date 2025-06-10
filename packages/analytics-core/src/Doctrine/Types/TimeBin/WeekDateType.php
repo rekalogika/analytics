@@ -11,22 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeBin;
 
-use Rekalogika\Analytics\Model\TimeInterval\Month;
+use Rekalogika\Analytics\Model\TimeBin\WeekDate;
 
-final class MonthType extends TimeIntervalType
+final class WeekDateType extends TimeBinType
 {
     use IntegerTypeTrait;
 
     #[\Override]
     protected function getClass(): string
     {
-        return Month::class;
+        return WeekDate::class;
     }
 
     final public function getName(): string
     {
-        return 'rekalogika_analytics_month';
+        return 'rekalogika_analytics_week_date';
     }
 }

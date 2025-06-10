@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeBin;
 
 use Rekalogika\Analytics\Contracts\Model\Bin;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 
-trait RecurringTimeIntervalTrait
+trait RecurringTimeBinTrait
 {
     public static function createFromDatabaseValue(int $databaseValue): static
     {

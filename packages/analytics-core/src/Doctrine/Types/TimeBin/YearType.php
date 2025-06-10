@@ -11,22 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine\Types\TimeInterval;
+namespace Rekalogika\Analytics\Doctrine\Types\TimeBin;
 
-use Rekalogika\Analytics\Model\TimeInterval\Date;
+use Rekalogika\Analytics\Model\TimeBin\Year;
 
-final class DateType extends TimeIntervalType
+final class YearType extends TimeBinType
 {
-    use IntegerTypeTrait;
+    use SmallintTypeTrait;
 
     #[\Override]
     protected function getClass(): string
     {
-        return Date::class;
+        return Year::class;
     }
 
     final public function getName(): string
     {
-        return 'rekalogika_analytics_date';
+        return 'rekalogika_analytics_year';
     }
 }

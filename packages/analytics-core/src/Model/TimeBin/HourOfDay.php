@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\TimeInterval;
+namespace Rekalogika\Analytics\Model\TimeBin;
 
 use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum HourOfDay: int implements RecurringTimeBin
 {
-    use RecurringTimeIntervalTrait;
+    use RecurringTimeBinTrait;
 
     case Hour0 = 0;
     case Hour1 = 1;

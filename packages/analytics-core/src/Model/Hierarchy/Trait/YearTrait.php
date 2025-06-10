@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Model\Hierarchy\Trait;
 
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Attribute\LevelProperty;
-use Rekalogika\Analytics\Model\TimeInterval\Year;
+use Rekalogika\Analytics\Model\TimeBin\Year;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Rekalogika\Analytics\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\TimeFormat;
