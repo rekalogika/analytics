@@ -15,14 +15,14 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Model\TimeBin;
-use Rekalogika\Analytics\Model\TimeBin\Date;
-use Rekalogika\Analytics\Model\TimeBin\Hour;
-use Rekalogika\Analytics\Model\TimeBin\Month;
-use Rekalogika\Analytics\Model\TimeBin\Quarter;
-use Rekalogika\Analytics\Model\TimeBin\Week;
-use Rekalogika\Analytics\Model\TimeBin\WeekDate;
-use Rekalogika\Analytics\Model\TimeBin\WeekYear;
-use Rekalogika\Analytics\Model\TimeBin\Year;
+use Rekalogika\Analytics\Time\Model\TimeBin\Date;
+use Rekalogika\Analytics\Time\Model\TimeBin\Hour;
+use Rekalogika\Analytics\Time\Model\TimeBin\Month;
+use Rekalogika\Analytics\Time\Model\TimeBin\Quarter;
+use Rekalogika\Analytics\Time\Model\TimeBin\Week;
+use Rekalogika\Analytics\Time\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Time\Model\TimeBin\WeekYear;
+use Rekalogika\Analytics\Time\Model\TimeBin\Year;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 

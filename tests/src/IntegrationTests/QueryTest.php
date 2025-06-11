@@ -19,13 +19,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Exception\OverflowException;
-use Rekalogika\Analytics\Model\TimeBin\DayOfMonth;
-use Rekalogika\Analytics\Model\TimeBin\Hour;
-use Rekalogika\Analytics\Model\TimeBin\Month;
-use Rekalogika\Analytics\Model\TimeBin\MonthOfYear;
 use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\Time\Model\TimeBin\DayOfMonth;
+use Rekalogika\Analytics\Time\Model\TimeBin\Hour;
+use Rekalogika\Analytics\Time\Model\TimeBin\Month;
+use Rekalogika\Analytics\Time\Model\TimeBin\MonthOfYear;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueryTest extends KernelTestCase
