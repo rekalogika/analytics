@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -29,8 +30,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
         $entityManagers = $container->getParameter('doctrine.entity_managers');
         \assert(\is_array($entityManagers));
 
-        // get entity directory
-        $directory = $this->getEntityDirectory();
+        $directories = $this->getEntityDirectories();
 
         /**
          * @var string $name
@@ -40,8 +40,8 @@ final class DoctrineEntityPass implements CompilerPassInterface
             $container->setParameter($parameterKey, $name);
 
             $pass = DoctrineOrmMappingsPass::createAttributeMappingDriver(
-                namespaces: ['Rekalogika\Analytics\Model'],
-                directories: [$directory],
+                namespaces: ['Rekalogika\Analytics\Model', 'Rekalogika\Analytics\Time\Model'],
+                directories: $directories,
                 managerParameters: [$parameterKey],
                 reportFieldsWhereDeclared: true,
             );
@@ -52,8 +52,14 @@ final class DoctrineEntityPass implements CompilerPassInterface
         }
     }
 
-    private function getEntityDirectory(): string
+    /**
+     * @return list<string>
+     */
+    private function getEntityDirectories(): array
     {
+        $directories = [];
+
+        // core
         $reflection = new \ReflectionClass(SummaryManager::class);
         $fileName = $reflection->getFileName();
 
@@ -61,6 +67,21 @@ final class DoctrineEntityPass implements CompilerPassInterface
             throw new \RuntimeException('Reflection failed');
         }
 
-        return \dirname($fileName, 2) . '/Model';
+        $directories[] = \dirname($fileName, 2) . '/Model';
+
+        // time
+
+        if (class_exists(TimeBin::class)) {
+            $reflection = new \ReflectionClass(TimeBin::class);
+            $fileName = $reflection->getFileName();
+
+            if (false === $fileName) {
+                throw new \RuntimeException('Reflection failed');
+            }
+
+            $directories[] = \dirname($fileName) . '/Model';
+        }
+
+        return $directories;
     }
 }

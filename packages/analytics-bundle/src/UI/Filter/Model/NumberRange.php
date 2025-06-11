@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Bundle\UI\Filter\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 
 final readonly class NumberRange implements \Stringable
 {
