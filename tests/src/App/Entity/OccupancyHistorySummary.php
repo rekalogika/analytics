@@ -24,9 +24,9 @@ use Rekalogika\Analytics\Time\Model\TimeBin\Date;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfMonth;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfWeek;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfYear;
+use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\DateToInteger;
-use Rekalogika\Analytics\ValueResolver\TimeBin;
-use Rekalogika\Analytics\ValueResolver\TimeFormat;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]

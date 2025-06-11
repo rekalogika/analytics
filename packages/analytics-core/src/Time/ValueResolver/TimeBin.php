@@ -11,12 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\ValueResolver;
+namespace Rekalogika\Analytics\Time\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\ValueResolver\PropertyValue;
 
 final readonly class TimeBin implements ValueResolver, HierarchyAware
 {

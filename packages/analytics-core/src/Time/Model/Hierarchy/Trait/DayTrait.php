@@ -21,9 +21,9 @@ use Rekalogika\Analytics\Time\Model\TimeBin\DayOfMonth;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfWeek;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfYear;
 use Rekalogika\Analytics\Time\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\ValueResolver\TimeBin;
-use Rekalogika\Analytics\ValueResolver\TimeFormat;
 
 trait DayTrait
 {
