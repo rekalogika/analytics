@@ -25,6 +25,6 @@ doctrine:
                 REKALOGIKA_HLL_UNION_AGG: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllUnionAggregateFunction
                 REKALOGIKA_HLL_HASH: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllHashFunction
             numeric_functions:
-                REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER: Rekalogika\Analytics\Time\Doctrine\Function\DateTimeToSummaryIntegerFunction
+                REKALOGIKA_TIME_BIN: Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction
                 REKALOGIKA_TRUNCATE_UUID_TO_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction
                 REKALOGIKA_HLL_CARDINALITY: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllCardinalityFunction

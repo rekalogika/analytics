@@ -62,7 +62,7 @@ final readonly class TimeBin implements ValueResolver, HierarchyAware
         }
 
         return \sprintf(
-            "REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(%s, '%s', '%s', '%s')",
+            "REKALOGIKA_TIME_BIN(%s, '%s', '%s', '%s')",
             $this->input->getExpression($context),
             $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
