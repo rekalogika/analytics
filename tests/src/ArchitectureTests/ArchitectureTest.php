@@ -15,9 +15,18 @@ namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Query\AST\Functions\FunctionNode;
+use Doctrine\ORM\Query\AST\Node;
+use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Query\SqlWalker;
+use Doctrine\ORM\Query\TokenType;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
@@ -25,12 +34,18 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Container\ContainerInterface;
+use Rekalogika\Analytics\Attribute\Hierarchy;
+use Rekalogika\Analytics\Attribute\LevelProperty;
+use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\ValueResolver\PropertyValue;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 use Rekalogika\Contracts\Rekapager\PageInterface;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\Rekapager\Doctrine\ORM\QueryBuilderAdapter;
 use Rekalogika\Rekapager\Keyset\KeysetPageable;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Twig\Environment;
@@ -51,6 +66,7 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
+                Selectors::selectAnalyticsContracts(),
 
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
@@ -104,9 +120,6 @@ final class ArchitectureTest
                 Selector::classname(\Error::class),
                 Selector::classname(\Throwable::class),
                 Selector::classname(\InvalidArgumentException::class),
-
-                // intl
-                Selector::classname(\IntlDateFormatter::class),
             );
     }
 
@@ -134,13 +147,26 @@ final class ArchitectureTest
     /**
      * analytics-core should not depend on bundle package
      */
-    public function testPackageAnalyticsCoreNegative(): Rule
+    public function testPackageAnalyticsCoreNegativeBundle(): Rule
     {
         return PHPat::rule()
             ->classes(Selectors::selectAnalyticsCore())
             ->shouldNotDependOn()
             ->classes(
                 Selector::inNamespace('Rekalogika\Analytics\Bundle'),
+            );
+    }
+
+    /**
+     * analytics-core should not depend on time package
+     */
+    public function testPackageAnalyticsCoreNegativeTime(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selectors::selectAnalyticsCore())
+            ->shouldNotDependOn()
+            ->classes(
+                Selector::inNamespace('Rekalogika\Analytics\Time'),
             );
     }
 
@@ -155,6 +181,11 @@ final class ArchitectureTest
             )
             ->canOnlyDependOn()
             ->classes(
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCore(),
+                Selector::inNamespace('Rekalogika\Analytics\Time'),
+
+                // misc
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
                 Selector::inNamespace('Symfony\Component\Config'),
                 Selector::inNamespace('Doctrine\Persistence'),
@@ -164,7 +195,6 @@ final class ArchitectureTest
                 Selector::inNamespace('Psr\SimpleCache'),
                 Selector::inNamespace('Rekalogika\Analytics\Bundle'),
                 Selector::inNamespace('Rekalogika\Analytics\Exception'),
-                Selectors::selectAnalyticsCore(),
                 Selector::inNamespace('Symfony\Component\Cache'),
                 Selector::inNamespace('Symfony\Component\Console'),
                 Selector::inNamespace('Symfony\Component\DependencyInjection'),
@@ -220,6 +250,61 @@ final class ArchitectureTest
                 Selector::classname(DataType::class),
                 Selector::classname(Html::class),
                 Selector::classname(Spreadsheet::class),
+            );
+    }
+
+    /**
+     * time deps
+     */
+    public function testPackageTime(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selector::inNamespace('Rekalogika\Analytics\Time'),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCoreException(),
+
+                // selected classes from core
+                Selector::classname(PropertyValue::class),
+                Selector::classname(LevelProperty::class),
+                Selector::classname(Hierarchy::class),
+
+                // misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\Override::class),
+
+                // enum
+                Selector::classname(\BackedEnum::class),
+
+                // datetime
+                Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateTimeImmutable::class),
+                Selector::classname(\DateTimeZone::class),
+                Selector::classname(\IntlDateFormatter::class),
+
+                // translation
+                Selector::classname(TranslatorInterface::class),
+                Selector::classname(TranslatableInterface::class),
+                Selector::classname(TranslatableMessage::class),
+
+                // exceptions
+                Selector::classname(\Error::class),
+
+                // doctrine
+                Selector::classname(Column::class),
+                Selector::classname(Types::class),
+                Selector::classname(Embeddable::class),
+                Selector::classname(AbstractPlatform::class),
+                Selector::classname(TokenType::class),
+                Selector::classname(SqlWalker::class),
+                Selector::classname(Parser::class),
+                Selector::classname(Node::class),
+                Selector::classname(FunctionNode::class),
+                Selector::classname(Type::class),
             );
     }
 

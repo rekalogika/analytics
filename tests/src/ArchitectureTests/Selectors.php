@@ -28,11 +28,24 @@ final readonly class Selectors
                 Selector::inNamespace('Rekalogika\Analytics\Bundle'),
             ),
             Selector::NOT(
+                Selector::inNamespace('Rekalogika\Analytics\Contracts'),
+            ),
+            Selector::NOT(
+                Selector::inNamespace('Rekalogika\Analytics\Time'),
+            ),
+            Selector::NOT(
                 Selector::inNamespace('Rekalogika\Analytics\Tests'),
             ),
             Selector::NOT(
                 Selector::inNamespace('Rekalogika\Analytics\Exception'),
             ),
+        );
+    }
+
+    public static function selectAnalyticsContracts(): AllOfSelectorModifier
+    {
+        return Selector::AllOf(
+            Selector::inNamespace('Rekalogika\Analytics\Contracts'),
         );
     }
 
