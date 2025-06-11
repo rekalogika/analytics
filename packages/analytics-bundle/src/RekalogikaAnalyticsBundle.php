@@ -22,6 +22,15 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Doctrine\Function\GroupingConcatFunction;
+use Rekalogika\Analytics\Doctrine\Function\NextValFunction;
+use Rekalogika\Analytics\Doctrine\Function\TruncateBigIntFunction;
+use Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction;
+use Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllAddAggregateFunction;
+use Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllCardinalityFunction;
+use Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllHashFunction;
+use Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllUnionAggregateFunction;
+use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -114,6 +123,30 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
     ): void {
         $this->prependTwig($builder);
         $this->prependAssetMapper($builder);
+        $this->prependDQLFunctions($builder);
+    }
+
+    private function prependDQLFunctions(ContainerBuilder $builder): void
+    {
+        $builder->prependExtensionConfig('doctrine', [
+            'orm' => [
+                'dql' => [
+                    'string_functions' => [
+                        'REKALOGIKA_NEXTVAL' => NextValFunction::class,
+                        'REKALOGIKA_TRUNCATE_BIGINT'  => TruncateBigIntFunction::class,
+                        'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
+                        'REKALOGIKA_HLL_ADD_AGG' => HllAddAggregateFunction::class,
+                        'REKALOGIKA_HLL_UNION_AGG' => HllUnionAggregateFunction::class,
+                        'REKALOGIKA_HLL_HASH' => HllHashFunction::class,
+                    ],
+                    'numeric_functions' => [
+                        'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
+                        'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT' => TruncateUuidToBigintFunction::class,
+                        'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
+                    ],
+                ],
+            ],
+        ]);
     }
 
     private function prependTwig(ContainerBuilder $builder): void

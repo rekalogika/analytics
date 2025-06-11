@@ -16,15 +16,3 @@ doctrine:
                 dir: "%kernel.project_dir%/src/App/Entity"
                 prefix: 'Rekalogika\Analytics\Tests\App\Entity'
                 alias: App
-        dql:
-            string_functions:
-                REKALOGIKA_NEXTVAL: Rekalogika\Analytics\Doctrine\Function\NextValFunction
-                REKALOGIKA_TRUNCATE_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateBigIntFunction
-                REKALOGIKA_GROUPING_CONCAT: Rekalogika\Analytics\Doctrine\Function\GroupingConcatFunction
-                REKALOGIKA_HLL_ADD_AGG: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllAddAggregateFunction
-                REKALOGIKA_HLL_UNION_AGG: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllUnionAggregateFunction
-                REKALOGIKA_HLL_HASH: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllHashFunction
-            numeric_functions:
-                REKALOGIKA_TIME_BIN: Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction
-                REKALOGIKA_TRUNCATE_UUID_TO_BIGINT: Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction
-                REKALOGIKA_HLL_CARDINALITY: Rekalogika\Analytics\Doctrine\HyperLogLog\Function\HllCardinalityFunction
