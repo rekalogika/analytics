@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\AggregateFunction;
+namespace Rekalogika\Analytics\PostgreSQLHll\AggregateFunction;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
