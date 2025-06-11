@@ -67,6 +67,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCoreException(),
 
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
@@ -115,7 +116,6 @@ final class ArchitectureTest
                 Selector::classname(\ReflectionException::class),
 
                 // exceptions
-                Selectors::selectAnalyticsCoreException(),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
                 Selector::classname(\Throwable::class),
@@ -130,7 +130,6 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCoreException(),
-                Selectors::selectAnalyticsCore(),
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),
@@ -153,7 +152,7 @@ final class ArchitectureTest
             ->classes(Selectors::selectAnalyticsCore())
             ->shouldNotDependOn()
             ->classes(
-                Selector::inNamespace('Rekalogika\Analytics\Bundle'),
+                Selectors::selectAnalyticsBundle(),
             );
     }
 
@@ -166,7 +165,7 @@ final class ArchitectureTest
             ->classes(Selectors::selectAnalyticsCore())
             ->shouldNotDependOn()
             ->classes(
-                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                Selectors::selectAnalyticsTime(),
             );
     }
 
@@ -183,7 +182,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                Selectors::selectAnalyticsTime(),
 
                 // misc
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
@@ -260,11 +259,11 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(
-                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                Selectors::selectAnalyticsTime(),
             )
             ->canOnlyDependOn()
             ->classes(
-                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCoreException(),
 
@@ -272,6 +271,7 @@ final class ArchitectureTest
                 Selector::classname(PropertyValue::class),
                 Selector::classname(LevelProperty::class),
                 Selector::classname(Hierarchy::class),
+                Selector::classname(TranslatableMessage::class),
 
                 // misc
                 Selector::classname(\Stringable::class),
@@ -289,7 +289,6 @@ final class ArchitectureTest
                 // translation
                 Selector::classname(TranslatorInterface::class),
                 Selector::classname(TranslatableInterface::class),
-                Selector::classname(TranslatableMessage::class),
 
                 // exceptions
                 Selector::classname(\Error::class),

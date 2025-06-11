@@ -13,46 +13,55 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
-use PHPat\Selector\Modifier\AllOfSelectorModifier;
 use PHPat\Selector\Selector;
+use PHPat\Selector\SelectorInterface;
 
 final readonly class Selectors
 {
     private function __construct() {}
 
-    public static function selectAnalyticsCore(): AllOfSelectorModifier
+    public static function selectAnalyticsCore(): SelectorInterface
     {
         return Selector::AllOf(
             Selector::inNamespace('Rekalogika\Analytics'),
             Selector::NOT(
-                Selector::inNamespace('Rekalogika\Analytics\Bundle'),
+                self::selectAnalyticsBundle(),
             ),
             Selector::NOT(
-                Selector::inNamespace('Rekalogika\Analytics\Contracts'),
+                self::selectAnalyticsContracts(),
             ),
             Selector::NOT(
-                Selector::inNamespace('Rekalogika\Analytics\Time'),
+                self::selectAnalyticsTime(),
             ),
             Selector::NOT(
                 Selector::inNamespace('Rekalogika\Analytics\Tests'),
             ),
             Selector::NOT(
-                Selector::inNamespace('Rekalogika\Analytics\Exception'),
+                self::selectAnalyticsCoreException(),
             ),
         );
     }
 
-    public static function selectAnalyticsContracts(): AllOfSelectorModifier
+    public static function selectAnalyticsContracts(): SelectorInterface
     {
-        return Selector::AllOf(
+        return Selector::AnyOf(
+            Selector::inNamespace('Rekalogika\Analytics\Attribute'),
             Selector::inNamespace('Rekalogika\Analytics\Contracts'),
         );
     }
 
-    public static function selectAnalyticsCoreException(): AllOfSelectorModifier
+    public static function selectAnalyticsBundle(): SelectorInterface
     {
-        return Selector::AllOf(
-            Selector::inNamespace('Rekalogika\Analytics\Exception'),
-        );
+        return Selector::inNamespace('Rekalogika\Analytics\Bundle');
+    }
+
+    public static function selectAnalyticsTime(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\Time');
+    }
+
+    public static function selectAnalyticsCoreException(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\Exception');
     }
 }
