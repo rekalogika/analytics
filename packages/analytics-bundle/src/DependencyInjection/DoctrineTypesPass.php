@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Doctrine\HyperLogLog\HllType;
+use Rekalogika\Analytics\PostgreSQLHll\Doctrine\HllType;
 use Rekalogika\Analytics\Time\Doctrine\Types\DateType;
 use Rekalogika\Analytics\Time\Doctrine\Types\HourType;
 use Rekalogika\Analytics\Time\Doctrine\Types\MonthType;
