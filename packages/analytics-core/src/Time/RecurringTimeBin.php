@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time;
 
+use Rekalogika\Analytics\Contracts\Model\Bin;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
