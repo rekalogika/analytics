@@ -102,7 +102,7 @@ final class SourceQueryTest extends KernelTestCase
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER(root.time, 'UTC', 'Asia/Jakarta', 'year') = :boundparameter0 ORDER BY root.id ASC",
+            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'year') = :boundparameter0 ORDER BY root.id ASC",
             $dql,
         );
     }

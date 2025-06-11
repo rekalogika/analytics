@@ -23,16 +23,16 @@ use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Exception\QueryException;
 
 /**
- * REKALOGIKA_DATETIME_TO_SUMMARY_INTEGER
+ * REKALOGIKA_TIME_BIN
  *
  * arguments:
  *
  * * source datetime
  * * stored time zone
  * * summary time zone
- * * output format (same as the values of TimeGranularity)
+ * * output format (same as the values of TimeFormat enum)
  */
-final class DateTimeToSummaryIntegerFunction extends FunctionNode
+final class TimeBinFunction extends FunctionNode
 {
     public null|Node|string $sourceDatetime = null;
 
