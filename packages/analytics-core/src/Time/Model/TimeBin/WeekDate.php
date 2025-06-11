@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Model\TimeBin;
 
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WeekDate implements TimeBin

@@ -18,8 +18,6 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Number;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\NumberRange;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfMonth;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfWeek;
 use Rekalogika\Analytics\Time\Model\TimeBin\DayOfYear;
@@ -34,6 +32,8 @@ use Rekalogika\Analytics\Time\Model\TimeBin\WeekOfMonth;
 use Rekalogika\Analytics\Time\Model\TimeBin\WeekOfYear;
 use Rekalogika\Analytics\Time\Model\TimeBin\WeekYear;
 use Rekalogika\Analytics\Time\Model\TimeBin\Year;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

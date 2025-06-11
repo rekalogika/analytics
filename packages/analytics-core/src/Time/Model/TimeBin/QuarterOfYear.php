@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Model\TimeBin;
 
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum QuarterOfYear: int implements RecurringTimeBin

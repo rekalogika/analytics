@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Exception\ConversionException;
+use Rekalogika\Analytics\Time\TimeBin;
 
 abstract class TimeBinType extends Type
 {

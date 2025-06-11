@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Contracts\Model\RecurringTimeBin;
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 
 /**
  * @implements SpecificFilterFactory<NumberRangesFilter>

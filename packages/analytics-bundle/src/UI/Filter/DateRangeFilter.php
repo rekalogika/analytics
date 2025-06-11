@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
-use Rekalogika\Analytics\Contracts\Model\TimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DateRangeFilter implements Filter

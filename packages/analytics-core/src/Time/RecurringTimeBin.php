@@ -11,27 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Model;
+namespace Rekalogika\Analytics\Time;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @extends Bin<\DateTimeInterface>
  */
-interface TimeBin extends \Stringable, TranslatableInterface, Bin
+interface RecurringTimeBin extends TranslatableInterface, Bin
 {
-    public static function createFromDateTime(
-        \DateTimeInterface $dateTime,
-    ): static;
-
     public static function createFromDatabaseValue(int $databaseValue): static;
-
-    public function getDatabaseValue(): int;
-
-    public function withTimeZone(\DateTimeZone $timeZone): static;
-
-    public function getStart(): \DateTimeInterface;
-
-    public function getEnd(): \DateTimeInterface;
-
 }
