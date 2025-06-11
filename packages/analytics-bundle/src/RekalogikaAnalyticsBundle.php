@@ -112,12 +112,24 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerConfigurator $container,
         ContainerBuilder $builder,
     ): void {
+        $this->prependTwig($builder);
+        $this->prependAssetMapper($builder);
+    }
+
+    private function prependTwig(ContainerBuilder $builder): void
+    {
         $builder->prependExtensionConfig('twig', [
             'paths' => [
                 __DIR__ . '/../templates' => 'RekalogikaAnalytics',
             ],
         ]);
+    }
 
+    /**
+     * @see https://symfony.com/doc/current/frontend/create_ux_bundle.html
+     */
+    private function prependAssetMapper(ContainerBuilder $builder): void
+    {
         if (!$this->isAssetMapperAvailable($builder)) {
             return;
         }
