@@ -19,8 +19,8 @@ use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Model\Summary;
+use Rekalogika\Analytics\Uuid\ValueResolver\UuidToTruncatedInteger;
 use Rekalogika\Analytics\ValueResolver\IdentifierValue;
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]

@@ -25,12 +25,13 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Doctrine\Function\TruncateBigIntFunction;
-use Rekalogika\Analytics\Doctrine\Function\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
+use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
+use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -143,6 +144,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                         'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
                         'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT' => TruncateUuidToBigintFunction::class,
                         'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
+                    ],
+                    'datetime_functions' => [
+                        'REKALOGIKA_UUID_TO_DATETIME' => UuidToDateTimeFunction::class,
                     ],
                 ],
             ],
