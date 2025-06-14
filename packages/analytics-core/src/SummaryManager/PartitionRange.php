@@ -18,10 +18,14 @@ use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Util\PartitionUtil;
 
 /**
- * @implements \IteratorAggregate<Partition>
+ * @implements \IteratorAggregate<Partition<mixed>>
  */
 final readonly class PartitionRange implements \IteratorAggregate, \Countable
 {
+    /**
+     * @param Partition<mixed> $start
+     * @param Partition<mixed> $end
+     */
     public function __construct(
         private Partition $start,
         private Partition $end,
@@ -87,11 +91,17 @@ final readonly class PartitionRange implements \IteratorAggregate, \Countable
         return $count;
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function getStart(): Partition
     {
         return $this->start;
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function getEnd(): Partition
     {
         return $this->end;

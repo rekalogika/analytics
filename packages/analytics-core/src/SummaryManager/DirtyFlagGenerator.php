@@ -87,6 +87,7 @@ final readonly class DirtyFlagGenerator
 
     /**
      * @param class-string $class
+     * @param Partition<mixed> $partition
      */
     public function createDirtyFlag(
         string $class,

@@ -19,6 +19,7 @@ interface RefreshRunner
 {
     /**
      * @param class-string $class
+     * @param null|Partition<mixed> $partition
      */
     public function refresh(string $class, ?Partition $partition): void;
 }

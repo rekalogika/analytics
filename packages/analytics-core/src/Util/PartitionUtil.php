@@ -60,7 +60,7 @@ final readonly class PartitionUtil
     }
 
     /**
-     * @param class-string<Partition> $partitionClass
+     * @param class-string<Partition<mixed>> $partitionClass
      */
     public static function getLowestLevel(string $partitionClass): int
     {
@@ -70,7 +70,7 @@ final readonly class PartitionUtil
     }
 
     /**
-     * @param class-string<Partition> $partitionClass
+     * @param class-string<Partition<mixed>> $partitionClass
      */
     public static function getHighestLevel(string $partitionClass): int
     {
