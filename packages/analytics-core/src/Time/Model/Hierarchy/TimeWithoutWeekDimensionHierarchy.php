@@ -28,7 +28,7 @@ use Rekalogika\Analytics\Time\Model\Hierarchy\Trait\YearTrait;
 #[Hierarchy([
     [600, 500, 400, 200, 100],
 ])]
-final class SimpleTimeDimensionHierarchy implements ContextAwareHierarchy
+final class TimeWithoutWeekDimensionHierarchy implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
     use TimeZoneTrait;
