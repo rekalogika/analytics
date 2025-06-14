@@ -59,10 +59,14 @@ final class TruncateBigIntFunction extends FunctionNode
             throw new QueryException('Only supported on PostgreSQL for now');
         }
 
+        $variable = $this->variable->dispatch($sqlWalker);
+        $bits = $this->bits->dispatch($sqlWalker);
+
         return \sprintf(
-            "( %s & (~((1 << %s) -1)) )",
-            $this->variable->dispatch($sqlWalker),
-            $this->bits->dispatch($sqlWalker),
+            "(%s >> %s) << %s",
+            $variable,
+            $bits,
+            $bits,
         );
     }
 }
