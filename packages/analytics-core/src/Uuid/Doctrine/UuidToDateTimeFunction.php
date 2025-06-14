@@ -54,7 +54,10 @@ final class UuidToDateTimeFunction extends FunctionNode implements TypedExpressi
             throw new QueryException('Only supported on PostgreSQL for now');
         }
 
-        return \sprintf("TO_TIMESTAMP(('x'||LPAD(ENCODE(UUID_SEND(%s), 'hex'), 16, '0'))::bit(48)::bigint / 1000)", $this->variable->dispatch($sqlWalker));
+        return \sprintf(
+            "TO_TIMESTAMP((('x' || ENCODE(UUID_SEND(%s::uuid), 'hex'))::bit(48)::bigint) / 1000)",
+            $this->variable->dispatch($sqlWalker),
+        );
     }
 
     #[\Override]
