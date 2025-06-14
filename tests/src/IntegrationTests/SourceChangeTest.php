@@ -111,6 +111,7 @@ final class SourceChangeTest extends KernelTestCase
         $order->setItem($item);
         $order->setCustomer($customer);
         $order->setTime($time);
+        $order->setShipped($time->modify('+3 days'));
 
         // persist and flush
 
