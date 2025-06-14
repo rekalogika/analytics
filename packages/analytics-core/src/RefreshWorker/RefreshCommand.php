@@ -22,7 +22,7 @@ final readonly class RefreshCommand
 {
     /**
      * @param class-string $class
-     * @param ?Partition $partition Empty partition means to process new
+     * @param null|Partition<mixed> $partition Empty partition means to process new
      * records.
      * @param L $key
      */
@@ -58,6 +58,9 @@ final readonly class RefreshCommand
         return $this->class;
     }
 
+    /**
+     * @return Partition<mixed>|null
+     */
     public function getPartition(): ?Partition
     {
         return $this->partition;

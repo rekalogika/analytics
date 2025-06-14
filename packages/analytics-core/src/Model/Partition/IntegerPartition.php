@@ -25,6 +25,8 @@ use Rekalogika\Analytics\PartitionKeyClassifier\BigIntClassifier;
 
 /**
  * Partition for summarizing source entities with integer primary key.
+ * 
+ * @implements Partition<int>
  */
 #[Embeddable]
 abstract class IntegerPartition implements Partition, \Stringable

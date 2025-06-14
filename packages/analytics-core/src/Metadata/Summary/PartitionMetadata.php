@@ -25,7 +25,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
 {
     /**
      * @param array<class-string,PartitionValueResolver> $source
-     * @param class-string<Partition> $partitionClass
+     * @param class-string<Partition<mixed>> $partitionClass
      */
     public function __construct(
         private array $source,
@@ -67,7 +67,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
     }
 
     /**
-     * @return class-string<Partition>
+     * @return class-string<Partition<mixed>>
      */
     public function getPartitionClass(): string
     {

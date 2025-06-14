@@ -13,45 +13,56 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Model;
 
+/**
+ * @template-covariant T
+ */
 interface Partition extends \Stringable
 {
     /**
-     * Returns all the levels of partitioning that can be used.
+     * Returns all the levels of partitioning used by this partitioning
+     * scheme.
      *
      * @return non-empty-list<int>
      */
     public static function getAllLevels(): array;
 
     /**
-     * Returns the level of this partition.
+     * Returns the level of this partition. It must be one of the levels
+     * returned by `getAllLevels()`.
      */
     public function getLevel(): int;
 
     /**
-     * Returns the key of this partition.
+     * Returns the key of this partition. A partition is identified by its
+     * key and level. The key is usually the first value of in the partition,
+     * but not neccessarily.
      */
-    public function getKey(): int|string;
+    public function getKey(): int;
 
     /**
-     * Creates a partition from the source value and level.
+     * Creates a partition from the source value and level.'
      */
     public static function createFromSourceValue(
         mixed $source,
         int $level,
-    ): self;
+    ): static;
 
     /**
      * The lowest value of the source data in the partition, inclusive. This
      * must be the same as the upper bound of the previous neighboring
      * partition.
+     * 
+     * @return T
      */
-    public function getLowerBound(): int|string;
+    public function getLowerBound(): mixed;
 
     /**
      * The highest value of the source data in the partition, exclusive. This
      * must be the same as the lower bound of the next neighboring partition.
+     * 
+     * @return T
      */
-    public function getUpperBound(): int|string;
+    public function getUpperBound(): mixed;
 
     /**
      * Returns the higher partition that contains this partition.

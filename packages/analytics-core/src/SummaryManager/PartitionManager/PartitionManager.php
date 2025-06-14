@@ -61,6 +61,9 @@ final readonly class PartitionManager
         ));
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function getLowestPartitionFromEntity(object $entity): Partition
     {
         $source = $this->resolvePartitionSource($entity);
@@ -87,6 +90,9 @@ final readonly class PartitionManager
         return $this->createLowestPartitionFromSourceValue($sourceValue);
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function createPartitionFromSourceValue(
         mixed $sourceValue,
         int $level,
@@ -109,6 +115,9 @@ final readonly class PartitionManager
         return $partitionClass::createFromSourceValue($inputValue, $level);
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function createLowestPartitionFromSourceValue(
         mixed $sourceValue,
     ): Partition {
@@ -118,6 +127,9 @@ final readonly class PartitionManager
         return $this->createPartitionFromSourceValue($sourceValue, $lowestLevel);
     }
 
+    /**
+     * @return Partition<mixed>
+     */
     public function createHighestPartitionFromSourceValue(
         mixed $sourceValue,
     ): Partition {
@@ -128,6 +140,7 @@ final readonly class PartitionManager
     }
 
     /**
+     * @param Partition<mixed> $partition
      * @param 'lower'|'upper' $type
      */
     public function calculateSourceBoundValueFromPartition(
@@ -154,6 +167,9 @@ final readonly class PartitionManager
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }
 
+    /**
+     * @return Partition<mixed>|null
+     */
     public function getPartitionFromDirtyFlag(DirtyFlag $dirtyFlag): ?Partition
     {
         $partitionClass = $this->partitionMetadata->getPartitionClass();
