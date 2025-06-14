@@ -26,6 +26,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryExtractor;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\Analytics\SummaryManager\PartitionManager\PartitionManager;
+use Rekalogika\Analytics\SummaryManager\Query\Helper\Groupings;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -37,10 +38,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 {
     private readonly GroupBy $groupBy;
 
-    /**
-     * @var array<string,string>
-     */
-    private array $groupings = [];
+    private Groupings $groupings;
 
     /**
      * @param class-string $sourceClass
@@ -62,6 +60,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
 
         $this->groupBy = new GroupBy();
+        $this->groupings = new Groupings();
     }
 
     /**
@@ -200,7 +199,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
                     $hierarchyAwareValueResolver = $dimensionPropertyMetadata->getValueResolver();
 
-                    $function = $hierarchyAwareValueResolver
+                    $expression = $hierarchyAwareValueResolver
                         ->withInput($valueResolver)
                         ->getExpression(
                             context: new SourceQueryContext(
@@ -214,17 +213,19 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             '%s AS %s',
-                            $function,
+                            $expression,
                             $alias,
                         ));
 
-                    $name = \sprintf('%s.%s', $summaryProperty, $name);
-                    $this->groupings[$name] = $function;
+                    $this->groupings->add(
+                        property: \sprintf('%s.%s', $summaryProperty, $name),
+                        expression: $expression,
+                    );
                 }
             } else {
                 // if not hierarchical
 
-                $propertySqlField = $valueResolver->getExpression(
+                $expression = $valueResolver->getExpression(
                     context: new SourceQueryContext(
                         queryBuilder: $this->getSimpleQueryBuilder(),
                         summaryMetadata: $this->summaryMetadata,
@@ -235,13 +236,16 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 $alias = \sprintf('d%d_', $i++);
 
                 $this->getSimpleQueryBuilder()
-                    ->addSelect(\sprintf('%s AS %s', $propertySqlField, $alias));
+                    ->addSelect(\sprintf('%s AS %s', $expression, $alias));
 
                 $cube = new Cube();
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[$summaryProperty] = $propertySqlField;
+                $this->groupings->add(
+                    property: $summaryProperty,
+                    expression: $expression,
+                );
             }
         }
     }
@@ -330,11 +334,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processGroupings(): void
     {
-        ksort($this->groupings);
-
         $this->getSimpleQueryBuilder()->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s)",
-            implode(', ', $this->groupings),
+            $this->groupings->getExpression(),
         ));
     }
 

@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
+use Rekalogika\Analytics\SummaryManager\Query\Helper\Groupings;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -36,10 +37,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 {
     private readonly GroupBy $groupBy;
 
-    /**
-     * @var array<string,string>
-     */
-    private array $groupings = [];
+    private Groupings $groupings;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -56,6 +54,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
 
         $this->groupBy = new GroupBy();
+        $this->groupings = new Groupings();
     }
 
     /**
@@ -177,11 +176,13 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $name = \sprintf('%s.%s', $summaryProperty, $name);
-                    $this->groupings[$name] = \sprintf(
-                        'root.%s.%s',
-                        $dimensionProperty,
-                        $name,
+                    $this->groupings->add(
+                        property: \sprintf('%s.%s', $summaryProperty, $name),
+                        expression: \sprintf(
+                            'root.%s.%s',
+                            $dimensionProperty,
+                            $name,
+                        ),
                     );
                 }
             } elseif ($isEntity) {
@@ -198,9 +199,12 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[$summaryProperty] = \sprintf(
-                    'IDENTITY(root.%s)',
-                    $levelProperty,
+                $this->groupings->add(
+                    property: $summaryProperty,
+                    expression: \sprintf(
+                        'IDENTITY(root.%s)',
+                        $levelProperty,
+                    ),
                 );
             } else {
                 $alias = \sprintf('d%d_', $i++);
@@ -216,9 +220,12 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings[$summaryProperty] = \sprintf(
-                    'root.%s',
-                    $levelProperty,
+                $this->groupings->add(
+                    property: $summaryProperty,
+                    expression: \sprintf(
+                        'root.%s',
+                        $levelProperty,
+                    ),
                 );
             }
         }
@@ -315,11 +322,9 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
     private function processGroupings(): void
     {
-        ksort($this->groupings);
-
         $this->getSimpleQueryBuilder()->addSelect(\sprintf(
             "REKALOGIKA_GROUPING_CONCAT(%s)",
-            implode(', ', $this->groupings),
+            $this->groupings->getExpression(),
         ));
     }
 
