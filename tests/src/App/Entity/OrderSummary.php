@@ -32,6 +32,9 @@ use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Model\Summary;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Model\Hierarchy\TimeDimensionHierarchy;
+use Rekalogika\Analytics\Time\Model\TimeBin\Date;
+use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
@@ -65,6 +68,19 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         orderBy: DoctrineOrder::Ascending,
     )]
     private TimeDimensionHierarchy $time;
+
+    #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
+    #[Analytics\Dimension(
+        source: new TimeBin(
+            format: TimeFormat::Date,
+            input: new PropertyValue('shipped'),
+        ),
+        label: new TranslatableMessage('Date shipped'),
+        sourceTimeZone: new \DateTimeZone('UTC'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        orderBy: DoctrineOrder::Ascending,
+    )]
+    private ?Date $shipped = null;
 
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
@@ -246,6 +262,11 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     public function getTime(): TimeDimensionHierarchy
     {
         return $this->time;
+    }
+
+    public function getShipped(): ?Date
+    {
+        return $this->shipped;
     }
 
     public function getCustomerCountry(): ?Country

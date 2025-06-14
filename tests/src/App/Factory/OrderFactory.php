@@ -42,10 +42,16 @@ final class OrderFactory extends PersistentProxyObjectFactory
     #[\Override]
     protected function defaults(): array|callable
     {
+        $time = \DateTimeImmutable::createFromInterface(self::faker()->dateTimeBetween('2023-01-01', '2024-12-31'));
+
+        // random between 1 & 7 days
+        $shipped = $time->modify(\sprintf('+%d days', self::faker()->numberBetween(1, 7)));
+
         return [
             'customer' => CustomerFactory::random(),
             'item' => ItemFactory::random(),
             'time' => \DateTimeImmutable::createFromInterface(self::faker()->dateTimeBetween('2023-01-01', '2024-12-31')),
+            'shipped' => $shipped,
         ];
     }
 

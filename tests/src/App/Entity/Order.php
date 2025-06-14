@@ -41,6 +41,9 @@ class Order
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeInterface $time = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeInterface $shipped = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,6 +81,18 @@ class Order
     public function setTime(\DateTimeInterface $time): static
     {
         $this->time = $time;
+
+        return $this;
+    }
+
+    public function getShipped(): ?\DateTimeInterface
+    {
+        return $this->shipped;
+    }
+
+    public function setShipped(\DateTimeInterface $shipped): static
+    {
+        $this->shipped = $shipped;
 
         return $this;
     }
