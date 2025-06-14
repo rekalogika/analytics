@@ -11,18 +11,17 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\ValueResolver;
+namespace Rekalogika\Analytics\Time\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Util\UuidV7Util;
 
 /**
- * Truncate the source value in UUID format to 48-bit integer.
+ * Convert source date into integer. Epoch is 1970-01-01.
  */
-final readonly class UuidToTruncatedInteger implements PartitionValueResolver
+final readonly class DateToInteger implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -38,7 +37,7 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
     public function getExpression(SourceQueryContext $context): string
     {
         return \sprintf(
-            'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT(%s)',
+            "DATE_DIFF(%s, '1970-01-01')",
             $context->resolve($this->property),
         );
     }
@@ -56,18 +55,24 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
             ));
         }
 
-        $value = str_replace('-', '', $value);
-        $value = hexdec(substr($value, 0, 12)); // first 48 bits
+        $date = \DateTimeImmutable::createFromFormat('Y-m-d', $value);
 
-        if (\is_float($value)) {
-            throw new LogicException('Cannot convert UUID to integer. Make sure you are using a 64-bit system.');
+        if (!$date instanceof \DateTimeImmutable) {
+            throw new InvalidArgumentException(\sprintf(
+                'Unable to convert "%s" to date.',
+                $value,
+            ));
         }
 
-        return $value;
+        if ($date->getTimestamp() < 0) {
+            throw new LogicException('Date cannot be before epoch.');
+        }
+
+        return $date->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
     }
 
     /**
-     * Transform from summary value to source value (integer to uuid)
+     * Transform from summary value to source value (integer to datetime)
      */
     #[\Override]
     public function transformSummaryValueToSourceValue(mixed $value): string
@@ -79,8 +84,13 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
             ));
         }
 
-        $value <<= 16;
+        if ($value < 0) {
+            throw new LogicException('Date cannot be before epoch.');
+        }
 
-        return UuidV7Util::getNilOfInteger($value);
+        $date = new \DateTimeImmutable('1970-01-01');
+        $date = $date->add(new \DateInterval(\sprintf('P%dD', $value)));
+
+        return $date->format('Y-m-d');
     }
 }

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
+use Rekalogika\Analytics\Uuid\ValueResolver\UuidToTruncatedInteger;
 
 final class UuidToTruncatedIntegerTest extends TestCase
 {

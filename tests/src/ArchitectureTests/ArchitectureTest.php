@@ -284,6 +284,7 @@ final class ArchitectureTest
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
                 Selector::classname(\DateTimeZone::class),
+                Selector::classname(\DateInterval::class),
                 Selector::classname(\IntlDateFormatter::class),
 
                 // translation

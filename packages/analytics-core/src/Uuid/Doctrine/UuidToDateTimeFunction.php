@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Doctrine\Function;
+namespace Rekalogika\Analytics\Uuid\Doctrine;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\Type;
@@ -25,9 +25,9 @@ use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Exception\QueryException;
 
 /**
- * REKALOGIKA_TRUNCATE_UUID_TO_BIGINT
+ * REKALOGIKA_UUID_TO_DATETIME
  */
-final class TruncateUuidToBigintFunction extends FunctionNode implements TypedExpression
+final class UuidToDateTimeFunction extends FunctionNode implements TypedExpression
 {
     public null|Node|string $variable = null;
 
@@ -48,17 +48,13 @@ final class TruncateUuidToBigintFunction extends FunctionNode implements TypedEx
             throw new QueryException('Expected a Node');
         }
 
-
         $platform = $sqlWalker->getConnection()->getDatabasePlatform();
 
         if (!$platform instanceof PostgreSQLPlatform) {
             throw new QueryException('Only supported on PostgreSQL for now');
         }
 
-        return \sprintf(
-            "(('x'||ENCODE(UUID_SEND(%s::uuid), 'hex'))::bit(48))::bigint",
-            $this->variable->dispatch($sqlWalker),
-        );
+        return \sprintf("TO_TIMESTAMP(('x'||LPAD(ENCODE(UUID_SEND(%s), 'hex'), 16, '0'))::bit(48)::bigint / 1000)", $this->variable->dispatch($sqlWalker));
     }
 
     #[\Override]

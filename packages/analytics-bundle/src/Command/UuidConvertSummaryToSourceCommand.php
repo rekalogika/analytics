@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
-use Rekalogika\Analytics\ValueResolver\UuidToTruncatedInteger;
+use Rekalogika\Analytics\Uuid\ValueResolver\UuidToTruncatedInteger;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
