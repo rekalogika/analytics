@@ -13,17 +13,5 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Metadata;
 
-use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
-
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class PartitionKey
-{
-    public function __construct(
-        private PartitionKeyClassifier $classifier,
-    ) {}
-
-    public function getClassifier(): PartitionKeyClassifier
-    {
-        return $this->classifier;
-    }
-}
+final readonly class PartitionKey {}

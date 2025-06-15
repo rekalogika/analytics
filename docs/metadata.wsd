@@ -51,7 +51,6 @@ class PartitionMetadata {
     +partitionClass: class-string
     +partitionLevelProperty: string
     +partitionKeyProperty: string
-    +keyClassifier: PartitionKeyClassifier
 }
 
 class MeasureMetadata {

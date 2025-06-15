@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Core\Util\LiteralString;
 
@@ -33,7 +32,6 @@ final readonly class PartitionMetadata extends PropertyMetadata
         private string $partitionClass,
         private string $partitionLevelProperty,
         private string $partitionKeyProperty,
-        private PartitionKeyClassifier $partitionKeyClassifier,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
@@ -53,7 +51,6 @@ final readonly class PartitionMetadata extends PropertyMetadata
             partitionClass: $this->partitionClass,
             partitionLevelProperty: $this->partitionLevelProperty,
             partitionKeyProperty: $this->partitionKeyProperty,
-            partitionKeyClassifier: $this->partitionKeyClassifier,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -82,11 +79,6 @@ final readonly class PartitionMetadata extends PropertyMetadata
     public function getPartitionKeyProperty(): string
     {
         return $this->partitionKeyProperty;
-    }
-
-    public function getKeyClassifier(): PartitionKeyClassifier
-    {
-        return $this->partitionKeyClassifier;
     }
 
     public function getFullyQualifiedPartitionKeyProperty(): string

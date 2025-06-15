@@ -16,12 +16,13 @@ namespace Rekalogika\Analytics\Core\Partition;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Metadata\PartitionKey;
 use Rekalogika\Analytics\Contracts\Metadata\PartitionLevel;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Core\PartitionKeyClassifier\BigIntClassifier;
 
 /**
  * Partition for summarizing source entities with integer primary key.
@@ -51,9 +52,7 @@ abstract class IntegerPartition implements Partition, \Stringable
          * First number in the partition
          */
         #[Column(type: Types::BIGINT, nullable: false)]
-        #[PartitionKey(
-            classifier: new BigIntClassifier(),
-        )]
+        #[PartitionKey()]
         protected int $key,
         /**
          * Number of insignificant/zero bits of the integer stored in the `key`
@@ -162,6 +161,19 @@ abstract class IntegerPartition implements Partition, \Stringable
         return static::createFromSourceValue(
             source: $this->getLowerBound() - 1,
             level: $this->getLevel(),
+        );
+    }
+
+    #[\Override]
+    public static function getClassifierExpression(
+        PartitionValueResolver $input,
+        int $level,
+        SourceQueryContext $context,
+    ): string {
+        return \sprintf(
+            'REKALOGIKA_TRUNCATE_BIGINT(%s, %s)',
+            $input->getExpression($context),
+            $level,
         );
     }
 }
