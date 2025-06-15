@@ -36,21 +36,21 @@ final readonly class PropertyValue implements PartitionValueResolver
     }
 
     #[\Override]
-    public function transformSourceValueToSummaryValue(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): int
     {
-        return $value;
-    }
-
-    #[\Override]
-    public function transformSummaryValueToSourceValue(mixed $value): int|string
-    {
-        if (!\is_int($value) && !\is_string($value)) {
+        if (!is_numeric($value)) {
             throw new InvalidArgumentException(\sprintf(
-                'Value must be an integer or string, "%s" given.',
+                'Value must be numeric, "%s" given.',
                 get_debug_type($value),
             ));
         }
 
+        return \intval($value);
+    }
+
+    #[\Override]
+    public function transformSummaryValueToSourceValue(int $value): mixed
+    {
         return $value;
     }
 }

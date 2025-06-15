@@ -289,9 +289,11 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 $this->sourceClass,
             ));
 
+        /** @psalm-suppress MixedAssignment */
         $start = $this->partitionManager
             ->calculateSourceBoundValueFromPartition($this->start, 'lower');
 
+        /** @psalm-suppress MixedAssignment */
         $end = $this->partitionManager
             ->calculateSourceBoundValueFromPartition($this->end, 'upper');
 
