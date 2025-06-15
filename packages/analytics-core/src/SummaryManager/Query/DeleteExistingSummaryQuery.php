@@ -20,6 +20,10 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class DeleteExistingSummaryQuery
 {
+    /**
+     * @param Partition<mixed> $start
+     * @param Partition<mixed> $end
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SummaryMetadata $summaryMetadata,
@@ -48,7 +52,9 @@ final readonly class DeleteExistingSummaryQuery
             ));
         }
 
+        /** @psalm-suppress MixedAssignment */
         $start = $this->start->getLowerBound();
+        /** @psalm-suppress MixedAssignment */
         $end = $this->end->getUpperBound();
 
         $queryBuilder = $this->entityManager

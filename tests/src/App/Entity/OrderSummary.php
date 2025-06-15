@@ -254,7 +254,10 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     // getters
     //
 
-    public function getPartition(): Partition
+    /**
+     * @return TestIntegerPartition
+     */
+    public function getPartition(): TestIntegerPartition
     {
         return $this->partition;
     }

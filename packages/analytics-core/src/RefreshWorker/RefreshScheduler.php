@@ -30,6 +30,10 @@ final readonly class RefreshScheduler
         private RefreshClassPropertiesResolver $propertiesResolver,
     ) {}
 
+    /**
+     * @param class-string $class
+     * @param Partition<mixed>|null $partition
+     */
     private function createLockKey(
         string $class,
         ?Partition $partition,
@@ -44,6 +48,7 @@ final readonly class RefreshScheduler
 
     /**
      * @param class-string $class
+     * @param Partition<mixed>|null $partition
      */
     public function scheduleWorker(
         string $class,
@@ -152,6 +157,7 @@ final readonly class RefreshScheduler
 
     /**
      * @param class-string $class
+     * @param Partition<mixed>|null $partition
      */
     private function refresh(
         string $class,

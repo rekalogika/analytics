@@ -21,6 +21,9 @@ final readonly class PartitionUtil
 {
     private function __construct() {}
 
+    /**
+     * @param Partition<mixed> $partitionClass
+     */
     public static function getLowerLevel(Partition $partition): ?int
     {
         $levels = $partition::getAllLevels();
@@ -79,6 +82,9 @@ final readonly class PartitionUtil
         return $levels[0];
     }
 
+    /**
+     * @param Partition<mixed>|PartitionRange $partition
+     */
     public static function isLowestLevel(Partition|PartitionRange $partition): bool
     {
         if ($partition instanceof PartitionRange) {
@@ -98,6 +104,9 @@ final readonly class PartitionUtil
         );
     }
 
+    /**
+     * @param Partition<mixed> $partition
+     */
     public static function getLowerLevelPartitionRange(
         Partition $partition,
     ): ?PartitionRange {
@@ -107,7 +116,9 @@ final readonly class PartitionUtil
             return null;
         }
 
+        /** @psalm-suppress MixedAssignment */
         $lowerBoundSourceValue = $partition->getLowerBound();
+        /** @psalm-suppress MixedAssignment */
         $upperBoundSourceValue = $partition->getUpperBound();
 
         $current = $partition::createFromSourceValue($lowerBoundSourceValue, $level);
@@ -116,12 +127,22 @@ final readonly class PartitionUtil
         return new PartitionRange($current, $end);
     }
 
+    /**
+     * @template T of mixed
+     * @param Partition<T> $a
+     * @param Partition<T> $b
+     */
     public static function isEqual(Partition $a, Partition $b): bool
     {
         return $a->getLevel() === $b->getLevel()
             && $a->getKey() === $b->getKey();
     }
 
+    /**
+     * @template T of mixed
+     * @param Partition<T> $a
+     * @param Partition<T> $b
+     */
     public static function isLessThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
@@ -135,6 +156,11 @@ final readonly class PartitionUtil
         return $a->getKey() < $b->getKey();
     }
 
+    /**
+     * @template T of mixed
+     * @param Partition<T> $a
+     * @param Partition<T> $b
+     */
     public static function isGreaterThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
@@ -148,6 +174,11 @@ final readonly class PartitionUtil
         return $a->getKey() > $b->getKey();
     }
 
+    /**
+     * @template T of mixed
+     * @param Partition<T> $a
+     * @param Partition<T> $b
+     */
     public static function isEqualOrLessThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {
@@ -161,6 +192,11 @@ final readonly class PartitionUtil
         return $a->getKey() <= $b->getKey();
     }
 
+    /**
+     * @template T of mixed
+     * @param Partition<T> $a
+     * @param Partition<T> $b
+     */
     public static function isEqualOrGreaterThan(Partition $a, Partition $b): bool
     {
         if ($a->getLevel() !== $b->getLevel()) {

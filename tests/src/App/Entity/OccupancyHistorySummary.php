@@ -119,7 +119,7 @@ class OccupancyHistorySummary extends Summary
     // getters
     //
 
-    public function getPartition(): Partition
+    public function getPartition(): SingleLevelIntegerPartition
     {
         return $this->partition;
     }
