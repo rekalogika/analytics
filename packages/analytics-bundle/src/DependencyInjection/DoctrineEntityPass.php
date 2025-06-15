@@ -43,7 +43,8 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
             $pass = DoctrineOrmMappingsPass::createAttributeMappingDriver(
                 namespaces: [
-                    'Rekalogika\Analytics\Model',
+                    'Rekalogika\Analytics\Entity',
+                    'Rekalogika\Analytics\Partition',
                     'Rekalogika\Analytics\Time\Hierarchy',
                     'Rekalogika\Analytics\Uuid\Partition',
                 ],
@@ -74,7 +75,8 @@ final class DoctrineEntityPass implements CompilerPassInterface
             throw new \RuntimeException('Reflection failed');
         }
 
-        $directories[] = \dirname($fileName, 2) . '/Model';
+        $directories[] = \dirname($fileName, 2) . '/Entity';
+        $directories[] = \dirname($fileName, 2) . '/Partition';
 
         // time
 

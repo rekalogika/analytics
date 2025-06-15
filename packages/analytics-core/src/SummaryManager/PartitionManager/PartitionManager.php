@@ -15,11 +15,11 @@ namespace Rekalogika\Analytics\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Entity\DirtyFlag;
 use Rekalogika\Analytics\Exception\MetadataException;
 use Rekalogika\Analytics\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\Model\Entity\DirtyFlag;
 use Rekalogika\Analytics\Util\PartitionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
