@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Model;
 
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+
 interface Partition extends \Stringable
 {
     /**
@@ -68,4 +71,18 @@ interface Partition extends \Stringable
      * partition.
      */
     public function getPrevious(): ?static;
+
+    /**
+     * Returns a DQL expression that takes a partitioning key value from the
+     * source, and outputs the partition key used in the summary table.
+     * Essentially, it classifies the source into a partition in the summary
+     * table.
+     *
+     * @param PartitionValueResolver<mixed> $input
+     */
+    public static function getClassifierExpression(
+        PartitionValueResolver $input,
+        int $level,
+        SourceQueryContext $context,
+    ): string;
 }

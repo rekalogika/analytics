@@ -102,9 +102,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $partitioningLevels = $partitionClass::getAllLevels();
         $lowestLevel = min($partitioningLevels);
 
-        $classifier = $partitionMetadata->getKeyClassifier();
-
-        $function = $classifier->getExpression(
+        $function = $partitionClass::getClassifierExpression(
             input: $valueResolver,
             level: $lowestLevel,
             context: new SourceQueryContext(

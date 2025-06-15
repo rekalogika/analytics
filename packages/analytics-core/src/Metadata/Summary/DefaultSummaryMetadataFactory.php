@@ -382,7 +382,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $partitionLevelPropertyName = null;
         $partitionKeyPropertyName = null;
-        $partitionKeyClassifier = null;
 
         $properties = AttributeUtil::getPropertiesOfClass($partitionClass);
 
@@ -415,7 +414,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 }
 
                 $partitionKeyPropertyName = $property;
-                $partitionKeyClassifier = $partitionKeyAttribute->getClassifier();
             }
         }
 
@@ -427,17 +425,12 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             throw new MetadataException('Partition id property not found');
         }
 
-        if ($partitionKeyClassifier === null) {
-            throw new MetadataException('Partition id classifier not found');
-        }
-
         return new PartitionMetadata(
             source: $sourceProperty,
             summaryProperty: $summaryProperty,
             partitionClass: $partitionClass,
             partitionLevelProperty: $partitionLevelPropertyName,
             partitionKeyProperty: $partitionKeyPropertyName,
-            partitionKeyClassifier: $partitionKeyClassifier,
         );
     }
 
