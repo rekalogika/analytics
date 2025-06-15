@@ -44,18 +44,18 @@ final readonly class GapFiller
         $name = null;
 
         foreach ($dimensions as $dimension) {
-            $rawMember = $dimension->getRawMember();
+            $member = $dimension->getMember();
 
             $label ??= $dimension->getLabel();
             $name ??= $dimension->getName();
 
             // @todo we skip null value if there is a null value in the dimensions
-            if ($rawMember === null) {
+            if ($member === null) {
                 continue;
             }
 
-            // ensure member implements SequenceMember
-            if (!$rawMember instanceof Bin) {
+            // ensure member implements Bin
+            if (!$member instanceof Bin) {
                 throw new InvalidArgumentException(\sprintf(
                     'Dimension must implement "%s".',
                     Bin::class,
@@ -64,8 +64,8 @@ final readonly class GapFiller
 
             // ensure member is of the same class
             if ($class === null) {
-                $class = $rawMember::class;
-            } elseif ($rawMember::class !== $class) {
+                $class = $member::class;
+            } elseif ($member::class !== $class) {
                 throw new InvalidArgumentException(\sprintf(
                     'Dimension must be of the same class "%s".',
                     $class,
@@ -73,7 +73,7 @@ final readonly class GapFiller
             }
 
             /** @psalm-suppress MixedAssignment */
-            $newDimensions[spl_object_id($rawMember)] = $dimension;
+            $newDimensions[spl_object_id($member)] = $dimension;
         }
 
         $this->dimensions = $newDimensions;
