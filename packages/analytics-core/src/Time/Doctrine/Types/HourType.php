@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
-use Rekalogika\Analytics\Time\Model\TimeBin\Hour;
+use Rekalogika\Analytics\Time\Bin\Hour;
 
 final class HourType extends TimeBinType
 {

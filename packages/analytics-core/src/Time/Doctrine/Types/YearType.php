@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
-use Rekalogika\Analytics\Time\Model\TimeBin\Year;
+use Rekalogika\Analytics\Time\Bin\Year;
 
 final class YearType extends TimeBinType
 {

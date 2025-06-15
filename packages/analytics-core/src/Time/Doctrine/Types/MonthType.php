@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
-use Rekalogika\Analytics\Time\Model\TimeBin\Month;
+use Rekalogika\Analytics\Time\Bin\Month;
 
 final class MonthType extends TimeBinType
 {
