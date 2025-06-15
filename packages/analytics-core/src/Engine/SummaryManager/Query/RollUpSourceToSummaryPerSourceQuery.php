@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
-use Rekalogika\Analytics\SimpleQueryBuilder\QueryExtractor;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -320,8 +319,6 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $query = $this->getSimpleQueryBuilder()->getQuery();
         $this->groupBy->apply($query);
 
-        $extractor = new QueryExtractor($query);
-
-        return $extractor->createQuery();
+        return DecomposedQuery::createFromQuery($query);
     }
 }
