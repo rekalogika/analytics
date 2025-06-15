@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 final readonly class DecomposedQuery
@@ -24,12 +25,24 @@ final readonly class DecomposedQuery
      * @param array<int<0,max>,mixed> $parameters
      * @param array<int<0,max>,int|string|ParameterType|ArrayParameterType> $types
      */
-    public function __construct(
+    private function __construct(
         private string $sql,
         private array $parameters,
         private array $types,
         private ResultSetMapping $resultSetMapping,
     ) {}
+
+    public static function createFromQuery(Query $query): self
+    {
+        $extractor = new QueryExtractor($query);
+
+        return new self(
+            sql: $extractor->getSqlStatement(),
+            parameters: $extractor->getParameters(),
+            types: $extractor->getTypes(),
+            resultSetMapping: $extractor->getResultSetMapping(),
+        );
+    }
 
     public function getSql(): string
     {

@@ -15,11 +15,15 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query as DoctrineQuery;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Rekalogika\Analytics\Core\Exception\LogicException;
+use Doctrine\ORM\Utility\HierarchyDiscriminatorResolver;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 
 /**
@@ -60,57 +64,117 @@ final readonly class QueryExtractor
         $this->resultSetMapping = $parserResult->getResultSetMapping();
         $parameterMappings = $parserResult->getParameterMappings();
 
-        $bindValues = [];
-
-        foreach ($parameterMappings as $key => $positions) {
-            $parameter = $query->getParameter($key);
-
-            if ($parameter === null) {
-                throw new LogicException('Parameter not found');
-            }
-
-            /** @psalm-suppress MixedAssignment */
-            $originalValue = $parameter->getValue();
-            /** @psalm-suppress MixedAssignment */
-            $processedValue = $query->processParameterValue($originalValue);
-
-            if ($originalValue === $processedValue) {
-                $type = $parameter->getType();
-            } else {
-                $type = ParameterTypeInferer::inferType($processedValue);
-            }
-
-            if (
-                !\is_string($type)
-                && !\is_int($type)
-                && !$type instanceof ArrayParameterType
-                && !$type instanceof ParameterType
-            ) {
-                throw new LogicException('Invalid type');
-            }
-
-            foreach ($positions as $position) {
-                $bindValues[$position] = [$processedValue, $type];
-            }
-        }
-
-        ksort($bindValues);
-
-        $parameters = [];
-        $types = [];
-
-        /** @psalm-suppress MixedAssignment */
-        foreach ($bindValues as $position => [$value, $type]) {
-            if ($position < 0) {
-                throw new LogicException('Parameter position must be non-negative');
-            }
-
-            $parameters[$position] = $value;
-            $types[$position] = $type;
-        }
+        [$parameters, $types] = $this->processParameterMappings(
+            $parameterMappings,
+            $query,
+        );
 
         $this->parameters = $parameters;
+        /**
+         * @psalm-suppress MixedPropertyTypeCoercion
+         * @phpstan-ignore assign.propertyType
+         */
         $this->types = $types;
+    }
+
+    /**
+     * @return mixed[] tuple of (value, type)
+     * @phpstan-return array{0: mixed, 1: mixed}
+     */
+    private function resolveParameterValue(Parameter $parameter, Query $query): array
+    {
+        if ($parameter->typeWasSpecified()) {
+            return [$parameter->getValue(), $parameter->getType()];
+        }
+
+        $key           = $parameter->getName();
+        /** @psalm-suppress MixedAssignment */
+        $originalValue = $parameter->getValue();
+        /** @psalm-suppress MixedAssignment */
+        $value         = $originalValue;
+        $rsm           = $this->getResultSetMapping();
+
+        if ($value instanceof ClassMetadata && isset($rsm->metadataParameterMapping[$key])) {
+            /** @psalm-suppress MixedAssignment */
+            $value = $value->getMetadataValue($rsm->metadataParameterMapping[$key]);
+        }
+
+        if ($value instanceof ClassMetadata && isset($rsm->discriminatorParameters[$key])) {
+            /**
+             * @psalm-suppress InternalClass
+             * @psalm-suppress InternalMethod
+             * @phpstan-ignore staticMethod.internalClass
+             */
+            $value = array_keys(HierarchyDiscriminatorResolver::resolveDiscriminatorsForClass($value, $query->getEntityManager()));
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $processedValue = $query->processParameterValue($value);
+
+        return [
+            $processedValue,
+            $originalValue === $processedValue
+                ? $parameter->getType()
+                : ParameterTypeInferer::inferType($processedValue),
+        ];
+    }
+
+    /**
+     * @see Doctrine\ORM\Query::processParameterMappings()
+     *
+     * @param array<list<int>> $paramMappings
+     * @return array{list<mixed>,array<array-key,mixed>}
+     */
+    private function processParameterMappings(
+        array $paramMappings,
+        Query $query,
+    ): array {
+        $parameters = $query->getParameters();
+
+        $sqlParams = [];
+        $types     = [];
+
+        foreach ($parameters as $parameter) {
+            $key = $parameter->getName();
+
+            if (! isset($paramMappings[$key])) {
+                throw QueryException::unknownParameter($key);
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            [$value, $type] = $this->resolveParameterValue($parameter, $query);
+
+            foreach ($paramMappings[$key] as $position) {
+                /** @psalm-suppress MixedAssignment */
+                $types[$position] = $type;
+            }
+
+            $sqlPositions = $paramMappings[$key];
+
+            // optimized multi value sql positions away for now,
+            // they are not allowed in DQL anyways.
+            $value      = [$value];
+            $countValue = \count($value);
+
+            for ($i = 0, $l = \count($sqlPositions); $i < $l; $i++) {
+                /** @psalm-suppress MixedAssignment */
+                $sqlParams[$sqlPositions[$i]] = $value[$i % $countValue];
+            }
+        }
+
+        if (\count($sqlParams) !== \count($types)) {
+            throw QueryException::parameterTypeMismatch();
+        }
+
+        if ($sqlParams) {
+            ksort($sqlParams);
+            $sqlParams = array_values($sqlParams);
+
+            ksort($types);
+            $types = array_values($types);
+        }
+
+        return [$sqlParams, $types];
     }
 
     /**
@@ -148,16 +212,7 @@ final readonly class QueryExtractor
      */
     public function getTypes(): array
     {
+        // @phpstan-ignore return.type
         return $this->types;
-    }
-
-    public function createQuery(): DecomposedQuery
-    {
-        return new DecomposedQuery(
-            sql: $this->getSqlStatement(),
-            parameters: $this->getParameters(),
-            types: $this->types,
-            resultSetMapping: $this->getResultSetMapping(),
-        );
     }
 }
