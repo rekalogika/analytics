@@ -34,6 +34,9 @@ final readonly class PartitionManager
         $this->partitionMetadata = $metadata->getPartition();
     }
 
+    /**
+     * @return PartitionValueResolver<mixed>
+     */
     private function resolvePartitionSource(object $entity): PartitionValueResolver
     {
         $source = $this->partitionMetadata->getSource();
@@ -103,7 +106,6 @@ final readonly class PartitionManager
             ));
         }
 
-        /** @var mixed */
         $inputValue = $valueResolver->transformSourceValueToSummaryValue($sourceValue);
 
         return $partitionClass::createFromSourceValue($inputValue, $level);

@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
+/**
+ * @template T
+ */
 interface PartitionValueResolver extends ValueResolver
 {
     /**
@@ -25,12 +28,17 @@ interface PartitionValueResolver extends ValueResolver
     public function getInvolvedProperties(): array;
 
     /**
-     * Transforms a source value to the summary value in PHP.
+     * Transforms a source value to the summary value in PHP. It must accept
+     * input in string format because the value may come from a CLI argument.
+     *
+     * @param T|string $value
      */
     public function transformSourceValueToSummaryValue(mixed $value): int;
 
     /**
      * Transforms a summary value to the source value in PHP.
+     *
+     * @return T
      */
     public function transformSummaryValueToSourceValue(int $value): mixed;
 }

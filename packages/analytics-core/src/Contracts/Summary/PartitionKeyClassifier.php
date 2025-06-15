@@ -21,6 +21,9 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
  */
 interface PartitionKeyClassifier
 {
+    /**
+     * @param PartitionValueResolver<mixed> $input
+     */
     public function getExpression(
         PartitionValueResolver $input,
         int $level,

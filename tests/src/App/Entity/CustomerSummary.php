@@ -19,7 +19,7 @@ use Rekalogika\Analytics\AggregateFunction\Count;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Model\Summary;
-use Rekalogika\Analytics\Uuid\ValueResolver\UuidToTruncatedInteger;
+use Rekalogika\Analytics\Uuid\ValueResolver\StringUuidToTruncatedInteger;
 use Rekalogika\Analytics\ValueResolver\IdentifierValue;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -35,7 +35,7 @@ class CustomerSummary extends Summary
     //
 
     #[ORM\Embedded()]
-    #[Analytics\Partition(new UuidToTruncatedInteger('id'))]
+    #[Analytics\Partition(new StringUuidToTruncatedInteger('id'))]
     private UuidV7IntegerPartition $partition;
 
     //

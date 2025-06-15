@@ -37,6 +37,7 @@ use Rekalogika\Analytics\Time\TimeFormat;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Rekalogika\Analytics\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\ValueResolver\IdentifierValue;
+use Rekalogika\Analytics\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\ValueResolver\PropertyValue;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -52,7 +53,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     //
 
     #[ORM\Embedded()]
-    #[Analytics\Partition(new PropertyValue('id'))]
+    #[Analytics\Partition(new IntegerValue('id'))]
     private TestIntegerPartition $partition;
 
     //

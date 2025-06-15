@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
 /**
  * Resolve a property value as an integer.
+ *
+ * @implements PartitionValueResolver<int>
  */
-final readonly class PropertyValue implements ValueResolver
+final readonly class IntegerValue implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -35,5 +37,17 @@ final readonly class PropertyValue implements ValueResolver
     public function getExpression(SourceQueryContext $context): string
     {
         return $context->resolve($this->property);
+    }
+
+    #[\Override]
+    public function transformSourceValueToSummaryValue(mixed $value): int
+    {
+        return \intval($value);
+    }
+
+    #[\Override]
+    public function transformSummaryValueToSourceValue(int $value): int
+    {
+        return $value;
     }
 }
