@@ -87,16 +87,13 @@ final class SqlFactory
     }
 
     /**
-     * @param class-string $sourceClass
      * @return iterable<DecomposedQuery>
      */
     private function createSelectForRollingUpSingleSourceToSummaryQuery(
-        string $sourceClass,
         Partition $start,
         Partition $end,
     ): iterable {
         $query = new RollUpSourceToSummaryPerSourceQuery(
-            sourceClass: $sourceClass,
             entityManager: $this->entityManager,
             partitionManager: $this->partitionManager,
             summaryMetadata: $this->summaryMetadata,
@@ -108,16 +105,13 @@ final class SqlFactory
     }
 
     /**
-     * @param class-string $sourceClass
      * @return iterable<DecomposedQuery>
      */
     private function createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
-        string $sourceClass,
         Partition $start,
         Partition $end,
     ): iterable {
         $selects = $this->createSelectForRollingUpSingleSourceToSummaryQuery(
-            sourceClass: $sourceClass,
             start: $start,
             end: $end,
         );
@@ -136,18 +130,15 @@ final class SqlFactory
         Partition $start,
         Partition $end,
     ): iterable {
-        $sources = $this->summaryMetadata->getSourceClasses();
+        $source = $this->summaryMetadata->getSourceClass();
 
-        foreach ($sources as $source) {
-            $insertIntoSelects = $this
-                ->createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
-                    sourceClass: $source,
-                    start: $start,
-                    end: $end,
-                );
+        $insertIntoSelects = $this
+            ->createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
+                start: $start,
+                end: $end,
+            );
 
-            yield from $insertIntoSelects;
-        }
+        yield from $insertIntoSelects;
     }
 
     /**

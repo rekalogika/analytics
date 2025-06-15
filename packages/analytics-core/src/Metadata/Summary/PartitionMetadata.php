@@ -23,11 +23,11 @@ use Rekalogika\Analytics\Core\Util\LiteralString;
 final readonly class PartitionMetadata extends PropertyMetadata
 {
     /**
-     * @param array<class-string,PartitionValueResolver<mixed>> $source
+     * @param PartitionValueResolver<mixed> $source
      * @param class-string<Partition> $partitionClass
      */
     public function __construct(
-        private array $source,
+        private PartitionValueResolver $source,
         string $summaryProperty,
         private string $partitionClass,
         private string $partitionLevelProperty,
@@ -56,9 +56,9 @@ final readonly class PartitionMetadata extends PropertyMetadata
     }
 
     /**
-     * @return array<class-string,PartitionValueResolver<mixed>>
+     * @return PartitionValueResolver<mixed>
      */
-    public function getSource(): array
+    public function getSource(): PartitionValueResolver
     {
         return $this->source;
     }

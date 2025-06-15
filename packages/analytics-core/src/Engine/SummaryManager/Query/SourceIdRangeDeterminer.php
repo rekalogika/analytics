@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
@@ -54,11 +53,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
 
         $this->valueResolver = $summaryMetadata
             ->getPartition()
-            ->getSource()[$class]
-            ?? throw new MetadataException(\sprintf(
-                'Value resolver for class "%s" not found',
-                $class,
-            ));
+            ->getSource();
     }
 
     public function getMinId(): int|string|null
