@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Rekalogika\Analytics\AggregateFunction\Count;
-use Rekalogika\Analytics\Attribute as Analytics;
-use Rekalogika\Analytics\Entity\Summary;
+use Rekalogika\Analytics\Contracts\Metadata as Analytics;
+use Rekalogika\Analytics\Core\AggregateFunction\Count;
+use Rekalogika\Analytics\Core\Entity\Summary;
+use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Uuid\ValueResolver\StringUuidToTruncatedInteger;
-use Rekalogika\Analytics\ValueResolver\IdentifierValue;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]

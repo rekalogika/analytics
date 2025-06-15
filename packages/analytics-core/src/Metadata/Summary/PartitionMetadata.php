@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionKeyClassifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Util\LiteralString;
+use Rekalogika\Analytics\Core\Util\LiteralString;
 
 /**
  * @todo improve naming

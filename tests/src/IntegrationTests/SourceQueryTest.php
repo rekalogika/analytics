@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\SummaryManager\DefaultSummaryManager;
+use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

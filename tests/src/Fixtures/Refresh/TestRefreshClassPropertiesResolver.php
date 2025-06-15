@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\Fixtures\Refresh;
 
-use Rekalogika\Analytics\RefreshWorker\RefreshClassProperties;
-use Rekalogika\Analytics\RefreshWorker\RefreshClassPropertiesResolver;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshClassProperties;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshClassPropertiesResolver;
 
 final class TestRefreshClassPropertiesResolver implements RefreshClassPropertiesResolver
 {

@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Number;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\NumberRange;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
@@ -34,7 +35,6 @@ use Rekalogika\Analytics\Time\Bin\WeekYear;
 use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
-use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class NumberRangesFilter implements Filter

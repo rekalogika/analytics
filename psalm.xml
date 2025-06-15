@@ -29,8 +29,8 @@
         <ClassMustBeFinal>
             <errorLevel type="suppress">
                 <directory name="tests/src/App/Entity" />
-                <directory name="packages/analytics-core/src/Entity" />
-                <directory name="packages/analytics-core/src/Exception" />
+                <directory name="packages/analytics-core/src/Core/Entity" />
+                <directory name="packages/analytics-core/src/Core/Exception" />
             </errorLevel>
         </ClassMustBeFinal>
     </issueHandlers>

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Core\Entity\Summary;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
@@ -43,8 +43,8 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
             $pass = DoctrineOrmMappingsPass::createAttributeMappingDriver(
                 namespaces: [
-                    'Rekalogika\Analytics\Entity',
-                    'Rekalogika\Analytics\Partition',
+                    'Rekalogika\Analytics\Core\Entity',
+                    'Rekalogika\Analytics\Core\Partition',
                     'Rekalogika\Analytics\Time\Hierarchy',
                     'Rekalogika\Analytics\Uuid\Partition',
                 ],
@@ -68,14 +68,14 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
         // core
 
-        $reflection = new \ReflectionClass(SummaryManager::class);
+        $reflection = new \ReflectionClass(Summary::class);
         $fileName = $reflection->getFileName();
 
         if (false === $fileName) {
             throw new \RuntimeException('Reflection failed');
         }
 
-        $directories[] = \dirname($fileName, 2) . '/Entity';
+        $directories[] = \dirname($fileName);
         $directories[] = \dirname($fileName, 2) . '/Partition';
 
         // time

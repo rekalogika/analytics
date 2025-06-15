@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Service;
 
-use Rekalogika\Analytics\Exception\NotFoundException;
+use Rekalogika\Analytics\Core\Exception\NotFoundException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

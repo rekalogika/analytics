@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\Util\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class PivotAwareQuery

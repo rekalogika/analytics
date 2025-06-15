@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
-use Rekalogika\Analytics\SummaryManager\SummarizerWorker\Output\DefaultDimension;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Symfony\Component\Translation\TranslatableMessage;
 

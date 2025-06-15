@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Uuid\Partition;
 
 use Doctrine\ORM\Mapping\Embeddable;
-use Rekalogika\Analytics\Partition\IntegerPartition;
+use Rekalogika\Analytics\Core\Partition\IntegerPartition;
 
 /**
  * Partition optimized for summarizing source entities with UUIDv7 primary key.

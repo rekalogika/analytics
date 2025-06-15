@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\Fixtures\Refresh;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\RefreshWorker\RefreshRunner;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshRunner;
 use Symfony\Component\Clock\ClockInterface;
 
 final class TestRefreshRunner implements RefreshRunner

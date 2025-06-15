@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\ValueResolver\PropertyValue;
+use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 
 final readonly class CountDistinct implements SummarizableAggregateFunction
 {

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Contracts\Context;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;

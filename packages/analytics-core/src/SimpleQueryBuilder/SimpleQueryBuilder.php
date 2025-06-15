@@ -18,8 +18,8 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Exception\BadMethodCallException;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Core\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 
 /**

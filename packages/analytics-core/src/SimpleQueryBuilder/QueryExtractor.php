@@ -19,8 +19,8 @@ use Doctrine\ORM\Query as DoctrineQuery;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 
 /**
  * Extracts information from Doctrine ORM Query objects

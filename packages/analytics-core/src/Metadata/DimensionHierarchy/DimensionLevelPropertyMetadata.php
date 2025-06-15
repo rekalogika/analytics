@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionLevelPropertyMetadata
