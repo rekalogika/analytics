@@ -42,7 +42,7 @@ final readonly class IntegerValue implements PartitionValueResolver
     #[\Override]
     public function transformSourceValueToSummaryValue(mixed $value): int
     {
-        return intval($value);
+        return \intval($value);
     }
 
     #[\Override]
