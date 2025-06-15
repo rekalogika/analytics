@@ -69,6 +69,11 @@ final readonly class Selectors
         return Selector::inNamespace('Rekalogika\Analytics\Uuid');
     }
 
+    public static function selectAnalyticsPivotTable(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\PivotTable');
+    }
+
     public static function selectAnalyticsPostgreSQLHll(): SelectorInterface
     {
         return Selector::inNamespace('Rekalogika\Analytics\PostgreSQLHll');

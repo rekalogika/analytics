@@ -18,7 +18,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Number;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\NumberRange;
-use Rekalogika\Analytics\Core\Util\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;

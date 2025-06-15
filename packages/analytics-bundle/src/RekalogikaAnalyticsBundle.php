@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
@@ -190,17 +191,17 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
 
         if (!\is_array($bundlesMetadata)) {
-            throw new \LogicException('Kernel bundles metadata not found.');
+            throw new LogicException('Kernel bundles metadata not found.');
         }
 
         if (!isset($bundlesMetadata['FrameworkBundle']) || !\is_array($bundlesMetadata['FrameworkBundle'])) {
-            throw new \LogicException('FrameworkBundle metadata not found.');
+            throw new LogicException('FrameworkBundle metadata not found.');
         }
 
-        $dir = $bundlesMetadata['FrameworkBundle']['path'] ?? throw new \LogicException('FrameworkBundle path not found.');
+        $dir = $bundlesMetadata['FrameworkBundle']['path'] ?? throw new LogicException('FrameworkBundle path not found.');
 
         if (!\is_string($dir)) {
-            throw new \LogicException('FrameworkBundle path is not a string.');
+            throw new LogicException('FrameworkBundle path is not a string.');
         }
 
         return is_file($dir . '/Resources/config/asset_mapper.php');

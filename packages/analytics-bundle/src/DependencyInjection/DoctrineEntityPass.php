@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Rekalogika\Analytics\Core\Entity\Summary;
+use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
@@ -72,7 +73,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
         $fileName = $reflection->getFileName();
 
         if (false === $fileName) {
-            throw new \RuntimeException('Reflection failed');
+            throw new LogicException('Reflection failed');
         }
 
         $directories[] = \dirname($fileName);
@@ -85,7 +86,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
             $fileName = $reflection->getFileName();
 
             if (false === $fileName) {
-                throw new \RuntimeException('Reflection failed');
+                throw new LogicException('Reflection failed');
             }
 
             $directories[] = \dirname($fileName);
@@ -98,7 +99,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
             $fileName = $reflection->getFileName();
 
             if (false === $fileName) {
-                throw new \RuntimeException('Reflection failed');
+                throw new LogicException('Reflection failed');
             }
 
             $directories[] = \dirname($fileName);

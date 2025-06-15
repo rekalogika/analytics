@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
 {
@@ -44,13 +45,13 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
             $specificResolver = $this->specificResolverLocator->get($key);
 
             if (!$specificResolver instanceof DistinctValuesResolver) {
-                throw new \InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+                throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
             }
 
             $result = $specificResolver->getDistinctValues($class, $dimension, $limit);
 
             if ($result === null) {
-                throw new \InvalidArgumentException(\sprintf('Service "%s" returned null', $key));
+                throw new InvalidArgumentException(\sprintf('Service "%s" returned null', $key));
             }
 
             return $result;
@@ -79,7 +80,7 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
             $specificResolver = $this->specificResolverLocator->get($key);
 
             if (!$specificResolver instanceof DistinctValuesResolver) {
-                throw new \InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+                throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
             }
 
             return $specificResolver->getValueFromId($class, $dimension, $id);

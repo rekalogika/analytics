@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -156,14 +157,14 @@ final class RefreshSummaryCommand extends Command implements SignalableCommandIn
         $resume = $input->getOption('resume');
 
         if ($resume !== null && !\is_string($resume)) {
-            throw new \InvalidArgumentException('Invalid resume ID: ' . get_debug_type($resume));
+            throw new InvalidArgumentException('Invalid resume ID: ' . get_debug_type($resume));
         }
 
         /** @var mixed */
         $batchSize = $input->getOption('batchsize');
 
         if (!is_numeric($batchSize)) {
-            throw new \InvalidArgumentException('Invalid batch size: ' . get_debug_type($batchSize));
+            throw new InvalidArgumentException('Invalid batch size: ' . get_debug_type($batchSize));
         }
 
         $batchSize = (int) $batchSize;

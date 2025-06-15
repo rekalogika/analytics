@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
@@ -73,7 +74,7 @@ final readonly class PivotAwareMetadataProxy
     public function getDimension(string $summaryProperty): DimensionMetadata
     {
         return $this->dimensions[$summaryProperty]
-            ?? throw new \InvalidArgumentException(\sprintf(
+            ?? throw new InvalidArgumentException(\sprintf(
                 'Dimension with summary property "%s" not found.',
                 $summaryProperty,
             ));

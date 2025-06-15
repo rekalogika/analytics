@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
 use Doctrine\ORM\Mapping\Column;
+use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
-use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\WeekYear;
 use Rekalogika\Analytics\Time\TimeFormat;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;

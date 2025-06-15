@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Choice;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -96,7 +97,7 @@ final class EqualFilter implements Filter
             }
 
             if (!\is_string($v)) {
-                throw new \InvalidArgumentException('Invalid input value');
+                throw new InvalidArgumentException('Invalid input value');
             }
 
             $values[] = $this->distinctValuesResolver->getValueFromId(
@@ -142,7 +143,7 @@ final class EqualFilter implements Filter
         /** @psalm-suppress MixedAssignment */
         foreach ($choices as $id => $value) {
             if ($id === Choice::NULL) {
-                throw new \InvalidArgumentException('ID cannot be the same as NULL value');
+                throw new InvalidArgumentException('ID cannot be the same as NULL value');
             }
 
             $choices2[] = new Choice(

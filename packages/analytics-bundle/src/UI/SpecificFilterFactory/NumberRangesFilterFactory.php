@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
@@ -54,7 +55,7 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
                 && !is_a($typeClass, RecurringTimeBin::class, true)
             )
         ) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'NumberRangesFilter needs the type class of "%s" or "%s", "%s" given',
                 TimeBin::class,
                 RecurringTimeBin::class,
