@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
-use Rekalogika\Analytics\Time\Model\TimeBin\WeekDate;
+use Rekalogika\Analytics\Time\Bin\WeekDate;
 
 final class WeekDateType extends TimeBinType
 {

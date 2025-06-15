@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Doctrine\Types;
 
-use Rekalogika\Analytics\Time\Model\TimeBin\Date;
+use Rekalogika\Analytics\Time\Bin\Date;
 
 final class DateType extends TimeBinType
 {

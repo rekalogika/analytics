@@ -23,17 +23,17 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\Model\TimeBin\DayOfMonth;
-use Rekalogika\Analytics\Time\Model\TimeBin\DayOfYear;
-use Rekalogika\Analytics\Time\Model\TimeBin\HourOfDay;
-use Rekalogika\Analytics\Time\Model\TimeBin\Month;
-use Rekalogika\Analytics\Time\Model\TimeBin\Quarter;
-use Rekalogika\Analytics\Time\Model\TimeBin\Week;
-use Rekalogika\Analytics\Time\Model\TimeBin\WeekDate;
-use Rekalogika\Analytics\Time\Model\TimeBin\WeekOfMonth;
-use Rekalogika\Analytics\Time\Model\TimeBin\WeekOfYear;
-use Rekalogika\Analytics\Time\Model\TimeBin\WeekYear;
-use Rekalogika\Analytics\Time\Model\TimeBin\Year;
+use Rekalogika\Analytics\Time\Bin\DayOfMonth;
+use Rekalogika\Analytics\Time\Bin\DayOfYear;
+use Rekalogika\Analytics\Time\Bin\HourOfDay;
+use Rekalogika\Analytics\Time\Bin\Month;
+use Rekalogika\Analytics\Time\Bin\Quarter;
+use Rekalogika\Analytics\Time\Bin\Week;
+use Rekalogika\Analytics\Time\Bin\WeekDate;
+use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
+use Rekalogika\Analytics\Time\Bin\WeekOfYear;
+use Rekalogika\Analytics\Time\Bin\WeekYear;
+use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\TimeBin;
 
 final readonly class DefaultFilterFactory implements FilterFactory
