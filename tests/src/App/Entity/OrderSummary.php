@@ -29,7 +29,7 @@ use Rekalogika\Analytics\AggregateFunction\SumSquare;
 use Rekalogika\Analytics\Attribute as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
-use Rekalogika\Analytics\Model\Summary;
+use Rekalogika\Analytics\Entity\Summary;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;

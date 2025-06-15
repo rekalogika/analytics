@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Model\Partition\DefaultIntegerPartition;
+use Rekalogika\Analytics\Partition\DefaultIntegerPartition;
 use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\Fixtures\Refresh\Lock;

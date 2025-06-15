@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Rekalogika\Analytics\Model\Partition\IntegerPartition;
+use Rekalogika\Analytics\Partition\IntegerPartition;
 
 #[ORM\Embeddable]
 final class TestIntegerPartition extends IntegerPartition

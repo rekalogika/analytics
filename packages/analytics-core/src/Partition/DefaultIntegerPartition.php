@@ -11,23 +11,25 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\Partition;
+namespace Rekalogika\Analytics\Partition;
 
 use Doctrine\ORM\Mapping\Embeddable;
 
 /**
- * Single level partition, whole integer without truncating. Suitable for
- * partitioning snapshotted, historical data, where data in a different
- * partition cannot be summarized together.
+ * Partition for summarizing source entities with integer primary key.
  */
 #[Embeddable]
-final class SingleLevelIntegerPartition extends IntegerPartition
+final class DefaultIntegerPartition extends IntegerPartition
 {
     #[\Override]
     public static function getAllLevels(): array
     {
         return [
-            0,
+            55,
+            44,
+            33,
+            22,
+            11,
         ];
     }
 }
