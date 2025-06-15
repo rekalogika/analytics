@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -40,7 +41,11 @@ final class DoctrineEntityPass implements CompilerPassInterface
             $container->setParameter($parameterKey, $name);
 
             $pass = DoctrineOrmMappingsPass::createAttributeMappingDriver(
-                namespaces: ['Rekalogika\Analytics\Model', 'Rekalogika\Analytics\Time\Model'],
+                namespaces: [
+                    'Rekalogika\Analytics\Model',
+                    'Rekalogika\Analytics\Time\Model',
+                    'Rekalogika\Analytics\Uuid\Partition',
+                ],
                 directories: $directories,
                 managerParameters: [$parameterKey],
                 reportFieldsWhereDeclared: true,
@@ -80,6 +85,19 @@ final class DoctrineEntityPass implements CompilerPassInterface
             }
 
             $directories[] = \dirname($fileName) . '/Model';
+        }
+
+        // uuid
+
+        if (class_exists(TimeBin::class)) {
+            $reflection = new \ReflectionClass(UuidV7IntegerPartition::class);
+            $fileName = $reflection->getFileName();
+
+            if (false === $fileName) {
+                throw new \RuntimeException('Reflection failed');
+            }
+
+            $directories[] = \dirname($fileName);
         }
 
         return $directories;

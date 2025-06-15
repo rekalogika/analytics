@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Model\Partition\UuidV7IntegerPartition;
+use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 
 final class PartitionTest extends TestCase
 {

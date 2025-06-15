@@ -11,12 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Model\Partition;
+namespace Rekalogika\Analytics\Uuid\Partition;
 
 use Doctrine\ORM\Mapping\Embeddable;
+use Rekalogika\Analytics\Model\Partition\IntegerPartition;
 
 /**
- * Partition suitable for summarizing source entities with UUIDv7 primary key.
+ * Partition optimized for summarizing source entities with UUIDv7 primary key.
  */
 #[Embeddable]
 final class UuidV7IntegerPartition extends IntegerPartition
