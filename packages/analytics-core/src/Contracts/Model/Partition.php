@@ -30,7 +30,7 @@ interface Partition extends \Stringable
     /**
      * Returns the key of this partition.
      */
-    public function getKey(): int|string;
+    public function getKey(): int;
 
     /**
      * Creates a partition from the source value and level.
@@ -41,17 +41,16 @@ interface Partition extends \Stringable
     ): self;
 
     /**
-     * The lowest value of the source data in the partition, inclusive. This
-     * must be the same as the upper bound of the previous neighboring
-     * partition.
+     * The lowest value of the partition, inclusive. This must be the same as
+     * the upper bound of the previous neighboring partition.
      */
-    public function getLowerBound(): int|string;
+    public function getLowerBound(): int;
 
     /**
-     * The highest value of the source data in the partition, exclusive. This
-     * must be the same as the lower bound of the next neighboring partition.
+     * The highest value of the partition, exclusive. This must be the same as
+     * the lower bound of the next neighboring partition.
      */
-    public function getUpperBound(): int|string;
+    public function getUpperBound(): int;
 
     /**
      * Returns the higher partition that contains this partition.

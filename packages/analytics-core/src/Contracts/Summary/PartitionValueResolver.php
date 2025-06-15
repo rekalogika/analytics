@@ -27,10 +27,10 @@ interface PartitionValueResolver extends ValueResolver
     /**
      * Transforms a source value to the summary value in PHP.
      */
-    public function transformSourceValueToSummaryValue(mixed $value): mixed;
+    public function transformSourceValueToSummaryValue(mixed $value): int;
 
     /**
      * Transforms a summary value to the source value in PHP.
      */
-    public function transformSummaryValueToSourceValue(mixed $value): int|string;
+    public function transformSummaryValueToSourceValue(int $value): mixed;
 }

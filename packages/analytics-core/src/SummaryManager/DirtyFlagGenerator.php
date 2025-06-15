@@ -95,7 +95,7 @@ final readonly class DirtyFlagGenerator
         return new DirtyFlag(
             class: $class,
             level: $partition->getLevel(),
-            key: (string) $partition->getKey(),
+            key: $partition->getKey(),
         );
     }
 

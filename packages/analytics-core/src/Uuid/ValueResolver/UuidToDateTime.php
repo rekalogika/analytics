@@ -14,12 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Uuid\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Util\UuidV7Util;
-use Symfony\Component\Uid\UuidV7;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-final readonly class UuidToDateTime implements PartitionValueResolver
+final readonly class UuidToDateTime implements ValueResolver
 {
     public function __construct(
         private string $property,
@@ -38,33 +35,5 @@ final readonly class UuidToDateTime implements PartitionValueResolver
             'REKALOGIKA_UUID_TO_DATETIME(%s)',
             $context->resolve($this->property),
         );
-    }
-
-    #[\Override]
-    public function transformSummaryValueToSourceValue(mixed $value): string
-    {
-        if (!$value instanceof \DateTimeInterface) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be an instance of DateTimeInterface, "%s" given.',
-                get_debug_type($value),
-            ));
-        }
-
-        return UuidV7Util::getNilOfDateTime($value);
-    }
-
-    #[\Override]
-    public function transformSourceValueToSummaryValue(mixed $value): mixed
-    {
-        if (!\is_string($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be a string, "%s" given.',
-                get_debug_type($value),
-            ));
-        }
-
-        $uuid = new UuidV7($value);
-
-        return $uuid->getDateTime();
     }
 }

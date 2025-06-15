@@ -133,7 +133,7 @@ final readonly class PartitionManager
     public function calculateSourceBoundValueFromPartition(
         Partition $partition,
         string $type,
-    ): int|string {
+    ): mixed {
         if ($type === 'upper') {
             $inputBound = $partition->getUpperBound();
         } else {

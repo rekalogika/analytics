@@ -60,21 +60,21 @@ final readonly class DeleteExistingSummaryQuery
                 'root.%s.%s >= %s',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $this->quoteVariable($start),
+                $start,
             ))
 
             ->andWhere(\sprintf(
                 'root.%s.%s < %s',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $this->quoteVariable($end),
+                $end,
             ))
 
             ->andWhere(\sprintf(
                 'root.%s.%s = %s',
                 $partitionProperty,
                 $partitionLevelProperty,
-                $this->quoteVariable($level),
+                $level,
             ))
         ;
 
@@ -85,14 +85,5 @@ final readonly class DeleteExistingSummaryQuery
         } else {
             yield $result;
         }
-    }
-
-    private function quoteVariable(int|string $input): string
-    {
-        if (\is_string($input)) {
-            return \sprintf("'%s'", $input);
-        }
-
-        return (string) $input;
     }
 }

@@ -34,15 +34,15 @@ class DirtyFlag
      * Level and key are partition properties, indicating the partition that
      * needs refreshing. Null level and keys means there are new records.
      *
-     * @param class-string $class
+     * @param class-string $class The summary class that needs refreshing.
      */
     public function __construct(
         #[ORM\Column(length: 255, nullable: false)]
         private string $class,
-        #[ORM\Column(nullable: true)]
+        #[ORM\Column(type: Types::SMALLINT, nullable: true)]
         private ?int $level,
-        #[ORM\Column(nullable: true)]
-        private ?string $key,
+        #[ORM\Column(type: Types::BIGINT, nullable: true)]
+        private ?int $key,
     ) {
         $this->id = Uuid::v7()->toRfc4122();
     }
@@ -75,7 +75,7 @@ class DirtyFlag
         return $this->level;
     }
 
-    public function getKey(): ?string
+    public function getKey(): ?int
     {
         return $this->key;
     }

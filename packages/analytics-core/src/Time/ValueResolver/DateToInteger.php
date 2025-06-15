@@ -46,7 +46,7 @@ final readonly class DateToInteger implements PartitionValueResolver
      * transform from source value to summary value (uuid to integer)
      */
     #[\Override]
-    public function transformSourceValueToSummaryValue(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): int
     {
         if (!\is_string($value)) {
             throw new InvalidArgumentException(\sprintf(
@@ -68,22 +68,17 @@ final readonly class DateToInteger implements PartitionValueResolver
             throw new LogicException('Date cannot be before epoch.');
         }
 
-        return $date->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
+        $days = $date->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
+
+        return \intval($days);
     }
 
     /**
      * Transform from summary value to source value (integer to datetime)
      */
     #[\Override]
-    public function transformSummaryValueToSourceValue(mixed $value): string
+    public function transformSummaryValueToSourceValue(int $value): string
     {
-        if (!\is_int($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be an integer, got "%s".',
-                get_debug_type($value),
-            ));
-        }
-
         if ($value < 0) {
             throw new LogicException('Date cannot be before epoch.');
         }

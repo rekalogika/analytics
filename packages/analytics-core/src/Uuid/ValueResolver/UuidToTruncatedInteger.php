@@ -47,7 +47,7 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
      * transform from source value to summary value (uuid to integer)
      */
     #[\Override]
-    public function transformSourceValueToSummaryValue(mixed $value): mixed
+    public function transformSourceValueToSummaryValue(mixed $value): int
     {
         if (!\is_string($value)) {
             throw new InvalidArgumentException(\sprintf(
@@ -70,17 +70,8 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
      * Transform from summary value to source value (integer to uuid)
      */
     #[\Override]
-    public function transformSummaryValueToSourceValue(mixed $value): string
+    public function transformSummaryValueToSourceValue(int $value): mixed
     {
-        if (!\is_int($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be an integer, got "%s".',
-                get_debug_type($value),
-            ));
-        }
-
-        $value <<= 16;
-
-        return UuidV7Util::getNilOfInteger($value);
+        return UuidV7Util::getNilOfInteger($value <<= 16);
     }
 }

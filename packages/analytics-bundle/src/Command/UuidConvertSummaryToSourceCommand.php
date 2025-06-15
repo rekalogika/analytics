@@ -39,6 +39,9 @@ final class UuidConvertSummaryToSourceCommand extends Command
         );
     }
 
+    /**
+     * @todo fix
+     */
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -54,6 +57,7 @@ final class UuidConvertSummaryToSourceCommand extends Command
         $integerKey = (int) $integerKey;
 
         $resolver = new UuidToTruncatedInteger('foo');
+        /** @var string */
         $uuid = $resolver->transformSummaryValueToSourceValue($integerKey);
 
         $output->writeln($uuid);
