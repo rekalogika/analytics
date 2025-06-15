@@ -21,9 +21,6 @@ use PHPat\Test\PHPat;
 
 final class ArchitectureTest
 {
-    /**
-     * analytics-core deps
-     */
     public function testPackageAnalyticsCore(): Rule
     {
         return PHPat::rule()
@@ -78,6 +75,67 @@ final class ArchitectureTest
                 Selector::classname(\DomainException::class),
                 Selector::classname(QueryException::class),
                 Selector::classname(ConversionException::class),
+            );
+    }
+
+    public function testPackageAnalyticsEngine(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selectors::selectAnalyticsEngine())
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsEngine(),
+                Selectors::selectAnalyticsCore(),
+                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsMetadata(),
+
+                // dependencies
+                Selector::inNamespace('Rekalogika\Analytics\SimpleQueryBuilder'),
+                Selector::inNamespace('Rekalogika\Contracts\Rekapager'),
+                Selector::inNamespace('Rekalogika\Rekapager\Keyset'),
+                Selector::inNamespace('Rekalogika\Rekapager\Doctrine'),
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Psr\EventDispatcher'),
+                Selector::inNamespace('Symfony\Contracts\Service'),
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // symfony
+                Selector::inNamespace('Symfony\Component\PropertyAccess'),
+                Selector::inNamespace('Symfony\Component\Translation'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\Persistence'),
+                Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+                Selector::inNamespace('Doctrine\DBAL'),
+
+                // datetime
+                Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateInterval::class),
+
+                // misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\Override::class),
+                Selector::classname(\BackedEnum::class),
+                Selector::classname(\UnitEnum::class),
+
+                // reflections
+                Selector::classname(\ReflectionClass::class),
+                Selector::classname(\ReflectionProperty::class),
+
+                // exceptions
+                Selector::classname(\Error::class),
+                Selector::classname(\TypeError::class),
+                Selector::classname(\InvalidArgumentException::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\Traversable::class),
+                Selector::classname(\Iterator::class),
+                Selector::classname(\Countable::class),
             );
     }
 
