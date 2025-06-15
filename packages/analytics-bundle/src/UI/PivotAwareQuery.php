@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Core\Util\TranslatableMessage;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -208,7 +209,7 @@ final class PivotAwareQuery
     {
         $rootKey = explode('.', $key)[0];
 
-        return $this->getAllChoices()[$rootKey] ?? throw new \InvalidArgumentException(\sprintf('"%s" is not a valid key', $key));
+        return $this->getAllChoices()[$rootKey] ?? throw new InvalidArgumentException(\sprintf('"%s" is not a valid key', $key));
     }
 
     /**

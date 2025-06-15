@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,14 +37,14 @@ final class DistinctValuesResolverPass implements CompilerPassInterface
         foreach (array_keys($resolvers) as $serviceId) {
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass()
-                ?? throw new \InvalidArgumentException(\sprintf('Service "%s" does not have a class', $serviceId));
+                ?? throw new InvalidArgumentException(\sprintf('Service "%s" does not have a class', $serviceId));
 
             if (!class_exists($class)) {
-                throw new \InvalidArgumentException(\sprintf('Class "%s" not found', $class));
+                throw new InvalidArgumentException(\sprintf('Class "%s" not found', $class));
             }
 
             if (!is_a($class, DistinctValuesResolver::class, true)) {
-                throw new \InvalidArgumentException(\sprintf('Class "%s" does not implement DistinctValuesResolver', $class));
+                throw new InvalidArgumentException(\sprintf('Class "%s" does not implement DistinctValuesResolver', $class));
             }
 
             $applicableDimensions = $class::getApplicableDimensions();
@@ -53,7 +54,7 @@ final class DistinctValuesResolverPass implements CompilerPassInterface
                     $key = \sprintf('%s::%s', $summaryClass, $dimension);
 
                     if (isset($specificResolvers[$key])) {
-                        throw new \InvalidArgumentException(\sprintf('Duplicate resolver for "%s"', $key));
+                        throw new InvalidArgumentException(\sprintf('Duplicate resolver for "%s"', $key));
                     }
 
                     $specificResolvers[$key] = $serviceId;

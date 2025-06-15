@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\DateRangeFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\TimeBin;
 
@@ -49,7 +50,7 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
         $typeClass = $dimensionMetadata->getTypeClass();
 
         if ($typeClass === null || !is_a($typeClass, TimeBin::class, true)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'DateRangeFilter needs a specific type class of %s, %s given',
                 TimeBin::class,
                 get_debug_type($typeClass),

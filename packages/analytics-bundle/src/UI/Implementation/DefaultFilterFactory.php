@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
@@ -101,7 +102,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
         $filterFactory = $this->specificFilterFactories->get($class);
 
         if (!$filterFactory instanceof SpecificFilterFactory) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'Expected %s, got %s',
                 SpecificFilterFactory::class,
                 get_debug_type($filterFactory),

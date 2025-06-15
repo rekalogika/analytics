@@ -13,46 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr\Expression;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Embeddable;
-use Doctrine\ORM\Query\AST\Functions\FunctionNode;
-use Doctrine\ORM\Query\AST\Node;
-use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
-use Doctrine\ORM\Query\SqlWalker;
-use Doctrine\ORM\Query\TokenType;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Reader\Html;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Psr\Container\ContainerInterface;
-use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
-use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
-use Rekalogika\Analytics\Core\Util\TranslatableMessage;
-use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
-use Rekalogika\Contracts\Rekapager\PageableInterface;
-use Rekalogika\Contracts\Rekapager\PageInterface;
-use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\Rekapager\Doctrine\ORM\QueryBuilderAdapter;
-use Rekalogika\Rekapager\Keyset\KeysetPageable;
-use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
-use Twig\Environment;
-use Twig\Extension\AbstractExtension;
-use Twig\Extension\RuntimeExtensionInterface;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 
 final class ArchitectureTest
 {
@@ -72,54 +37,27 @@ final class ArchitectureTest
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
-                Selector::inNamespace('Doctrine\Persistence'),
-                Selector::inNamespace('Doctrine\Common\Collections'),
-                Selector::inNamespace('Psr\EventDispatcher'),
-                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
-                Selector::inNamespace('Symfony\Component\PropertyAccess'),
                 Selector::inNamespace('Symfony\Component\Uid'),
-                Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
-
-                // rekapager
-                Selector::classname(PageableInterface::class),
-                Selector::classname(PageInterface::class),
-                Selector::classname(QueryBuilderAdapter::class),
-                Selector::classname(KeysetPageable::class),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
-                Selector::classname(\DateTimeZone::class),
-                Selector::classname(\DateInterval::class),
-
-                // collections
-                Selector::classname(\IteratorAggregate::class),
-                Selector::classname(\Traversable::class),
-                Selector::classname(\Countable::class),
-                Selector::classname(\ArrayIterator::class),
-                Selector::classname(\Iterator::class),
 
                 // misc
                 Selector::classname(\Stringable::class),
-                Selector::classname(\BackedEnum::class),
-                Selector::classname(\UnitEnum::class),
                 Selector::classname(\Override::class),
-                Selector::classname(\Attribute::class),
 
                 // reflections
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\ReflectionAttribute::class),
-                Selector::classname(\ReflectionObject::class),
+                // Selector::classname(\ReflectionObject::class),
                 Selector::classname(\ReflectionProperty::class),
                 Selector::classname(\ReflectionException::class),
 
                 // exceptions
-                Selector::classname(\TypeError::class),
                 Selector::classname(\Error::class),
-                Selector::classname(\Throwable::class),
-                Selector::classname(\InvalidArgumentException::class),
             );
     }
 
@@ -143,35 +81,6 @@ final class ArchitectureTest
             );
     }
 
-    /**
-     * analytics-core should not depend on bundle package
-     */
-    public function testPackageAnalyticsCoreNegativeBundle(): Rule
-    {
-        return PHPat::rule()
-            ->classes(Selectors::selectAnalyticsCore())
-            ->shouldNotDependOn()
-            ->classes(
-                Selectors::selectAnalyticsBundle(),
-            );
-    }
-
-    /**
-     * analytics-core should not depend on time package
-     */
-    public function testPackageAnalyticsCoreNegativeTime(): Rule
-    {
-        return PHPat::rule()
-            ->classes(Selectors::selectAnalyticsCore())
-            ->shouldNotDependOn()
-            ->classes(
-                Selectors::selectAnalyticsTime(),
-            );
-    }
-
-    /**
-     * analytics-bundle deps
-     */
     public function testPackageAnalyticsBundle(): Rule
     {
         return PHPat::rule()
@@ -180,25 +89,33 @@ final class ArchitectureTest
             )
             ->canOnlyDependOn()
             ->classes(
+                Selectors::selectAnalyticsBundle(),
+
+                // dependencies
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsTime(),
+                Selectors::selectAnalyticsCoreException(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsEngine(),
+                Selector::inNamespace('OzdemirBurak\Iris\Color'),
+                Selectors::selectAnalyticsPivotTable(),
+
+                // optional dependencies
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsPostgreSQLHll(),
 
-                // misc
-                Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
-                Selector::inNamespace('Symfony\Component\Config'),
-                Selector::inNamespace('Doctrine\Persistence'),
-                Selector::inNamespace('Doctrine\ORM'),
+                // psr/symfony contracts
                 Selector::inNamespace('Psr\Cache'),
                 Selector::inNamespace('Psr\Log'),
+                Selector::inNamespace('Psr\Container'),
                 Selector::inNamespace('Psr\SimpleCache'),
-                Selector::inNamespace('Rekalogika\Analytics\Bundle'),
-                Selector::inNamespace('Rekalogika\Analytics\Core\Exception'),
+                Selector::inNamespace('Symfony\Contracts\Service'),
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // symfony
+                Selector::inNamespace('Symfony\Component\AssetMapper'),
+                Selector::inNamespace('Symfony\Component\Config'),
                 Selector::inNamespace('Symfony\Component\Cache'),
                 Selector::inNamespace('Symfony\Component\Console'),
                 Selector::inNamespace('Symfony\Component\DependencyInjection'),
@@ -206,60 +123,39 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Component\HttpKernel'),
                 Selector::inNamespace('Symfony\Component\Lock'),
                 Selector::inNamespace('Symfony\Component\Messenger'),
-                Selector::inNamespace('Symfony\Component\OptionsResolver'),
                 Selector::inNamespace('Symfony\Component\Translation'),
-                Selector::inNamespace('Symfony\Contracts\Service'),
-                Selector::inNamespace('Symfony\Contracts\Translation'),
-                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
-                Selector::classname(\Override::class),
-                Selector::classname(\InvalidArgumentException::class),
-                Selector::classname(\Exception::class),
-                Selector::classname(\WeakMap::class),
-                Selector::classname(\LogicException::class),
-                Selector::classname(\RuntimeException::class),
-                Selector::classname(\ReflectionClass::class),
-                Selector::classname(\DateTimeInterface::class),
-                Selector::classname(\DateTimeImmutable::class),
-                Selector::classname(\Stringable::class),
-                Selector::classname(\IteratorAggregate::class),
-                Selector::classname(\ArrayAccess::class),
-                Selector::classname(\ArrayIterator::class),
-                Selector::classname(\Traversable::class),
-                Selector::classname(\UnexpectedValueException::class),
-                Selector::classname(AssetMapperInterface::class),
-                Selector::classname(ContainerInterface::class),
-                Selector::classname(\UnitEnum::class),
-                Selector::inNamespace('OzdemirBurak\Iris\Color'),
-
-                // twig
-                Selector::classname(Environment::class),
-                Selector::classname(RuntimeExtensionInterface::class),
-                Selector::classname(TwigFunction::class),
-                Selector::classname(TwigFilter::class),
-                Selector::classname(AbstractExtension::class),
+                Selector::inNamespace('Symfony\UX\Chartjs'),
 
                 // doctrine
-                Selector::classname(Criteria::class),
-                Selector::classname(Expression::class),
-                Selector::classname(Type::class),
+                Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
+                Selector::inNamespace('Doctrine\Persistence'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+                Selector::inNamespace('Doctrine\DBAL\Types'),
 
-                // Chartjs
-                Selector::classname(ChartBuilderInterface::class),
-                Selector::classname(Chart::class),
+                // other third-party libraries
+                Selector::inNamespace('Twig'),
+                Selector::inNamespace('PhpOffice\PhpSpreadsheet'),
 
-                // pivot table
-                Selector::classname(PivotTableTransformer::class),
+                // php misc
+                Selector::classname(\Override::class),
+                Selector::classname(\Stringable::class),
+                Selector::classname(\UnitEnum::class),
 
-                // PhpSpreadsheet
-                Selector::classname(DataType::class),
-                Selector::classname(Html::class),
-                Selector::classname(Spreadsheet::class),
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Traversable::class),
+
+                // php datetime
+                Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateTimeImmutable::class),
+
+                // php reflection
+                Selector::classname(\ReflectionClass::class),
+                Selector::classname(\ReflectionException::class),
             );
     }
 
-    /**
-     * time deps
-     */
     public function testPackageTime(): Rule
     {
         return PHPat::rule()
@@ -272,67 +168,107 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCoreException(),
 
-                // selected classes from core
-                Selector::classname(PropertyValue::class),
-                Selector::classname(LevelProperty::class),
-                Selector::classname(Hierarchy::class),
-                Selector::classname(TranslatableMessage::class),
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
 
-                // misc
+                // doctrine
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\ORM'),
+
+                // php misc
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
 
-                // enum
+                // php enum
                 Selector::classname(\BackedEnum::class),
 
-                // datetime
+                // php datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
                 Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateInterval::class),
                 Selector::classname(\IntlDateFormatter::class),
 
-                // translation
-                Selector::classname(TranslatorInterface::class),
-                Selector::classname(TranslatableInterface::class),
-
                 // exceptions
                 Selector::classname(\Error::class),
-
-                // doctrine
-                Selector::classname(Column::class),
-                Selector::classname(Types::class),
-                Selector::classname(Embeddable::class),
-                Selector::classname(AbstractPlatform::class),
-                Selector::classname(TokenType::class),
-                Selector::classname(SqlWalker::class),
-                Selector::classname(Parser::class),
-                Selector::classname(Node::class),
-                Selector::classname(FunctionNode::class),
-                Selector::classname(Type::class),
             );
     }
 
-    /**
-     * pivot-table deps
-     */
+    public function testPackagePostgreSQLHll(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsPostgreSQLHll(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsPostgreSQLHll(),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCoreException(),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\ORM'),
+
+                // php misc
+                Selector::classname(\Override::class),
+
+                // php enum
+                Selector::classname(\BackedEnum::class),
+            );
+    }
+
+    public function testPackageUuid(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsUuid(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsUuid(),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCore(), // @todo maybe try removing this?
+                Selectors::selectAnalyticsCoreException(),
+
+                // symfony
+                Selector::inNamespace('Symfony\Component\Uid'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\ORM'),
+
+                // php misc
+                Selector::classname(\Override::class),
+
+                // php datetime
+                Selector::classname(\DateTimeInterface::class),
+            );
+    }
+
     public function testPackagePivotTable(): Rule
     {
         return PHPat::rule()
             ->classes(
-                Selector::inNamespace('Rekalogika\PivotTable'),
+                Selectors::selectAnalyticsPivotTable(),
             )
             ->canOnlyDependOn()
             ->classes(
-                Selector::inNamespace('Rekalogika\PivotTable'),
+                Selectors::selectAnalyticsPivotTable(),
+
+                // exceptions
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),
+
+                // array
                 Selector::classname(\Countable::class),
-                Selector::classname(\Override::class),
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\Traversable::class),
                 Selector::classname(\ArrayIterator::class),
+
+                // misc
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\Override::class),
             );
     }
 }

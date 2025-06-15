@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeValue;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapperFactory;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
 final readonly class UIPivotTableLeaf implements LeafNode
@@ -25,7 +26,7 @@ final readonly class UIPivotTableLeaf implements LeafNode
         private NodeWrapperFactory $nodeWrapperFactory,
     ) {
         if (\count($node) > 0) {
-            throw new \InvalidArgumentException('Item must be a leaf');
+            throw new InvalidArgumentException('Item must be a leaf');
         }
     }
 

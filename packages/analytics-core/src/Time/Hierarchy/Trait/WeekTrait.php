@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
+use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
-use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Week;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
 use Rekalogika\Analytics\Time\Bin\WeekOfYear;

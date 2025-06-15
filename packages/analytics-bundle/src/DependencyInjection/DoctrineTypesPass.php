@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
+use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\HllType;
 use Rekalogika\Analytics\Time\Doctrine\Types\DateType;
 use Rekalogika\Analytics\Time\Doctrine\Types\HourType;
@@ -38,7 +39,7 @@ final class DoctrineTypesPass implements CompilerPassInterface
             ->getParameter('doctrine.dbal.connection_factory.types');
 
         if (!\is_array($typeDefinition)) {
-            throw new \RuntimeException('The type definition is not an array.');
+            throw new LogicException('The type definition is not an array.');
         }
 
         foreach ($this->getTypes() as $id => $type) {

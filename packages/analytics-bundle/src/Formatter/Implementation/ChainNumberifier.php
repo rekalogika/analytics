@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 final readonly class ChainNumberifier implements Numberifier
 {
@@ -54,7 +55,7 @@ final readonly class ChainNumberifier implements Numberifier
             }
         }
 
-        throw new \InvalidArgumentException(\sprintf(
+        throw new InvalidArgumentException(\sprintf(
             'Cannot convert "%s" to a number. To fix this problem, you need to create a custom implementation of "BackendNumberifier" for "%s".',
             get_debug_type($input),
             get_debug_type($input),

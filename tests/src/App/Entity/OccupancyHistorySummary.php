@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\Entity\Summary;
 use Rekalogika\Analytics\Core\Partition\SingleLevelIntegerPartition;
+use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
@@ -51,7 +52,7 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
-            input: 'date',
+            input: new PropertyValue('date'),
             format: TimeFormat::Date,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -64,7 +65,7 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
-            input: 'date',
+            input: new PropertyValue('date'),
             format: TimeFormat::DayOfWeek,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -76,7 +77,7 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
-            input: 'date',
+            input: new PropertyValue('date'),
             format: TimeFormat::DayOfMonth,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -88,7 +89,7 @@ class OccupancyHistorySummary extends Summary
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
-            input: 'date',
+            input: new PropertyValue('date'),
             format: TimeFormat::DayOfYear,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),

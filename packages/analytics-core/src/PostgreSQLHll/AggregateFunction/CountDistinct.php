@@ -17,20 +17,15 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 
 final readonly class CountDistinct implements SummarizableAggregateFunction
 {
     private ValueResolver $property;
 
     public function __construct(
-        string|ValueResolver $property,
+        ValueResolver $property,
         private CountDistinctHashType $hashType = CountDistinctHashType::Any,
     ) {
-        if (\is_string($property)) {
-            $property = new PropertyValue($property);
-        }
-
         $this->property = $property;
     }
 
