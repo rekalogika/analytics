@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Core\Exception\QueryException;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
@@ -31,13 +30,7 @@ final class SourceQuery extends AbstractQuery
         private readonly SummaryMetadata $summaryMetadata,
         private readonly Tuple $tuple,
     ) {
-        $sourceClasses = $summaryMetadata->getSourceClasses();
-
-        if (\count($sourceClasses) !== 1) {
-            throw new QueryException('Source query can only be created for a single source class');
-        }
-
-        $sourceClass = reset($sourceClasses);
+        $sourceClass = $summaryMetadata->getSourceClass();
 
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -98,13 +91,7 @@ final class SourceQuery extends AbstractQuery
         DimensionMetadata $dimension,
         mixed $rawMember,
     ): void {
-        $valueResolvers = $dimension->getSource();
-
-        if (\count($valueResolvers) !== 1) {
-            throw new QueryException('More than one ValueResolver is not supported');
-        }
-
-        $valueResolver = reset($valueResolvers);
+        $valueResolver = $dimension->getValueResolver();
 
         $expression = $valueResolver->getExpression(
             context: new SourceQueryContext(
@@ -126,16 +113,7 @@ final class SourceQuery extends AbstractQuery
         mixed $rawMember,
     ): void {
         $dimension = $dimensionProperty->getDimension();
-
-        // get the value resolver from dimension
-
-        $valueResolvers = $dimension->getSource();
-
-        if (\count($valueResolvers) !== 1) {
-            throw new QueryException('More than one ValueResolver is not supported');
-        }
-
-        $valueResolver = reset($valueResolvers);
+        $valueResolver = $dimension->getValueResolver();
 
         // get the value resolver from hierarchical dimension
 
@@ -164,7 +142,7 @@ final class SourceQuery extends AbstractQuery
     private function processOrderBy(): void
     {
         $identifier = $this->entityManager
-            ->getClassMetadata($this->summaryMetadata->getSourceClasses()[0])
+            ->getClassMetadata($this->summaryMetadata->getSourceClass())
             ->getSingleIdentifierFieldName();
 
         $this->getSimpleQueryBuilder()->orderBy(

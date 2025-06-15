@@ -532,17 +532,8 @@ final class SummaryRefresher
             return $this->maxIdOfSource;
         }
 
-        $classes = $this->metadata->getSourceClasses();
-        $max = null;
-
-        foreach ($classes as $class) {
-            if ($max === null) {
-                $max = $this->getMaxIdOfClass($class);
-                continue;
-            }
-
-            $max = max($max, $this->getMaxIdOfClass($class));
-        }
+        $class = $this->metadata->getSourceClass();
+        $max = $this->getMaxIdOfClass($class);
 
         return $this->maxIdOfSource = $max;
     }
@@ -553,17 +544,8 @@ final class SummaryRefresher
             return $this->minIdOfSource;
         }
 
-        $classes = $this->metadata->getSourceClasses();
-        $min = null;
-
-        foreach ($classes as $class) {
-            if ($min === null) {
-                $min = $this->getMinIdOfClass($class);
-                continue;
-            }
-
-            $min = min($min, $this->getMinIdOfClass($class));
-        }
+        $class = $this->metadata->getSourceClass();
+        $min = $this->getMinIdOfClass($class);
 
         return $this->minIdOfSource = $min;
     }

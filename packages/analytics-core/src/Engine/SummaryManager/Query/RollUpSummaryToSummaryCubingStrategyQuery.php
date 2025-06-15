@@ -239,7 +239,6 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
             }
 
             $function = $metadata->getFunction();
-            $function = reset($function);
 
             if (!$function instanceof SummarizableAggregateFunction) {
                 continue;

@@ -20,16 +20,15 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
 {
     /**
-     * @var array<class-string,list<string>>
+     * @var list<string>
      */
     private array $involvedProperties;
 
     /**
-     * @param non-empty-array<class-string,AggregateFunction> $function
      * @param class-string $typeClass
      */
     public function __construct(
-        private array $function,
+        private AggregateFunction $function,
         string $summaryProperty,
         TranslatableInterface $label,
         ?string $typeClass,
@@ -49,23 +48,11 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
 
         // involved properties
 
-        $properties = [];
-
-        foreach ($this->function as $class => $aggregateFunction) {
-            if ($aggregateFunction instanceof SummarizableAggregateFunction) {
-                foreach ($aggregateFunction->getInvolvedProperties() as $property) {
-                    $properties[$class][] = $property;
-                }
-            }
+        if ($function instanceof SummarizableAggregateFunction) {
+            $this->involvedProperties = $function->getInvolvedProperties();
+        } else {
+            $this->involvedProperties = [];
         }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        $this->involvedProperties = $uniqueProperties;
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -83,19 +70,9 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         );
     }
 
-    /**
-     * @return array<class-string,AggregateFunction>
-     */
-    public function getFunction(): array
+    public function getFunction(): AggregateFunction
     {
         return $this->function;
-    }
-
-    public function getFirstFunction(): AggregateFunction
-    {
-        $function = $this->function;
-
-        return reset($function);
     }
 
     public function getUnit(): null|TranslatableInterface
@@ -114,7 +91,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
     }
 
     /**
-     * @return array<class-string,list<string>>
+     * @return list<string>
      */
     #[\Override]
     public function getInvolvedProperties(): array

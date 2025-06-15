@@ -60,7 +60,7 @@ final readonly class SummaryQueryContext
         $field = $this->queryBuilder
             ->resolve($measureMetadata->getSummaryProperty());
 
-        $function = $measureMetadata->getFirstFunction();
+        $function = $measureMetadata->getFunction();
 
         if ($function instanceof SummarizableAggregateFunction) {
             $aggregateToAggregateExpression =

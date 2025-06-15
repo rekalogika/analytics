@@ -19,7 +19,6 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
@@ -40,11 +39,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private Groupings $groupings;
 
-    /**
-     * @param class-string $sourceClass
-     */
     public function __construct(
-        private readonly string $sourceClass,
         EntityManagerInterface $entityManager,
         private readonly PartitionManager $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
@@ -53,7 +48,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
-            from: $this->sourceClass,
+            from: $this->summaryMetadata->getSourceClass(),
             alias: 'root',
         );
 
@@ -91,13 +86,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     private function processPartition(): void
     {
         $partitionMetadata = $this->summaryMetadata->getPartition();
-
-        $valueResolver = $partitionMetadata->getSource()[$this->sourceClass]
-            ?? throw new MetadataException(\sprintf(
-                'Value resolver not found for source class "%s".',
-                $this->sourceClass,
-            ));
-
+        $valueResolver = $partitionMetadata->getSource();
         $partitionClass = $partitionMetadata->getPartitionClass();
         $partitioningLevels = $partitionClass::getAllLevels();
         $lowestLevel = min($partitioningLevels);
@@ -133,12 +122,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         foreach ($this->summaryMetadata->getDimensions() as $dimensionMetadata) {
             $summaryProperty = $dimensionMetadata->getSummaryProperty();
             $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
-
-            $valueResolver = $dimensionMetadata->getSource()[$this->sourceClass]
-                ?? throw new MetadataException(\sprintf(
-                    'Value resolver not found for source class "%s".',
-                    $this->sourceClass,
-                ));
+            $valueResolver = $dimensionMetadata->getValueResolver();
 
             // if hierarchical
             if ($dimensionHierarchyMetadata !== null) {
@@ -255,11 +239,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 continue;
             }
 
-            $function = $measureMetadata->getFunction()[$this->sourceClass]
-                ?? throw new InvalidArgumentException(\sprintf(
-                    'Function not found for source class "%s".',
-                    $this->sourceClass,
-                ));
+            $function = $measureMetadata->getFunction();
 
             if (!$function instanceof SummarizableAggregateFunction) {
                 continue;
@@ -280,12 +260,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     private function processConstraints(): void
     {
         $partitionMetadata = $this->summaryMetadata->getPartition();
-
-        $valueResolver = $partitionMetadata->getSource()[$this->sourceClass]
-            ?? throw new InvalidArgumentException(\sprintf(
-                'Value resolver not found for source class "%s".',
-                $this->sourceClass,
-            ));
+        $valueResolver = $partitionMetadata->getSource();
 
         /** @psalm-suppress MixedAssignment */
         $start = $this->partitionManager

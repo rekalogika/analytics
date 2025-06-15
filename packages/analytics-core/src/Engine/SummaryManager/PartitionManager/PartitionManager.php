@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Core\Entity\DirtyFlag;
-use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
@@ -34,39 +32,9 @@ final readonly class PartitionManager
         $this->partitionMetadata = $metadata->getPartition();
     }
 
-    /**
-     * @return PartitionValueResolver<mixed>
-     */
-    private function resolvePartitionSource(object $entity): PartitionValueResolver
-    {
-        $source = $this->partitionMetadata->getSource();
-
-        $parents = class_parents($entity::class);
-
-        if ($parents === false) {
-            $parents = [];
-        }
-
-        $classes = [
-            $entity::class,
-            ...$parents,
-        ];
-
-        foreach ($classes as $class) {
-            if (isset($source[$class])) {
-                return $source[$class];
-            }
-        }
-
-        throw new MetadataException(\sprintf(
-            'Partition source not found for class "%s"',
-            $entity::class,
-        ));
-    }
-
     public function getLowestPartitionFromEntity(object $entity): Partition
     {
-        $source = $this->resolvePartitionSource($entity);
+        $source = $this->partitionMetadata->getSource();
 
         $sourceProperty = $source->getInvolvedProperties()[0]
             ?? throw new UnexpectedValueException(\sprintf(
@@ -95,17 +63,7 @@ final readonly class PartitionManager
         int $level,
     ): Partition {
         $partitionClass = $this->partitionMetadata->getPartitionClass();
-
-        $source = $this->partitionMetadata->getSource();
-        $valueResolver = reset($source);
-
-        if ($valueResolver === false) {
-            throw new UnexpectedValueException(\sprintf(
-                'Value resolver not found for class "%s"',
-                $partitionClass,
-            ));
-        }
-
+        $valueResolver = $this->partitionMetadata->getSource();
         $inputValue = $valueResolver->transformSourceValueToSummaryValue($sourceValue);
 
         return $partitionClass::createFromSourceValue($inputValue, $level);
@@ -142,16 +100,7 @@ final readonly class PartitionManager
             $inputBound = $partition->getLowerBound();
         }
 
-        $source = $this->partitionMetadata->getSource();
-
-        $valueResolver = reset($source);
-
-        if ($valueResolver === false) {
-            throw new UnexpectedValueException(\sprintf(
-                'Value resolver not found for class "%s"',
-                $partition::class,
-            ));
-        }
+        $valueResolver = $this->partitionMetadata->getSource();
 
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
     }

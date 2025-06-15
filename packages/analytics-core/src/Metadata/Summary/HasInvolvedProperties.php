@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 interface HasInvolvedProperties
 {
     /**
-     * @return array<class-string,list<string>>
+     * @return list<string>
      */
     public function getInvolvedProperties(): array;
 }

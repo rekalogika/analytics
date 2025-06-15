@@ -51,18 +51,18 @@ final readonly class SummaryMetadata
     /**
      * Source class to the list of its properties that influence this summary.
      *
-     * @var array<class-string,list<string>>
+     * @var list<string>
      */
     private array $involvedProperties;
 
     /**
-     * @param non-empty-list<class-string> $sourceClasses
+     * @param class-string $sourceClass
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
      * @param non-empty-array<string,MeasureMetadata> $measures
      */
     public function __construct(
-        private array $sourceClasses,
+        private string $sourceClass,
         private string $summaryClass,
         PartitionMetadata $partition,
         array $dimensions,
@@ -146,28 +146,18 @@ final readonly class SummaryMetadata
         $dimensionsAndMeasures = array_merge($this->dimensions, $this->measures);
 
         foreach ($dimensionsAndMeasures as $dimensionOrMeasure) {
-            foreach ($dimensionOrMeasure->getInvolvedProperties() as $class => $dimensionOrMeasureProperties) {
-                foreach ($dimensionOrMeasureProperties as $property) {
-                    // normalize property
-                    // - remove everything after dot
-                    $property = explode('.', $property)[0];
-                    // - remove everything after (
-                    $property = explode('(', $property)[0];
-                    // - remove * from the beginning
-                    $property = ltrim($property, '*');
+            foreach ($dimensionOrMeasure->getInvolvedProperties() as $property) {
+                // normalize property
+                // - remove everything after dot
+                $property = explode('.', $property)[0];
+                // - remove everything after (
+                $property = explode('(', $property)[0];
 
-                    $properties[$class][] = $property;
-                }
+                $properties[] = $property;
             }
         }
 
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        $this->involvedProperties = $uniqueProperties;
+        $this->involvedProperties = $properties;
     }
 
     /**
@@ -179,11 +169,11 @@ final readonly class SummaryMetadata
     }
 
     /**
-     * @return non-empty-list<class-string>
+     * @return class-string
      */
-    public function getSourceClasses(): array
+    public function getSourceClass(): string
     {
-        return $this->sourceClasses;
+        return $this->sourceClass;
     }
 
     public function getLabel(): TranslatableInterface
@@ -337,7 +327,7 @@ final readonly class SummaryMetadata
     /**
      * Source class to the list of its properties that influence this summary.
      *
-     * @return array<class-string,list<string>>
+     * @return list<string>
      */
     public function getInvolvedProperties(): array
     {

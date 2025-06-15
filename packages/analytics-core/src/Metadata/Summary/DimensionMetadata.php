@@ -29,18 +29,17 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     private array $properties;
 
     /**
-     * @var array<class-string,list<string>>
+     * @var list<string>
      */
     private array $involvedProperties;
 
     /**
-     * @param array<class-string,ValueResolver> $source
      * @param Order|array<string,Order> $orderBy
      * @param null|class-string $typeClass
      * @param array<string,DimensionPropertyMetadata> $properties
      */
     public function __construct(
-        private array $source,
+        private ValueResolver $valueResolver,
         private string $summaryProperty,
         TranslatableInterface $label,
         private \DateTimeZone $sourceTimeZone,
@@ -83,27 +82,13 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
 
         // involved properties
 
-        $properties = [];
-
-        foreach ($this->source as $class => $valueResolver) {
-            foreach ($valueResolver->getInvolvedProperties() as $property) {
-                $properties[$class][] = $property;
-            }
-        }
-
-        $uniqueProperties = [];
-
-        foreach ($properties as $class => $listOfProperties) {
-            $uniqueProperties[$class] = array_values(array_unique($listOfProperties));
-        }
-
-        $this->involvedProperties = $uniqueProperties;
+        $this->involvedProperties = $valueResolver->getInvolvedProperties();
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
-            source: $this->source,
+            valueResolver: $this->valueResolver,
             summaryProperty: $this->summaryProperty,
             label: $this->getLabel(),
             sourceTimeZone: $this->sourceTimeZone,
@@ -119,12 +104,9 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         );
     }
 
-    /**
-     * @return array<class-string,ValueResolver>
-     */
-    public function getSource(): array
+    public function getValueResolver(): ValueResolver
     {
-        return $this->source;
+        return $this->valueResolver;
     }
 
     public function getSourceTimeZone(): \DateTimeZone
@@ -148,7 +130,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     }
 
     /**
-     * @return array<class-string,list<string>>
+     * @return list<string>
      */
     #[\Override]
     public function getInvolvedProperties(): array

@@ -98,13 +98,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             attributeClass: Summary::class,
         ) ?? throw new SummaryNotFound($summaryClassName);
 
-        $sourceClasses = [$summaryAttribute->getSourceClass()];
-        $sourceClassMetadata = [];
-
-        foreach ($sourceClasses as $sourceClass) {
-            $sourceClassMetadata[$sourceClass] = $this->getDoctrineClassMetadata($sourceClass);
-        }
-
+        $sourceClass = $summaryAttribute->getSourceClass();
+        $sourceClassMetadata = $this->getDoctrineClassMetadata($sourceClass);
         $summaryClassMetadata = $this->getDoctrineClassMetadata($summaryClassName);
 
         $properties = AttributeUtil::getPropertiesOfClass($summaryClassName);
@@ -151,8 +146,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 $dimensionMetadata = $this->createDimensionMetadata(
                     summaryProperty: $property,
                     dimensionAttribute: $dimensionAttribute,
-                    sourceClasses: $sourceClasses,
-                    sourceClassesMetadata: $sourceClassMetadata,
+                    sourceClass: $sourceClass,
+                    sourceClassMetadata: $sourceClassMetadata,
                     summaryClassMetadata: $summaryClassMetadata,
                     typeClass: $typeClass,
                 );
@@ -161,8 +156,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             } elseif ($measureAttribute !== null) {
                 $measureMetadatas[$property] =
                     $this->createMeasureMetadata(
-                        summaryClassName: $summaryClassName,
-                        sourceClasses: $sourceClasses,
+                        summaryClass: $summaryClassName,
                         property: $property,
                         measureAttribute: $measureAttribute,
                         typeClass: $typeClass,
@@ -170,8 +164,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             } elseif ($partitionAttribute !== null) {
                 $partitionMetadata = $this->createPartitionMetadata(
                     summaryProperty: $property,
-                    sourceClasses: $sourceClasses,
-                    sourceClassesMetadata: $sourceClassMetadata,
+                    sourceClassMetadata: $sourceClassMetadata,
                     partitionAttribute: $partitionAttribute,
                     summaryClassMetadata: $summaryClassMetadata,
                 );
@@ -200,7 +193,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $label = TranslatableUtil::normalize($label);
 
         return new SummaryMetadata(
-            sourceClasses: $sourceClasses,
+            sourceClass: $sourceClass,
             summaryClass: $summaryClassName,
             partition: $partitionMetadata,
             dimensions: $dimensionMetadatas,
@@ -213,15 +206,14 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     /**
      * @todo change $sourceProperty to be a single ValueResolver instead of an
      * array
-     * @param non-empty-list<class-string> $sourceClasses
-     * @param array<class-string,ClassMetadataWrapper> $sourceClassesMetadata
+     * @param class-string $sourceClass
      * @param class-string|null $typeClass
      */
     private function createDimensionMetadata(
         string $summaryProperty,
-        array $sourceClasses,
+        string $sourceClass,
         Dimension $dimensionAttribute,
-        array $sourceClassesMetadata,
+        ClassMetadataWrapper $sourceClassMetadata,
         ?string $typeClass,
         ClassMetadataWrapper $summaryClassMetadata,
     ): DimensionMetadata {
@@ -234,44 +226,21 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             $sourceProperty = $summaryProperty;
         }
 
-        // change scalar source to array
-
-        $newSourceProperty = [];
-
-        foreach ($sourceClasses as $sourceClass) {
-            $newSourceProperty[$sourceClass] = $sourceProperty;
-        }
-
-        $sourceProperty = $newSourceProperty;
-
         // normalize source property
 
-        $newSourceProperty = [];
-
-        foreach ($sourceProperty as $sourceClass => $curProperty) {
-            if ($curProperty instanceof ValueResolver) {
-                $newSourceProperty[$sourceClass] = $curProperty;
-
-                continue;
-            }
-
-            $sourceClassMetadata = $sourceClassesMetadata[$sourceClass]
-                ?? throw new MetadataException(\sprintf('Source class not found: %s', $sourceClass));
-
-            $isEntity = $sourceClassMetadata->isPropertyEntity($curProperty);
-            $isField = $sourceClassMetadata->isPropertyField($curProperty);
+        if (!$sourceProperty instanceof ValueResolver) {
+            $isEntity = $sourceClassMetadata->isPropertyEntity($sourceProperty);
+            $isField = $sourceClassMetadata->isPropertyField($sourceProperty);
 
             if ($isEntity) {
-                $newSourceProperty[$sourceClass] = new IdentifierValue($curProperty);
+                $sourceProperty = new IdentifierValue($sourceProperty);
             } elseif ($isField) {
-                $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
+                $sourceProperty = new PropertyValue($sourceProperty);
             } else {
                 // @todo ensure validity
-                $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
+                $sourceProperty = new PropertyValue($sourceProperty);
             }
         }
-
-        $sourceProperty = $newSourceProperty;
 
         // label
 
@@ -300,7 +269,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         }
 
         return new DimensionMetadata(
-            source: $sourceProperty,
+            valueResolver: $sourceProperty,
             summaryProperty: $summaryProperty,
             label: $label,
             sourceTimeZone: $dimensionAttribute->getSourceTimeZone(),
@@ -344,28 +313,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     /**
      * @todo change $sourceProperty to be a single ValueResolver instead of an
      * array
-     * @param non-empty-list<class-string> $sourceClasses
-     * @param array<class-string,ClassMetadataWrapper> $sourceClassesMetadata
      * @param Partition<mixed> $partitionAttribute
      */
     private function createPartitionMetadata(
         string $summaryProperty,
-        array $sourceClasses,
-        array $sourceClassesMetadata,
+        ClassMetadataWrapper $sourceClassMetadata,
         Partition $partitionAttribute,
         ClassMetadataWrapper $summaryClassMetadata,
     ): PartitionMetadata {
         $sourceProperty = $partitionAttribute->getSource();
-
-        // change scalar source to array
-
-        $newSourceProperty = [];
-
-        foreach ($sourceClasses as $sourceClass) {
-            $newSourceProperty[$sourceClass] = $sourceProperty;
-        }
-
-        $sourceProperty = $newSourceProperty;
 
         if (!$summaryClassMetadata->isPropertyEmbedded($summaryProperty)) {
             throw new MetadataException('Partition property must be embedded');
@@ -382,6 +338,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $partitionLevelPropertyName = null;
         $partitionKeyPropertyName = null;
+        $partitionKeyClassifier = null;
 
         $properties = AttributeUtil::getPropertiesOfClass($partitionClass);
 
@@ -435,13 +392,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
-     * @param class-string $summaryClassName
-     * @param non-empty-list<class-string> $sourceClasses
+     * @param class-string $summaryClass
      * @param class-string|null $typeClass
      */
     private function createMeasureMetadata(
-        string $summaryClassName,
-        array $sourceClasses,
+        string $summaryClass,
         string $property,
         Measure $measureAttribute,
         ?string $typeClass,
@@ -458,31 +413,9 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $unit = TranslatableUtil::normalize($unit);
 
-        // change scalar function to array
-
-        $newFunction = [];
-
-        foreach ($sourceClasses as $sourceClass) {
-            $newFunction[$sourceClass] = $function;
-        }
-
-        $function = $newFunction;
-
-        // make sure all functions are of the same class
-
-        $class = null;
-
-        foreach ($function as $curFunction) {
-            if ($class === null) {
-                $class = $curFunction::class;
-            } elseif ($class !== $curFunction::class) {
-                throw new MetadataException('All functions must be of the same class');
-            }
-        }
-
         // determine whether the measure is virtual or not
 
-        $classMetadata = $this->getDoctrineClassMetadata($summaryClassName);
+        $classMetadata = $this->getDoctrineClassMetadata($summaryClass);
         $virtual = !$classMetadata->hasProperty($property);
 
         $label = TranslatableUtil::normalize($measureAttribute->getLabel())
