@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin;
 
 use Rekalogika\Analytics\Contracts\Model\Bin;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 trait TimeBinTrait
 {

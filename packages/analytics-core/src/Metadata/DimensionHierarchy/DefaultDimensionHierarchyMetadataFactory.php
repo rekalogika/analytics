@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
-use Rekalogika\Analytics\Attribute\Hierarchy;
-use Rekalogika\Analytics\Attribute\LevelProperty;
-use Rekalogika\Analytics\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
+use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
+use Rekalogika\Analytics\Core\Exception\MetadataException;
+use Rekalogika\Analytics\Core\Util\AttributeUtil;
+use Rekalogika\Analytics\Core\Util\LiteralString;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
+use Rekalogika\Analytics\Core\Util\TranslatableUtil;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
-use Rekalogika\Analytics\Util\AttributeUtil;
-use Rekalogika\Analytics\Util\LiteralString;
-use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\Util\TranslatableUtil;
 
 final readonly class DefaultDimensionHierarchyMetadataFactory implements DimensionHierarchyMetadataFactory
 {

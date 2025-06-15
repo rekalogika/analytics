@@ -34,10 +34,10 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Container\ContainerInterface;
-use Rekalogika\Analytics\Attribute\Hierarchy;
-use Rekalogika\Analytics\Attribute\LevelProperty;
-use Rekalogika\Analytics\Util\TranslatableMessage;
-use Rekalogika\Analytics\ValueResolver\PropertyValue;
+use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
+use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
+use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 use Rekalogika\Contracts\Rekapager\PageInterface;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -66,8 +66,8 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsContracts(),
 
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
@@ -183,6 +183,11 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsTime(),
+                Selectors::selectAnalyticsMetadata(),
+                Selectors::selectAnalyticsEngine(),
+                Selectors::selectAnalyticsUuid(),
+                Selectors::selectAnalyticsTime(),
+                Selectors::selectAnalyticsPostgreSQLHll(),
 
                 // misc
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
@@ -193,7 +198,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Psr\Log'),
                 Selector::inNamespace('Psr\SimpleCache'),
                 Selector::inNamespace('Rekalogika\Analytics\Bundle'),
-                Selector::inNamespace('Rekalogika\Analytics\Exception'),
+                Selector::inNamespace('Rekalogika\Analytics\Core\Exception'),
                 Selector::inNamespace('Symfony\Component\Cache'),
                 Selector::inNamespace('Symfony\Component\Console'),
                 Selector::inNamespace('Symfony\Component\DependencyInjection'),

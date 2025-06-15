@@ -23,30 +23,29 @@ final readonly class Selectors
     public static function selectAnalyticsCore(): SelectorInterface
     {
         return Selector::AllOf(
-            Selector::inNamespace('Rekalogika\Analytics'),
-            Selector::NOT(
-                self::selectAnalyticsBundle(),
-            ),
-            Selector::NOT(
-                self::selectAnalyticsContracts(),
-            ),
-            Selector::NOT(
-                self::selectAnalyticsTime(),
-            ),
-            Selector::NOT(
-                Selector::inNamespace('Rekalogika\Analytics\Tests'),
-            ),
+            Selector::inNamespace('Rekalogika\Analytics\Core'),
             Selector::NOT(
                 self::selectAnalyticsCoreException(),
             ),
         );
     }
 
+    public static function selectAnalyticsCoreException(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\Core\Exception');
+    }
+
     public static function selectAnalyticsContracts(): SelectorInterface
     {
         return Selector::AnyOf(
-            Selector::inNamespace('Rekalogika\Analytics\Attribute'),
             Selector::inNamespace('Rekalogika\Analytics\Contracts'),
+        );
+    }
+
+    public static function selectAnalyticsMetadata(): SelectorInterface
+    {
+        return Selector::AnyOf(
+            Selector::inNamespace('Rekalogika\Analytics\Metadata'),
         );
     }
 
@@ -55,13 +54,23 @@ final readonly class Selectors
         return Selector::inNamespace('Rekalogika\Analytics\Bundle');
     }
 
+    public static function selectAnalyticsEngine(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\Engine');
+    }
+
     public static function selectAnalyticsTime(): SelectorInterface
     {
         return Selector::inNamespace('Rekalogika\Analytics\Time');
     }
 
-    public static function selectAnalyticsCoreException(): SelectorInterface
+    public static function selectAnalyticsUuid(): SelectorInterface
     {
-        return Selector::inNamespace('Rekalogika\Analytics\Exception');
+        return Selector::inNamespace('Rekalogika\Analytics\Uuid');
+    }
+
+    public static function selectAnalyticsPostgreSQLHll(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\PostgreSQLHll');
     }
 }

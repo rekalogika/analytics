@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\RefreshWorker;
 
 use Psr\Log\LoggerInterface;
-use Rekalogika\Analytics\RefreshWorker\RefreshCommand;
-use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshCommand;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
 
 final readonly class RefreshMessageHandler
 {

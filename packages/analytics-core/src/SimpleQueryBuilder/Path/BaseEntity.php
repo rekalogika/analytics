@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder\Path;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Core\Exception\LogicException;
 
 final readonly class BaseEntity
 {

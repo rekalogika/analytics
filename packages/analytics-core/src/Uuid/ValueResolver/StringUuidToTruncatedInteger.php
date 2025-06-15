@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Uuid\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Exception\LogicException;
-use Rekalogika\Analytics\Util\UuidV7Util;
+use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Core\Util\UuidV7Util;
 
 /**
  * Truncate the source value in UUID format to 48-bit integer.

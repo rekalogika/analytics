@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
-use Rekalogika\Analytics\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

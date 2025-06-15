@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\EventListener;
 
-use Rekalogika\Analytics\SummaryManager\Event\NewDirtyFlagEvent;
+use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class TestNewDirtyFlagListener

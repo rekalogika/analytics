@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\EventListener;
 
-use Rekalogika\Analytics\SummaryManager\PartitionRange;
-use Rekalogika\Analytics\Util\PartitionUtil;
+use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
+use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 
 final readonly class Printer
 {

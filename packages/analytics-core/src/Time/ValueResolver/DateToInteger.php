@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Exception\LogicException;
+use Rekalogika\Analytics\Core\Exception\LogicException;
 
 /**
  * Convert source date into integer. Epoch is 1970-01-01.

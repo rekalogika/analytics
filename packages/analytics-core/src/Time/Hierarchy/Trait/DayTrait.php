@@ -15,7 +15,8 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
-use Rekalogika\Analytics\Attribute\LevelProperty;
+use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
@@ -23,7 +24,6 @@ use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\Bin\WeekDate;
 use Rekalogika\Analytics\Time\TimeFormat;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
-use Rekalogika\Analytics\Util\TranslatableMessage;
 
 trait DayTrait
 {

@@ -17,7 +17,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\New_;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitor;
-use Rekalogika\Analytics\Util\TranslatableMessage;
+use Rekalogika\Analytics\Core\Util\TranslatableMessage;
 use Symfony\Component\Translation\Extractor\Visitor\AbstractVisitor;
 
 final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVisitor

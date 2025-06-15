@@ -16,9 +16,9 @@ namespace Rekalogika\Analytics\Time\ValueResolver;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\Time\TimeFormat;
-use Rekalogika\Analytics\ValueResolver\PropertyValue;
 
 final readonly class TimeBin implements ValueResolver, HierarchyAware
 {

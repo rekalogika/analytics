@@ -22,7 +22,7 @@ use Doctrine\ORM\Query\AST\TypedExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
-use Rekalogika\Analytics\Exception\QueryException;
+use Rekalogika\Analytics\Core\Exception\QueryException;
 
 /**
  * REKALOGIKA_UUID_TO_DATETIME

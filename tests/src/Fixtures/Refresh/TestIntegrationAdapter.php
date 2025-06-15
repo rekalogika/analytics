@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\Fixtures\Refresh;
 
-use Rekalogika\Analytics\RefreshWorker\RefreshCommand;
-use Rekalogika\Analytics\RefreshWorker\RefreshFrameworkAdapter;
-use Rekalogika\Analytics\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshCommand;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshFrameworkAdapter;
+use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
 use Symfony\Component\Clock\ClockInterface;
 
 /**
