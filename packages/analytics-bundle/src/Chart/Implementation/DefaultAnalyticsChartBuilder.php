@@ -135,9 +135,9 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     {
         $tuple = $result->getTable()->getRowPrototype();
 
-        if (\count($tuple) === 2) {
+        if (\count($tuple) === 1) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
-        } elseif (\count($tuple) === 3) {
+        } elseif (\count($tuple) === 2) {
             return $this->createGroupedBarChart($result, 'multiLine');
         }
 
@@ -224,7 +224,18 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             foreach ($selectedMeasures as $name) {
                 $measure = $measures->getByName($name);
 
-                $dataSets[$name]['data'][] = $this->numberifier->toNumber($measure?->getValue());
+                /** @todo implement proper gap filling */
+
+                /** @psalm-suppress MixedAssignment */
+                $value = $measure?->getValue() ?? 0;
+
+                $dataSets[$name]['data'][] = $this->numberifier->toNumber($value);
+
+                // $value = $measure?->getValue();
+                // $dataSets[$name]['data'][] = $value;
+                // $value === null
+                //     ? null
+                //     : $this->numberifier->toNumber($value);
             }
         }
 
@@ -293,6 +304,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                     'title' => $yTitle,
                 ],
             ],
+            'spanGaps' => true,
         ]);
 
         return $chart;
