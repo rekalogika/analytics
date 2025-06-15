@@ -19,6 +19,9 @@ use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
 final readonly class BigIntClassifier implements PartitionKeyClassifier
 {
+    /**
+     * @param PartitionValueResolver<mixed> $input
+     */
     #[\Override]
     public function getExpression(
         PartitionValueResolver $input,

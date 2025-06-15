@@ -15,14 +15,15 @@ namespace Rekalogika\Analytics\Uuid\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 use Rekalogika\Analytics\Util\UuidV7Util;
 
 /**
  * Truncate the source value in UUID format to 48-bit integer.
+ *
+ * @implements PartitionValueResolver<string>
  */
-final readonly class UuidToTruncatedInteger implements PartitionValueResolver
+final readonly class StringUuidToTruncatedInteger implements PartitionValueResolver
 {
     public function __construct(
         private string $property,
@@ -49,13 +50,6 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
     #[\Override]
     public function transformSourceValueToSummaryValue(mixed $value): int
     {
-        if (!\is_string($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be a string, got "%s".',
-                get_debug_type($value),
-            ));
-        }
-
         $value = str_replace('-', '', $value);
         $value = hexdec(substr($value, 0, 12)); // first 48 bits
 
@@ -70,7 +64,7 @@ final readonly class UuidToTruncatedInteger implements PartitionValueResolver
      * Transform from summary value to source value (integer to uuid)
      */
     #[\Override]
-    public function transformSummaryValueToSourceValue(int $value): mixed
+    public function transformSummaryValueToSourceValue(int $value): string
     {
         return UuidV7Util::getNilOfInteger($value <<= 16);
     }

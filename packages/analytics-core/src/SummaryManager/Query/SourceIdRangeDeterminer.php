@@ -25,6 +25,9 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
  */
 final class SourceIdRangeDeterminer extends AbstractQuery
 {
+    /**
+     * @var PartitionValueResolver<mixed>
+     */
     private readonly PartitionValueResolver $valueResolver;
 
     /**

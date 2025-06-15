@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Util\LiteralString;
 final readonly class PartitionMetadata extends PropertyMetadata
 {
     /**
-     * @param array<class-string,PartitionValueResolver> $source
+     * @param array<class-string,PartitionValueResolver<mixed>> $source
      * @param class-string<Partition> $partitionClass
      */
     public function __construct(
@@ -59,7 +59,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
     }
 
     /**
-     * @return array<class-string,PartitionValueResolver>
+     * @return array<class-string,PartitionValueResolver<mixed>>
      */
     public function getSource(): array
     {

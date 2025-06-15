@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Attribute\PartitionKey;
 use Rekalogika\Analytics\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Attribute\Summary;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Exception\MetadataException;
@@ -347,6 +346,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
      * array
      * @param non-empty-list<class-string> $sourceClasses
      * @param array<class-string,ClassMetadataWrapper> $sourceClassesMetadata
+     * @param Partition<mixed> $partitionAttribute
      */
     private function createPartitionMetadata(
         string $summaryProperty,
@@ -357,44 +357,12 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     ): PartitionMetadata {
         $sourceProperty = $partitionAttribute->getSource();
 
-        // if source property is not provided, use summary property name as
-        // source property name
-
-        if ($sourceProperty === null) {
-            $sourceProperty = $summaryProperty;
-        }
-
         // change scalar source to array
 
         $newSourceProperty = [];
 
         foreach ($sourceClasses as $sourceClass) {
             $newSourceProperty[$sourceClass] = $sourceProperty;
-        }
-
-        $sourceProperty = $newSourceProperty;
-
-        // normalize source property
-
-        $newSourceProperty = [];
-
-        foreach ($sourceProperty as $sourceClass => $curProperty) {
-            if ($curProperty instanceof PartitionValueResolver) {
-                $newSourceProperty[$sourceClass] = $curProperty;
-
-                continue;
-            }
-
-            $sourceClassMetadata = $sourceClassesMetadata[$sourceClass]
-                ?? throw new MetadataException(\sprintf('Source class not found: %s', $sourceClass));
-
-            $isField = $sourceClassMetadata->isPropertyField($curProperty);
-
-            if (!$isField) {
-                throw new MetadataException('Partition property must be field');
-            }
-
-            $newSourceProperty[$sourceClass] = new PropertyValue($curProperty);
         }
 
         $sourceProperty = $newSourceProperty;

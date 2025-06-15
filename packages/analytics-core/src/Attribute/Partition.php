@@ -15,20 +15,23 @@ namespace Rekalogika\Analytics\Attribute;
 
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
+/**
+ * @template T
+ */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class Partition
 {
     /**
-     * @param null|string|PartitionValueResolver $source
+     * @param PartitionValueResolver<T> $source
      */
     public function __construct(
-        private null|string|PartitionValueResolver $source = null,
+        private PartitionValueResolver $source,
     ) {}
 
     /**
-     * @return null|string|PartitionValueResolver
+     * @return PartitionValueResolver<T>
      */
-    public function getSource(): null|string|PartitionValueResolver
+    public function getSource(): PartitionValueResolver
     {
         return $this->source;
     }

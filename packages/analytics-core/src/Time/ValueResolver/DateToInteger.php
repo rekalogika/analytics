@@ -15,11 +15,12 @@ namespace Rekalogika\Analytics\Time\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Exception\LogicException;
 
 /**
  * Convert source date into integer. Epoch is 1970-01-01.
+ *
+ * @implements PartitionValueResolver<\DateTimeInterface>
  */
 final readonly class DateToInteger implements PartitionValueResolver
 {
@@ -42,42 +43,24 @@ final readonly class DateToInteger implements PartitionValueResolver
         );
     }
 
-    /**
-     * transform from source value to summary value (uuid to integer)
-     */
     #[\Override]
     public function transformSourceValueToSummaryValue(mixed $value): int
     {
-        if (!\is_string($value)) {
-            throw new InvalidArgumentException(\sprintf(
-                'Value must be a string, got "%s".',
-                get_debug_type($value),
-            ));
+        if (\is_string($value)) {
+            $value = new \DateTimeImmutable($value);
         }
 
-        $date = \DateTimeImmutable::createFromFormat('Y-m-d', $value);
-
-        if (!$date instanceof \DateTimeImmutable) {
-            throw new InvalidArgumentException(\sprintf(
-                'Unable to convert "%s" to date.',
-                $value,
-            ));
-        }
-
-        if ($date->getTimestamp() < 0) {
+        if ($value->getTimestamp() < 0) {
             throw new LogicException('Date cannot be before epoch.');
         }
 
-        $days = $date->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
+        $days = $value->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
 
         return \intval($days);
     }
 
-    /**
-     * Transform from summary value to source value (integer to datetime)
-     */
     #[\Override]
-    public function transformSummaryValueToSourceValue(int $value): string
+    public function transformSummaryValueToSourceValue(int $value): \DateTimeInterface
     {
         if ($value < 0) {
             throw new LogicException('Date cannot be before epoch.');
@@ -86,6 +69,6 @@ final readonly class DateToInteger implements PartitionValueResolver
         $date = new \DateTimeImmutable('1970-01-01');
         $date = $date->add(new \DateInterval(\sprintf('P%dD', $value)));
 
-        return $date->format('Y-m-d');
+        return $date;
     }
 }
