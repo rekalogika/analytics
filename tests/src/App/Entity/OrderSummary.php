@@ -267,7 +267,11 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
 
     public function getShipped(): ?Date
     {
-        return $this->shipped;
+        return $this->getContext()->getUserValue(
+            property: 'shipped',
+            rawValue: $this->shipped,
+            class: Date::class,
+        );
     }
 
     public function getCustomerCountry(): ?Country
