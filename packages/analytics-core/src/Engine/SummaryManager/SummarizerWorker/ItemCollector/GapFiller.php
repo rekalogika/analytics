@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
 
-use Rekalogika\Analytics\Contracts\Model\Bin;
+use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Core\Util\LiteralString;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -22,8 +22,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class GapFiller
 {
     /**
-     * Object id of raw member to dimension
-     *
      * @var array<int,DefaultDimension>
      */
     private array $dimensions;
@@ -55,10 +53,10 @@ final readonly class GapFiller
             }
 
             // ensure member implements Bin
-            if (!$member instanceof Bin) {
+            if (!$member instanceof Sequence) {
                 throw new InvalidArgumentException(\sprintf(
                     'Dimension must implement "%s".',
-                    Bin::class,
+                    Sequence::class,
                 ));
             }
 
@@ -112,31 +110,28 @@ final readonly class GapFiller
     {
         $firstDimension = $this->dimensions[array_key_first($this->dimensions) ?? throw new InvalidArgumentException('Dimensions is empty')];
         $lastDimension = $this->dimensions[array_key_last($this->dimensions) ?? throw new InvalidArgumentException('Dimensions is empty')];
-        $firstRawMember = $firstDimension->getRawMember();
-        $lastRawMember = $lastDimension->getRawMember();
+        $firstMember = $firstDimension->getMember();
+        $lastMember = $lastDimension->getMember();
 
         if (
-            !$firstRawMember instanceof Bin
-            || !$lastRawMember instanceof Bin
+            !$firstMember instanceof Sequence
+            || !$lastMember instanceof Sequence
         ) {
             throw new InvalidArgumentException(\sprintf(
                 'Dimension must implement "%s".',
-                Bin::class,
+                Sequence::class,
             ));
         }
 
-        $sequence = $this->getSequence($firstRawMember, $lastRawMember);
+        $sequence = $this->getSequence($firstMember, $lastMember);
 
         foreach ($sequence as $current) {
             yield $this->getDimensionFromSequenceMember($current);
         }
     }
 
-    /**
-     * @param Bin<mixed> $member
-     */
     private function getDimensionFromSequenceMember(
-        Bin $member,
+        Sequence $member,
     ): DefaultDimension {
         $objectId = spl_object_id($member);
 
@@ -150,14 +145,14 @@ final readonly class GapFiller
     }
 
     /**
-     * @template T
-     * @param Bin<T> $first
-     * @param Bin<T> $last
-     * @return iterable<Bin<T>>
+     * @template T of Sequence
+     * @param T $first
+     * @param T $last
+     * @return iterable<T>
      */
     private function getSequence(
-        Bin $first,
-        Bin $last,
+        Sequence $first,
+        Sequence $last,
     ): iterable {
         $class = $first::class;
 
@@ -174,7 +169,7 @@ final readonly class GapFiller
         if ($comparison === 0) {
             yield $first;
         } elseif ($class::compare($first, $last) < 0) { // ascending
-            while ($current instanceof Bin) {
+            while ($current instanceof Sequence) {
                 yield $current;
 
                 if ($current === $last) {
@@ -184,7 +179,7 @@ final readonly class GapFiller
                 $current = $current->getNext();
             }
         } else { // descending
-            while ($current instanceof Bin) {
+            while ($current instanceof Sequence) {
                 yield $current;
 
                 if ($current === $last) {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Model\Bin;
+use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -83,7 +83,7 @@ final readonly class DefaultDimension implements Dimension
 
     public function isSequence(): bool
     {
-        return $this->rawMember instanceof Bin;
+        return $this->member instanceof Sequence;
     }
 
     public function getSignature(): string

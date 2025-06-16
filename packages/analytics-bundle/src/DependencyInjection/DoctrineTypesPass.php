@@ -16,14 +16,6 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 use Doctrine\DBAL\Types\Type;
 use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\HllType;
-use Rekalogika\Analytics\Time\Doctrine\Types\DateType;
-use Rekalogika\Analytics\Time\Doctrine\Types\HourType;
-use Rekalogika\Analytics\Time\Doctrine\Types\MonthType;
-use Rekalogika\Analytics\Time\Doctrine\Types\QuarterType;
-use Rekalogika\Analytics\Time\Doctrine\Types\WeekDateType;
-use Rekalogika\Analytics\Time\Doctrine\Types\WeekType;
-use Rekalogika\Analytics\Time\Doctrine\Types\WeekYearType;
-use Rekalogika\Analytics\Time\Doctrine\Types\YearType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -59,14 +51,6 @@ final class DoctrineTypesPass implements CompilerPassInterface
      */
     private function getTypes(): \Traversable
     {
-        yield 'rekalogika_analytics_date' => DateType::class;
-        yield 'rekalogika_analytics_hour' => HourType::class;
-        yield 'rekalogika_analytics_month' => MonthType::class;
-        yield 'rekalogika_analytics_quarter' => QuarterType::class;
-        yield 'rekalogika_analytics_week_date' => WeekDateType::class;
-        yield 'rekalogika_analytics_week' => WeekType::class;
-        yield 'rekalogika_analytics_week_year' => WeekYearType::class;
-        yield 'rekalogika_analytics_year' => YearType::class;
         yield 'rekalogika_hll' => HllType::class;
     }
 }

@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Bundle\Chart\ChartType;
 use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Contracts\Model\Bin;
+use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Core\Exception\EmptyResultException;
@@ -95,32 +95,32 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
     {
         $tree = $result->getTree();
 
-        $lastRawMember = null;
+        $lastMember = null;
         $direction = null;
 
         foreach ($tree as $child) {
             /** @psalm-suppress MixedAssignment */
-            $rawMember = $child->getRawMember();
+            $member = $child->getMember();
 
-            if (!$rawMember instanceof Bin) {
+            if (!$member instanceof Sequence) {
                 return false;
             }
 
-            $class = $rawMember::class;
+            $class = $member::class;
 
             if (
-                $lastRawMember !== null
+                $lastMember !== null
                 && $direction !== null
-                && $class::compare($lastRawMember, $rawMember) !== $direction
+                && $class::compare($lastMember, $member) !== $direction
             ) {
                 return false;
             }
 
-            if ($direction === null && $lastRawMember !== null) {
-                $direction = $class::compare($lastRawMember, $rawMember);
+            if ($direction === null && $lastMember !== null) {
+                $direction = $class::compare($lastMember, $member);
             }
 
-            $lastRawMember = $rawMember;
+            $lastMember = $member;
         }
 
         return true;

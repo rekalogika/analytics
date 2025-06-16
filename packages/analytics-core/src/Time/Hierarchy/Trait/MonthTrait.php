@@ -35,7 +35,7 @@ trait MonthTrait
         label: new TranslatableMessage('Month'),
         valueResolver: new TimeBin(TimeBinType::Month),
     )]
-    private ?Month $month = null;
+    private ?int $month = null;
 
     #[Column(
         type: TimeBinType::TypeMonthOfYear,

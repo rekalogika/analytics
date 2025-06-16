@@ -35,7 +35,7 @@ trait QuarterTrait
         label: new TranslatableMessage('Quarter'),
         valueResolver: new TimeBin(TimeBinType::Quarter),
     )]
-    private ?Quarter $quarter = null;
+    private ?int $quarter = null;
 
     #[Column(
         type: TimeBinType::TypeQuarterOfYear,

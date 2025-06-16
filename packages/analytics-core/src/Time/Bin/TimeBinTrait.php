@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
-use Rekalogika\Analytics\Contracts\Model\Bin;
+use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 trait TimeBinTrait
@@ -68,8 +68,8 @@ trait TimeBinTrait
      * @return -1|0|1
      */
     public static function compare(
-        Bin $a,
-        Bin $b,
+        Sequence $a,
+        Sequence $b,
     ): int {
         if (
             !$a instanceof self

@@ -34,7 +34,7 @@ trait WeekYearTrait
         label: new TranslatableMessage('Week Year'),
         valueResolver: new TimeBin(TimeBinType::WeekYear),
     )]
-    private ?WeekYear $weekYear = null;
+    private ?int $weekYear = null;
 
     public function getWeekYear(): ?WeekYear
     {
