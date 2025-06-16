@@ -16,14 +16,13 @@ namespace Rekalogika\Analytics\Time\ValueResolver;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
-use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
  * @implements UserValueTransformer<TimeBinInterface,TimeBinInterface>

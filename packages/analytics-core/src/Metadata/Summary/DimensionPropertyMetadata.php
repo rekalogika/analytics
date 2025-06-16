@@ -75,7 +75,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     {
         return $this->hierarchyProperty;
     }
-    
+
 
     public function getDimension(): DimensionMetadata
     {
