@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
@@ -30,7 +29,10 @@ trait DayTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_date', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeDate,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Date'),
@@ -38,7 +40,10 @@ trait DayTrait
     )]
     private ?Date $date = null;
 
-    #[Column(type: 'rekalogika_analytics_week_date', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeWeekDate,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Week Date'),
@@ -46,7 +51,11 @@ trait DayTrait
     )]
     private ?WeekDate $weekDate = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfWeek::class)]
+    #[Column(
+        type: TimeBinType::TypeDayOfWeek,
+        nullable: true,
+        enumType: DayOfWeek::class,
+    )]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Week'),
@@ -54,7 +63,11 @@ trait DayTrait
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfMonth::class)]
+    #[Column(
+        type: TimeBinType::TypeDayOfMonth,
+        nullable: true,
+        enumType: DayOfMonth::class,
+    )]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Month'),
@@ -62,7 +75,11 @@ trait DayTrait
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: DayOfYear::class)]
+    #[Column(
+        type: TimeBinType::TypeDayOfYear,
+        nullable: true,
+        enumType: DayOfYear::class,
+    )]
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Year'),

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
@@ -27,7 +26,10 @@ trait MonthTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_month', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeMonth,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month'),
@@ -35,7 +37,11 @@ trait MonthTrait
     )]
     private ?Month $month = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: MonthOfYear::class)]
+    #[Column(
+        type: TimeBinType::TypeMonthOfYear,
+        nullable: true,
+        enumType: MonthOfYear::class,
+    )]
     #[LevelProperty(
         level: 400,
         label: new TranslatableMessage('Month of Year'),

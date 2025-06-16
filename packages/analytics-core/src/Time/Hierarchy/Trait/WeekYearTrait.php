@@ -25,7 +25,10 @@ trait WeekYearTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_week_year', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeWeekYear,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 700,
         label: new TranslatableMessage('Week Year'),
