@@ -182,6 +182,7 @@ final readonly class QueryResultToTableHelper
                         'Dimension "%s" does not have a hierarchy defined',
                         $propertyName,
                     )),
+                propertyMetadata: $propertyMetadata,
             );
         } else {
             throw new LogicException(\sprintf(

@@ -75,6 +75,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     {
         return $this->hierarchyProperty;
     }
+    
 
     public function getDimension(): DimensionMetadata
     {
@@ -103,5 +104,23 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     public function getValueResolver(): ValueResolver&HierarchyAware
     {
         return $this->dimensionLevelProperty->getValueResolver();
+    }
+
+    public function getSummaryTimeZone(): \DateTimeZone
+    {
+        if (null === $this->dimensionMetadata) {
+            throw new LogicException('Dimension metadata is not set.');
+        }
+
+        return $this->dimensionMetadata->getSummaryTimeZone();
+    }
+
+    public function getSourceTimeZone(): \DateTimeZone
+    {
+        if (null === $this->dimensionMetadata) {
+            throw new LogicException('Dimension metadata is not set.');
+        }
+
+        return $this->dimensionMetadata->getSourceTimeZone();
     }
 }

@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Context;
 
+use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
+use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class HierarchyContext
@@ -23,6 +27,7 @@ final readonly class HierarchyContext
         private SummaryMetadata $summaryMetadata,
         private DimensionMetadata $dimensionMetadata,
         private DimensionHierarchyMetadata $dimensionHierarchyMetadata,
+        private PropertyMetadata $propertyMetadata,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -38,5 +43,35 @@ final readonly class HierarchyContext
     public function getDimensionHierarchyMetadata(): DimensionHierarchyMetadata
     {
         return $this->dimensionHierarchyMetadata;
+    }
+
+    public function getPropertyMetadata(): PropertyMetadata
+    {
+        return $this->propertyMetadata;
+    }
+
+    public function getUserValue(string $property, mixed $rawValue): mixed
+    {
+        $propertyMetadata = $this->propertyMetadata;
+
+        if (
+            !$propertyMetadata instanceof DimensionPropertyMetadata
+            && !$propertyMetadata instanceof DimensionMetadata
+        ) {
+            throw new InvalidArgumentException(\sprintf(
+                'User value is only supported for dimensions, but property "%s" is given.',
+                $property,
+            ));
+        }
+
+        $valueResolver = $propertyMetadata->getValueResolver();
+
+        if (!$valueResolver instanceof UserValueTransformer) {
+            return $rawValue;
+        }
+
+        $timeZone = $propertyMetadata->getSummaryTimeZone();
+
+        return $this->dimensionMetadata->getUserValue($rawValue);
     }
 }
