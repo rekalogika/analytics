@@ -95,32 +95,6 @@ final class Date implements TimeBin
         return $this->end;
     }
 
-    // public function getStartDatabaseValue(): int
-    // {
-    //     return (int) $this->start->format('Ymd');
-    // }
-
-    // public function getEndDatabaseValue(): int
-    // {
-    //     return (int) $this->end->format('Ymd');
-    // }
-
-    // private function getContainingWeek(): Week
-    // {
-    //     return Week::createFromDatabaseValue(
-    //         (int) $this->start->format('oW'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
-    // private function getContainingMonth(): Month
-    // {
-    //     return Month::createFromDatabaseValue(
-    //         (int) $this->start->format('Ym'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
     #[\Override]
     public function getNext(): static
     {

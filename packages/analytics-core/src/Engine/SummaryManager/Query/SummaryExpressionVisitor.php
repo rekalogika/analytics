@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
-use Rekalogika\Analytics\Core\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
@@ -131,7 +131,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $fieldWithAlias = $this->rootAlias . '.' . $field;
 
         /** @psalm-suppress MixedAssignment */
-        $value = $comparison->getValue()->getValue();
+        $value = $this->walkValue($comparison->getValue());
         $type = $this->getFieldType($field);
 
         if (\is_array($value)) {
@@ -209,7 +209,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         // ensure value is array
 
         /** @psalm-suppress MixedAssignment */
-        $values = $comparison->getValue()->getValue();
+        $values = $this->walkValue($comparison->getValue());
 
         if (!\is_array($values)) {
             throw new LogicException('Value must be an array with IN or NOT IN operator');
@@ -263,7 +263,21 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkValue(Value $value): mixed
     {
-        throw new BadMethodCallException('Not used');
+        /** @psalm-suppress MixedAssignment */
+        $value = $value->getValue();
+
+        if ($value instanceof DatabaseValueAware) {
+            return $value->getDatabaseValue();
+        }
+
+        if (\is_array($value)) {
+            return array_map(
+                fn($v): mixed => $this->walkValue(new Value($v)),
+                $value,
+            );
+        }
+
+        return $value;
     }
 
     #[\Override]

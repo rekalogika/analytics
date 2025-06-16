@@ -14,8 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Model;
 
 /**
- * Represents a bin, which is the result of a data binning operation.
+ * Provides information about the raw Doctrine value of this object. Used by the
+ * framework for query and comparison.
  *
  * @template T
  */
-interface Bin extends Sequence {}
+interface DatabaseValueAware
+{
+    /**
+     * @return T
+     */
+    public function getDatabaseValue(): mixed;
+}

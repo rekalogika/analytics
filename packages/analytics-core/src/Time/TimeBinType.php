@@ -21,28 +21,27 @@ enum TimeBinType: string
     // doctrine types
     //
 
-    public const TypeHour = 'rekalogika_analytics_hour';
+    public const TypeHour = Types::INTEGER;
     public const TypeHourOfDay = Types::SMALLINT;
 
-    public const TypeDate = 'rekalogika_analytics_date';
-    public const TypeWeekDate = 'rekalogika_analytics_week_date';
+    public const TypeDate = Types::INTEGER;
+    public const TypeWeekDate = Types::INTEGER;
     public const TypeDayOfWeek = Types::SMALLINT;
     public const TypeDayOfMonth = Types::SMALLINT;
     public const TypeDayOfYear = Types::SMALLINT;
 
-    public const TypeWeek = 'rekalogika_analytics_week';
+    public const TypeWeek = Types::INTEGER;
     public const TypeWeekOfYear = Types::SMALLINT;
     public const TypeWeekOfMonth = Types::SMALLINT;
 
-    public const TypeMonth = 'rekalogika_analytics_month';
+    public const TypeMonth = Types::INTEGER;
     public const TypeMonthOfYear = Types::SMALLINT;
 
-    public const TypeQuarter = 'rekalogika_analytics_quarter';
+    public const TypeQuarter = Types::INTEGER;
     public const TypeQuarterOfYear = Types::SMALLINT;
 
-    public const TypeWeekYear = 'rekalogika_analytics_week_year';
-    public const TypeYear = 'rekalogika_analytics_year';
-
+    public const TypeWeekYear = Types::SMALLINT;
+    public const TypeYear = Types::SMALLINT;
 
     //
     // enum cases
@@ -70,46 +69,43 @@ enum TimeBinType: string
 
     case Year = 'year';
 
-    /**
-     * This is mainly for documentation purposes.
-     */
     public function getDoctrineType(): string
     {
         return match ($this) {
             // HourTrait
-            self::Hour => 'rekalogika_analytics_hour',
-            self::HourOfDay => Types::SMALLINT,
+            self::Hour => self::TypeHour,
+            self::HourOfDay => self::TypeHourOfDay,
 
             // DayTrait
-            self::Date => 'rekalogika_analytics_date',
-            self::WeekDate => 'rekalogika_analytics_week_date',
-            self::DayOfWeek => Types::SMALLINT,
-            self::DayOfMonth => Types::SMALLINT,
-            self::DayOfYear => Types::SMALLINT,
+            self::Date => self::TypeDate,
+            self::WeekDate => self::TypeWeekDate,
+            self::DayOfWeek => self::TypeDayOfWeek,
+            self::DayOfMonth => self::TypeDayOfMonth,
+            self::DayOfYear => self::TypeDayOfYear,
 
             // WeekTrait
-            self::Week => 'rekalogika_analytics_week',
-            self::WeekOfYear => Types::SMALLINT,
-            self::WeekOfMonth => Types::SMALLINT,
+            self::Week => self::TypeWeek,
+            self::WeekOfYear => self::TypeWeekOfYear,
+            self::WeekOfMonth => self::TypeWeekOfMonth,
 
             // MonthTrait
-            self::Month => 'rekalogika_analytics_month',
-            self::MonthOfYear => Types::SMALLINT,
+            self::Month => self::TypeMonth,
+            self::MonthOfYear => self::TypeMonthOfYear,
 
             // QuarterTrait
-            self::Quarter => 'rekalogika_analytics_quarter',
-            self::QuarterOfYear => Types::SMALLINT,
+            self::Quarter => self::TypeQuarter,
+            self::QuarterOfYear => self::TypeQuarterOfYear,
 
             // WeekYearTrait
-            self::WeekYear => 'rekalogika_analytics_week_year',
+            self::WeekYear => self::TypeWeekYear,
 
             // YearTrait
-            self::Year => 'rekalogika_analytics_year',
+            self::Year => self::TypeYear,
         };
     }
 
     /**
-     * @return class-string
+     * @return class-string<TimeBin|RecurringTimeBin>
      */
     public function getBinClass(): string
     {

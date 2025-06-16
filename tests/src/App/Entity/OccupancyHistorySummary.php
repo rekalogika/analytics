@@ -49,24 +49,24 @@ class OccupancyHistorySummary extends Summary
     // dimensions
     //
 
-    #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
+    #[ORM\Column(type: TimeBinType::TypeDate, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeBinType::Date,
+            type: TimeBinType::Date,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
         mandatory: true,
     )]
-    private ?Date $date = null;
+    private ?int $date = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeBinType::DayOfWeek,
+            type: TimeBinType::DayOfWeek,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -78,7 +78,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeBinType::DayOfMonth,
+            type: TimeBinType::DayOfMonth,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -90,7 +90,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeBinType::DayOfYear,
+            type: TimeBinType::DayOfYear,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -132,7 +132,11 @@ class OccupancyHistorySummary extends Summary
 
     public function getDate(): ?Date
     {
-        return $this->date;
+        return $this->getContext()->getUserValue(
+            property: 'date',
+            rawValue: new DateToInteger('date'),
+            class: Date::class,
+        );
     }
 
     public function getDayOfWeek(): ?DayOfWeek

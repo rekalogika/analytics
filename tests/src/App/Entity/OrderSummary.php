@@ -70,10 +70,13 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     )]
     private TimeDimensionHierarchy $time;
 
-    #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
+    #[ORM\Column(
+        type: TimeBinType::TypeDate,
+        nullable: true,
+    )]
     #[Analytics\Dimension(
         source: new TimeBin(
-            format: TimeBinType::Date,
+            type: TimeBinType::Date,
             input: new PropertyValue('shipped'),
         ),
         label: new TranslatableMessage('Date shipped'),
@@ -81,7 +84,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         orderBy: DoctrineOrder::Ascending,
     )]
-    private ?Date $shipped = null;
+    private ?int $shipped = null;
 
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]

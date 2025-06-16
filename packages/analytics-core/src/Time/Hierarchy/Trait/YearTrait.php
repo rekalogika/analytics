@@ -34,7 +34,7 @@ trait YearTrait
         label: new TranslatableMessage('Year'),
         valueResolver: new TimeBin(TimeBinType::Year),
     )]
-    private ?Year $year = null;
+    private ?int $year = null;
 
     public function getYear(): ?Year
     {

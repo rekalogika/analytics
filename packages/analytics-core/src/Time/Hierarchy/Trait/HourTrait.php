@@ -35,7 +35,7 @@ trait HourTrait
         label: new TranslatableMessage('Hour'),
         valueResolver: new TimeBin(TimeBinType::Hour),
     )]
-    private ?Hour $hour = null;
+    private ?int $hour = null;
 
     #[Column(
         type: TimeBinType::TypeHourOfDay,

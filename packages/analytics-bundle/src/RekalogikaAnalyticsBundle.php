@@ -30,7 +30,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
-use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
+use Rekalogika\Analytics\Time\Doctrine\TimeBinFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\AssetMapper\AssetMapperInterface;

@@ -26,8 +26,7 @@ use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
 use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
- * @template T of TimeBinInterface|RecurringTimeBin
- * @implements UserValueTransformer<T,T>
+ * @implements UserValueTransformer<RecurringTimeBin|int,TimeBinInterface|RecurringTimeBin>
  */
 final readonly class TimeBin implements
     ValueResolver,
@@ -35,7 +34,7 @@ final readonly class TimeBin implements
     UserValueTransformer
 {
     public function __construct(
-        private TimeBinType $format,
+        private TimeBinType $type,
         private ?ValueResolver $input = null,
     ) {}
 
@@ -43,7 +42,7 @@ final readonly class TimeBin implements
     public function withInput(ValueResolver $input): static
     {
         return new static(
-            format: $this->format,
+            type: $this->type,
             input: $input,
         );
     }
@@ -70,7 +69,7 @@ final readonly class TimeBin implements
             $this->input->getExpression($context),
             $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
-            $this->format->value,
+            $this->type->value,
         );
     }
 
@@ -83,9 +82,10 @@ final readonly class TimeBin implements
             return $rawValue;
         }
 
-        if (!$rawValue instanceof TimeBinInterface) {
+        /** @psalm-suppress DocblockTypeContradiction */
+        if (!\is_int($rawValue)) {
             throw new InvalidArgumentException(\sprintf(
-                'Expected TimeBinInterface, but got %s',
+                'Expected integer, but got %s',
                 get_debug_type($rawValue),
             ));
         }
@@ -98,6 +98,16 @@ final readonly class TimeBin implements
             $timeZone = new \DateTimeZone('UTC');
         }
 
-        return $rawValue->withTimeZone($timeZone);
+        $binClass = $this->type->getBinClass();
+
+        if (!is_a($binClass, TimeBinInterface::class, true)) {
+            throw new InvalidArgumentException(\sprintf(
+                'The class "%s" is not a valid TimeBin class.',
+                $binClass,
+            ));
+        }
+
+        return $binClass::createFromDatabaseValue($rawValue)
+            ->withTimeZone($timeZone);
     }
 }

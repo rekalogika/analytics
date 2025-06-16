@@ -36,7 +36,7 @@ trait WeekTrait
         label: new TranslatableMessage('Week'),
         valueResolver: new TimeBin(TimeBinType::Week),
     )]
-    private ?Week $week = null;
+    private ?int $week = null;
 
     #[Column(
         type: TimeBinType::TypeWeekOfYear,

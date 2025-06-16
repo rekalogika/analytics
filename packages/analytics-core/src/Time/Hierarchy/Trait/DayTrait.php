@@ -38,7 +38,7 @@ trait DayTrait
         label: new TranslatableMessage('Date'),
         valueResolver: new TimeBin(TimeBinType::Date),
     )]
-    private ?Date $date = null;
+    private ?int $date = null;
 
     #[Column(
         type: TimeBinType::TypeWeekDate,
@@ -49,7 +49,7 @@ trait DayTrait
         label: new TranslatableMessage('Week Date'),
         valueResolver: new TimeBin(TimeBinType::WeekDate),
     )]
-    private ?WeekDate $weekDate = null;
+    private ?int $weekDate = null;
 
     #[Column(
         type: TimeBinType::TypeDayOfWeek,
