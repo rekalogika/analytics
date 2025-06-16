@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
@@ -27,7 +28,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait DayTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[LevelProperty(
@@ -71,12 +72,20 @@ trait DayTrait
 
     public function getDate(): ?Date
     {
-        return $this->date?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'date',
+            rawValue: $this->date,
+            class: Date::class,
+        );
     }
 
     public function getWeekDate(): ?WeekDate
     {
-        return $this->weekDate?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'weekDate',
+            rawValue: $this->weekDate,
+            class: WeekDate::class,
+        );
     }
 
     public function getDayOfWeek(): ?DayOfWeek

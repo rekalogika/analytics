@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\TimeBinType;
@@ -22,7 +23,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait YearTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_year', nullable: true)]
     #[LevelProperty(
@@ -34,6 +35,10 @@ trait YearTrait
 
     public function getYear(): ?Year
     {
-        return $this->year?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'year',
+            rawValue: $this->year,
+            class: Year::class,
+        );
     }
 }

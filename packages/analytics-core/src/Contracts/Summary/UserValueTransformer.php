@@ -34,10 +34,10 @@ interface UserValueTransformer
      * Takes a raw value as returned by Doctrine, and transforms it into a value
      * suitable for the user.
      *
-     * @param I $rawValue The raw value as returned by Doctrine.
+     * @param ?I $rawValue The raw value as returned by Doctrine.
      * @param ValueTransformerContext $context The context for getting the user
      * value.
-     * @return O The final user value.
+     * @return ?O The final user value.
      */
     public function getUserValue(
         mixed $rawValue,

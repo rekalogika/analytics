@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
-use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class HierarchyContext
@@ -27,7 +26,6 @@ final readonly class HierarchyContext
         private SummaryMetadata $summaryMetadata,
         private DimensionMetadata $dimensionMetadata,
         private DimensionHierarchyMetadata $dimensionHierarchyMetadata,
-        private PropertyMetadata $propertyMetadata,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -45,21 +43,28 @@ final readonly class HierarchyContext
         return $this->dimensionHierarchyMetadata;
     }
 
-    public function getPropertyMetadata(): PropertyMetadata
-    {
-        return $this->propertyMetadata;
-    }
+    /**
+     * @template T of object
+     * @param null|class-string<T> $class
+     * @return ($class is null ? mixed : T|null)
+     */
+    public function getUserValue(
+        string $property,
+        mixed $rawValue,
+        ?string $class = null,
+    ): mixed {
+        $fullyQualifiedProperty = \sprintf(
+            '%s.%s',
+            $this->dimensionMetadata->getSummaryProperty(),
+            $property,
+        );
 
-    public function getUserValue(string $property, mixed $rawValue): mixed
-    {
-        $propertyMetadata = $this->propertyMetadata;
+        $propertyMetadata = $this->summaryMetadata
+            ->getProperty($fullyQualifiedProperty);
 
-        if (
-            !$propertyMetadata instanceof DimensionPropertyMetadata
-            && !$propertyMetadata instanceof DimensionMetadata
-        ) {
+        if (!$propertyMetadata instanceof DimensionPropertyMetadata) {
             throw new InvalidArgumentException(\sprintf(
-                'User value is only supported for dimensions, but property "%s" is given.',
+                'Getting user value is not supported, the property "%s" is not a dimension property.',
                 $property,
             ));
         }
@@ -67,11 +72,35 @@ final readonly class HierarchyContext
         $valueResolver = $propertyMetadata->getValueResolver();
 
         if (!$valueResolver instanceof UserValueTransformer) {
-            return $rawValue;
+            throw new InvalidArgumentException(\sprintf(
+                'Getting user value is not supported, but the value resolver of property "%s" is "%s" which is not an instance of "%s".',
+                $property,
+                $valueResolver::class,
+                UserValueTransformer::class,
+            ));
         }
 
-        $timeZone = $propertyMetadata->getSummaryTimeZone();
+        $valueTransformerContext = new ValueTransformerContext($propertyMetadata);
+        /** @psalm-suppress MixedAssignment */
+        $result = $valueResolver->getUserValue($rawValue, $valueTransformerContext);
 
-        return $this->dimensionMetadata->getUserValue($rawValue);
+        if (
+            $class !== null
+            && $result !== null
+            && (
+                !\is_object($result)
+                || !is_a($result, $class, true)
+            )
+        ) {
+            throw new InvalidArgumentException(\sprintf(
+                'The user value for property "%s" is not an instance of "%s", but "%s".',
+                $property,
+                $class,
+                get_debug_type($result),
+            ));
+        }
+
+        /** @psalm-suppress MixedReturnStatement */
+        return $result;
     }
 }

@@ -21,7 +21,6 @@ use Rekalogika\Analytics\Time\Hierarchy\Trait\DayTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\HourTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\MonthTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\QuarterTrait;
-use Rekalogika\Analytics\Time\Hierarchy\Trait\TimeZoneTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\YearTrait;
 
 #[Embeddable]
@@ -31,7 +30,6 @@ use Rekalogika\Analytics\Time\Hierarchy\Trait\YearTrait;
 final class TimeWithoutWeekDimensionHierarchy implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
-    use TimeZoneTrait;
     use YearTrait;
     use QuarterTrait;
     use MonthTrait;

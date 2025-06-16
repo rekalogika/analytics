@@ -21,11 +21,13 @@ use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
 use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
- * @implements UserValueTransformer<TimeBinInterface,TimeBinInterface>
+ * @template T of TimeBinInterface|RecurringTimeBin
+ * @implements UserValueTransformer<T,T>
  */
 final readonly class TimeBin implements
     ValueResolver,
@@ -77,6 +79,10 @@ final readonly class TimeBin implements
         mixed $rawValue,
         ValueTransformerContext $context,
     ): mixed {
+        if ($rawValue === null || $rawValue instanceof RecurringTimeBin) {
+            return $rawValue;
+        }
+
         if (!$rawValue instanceof TimeBinInterface) {
             throw new InvalidArgumentException(\sprintf(
                 'Expected TimeBinInterface, but got %s',

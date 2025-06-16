@@ -30,7 +30,7 @@ use Rekalogika\Analytics\Core\Exception\QueryException;
  * * source datetime
  * * stored time zone
  * * summary time zone
- * * output format (same as the values of TimeFormat enum)
+ * * output format (same as the values of TimeBinType enum)
  */
 final class TimeBinFunction extends FunctionNode
 {
