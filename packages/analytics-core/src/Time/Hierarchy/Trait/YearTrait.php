@@ -25,7 +25,10 @@ trait YearTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_year', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeYear,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 600,
         label: new TranslatableMessage('Year'),

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
@@ -27,7 +26,10 @@ trait QuarterTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_quarter', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeQuarter,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter'),
@@ -35,7 +37,11 @@ trait QuarterTrait
     )]
     private ?Quarter $quarter = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: QuarterOfYear::class)]
+    #[Column(
+        type: TimeBinType::TypeQuarterOfYear,
+        nullable: true,
+        enumType: QuarterOfYear::class,
+    )]
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter of Year'),

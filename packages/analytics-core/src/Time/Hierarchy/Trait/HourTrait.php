@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
@@ -27,7 +26,10 @@ trait HourTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_hour', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeHour,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour'),
@@ -35,7 +37,11 @@ trait HourTrait
     )]
     private ?Hour $hour = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: HourOfDay::class)]
+    #[Column(
+        type: TimeBinType::TypeHourOfDay,
+        nullable: true,
+        enumType: HourOfDay::class,
+    )]
     #[LevelProperty(
         level: 100,
         label: new TranslatableMessage('Hour of Day'),

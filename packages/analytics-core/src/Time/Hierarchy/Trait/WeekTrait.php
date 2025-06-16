@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
@@ -28,7 +27,10 @@ trait WeekTrait
 {
     abstract private function getContext(): HierarchyContext;
 
-    #[Column(type: 'rekalogika_analytics_week', nullable: true)]
+    #[Column(
+        type: TimeBinType::TypeWeek,
+        nullable: true,
+    )]
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week'),
@@ -36,7 +38,11 @@ trait WeekTrait
     )]
     private ?Week $week = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: WeekOfYear::class)]
+    #[Column(
+        type: TimeBinType::TypeWeekOfYear,
+        nullable: true,
+        enumType: WeekOfYear::class,
+    )]
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Year'),
@@ -44,7 +50,11 @@ trait WeekTrait
     )]
     private ?WeekOfYear $weekOfYear = null;
 
-    #[Column(type: Types::SMALLINT, nullable: true, enumType: WeekOfMonth::class)]
+    #[Column(
+        type: TimeBinType::TypeWeekOfMonth,
+        nullable: true,
+        enumType: WeekOfMonth::class,
+    )]
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Month'),
