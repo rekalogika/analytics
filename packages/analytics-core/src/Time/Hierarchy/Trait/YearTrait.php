@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait YearTrait
@@ -28,7 +28,7 @@ trait YearTrait
     #[LevelProperty(
         level: 600,
         label: new TranslatableMessage('Year'),
-        valueResolver: new TimeBin(TimeFormat::Year),
+        valueResolver: new TimeBin(TimeBinType::Year),
     )]
     private ?Year $year = null;
 

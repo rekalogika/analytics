@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Week;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
 use Rekalogika\Analytics\Time\Bin\WeekOfYear;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait WeekTrait
@@ -31,7 +31,7 @@ trait WeekTrait
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week'),
-        valueResolver: new TimeBin(TimeFormat::Week),
+        valueResolver: new TimeBin(TimeBinType::Week),
     )]
     private ?Week $week = null;
 
@@ -39,7 +39,7 @@ trait WeekTrait
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Year'),
-        valueResolver: new TimeBin(TimeFormat::WeekOfYear),
+        valueResolver: new TimeBin(TimeBinType::WeekOfYear),
     )]
     private ?WeekOfYear $weekOfYear = null;
 
@@ -47,7 +47,7 @@ trait WeekTrait
     #[LevelProperty(
         level: 300,
         label: new TranslatableMessage('Week of Month'),
-        valueResolver: new TimeBin(TimeFormat::WeekOfMonth),
+        valueResolver: new TimeBin(TimeBinType::WeekOfMonth),
     )]
     private ?WeekOfMonth $weekOfMonth = null;
 

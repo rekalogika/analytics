@@ -17,12 +17,12 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 
 final readonly class TimeBin implements ValueResolver, HierarchyAware
 {
     public function __construct(
-        private TimeFormat $format,
+        private TimeBinType $format,
         private ?ValueResolver $input = null,
     ) {}
 

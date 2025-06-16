@@ -25,7 +25,7 @@ use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\DateToInteger;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -53,7 +53,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeFormat::Date,
+            format: TimeBinType::Date,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -66,7 +66,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeFormat::DayOfWeek,
+            format: TimeBinType::DayOfWeek,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -78,7 +78,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeFormat::DayOfMonth,
+            format: TimeBinType::DayOfMonth,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
@@ -90,7 +90,7 @@ class OccupancyHistorySummary extends Summary
     #[Analytics\Dimension(
         source: new TimeBin(
             input: new PropertyValue('date'),
-            format: TimeFormat::DayOfYear,
+            format: TimeBinType::DayOfYear,
         ),
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),

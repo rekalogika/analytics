@@ -37,7 +37,7 @@ use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -73,7 +73,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[ORM\Column(type: 'rekalogika_analytics_date', nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBin(
-            format: TimeFormat::Date,
+            format: TimeBinType::Date,
             input: new PropertyValue('shipped'),
         ),
         label: new TranslatableMessage('Date shipped'),
