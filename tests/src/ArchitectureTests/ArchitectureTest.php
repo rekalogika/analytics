@@ -224,6 +224,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCoreException(),
 
                 // psr/symfony contracts
@@ -286,7 +287,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCore(), // @todo maybe try removing this?
+                Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCoreException(),
 
                 // symfony

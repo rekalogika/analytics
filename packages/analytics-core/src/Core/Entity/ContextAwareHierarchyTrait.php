@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
+namespace Rekalogika\Analytics\Core\Entity;
 
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
