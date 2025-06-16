@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Week;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
@@ -25,7 +26,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait WeekTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_week', nullable: true)]
     #[LevelProperty(
@@ -53,16 +54,28 @@ trait WeekTrait
 
     public function getWeek(): ?Week
     {
-        return $this->week?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'week',
+            rawValue: $this->week,
+            class: Week::class,
+        );
     }
 
     public function getWeekOfYear(): ?WeekOfYear
     {
-        return $this->weekOfYear;
+        return $this->getContext()->getUserValue(
+            property: 'weekOfYear',
+            rawValue: $this->weekOfYear,
+            class: WeekOfYear::class,
+        );
     }
 
     public function getWeekOfMonth(): ?WeekOfMonth
     {
-        return $this->weekOfMonth;
+        return $this->getContext()->getUserValue(
+            property: 'weekOfMonth',
+            rawValue: $this->weekOfMonth,
+            class: WeekOfMonth::class,
+        );
     }
 }

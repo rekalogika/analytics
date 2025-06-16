@@ -16,9 +16,8 @@ namespace Rekalogika\Analytics\Time\Hierarchy;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
-use Rekalogika\Analytics\Time\Hierarchy\Trait\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\DayTrait;
-use Rekalogika\Analytics\Time\Hierarchy\Trait\TimeZoneTrait;
 
 #[Embeddable]
 #[Hierarchy([
@@ -27,6 +26,5 @@ use Rekalogika\Analytics\Time\Hierarchy\Trait\TimeZoneTrait;
 final class DateOnlyDimensionHierarchy implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
-    use TimeZoneTrait;
     use DayTrait;
 }

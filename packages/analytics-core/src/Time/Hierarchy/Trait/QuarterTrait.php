@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
@@ -24,7 +25,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait QuarterTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_quarter', nullable: true)]
     #[LevelProperty(
@@ -44,11 +45,19 @@ trait QuarterTrait
 
     public function getQuarter(): ?Quarter
     {
-        return $this->quarter?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'quarter',
+            rawValue: $this->quarter,
+            class: Quarter::class,
+        );
     }
 
     public function getQuarterOfYear(): ?QuarterOfYear
     {
-        return $this->quarterOfYear;
+        return $this->getContext()->getUserValue(
+            property: 'quarterOfYear',
+            rawValue: $this->quarterOfYear,
+            class: QuarterOfYear::class,
+        );
     }
 }

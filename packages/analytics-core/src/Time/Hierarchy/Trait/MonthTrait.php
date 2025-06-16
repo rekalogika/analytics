@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Month;
 use Rekalogika\Analytics\Time\Bin\MonthOfYear;
@@ -24,7 +25,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait MonthTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_month', nullable: true)]
     #[LevelProperty(
@@ -44,11 +45,19 @@ trait MonthTrait
 
     public function getMonth(): ?Month
     {
-        return $this->month?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'month',
+            rawValue: $this->month,
+            class: Month::class,
+        );
     }
 
     public function getMonthOfYear(): ?MonthOfYear
     {
-        return $this->monthOfYear;
+        return $this->getContext()->getUserValue(
+            property: 'monthOfYear',
+            rawValue: $this->monthOfYear,
+            class: MonthOfYear::class,
+        );
     }
 }

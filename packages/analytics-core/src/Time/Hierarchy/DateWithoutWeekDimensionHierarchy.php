@@ -16,10 +16,9 @@ namespace Rekalogika\Analytics\Time\Hierarchy;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
-use Rekalogika\Analytics\Time\Hierarchy\Trait\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\DayTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\MonthTrait;
-use Rekalogika\Analytics\Time\Hierarchy\Trait\TimeZoneTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\YearTrait;
 
 #[Embeddable]
@@ -29,7 +28,6 @@ use Rekalogika\Analytics\Time\Hierarchy\Trait\YearTrait;
 final class DateWithoutWeekDimensionHierarchy implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
-    use TimeZoneTrait;
     use YearTrait;
     use MonthTrait;
     use DayTrait;

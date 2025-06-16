@@ -14,12 +14,25 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\ValueResolver;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
+use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Time\RecurringTimeBin;
+use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
 use Rekalogika\Analytics\Time\TimeBinType;
 
-final readonly class TimeBin implements ValueResolver, HierarchyAware
+/**
+ * @template T of TimeBinInterface|RecurringTimeBin
+ * @implements UserValueTransformer<T,T>
+ */
+final readonly class TimeBin implements
+    ValueResolver,
+    HierarchyAware,
+    UserValueTransformer
 {
     public function __construct(
         private TimeBinType $format,
@@ -59,5 +72,32 @@ final readonly class TimeBin implements ValueResolver, HierarchyAware
             $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
             $this->format->value,
         );
+    }
+
+    #[\Override]
+    public function getUserValue(
+        mixed $rawValue,
+        ValueTransformerContext $context,
+    ): mixed {
+        if ($rawValue === null || $rawValue instanceof RecurringTimeBin) {
+            return $rawValue;
+        }
+
+        if (!$rawValue instanceof TimeBinInterface) {
+            throw new InvalidArgumentException(\sprintf(
+                'Expected TimeBinInterface, but got %s',
+                get_debug_type($rawValue),
+            ));
+        }
+
+        $metadata = $context->getPropertyMetadata();
+
+        if ($metadata instanceof DimensionMetadata || $metadata instanceof DimensionPropertyMetadata) {
+            $timeZone = $metadata->getSummaryTimeZone();
+        } else {
+            $timeZone = new \DateTimeZone('UTC');
+        }
+
+        return $rawValue->withTimeZone($timeZone);
     }
 }

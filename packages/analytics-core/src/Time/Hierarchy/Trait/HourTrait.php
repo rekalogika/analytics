@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Hour;
 use Rekalogika\Analytics\Time\Bin\HourOfDay;
@@ -24,7 +25,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait HourTrait
 {
-    abstract private function getTimeZone(): \DateTimeZone;
+    abstract private function getContext(): HierarchyContext;
 
     #[Column(type: 'rekalogika_analytics_hour', nullable: true)]
     #[LevelProperty(
@@ -44,11 +45,19 @@ trait HourTrait
 
     public function getHour(): ?Hour
     {
-        return $this->hour?->withTimeZone($this->getTimeZone());
+        return $this->getContext()->getUserValue(
+            property: 'hour',
+            rawValue: $this->hour,
+            class: Hour::class,
+        );
     }
 
     public function getHourOfDay(): ?HourOfDay
     {
-        return $this->hourOfDay;
+        return $this->getContext()->getUserValue(
+            property: 'hourOfDay',
+            rawValue: $this->hourOfDay,
+            class: HourOfDay::class,
+        );
     }
 }
