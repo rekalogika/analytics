@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Common\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait QuarterTrait
@@ -30,7 +30,7 @@ trait QuarterTrait
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter'),
-        valueResolver: new TimeBin(TimeFormat::Quarter),
+        valueResolver: new TimeBin(TimeBinType::Quarter),
     )]
     private ?Quarter $quarter = null;
 
@@ -38,7 +38,7 @@ trait QuarterTrait
     #[LevelProperty(
         level: 500,
         label: new TranslatableMessage('Quarter of Year'),
-        valueResolver: new TimeBin(TimeFormat::QuarterOfYear),
+        valueResolver: new TimeBin(TimeBinType::QuarterOfYear),
     )]
     private ?QuarterOfYear $quarterOfYear = null;
 

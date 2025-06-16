@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\Bin\WeekDate;
-use Rekalogika\Analytics\Time\TimeFormat;
+use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait DayTrait
@@ -33,7 +33,7 @@ trait DayTrait
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Date'),
-        valueResolver: new TimeBin(TimeFormat::Date),
+        valueResolver: new TimeBin(TimeBinType::Date),
     )]
     private ?Date $date = null;
 
@@ -41,7 +41,7 @@ trait DayTrait
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Week Date'),
-        valueResolver: new TimeBin(TimeFormat::WeekDate),
+        valueResolver: new TimeBin(TimeBinType::WeekDate),
     )]
     private ?WeekDate $weekDate = null;
 
@@ -49,7 +49,7 @@ trait DayTrait
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Week'),
-        valueResolver: new TimeBin(TimeFormat::DayOfWeek),
+        valueResolver: new TimeBin(TimeBinType::DayOfWeek),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -57,7 +57,7 @@ trait DayTrait
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Month'),
-        valueResolver: new TimeBin(TimeFormat::DayOfMonth),
+        valueResolver: new TimeBin(TimeBinType::DayOfMonth),
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
@@ -65,7 +65,7 @@ trait DayTrait
     #[LevelProperty(
         level: 200,
         label: new TranslatableMessage('Day of Year'),
-        valueResolver: new TimeBin(TimeFormat::DayOfYear),
+        valueResolver: new TimeBin(TimeBinType::DayOfYear),
     )]
     private ?DayOfYear $dayOfYear = null;
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time;
 
-enum TimeFormat: string
+enum TimeBinType: string
 {
     case Hour = 'hour';
     case HourOfDay = 'hourOfDay';
