@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Engine\Sequence\SequenceUtil;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -52,7 +53,7 @@ final readonly class GapFiller
                 continue;
             }
 
-            // ensure member implements Bin
+            // ensure member implements SequenceMember
             if (!$member instanceof SequenceMember) {
                 throw new InvalidArgumentException(\sprintf(
                     'Dimension must implement "%s".',
@@ -123,7 +124,7 @@ final readonly class GapFiller
             ));
         }
 
-        $sequence = $this->getSequence($firstMember, $lastMember);
+        $sequence = SequenceUtil::getSequenceFromMembers($firstMember, $lastMember);
 
         foreach ($sequence as $current) {
             yield $this->getDimensionFromSequenceMember($current);
@@ -142,52 +143,5 @@ final readonly class GapFiller
             rawMember: $member,
             displayMember: $member,
         );
-    }
-
-    /**
-     * @template T of SequenceMember
-     * @param T $first
-     * @param T $last
-     * @return iterable<T>
-     */
-    private function getSequence(
-        SequenceMember $first,
-        SequenceMember $last,
-    ): iterable {
-        $class = $first::class;
-
-        if ($class !== $last::class) {
-            throw new InvalidArgumentException(\sprintf(
-                'Sequence member must be of the same class "%s".',
-                $class,
-            ));
-        }
-
-        $comparison = $class::compare($first, $last);
-        $current = $first;
-
-        if ($comparison === 0) {
-            yield $first;
-        } elseif ($class::compare($first, $last) < 0) { // ascending
-            while ($current instanceof SequenceMember) {
-                yield $current;
-
-                if ($current === $last) {
-                    break;
-                }
-
-                $current = $current->getNext();
-            }
-        } else { // descending
-            while ($current instanceof SequenceMember) {
-                yield $current;
-
-                if ($current === $last) {
-                    break;
-                }
-
-                $current = $current->getPrevious();
-            }
-        }
     }
 }
