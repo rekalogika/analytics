@@ -60,6 +60,7 @@ trait RecurringTimeBinTrait
     }
 
     /**
+     * @psalm-suppress InvalidReturnType
      * @return RecurringTimeBinSequence<static>
      */
     #[\Override]
