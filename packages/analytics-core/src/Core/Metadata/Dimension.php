@@ -27,8 +27,6 @@ final readonly class Dimension
     public function __construct(
         private null|string|ValueResolver $source = null,
         private null|string|TranslatableInterface $label = null,
-        private \DateTimeZone $sourceTimeZone = new \DateTimeZone('UTC'),
-        private \DateTimeZone $summaryTimeZone = new \DateTimeZone('UTC'),
         private Order|array $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
         private bool $mandatory = false,
@@ -46,16 +44,6 @@ final readonly class Dimension
     public function getLabel(): null|string|TranslatableInterface
     {
         return $this->label;
-    }
-
-    public function getSourceTimeZone(): \DateTimeZone
-    {
-        return $this->sourceTimeZone;
-    }
-
-    public function getSummaryTimeZone(): \DateTimeZone
-    {
-        return $this->summaryTimeZone;
     }
 
     /**

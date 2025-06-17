@@ -37,6 +37,7 @@ use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
+use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -64,9 +65,11 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new PropertyValue('time'),
         label: new TranslatableMessage('Placed Time'),
+        orderBy: DoctrineOrder::Ascending,
+    )]
+    #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        orderBy: DoctrineOrder::Ascending,
     )]
     private TimeDimensionHierarchy $time;
 
@@ -80,9 +83,11 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
             input: new PropertyValue('shipped'),
         ),
         label: new TranslatableMessage('Date shipped'),
+        orderBy: DoctrineOrder::Ascending,
+    )]
+    #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        orderBy: DoctrineOrder::Ascending,
     )]
     private ?int $shipped = null;
 

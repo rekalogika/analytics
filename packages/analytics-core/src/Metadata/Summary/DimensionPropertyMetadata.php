@@ -109,22 +109,4 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
     {
         return $this->dimensionLevelProperty->getValueResolver();
     }
-
-    public function getSummaryTimeZone(): \DateTimeZone
-    {
-        if (null === $this->dimensionMetadata) {
-            throw new LogicException('Dimension metadata is not set.');
-        }
-
-        return $this->dimensionMetadata->getSummaryTimeZone();
-    }
-
-    public function getSourceTimeZone(): \DateTimeZone
-    {
-        if (null === $this->dimensionMetadata) {
-            throw new LogicException('Dimension metadata is not set.');
-        }
-
-        return $this->dimensionMetadata->getSourceTimeZone();
-    }
 }
