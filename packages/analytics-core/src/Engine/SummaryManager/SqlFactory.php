@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Core\Exception\LogicException;
-use Rekalogika\Analytics\Engine\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\InsertIntoSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSourceToSummaryPerSourceQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSummaryToSummaryCubingStrategyQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSummaryToSummaryGroupAllStrategyQuery;
+use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Util;
+namespace Rekalogika\Analytics\Metadata\Util;
 
 final readonly class AttributeUtil
 {

@@ -21,6 +21,9 @@ use PHPat\Test\PHPat;
 
 final class ArchitectureTest
 {
+    /**
+     * @todo cleanup
+     */
     public function testPackageAnalyticsCore(): Rule
     {
         return PHPat::rule()
@@ -45,13 +48,6 @@ final class ArchitectureTest
                 // misc
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
-
-                // reflections
-                Selector::classname(\ReflectionClass::class),
-                Selector::classname(\ReflectionAttribute::class),
-                // Selector::classname(\ReflectionObject::class),
-                Selector::classname(\ReflectionProperty::class),
-                Selector::classname(\ReflectionException::class),
 
                 // exceptions
                 Selector::classname(\Error::class),
@@ -211,6 +207,52 @@ final class ArchitectureTest
                 // php reflection
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\ReflectionException::class),
+            );
+    }
+
+    public function testPackageMetadata(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsMetadata(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsMetadata(),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCore(),
+                Selectors::selectAnalyticsCoreException(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+                Selector::inNamespace('Doctrine\Persistence'),
+
+                // php misc
+                Selector::classname(\Override::class),
+
+                // php enum
+                Selector::classname(\UnitEnum::class),
+
+                // php datetime
+                Selector::classname(\DateTimeZone::class),
+
+                // reflections
+                Selector::classname(\ReflectionClass::class),
+                Selector::classname(\ReflectionAttribute::class),
+                Selector::classname(\ReflectionProperty::class),
+                Selector::classname(\ReflectionException::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Traversable::class),
+
+                // exceptions
+                Selector::classname(\Error::class),
             );
     }
 

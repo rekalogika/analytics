@@ -18,9 +18,9 @@ use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
 use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Core\Model\LiteralString;
 use Rekalogika\Analytics\Core\Model\TranslatableMessage;
-use Rekalogika\Analytics\Core\Util\AttributeUtil;
 use Rekalogika\Analytics\Core\Util\TranslatableUtil;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
+use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
 final readonly class DefaultDimensionHierarchyMetadataFactory implements DimensionHierarchyMetadataFactory
 {

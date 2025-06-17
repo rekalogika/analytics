@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
-use Rekalogika\Analytics\Engine\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class InsertIntoSummaryQuery
