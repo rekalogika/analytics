@@ -299,6 +299,7 @@ final class ArchitectureTest
                 // php misc
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
+                Selector::classname(\Attribute::class),
 
                 // php enum
                 Selector::classname(\BackedEnum::class),

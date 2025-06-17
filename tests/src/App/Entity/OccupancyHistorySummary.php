@@ -25,6 +25,7 @@ use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
+use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\DateToInteger;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
@@ -55,10 +56,12 @@ class OccupancyHistorySummary extends Summary
             input: new PropertyValue('date'),
             type: TimeBinType::Date,
         ),
-        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
         mandatory: true,
+    )]
+    #[TimeProperties(
+        sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
     )]
     private ?int $date = null;
 
@@ -68,9 +71,11 @@ class OccupancyHistorySummary extends Summary
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfWeek,
         ),
+        label: new TranslatableMessage('Day of Week', domain: 'rekalogika_analytics'),
+    )]
+    #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        label: new TranslatableMessage('Day of Week', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -80,9 +85,11 @@ class OccupancyHistorySummary extends Summary
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfMonth,
         ),
+        label: new TranslatableMessage('Day of Month', domain: 'rekalogika_analytics'),
+    )]
+    #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        label: new TranslatableMessage('Day of Month', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
@@ -92,9 +99,11 @@ class OccupancyHistorySummary extends Summary
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfYear,
         ),
+        label: new TranslatableMessage('Day of Year', domain: 'rekalogika_analytics'),
+    )]
+    #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
-        label: new TranslatableMessage('Day of Year', domain: 'rekalogika_analytics'),
     )]
     private ?DayOfYear $dayOfYear = null;
 
@@ -134,7 +143,7 @@ class OccupancyHistorySummary extends Summary
     {
         return $this->getContext()->getUserValue(
             property: 'date',
-            rawValue: new DateToInteger('date'),
+            rawValue: $this->date,
             class: Date::class,
         );
     }

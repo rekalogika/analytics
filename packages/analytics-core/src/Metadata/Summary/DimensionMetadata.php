@@ -43,8 +43,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         private ValueResolver $valueResolver,
         private string $summaryProperty,
         TranslatableInterface $label,
-        private \DateTimeZone $sourceTimeZone,
-        private \DateTimeZone $summaryTimeZone,
         ?DimensionHierarchyMetadata $hierarchy,
         private Order|array $orderBy,
         ?string $typeClass,
@@ -94,8 +92,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             valueResolver: $this->valueResolver,
             summaryProperty: $this->summaryProperty,
             label: $this->getLabel(),
-            sourceTimeZone: $this->sourceTimeZone,
-            summaryTimeZone: $this->summaryTimeZone,
             hierarchy: $this->hierarchy,
             orderBy: $this->orderBy,
             typeClass: $this->getTypeClass(),
@@ -111,16 +107,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     public function getValueResolver(): ValueResolver
     {
         return $this->valueResolver;
-    }
-
-    public function getSourceTimeZone(): \DateTimeZone
-    {
-        return $this->sourceTimeZone;
-    }
-
-    public function getSummaryTimeZone(): \DateTimeZone
-    {
-        return $this->summaryTimeZone;
     }
 
     public function getHierarchy(): ?DimensionHierarchyMetadata

@@ -36,8 +36,6 @@ class DimensionMetadata {
     +source: <class-string,ValueResolver>
     +summaryProperty: string
     +label: TranslatableInterface
-    +sourceTimeZone: \DateTimeZone
-    +summaryTimeZone: \DateTimeZone
     +hierarchy: ?DimensionHierarchyMetadata
     +involvedProperties: <class-string,list<string>>
     +isHierarchical(): bool

@@ -19,11 +19,10 @@ use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
 use Rekalogika\Analytics\Time\TimeBinType;
+use Rekalogika\Analytics\Time\Util\TimeZoneUtil;
 
 /**
  * @implements UserValueTransformer<RecurringTimeBin|int,TimeBinInterface|RecurringTimeBin>
@@ -64,11 +63,15 @@ final readonly class TimeBin implements
             ));
         }
 
+        [$sourceTimeZone, $summaryTimeZone] = TimeZoneUtil::resolveTimeZones(
+            $context->getDimensionMetadata(),
+        );
+
         return \sprintf(
             "REKALOGIKA_TIME_BIN(%s, '%s', '%s', '%s')",
             $this->input->getExpression($context),
-            $context->getDimensionMetadata()->getSourceTimeZone()->getName(),
-            $context->getDimensionMetadata()->getSummaryTimeZone()->getName(),
+            $sourceTimeZone->getName(),
+            $summaryTimeZone->getName(),
             $this->type->value,
         );
     }
@@ -90,13 +93,11 @@ final readonly class TimeBin implements
             ));
         }
 
-        $metadata = $context->getPropertyMetadata();
+        $dimensionMetadata = $context->getDimensionMetadata();
 
-        if ($metadata instanceof DimensionMetadata || $metadata instanceof DimensionPropertyMetadata) {
-            $timeZone = $metadata->getSummaryTimeZone();
-        } else {
-            $timeZone = new \DateTimeZone('UTC');
-        }
+        [$sourceTimeZone, $summaryTimeZone] = TimeZoneUtil::resolveTimeZones(
+            $dimensionMetadata,
+        );
 
         $binClass = $this->type->getBinClass();
 
@@ -108,6 +109,6 @@ final readonly class TimeBin implements
         }
 
         return $binClass::createFromDatabaseValue($rawValue)
-            ->withTimeZone($timeZone);
+            ->withTimeZone($summaryTimeZone);
     }
 }
