@@ -30,14 +30,14 @@ use Rekalogika\Analytics\Core\Exception\MetadataException;
 use Rekalogika\Analytics\Core\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Core\Model\LiteralString;
 use Rekalogika\Analytics\Core\Model\TranslatableMessage;
-use Rekalogika\Analytics\Core\Util\AttributeUtil;
 use Rekalogika\Analytics\Core\Util\TranslatableUtil;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
-use Rekalogika\Analytics\Engine\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
+use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
 final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
