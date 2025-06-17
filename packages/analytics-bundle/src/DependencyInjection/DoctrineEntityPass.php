@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Rekalogika\Analytics\Core\Entity\Summary;
 use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
-use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,6 +46,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
                 namespaces: [
                     'Rekalogika\Analytics\Core\Entity',
                     'Rekalogika\Analytics\Core\Partition',
+                    'Rekalogika\Analytics\Engine\Entity',
                     'Rekalogika\Analytics\Time\Hierarchy',
                     'Rekalogika\Analytics\Uuid\Partition',
                 ],
@@ -81,7 +82,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
         // time
 
-        if (class_exists(TimeBin::class)) {
+        if (class_exists(TimeDimensionHierarchy::class)) {
             $reflection = new \ReflectionClass(TimeDimensionHierarchy::class);
             $fileName = $reflection->getFileName();
 
@@ -94,8 +95,21 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
         // uuid
 
-        if (class_exists(TimeBin::class)) {
+        if (class_exists(UuidV7IntegerPartition::class)) {
             $reflection = new \ReflectionClass(UuidV7IntegerPartition::class);
+            $fileName = $reflection->getFileName();
+
+            if (false === $fileName) {
+                throw new LogicException('Reflection failed');
+            }
+
+            $directories[] = \dirname($fileName);
+        }
+
+        // Engine
+
+        if (class_exists(DirtyFlag::class)) {
+            $reflection = new \ReflectionClass(DirtyFlag::class);
             $fileName = $reflection->getFileName();
 
             if (false === $fileName) {

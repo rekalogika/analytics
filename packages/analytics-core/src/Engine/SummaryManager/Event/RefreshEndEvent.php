@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Event;
 
-use Rekalogika\Analytics\Core\Util\DateTimeUtil;
+use Rekalogika\Analytics\Engine\Util\DateTimeUtil;
 
 final readonly class RefreshEndEvent
 {

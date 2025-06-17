@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Event;
 
-use Rekalogika\Analytics\Core\Util\DateTimeUtil;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
+use Rekalogika\Analytics\Engine\Util\DateTimeUtil;
 
 abstract readonly class AbstractEndEvent implements \Stringable
 {

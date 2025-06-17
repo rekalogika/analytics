@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Core\Entity\SummaryProperties;
+use Rekalogika\Analytics\Engine\Entity\SummaryProperties;
 
 final readonly class SummaryPropertiesManager
 {

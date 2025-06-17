@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Entity;
+namespace Rekalogika\Analytics\Engine\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

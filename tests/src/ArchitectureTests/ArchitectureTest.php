@@ -37,7 +37,6 @@ final class ArchitectureTest
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
-                Selector::inNamespace('Symfony\Component\Uid'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
 
@@ -101,6 +100,7 @@ final class ArchitectureTest
                 // symfony
                 Selector::inNamespace('Symfony\Component\PropertyAccess'),
                 Selector::inNamespace('Symfony\Component\Translation'),
+                Selector::inNamespace('Symfony\Component\Uid'),
 
                 // doctrine
                 Selector::inNamespace('Doctrine\Persistence'),
@@ -110,6 +110,7 @@ final class ArchitectureTest
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateTimeImmutable::class),
                 Selector::classname(\DateInterval::class),
 
                 // misc

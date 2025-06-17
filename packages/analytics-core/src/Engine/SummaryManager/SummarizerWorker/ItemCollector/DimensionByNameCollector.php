@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Core\Util\DimensionUtil;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
+use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
 /**
  * Get unique dimensions while preserving the order of the dimensions.
