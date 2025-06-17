@@ -17,8 +17,8 @@ use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Core\Exception\MetadataException;
-use Rekalogika\Analytics\Core\Util\LiteralString;
-use Rekalogika\Analytics\Core\Util\TranslatablePropertyDimension;
+use Rekalogika\Analytics\Core\Model\LiteralString;
+use Rekalogika\Analytics\Core\Model\TranslatablePropertyDimension;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
