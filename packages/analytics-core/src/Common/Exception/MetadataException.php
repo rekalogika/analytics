@@ -11,6 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Common\Exception;
 
-class DomainException extends \DomainException implements AnalyticsException {}
+/**
+ * Indicates errors in metadata
+ */
+class MetadataException extends DomainException implements AnalyticsException {}

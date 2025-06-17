@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 

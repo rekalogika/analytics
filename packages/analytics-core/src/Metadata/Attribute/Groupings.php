@@ -11,9 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
-/**
- * Indicates errors in metadata
- */
-class MetadataException extends DomainException implements AnalyticsException {}
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
+final readonly class Groupings {}

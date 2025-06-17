@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\Sequence;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 trait TimeBinTrait
 {

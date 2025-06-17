@@ -15,10 +15,10 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SourceQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SourceResult\DefaultSourceResult;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;

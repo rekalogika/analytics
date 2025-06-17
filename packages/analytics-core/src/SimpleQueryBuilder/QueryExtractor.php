@@ -24,7 +24,7 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Utility\HierarchyDiscriminatorResolver;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 
 /**
  * Extracts information from Doctrine ORM Query objects

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Metadata;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;

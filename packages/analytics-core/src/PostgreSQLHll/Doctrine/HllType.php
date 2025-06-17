@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\PostgreSQLHll\Doctrine;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 
 final class HllType extends Type
 {

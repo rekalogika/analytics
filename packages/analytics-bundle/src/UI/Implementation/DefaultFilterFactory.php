@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NullFilter;
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;

@@ -18,8 +18,8 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Choice;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

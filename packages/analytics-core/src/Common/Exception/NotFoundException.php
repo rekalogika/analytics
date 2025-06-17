@@ -11,6 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Common\Exception;
 
-class RuntimeException extends \RuntimeException implements AnalyticsException {}
+class NotFoundException extends RuntimeException implements AnalyticsException {}

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Context;
 
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;

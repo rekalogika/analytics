@@ -25,14 +25,14 @@ final readonly class Selectors
         return Selector::AllOf(
             Selector::inNamespace('Rekalogika\Analytics\Core'),
             Selector::NOT(
-                self::selectAnalyticsCoreException(),
+                self::selectAnalyticsCommon(),
             ),
         );
     }
 
-    public static function selectAnalyticsCoreException(): SelectorInterface
+    public static function selectAnalyticsCommon(): SelectorInterface
     {
-        return Selector::inNamespace('Rekalogika\Analytics\Core\Exception');
+        return Selector::inNamespace('Rekalogika\Analytics\Common');
     }
 
     public static function selectAnalyticsContracts(): SelectorInterface

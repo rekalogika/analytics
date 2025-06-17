@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
-use Rekalogika\Analytics\Core\Model\TranslatableMessage;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
 /**

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 
 use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;

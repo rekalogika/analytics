@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Core\Exception\LogicException;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

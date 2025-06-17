@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
