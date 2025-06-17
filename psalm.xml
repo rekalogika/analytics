@@ -31,6 +31,7 @@
                 <directory name="tests/src/App/Entity" />
                 <directory name="packages/analytics-core/src/Core/Entity" />
                 <directory name="packages/analytics-core/src/Core/Exception" />
+                <directory name="packages/analytics-core/src/Engine/Entity" />
             </errorLevel>
         </ClassMustBeFinal>
     </issueHandlers>

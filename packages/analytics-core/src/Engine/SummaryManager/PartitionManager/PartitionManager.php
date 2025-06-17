@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\PartitionManager;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Core\Entity\DirtyFlag;
 use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;

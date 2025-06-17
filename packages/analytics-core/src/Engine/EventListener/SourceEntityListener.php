@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Rekalogika\Analytics\Core\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
 use Symfony\Contracts\Service\ResetInterface;

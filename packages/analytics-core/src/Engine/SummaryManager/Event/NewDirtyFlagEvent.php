@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Event;
 
-use Rekalogika\Analytics\Core\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 
 final readonly class NewDirtyFlagEvent
 {
