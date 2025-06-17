@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -68,6 +69,7 @@ final readonly class SummaryMetadata
         array $dimensions,
         array $measures,
         private string $groupingsProperty,
+        private AttributeCollection $attributes,
         private TranslatableInterface $label,
     ) {
         $allProperties = [];
@@ -179,6 +181,11 @@ final readonly class SummaryMetadata
     public function getLabel(): TranslatableInterface
     {
         return $this->label;
+    }
+
+    public function getAttributes(): AttributeCollection
+    {
+        return $this->attributes;
     }
 
     //

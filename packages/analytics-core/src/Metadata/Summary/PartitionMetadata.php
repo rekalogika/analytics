@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 
 /**
  * @todo improve naming
@@ -32,6 +33,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
         private string $partitionClass,
         private string $partitionLevelProperty,
         private string $partitionKeyProperty,
+        AttributeCollection $attributes,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
@@ -39,6 +41,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
             label: new LiteralString('Partition'),
             typeClass: $partitionClass,
             summaryMetadata: $summaryMetadata,
+            attributes: $attributes,
             hidden: true,
         );
     }
@@ -51,6 +54,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
             partitionClass: $this->partitionClass,
             partitionLevelProperty: $this->partitionLevelProperty,
             partitionKeyProperty: $this->partitionKeyProperty,
+            attributes: $this->getAttributes(),
             summaryMetadata: $summaryMetadata,
         );
     }

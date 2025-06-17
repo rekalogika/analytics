@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\Groupings;
-use Rekalogika\Analytics\Core\Metadata\Hierarchy;
 use Rekalogika\Analytics\Core\Metadata\Measure;
 use Rekalogika\Analytics\Core\Metadata\Partition;
 use Rekalogika\Analytics\Core\Metadata\PartitionKey;
@@ -32,6 +31,7 @@ use Rekalogika\Analytics\Core\Metadata\PartitionLevel;
 use Rekalogika\Analytics\Core\Metadata\Summary;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
@@ -116,23 +116,25 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $partitionMetadata = null;
         $groupingsProperty = null;
 
+        $classAttributes = $this->attributeCollectionFactory
+            ->getClassAttributes($summaryClassName);
+
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $dimensionAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($summaryClassName, $property)
+            $propertyAttributes = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClassName, $property);
+
+            $dimensionAttribute = $propertyAttributes
                 ->getAttribute(Dimension::class);
 
-            $measureAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($summaryClassName, $property)
+            $measureAttribute = $propertyAttributes
                 ->getAttribute(Measure::class);
 
-            $partitionAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($summaryClassName, $property)
+            $partitionAttribute = $propertyAttributes
                 ->getAttribute(Partition::class);
 
-            $groupingsAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($summaryClassName, $property)
+            $groupingsAttribute = $propertyAttributes
                 ->getAttribute(Groupings::class);
 
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
@@ -145,9 +147,10 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 $dimensionMetadata = $this->createDimensionMetadata(
                     summaryProperty: $property,
                     dimensionAttribute: $dimensionAttribute,
-                    sourceClass: $sourceClass,
+                    summaryClass: $summaryClassName,
                     sourceClassMetadata: $sourceClassMetadata,
                     summaryClassMetadata: $summaryClassMetadata,
+                    attributes: $propertyAttributes,
                     typeClass: $typeClass,
                 );
 
@@ -158,6 +161,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                         summaryClass: $summaryClassName,
                         property: $property,
                         measureAttribute: $measureAttribute,
+                        attributes: $propertyAttributes,
                         typeClass: $typeClass,
                     );
             } elseif ($partitionAttribute !== null) {
@@ -165,6 +169,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                     summaryProperty: $property,
                     partitionAttribute: $partitionAttribute,
                     summaryClassMetadata: $summaryClassMetadata,
+                    attributes: $propertyAttributes,
                 );
             } elseif ($groupingsAttribute !== null) {
                 $groupingsProperty = $property;
@@ -197,21 +202,21 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             dimensions: $dimensionMetadatas,
             measures: $measureMetadatas,
             groupingsProperty: $groupingsProperty,
+            attributes: $classAttributes,
             label: $label,
         );
     }
 
     /**
-     * @todo change $sourceProperty to be a single ValueResolver instead of an
-     * array
-     * @param class-string $sourceClass
+     * @param class-string $summaryClass
      * @param class-string|null $typeClass
      */
     private function createDimensionMetadata(
         string $summaryProperty,
-        string $sourceClass,
+        string $summaryClass,
         Dimension $dimensionAttribute,
         ClassMetadataWrapper $sourceClassMetadata,
+        AttributeCollection $attributes,
         ?string $typeClass,
         ClassMetadataWrapper $summaryClassMetadata,
     ): DimensionMetadata {
@@ -258,6 +263,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 ->getDimensionHierarchyMetadata($embeddedClass);
 
             $dimensionProperties = $this->createDimensionProperties(
+                summaryClass: $summaryClass,
                 summaryProperty: $summaryProperty,
                 dimensionHierarchy: $dimensionHierarchy,
             );
@@ -278,20 +284,26 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             nullLabel: $nullLabel,
             mandatory: $dimensionAttribute->isMandatory(),
             hidden: $dimensionAttribute->isHidden(),
+            attributes: $attributes,
             properties: $dimensionProperties,
         );
     }
 
     /**
+     * @param class-string $summaryClass
      * @return array<string,DimensionPropertyMetadata>
      */
     private function createDimensionProperties(
+        string $summaryClass,
         string $summaryProperty,
         DimensionHierarchyMetadata $dimensionHierarchy,
     ): array {
         $dimensionProperties = [];
 
         foreach ($dimensionHierarchy->getProperties() as $dimensionLevelProperty) {
+            $attributes = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClass, $dimensionLevelProperty->getName());
+
             $dimensionProperty = new DimensionPropertyMetadata(
                 summaryProperty: $summaryProperty,
                 hierarchyProperty: $dimensionLevelProperty->getName(),
@@ -299,6 +311,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 nullLabel: $dimensionLevelProperty->getNullLabel(),
                 typeClass: $dimensionLevelProperty->getTypeClass(),
                 dimensionLevelProperty: $dimensionLevelProperty,
+                attributes: $attributes,
                 hidden: $dimensionLevelProperty->isHidden(),
             );
 
@@ -316,6 +329,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     private function createPartitionMetadata(
         string $summaryProperty,
         Partition $partitionAttribute,
+        AttributeCollection $attributes,
         ClassMetadataWrapper $summaryClassMetadata,
     ): PartitionMetadata {
         $sourceProperty = $partitionAttribute->getSource();
@@ -341,12 +355,13 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $partitionLevelAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($partitionClass, $property)
+            $attributes = $this->attributeCollectionFactory
+                ->getPropertyAttributes($partitionClass, $property);
+
+            $partitionLevelAttribute = $attributes
                 ->getAttribute(PartitionLevel::class);
 
-            $partitionKeyAttribute = $this->attributeCollectionFactory
-                ->getPropertyAttributes($partitionClass, $property)
+            $partitionKeyAttribute = $attributes
                 ->getAttribute(PartitionKey::class);
 
             if ($partitionLevelAttribute !== null) {
@@ -380,6 +395,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             partitionClass: $partitionClass,
             partitionLevelProperty: $partitionLevelPropertyName,
             partitionKeyProperty: $partitionKeyPropertyName,
+            attributes: $attributes,
         );
     }
 
@@ -391,6 +407,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         string $summaryClass,
         string $property,
         Measure $measureAttribute,
+        AttributeCollection $attributes,
         ?string $typeClass,
     ): MeasureMetadata {
         $function = $measureAttribute->getFunction();
@@ -418,6 +435,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             summaryProperty: $property,
             label: $label,
             typeClass: $typeClass,
+            attributes: $attributes,
             unit: $unit,
             unitSignature: $unitSignature,
             virtual: $virtual,

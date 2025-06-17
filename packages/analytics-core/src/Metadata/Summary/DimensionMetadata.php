@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -50,6 +51,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         private TranslatableInterface $nullLabel,
         private bool $mandatory,
         bool $hidden,
+        AttributeCollection $attributes,
         array $properties,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
@@ -58,6 +60,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
+            attributes: $attributes,
             summaryMetadata: $summaryMetadata,
         );
 
@@ -99,6 +102,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             nullLabel: $this->nullLabel,
             mandatory: $this->mandatory,
             hidden: $this->isHidden(),
+            attributes: $this->getAttributes(),
             summaryMetadata: $summaryMetadata,
             properties: $this->properties,
         );
