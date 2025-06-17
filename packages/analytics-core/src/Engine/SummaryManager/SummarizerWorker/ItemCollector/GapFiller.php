@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Model\LiteralString;
-use Rekalogika\Analytics\Contracts\Model\Sequence;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -53,10 +53,10 @@ final readonly class GapFiller
             }
 
             // ensure member implements Bin
-            if (!$member instanceof Sequence) {
+            if (!$member instanceof SequenceMember) {
                 throw new InvalidArgumentException(\sprintf(
                     'Dimension must implement "%s".',
-                    Sequence::class,
+                    SequenceMember::class,
                 ));
             }
 
@@ -114,12 +114,12 @@ final readonly class GapFiller
         $lastMember = $lastDimension->getMember();
 
         if (
-            !$firstMember instanceof Sequence
-            || !$lastMember instanceof Sequence
+            !$firstMember instanceof SequenceMember
+            || !$lastMember instanceof SequenceMember
         ) {
             throw new InvalidArgumentException(\sprintf(
                 'Dimension must implement "%s".',
-                Sequence::class,
+                SequenceMember::class,
             ));
         }
 
@@ -131,7 +131,7 @@ final readonly class GapFiller
     }
 
     private function getDimensionFromSequenceMember(
-        Sequence $member,
+        SequenceMember $member,
     ): DefaultDimension {
         $objectId = spl_object_id($member);
 
@@ -145,14 +145,14 @@ final readonly class GapFiller
     }
 
     /**
-     * @template T of Sequence
+     * @template T of SequenceMember
      * @param T $first
      * @param T $last
      * @return iterable<T>
      */
     private function getSequence(
-        Sequence $first,
-        Sequence $last,
+        SequenceMember $first,
+        SequenceMember $last,
     ): iterable {
         $class = $first::class;
 
@@ -169,7 +169,7 @@ final readonly class GapFiller
         if ($comparison === 0) {
             yield $first;
         } elseif ($class::compare($first, $last) < 0) { // ascending
-            while ($current instanceof Sequence) {
+            while ($current instanceof SequenceMember) {
                 yield $current;
 
                 if ($current === $last) {
@@ -179,7 +179,7 @@ final readonly class GapFiller
                 $current = $current->getNext();
             }
         } else { // descending
-            while ($current instanceof Sequence) {
+            while ($current instanceof SequenceMember) {
                 yield $current;
 
                 if ($current === $last) {

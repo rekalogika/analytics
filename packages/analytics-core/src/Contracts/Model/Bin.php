@@ -18,4 +18,4 @@ namespace Rekalogika\Analytics\Contracts\Model;
  *
  * @template T
  */
-interface Bin extends Sequence {}
+interface Bin extends SequenceMember {}

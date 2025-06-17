@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Model\Sequence;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -102,7 +102,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             /** @psalm-suppress MixedAssignment */
             $member = $child->getMember();
 
-            if (!$member instanceof Sequence) {
+            if (!$member instanceof SequenceMember) {
                 return false;
             }
 

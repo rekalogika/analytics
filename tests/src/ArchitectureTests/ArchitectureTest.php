@@ -304,6 +304,10 @@ final class ArchitectureTest
                 Selector::classname(\DateInterval::class),
                 Selector::classname(\IntlDateFormatter::class),
 
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\Traversable::class),
+
                 // exceptions
                 Selector::classname(\Error::class),
             );
