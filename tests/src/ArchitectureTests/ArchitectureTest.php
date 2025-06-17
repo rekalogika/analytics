@@ -38,14 +38,17 @@ final class ArchitectureTest
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
-                // Selector::inNamespace('Symfony\Contracts\Translation'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+                Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
+                Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateTimeImmutable::class),
 
                 // misc
+                Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
 
                 // exceptions
@@ -245,7 +248,6 @@ final class ArchitectureTest
 
                 // php misc
                 Selector::classname(\Override::class),
-                Selector::classname(\Attribute::class),
 
                 // php enum
                 Selector::classname(\UnitEnum::class),
