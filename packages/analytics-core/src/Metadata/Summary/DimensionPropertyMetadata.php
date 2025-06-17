@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Common\Model\TranslatablePropertyDimension;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -34,6 +35,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         private TranslatableInterface $nullLabel,
         ?string $typeClass,
         private DimensionLevelPropertyMetadata $dimensionLevelProperty,
+        AttributeCollection $attributes,
         bool $hidden,
         private ?DimensionMetadata $dimensionMetadata = null,
     ) {
@@ -53,6 +55,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
+            attributes: $attributes,
             summaryMetadata: $summaryMetadata,
         );
     }
@@ -67,6 +70,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
             typeClass: $this->getTypeClass(),
             dimensionLevelProperty: $this->dimensionLevelProperty,
             hidden: $this->isHidden(),
+            attributes: $this->getAttributes(),
             dimensionMetadata: $dimensionMetadata,
         );
     }

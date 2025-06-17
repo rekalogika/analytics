@@ -239,6 +239,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCommon(),
 
                 // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Cache'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // doctrine

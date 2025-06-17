@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
@@ -36,6 +37,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         private ?string $unitSignature,
         private bool $virtual,
         bool $hidden,
+        AttributeCollection $attributes,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
@@ -43,6 +45,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
+            attributes: $attributes,
             summaryMetadata: $summaryMetadata,
         );
 
@@ -66,6 +69,7 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
             unitSignature: $this->unitSignature,
             virtual: $this->virtual,
             hidden: $this->isHidden(),
+            attributes: $this->getAttributes(),
             summaryMetadata: $summaryMetadata,
         );
     }

@@ -15,12 +15,13 @@ namespace Rekalogika\Analytics\Metadata\Attribute;
 
 use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
 
 final readonly class CachingAttributeCollectionFactory implements AttributeCollectionFactory
 {
     public function __construct(
         private AttributeCollectionFactory $decorated,
-        private ArrayAdapter $cache = new ArrayAdapter(),
+        private CacheInterface $cache = new ArrayAdapter(),
     ) {}
 
     /**
