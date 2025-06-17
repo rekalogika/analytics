@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Core\Util;
 
+use Rekalogika\Analytics\Core\Model\LiteralString;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class TranslatableUtil

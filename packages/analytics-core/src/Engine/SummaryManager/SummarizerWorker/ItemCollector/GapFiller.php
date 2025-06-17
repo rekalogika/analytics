@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 
 use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Util\LiteralString;
+use Rekalogika\Analytics\Core\Model\LiteralString;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
