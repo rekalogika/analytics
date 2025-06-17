@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
-use Rekalogika\Analytics\Metadata\Attribute\LevelProperty;
+use Rekalogika\Analytics\Core\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\WeekYear;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;

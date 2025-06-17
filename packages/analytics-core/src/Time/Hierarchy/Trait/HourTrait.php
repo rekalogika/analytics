@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 use Doctrine\ORM\Mapping\Column;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
-use Rekalogika\Analytics\Metadata\Attribute\LevelProperty;
+use Rekalogika\Analytics\Core\Metadata\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Hour;
 use Rekalogika\Analytics\Time\Bin\HourOfDay;
 use Rekalogika\Analytics\Time\TimeBinType;

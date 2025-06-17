@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\Hierarchy;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
-use Rekalogika\Analytics\Metadata\Attribute\Hierarchy;
+use Rekalogika\Analytics\Core\Metadata\Hierarchy;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\DayTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\MonthTrait;
 use Rekalogika\Analytics\Time\Hierarchy\Trait\QuarterTrait;

@@ -11,30 +11,26 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\Attribute;
+namespace Rekalogika\Analytics\Core\Metadata;
 
-use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class Measure
+final readonly class LevelProperty
 {
-    /**
-     * @param AggregateFunction $function
-     */
     public function __construct(
-        private AggregateFunction $function,
+        private int $level,
+        private ValueResolver&HierarchyAware $valueResolver,
         private null|string|TranslatableInterface $label = null,
-        private null|string|TranslatableInterface $unit = null,
+        private null|string|TranslatableInterface $nullLabel = null,
         private bool $hidden = false,
     ) {}
 
-    /**
-     * @return AggregateFunction
-     */
-    public function getFunction(): AggregateFunction
+    public function getLevel(): int
     {
-        return $this->function;
+        return $this->level;
     }
 
     public function getLabel(): null|string|TranslatableInterface
@@ -42,9 +38,14 @@ final readonly class Measure
         return $this->label;
     }
 
-    public function getUnit(): null|string|TranslatableInterface
+    public function getValueResolver(): ValueResolver&HierarchyAware
     {
-        return $this->unit;
+        return $this->valueResolver;
+    }
+
+    public function getNullLabel(): null|string|TranslatableInterface
+    {
+        return $this->nullLabel;
     }
 
     public function isHidden(): bool

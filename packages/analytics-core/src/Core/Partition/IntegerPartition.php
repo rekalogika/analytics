@@ -21,8 +21,8 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
-use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
+use Rekalogika\Analytics\Core\Metadata\PartitionKey;
+use Rekalogika\Analytics\Core\Metadata\PartitionLevel;
 
 /**
  * Partition for summarizing source entities with integer primary key.
