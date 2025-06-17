@@ -18,13 +18,8 @@ use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class MeasureMetadata extends PropertyMetadata implements HasInvolvedProperties
+final readonly class MeasureMetadata extends PropertyMetadata
 {
-    /**
-     * @var list<string>
-     */
-    private array $involvedProperties;
-
     /**
      * @param class-string $typeClass
      */
@@ -40,22 +35,21 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
         AttributeCollection $attributes,
         ?SummaryMetadata $summaryMetadata = null,
     ) {
+        if ($function instanceof SummarizableAggregateFunction) {
+            $involvedSourceProperties = $function->getInvolvedProperties();
+        } else {
+            $involvedSourceProperties = [];
+        }
+
         parent::__construct(
             summaryProperty: $summaryProperty,
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
             attributes: $attributes,
+            involvedSourceProperties: $involvedSourceProperties,
             summaryMetadata: $summaryMetadata,
         );
-
-        // involved properties
-
-        if ($function instanceof SummarizableAggregateFunction) {
-            $this->involvedProperties = $function->getInvolvedProperties();
-        } else {
-            $this->involvedProperties = [];
-        }
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -92,14 +86,5 @@ final readonly class MeasureMetadata extends PropertyMetadata implements HasInvo
     public function isVirtual(): bool
     {
         return $this->virtual;
-    }
-
-    /**
-     * @return list<string>
-     */
-    #[\Override]
-    public function getInvolvedProperties(): array
-    {
-        return $this->involvedProperties;
     }
 }

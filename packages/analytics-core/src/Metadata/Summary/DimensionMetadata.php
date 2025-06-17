@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionMetadata extends PropertyMetadata implements HasInvolvedProperties
+final readonly class DimensionMetadata extends PropertyMetadata
 {
     private ?DimensionHierarchyMetadata $hierarchy;
 
@@ -28,11 +28,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
      * @var array<string,DimensionPropertyMetadata>
      */
     private array $properties;
-
-    /**
-     * @var list<string>
-     */
-    private array $involvedProperties;
 
     /**
      * @param Order|array<string,Order> $orderBy
@@ -59,6 +54,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
             typeClass: $typeClass,
             hidden: $hidden,
             attributes: $attributes,
+            involvedSourceProperties: $valueResolver->getInvolvedProperties(),
             summaryMetadata: $summaryMetadata,
         );
 
@@ -80,10 +76,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
         }
 
         $this->properties = $newProperties;
-
-        // involved properties
-
-        $this->involvedProperties = $valueResolver->getInvolvedProperties();
     }
 
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
@@ -117,15 +109,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements HasIn
     public function isHierarhical(): bool
     {
         return $this->hierarchy !== null;
-    }
-
-    /**
-     * @return list<string>
-     */
-    #[\Override]
-    public function getInvolvedProperties(): array
-    {
-        return $this->involvedProperties;
     }
 
     /**

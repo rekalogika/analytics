@@ -56,6 +56,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
             typeClass: $typeClass,
             hidden: $hidden,
             attributes: $attributes,
+            involvedSourceProperties: $dimensionMetadata?->getInvolvedSourceProperties() ?? [],
             summaryMetadata: $summaryMetadata,
         );
     }

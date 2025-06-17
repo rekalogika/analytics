@@ -22,6 +22,7 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
 {
     /**
      * @param class-string|null $typeClass
+     * @param list<string> $involvedSourceProperties
      */
     protected function __construct(
         private string $summaryProperty,
@@ -29,6 +30,7 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
         private ?string $typeClass,
         private bool $hidden,
         private AttributeCollection $attributes,
+        private array $involvedSourceProperties,
         private ?SummaryMetadata $summaryMetadata = null,
     ) {}
 
@@ -75,5 +77,13 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
     public function isHidden(): bool
     {
         return $this->hidden;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getInvolvedSourceProperties(): array
+    {
+        return $this->involvedSourceProperties;
     }
 }
