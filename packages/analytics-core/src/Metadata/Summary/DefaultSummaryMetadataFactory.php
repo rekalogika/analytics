@@ -32,6 +32,7 @@ use Rekalogika\Analytics\Core\Metadata\PartitionLevel;
 use Rekalogika\Analytics\Core\Metadata\Summary;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
+use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
@@ -44,6 +45,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory,
+        private AttributeCollectionFactory $attributeCollectionFactory,
     ) {}
 
     /**
@@ -70,7 +72,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             foreach ($metadata as $classMetadata) {
                 $class = $classMetadata->getName();
 
-                if (!AttributeUtil::classHasAttribute($class, Summary::class)) {
+                $hasAttribute = $this->attributeCollectionFactory
+                    ->getClassAttributes($class)
+                    ->hasAttribute(Summary::class);
+
+                if (!$hasAttribute) {
                     continue;
                 }
 
@@ -93,10 +99,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         $reflectionClass = new \ReflectionClass($summaryClassName);
 
         // get summary attribute
-        $summaryAttribute = AttributeUtil::getClassAttribute(
-            class: $summaryClassName,
-            attributeClass: Summary::class,
-        ) ?? throw new SummaryNotFound($summaryClassName);
+
+        $summaryAttribute = $this->attributeCollectionFactory
+            ->getClassAttributes($summaryClassName)
+            ->getAttribute(Summary::class)
+            ?? throw new SummaryNotFound($summaryClassName);
 
         $sourceClass = $summaryAttribute->getSourceClass();
         $sourceClassMetadata = $this->getDoctrineClassMetadata($sourceClass);
@@ -112,29 +119,21 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $dimensionAttribute = AttributeUtil::getPropertyAttribute(
-                class: $summaryClassName,
-                property: $property,
-                attributeClass: Dimension::class,
-            );
+            $dimensionAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClassName, $property)
+                ->getAttribute(Dimension::class);
 
-            $measureAttribute = AttributeUtil::getPropertyAttribute(
-                class: $summaryClassName,
-                property: $property,
-                attributeClass: Measure::class,
-            );
+            $measureAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClassName, $property)
+                ->getAttribute(Measure::class);
 
-            $partitionAttribute = AttributeUtil::getPropertyAttribute(
-                class: $summaryClassName,
-                property: $property,
-                attributeClass: Partition::class,
-            );
+            $partitionAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClassName, $property)
+                ->getAttribute(Partition::class);
 
-            $groupingsAttribute = AttributeUtil::getPropertyAttribute(
-                class: $summaryClassName,
-                property: $property,
-                attributeClass: Groupings::class,
-            );
+            $groupingsAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($summaryClassName, $property)
+                ->getAttribute(Groupings::class);
 
             $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
 
@@ -164,7 +163,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             } elseif ($partitionAttribute !== null) {
                 $partitionMetadata = $this->createPartitionMetadata(
                     summaryProperty: $property,
-                    sourceClassMetadata: $sourceClassMetadata,
                     partitionAttribute: $partitionAttribute,
                     summaryClassMetadata: $summaryClassMetadata,
                 );
@@ -317,7 +315,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
      */
     private function createPartitionMetadata(
         string $summaryProperty,
-        ClassMetadataWrapper $sourceClassMetadata,
         Partition $partitionAttribute,
         ClassMetadataWrapper $summaryClassMetadata,
     ): PartitionMetadata {
@@ -338,24 +335,19 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $partitionLevelPropertyName = null;
         $partitionKeyPropertyName = null;
-        $partitionKeyClassifier = null;
 
         $properties = AttributeUtil::getPropertiesOfClass($partitionClass);
 
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $partitionLevelAttribute = AttributeUtil::getPropertyAttribute(
-                class: $partitionClass,
-                property: $property,
-                attributeClass: PartitionLevel::class,
-            );
+            $partitionLevelAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($partitionClass, $property)
+                ->getAttribute(PartitionLevel::class);
 
-            $partitionKeyAttribute = AttributeUtil::getPropertyAttribute(
-                class: $partitionClass,
-                property: $property,
-                attributeClass: PartitionKey::class,
-            );
+            $partitionKeyAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($partitionClass, $property)
+                ->getAttribute(PartitionKey::class);
 
             if ($partitionLevelAttribute !== null) {
                 if ($partitionLevelPropertyName !== null) {

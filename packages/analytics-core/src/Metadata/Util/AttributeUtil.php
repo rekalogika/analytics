@@ -21,7 +21,7 @@ final readonly class AttributeUtil
      * @param object|class-string $objectOrClass
      * @return iterable<class-string>
      */
-    private static function getAllClassesFromObject(
+    public static function getAllClassesFromObject(
         object|string $objectOrClass,
     ): iterable {
         $class = \is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass;
@@ -62,84 +62,6 @@ final readonly class AttributeUtil
     }
 
     /**
-     * @param class-string $class
-     * @param class-string $attributeClass
-     */
-    public static function classHasAttribute(
-        string $class,
-        string $attributeClass,
-    ): bool {
-        return self::getClassAttribute($class, $attributeClass) !== null;
-    }
-
-    /**
-     * @template T of object
-     * @param class-string $class
-     * @param class-string<T> $attributeClass
-     * @return T|null
-     */
-    public static function getClassAttribute(
-        string $class,
-        string $attributeClass,
-    ): ?object {
-        $classes = self::getAllClassesFromObject($class);
-
-        foreach ($classes as $class) {
-            $reflectionClass = new \ReflectionClass($class);
-
-            $reflectionAttributes = $reflectionClass
-                ->getAttributes($attributeClass, \ReflectionAttribute::IS_INSTANCEOF);
-
-            foreach ($reflectionAttributes as $reflectionAttribute) {
-                try {
-                    return $reflectionAttribute->newInstance();
-                } catch (\Error) {
-                    // Ignore errors
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @template T of object
-     * @param class-string $class
-     * @param class-string<T> $attributeClass
-     * @return T|null
-     */
-    public static function getPropertyAttribute(
-        string $class,
-        string $property,
-        string $attributeClass,
-    ): ?object {
-        $classes = self::getAllClassesFromObject($class);
-
-        foreach ($classes as $class) {
-            $reflectionClass = new \ReflectionClass($class);
-
-            try {
-                $reflectionProperty = $reflectionClass->getProperty($property);
-            } catch (\ReflectionException) {
-                continue;
-            }
-
-            $reflectionAttributes = $reflectionProperty
-                ->getAttributes($attributeClass, \ReflectionAttribute::IS_INSTANCEOF);
-
-            foreach ($reflectionAttributes as $reflectionAttribute) {
-                try {
-                    return $reflectionAttribute->newInstance();
-                } catch (\Error) {
-                    // Ignore errors
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @return class-string|null
      */
     public static function getTypeClass(
@@ -166,5 +88,55 @@ final readonly class AttributeUtil
         }
 
         return $name;
+    }
+
+    /**
+     * @param class-string $class
+     * @return iterable<object>
+     */
+    public static function getClassAttributes(string $class): iterable
+    {
+        foreach (self::getAllClassesFromObject($class) as $class) {
+            $reflectionClass = new \ReflectionClass($class);
+            $reflectionAttributes = $reflectionClass->getAttributes();
+
+            foreach ($reflectionAttributes as $reflectionAttribute) {
+                try {
+                    yield $reflectionAttribute->newInstance();
+                } catch (\Error) {
+                    // Ignore errors
+                }
+            }
+        }
+    }
+
+    /**
+     * @param class-string $class
+     * @param string $property
+     * @return iterable<object>
+     */
+    public static function getPropertyAttributes(
+        string $class,
+        string $property,
+    ): iterable {
+        foreach (self::getAllClassesFromObject($class) as $class) {
+            $reflectionClass = new \ReflectionClass($class);
+
+            try {
+                $reflectionProperty = $reflectionClass->getProperty($property);
+            } catch (\ReflectionException) {
+                continue;
+            }
+
+            $reflectionAttributes = $reflectionProperty->getAttributes();
+
+            foreach ($reflectionAttributes as $reflectionAttribute) {
+                try {
+                    yield $reflectionAttribute->newInstance();
+                } catch (\Error) {
+                    // Ignore errors
+                }
+            }
+        }
     }
 }

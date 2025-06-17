@@ -18,12 +18,18 @@ use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Metadata\Hierarchy;
 use Rekalogika\Analytics\Core\Metadata\LevelProperty;
+use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
-final readonly class DefaultDimensionHierarchyMetadataFactory implements DimensionHierarchyMetadataFactory
+final readonly class DefaultDimensionHierarchyMetadataFactory implements
+    DimensionHierarchyMetadataFactory
 {
+    public function __construct(
+        private AttributeCollectionFactory $attributeCollectionFactory,
+    ) {}
+
     /**
      * @param class-string $hierarchyClass
      */
@@ -31,10 +37,10 @@ final readonly class DefaultDimensionHierarchyMetadataFactory implements Dimensi
     public function getDimensionHierarchyMetadata(
         string $hierarchyClass,
     ): DimensionHierarchyMetadata {
-        $hierarchyAttribute = AttributeUtil::getClassAttribute(
-            class: $hierarchyClass,
-            attributeClass: Hierarchy::class,
-        ) ?? throw new MetadataException('DimensionHierarchy attribute is required, but not found');
+        $hierarchyAttribute = $this->attributeCollectionFactory
+            ->getClassAttributes($hierarchyClass)
+            ->getAttribute(Hierarchy::class)
+            ?? throw new MetadataException('DimensionHierarchy attribute is required, but not found');
 
         // collect properties & levels
 
@@ -45,11 +51,9 @@ final readonly class DefaultDimensionHierarchyMetadataFactory implements Dimensi
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $dimensionLevelAttribute = AttributeUtil::getPropertyAttribute(
-                class: $hierarchyClass,
-                property: $property,
-                attributeClass: LevelProperty::class,
-            );
+            $dimensionLevelAttribute = $this->attributeCollectionFactory
+                ->getPropertyAttributes($hierarchyClass, $property)
+                ->getAttribute(LevelProperty::class);
 
             if ($dimensionLevelAttribute === null) {
                 continue;
