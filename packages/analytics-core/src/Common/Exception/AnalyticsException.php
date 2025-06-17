@@ -11,8 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Common\Exception;
 
-use Doctrine\DBAL\Types\ConversionException as DoctrineConversionException;
-
-class ConversionException extends DoctrineConversionException implements AnalyticsException {}
+interface AnalyticsException {}

@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\Core\Partition;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Metadata\PartitionKey;
-use Rekalogika\Analytics\Contracts\Metadata\PartitionLevel;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
+use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
 
 /**
  * Partition for summarizing source entities with integer primary key.

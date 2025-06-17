@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 

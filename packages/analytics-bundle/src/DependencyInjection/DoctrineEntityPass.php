@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Core\Entity\Summary;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;

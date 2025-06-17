@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Model\TranslatableMessage;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;

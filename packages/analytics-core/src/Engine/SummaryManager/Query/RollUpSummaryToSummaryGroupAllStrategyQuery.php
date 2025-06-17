@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;

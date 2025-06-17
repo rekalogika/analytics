@@ -11,29 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Model;
+namespace Rekalogika\Analytics\Common\Model;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Translatable that simply returns a string, without translation.
- */
-final readonly class LiteralString implements TranslatableInterface, \Stringable
+final readonly class TranslatablePropertyDimension implements TranslatableInterface
 {
     public function __construct(
-        private string $string,
+        private TranslatableInterface $propertyLabel,
+        private TranslatableInterface $dimensionLabel,
     ) {}
-
-    #[\Override]
-    public function __toString(): string
-    {
-        return $this->string;
-    }
 
     #[\Override]
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
-        return $this->string;
+        $translatedProperty = $this->propertyLabel->trans($translator, $locale);
+        $translatedDimension = $this->dimensionLabel->trans($translator, $locale);
+
+        return \sprintf('%s - %s', $translatedProperty, $translatedDimension);
     }
 }

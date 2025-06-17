@@ -31,13 +31,14 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsMetadata(),
+                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
 
                 // dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
-                Selector::inNamespace('Symfony\Contracts\Translation'),
+                // Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
 
                 // datetime
@@ -45,7 +46,6 @@ final class ArchitectureTest
                 Selector::classname(\DateTimeImmutable::class),
 
                 // misc
-                Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
 
                 // exceptions
@@ -53,13 +53,22 @@ final class ArchitectureTest
             );
     }
 
-    public function testPackageAnalyticsCoreException(): Rule
+    public function testPackageAnalyticsCommon(): Rule
     {
         return PHPat::rule()
-            ->classes(Selectors::selectAnalyticsCoreException())
+            ->classes(Selectors::selectAnalyticsCommon())
             ->canOnlyDependOn()
             ->classes(
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
+
+                // contracts dependencies
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // php misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\Override::class),
+
+                // php exception
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),
@@ -68,6 +77,8 @@ final class ArchitectureTest
                 Selector::classname(\OverflowException::class),
                 Selector::classname(\UnderflowException::class),
                 Selector::classname(\DomainException::class),
+
+                // doctrine
                 Selector::classname(QueryException::class),
                 Selector::classname(ConversionException::class),
             );
@@ -81,7 +92,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsEngine(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsMetadata(),
 
@@ -149,7 +160,7 @@ final class ArchitectureTest
                 // dependencies
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsEngine(),
                 Selector::inNamespace('OzdemirBurak\Iris\Color'),
@@ -222,7 +233,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
@@ -234,6 +245,7 @@ final class ArchitectureTest
 
                 // php misc
                 Selector::classname(\Override::class),
+                Selector::classname(\Attribute::class),
 
                 // php enum
                 Selector::classname(\UnitEnum::class),
@@ -268,7 +280,8 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
+                Selectors::selectAnalyticsMetadata(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
@@ -306,7 +319,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLHll(),
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
 
                 // doctrine
                 Selector::inNamespace('Doctrine\DBAL'),
@@ -331,7 +344,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCoreException(),
+                Selectors::selectAnalyticsCommon(),
 
                 // symfony
                 Selector::inNamespace('Symfony\Component\Uid'),

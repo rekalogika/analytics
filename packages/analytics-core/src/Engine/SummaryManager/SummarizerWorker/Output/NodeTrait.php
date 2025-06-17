@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 trait NodeTrait
 {

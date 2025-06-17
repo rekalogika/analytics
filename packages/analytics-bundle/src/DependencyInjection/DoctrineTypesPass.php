@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
-use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\HllType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

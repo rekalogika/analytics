@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Result\Table;
-use Rekalogika\Analytics\Core\Exception\EmptyResultException;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>

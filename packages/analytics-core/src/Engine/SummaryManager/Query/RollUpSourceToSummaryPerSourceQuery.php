@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;

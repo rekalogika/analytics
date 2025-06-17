@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Core\Exception\OverflowException;
+use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
 
 final class DefaultTreeNodeFactory

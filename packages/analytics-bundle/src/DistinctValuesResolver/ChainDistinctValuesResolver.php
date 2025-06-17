@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
 
 use Psr\Container\ContainerInterface;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 
 final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
 {

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\InsertIntoSummaryQuery;

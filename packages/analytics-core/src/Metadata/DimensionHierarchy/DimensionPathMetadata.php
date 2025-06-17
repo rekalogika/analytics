@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
-use Rekalogika\Analytics\Core\Exception\MetadataException;
+use Rekalogika\Analytics\Common\Exception\MetadataException;
 
 /**
  * @implements \IteratorAggregate<DimensionLevelMetadata>

@@ -21,9 +21,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison as ORMComparison;
 use Doctrine\ORM\Query\Expr\Orx;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Core\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class SummaryExpressionVisitor extends ExpressionVisitor

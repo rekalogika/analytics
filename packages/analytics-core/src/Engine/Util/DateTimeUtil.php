@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Util;
 
-use Rekalogika\Analytics\Core\Exception\RuntimeException;
+use Rekalogika\Analytics\Common\Exception\RuntimeException;
 
 final readonly class DateTimeUtil
 {

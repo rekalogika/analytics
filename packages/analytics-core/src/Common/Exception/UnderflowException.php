@@ -11,7 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Metadata;
+namespace Rekalogika\Analytics\Common\Exception;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class PartitionKey {}
+class UnderflowException extends \UnderflowException implements AnalyticsException {}

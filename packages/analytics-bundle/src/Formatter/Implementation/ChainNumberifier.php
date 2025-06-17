@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 
 final readonly class ChainNumberifier implements Numberifier
 {

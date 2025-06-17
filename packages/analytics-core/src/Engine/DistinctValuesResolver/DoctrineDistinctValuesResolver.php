@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Engine\DistinctValuesResolver;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Core\Exception\MetadataException;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;

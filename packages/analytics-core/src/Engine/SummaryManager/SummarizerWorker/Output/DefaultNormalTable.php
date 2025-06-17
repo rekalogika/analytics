@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
-use Rekalogika\Analytics\Core\Exception\EmptyResultException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
 
 /**

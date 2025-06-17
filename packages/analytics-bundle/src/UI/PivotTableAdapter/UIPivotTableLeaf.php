@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter;
 
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeValue;
 use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapperFactory;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Core\Exception\InvalidArgumentException;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
 final readonly class UIPivotTableLeaf implements LeafNode

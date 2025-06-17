@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Core\Exception\LogicException;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\Path;
 
 final class PathTest extends TestCase

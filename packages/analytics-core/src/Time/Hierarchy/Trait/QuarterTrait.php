@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Hierarchy\Trait;
 
 use Doctrine\ORM\Mapping\Column;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
-use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
-use Rekalogika\Analytics\Core\Model\TranslatableMessage;
+use Rekalogika\Analytics\Metadata\Attribute\LevelProperty;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
 use Rekalogika\Analytics\Time\TimeBinType;

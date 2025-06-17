@@ -11,12 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
-final class SummaryNotFound extends NotFoundException
-{
-    public function __construct(string $summary)
-    {
-        parent::__construct(\sprintf('Summary "%s" not found.', $summary));
-    }
-}
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
+final readonly class PartitionLevel {}

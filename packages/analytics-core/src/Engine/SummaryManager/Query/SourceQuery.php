@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;

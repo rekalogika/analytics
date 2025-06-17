@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Core\PivotTableAdapter;
 
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Core\Exception\UnexpectedValueException;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
 final readonly class PivotTableLeaf implements LeafNode

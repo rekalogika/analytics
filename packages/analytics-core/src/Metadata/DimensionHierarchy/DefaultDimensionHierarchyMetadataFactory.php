@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
-use Rekalogika\Analytics\Contracts\Metadata\Hierarchy;
-use Rekalogika\Analytics\Contracts\Metadata\LevelProperty;
-use Rekalogika\Analytics\Core\Exception\MetadataException;
-use Rekalogika\Analytics\Core\Model\LiteralString;
-use Rekalogika\Analytics\Core\Model\TranslatableMessage;
+use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Common\Model\LiteralString;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Metadata\Attribute\Hierarchy;
+use Rekalogika\Analytics\Metadata\Attribute\LevelProperty;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;

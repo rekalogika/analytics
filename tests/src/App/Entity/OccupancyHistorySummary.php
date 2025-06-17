@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Rekalogika\Analytics\Contracts\Metadata as Analytics;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\Entity\Summary;
 use Rekalogika\Analytics\Core\Partition\SingleLevelIntegerPartition;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
+use Rekalogika\Analytics\Metadata\Attribute as Analytics;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;

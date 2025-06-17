@@ -11,6 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Exception;
+namespace Rekalogika\Analytics\Common\Exception;
 
-class OverflowException extends \OverflowException implements AnalyticsException {}
+final class SummaryNotFound extends NotFoundException
+{
+    public function __construct(string $summary)
+    {
+        parent::__construct(\sprintf('Summary "%s" not found.', $summary));
+    }
+}
