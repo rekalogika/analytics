@@ -14,22 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Model;
 
 /**
- * Represents a sequence in a data set, which is a series of ordered elements.
+ * A sequence, which is a series of ordered elements
+ *
+ * @template T of SequenceMember
+ * @extends \Traversable<T>
  */
-interface Sequence
+interface Sequence extends \Traversable
 {
-    public function getNext(): ?static;
-
-    public function getPrevious(): ?static;
+    /**
+     * @return T
+     */
+    public function getFirst(): SequenceMember;
 
     /**
-     * @template U of Sequence
-     * @param U $a
-     * @param U $b
-     * @return -1|0|1
+     * @return T
      */
-    public static function compare(
-        Sequence $a,
-        Sequence $b,
-    ): int;
+    public function getLast(): SequenceMember;
 }

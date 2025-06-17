@@ -11,10 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Trait;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Model\Sequence;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 
 trait TimeBinTrait
 {
@@ -64,12 +64,17 @@ trait TimeBinTrait
         return $this->databaseValue;
     }
 
+    public function getSequence(): null
+    {
+        return null;
+    }
+
     /**
      * @return -1|0|1
      */
     public static function compare(
-        Sequence $a,
-        Sequence $b,
+        SequenceMember $a,
+        SequenceMember $b,
     ): int {
         if (
             !$a instanceof self

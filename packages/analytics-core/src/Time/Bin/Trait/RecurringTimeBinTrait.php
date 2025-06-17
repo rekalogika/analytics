@@ -11,10 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Trait;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Model\Sequence;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Time\Bin\Sequence\RecurringTimeBinSequence;
 
 trait RecurringTimeBinTrait
 {
@@ -27,8 +28,8 @@ trait RecurringTimeBinTrait
      * @return -1|0|1
      */
     public static function compare(
-        Sequence $a,
-        Sequence $b,
+        SequenceMember $a,
+        SequenceMember $b,
     ): int {
         if (
             $a::class !== $b::class
@@ -56,5 +57,14 @@ trait RecurringTimeBinTrait
     public function getPrevious(): ?static
     {
         return self::tryFrom($this->value - 1);
+    }
+
+    /**
+     * @return RecurringTimeBinSequence<static>
+     */
+    #[\Override]
+    public function getSequence(): RecurringTimeBinSequence
+    {
+        return new RecurringTimeBinSequence(static::class);
     }
 }

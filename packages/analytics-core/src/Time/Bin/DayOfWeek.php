@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
+use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

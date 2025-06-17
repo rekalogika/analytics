@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @extends Bin<\DateTimeInterface>
  */
-interface RecurringTimeBin extends TranslatableInterface, Bin
+interface RecurringTimeBin extends TranslatableInterface, Bin, \BackedEnum
 {
     public static function createFromDatabaseValue(int $databaseValue): static;
 }
