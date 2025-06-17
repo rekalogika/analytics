@@ -69,6 +69,8 @@ use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
+use Rekalogika\Analytics\Metadata\Attribute\CachingAttributeCollectionFactory;
+use Rekalogika\Analytics\Metadata\Attribute\DefaultAttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DefaultDimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Source\DefaultSourceMetadataFactory;
@@ -91,6 +93,27 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
 
     //
+    // attribute collection factory
+    //
+
+    $services->alias(
+        'rekalogika.analytics.attribute_collection_factory',
+        'rekalogika.analytics.metadata.attribute_collection_factory',
+    );
+
+    $services
+        ->set('rekalogika.analytics.metadata.attribute_collection_factory')
+        ->class(DefaultAttributeCollectionFactory::class);
+
+    $services
+        ->set('rekalogika.analytics.metadata.attribute_collection_factory.caching')
+        ->class(CachingAttributeCollectionFactory::class)
+        ->decorate('rekalogika.analytics.metadata.attribute_collection_factory')
+        ->args([
+            '$decorated' => service('.inner'),
+        ]);
+
+    //
     // dimension hierarchy metadata factory
     //
 
@@ -102,6 +125,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set('rekalogika.analytics.dimension_hierarchy_metadata_factory')
         ->class(DefaultDimensionHierarchyMetadataFactory::class)
+        ->args([
+            '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
+        ])
     ;
 
     //
@@ -119,6 +145,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$dimensionHierarchyMetadataFactory' => service(DimensionHierarchyMetadataFactory::class),
+            '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
         ])
     ;
 

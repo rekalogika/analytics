@@ -246,6 +246,9 @@ final class ArchitectureTest
                 Selector::inNamespace('Doctrine\Common\Collections'),
                 Selector::inNamespace('Doctrine\Persistence'),
 
+                // symfony components
+                Selector::inNamespace('Symfony\Component\Cache'),
+
                 // php misc
                 Selector::classname(\Override::class),
 
