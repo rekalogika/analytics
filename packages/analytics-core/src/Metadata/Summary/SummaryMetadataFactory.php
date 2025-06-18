@@ -11,10 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 interface SummaryMetadataFactory
 {

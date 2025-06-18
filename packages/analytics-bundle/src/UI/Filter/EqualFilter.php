@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter;
 use Rekalogika\Analytics\Bundle\UI\Filter\Model\Choice;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class EqualFilter implements Filter

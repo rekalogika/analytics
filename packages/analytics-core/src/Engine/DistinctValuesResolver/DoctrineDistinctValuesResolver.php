@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSource
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final readonly class DoctrineDistinctValuesResolver implements DistinctValuesResolver

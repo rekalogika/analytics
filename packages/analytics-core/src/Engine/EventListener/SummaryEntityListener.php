@@ -18,7 +18,7 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 /**
  * Prevents the modifications of summary entities by end users.

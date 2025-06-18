@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class SummaryRefresherFactory
 {

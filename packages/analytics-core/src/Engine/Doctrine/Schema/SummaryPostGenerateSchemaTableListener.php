@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\Doctrine\Schema;
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class SummaryPostGenerateSchemaTableListener
 {

@@ -11,11 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\Source;
+namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
+use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class DefaultSourceMetadataFactory implements SourceMetadataFactory
 {

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
-use Rekalogika\Analytics\Metadata\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 
 /**
  * Generates dirty flags to indicate that a summary needs to be refreshed.

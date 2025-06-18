@@ -11,9 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\Attribute;
+namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
 final readonly class DefaultAttributeCollectionFactory implements AttributeCollectionFactory

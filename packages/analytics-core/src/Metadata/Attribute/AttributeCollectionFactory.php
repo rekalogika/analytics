@@ -11,9 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata;
-
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
 interface AttributeCollectionFactory
 {

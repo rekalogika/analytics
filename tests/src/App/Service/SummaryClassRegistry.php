@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Service;
 
 use Rekalogika\Analytics\Common\Exception\NotFoundException;
-use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryClassRegistry
