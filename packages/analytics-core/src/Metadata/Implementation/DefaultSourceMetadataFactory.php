@@ -55,7 +55,7 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
         foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
             $summaryClass = $summaryMetadata->getSummaryClass();
             $sourceClass = $summaryMetadata->getSourceClass();
-            $properties = $summaryMetadata->getInvolvedProperties();
+            $properties = $summaryMetadata->getInvolvedSourceProperties();
 
             foreach ($properties as $property) {
                 $involvedProperties[$sourceClass][$property][] = $summaryClass;

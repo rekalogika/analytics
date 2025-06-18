@@ -54,7 +54,7 @@ final readonly class SummaryMetadata
      *
      * @var list<string>
      */
-    private array $involvedProperties;
+    private array $involvedSourceProperties;
 
     /**
      * @param class-string $sourceClass
@@ -145,10 +145,13 @@ final readonly class SummaryMetadata
         //
 
         $properties = [];
-        $dimensionsAndMeasures = array_merge($this->dimensions, $this->measures);
+        $dimensionsAndMeasures = [
+            ...$this->dimensions,
+            ...$this->measures,
+        ];
 
         foreach ($dimensionsAndMeasures as $dimensionOrMeasure) {
-            foreach ($dimensionOrMeasure->getInvolvedProperties() as $property) {
+            foreach ($dimensionOrMeasure->getInvolvedSourceProperties() as $property) {
                 // normalize property
                 // - remove everything after dot
                 $property = explode('.', $property)[0];
@@ -159,7 +162,7 @@ final readonly class SummaryMetadata
             }
         }
 
-        $this->involvedProperties = $properties;
+        $this->involvedSourceProperties = array_values(array_unique($properties));
     }
 
     /**
@@ -336,8 +339,8 @@ final readonly class SummaryMetadata
      *
      * @return list<string>
      */
-    public function getInvolvedProperties(): array
+    public function getInvolvedSourceProperties(): array
     {
-        return $this->involvedProperties;
+        return $this->involvedSourceProperties;
     }
 }

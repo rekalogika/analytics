@@ -42,6 +42,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
             typeClass: $partitionClass,
             summaryMetadata: $summaryMetadata,
             attributes: $attributes,
+            involvedSourceProperties: $source->getInvolvedProperties(),
             hidden: true,
         );
     }
