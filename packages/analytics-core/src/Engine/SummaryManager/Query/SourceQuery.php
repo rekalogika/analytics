@@ -126,7 +126,7 @@ final class SourceQuery extends AbstractQuery
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->summaryMetadata,
                     dimensionMetadata: $dimension,
-                    dimensionPropertyMetadata: $dimensionProperty->getDimensionLevelProperty(),
+                    dimensionPropertyMetadata: $dimensionProperty,
                 ),
             );
 

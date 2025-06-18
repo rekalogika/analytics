@@ -171,6 +171,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
                 foreach ($dimensionHierarchyMetadata->getProperties() as $dimensionPropertyMetadata) {
                     $name = $dimensionPropertyMetadata->getName();
+                    $fullyQualifiedName = \sprintf('%s.%s', $summaryProperty, $name);
+
+                    $dimensionPropertyMetadata = $this->summaryMetadata
+                        ->getDimensionProperty($fullyQualifiedName);
 
                     $alias = $propertyToAlias[$name]
                         ?? throw new InvalidArgumentException(\sprintf(
@@ -199,7 +203,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                         ));
 
                     $this->groupings->add(
-                        property: \sprintf('%s.%s', $summaryProperty, $name),
+                        property: $fullyQualifiedName,
                         expression: $expression,
                     );
                 }

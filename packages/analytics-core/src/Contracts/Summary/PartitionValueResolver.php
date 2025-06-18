@@ -28,8 +28,9 @@ interface PartitionValueResolver extends ValueResolver
     public function getInvolvedProperties(): array;
 
     /**
-     * Transforms a source value to the summary value in PHP. It must accept
-     * input in string format because the value may come from a CLI argument.
+     * Transforms a source value to the summary value in PHP. It must be able to
+     * accept input in string format because the value may come from a CLI
+     * argument.
      *
      * @param T|string $value
      */
