@@ -106,11 +106,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->hierarchy;
     }
 
-    public function isHierarhical(): bool
-    {
-        return $this->hierarchy !== null;
-    }
-
     /**
      * @return Order|array<string,Order>
      */

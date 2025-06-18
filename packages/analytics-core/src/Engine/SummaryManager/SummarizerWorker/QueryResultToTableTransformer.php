@@ -343,7 +343,7 @@ final readonly class QueryResultToTableTransformer
     private function getNullValue(string $dimension): TranslatableInterface
     {
         return $this->metadata
-            ->getDimensionOrDimensionProperty($dimension)
+            ->getAnyDimension($dimension)
             ->getNullLabel();
     }
 }

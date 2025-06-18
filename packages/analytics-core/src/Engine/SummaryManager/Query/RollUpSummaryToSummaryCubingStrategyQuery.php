@@ -107,7 +107,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getDimensions() as $levelProperty => $metadata) {
+        foreach ($this->metadata->getRootDimensions() as $levelProperty => $metadata) {
             $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())
@@ -257,7 +257,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
         $groupingString = '';
 
-        foreach ($this->metadata->getDimensions() as $dimensionMetadata) {
+        foreach ($this->metadata->getRootDimensions() as $dimensionMetadata) {
             $hierarchyMetadata = $dimensionMetadata->getHierarchy();
 
             // non hierarchical dimension

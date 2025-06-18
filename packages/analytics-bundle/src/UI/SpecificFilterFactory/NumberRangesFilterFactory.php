@@ -45,7 +45,7 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
-        $dimensionMetadata = $metadata->getDimensionOrDimensionProperty($dimension);
+        $dimensionMetadata = $metadata->getAnyDimension($dimension);
         $label = $dimensionMetadata->getLabel();
         $typeClass = $dimensionMetadata->getTypeClass();
 

@@ -46,7 +46,7 @@ final readonly class InsertIntoSummaryQuery
 
         // add dimension columns
 
-        foreach ($this->summaryMetadata->getDimensions() as $dimensionMetadata) {
+        foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
             $property = $dimensionMetadata->getSummaryProperty();
             $hierarchyMetadata = $dimensionMetadata->getHierarchy();
 

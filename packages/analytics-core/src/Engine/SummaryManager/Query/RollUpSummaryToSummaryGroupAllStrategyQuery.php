@@ -89,7 +89,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getDimensions() as $levelProperty => $metadata) {
+        foreach ($this->metadata->getRootDimensions() as $levelProperty => $metadata) {
             $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())

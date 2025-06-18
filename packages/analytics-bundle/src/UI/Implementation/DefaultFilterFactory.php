@@ -55,7 +55,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
-        $dimension = $metadata->getDimensionOrDimensionProperty($dimension);
+        $dimension = $metadata->getAnyDimension($dimension);
         $typeClass = $dimension->getTypeClass();
 
         if (
