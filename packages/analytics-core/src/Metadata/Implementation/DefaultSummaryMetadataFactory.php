@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\Summary;
+namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -36,6 +36,11 @@ use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
+use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;

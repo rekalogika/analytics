@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
+namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Model\LiteralString;
@@ -19,6 +19,10 @@ use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Metadata\Hierarchy;
 use Rekalogika\Analytics\Core\Metadata\LevelProperty;
 use Rekalogika\Analytics\Metadata\AttributeCollectionFactory;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
+use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionPathMetadata;
 use Rekalogika\Analytics\Metadata\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
