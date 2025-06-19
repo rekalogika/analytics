@@ -46,29 +46,9 @@ final readonly class InsertIntoSummaryQuery
 
         // add dimension columns
 
-        foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
+        foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
             $property = $dimensionMetadata->getName();
-            $hierarchyMetadata = $dimensionMetadata->getHierarchy();
-
-            // if not hierarchical
-
-            if ($hierarchyMetadata === null) {
-                $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
-
-                continue;
-            }
-
-            // if hierarchical
-
-            foreach ($hierarchyMetadata->getProperties() as $property) {
-                $p = \sprintf(
-                    '%s.%s',
-                    $dimensionMetadata->getName(),
-                    $property->getName(),
-                );
-
-                $columns[] = $this->doctrineClassMetadata->getSQLFieldName($p);
-            }
+            $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
         }
 
         // add measure columns

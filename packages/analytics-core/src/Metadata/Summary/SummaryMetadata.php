@@ -109,10 +109,7 @@ final readonly class SummaryMetadata
             $newDimensions[$dimensionKey] = $dimension;
             $allProperties[$dimensionKey] = $dimension;
 
-            $hierarchy = $dimension->getHierarchy();
-
-            // if not hierarchical
-            if ($hierarchy === null) {
+            if (!$dimension->isHierarchical()) {
                 $leafDimensions[$dimensionKey] = $dimension;
 
                 continue;

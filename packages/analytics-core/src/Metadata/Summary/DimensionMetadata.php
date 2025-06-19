@@ -97,6 +97,14 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->valueResolver;
     }
 
+    public function isHierarchical(): bool
+    {
+        return $this->hierarchy !== null;
+    }
+
+    /**
+     * @deprecated
+     */
     public function getHierarchy(): ?DimensionHierarchyMetadata
     {
         return $this->hierarchy;

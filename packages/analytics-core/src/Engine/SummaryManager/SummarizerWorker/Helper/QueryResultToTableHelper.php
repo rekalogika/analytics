@@ -177,11 +177,6 @@ final readonly class QueryResultToTableHelper
             $context = new HierarchyContext(
                 summaryMetadata: $this->metadata,
                 dimensionMetadata: $propertyMetadata,
-                dimensionHierarchyMetadata: $propertyMetadata->getHierarchy()
-                    ?? throw new LogicException(\sprintf(
-                        'Dimension "%s" does not have a hierarchy defined',
-                        $propertyName,
-                    )),
             );
         } else {
             throw new LogicException(\sprintf(
