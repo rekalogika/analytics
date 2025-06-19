@@ -22,8 +22,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionMetadata extends PropertyMetadata
 {
-    private ?DimensionHierarchyMetadata $hierarchy;
-
     /**
      * @var array<string,DimensionPropertyMetadata>
      */
@@ -38,7 +36,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         private ValueResolver $valueResolver,
         private string $summaryProperty,
         TranslatableInterface $label,
-        ?DimensionHierarchyMetadata $hierarchy,
+        private ?DimensionHierarchyMetadata $hierarchy,
         private Order|array $orderBy,
         ?string $typeClass,
         private TranslatableInterface $nullLabel,
@@ -63,8 +61,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
         if ($hierarchy !== null && \is_array($orderBy)) {
             throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
         }
-
-        $this->hierarchy = $hierarchy?->withDimensionMetadata($this);
 
         // properties
 
@@ -119,6 +115,9 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->nullLabel;
     }
 
+    /**
+     * @todo deprecate this?
+     */
     public function isMandatory(): bool
     {
         return $this->mandatory;

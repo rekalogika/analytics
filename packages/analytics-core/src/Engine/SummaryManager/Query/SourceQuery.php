@@ -112,23 +112,16 @@ final class SourceQuery extends AbstractQuery
         DimensionPropertyMetadata $dimensionProperty,
         mixed $rawMember,
     ): void {
-        $dimension = $dimensionProperty->getDimension();
-        $valueResolver = $dimension->getValueResolver();
+        $valueResolver = $dimensionProperty->getValueResolver();
 
-        // get the value resolver from hierarchical dimension
-
-        $hierarchicalDimensionValueResolver = $dimensionProperty->getValueResolver();
-
-        $expression = $hierarchicalDimensionValueResolver
-            ->withInput($valueResolver)
-            ->getExpression(
-                context: new SourceQueryContext(
-                    queryBuilder: $this->getSimpleQueryBuilder(),
-                    summaryMetadata: $this->summaryMetadata,
-                    dimensionMetadata: $dimension,
-                    dimensionPropertyMetadata: $dimensionProperty,
-                ),
-            );
+        $expression = $valueResolver->getExpression(
+            context: new SourceQueryContext(
+                queryBuilder: $this->getSimpleQueryBuilder(),
+                summaryMetadata: $this->summaryMetadata,
+                dimensionMetadata: $dimensionProperty->getDimension(),
+                dimensionPropertyMetadata: $dimensionProperty,
+            ),
+        );
 
         // add to query
 

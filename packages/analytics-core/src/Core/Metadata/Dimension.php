@@ -22,7 +22,8 @@ final readonly class Dimension
 {
     /**
      * @param null|string|ValueResolver $source
-     * @param Order|array<string,Order> $orderBy
+     * @param Order|array<string,Order> $orderBy If the dimension is
+     * hierarchical, use an array to order by members of the hierarchy.
      */
     public function __construct(
         private null|string|ValueResolver $source = null,

@@ -17,7 +17,6 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Common\Model\TranslatablePropertyDimension;
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionLevelPropertyMetadata;
@@ -25,6 +24,8 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DimensionPropertyMetadata extends PropertyMetadata
 {
+    private ValueResolver $valueResolver;
+
     /**
      * @param class-string|null $typeClass
      */
@@ -44,6 +45,19 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         } catch (MetadataException) {
             $summaryMetadata = null;
         }
+
+        // value resolver
+
+        $valueResolver = $dimensionLevelProperty->getValueResolver();
+
+        if ($dimensionMetadata !== null) {
+            $valueResolver = $valueResolver
+                ->withInput($dimensionMetadata->getValueResolver());
+        }
+
+        $this->valueResolver = $valueResolver;
+
+        // label
 
         $label = new TranslatablePropertyDimension(
             propertyLabel: $dimensionMetadata?->getLabel() ?? new LiteralString('Unknown'),
@@ -101,13 +115,8 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         return $this->nullLabel;
     }
 
-    public function getPropertyLabel(): TranslatableInterface
+    public function getValueResolver(): ValueResolver
     {
-        return $this->label;
-    }
-
-    public function getValueResolver(): ValueResolver&HierarchyAware
-    {
-        return $this->dimensionLevelProperty->getValueResolver();
+        return $this->valueResolver;
     }
 }

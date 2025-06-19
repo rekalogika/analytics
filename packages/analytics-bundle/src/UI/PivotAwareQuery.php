@@ -177,7 +177,7 @@ final class PivotAwareQuery
             }
 
             foreach ($dimension->getProperties() as $child) {
-                $result[$name]['choices'][$child->getHierarchyProperty()] = $child->getPropertyLabel();
+                $result[$name]['choices'][$child->getHierarchyProperty()] = $child->getLabel();
             }
 
             $result[$name]['label'] = $dimension->getLabel();

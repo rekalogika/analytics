@@ -121,7 +121,6 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
             $summaryProperty = $dimensionMetadata->getSummaryProperty();
             $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
-            $valueResolver = $dimensionMetadata->getValueResolver();
 
             // if hierarchical
             if ($dimensionHierarchyMetadata !== null) {
@@ -182,18 +181,17 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                             $name,
                         ));
 
-                    $hierarchyAwareValueResolver = $dimensionPropertyMetadata->getValueResolver();
+                    $valueResolver = $dimensionPropertyMetadata
+                        ->getValueResolver();
 
-                    $expression = $hierarchyAwareValueResolver
-                        ->withInput($valueResolver)
-                        ->getExpression(
-                            context: new SourceQueryContext(
-                                queryBuilder: $this->getSimpleQueryBuilder(),
-                                summaryMetadata: $this->summaryMetadata,
-                                dimensionMetadata: $dimensionMetadata,
-                                dimensionPropertyMetadata: $dimensionPropertyMetadata,
-                            ),
-                        );
+                    $expression = $valueResolver->getExpression(
+                        context: new SourceQueryContext(
+                            queryBuilder: $this->getSimpleQueryBuilder(),
+                            summaryMetadata: $this->summaryMetadata,
+                            dimensionMetadata: $dimensionMetadata,
+                            dimensionPropertyMetadata: $dimensionPropertyMetadata,
+                        ),
+                    );
 
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
@@ -209,6 +207,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
                 }
             } else {
                 // if not hierarchical
+
+                $valueResolver = $dimensionMetadata->getValueResolver();
 
                 $expression = $valueResolver->getExpression(
                     context: new SourceQueryContext(
