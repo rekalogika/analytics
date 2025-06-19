@@ -55,7 +55,7 @@ final readonly class HierarchyContext
     ): mixed {
         $fullyQualifiedProperty = \sprintf(
             '%s.%s',
-            $this->dimensionMetadata->getSummaryProperty(),
+            $this->dimensionMetadata->getName(),
             $property,
         );
 

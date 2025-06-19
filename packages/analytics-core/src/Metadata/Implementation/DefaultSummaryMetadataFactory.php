@@ -318,7 +318,7 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 hidden: $dimensionLevelProperty->isHidden(),
             );
 
-            $dimensionProperties[$dimensionProperty->getSummaryProperty()] = $dimensionProperty;
+            $dimensionProperties[$dimensionProperty->getName()] = $dimensionProperty;
         }
 
         return $dimensionProperties;

@@ -119,7 +119,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $i = 0;
 
         foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
-            $summaryProperty = $dimensionMetadata->getSummaryProperty();
+            $summaryProperty = $dimensionMetadata->getName();
             $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
             // if hierarchical

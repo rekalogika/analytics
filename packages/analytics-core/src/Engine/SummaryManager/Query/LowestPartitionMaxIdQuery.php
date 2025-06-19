@@ -28,7 +28,7 @@ final readonly class LowestPartitionMaxIdQuery
     public function getLowestLevelPartitionMaxId(): int|string|null
     {
         $partitionSummaryProperty = $this->metadata->getPartition()
-            ->getSummaryProperty();
+            ->getName();
 
         $partitionClass = $this->metadata->getPartition()
             ->getPartitionClass();

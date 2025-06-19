@@ -58,7 +58,7 @@ final readonly class SummaryQueryContext
         // create summary to summary DQL expression
 
         $field = $this->queryBuilder
-            ->resolve($measureMetadata->getSummaryProperty());
+            ->resolve($measureMetadata->getName());
 
         $function = $measureMetadata->getFunction();
 

@@ -33,8 +33,8 @@ final readonly class DimensionMetadata extends PropertyMetadata
      * @param array<string,DimensionPropertyMetadata> $properties
      */
     public function __construct(
+        string $summaryProperty,
         private ValueResolver $valueResolver,
-        private string $summaryProperty,
         TranslatableInterface $label,
         private ?DimensionHierarchyMetadata $hierarchy,
         private Order|array $orderBy,
@@ -47,7 +47,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
-            summaryProperty: $summaryProperty,
+            name: $summaryProperty,
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
@@ -67,7 +67,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         $newProperties = [];
 
         foreach ($properties as $property) {
-            $newProperties[$property->getSummaryProperty()] = $property
+            $newProperties[$property->getName()] = $property
                 ->withDimensionMetadata($this);
         }
 
@@ -77,8 +77,8 @@ final readonly class DimensionMetadata extends PropertyMetadata
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
+            summaryProperty: $this->getName(),
             valueResolver: $this->valueResolver,
-            summaryProperty: $this->summaryProperty,
             label: $this->getLabel(),
             hierarchy: $this->hierarchy,
             orderBy: $this->orderBy,

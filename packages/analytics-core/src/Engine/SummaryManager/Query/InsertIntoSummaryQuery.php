@@ -34,7 +34,7 @@ final readonly class InsertIntoSummaryQuery
         // add partition columns
 
         $partitionMetadata = $this->summaryMetadata->getPartition();
-        $fieldName = $partitionMetadata->getSummaryProperty();
+        $fieldName = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
@@ -47,7 +47,7 @@ final readonly class InsertIntoSummaryQuery
         // add dimension columns
 
         foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
-            $property = $dimensionMetadata->getSummaryProperty();
+            $property = $dimensionMetadata->getName();
             $hierarchyMetadata = $dimensionMetadata->getHierarchy();
 
             // if not hierarchical
@@ -63,7 +63,7 @@ final readonly class InsertIntoSummaryQuery
             foreach ($hierarchyMetadata->getProperties() as $property) {
                 $p = \sprintf(
                     '%s.%s',
-                    $dimensionMetadata->getSummaryProperty(),
+                    $dimensionMetadata->getName(),
                     $property->getName(),
                 );
 

@@ -114,10 +114,10 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 ->hasAssociation($levelProperty);
 
             $hierarchyMetadata = $metadata->getHierarchy();
-            $summaryProperty = $metadata->getSummaryProperty();
+            $summaryProperty = $metadata->getName();
 
             if ($hierarchyMetadata !== null) {
-                $dimensionProperty = $metadata->getSummaryProperty();
+                $dimensionProperty = $metadata->getName();
                 $dimensionPathsMetadata = $hierarchyMetadata->getPaths();
 
                 $propertyToAlias = [];
@@ -278,7 +278,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         }
 
         $partitionMetadata = $this->metadata->getPartition();
-        $partitionProperty = $partitionMetadata->getSummaryProperty();
+        $partitionProperty = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
         $groupingsProperty = $this->metadata->getGroupingsProperty();

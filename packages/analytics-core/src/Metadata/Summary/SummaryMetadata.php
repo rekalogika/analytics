@@ -79,7 +79,7 @@ final readonly class SummaryMetadata
         //
 
         $this->partition = $partition->withSummaryMetadata($this);
-        $allProperties[$partition->getSummaryProperty()] = $partition;
+        $allProperties[$partition->getName()] = $partition;
 
         //
         // measures

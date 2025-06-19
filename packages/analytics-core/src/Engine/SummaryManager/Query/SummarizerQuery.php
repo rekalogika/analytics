@@ -509,7 +509,7 @@ final class SummarizerQuery extends AbstractQuery
 
         try {
             $joinedEntityClass = $classMetadata
-                ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
+                ->getAssociationTargetClass($dimensionMetadata->getName());
             // @phpstan-ignore phpat.testPackageAnalyticsCore
         } catch (MappingException | \InvalidArgumentException) {
             $joinedEntityClass = null;
@@ -589,11 +589,11 @@ final class SummarizerQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS %s',
-                $this->resolve($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getName()),
                 $dimension,
             ))
             ->addOrderBy(
-                $this->resolve($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getName()),
                 $orderBy->value,
             )
         ;
@@ -601,7 +601,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->rollUpFields[] = $dimension;
 
         $this->groupingFields[] =
-            $this->resolve($dimensionMetadata->getSummaryProperty());
+            $this->resolve($dimensionMetadata->getName());
     }
 
     private function addUserSuppliedOrderBy(): void

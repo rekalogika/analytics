@@ -60,7 +60,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
         if (
             $typeClass === null
-            || $this->isDoctrineRelation($summaryClass, $dimension->getSummaryProperty())
+            || $this->isDoctrineRelation($summaryClass, $dimension->getName())
         ) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
         } elseif (\in_array($typeClass, [
@@ -87,7 +87,7 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
         return $filterFactory->createFilter(
             summaryClass: $summaryClass,
-            dimension: $dimension->getSummaryProperty(),
+            dimension: $dimension->getName(),
             inputArray: $inputArray,
         );
     }

@@ -65,7 +65,7 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         );
 
         parent::__construct(
-            summaryProperty: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
+            name: \sprintf('%s.%s', $summaryProperty, $hierarchyProperty),
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
@@ -90,11 +90,15 @@ final readonly class DimensionPropertyMetadata extends PropertyMetadata
         );
     }
 
+    public function getSummaryProperty(): string
+    {
+        return $this->summaryProperty;
+    }
+
     public function getHierarchyProperty(): string
     {
         return $this->hierarchyProperty;
     }
-
 
     public function getDimension(): DimensionMetadata
     {

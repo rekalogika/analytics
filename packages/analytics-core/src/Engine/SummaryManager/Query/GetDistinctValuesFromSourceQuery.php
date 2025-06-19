@@ -31,7 +31,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
         $summaryMetadata = $dimensionMetadata->getSummaryMetadata();
         $summaryClass = $summaryMetadata->getSummaryClass();
         $orderBy = $dimensionMetadata->getOrderBy();
-        $dimension = $dimensionMetadata->getSummaryProperty();
+        $dimension = $dimensionMetadata->getName();
 
         $doctrineMetadata = $entityManager->getClassMetadata($summaryClass);
 
