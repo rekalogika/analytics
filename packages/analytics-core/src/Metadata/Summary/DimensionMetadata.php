@@ -103,7 +103,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
     }
 
     /**
-     * @deprecated
+     * @note deprecate this
      */
     public function getHierarchy(): ?DimensionHierarchyMetadata
     {
