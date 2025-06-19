@@ -37,7 +37,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
         ?SummaryMetadata $summaryMetadata = null,
     ) {
         parent::__construct(
-            summaryProperty: $summaryProperty,
+            name: $summaryProperty,
             label: new LiteralString('Partition'),
             typeClass: $partitionClass,
             summaryMetadata: $summaryMetadata,
@@ -51,7 +51,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
     {
         return new self(
             source: $this->source,
-            summaryProperty: $this->getSummaryProperty(),
+            summaryProperty: $this->getName(),
             partitionClass: $this->partitionClass,
             partitionLevelProperty: $this->partitionLevelProperty,
             partitionKeyProperty: $this->partitionKeyProperty,
@@ -88,11 +88,11 @@ final readonly class PartitionMetadata extends PropertyMetadata
 
     public function getFullyQualifiedPartitionKeyProperty(): string
     {
-        return $this->getSummaryProperty() . '.' . $this->partitionKeyProperty;
+        return $this->getName() . '.' . $this->partitionKeyProperty;
     }
 
     public function getFullyQualifiedPartitionLevelProperty(): string
     {
-        return $this->getSummaryProperty() . '.' . $this->partitionLevelProperty;
+        return $this->getName() . '.' . $this->partitionLevelProperty;
     }
 }

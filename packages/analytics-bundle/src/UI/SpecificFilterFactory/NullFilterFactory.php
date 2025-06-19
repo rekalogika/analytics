@@ -43,7 +43,7 @@ final readonly class NullFilterFactory implements SpecificFilterFactory
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
-        $dimensionMetadata = $metadata->getDimensionOrDimensionProperty($dimension);
+        $dimensionMetadata = $metadata->getAnyDimension($dimension);
         $label = $dimensionMetadata->getLabel();
 
         return new NullFilter(

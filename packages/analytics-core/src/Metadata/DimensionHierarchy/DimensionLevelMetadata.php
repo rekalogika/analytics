@@ -60,10 +60,10 @@ final readonly class DimensionLevelMetadata implements \IteratorAggregate
         return $this->pathMetadata;
     }
 
-    public function getPrimaryProperty(): DimensionLevelPropertyMetadata
-    {
-        return $this->properties[0];
-    }
+    // public function getPrimaryProperty(): DimensionLevelPropertyMetadata
+    // {
+    //     return $this->properties[0];
+    // }
 
     #[\Override]
     public function getIterator(): \Traversable
@@ -84,8 +84,8 @@ final readonly class DimensionLevelMetadata implements \IteratorAggregate
         return $this->properties;
     }
 
-    public function getLowerLevel(): ?DimensionLevelMetadata
-    {
-        return $this->getPathMetadata()->getLowerLevel($this);
-    }
+    // public function getLowerLevel(): ?DimensionLevelMetadata
+    // {
+    //     return $this->getPathMetadata()->getLowerLevel($this);
+    // }
 }

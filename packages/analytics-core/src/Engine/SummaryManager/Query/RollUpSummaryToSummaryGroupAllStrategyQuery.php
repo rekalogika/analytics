@@ -89,7 +89,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getDimensions() as $levelProperty => $metadata) {
+        foreach ($this->metadata->getRootDimensions() as $levelProperty => $metadata) {
             $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())
@@ -100,7 +100,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             // hierarchical dimension
 
             if ($hierarchyMetadata !== null) {
-                $dimensionProperty = $metadata->getSummaryProperty();
+                $dimensionProperty = $metadata->getName();
 
                 // add select for each of the properties
 
@@ -167,7 +167,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     private function processConstraints(): void
     {
         $partitionMetadata = $this->metadata->getPartition();
-        $partitionProperty = $partitionMetadata->getSummaryProperty();
+        $partitionProperty = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 

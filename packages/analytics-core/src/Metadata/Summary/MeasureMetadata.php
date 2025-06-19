@@ -42,7 +42,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
         }
 
         parent::__construct(
-            summaryProperty: $summaryProperty,
+            name: $summaryProperty,
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,
@@ -56,7 +56,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
     {
         return new self(
             function: $this->function,
-            summaryProperty: $this->getSummaryProperty(),
+            summaryProperty: $this->getName(),
             label: $this->getLabel(),
             typeClass: $this->getTypeClass(),
             unit: $this->unit,

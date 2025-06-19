@@ -25,7 +25,7 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
      * @param list<string> $involvedSourceProperties
      */
     protected function __construct(
-        private string $summaryProperty,
+        private string $name,
         private TranslatableInterface $label,
         private ?string $typeClass,
         private bool $hidden,
@@ -42,9 +42,12 @@ abstract readonly class PropertyMetadata implements TranslatableInterface
         return $this->label->trans($translator, $locale);
     }
 
-    public function getSummaryProperty(): string
+    /**
+     * Fully qualified property name. e.g. `time.hour`
+     */
+    public function getName(): string
     {
-        return $this->summaryProperty;
+        return $this->name;
     }
 
     public function getSummaryMetadata(): SummaryMetadata

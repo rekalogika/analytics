@@ -44,14 +44,14 @@ final readonly class SummaryPostGenerateSchemaTableListener
         $partitionLevelColumnName = $classMetadata
             ->getSQLFieldName(\sprintf(
                 '%s.%s',
-                $partitionMetadata->getSummaryProperty(),
+                $partitionMetadata->getName(),
                 $partitionMetadata->getPartitionLevelProperty(),
             ));
 
         $partitionKeyColumnName = $classMetadata
             ->getSQLFieldName(\sprintf(
                 '%s.%s',
-                $partitionMetadata->getSummaryProperty(),
+                $partitionMetadata->getName(),
                 $partitionMetadata->getPartitionKeyProperty(),
             ));
 

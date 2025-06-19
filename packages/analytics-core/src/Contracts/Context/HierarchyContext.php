@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Contracts\Context;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -25,7 +24,6 @@ final readonly class HierarchyContext
     public function __construct(
         private SummaryMetadata $summaryMetadata,
         private DimensionMetadata $dimensionMetadata,
-        private DimensionHierarchyMetadata $dimensionHierarchyMetadata,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -36,11 +34,6 @@ final readonly class HierarchyContext
     public function getDimensionMetadata(): DimensionMetadata
     {
         return $this->dimensionMetadata;
-    }
-
-    public function getDimensionHierarchyMetadata(): DimensionHierarchyMetadata
-    {
-        return $this->dimensionHierarchyMetadata;
     }
 
     /**
@@ -55,7 +48,7 @@ final readonly class HierarchyContext
     ): mixed {
         $fullyQualifiedProperty = \sprintf(
             '%s.%s',
-            $this->dimensionMetadata->getSummaryProperty(),
+            $this->dimensionMetadata->getName(),
             $property,
         );
 

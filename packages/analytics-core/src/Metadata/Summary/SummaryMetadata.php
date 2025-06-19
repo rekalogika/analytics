@@ -79,7 +79,7 @@ final readonly class SummaryMetadata
         //
 
         $this->partition = $partition->withSummaryMetadata($this);
-        $allProperties[$partition->getSummaryProperty()] = $partition;
+        $allProperties[$partition->getName()] = $partition;
 
         //
         // measures
@@ -109,10 +109,7 @@ final readonly class SummaryMetadata
             $newDimensions[$dimensionKey] = $dimension;
             $allProperties[$dimensionKey] = $dimension;
 
-            $hierarchy = $dimension->getHierarchy();
-
-            // if not hierarchical
-            if ($hierarchy === null) {
+            if (!$dimension->isHierarchical()) {
                 $leafDimensions[$dimensionKey] = $dimension;
 
                 continue;
@@ -236,10 +233,20 @@ final readonly class SummaryMetadata
      *
      * @return non-empty-array<string,DimensionMetadata>
      */
-    public function getDimensions(): array
+    public function getRootDimensions(): array
     {
         return $this->dimensions;
     }
+
+    public function getRootDimension(string $dimensionName): DimensionMetadata
+    {
+        return $this->dimensions[$dimensionName]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension not found: %s',
+                $dimensionName,
+            ));
+    }
+
 
     /**
      * Returns all the leaf dimensions, which can be either a DimensionMetadata
@@ -251,6 +258,16 @@ final readonly class SummaryMetadata
     public function getLeafDimensions(): array
     {
         return $this->leafDimensions;
+    }
+
+    public function getLeafDimension(
+        string $dimensionName,
+    ): DimensionMetadata|DimensionPropertyMetadata {
+        return $this->leafDimensions[$dimensionName]
+            ?? throw new MetadataException(\sprintf(
+                'Leaf dimension not found: %s',
+                $dimensionName,
+            ));
     }
 
     /**
@@ -265,25 +282,6 @@ final readonly class SummaryMetadata
         return $this->dimensionProperties;
     }
 
-    /**
-     * Returns all dimensions and dimension properties.
-     *
-     * @return array<string,DimensionMetadata|DimensionPropertyMetadata>
-     */
-    public function getDimensionsAndDimensionProperties(): array
-    {
-        return array_merge($this->dimensions, $this->dimensionProperties);
-    }
-
-    public function getDimension(string $dimensionName): DimensionMetadata
-    {
-        return $this->dimensions[$dimensionName]
-            ?? throw new MetadataException(\sprintf(
-                'Dimension not found: %s',
-                $dimensionName,
-            ));
-    }
-
     public function getDimensionProperty(string $propertyName): DimensionPropertyMetadata
     {
         return $this->dimensionProperties[$propertyName]
@@ -293,7 +291,7 @@ final readonly class SummaryMetadata
             ));
     }
 
-    public function getDimensionOrDimensionProperty(
+    public function getAnyDimension(
         string $dimensionName,
     ): DimensionMetadata|DimensionPropertyMetadata {
         return $this->dimensions[$dimensionName]
@@ -323,11 +321,6 @@ final readonly class SummaryMetadata
                 'Measure not found: %s',
                 $measureName,
             ));
-    }
-
-    public function isMeasure(string $fieldName): bool
-    {
-        return isset($this->measures[$fieldName]);
     }
 
     //

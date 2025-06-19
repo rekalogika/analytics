@@ -34,7 +34,7 @@ final readonly class DeleteExistingSummaryQuery
     {
         $summaryClassName = $this->summaryMetadata->getSummaryClass();
         $partitionMetadata = $this->summaryMetadata->getPartition();
-        $partitionProperty = $partitionMetadata->getSummaryProperty();
+        $partitionProperty = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 

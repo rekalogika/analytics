@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 
 /**
  * @implements \IteratorAggregate<DimensionPathMetadata>
@@ -26,12 +25,10 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
      */
     private array $paths;
 
-    /**
-     * @var array<int,DimensionLevelMetadata>
-     */
-    private array $levels;
-
-    private DimensionLevelMetadata $lowestLevel;
+    // /**
+    //  * @var array<int,DimensionLevelMetadata>
+    //  */
+    // private array $levels;
 
     /**
      * @var array<string,DimensionLevelPropertyMetadata> $properties
@@ -45,7 +42,6 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     public function __construct(
         private string $hierarchyClass,
         array $paths,
-        private ?DimensionMetadata $dimensionMetadata = null,
     ) {
         $newPaths = [];
         $levels = [];
@@ -65,27 +61,9 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
         }
 
         $this->paths = $newPaths;
-        $this->levels = $levels;
+        // $this->levels = $levels;
         $this->properties = $properties;
-        $this->lowestLevel = $this->paths[0]->getLowestLevel();
-    }
-
-    public function getDimensionMetadata(): DimensionMetadata
-    {
-        if ($this->dimensionMetadata === null) {
-            throw new MetadataException('Dimension metadata not set');
-        }
-
-        return $this->dimensionMetadata;
-    }
-
-    public function withDimensionMetadata(DimensionMetadata $dimensionMetadata): self
-    {
-        return new self(
-            hierarchyClass: $this->hierarchyClass,
-            paths: $this->paths,
-            dimensionMetadata: $dimensionMetadata,
-        );
+        // $this->lowestLevel = $this->paths[0]->getLowestLevel();
     }
 
     #[\Override]
@@ -110,43 +88,43 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
         return $this->paths;
     }
 
-    public function getPrimaryPath(): DimensionPathMetadata
-    {
-        return $this->paths[0];
-    }
+    // private function getPrimaryPath(): DimensionPathMetadata
+    // {
+    //     return $this->paths[0];
+    // }
 
-    /**
-     * @return array<int,DimensionLevelMetadata>
-     */
-    public function getLevels(): array
-    {
-        return $this->levels;
-    }
+    // /**
+    //  * @return array<int,DimensionLevelMetadata>
+    //  */
+    // public function getLevels(): array
+    // {
+    //     return $this->levels;
+    // }
 
-    public function getOneOfHighestLevels(): DimensionLevelMetadata
-    {
-        return $this->getPrimaryPath()->getHighestLevel();
-    }
+    // private function getOneOfHighestLevels(): DimensionLevelMetadata
+    // {
+    //     return $this->getPrimaryPath()->getHighestLevel();
+    // }
 
-    public function getLowestLevel(): DimensionLevelMetadata
-    {
-        return $this->lowestLevel;
-    }
+    // public function getLowestLevel(): DimensionLevelMetadata
+    // {
+    //     return $this->lowestLevel;
+    // }
 
-    public function getLevel(int $level): DimensionLevelMetadata
-    {
-        return $this->levels[$level]
-            ?? throw new MetadataException(\sprintf('Level not found: %d', $level));
-    }
+    // private function getLevel(int $level): DimensionLevelMetadata
+    // {
+    //     return $this->levels[$level]
+    //         ?? throw new MetadataException(\sprintf('Level not found: %d', $level));
+    // }
 
-    public function getLowerLevel(?int $level): ?int
-    {
-        if ($level === null) {
-            return $this->getOneOfHighestLevels()->getLevelId();
-        }
+    // private function getLowerLevel(?int $level): ?int
+    // {
+    //     if ($level === null) {
+    //         return $this->getOneOfHighestLevels()->getLevelId();
+    //     }
 
-        return $this->getLevel($level)->getLowerLevel()?->getLevelId();
-    }
+    //     return $this->getLevel($level)->getLowerLevel()?->getLevelId();
+    // }
 
     /**
      * @return list<DimensionLevelPropertyMetadata>
@@ -156,7 +134,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
         return array_values($this->properties);
     }
 
-    public function getProperty(string $name): DimensionLevelPropertyMetadata
+    private function getProperty(string $name): DimensionLevelPropertyMetadata
     {
         return $this->properties[$name]
             ?? throw new MetadataException(\sprintf('Property not found: %s', $name));
@@ -165,7 +143,7 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
     /**
      * @return list<DimensionPathMetadata>
      */
-    public function getPathMetadatasForLevel(int $levelId): array
+    private function getPathMetadatasForLevel(int $levelId): array
     {
         $paths = [];
 
@@ -178,16 +156,16 @@ final readonly class DimensionHierarchyMetadata implements \IteratorAggregate
         return $paths;
     }
 
-    public function getPrimaryPathMetadataForLevel(int $levelId): DimensionPathMetadata
-    {
-        foreach ($this->paths as $path) {
-            if ($path->containsLevel($levelId)) {
-                return $path;
-            }
-        }
+    // public function getPrimaryPathMetadataForLevel(int $levelId): DimensionPathMetadata
+    // {
+    //     foreach ($this->paths as $path) {
+    //         if ($path->containsLevel($levelId)) {
+    //             return $path;
+    //         }
+    //     }
 
-        throw new MetadataException(\sprintf('Path not found for level: %d', $levelId));
-    }
+    //     throw new MetadataException(\sprintf('Path not found for level: %d', $levelId));
+    // }
 
     /**
      * @return array<string,bool>

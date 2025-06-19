@@ -26,7 +26,7 @@ final class GetDistinctValuesFromSummaryQuery extends AbstractQuery
     ) {
         $summaryMetadata = $dimensionMetadata->getSummaryMetadata();
         $summaryClass = $summaryMetadata->getSummaryClass();
-        $dimension = $dimensionMetadata->getSummaryProperty();
+        $dimension = $dimensionMetadata->getName();
 
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,

@@ -34,7 +34,7 @@ final readonly class InsertIntoSummaryQuery
         // add partition columns
 
         $partitionMetadata = $this->summaryMetadata->getPartition();
-        $fieldName = $partitionMetadata->getSummaryProperty();
+        $fieldName = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
@@ -46,29 +46,9 @@ final readonly class InsertIntoSummaryQuery
 
         // add dimension columns
 
-        foreach ($this->summaryMetadata->getDimensions() as $dimensionMetadata) {
-            $property = $dimensionMetadata->getSummaryProperty();
-            $hierarchyMetadata = $dimensionMetadata->getHierarchy();
-
-            // if not hierarchical
-
-            if ($hierarchyMetadata === null) {
-                $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
-
-                continue;
-            }
-
-            // if hierarchical
-
-            foreach ($hierarchyMetadata->getProperties() as $property) {
-                $p = \sprintf(
-                    '%s.%s',
-                    $dimensionMetadata->getSummaryProperty(),
-                    $property->getName(),
-                );
-
-                $columns[] = $this->doctrineClassMetadata->getSQLFieldName($p);
-            }
+        foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
+            $property = $dimensionMetadata->getName();
+            $columns[] = $this->doctrineClassMetadata->getSQLFieldName($property);
         }
 
         // add measure columns

@@ -25,6 +25,9 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -347,7 +350,7 @@ final class SummarizerQuery extends AbstractQuery
                 [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
                 $dimensionMetadata = $this->metadata
-                    ->getDimension($dimensionProperty);
+                    ->getRootDimension($dimensionProperty);
 
                 $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -421,7 +424,7 @@ final class SummarizerQuery extends AbstractQuery
         // determine level
 
         $dimensionMetadata = $this->metadata
-            ->getDimension($dimensionProperty);
+            ->getRootDimension($dimensionProperty);
 
         $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
@@ -497,7 +500,7 @@ final class SummarizerQuery extends AbstractQuery
     private function addNonHierarchicalDimensionToQueryBuilder(
         string $dimension,
     ): void {
-        $dimensionMetadata = $this->metadata->getDimension($dimension);
+        $dimensionMetadata = $this->metadata->getRootDimension($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
             manager: $this->entityManager,
@@ -506,7 +509,7 @@ final class SummarizerQuery extends AbstractQuery
 
         try {
             $joinedEntityClass = $classMetadata
-                ->getAssociationTargetClass($dimensionMetadata->getSummaryProperty());
+                ->getAssociationTargetClass($dimensionMetadata->getName());
             // @phpstan-ignore phpat.testPackageAnalyticsCore
         } catch (MappingException | \InvalidArgumentException) {
             $joinedEntityClass = null;
@@ -586,11 +589,11 @@ final class SummarizerQuery extends AbstractQuery
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS %s',
-                $this->resolve($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getName()),
                 $dimension,
             ))
             ->addOrderBy(
-                $this->resolve($dimensionMetadata->getSummaryProperty()),
+                $this->resolve($dimensionMetadata->getName()),
                 $orderBy->value,
             )
         ;
@@ -598,7 +601,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->rollUpFields[] = $dimension;
 
         $this->groupingFields[] =
-            $this->resolve($dimensionMetadata->getSummaryProperty());
+            $this->resolve($dimensionMetadata->getName());
     }
 
     private function addUserSuppliedOrderBy(): void
@@ -612,7 +615,9 @@ final class SummarizerQuery extends AbstractQuery
         $i = 0;
 
         foreach ($orderBy as $field => $order) {
-            if ($this->metadata->isMeasure($field)) {
+            $propertyMetadata = $this->metadata->getProperty($field);
+
+            if ($propertyMetadata instanceof MeasureMetadata) {
                 $summaryContext = SummaryQueryContext::create(
                     queryBuilder: $this->getSimpleQueryBuilder(),
                     summaryMetadata: $this->metadata,
@@ -620,8 +625,16 @@ final class SummarizerQuery extends AbstractQuery
                 );
 
                 $fieldString = $summaryContext->resolve($field);
-            } else {
+            } elseif (
+                $propertyMetadata instanceof DimensionMetadata
+                || $propertyMetadata instanceof DimensionPropertyMetadata
+            ) {
                 $fieldString = $this->resolve($field);
+            } else {
+                throw new UnexpectedValueException(\sprintf(
+                    'Field "%s" is not a valid dimension or measure.',
+                    $field,
+                ));
             }
 
             if ($i === 0) {

@@ -107,17 +107,17 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getDimensions() as $levelProperty => $metadata) {
+        foreach ($this->metadata->getRootDimensions() as $levelProperty => $metadata) {
             $isEntity = $this->getSimpleQueryBuilder()
                 ->getEntityManager()
                 ->getClassMetadata($this->metadata->getSummaryClass())
                 ->hasAssociation($levelProperty);
 
             $hierarchyMetadata = $metadata->getHierarchy();
-            $summaryProperty = $metadata->getSummaryProperty();
+            $summaryProperty = $metadata->getName();
 
             if ($hierarchyMetadata !== null) {
-                $dimensionProperty = $metadata->getSummaryProperty();
+                $dimensionProperty = $metadata->getName();
                 $dimensionPathsMetadata = $hierarchyMetadata->getPaths();
 
                 $propertyToAlias = [];
@@ -257,7 +257,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 
         $groupingString = '';
 
-        foreach ($this->metadata->getDimensions() as $dimensionMetadata) {
+        foreach ($this->metadata->getRootDimensions() as $dimensionMetadata) {
             $hierarchyMetadata = $dimensionMetadata->getHierarchy();
 
             // non hierarchical dimension
@@ -278,7 +278,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         }
 
         $partitionMetadata = $this->metadata->getPartition();
-        $partitionProperty = $partitionMetadata->getSummaryProperty();
+        $partitionProperty = $partitionMetadata->getName();
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
         $groupingsProperty = $this->metadata->getGroupingsProperty();

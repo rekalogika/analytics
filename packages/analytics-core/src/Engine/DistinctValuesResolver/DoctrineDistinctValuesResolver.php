@@ -68,7 +68,7 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getDimensionOrDimensionProperty($dimension);
+        $dimensionMetadata = $summaryMetadata->getAnyDimension($dimension);
 
         if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
             $dimensionMetadata = $dimensionMetadata->getDimension();
@@ -138,7 +138,7 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getDimensionOrDimensionProperty($dimension);
+        $dimensionMetadata = $summaryMetadata->getAnyDimension($dimension);
 
         if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
             $dimensionMetadata = $dimensionMetadata->getDimension();

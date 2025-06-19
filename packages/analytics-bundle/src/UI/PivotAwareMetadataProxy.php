@@ -45,7 +45,7 @@ final readonly class PivotAwareMetadataProxy
         );
 
         $this->dimensions = array_filter(
-            $summaryMetadata->getDimensions(),
+            $summaryMetadata->getRootDimensions(),
             static fn(DimensionMetadata $dimension) => !$dimension->isHidden(),
         );
 
