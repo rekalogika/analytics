@@ -20,7 +20,7 @@ final readonly class Hierarchy
      * @param list<list<int>> $paths
      */
     public function __construct(
-        private array $paths,
+        private array $paths = [],
     ) {}
 
     /**

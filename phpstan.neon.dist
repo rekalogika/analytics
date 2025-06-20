@@ -17,6 +17,9 @@ parameters:
         objectManagerLoader: tests/object-manager.php
     ignoreErrors:
         -
+            identifier: property.unusedType
+            path: packages/analytics-core/src/Time/Dimension/*
+        -
             identifier: property.onlyRead
             path: tests/src/App/Entity/*
         -
