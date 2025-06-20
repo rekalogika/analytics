@@ -38,6 +38,7 @@ use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
+use Rekalogika\Analytics\Time\NewHierarchy\Group\TimeGroup;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -71,7 +72,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
     )]
-    private TimeDimensionHierarchy $time;
+    private TimeGroup $time;
 
     #[ORM\Column(
         type: TimeBinType::TypeDate,

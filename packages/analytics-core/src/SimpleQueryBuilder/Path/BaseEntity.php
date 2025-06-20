@@ -50,10 +50,6 @@ final readonly class BaseEntity
             return $this->processHasOneElement($path);
         }
 
-        if ($count === 2) {
-            return $this->processHasTwoElements($path);
-        }
-
         return $this->processHasMoreElements($path);
     }
 
@@ -75,12 +71,12 @@ final readonly class BaseEntity
     }
 
     /**
-     * If we have two elements, the possibilities are:
+     * If we have more than one elements, the possibilities are:
      *
-     * - It is a property of an embeddable in the base entity
-     * - It is a property in a related entity
+     * - the first element must be a reference to a related entity
+     * - the elements are reference to a propert in an embeddable
      */
-    private function processHasTwoElements(Path $path): string
+    private function processHasMoreElements(Path $path): string
     {
         if ($this->hasProperty((string) $path)) {
             return $this->processProperty($path);
@@ -90,20 +86,11 @@ final readonly class BaseEntity
     }
 
     /**
-     * If we have more than two elements, the first element must be a reference
-     * to a related entity
-     */
-    private function processHasMoreElements(Path $path): string
-    {
-        return $this->processRelatedEntity($path);
-    }
-
-    /**
      * Executed if the path is a property.
      *
      * - If we have one element, it is a property of the base entity
-     * - If we have two elements, it is a property in an embeddable in the base
-     *   entity
+     * - If we have more than one element, it is a property in an embeddable in
+     *   the base entity
      */
     private function processProperty(Path $path): string
     {
