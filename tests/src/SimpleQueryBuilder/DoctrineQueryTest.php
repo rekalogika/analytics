@@ -20,6 +20,7 @@ use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryExtractor;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -194,5 +195,43 @@ final class DoctrineQueryTest extends KernelTestCase
             4 => [new \DateTimeImmutable('2021-01-01 00:00:00'), 'datetime_immutable'],
             5 => [$itemIds, ArrayParameterType::INTEGER],
         ], $parameters);
+    }
+
+    public function testNestedEmbeddable(): void
+    {
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $entity = new Entity();
+        $entity->setName('Test Entity');
+        $embeddable1 = $entity->getEmbeddable1();
+        $embeddable1->setName('Test Embeddable 1');
+        $embeddable2 = $embeddable1->getEmbeddable2();
+        $embeddable2->setName('Test Embeddable 2');
+        $embeddable3 = $embeddable2->getEmbeddable3();
+        $embeddable3->setName('Test Embeddable 3');
+        $entityManager->persist($entity);
+        $entityManager->flush();
+
+        $queryBuilder = $entityManager->createQueryBuilder()
+            ->select('e.embeddable1.embeddable2.embeddable3.name')
+            ->from(Entity::class, 'e');
+
+        /** @psalm-suppress MixedAssignment */
+        $result = $queryBuilder->getQuery()->getResult();
+
+        $this->assertEquals(
+            [['embeddable1.embeddable2.embeddable3.name' => 'Test Embeddable 3']],
+            $result,
+        );
+    }
+
+    public function testNestedEmbeddableMetadata(): void
+    {
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $classMetadata = $entityManager->getClassMetadata(Entity::class);
+        $this->assertTrue($classMetadata->hasField('embeddable1.embeddable2.embeddable3.name'));
     }
 }

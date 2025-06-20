@@ -45,6 +45,7 @@
     <testsuite name="default">
       <directory>tests/src/UnitTests</directory>
       <directory>tests/src/IntegrationTests</directory>
+      <directory>tests/src/SimpleQueryBuilder</directory>
     </testsuite>
   </testsuites>
 

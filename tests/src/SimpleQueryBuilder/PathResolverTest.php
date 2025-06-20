@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -91,6 +92,46 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer _a0 WITH _a0.id = root.id',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    //
+    // embeddable
+    //
+
+    public function testEmbeddable(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Entity::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            'root.embeddable1.name',
+            $pathResolver->resolve('embeddable1.name'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity root',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testNestedEmbeddable(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Entity::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            'root.embeddable1.embeddable2.embeddable3.name',
+            $pathResolver->resolve('embeddable1.embeddable2.embeddable3.name'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity root',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }
