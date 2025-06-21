@@ -19,8 +19,9 @@ use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
-use Rekalogika\Analytics\Core\Metadata\Hierarchy;
+use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\Dimension\Set\DateSet;
@@ -31,8 +32,10 @@ use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 #[Embeddable()]
-#[Hierarchy()]
-class GregorianDateTime implements ContextAwareHierarchy
+#[DimensionGroup(
+    groupingStrategy: new RollUpStrategy(),
+)]
+class GregorianDateWithHour implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
 

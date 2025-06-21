@@ -92,7 +92,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
             }
 
             $directories[] = \dirname($fileName, 2) . '/Hierarchy';
-            $directories[] = \dirname($fileName, 2) . '/NewHierarchy';
+            $directories[] = \dirname($fileName, 2) . '/Dimension';
         }
 
         // uuid

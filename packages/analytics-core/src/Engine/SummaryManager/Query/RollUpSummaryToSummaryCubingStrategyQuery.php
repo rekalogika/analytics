@@ -54,7 +54,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
 
         $this->groupBy = new GroupBy();
-        $this->groupings = new Groupings();
+        $this->groupings = Groupings::create($metadata);
     }
 
     /**
@@ -176,8 +176,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $this->groupings->add(
-                        property: \sprintf('%s.%s', $summaryProperty, $name),
+                    $this->groupings->registerExpression(
+                        name: \sprintf('%s.%s', $summaryProperty, $name),
                         expression: \sprintf(
                             'root.%s.%s',
                             $dimensionProperty,
@@ -199,8 +199,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings->add(
-                    property: $summaryProperty,
+                $this->groupings->registerExpression(
+                    name: $summaryProperty,
                     expression: \sprintf(
                         'IDENTITY(root.%s)',
                         $levelProperty,
@@ -220,8 +220,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings->add(
-                    property: $summaryProperty,
+                $this->groupings->registerExpression(
+                    name: $summaryProperty,
                     expression: \sprintf(
                         'root.%s',
                         $levelProperty,

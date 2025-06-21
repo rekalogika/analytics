@@ -18,13 +18,16 @@ use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\GroupingStrategy\GroupingSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
-use Rekalogika\Analytics\Core\Metadata\Hierarchy;
+use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
-use Rekalogika\Analytics\Time\Dimension\System\GregorianDateTime;
+use Rekalogika\Analytics\Time\Dimension\System\GregorianDateWithHour;
 
 #[Embeddable()]
-#[Hierarchy()]
+#[DimensionGroup(
+    groupingStrategy: new GroupingSetStrategy(),
+)]
 class TimeGroup implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
@@ -34,9 +37,9 @@ class TimeGroup implements ContextAwareHierarchy
         label: new TranslatableMessage('Group'),
         source: new Noop(),
     )]
-    private ?GregorianDateTime $gregorian = null;
+    private ?GregorianDateWithHour $gregorian = null;
 
-    public function getGregorian(): ?GregorianDateTime
+    public function getGregorian(): ?GregorianDateWithHour
     {
         return $this->gregorian;
     }

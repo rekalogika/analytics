@@ -13,20 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Command;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\Time\Dimension\Set\MonthSet;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'rekalogika:debug:test',
@@ -34,21 +28,22 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class DebugTestCommand extends Command implements SignalableCommandInterface
 {
-    private ?SymfonyStyle $io = null;
-
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly SummaryMetadataFactory $summaryMetadataFactory,
     ) {
         parent::__construct();
     }
 
-    #[\Override] protected function configure(): void
-    {
-    }
+    #[\Override] protected function configure(): void {}
 
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // $classMetadata = $this->entityManager->getClassMetadata(MonthSet::class);
+        // dump($classMetadata);
+
+        $summaryMetadata = $this->summaryMetadataFactory
+            ->getSummaryMetadata(OrderSummary::class);
 
         return Command::SUCCESS;
     }

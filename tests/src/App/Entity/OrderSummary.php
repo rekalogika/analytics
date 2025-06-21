@@ -36,9 +36,8 @@ use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
+use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
-use Rekalogika\Analytics\Time\NewHierarchy\Group\TimeGroup;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -269,7 +268,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         return $this->partition;
     }
 
-    public function getTime(): TimeDimensionHierarchy
+    public function getTime(): TimeGroup
     {
         return $this->time;
     }

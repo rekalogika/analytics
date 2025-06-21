@@ -17,12 +17,15 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
+/**
+ * @todo add method to get the parent context, and use that when calling
+ * parent's method
+ */
 final readonly class SourceQueryContext
 {
     public function __construct(
@@ -31,7 +34,6 @@ final readonly class SourceQueryContext
         private ?PartitionMetadata $partitionMetadata = null,
         private ?DimensionMetadata $dimensionMetadata = null,
         private ?MeasureMetadata $measureMetadata = null,
-        private ?DimensionPropertyMetadata $dimensionPropertyMetadata = null,
     ) {}
 
     /**
@@ -86,14 +88,5 @@ final readonly class SourceQueryContext
     public function getSummaryMetadata(): SummaryMetadata
     {
         return $this->summaryMetadata;
-    }
-
-    public function getDimensionPropertyMetadata(): DimensionPropertyMetadata
-    {
-        if (null === $this->dimensionPropertyMetadata) {
-            throw new MetadataException('Dimension property metadata is not set, probably because the context is not created for a property inside a hierarchical dimension.');
-        }
-
-        return $this->dimensionPropertyMetadata;
     }
 }

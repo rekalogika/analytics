@@ -43,6 +43,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
 
         parent::__construct(
             name: $summaryProperty,
+            propertyName: $summaryProperty,
             label: $label,
             typeClass: $typeClass,
             hidden: $hidden,

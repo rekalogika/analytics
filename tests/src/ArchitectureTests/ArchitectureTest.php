@@ -250,6 +250,9 @@ final class ArchitectureTest
                 // symfony components
                 Selector::inNamespace('Symfony\Component\Cache'),
 
+                // other third-party libraries
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
+
                 // php misc
                 Selector::classname(\Override::class),
 

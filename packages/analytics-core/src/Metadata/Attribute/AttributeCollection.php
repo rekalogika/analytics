@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Attribute;
 
+use Rekalogika\Analytics\Common\Exception\RuntimeException;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
 final readonly class AttributeCollection
@@ -43,9 +44,21 @@ final readonly class AttributeCollection
     /**
      * @template T of object
      * @param class-string<T> $class
-     * @return T|null
+     * @return T
      */
-    public function getAttribute(string $class): ?object
+    public function getAttribute(string $class): object
+    {
+        return $this->tryGetAttribute($class) ?? throw new RuntimeException(
+            "Attribute of class '$class' not found in collection.",
+        );
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T> $class
+     * @return ?T
+     */
+    public function tryGetAttribute(string $class): ?object
     {
         return $this->getAttributes($class)[0] ?? null;
     }

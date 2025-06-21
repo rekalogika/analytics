@@ -11,14 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Metadata\DimensionHierarchy;
+namespace Rekalogika\Analytics\Metadata\Summary;
 
-interface DimensionHierarchyMetadataFactory
+interface DimensionMetadataFactory
 {
     /**
-     * @param class-string $hierarchyClass
+     * @param class-string $class
      */
-    public function getDimensionHierarchyMetadata(
-        string $hierarchyClass,
-    ): DimensionHierarchyMetadata;
+    public function createDimensionMetadata(
+        string $class,
+        string $property,
+    ): DimensionMetadata;
 }

@@ -18,15 +18,18 @@ use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
-use Rekalogika\Analytics\Core\Metadata\Hierarchy;
+use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\Hour;
 use Rekalogika\Analytics\Time\Bin\HourOfDay;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 #[Embeddable()]
-#[Hierarchy()]
+#[DimensionGroup(
+    groupingStrategy: new FieldSetStrategy(),
+)]
 class HourSet implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;

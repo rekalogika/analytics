@@ -54,6 +54,10 @@ final readonly class AttributeUtil
             $reflectionClass = new \ReflectionClass($class);
 
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+                if (isset($properties[$reflectionProperty->getName()])) {
+                    continue; // Skip if property already exists
+                }
+
                 $properties[$reflectionProperty->getName()] = $reflectionProperty;
             }
         }
@@ -64,7 +68,7 @@ final readonly class AttributeUtil
     /**
      * @return class-string|null
      */
-    public static function getTypeClass(
+    public static function getTypeClassFromReflection(
         \ReflectionProperty $reflectionProperty,
     ): ?string {
         $type = $reflectionProperty->getType();
@@ -89,6 +93,30 @@ final readonly class AttributeUtil
 
         return $name;
     }
+
+    /**
+     * @param class-string $class
+     * @return class-string|null
+     */
+    public static function getTypeClass(
+        string $class,
+        string $property,
+    ): ?string {
+        foreach (self::getAllClassesFromObject($class) as $class) {
+            $reflectionClass = new \ReflectionClass($class);
+
+            try {
+                $reflectionProperty = $reflectionClass->getProperty($property);
+            } catch (\ReflectionException) {
+                continue;
+            }
+
+            return self::getTypeClassFromReflection($reflectionProperty);
+        }
+
+        return null;
+    }
+
 
     /**
      * @param class-string $class

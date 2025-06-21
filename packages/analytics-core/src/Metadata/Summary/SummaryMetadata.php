@@ -14,7 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Core\GroupingStrategy\RootStrategy;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
+use Rekalogika\Analytics\Metadata\Summary\Util\GroupingFieldsHelper;
+use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -32,17 +37,17 @@ final readonly class SummaryMetadata
     /**
      * @var non-empty-array<string,DimensionMetadata>
      */
-    private array $dimensions;
+    private array $rootDimensions;
 
     /**
-     * @var array<string,DimensionPropertyMetadata>
-     */
-    private array $dimensionProperties;
-
-    /**
-     * @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @var non-empty-array<string,DimensionMetadata>
      */
     private array $leafDimensions;
+
+    /**
+     * @var non-empty-array<string,DimensionMetadata>
+     */
+    private array $allDimensions;
 
     /**
      * @var non-empty-array<string,MeasureMetadata>
@@ -55,6 +60,13 @@ final readonly class SummaryMetadata
      * @var list<string>
      */
     private array $involvedSourceProperties;
+
+    private GroupingSet $groupByExpression;
+
+    /**
+     * @var array<string,string>
+     */
+    private array $groupingFields;
 
     /**
      * @param class-string $sourceClass
@@ -73,6 +85,7 @@ final readonly class SummaryMetadata
         private TranslatableInterface $label,
     ) {
         $allProperties = [];
+        $strategy = new RootStrategy();
 
         //
         // partition
@@ -99,36 +112,46 @@ final readonly class SummaryMetadata
         // dimensions
         //
 
-        $newDimensions = [];
-        $dimensionProperties = [];
+        $allDimensions = [];
+        $rootDimensions = [];
         $leafDimensions = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
-            $dimension = $dimension->withSummaryMetadata($this);
+            $groupingField = $strategy
+                ->getAssociatedGroupingField($dimensionKey)
+                ?? $dimensionKey;
 
-            $newDimensions[$dimensionKey] = $dimension;
+            $dimension = $dimension->withSummaryMetadata(
+                summaryMetadata: $this,
+                groupingField: $groupingField,
+            );
+
+            $allDimensions[$dimensionKey] = $dimension;
+            $rootDimensions[$dimensionKey] = $dimension;
             $allProperties[$dimensionKey] = $dimension;
 
-            if (!$dimension->isHierarchical()) {
+            if (!$dimension->hasChildren()) {
                 $leafDimensions[$dimensionKey] = $dimension;
-
-                continue;
             }
 
-            // if hierarchical
-            foreach ($dimension->getProperties() as $dimensionPropertyKey => $dimensionProperty) {
-                $dimensionProperties[$dimensionPropertyKey] = $dimensionProperty;
-                $allProperties[$dimensionPropertyKey] = $dimensionProperty;
-                $leafDimensions[$dimensionPropertyKey] = $dimensionProperty;
+            foreach ($dimension->getDescendants() as $dimensionKey => $descendant) {
+                if (!$descendant->hasChildren()) {
+                    // this is a leaf dimension
+                    $leafDimensions[$dimensionKey] = $descendant;
+                }
+
+                $allDimensions[$dimensionKey] = $descendant;
+                $allProperties[$dimensionKey] = $descendant;
             }
         }
 
-        $this->dimensionProperties = $dimensionProperties;
+        /** @var non-empty-array<string,DimensionMetadata> $rootDimensions */
+        $this->allDimensions = $allDimensions;
 
-        /** @var non-empty-array<string,DimensionMetadata> $newDimensions */
-        $this->dimensions = $newDimensions;
+        /** @var non-empty-array<string,DimensionMetadata> $rootDimensions */
+        $this->rootDimensions = $rootDimensions;
 
-        /** @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata> $leafDimensions */
+        /** @var non-empty-array<string,DimensionMetadata> $leafDimensions */
         $this->leafDimensions = $leafDimensions;
 
         //
@@ -143,7 +166,7 @@ final readonly class SummaryMetadata
 
         $properties = [];
         $dimensionsAndMeasures = [
-            ...$this->dimensions,
+            ...$this->rootDimensions,
             ...$this->measures,
         ];
 
@@ -160,6 +183,38 @@ final readonly class SummaryMetadata
         }
 
         $this->involvedSourceProperties = array_values(array_unique($properties));
+
+        //
+        // group by expression
+        //
+
+        $childrenExpressions = [];
+
+        foreach ($this->rootDimensions as $key => $dimension) {
+            $childrenExpressions[$key] = $dimension->getGroupByExpression();
+        }
+
+        $childrenExpressions = new DefaultGroupByExpressions($childrenExpressions);
+        $groupByExpression = $strategy->getGroupByExpression($childrenExpressions);
+
+        if (!$groupByExpression instanceof GroupingSet) {
+            throw new UnexpectedValueException(\sprintf(
+                'Root GroupBy expression must be an instance of %s, "%s" given.',
+                GroupingSet::class,
+                get_debug_type($groupByExpression),
+            ));
+        }
+
+        $this->groupByExpression = $groupByExpression;
+
+        //
+        // grouping fields
+        //
+
+        $this->groupingFields = GroupingFieldsHelper::getGroupingFields(
+            children: $this->rootDimensions,
+            groupingStrategy: $strategy,
+        );
     }
 
     /**
@@ -235,12 +290,12 @@ final readonly class SummaryMetadata
      */
     public function getRootDimensions(): array
     {
-        return $this->dimensions;
+        return $this->rootDimensions;
     }
 
     public function getRootDimension(string $dimensionName): DimensionMetadata
     {
-        return $this->dimensions[$dimensionName]
+        return $this->rootDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
                 'Dimension not found: %s',
                 $dimensionName,
@@ -253,16 +308,15 @@ final readonly class SummaryMetadata
      * or a DimensionPropertyMetadata. The DimensionMetadata of a
      * DimensionPropertyMetadata is not included in this list.
      *
-     * @return non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @return non-empty-array<string,DimensionMetadata>
      */
     public function getLeafDimensions(): array
     {
         return $this->leafDimensions;
     }
 
-    public function getLeafDimension(
-        string $dimensionName,
-    ): DimensionMetadata|DimensionPropertyMetadata {
+    public function getLeafDimension(string $dimensionName): DimensionMetadata
+    {
         return $this->leafDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
                 'Leaf dimension not found: %s',
@@ -271,33 +325,21 @@ final readonly class SummaryMetadata
     }
 
     /**
-     * Returns all the dimension properties, which are subdimensions of
-     * DimensionMetadata. The DimensionMetadata itself is not included in this
-     * list.
+     * Returns all the dimensions, including root, leaf, and intermediate
+     * dimensions.
      *
-     * @return array<string,DimensionPropertyMetadata>
+     * @return non-empty-array<string,DimensionMetadata>
      */
-    public function getDimensionProperties(): array
+    public function getAllDimensions(): array
     {
-        return $this->dimensionProperties;
+        return $this->allDimensions;
     }
 
-    public function getDimensionProperty(string $propertyName): DimensionPropertyMetadata
+    public function getDimension(string $dimensionName): DimensionMetadata
     {
-        return $this->dimensionProperties[$propertyName]
+        return $this->allDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
-                'Dimension property not found: %s',
-                $propertyName,
-            ));
-    }
-
-    public function getAnyDimension(
-        string $dimensionName,
-    ): DimensionMetadata|DimensionPropertyMetadata {
-        return $this->dimensions[$dimensionName]
-            ?? $this->dimensionProperties[$dimensionName]
-            ?? throw new MetadataException(\sprintf(
-                'Dimension or dimension property not found: %s',
+                'Dimension not found: %s',
                 $dimensionName,
             ));
     }
@@ -335,5 +377,22 @@ final readonly class SummaryMetadata
     public function getInvolvedSourceProperties(): array
     {
         return $this->involvedSourceProperties;
+    }
+
+    //
+    // group by expression
+    //
+
+    public function getGroupByExpression(): GroupingSet
+    {
+        return $this->groupByExpression;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getGroupingFields(): array
+    {
+        return $this->groupingFields;
     }
 }

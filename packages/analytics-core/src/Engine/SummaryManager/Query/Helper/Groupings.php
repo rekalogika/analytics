@@ -15,18 +15,43 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query\Helper;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final class Groupings
 {
     /**
      * @var array<string,string>
      */
-    private array $grouping = [];
+    private array $nameToExpression = [];
 
-    public function add(string $property, string $expression): void
+    /**
+     * @param array<string,DimensionMetadata> $groupingFieldToDimension
+     * @param array<string,string> $groupingFieldToName
+     */
+    private function __construct(
+        private readonly array $groupingFieldToDimension,
+        private readonly array $groupingFieldToName,
+    ) {}
+
+    public static function create(SummaryMetadata $summaryMetadata): self
     {
-        if (\in_array($expression, $this->grouping, true)) {
-            $previousProperty = array_search($expression, $this->grouping, true);
+        $groupingFieldToDimension = [];
+
+        foreach ($summaryMetadata->getLeafDimensions() as $dimension) {
+            $groupingFieldToDimension[$dimension->getGroupingField()] = $dimension;
+        }
+
+        return new self(
+            groupingFieldToDimension: $groupingFieldToDimension,
+            groupingFieldToName: $summaryMetadata->getGroupingFields(),
+        );
+    }
+
+    public function registerExpression(string $name, string $expression): void
+    {
+        if (\in_array($expression, $this->nameToExpression, true)) {
+            $previousProperty = array_search($expression, $this->nameToExpression, true);
 
             if ($previousProperty === false) {
                 throw new LogicException("Should never happen");
@@ -35,19 +60,30 @@ final class Groupings
             throw new InvalidArgumentException(\sprintf(
                 'Expression "%s" already exists for property "%s", and you are trying to add the same expression for property "%s". Two properties with the same expression in the same summary class is not allowed because it will confuse the database.',
                 $expression,
-                $property,
+                $name,
                 $previousProperty,
             ));
         }
 
-        $this->grouping[$property] = $expression;
+        $this->nameToExpression[$name] = $expression;
     }
 
     public function getExpression(): string
     {
-        $grouping = $this->grouping;
+        $grouping = [];
+
+        foreach ($this->groupingFieldToName as $groupingField => $name) {
+            $expression = $this->nameToExpression[$name]
+                ?? throw new LogicException(\sprintf(
+                    'Grouping field "%s" is not registered in the groupings. Make sure to register the expression for the grouping field before calling getExpression().',
+                    $groupingField,
+                ));
+
+            $grouping[$groupingField] = $expression;
+        }
+
         ksort($grouping);
 
-        return implode(', ', $grouping);
+        return 'REKALOGIKA_GROUPING_CONCAT(' . implode(', ', $grouping) . ')';
     }
 }

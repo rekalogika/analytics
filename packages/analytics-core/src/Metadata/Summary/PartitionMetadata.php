@@ -38,6 +38,7 @@ final readonly class PartitionMetadata extends PropertyMetadata
     ) {
         parent::__construct(
             name: $summaryProperty,
+            propertyName: $summaryProperty,
             label: new LiteralString('Partition'),
             typeClass: $partitionClass,
             summaryMetadata: $summaryMetadata,
