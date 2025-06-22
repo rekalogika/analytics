@@ -24,4 +24,9 @@ use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
  *
  * @extends \Traversable<string,Field|FieldSet|Cube|RollUp|GroupingSet>
  */
-interface GroupByExpressions extends \Traversable {}
+interface GroupByExpressions extends \Traversable
+{
+    public function get(
+        string $name,
+    ): Field|FieldSet|Cube|RollUp|GroupingSet|null;
+}

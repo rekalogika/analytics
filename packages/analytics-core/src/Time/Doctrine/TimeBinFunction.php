@@ -85,25 +85,14 @@ final class TimeBinFunction extends FunctionNode
             throw new QueryException('Summary time zone must be a literal');
         }
 
-        if ($this->outputFormat->value === 'dayOfWeek') {
-            // dayOfWeek is a special case, because TO_CHAR D outputs 1-7 sunday
-            // to saturday, but we want ISO day of week 1-7 monday to sunday
-            return 'EXTRACT(ISODOW FROM '
-                . $this->sourceDatetime->dispatch($sqlWalker)
-                . ' AT TIME ZONE '
-                . $this->storedTimeZone->dispatch($sqlWalker)
-                . ' AT TIME ZONE '
-                . $this->summaryTimeZone->dispatch($sqlWalker)
-                . ')::integer';
-        }
-
         $sqlOutputFormat = match ($this->outputFormat->value) {
             'hour' => 'YYYYMMDDHH24',
             'hourOfDay' => 'HH24',
             'date' => 'YYYYMMDD',
-            // 'dayOfWeek' => 'D',
+            'dayOfWeek' => 'ID',
             'dayOfMonth' => 'DD',
             'dayOfYear' => 'DDD',
+            'dayOfWeekYear' => 'IDDD',
             'week' => 'IYYYIW',
             'weekDate' => 'IYYYIWID',
             'weekYear' => 'IYYY',

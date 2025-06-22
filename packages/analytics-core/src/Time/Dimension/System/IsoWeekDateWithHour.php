@@ -23,22 +23,21 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Time\Dimension\Set\HourSet;
-use Rekalogika\Analytics\Time\Dimension\System\Trait\GregorianDateTrait;
+use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
 
 #[Embeddable()]
 #[DimensionGroup(
     groupingStrategy: new RollUpStrategy([
-        'year',
-        'quarter',
-        'month',
-        'date',
+        'weekYear',
+        'week',
+        'weekDate',
         'hour',
     ]),
 )]
-class GregorianDateWithHour implements ContextAwareHierarchy
+class IsoWeekDateWithHour implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
-    use GregorianDateTrait;
+    use IsoWeekDateTrait;
 
     #[Embedded()]
     #[Dimension(

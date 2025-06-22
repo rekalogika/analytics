@@ -23,6 +23,7 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Time\Dimension\System\GregorianDateWithHour;
+use Rekalogika\Analytics\Time\Dimension\System\IsoWeekDateWithHour;
 
 #[Embeddable()]
 #[DimensionGroup(
@@ -34,13 +35,25 @@ class TimeGroup implements ContextAwareHierarchy
 
     #[Embedded()]
     #[Dimension(
-        label: new TranslatableMessage('Group'),
+        label: new TranslatableMessage('Civil'),
         source: new Noop(),
     )]
-    private ?GregorianDateWithHour $gregorian = null;
+    private ?GregorianDateWithHour $civil = null;
 
-    public function getGregorian(): ?GregorianDateWithHour
+    // #[Embedded()]
+    // #[Dimension(
+    //     label: new TranslatableMessage('ISO Week'),
+    //     source: new Noop(),
+    // )]
+    // private ?IsoWeekDateWithHour $isoWeek = null;
+
+    public function getCivil(): ?GregorianDateWithHour
     {
-        return $this->gregorian;
+        return $this->civil;
     }
+
+    // public function getIsoWeek(): ?IsoWeekDateWithHour
+    // {
+    //     return $this->isoWeek;
+    // }
 }

@@ -22,14 +22,32 @@ use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final readonly class RollUpStrategy implements GroupingStrategy
 {
+    /**
+     * @param list<string>|null $ordering
+     */
+    public function __construct(
+        private ?array $ordering = null,
+    ) {}
+
     #[\Override]
     public function getGroupByExpression(
         GroupByExpressions $fields,
     ): RollUp {
+        $ordering = $this->ordering ?? array_keys(iterator_to_array($fields));
 
         $rollUp = new RollUp();
 
-        foreach ($fields as $field) {
+        foreach ($ordering as $fieldName) {
+            $field = $fields->get($fieldName);
+
+            if ($field === null) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Field "%s" is not defined in the group-by expressions. Available fields: %s',
+                    $fieldName,
+                    implode(', ', array_keys(iterator_to_array($fields))),
+                ));
+            }
+
             if (
                 !$field instanceof FieldSet
                 && !$field instanceof Field

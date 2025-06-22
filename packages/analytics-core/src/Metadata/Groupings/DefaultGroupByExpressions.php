@@ -37,6 +37,13 @@ final readonly class DefaultGroupByExpressions implements
     ) {}
 
     #[\Override]
+    public function get(
+        string $name,
+    ): Field|FieldSet|Cube|RollUp|GroupingSet|null {
+        return $this->expressions[$name] ?? null;
+    }
+
+    #[\Override]
     public function getIterator(): \Traversable
     {
         yield from $this->expressions;

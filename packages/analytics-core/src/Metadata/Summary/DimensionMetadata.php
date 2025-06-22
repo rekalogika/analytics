@@ -148,7 +148,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         if ($this->groupingStrategy !== null) {
             $mappings = [];
 
-            foreach ($this->children as $key => $child) {
+            foreach ($this->childrenByPropertyName as $key => $child) {
                 $mappings[$key] = $child->getGroupByExpression();
             }
 

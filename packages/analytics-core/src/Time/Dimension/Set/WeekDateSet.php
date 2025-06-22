@@ -21,10 +21,9 @@ use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\DayOfYear;
+use Rekalogika\Analytics\Time\Bin\DayOfWeekYear;
+use Rekalogika\Analytics\Time\Bin\WeekDate;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
@@ -32,19 +31,19 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 #[DimensionGroup(
     groupingStrategy: new FieldSetStrategy(),
 )]
-class DateSet implements ContextAwareHierarchy
+class WeekDateSet implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
 
     #[Column(
-        type: TimeBinType::TypeDate,
+        type: TimeBinType::TypeWeekDate,
         nullable: true,
     )]
     #[Dimension(
-        label: new TranslatableMessage('Date'),
-        source: new TimeBin(TimeBinType::Date),
+        label: new TranslatableMessage('Week Date'),
+        source: new TimeBin(TimeBinType::WeekDate),
     )]
-    private ?int $date = null;
+    private ?int $weekDate = null;
 
     #[Column(
         type: TimeBinType::TypeDayOfWeek,
@@ -58,33 +57,22 @@ class DateSet implements ContextAwareHierarchy
     private ?DayOfWeek $dayOfWeek = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfMonth,
+        type: TimeBinType::TypeDayOfWeek,
         nullable: true,
-        enumType: DayOfMonth::class,
+        enumType: DayOfWeekYear::class,
     )]
     #[Dimension(
-        label: new TranslatableMessage('Day of Month'),
-        source: new TimeBin(TimeBinType::DayOfMonth),
+        label: new TranslatableMessage('Day of WeekYear'),
+        source: new TimeBin(TimeBinType::DayOfWeekYear),
     )]
-    private ?DayOfMonth $dayOfMonth = null;
+    private ?DayOfWeekYear $dayOfWeekYear = null;
 
-    #[Column(
-        type: TimeBinType::TypeDayOfYear,
-        nullable: true,
-        enumType: DayOfYear::class,
-    )]
-    #[Dimension(
-        label: new TranslatableMessage('Day of Year'),
-        source: new TimeBin(TimeBinType::DayOfYear),
-    )]
-    private ?DayOfYear $dayOfYear = null;
-
-    public function getDate(): ?Date
+    public function getWeekDate(): ?WeekDate
     {
         return $this->getContext()->getUserValue(
-            property: 'date',
-            rawValue: $this->date,
-            class: Date::class,
+            property: 'weekDate',
+            rawValue: $this->weekDate,
+            class: WeekDate::class,
         );
     }
 
@@ -93,13 +81,8 @@ class DateSet implements ContextAwareHierarchy
         return $this->dayOfWeek;
     }
 
-    public function getDayOfMonth(): ?DayOfMonth
+    public function getDayOfWeekYear(): ?DayOfWeekYear
     {
-        return $this->dayOfMonth;
-    }
-
-    public function getDayOfYear(): ?DayOfYear
-    {
-        return $this->dayOfYear;
+        return $this->dayOfWeekYear;
     }
 }

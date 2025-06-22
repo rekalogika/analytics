@@ -29,6 +29,7 @@ enum TimeBinType: string
     public const TypeDayOfWeek = Types::SMALLINT;
     public const TypeDayOfMonth = Types::SMALLINT;
     public const TypeDayOfYear = Types::SMALLINT;
+    public const TypeDayOfWeekYear = Types::SMALLINT;
 
     public const TypeWeek = Types::INTEGER;
     public const TypeWeekOfYear = Types::SMALLINT;
@@ -54,6 +55,7 @@ enum TimeBinType: string
     case DayOfWeek = 'dayOfWeek';
     case DayOfMonth = 'dayOfMonth';
     case DayOfYear = 'dayOfYear';
+    case DayOfWeekYear = 'dayOfWeekYear';
 
     case Week = 'week';
     case WeekDate = 'weekDate';
@@ -82,6 +84,7 @@ enum TimeBinType: string
             self::DayOfWeek => self::TypeDayOfWeek,
             self::DayOfMonth => self::TypeDayOfMonth,
             self::DayOfYear => self::TypeDayOfYear,
+            self::DayOfWeekYear => self::TypeDayOfWeekYear,
 
             // WeekTrait
             self::Week => self::TypeWeek,
@@ -120,6 +123,7 @@ enum TimeBinType: string
             self::DayOfWeek => Bin\DayOfWeek::class,
             self::DayOfMonth => Bin\DayOfMonth::class,
             self::DayOfYear => Bin\DayOfYear::class,
+            self::DayOfWeekYear => Bin\DayOfWeekYear::class,
 
             // WeekTrait
             self::Week => Bin\Week::class,

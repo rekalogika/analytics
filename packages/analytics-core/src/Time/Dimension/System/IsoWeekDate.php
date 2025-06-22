@@ -14,41 +14,22 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Dimension\System;
 
 use Doctrine\ORM\Mapping\Embeddable;
-use Doctrine\ORM\Mapping\Embedded;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
-use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Core\ValueResolver\Noop;
-use Rekalogika\Analytics\Time\Dimension\Set\HourSet;
-use Rekalogika\Analytics\Time\Dimension\System\Trait\GregorianDateTrait;
+use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
 
 #[Embeddable()]
 #[DimensionGroup(
     groupingStrategy: new RollUpStrategy([
-        'year',
-        'quarter',
-        'month',
-        'date',
-        'hour',
+        'weekYear',
+        'week',
+        'weekDate',
     ]),
 )]
-class GregorianDateWithHour implements ContextAwareHierarchy
+class IsoWeekDate implements ContextAwareHierarchy
 {
     use ContextAwareHierarchyTrait;
-    use GregorianDateTrait;
-
-    #[Embedded()]
-    #[Dimension(
-        label: new TranslatableMessage('Hour'),
-        source: new Noop(),
-    )]
-    private ?HourSet $hour = null;
-
-    public function getHour(): ?HourSet
-    {
-        return $this->hour;
-    }
+    use IsoWeekDateTrait;
 }
