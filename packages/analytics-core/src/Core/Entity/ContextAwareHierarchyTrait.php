@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Core\Entity;
 
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
 use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
 
@@ -21,7 +22,7 @@ use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
  */
 trait ContextAwareHierarchyTrait
 {
-    private HierarchyContext $context;
+    private ?HierarchyContext $context = null;
 
     final public function setContext(HierarchyContext $context): void
     {
@@ -30,6 +31,10 @@ trait ContextAwareHierarchyTrait
 
     protected function getContext(): HierarchyContext
     {
+        if (null === $this->context) {
+            throw new LogicException('Context is not set.');
+        }
+
         return $this->context;
     }
 }

@@ -32,6 +32,8 @@ use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 /**
  * Roll up lower level summary to higher level by cubing the non-grouping row
  * of the lower level summary
+ *
+ * @todo fix
  */
 final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 {
