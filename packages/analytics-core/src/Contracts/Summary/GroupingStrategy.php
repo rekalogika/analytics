@@ -19,6 +19,9 @@ use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
+/**
+ * @internal Will change in the future.
+ */
 interface GroupingStrategy
 {
     /**
