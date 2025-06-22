@@ -35,6 +35,11 @@ final readonly class DimensionMetadata extends PropertyMetadata
      */
     private array $children;
 
+    /**
+     * @var array<string,DimensionMetadata>
+     */
+    private array $childrenByPropertyName;
+
     private ValueResolver $valueResolver;
 
     private string $dqlAlias;
@@ -102,6 +107,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         // children
 
         $newChildren = [];
+        $newChildrenByPropertyName = [];
 
         foreach ($children as $child) {
             $groupingField = $this->groupingStrategy
@@ -131,9 +137,11 @@ final readonly class DimensionMetadata extends PropertyMetadata
             );
 
             $newChildren[$child->getName()] = $child;
+            $newChildrenByPropertyName[$child->getPropertyName()] = $child;
         }
 
         $this->children = $newChildren;
+        $this->childrenByPropertyName = $newChildrenByPropertyName;
 
         // group by expression
 
@@ -280,9 +288,13 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->children !== [];
     }
 
+    /**
+     * @param string $name Name is the property name of the child dimension. Not
+     * the fully-qualified name.
+     */
     public function getChild(string $name): DimensionMetadata
     {
-        return $this->children[$name]
+        return $this->childrenByPropertyName[$name]
             ?? throw new LogicException(\sprintf(
                 'Dimension "%s" does not have child dimension "%s".',
                 $this->getName(),
