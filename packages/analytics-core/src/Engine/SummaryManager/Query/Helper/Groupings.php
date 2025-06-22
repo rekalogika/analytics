@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query\Helper;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final class Groupings
@@ -26,11 +25,9 @@ final class Groupings
     private array $nameToExpression = [];
 
     /**
-     * @param array<string,DimensionMetadata> $groupingFieldToDimension
      * @param array<string,string> $groupingFieldToName
      */
     private function __construct(
-        private readonly array $groupingFieldToDimension,
         private readonly array $groupingFieldToName,
     ) {}
 
@@ -43,7 +40,6 @@ final class Groupings
         }
 
         return new self(
-            groupingFieldToDimension: $groupingFieldToDimension,
             groupingFieldToName: $summaryMetadata->getGroupingFields(),
         );
     }

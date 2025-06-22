@@ -16,19 +16,17 @@ namespace Rekalogika\Analytics\Contracts\Context;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class HierarchyContext
 {
     public function __construct(
-        private SummaryMetadata $summaryMetadata,
         private DimensionMetadata $dimensionMetadata,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
     {
-        return $this->summaryMetadata;
+        return $this->dimensionMetadata->getSummaryMetadata();
     }
 
     public function getDimensionMetadata(): DimensionMetadata
@@ -52,12 +50,13 @@ final readonly class HierarchyContext
             $property,
         );
 
-        $propertyMetadata = $this->summaryMetadata
+        $propertyMetadata = $this
+            ->getSummaryMetadata()
             ->getProperty($fullyQualifiedProperty);
 
-        if (!$propertyMetadata instanceof DimensionPropertyMetadata) {
+        if (!$propertyMetadata instanceof DimensionMetadata) {
             throw new InvalidArgumentException(\sprintf(
-                'Getting user value is not supported, the property "%s" is not a dimension property.',
+                'Getting user value is not supported, the property "%s" is not a dimension.',
                 $property,
             ));
         }
@@ -66,7 +65,7 @@ final readonly class HierarchyContext
 
         if (!$valueResolver instanceof UserValueTransformer) {
             throw new InvalidArgumentException(\sprintf(
-                'Getting user value is not supported, but the value resolver of property "%s" is "%s" which is not an instance of "%s".',
+                'Getting user value is not supported. The value resolver of property "%s" is "%s" which is not an instance of "%s".',
                 $property,
                 $valueResolver::class,
                 UserValueTransformer::class,

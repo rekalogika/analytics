@@ -15,14 +15,13 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class PivotAwareMetadataProxy
 {
     /**
-     * @var array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @var array<string,DimensionMetadata>
      */
     private array $leafDimensions;
 
@@ -41,7 +40,7 @@ final readonly class PivotAwareMetadataProxy
     ) {
         $this->leafDimensions = array_filter(
             $summaryMetadata->getLeafDimensions(),
-            static fn(DimensionMetadata|DimensionPropertyMetadata $dimension) => !$dimension->isHidden(),
+            static fn(DimensionMetadata $dimension) => !$dimension->isHidden(),
         );
 
         $this->dimensions = array_filter(
@@ -56,7 +55,7 @@ final readonly class PivotAwareMetadataProxy
     }
 
     /**
-     * @return array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @return array<string,DimensionMetadata>
      */
     public function getLeafDimensions(): array
     {

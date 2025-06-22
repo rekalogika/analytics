@@ -22,12 +22,11 @@ final readonly class Dimension
 {
     /**
      * @param null|string|ValueResolver $source
-     * hierarchical, use an array to order by members of the hierarchy.
      */
     public function __construct(
         private null|string|ValueResolver $source,
         private null|string|TranslatableInterface $label = null,
-        private Order|array $orderBy = Order::Ascending,
+        private Order $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
         private bool $mandatory = false,
         private bool $hidden = false,
@@ -46,10 +45,7 @@ final readonly class Dimension
         return $this->label;
     }
 
-    /**
-     * @return Order|array<string,Order>
-     */
-    public function getOrderBy(): Order|array
+    public function getOrderBy(): Order
     {
         return $this->orderBy;
     }

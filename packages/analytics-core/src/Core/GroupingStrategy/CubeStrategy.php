@@ -19,15 +19,13 @@ use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
-use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final readonly class CubeStrategy implements GroupingStrategy
 {
     #[\Override]
     public function getGroupByExpression(
         GroupByExpressions $fields,
-    ): FieldSet|Cube|RollUp|GroupingSet {
+    ): Cube {
 
         $cube = new Cube();
 
@@ -63,7 +61,7 @@ final readonly class CubeStrategy implements GroupingStrategy
     #[\Override]
     public function getAssociatedGroupingField(
         string $fieldName,
-    ): ?string {
+    ): string {
         return $fieldName;
     }
 }

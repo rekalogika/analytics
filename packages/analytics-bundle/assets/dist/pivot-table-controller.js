@@ -136,7 +136,7 @@ var _default = /*#__PURE__*/function (_Controller) {
         var value = li.dataset.value;
         var select = li.querySelector('select');
         if (select) {
-          value += '.' + select.value;
+          value = select.value;
         }
 
         // data[type + '[' + index + ']'] = value

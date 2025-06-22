@@ -20,6 +20,9 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @todo restore functionality to resolve order by
+ */
 final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 {
     public function __construct(
@@ -30,7 +33,7 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
     ) {
         $summaryMetadata = $dimensionMetadata->getSummaryMetadata();
         $summaryClass = $summaryMetadata->getSummaryClass();
-        $orderBy = $dimensionMetadata->getOrderBy();
+        // $orderBy = $dimensionMetadata->getOrderBy();
         $dimension = $dimensionMetadata->getName();
 
         $doctrineMetadata = $entityManager->getClassMetadata($summaryClass);
@@ -59,13 +62,13 @@ final class GetDistinctValuesFromSourceQuery extends AbstractQuery
 
         parent::__construct($simpleQueryBuilder);
 
-        if (\is_array($orderBy)) {
-            foreach ($orderBy as $field => $direction) {
-                $fieldExpression = $this->resolve($field);
+        // if (\is_array($orderBy)) {
+        //     foreach ($orderBy as $field => $direction) {
+        //         $fieldExpression = $this->resolve($field);
 
-                $simpleQueryBuilder->addOrderBy($fieldExpression, $direction->value);
-            }
-        }
+        //         $simpleQueryBuilder->addOrderBy($fieldExpression, $direction->value);
+        //     }
+        // }
     }
 
     /**

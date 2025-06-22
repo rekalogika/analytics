@@ -21,7 +21,6 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -68,11 +67,7 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getAnyDimension($dimension);
-
-        if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
-            $dimensionMetadata = $dimensionMetadata->getDimension();
-        }
+        $dimensionMetadata = $summaryMetadata->getDimension($dimension);
 
         // if it is a relation, we get the unique values from the source entity
 
@@ -138,11 +133,7 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getAnyDimension($dimension);
-
-        if ($dimensionMetadata instanceof DimensionPropertyMetadata) {
-            $dimensionMetadata = $dimensionMetadata->getDimension();
-        }
+        $dimensionMetadata = $summaryMetadata->getDimension($dimension);
 
         // if it is a relation, we get the unique values from the source entity
 

@@ -16,10 +16,8 @@ namespace Rekalogika\Analytics\Core\GroupingStrategy;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
-use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final readonly class RollUpStrategy implements GroupingStrategy
@@ -27,7 +25,7 @@ final readonly class RollUpStrategy implements GroupingStrategy
     #[\Override]
     public function getGroupByExpression(
         GroupByExpressions $fields,
-    ): FieldSet|Cube|RollUp|GroupingSet {
+    ): RollUp {
 
         $rollUp = new RollUp();
 
@@ -63,7 +61,7 @@ final readonly class RollUpStrategy implements GroupingStrategy
     #[\Override]
     public function getAssociatedGroupingField(
         string $fieldName,
-    ): ?string {
+    ): string {
         return $fieldName;
     }
 }

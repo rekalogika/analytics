@@ -41,6 +41,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Doctrine\Common\Collections'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -72,6 +73,7 @@ final class ArchitectureTest
                 Selector::classname(\Override::class),
 
                 // php exception
+                Selector::classname(\Throwable::class),
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),

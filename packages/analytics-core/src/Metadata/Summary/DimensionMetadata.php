@@ -116,6 +116,13 @@ final readonly class DimensionMetadata extends PropertyMetadata
                 );
             }
 
+            if ($summaryMetadata !== null) {
+                $child = $child->withSummaryMetadata(
+                    summaryMetadata: $summaryMetadata,
+                    groupingField: $groupingField,
+                );
+            }
+
             $child = $child->withParent(
                 parent: $this,
                 parentPath: $name,
@@ -123,7 +130,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
                 groupingField: $groupingField,
             );
 
-            $newChildren[$child->getPropertyName()] = $child;
+            $newChildren[$child->getName()] = $child;
         }
 
         $this->children = $newChildren;
@@ -273,6 +280,16 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->children !== [];
     }
 
+    public function getChild(string $name): DimensionMetadata
+    {
+        return $this->children[$name]
+            ?? throw new LogicException(\sprintf(
+                'Dimension "%s" does not have child dimension "%s".',
+                $this->getName(),
+                $name,
+            ));
+    }
+
     /**
      * @return iterable<string,DimensionMetadata>
      */
@@ -283,6 +300,18 @@ final readonly class DimensionMetadata extends PropertyMetadata
 
             if ($child->hasChildren()) {
                 yield from $child->getDescendants();
+            }
+        }
+    }
+
+    /**
+     * @return iterable<string,DimensionMetadata>
+     */
+    public function getLeaves(): iterable
+    {
+        foreach ($this->getDescendants() as $child) {
+            if (!$child->hasChildren()) {
+                yield $child->getName() => $child;
             }
         }
     }

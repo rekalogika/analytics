@@ -116,7 +116,7 @@ export default class extends Controller {
                 let select = li.querySelector('select')
 
                 if (select) {
-                    value += '.' + select.value
+                    value = select.value
                 }
 
                 // data[type + '[' + index + ']'] = value

@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -74,30 +73,14 @@ final class SourceQuery extends AbstractQuery
 
     private function processDimension(string $name, mixed $rawMember): void
     {
-        $dimensionMetadata = $this->summaryMetadata->getProperty($name);
-
-        if ($dimensionMetadata instanceof DimensionMetadata) {
-            $this->processStandaloneDimension($dimensionMetadata, $rawMember);
-        } elseif ($dimensionMetadata instanceof DimensionPropertyMetadata) {
-            $this->processDimensionProperty($dimensionMetadata, $rawMember);
-        } else {
-            throw new UnexpectedValueException(
-                \sprintf('Invalid dimension metadata for key "%s"', $name),
-            );
-        }
-    }
-
-    private function processStandaloneDimension(
-        DimensionMetadata $dimension,
-        mixed $rawMember,
-    ): void {
-        $valueResolver = $dimension->getValueResolver();
+        $dimensionMetadata = $this->summaryMetadata->getDimension($name);
+        $valueResolver = $dimensionMetadata->getValueResolver();
 
         $expression = $valueResolver->getExpression(
             context: new SourceQueryContext(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->summaryMetadata,
-                dimensionMetadata: $dimension,
+                dimensionMetadata: $dimensionMetadata,
             ),
         );
 
@@ -108,29 +91,29 @@ final class SourceQuery extends AbstractQuery
         ));
     }
 
-    private function processDimensionProperty(
-        DimensionPropertyMetadata $dimensionProperty,
-        mixed $rawMember,
-    ): void {
-        $valueResolver = $dimensionProperty->getValueResolver();
+    // private function processDimensionProperty(
+    //     DimensionPropertyMetadata $dimensionProperty,
+    //     mixed $rawMember,
+    // ): void {
+    //     $valueResolver = $dimensionProperty->getValueResolver();
 
-        $expression = $valueResolver->getExpression(
-            context: new SourceQueryContext(
-                queryBuilder: $this->getSimpleQueryBuilder(),
-                summaryMetadata: $this->summaryMetadata,
-                dimensionMetadata: $dimensionProperty->getDimension(),
-                dimensionPropertyMetadata: $dimensionProperty,
-            ),
-        );
+    //     $expression = $valueResolver->getExpression(
+    //         context: new SourceQueryContext(
+    //             queryBuilder: $this->getSimpleQueryBuilder(),
+    //             summaryMetadata: $this->summaryMetadata,
+    //             dimensionMetadata: $dimensionProperty->getDimension(),
+    //             dimensionPropertyMetadata: $dimensionProperty,
+    //         ),
+    //     );
 
-        // add to query
+    //     // add to query
 
-        $this->getSimpleQueryBuilder()->andWhere(\sprintf(
-            '%s = %s',
-            $expression,
-            $this->createNamedParameter($rawMember),
-        ));
-    }
+    //     $this->getSimpleQueryBuilder()->andWhere(\sprintf(
+    //         '%s = %s',
+    //         $expression,
+    //         $this->createNamedParameter($rawMember),
+    //     ));
+    // }
 
     private function processOrderBy(): void
     {

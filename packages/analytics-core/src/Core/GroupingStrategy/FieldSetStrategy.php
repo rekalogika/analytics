@@ -16,18 +16,15 @@ namespace Rekalogika\Analytics\Core\GroupingStrategy;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
-use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
-use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final readonly class FieldSetStrategy implements GroupingStrategy
 {
     #[\Override]
     public function getGroupByExpression(
         GroupByExpressions $fields,
-    ): FieldSet|Cube|RollUp|GroupingSet {
+    ): FieldSet {
         $fieldSet = new FieldSet();
 
         foreach ($fields as $field) {
@@ -69,7 +66,7 @@ final readonly class FieldSetStrategy implements GroupingStrategy
     #[\Override]
     public function getAssociatedGroupingField(
         string $fieldName,
-    ): ?string {
+    ): string {
         return 'all';
     }
 }

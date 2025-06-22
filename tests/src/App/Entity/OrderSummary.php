@@ -42,6 +42,9 @@ use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
 
+/**
+ * @todo restore orderby functionality
+ */
 #[ORM\Entity()]
 #[Analytics\Summary(
     sourceClass: Order::class,
@@ -96,7 +99,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('customer.country'),
         label: new TranslatableMessage('Customer country'),
-        orderBy: ['name' => DoctrineOrder::Ascending],
+        // orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Country $customerCountry = null;
 
@@ -105,7 +108,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('customer.country.region'),
         label: new TranslatableMessage('Customer Region'),
-        orderBy: ['name' => DoctrineOrder::Ascending],
+        // orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Region $customerRegion = null;
 
@@ -154,7 +157,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
-        orderBy: ['name' => DoctrineOrder::Ascending],
+        // orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Country $itemCountryOfOrigin = null;
 

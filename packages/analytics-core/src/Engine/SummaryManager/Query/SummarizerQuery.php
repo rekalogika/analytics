@@ -26,7 +26,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
@@ -54,7 +53,7 @@ final class SummarizerQuery extends AbstractQuery
     /**
      * @var array<string,string>
      */
-    private array $dimensionAliases = [];
+    private array $aliases = [];
 
     /**
      * @var list<array<string, mixed>>|null
@@ -85,6 +84,7 @@ final class SummarizerQuery extends AbstractQuery
     }
 
     /**
+     * @todo restore roll up functionality
      * @return list<array<string,mixed>>
      */
     public function getQueryResult(): array
@@ -167,9 +167,9 @@ final class SummarizerQuery extends AbstractQuery
 
             /** @var mixed $value */
             foreach ($row as $name => $value) {
-                if (\array_key_exists($name, $this->dimensionAliases)) {
+                if (\array_key_exists($name, $this->aliases)) {
                     /** @psalm-suppress MixedAssignment */
-                    $newRow[$this->dimensionAliases[$name]] = $value;
+                    $newRow[$this->aliases[$name]] = $value;
                 } else {
                     /** @psalm-suppress MixedAssignment */
                     $newRow[$name] = $value;
@@ -339,41 +339,43 @@ final class SummarizerQuery extends AbstractQuery
         // add dimensions not in the query to the group by clause
 
         $involvedDimensions = $visitor->getInvolvedDimensions();
+
         $dimensionsInQuery = array_filter(
             $this->query->getGroupBy(),
             fn(string $dimension): bool => $dimension !== '@values',
         );
+
         $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
 
         foreach ($involvedDimensionNotInQuery as $dimension) {
-            if (str_contains($dimension, '.')) {
-                [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
+            // if (str_contains($dimension, '.')) {
+            //     [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
-                $dimensionMetadata = $this->metadata
-                    ->getRootDimension($dimensionProperty);
+            //     $dimensionMetadata = $this->metadata
+            //         ->getRootDimension($dimensionProperty);
 
-                $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
+            //     $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
-                if ($dimensionHierarchyMetadata === null) {
-                    throw new UnexpectedValueException(\sprintf(
-                        'Dimension "%s" is not hierarchical',
-                        $dimensionProperty,
-                    ));
-                }
+            //     if ($dimensionHierarchyMetadata === null) {
+            //         throw new UnexpectedValueException(\sprintf(
+            //             'Dimension "%s" is not hierarchical',
+            //             $dimensionProperty,
+            //         ));
+            //     }
 
-                $groupings = $dimensionHierarchyMetadata
-                    ->getGroupingsByPropertyForSelect($hierarchyProperty);
+            //     $groupings = $dimensionHierarchyMetadata
+            //         ->getGroupingsByPropertyForSelect($hierarchyProperty);
 
-                foreach ($groupings as $property => $isGrouping) {
-                    if ($isGrouping !== false) {
-                        continue;
-                    }
+            //     foreach ($groupings as $property => $isGrouping) {
+            //         if ($isGrouping !== false) {
+            //             continue;
+            //         }
 
-                    $this->groupings[\sprintf('%s.%s', $dimensionProperty, $property)] = false;
-                }
+            //         $this->groupings[\sprintf('%s.%s', $dimensionProperty, $property)] = false;
+            //     }
 
-                continue;
-            }
+            //     continue;
+            // }
 
             $this->groupings[$dimension] = false;
         }
@@ -397,85 +399,85 @@ final class SummarizerQuery extends AbstractQuery
     {
         if ($dimension === '@values') {
             $this->addMeasuresToQueryBuilder();
-        } elseif (str_contains($dimension, '.')) {
-            $this->addHierarchicalDimensionToQueryBuilder($dimension);
+            // } elseif (str_contains($dimension, '.')) {
+            // $this->addHierarchicalDimensionToQueryBuilder($dimension);
         } else {
-            $this->addNonHierarchicalDimensionToQueryBuilder($dimension);
+            $this->addDimensionToQueryBuilder($dimension);
         }
     }
 
-    private function addHierarchicalDimensionToQueryBuilder(
-        string $dimension,
-    ): void {
-        [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
+    // private function addHierarchicalDimensionToQueryBuilder(
+    //     string $dimension,
+    // ): void {
+    //     [$dimensionProperty, $hierarchyProperty] = explode('.', $dimension);
 
-        if ($hierarchyProperty === '') {
-            throw new UnexpectedValueException(\sprintf(
-                'Invalid hierarchical dimension "%s".',
-                $dimensionProperty,
-            ));
-        }
+    //     if ($hierarchyProperty === '') {
+    //         throw new UnexpectedValueException(\sprintf(
+    //             'Invalid hierarchical dimension "%s".',
+    //             $dimensionProperty,
+    //         ));
+    //     }
 
-        // create alias
+    //     // create alias
 
-        $alias = 'e_' . hash('xxh128', $dimension);
-        $this->dimensionAliases[$alias] = $dimension;
+    //     $alias = 'e_' . hash('xxh128', $dimension);
+    //     $this->dimensionAliases[$alias] = $dimension;
 
-        // determine level
+    //     // determine level
 
-        $dimensionMetadata = $this->metadata
-            ->getRootDimension($dimensionProperty);
+    //     $dimensionMetadata = $this->metadata
+    //         ->getRootDimension($dimensionProperty);
 
-        $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
+    //     $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
 
-        if ($dimensionHierarchyMetadata === null) {
-            throw new UnexpectedValueException(\sprintf(
-                'Dimension "%s" is not hierarchical',
-                $dimensionProperty,
-            ));
-        }
+    //     if ($dimensionHierarchyMetadata === null) {
+    //         throw new UnexpectedValueException(\sprintf(
+    //             'Dimension "%s" is not hierarchical',
+    //             $dimensionProperty,
+    //         ));
+    //     }
 
-        // add where level clause
+    //     // add where level clause
 
-        $groupings = $dimensionHierarchyMetadata
-            ->getGroupingsByPropertyForSelect($hierarchyProperty);
+    //     $groupings = $dimensionHierarchyMetadata
+    //         ->getGroupingsByPropertyForSelect($hierarchyProperty);
 
-        foreach ($dimensionHierarchyMetadata->getProperties() as $property) {
-            $name = \sprintf('%s.%s', $dimensionProperty, $property->getName());
+    //     foreach ($dimensionHierarchyMetadata->getProperties() as $property) {
+    //         $name = \sprintf('%s.%s', $dimensionProperty, $property->getName());
 
-            $this->groupings[$name] = $groupings[$property->getName()];
-        }
+    //         $this->groupings[$name] = $groupings[$property->getName()];
+    //     }
 
-        // add select
+    //     // add select
 
-        $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf(
-                "%s AS %s",
-                $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
-                $alias,
-            ))
-        ;
+    //     $this->getSimpleQueryBuilder()
+    //         ->addSelect(\sprintf(
+    //             "%s AS %s",
+    //             $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
+    //             $alias,
+    //         ))
+    //     ;
 
-        // add orderby
+    //     // add orderby
 
-        $orderBy = $dimensionMetadata->getOrderBy();
+    //     $orderBy = $dimensionMetadata->getOrderBy();
 
-        if (\is_array($orderBy)) {
-            throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
-        }
+    //     if (\is_array($orderBy)) {
+    //         throw new MetadataException('orderBy cannot be an array for hierarchical dimension');
+    //     }
 
-        $this->getSimpleQueryBuilder()->addOrderBy(
-            $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
-            $orderBy->value,
-        );
+    //     $this->getSimpleQueryBuilder()->addOrderBy(
+    //         $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty)),
+    //         $orderBy->value,
+    //     );
 
-        // add group by and grouping fields
+    //     // add group by and grouping fields
 
-        $this->rollUpFields[] = $alias;
+    //     $this->rollUpFields[] = $alias;
 
-        $this->groupingFields[] =
-            $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty));
-    }
+    //     $this->groupingFields[] =
+    //         $this->resolve(\sprintf('%s.%s', $dimensionProperty, $hierarchyProperty));
+    // }
 
     private function addMeasuresToQueryBuilder(): void
     {
@@ -492,15 +494,25 @@ final class SummarizerQuery extends AbstractQuery
                 ->addSelect(\sprintf(
                     '%s AS %s',
                     $summaryContext->resolve($name),
-                    $name,
+                    $this->getAlias($name),
                 ));
         }
     }
 
-    private function addNonHierarchicalDimensionToQueryBuilder(
+    private function getAlias(string $field): string
+    {
+        $alias = 'a_' . hash('xxh128', $field);
+
+        $this->aliases[$alias] = $field;
+
+        return $alias;
+    }
+
+    private function addDimensionToQueryBuilder(
         string $dimension,
     ): void {
-        $dimensionMetadata = $this->metadata->getRootDimension($dimension);
+        $dimensionMetadata = $this->metadata->getDimension($dimension);
+        $alias = $this->getAlias($dimension);
 
         $classMetadata = ClassMetadataWrapper::get(
             manager: $this->entityManager,
@@ -537,42 +549,43 @@ final class SummarizerQuery extends AbstractQuery
 
             // select
 
+
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     '%s AS %s',
                     $fieldExpression,
-                    $dimension,
+                    $alias,
                 ));
 
-            // order by
+            // order by @todo restore functionality
 
-            $orderBy = $dimensionMetadata->getOrderBy();
+            // $orderBy = $dimensionMetadata->getOrderBy();
 
-            if (!\is_array($orderBy)) {
-                $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
-            } else {
-                foreach ($orderBy as $orderField => $order) {
-                    $orderExpression = $this->resolve(\sprintf(
-                        '%s.%s',
-                        $dimension,
-                        $orderField,
-                    ));
+            // if (!\is_array($orderBy)) {
+            //     $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
+            // } else {
+            //     foreach ($orderBy as $orderField => $order) {
+            //         $orderExpression = $this->resolve(\sprintf(
+            //             '%s.%s',
+            //             $dimension,
+            //             $orderField,
+            //         ));
 
-                    $alias = $dimension . '_' . $orderField;
+            //         $alias = $dimension . '_' . $orderField;
 
-                    $this->getSimpleQueryBuilder()
-                        ->addSelect(\sprintf(
-                            'MIN(%s) AS HIDDEN %s',
-                            $orderExpression,
-                            $alias,
-                        ))
-                        ->addOrderBy($alias, $order->value);
-                }
-            }
+            //         $this->getSimpleQueryBuilder()
+            //             ->addSelect(\sprintf(
+            //                 'MIN(%s) AS HIDDEN %s',
+            //                 $orderExpression,
+            //                 $alias,
+            //             ))
+            //             ->addOrderBy($alias, $order->value);
+            //     }
+            // }
 
             // group by and grouping fields
 
-            $this->rollUpFields[] = $dimension;
+            $this->rollUpFields[] = $alias;
             $this->groupingFields[] = $fieldExpression;
 
             return;
@@ -580,25 +593,26 @@ final class SummarizerQuery extends AbstractQuery
 
         // not joined
 
-        $orderBy = $dimensionMetadata->getOrderBy();
+        // @todo restore functionality
+        // $orderBy = $dimensionMetadata->getOrderBy();
 
-        if (\is_array($orderBy)) {
-            throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
-        }
+        // if (\is_array($orderBy)) {
+        //     throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
+        // }
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
                 '%s AS %s',
                 $this->resolve($dimensionMetadata->getName()),
-                $dimension,
+                $alias,
             ))
-            ->addOrderBy(
-                $this->resolve($dimensionMetadata->getName()),
-                $orderBy->value,
-            )
+            // ->addOrderBy(
+            //     $this->resolve($dimensionMetadata->getName()),
+            //     $orderBy->value,
+            // )
         ;
 
-        $this->rollUpFields[] = $dimension;
+        $this->rollUpFields[] = $alias;
 
         $this->groupingFields[] =
             $this->resolve($dimensionMetadata->getName());
@@ -627,7 +641,6 @@ final class SummarizerQuery extends AbstractQuery
                 $fieldString = $summaryContext->resolve($field);
             } elseif (
                 $propertyMetadata instanceof DimensionMetadata
-                || $propertyMetadata instanceof DimensionPropertyMetadata
             ) {
                 $fieldString = $this->resolve($field);
             } else {
