@@ -140,7 +140,7 @@ final class Groupings
         foreach ($this->getGroupingFields() as $groupingField) {
             $groupingFields[$groupingField] = true;
         }
-        
+
         foreach ($this->selected as $name => $_) {
             if (!isset($this->nameToGroupingField[$name])) {
                 throw new InvalidArgumentException(\sprintf(
