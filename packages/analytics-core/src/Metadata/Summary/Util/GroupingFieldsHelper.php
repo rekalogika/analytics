@@ -29,7 +29,17 @@ final readonly class GroupingFieldsHelper
         array $children,
         GroupingStrategy $groupingStrategy,
     ): array {
+        $newChildren = [];
+
+        foreach ($children as $child) {
+            $newChildren[$child->getPropertyName()] = $child;
+        }
+
+        $children = $newChildren;
+
+
         $fields = array_keys($children);
+
         $groupingFields = $groupingStrategy->getGroupingFields($fields);
 
         $newGroupingFields = [];

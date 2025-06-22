@@ -25,7 +25,6 @@ final readonly class RootStrategy implements GroupingStrategy
     public function getGroupByExpression(
         GroupByExpressions $fields,
     ): GroupingSet {
-
         $groupingSet = new GroupingSet();
 
         foreach ($fields as $field) {
