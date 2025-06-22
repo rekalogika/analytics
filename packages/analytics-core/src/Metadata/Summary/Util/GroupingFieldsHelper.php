@@ -40,7 +40,9 @@ final readonly class GroupingFieldsHelper
 
         $fields = array_keys($children);
 
-        $groupingFields = $groupingStrategy->getGroupingFields($fields);
+        $configuration = new DefaultGroupingsConfiguration($fields);
+        $groupingStrategy->initializeGroupings($configuration, $fields);
+        $groupingFields = $configuration->getGroupingFields();
 
         $newGroupingFields = [];
 

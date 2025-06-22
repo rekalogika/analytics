@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Summary;
 
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
+use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
@@ -40,13 +41,11 @@ interface GroupingStrategy
      *
      * @param iterable<string> $fields All the field names of the children.
      * Fields are not fully qualified.
-     * @return iterable<string,string> Key is the identifier of the grouping
-     * field, will be used to identify the grouping field in the framework.
-     * Value is the field name of the children. Both are not fully qualified.
      */
-    public function getGroupingFields(
+    public function initializeGroupings(
+        GroupingsConfiguration $configuration,
         iterable $fields,
-    ): iterable;
+    ): void;
 
     public function getAssociatedGroupingField(
         string $fieldName,

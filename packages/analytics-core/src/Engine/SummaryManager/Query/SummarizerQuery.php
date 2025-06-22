@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
+use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -41,11 +41,14 @@ final class SummarizerQuery extends AbstractQuery
     private array $rollUpFields = [];
 
     /**
+     * This field is used for subtotal rollups, and is not related to the
+     * groupings property below.
+     *
      * @var list<string>
      */
     private array $groupingFields = [];
 
-    private Groupings $newGroupings;
+    private Groupings $groupings;
 
     /**
      * @var array<string,string>
@@ -79,7 +82,7 @@ final class SummarizerQuery extends AbstractQuery
             $dimensionsInQuery[] = '@values';
         }
 
-        $this->newGroupings = Groupings::create(
+        $this->groupings = Groupings::create(
             summaryMetadata: $metadata,
         );
     }
@@ -294,7 +297,7 @@ final class SummarizerQuery extends AbstractQuery
     {
         $groupingsProperty = $this->metadata->getGroupingsProperty();
 
-        $groupingsString = $this->newGroupings
+        $groupingsString = $this->groupings
             ->getGroupingStringForSelect();
 
         $this->getSimpleQueryBuilder()
@@ -341,7 +344,7 @@ final class SummarizerQuery extends AbstractQuery
         $involvedDimensionNotInQuery = array_diff($involvedDimensions, $dimensionsInQuery);
 
         foreach ($involvedDimensionNotInQuery as $dimension) {
-            $this->newGroupings->addSelected($dimension);
+            $this->groupings->addSelected($dimension);
         }
     }
 
@@ -419,7 +422,7 @@ final class SummarizerQuery extends AbstractQuery
         }
 
         // $this->groupings[$dimension] = false;
-        $this->newGroupings->addSelected($dimension);
+        $this->groupings->addSelected($dimension);
 
         if ($joinedEntityClass !== null) {
             // grouping by a related entity is not always possible, so we group

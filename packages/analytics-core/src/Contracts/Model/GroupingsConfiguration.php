@@ -13,4 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Model;
 
-interface GroupingExpression {}
+interface GroupingsConfiguration
+{
+    public function addGroupingField(
+        string $identifier,
+        string $sourcePropertyname,
+    ): void;
+}

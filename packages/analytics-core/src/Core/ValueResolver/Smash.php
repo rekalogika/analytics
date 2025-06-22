@@ -49,7 +49,7 @@ final readonly class Smash implements ValueResolver, HierarchyAware
 
         $random = rand(1, PHP_INT_MAX);
 
-        return sprintf(
+        return \sprintf(
             'CASE WHEN %s = %s THEN %s END',
             $random,
             $random,
