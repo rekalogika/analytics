@@ -96,7 +96,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('customer.country'),
         label: new TranslatableMessage('Customer country'),
-        // orderBy: ['name' => DoctrineOrder::Ascending],
+        orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Country $customerCountry = null;
 
@@ -105,7 +105,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('customer.country.region'),
         label: new TranslatableMessage('Customer Region'),
-        // orderBy: ['name' => DoctrineOrder::Ascending],
+        orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Region $customerRegion = null;
 

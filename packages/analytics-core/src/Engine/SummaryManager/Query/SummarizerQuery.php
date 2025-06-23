@@ -134,7 +134,7 @@ final class SummarizerQuery extends AbstractQuery
         $rollUp = new RollUp();
 
         foreach ($this->rollUpFields as $field) {
-            // $this->getSimpleQueryBuilder()->addGroupBy($field);
+            $this->getSimpleQueryBuilder()->addGroupBy($field);
             $rollUp->add(new Field($field));
         }
 
@@ -465,15 +465,19 @@ final class SummarizerQuery extends AbstractQuery
                         $orderField,
                     ));
 
-                    $alias = $this->getAlias($orderExpression);
+                    $orderAlias = \sprintf(
+                        '%s_%s',
+                        $this->getAlias($dimension),
+                        $orderField,
+                    );
 
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
                             'MIN(%s) AS HIDDEN %s',
                             $orderExpression,
-                            $alias,
+                            $orderAlias,
                         ))
-                        ->addOrderBy($alias, $order->value);
+                        ->addOrderBy($orderAlias, $order->value);
                 }
             }
 
