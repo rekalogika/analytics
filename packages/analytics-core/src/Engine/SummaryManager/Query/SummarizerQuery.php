@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
+use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
@@ -88,7 +89,6 @@ final class SummarizerQuery extends AbstractQuery
     }
 
     /**
-     * @todo restore roll up functionality
      * @return list<array<string,mixed>>
      */
     public function getQueryResult(): array
@@ -444,7 +444,6 @@ final class SummarizerQuery extends AbstractQuery
 
             // select
 
-
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf(
                     '%s AS %s',
@@ -452,31 +451,31 @@ final class SummarizerQuery extends AbstractQuery
                     $alias,
                 ));
 
-            // order by @todo restore functionality
+            // order by
 
-            // $orderBy = $dimensionMetadata->getOrderBy();
+            $orderBy = $dimensionMetadata->getOrderBy();
 
-            // if (!\is_array($orderBy)) {
-            //     $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
-            // } else {
-            //     foreach ($orderBy as $orderField => $order) {
-            //         $orderExpression = $this->resolve(\sprintf(
-            //             '%s.%s',
-            //             $dimension,
-            //             $orderField,
-            //         ));
+            if (!\is_array($orderBy)) {
+                $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
+            } else {
+                foreach ($orderBy as $orderField => $order) {
+                    $orderExpression = $this->resolve(\sprintf(
+                        '%s.%s',
+                        $dimension,
+                        $orderField,
+                    ));
 
-            //         $alias = $dimension . '_' . $orderField;
+                    $alias = $this->getAlias($orderExpression);
 
-            //         $this->getSimpleQueryBuilder()
-            //             ->addSelect(\sprintf(
-            //                 'MIN(%s) AS HIDDEN %s',
-            //                 $orderExpression,
-            //                 $alias,
-            //             ))
-            //             ->addOrderBy($alias, $order->value);
-            //     }
-            // }
+                    $this->getSimpleQueryBuilder()
+                        ->addSelect(\sprintf(
+                            'MIN(%s) AS HIDDEN %s',
+                            $orderExpression,
+                            $alias,
+                        ))
+                        ->addOrderBy($alias, $order->value);
+                }
+            }
 
             // group by and grouping fields
 
@@ -488,12 +487,11 @@ final class SummarizerQuery extends AbstractQuery
 
         // not joined
 
-        // @todo restore functionality
-        // $orderBy = $dimensionMetadata->getOrderBy();
+        $orderBy = $dimensionMetadata->getOrderBy();
 
-        // if (\is_array($orderBy)) {
-        //     throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
-        // }
+        if (\is_array($orderBy)) {
+            throw new MetadataException('orderBy cannot be an array for non-hierarchical dimension');
+        }
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
@@ -501,10 +499,10 @@ final class SummarizerQuery extends AbstractQuery
                 $this->resolve($dimensionMetadata->getName()),
                 $alias,
             ))
-            // ->addOrderBy(
-            //     $this->resolve($dimensionMetadata->getName()),
-            //     $orderBy->value,
-            // )
+            ->addOrderBy(
+                $this->resolve($dimensionMetadata->getName()),
+                $orderBy->value,
+            )
         ;
 
         $this->rollUpFields[] = $alias;

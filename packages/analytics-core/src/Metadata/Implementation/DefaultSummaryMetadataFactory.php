@@ -20,7 +20,6 @@ use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Common\Model\LiteralString;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\Groupings;
 use Rekalogika\Analytics\Core\Metadata\Measure;
@@ -200,8 +199,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
-     * @todo change $sourceProperty to be a single ValueResolver instead of an
-     * array
      * @param Partition<mixed> $partitionAttribute
      */
     private function createPartitionMetadata(

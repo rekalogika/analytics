@@ -171,6 +171,7 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
             label: $label,
             typeClass: $typeClass,
             nullLabel: $nullLabel,
+            orderBy: $dimensionAttribute->getOrderBy(),
             mandatory: $dimensionAttribute->isMandatory(),
             hidden: $dimensionAttribute->isHidden(),
             attributes: $propertyAttributes,

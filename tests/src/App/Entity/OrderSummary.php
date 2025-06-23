@@ -42,9 +42,6 @@ use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 use Symfony\Component\Translation\TranslatableMessage;
 
-/**
- * @todo restore orderby functionality
- */
 #[ORM\Entity()]
 #[Analytics\Summary(
     sourceClass: Order::class,

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
@@ -48,7 +49,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
     /**
      * @param null|class-string $typeClass
      * @param array<string,DimensionMetadata> $children
-     *
+     * @param Order|array<string,Order> $orderBy
      */
     public function __construct(
         string $propertyName,
@@ -56,6 +57,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         TranslatableInterface $label,
         ?string $typeClass,
         private TranslatableInterface $nullLabel,
+        private Order|array $orderBy,
         private bool $mandatory,
         bool $hidden,
         AttributeCollection $attributes,
@@ -162,6 +164,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
             label: $this->getLabel(),
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
+            orderBy: $this->orderBy,
             mandatory: $this->mandatory,
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
@@ -188,6 +191,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
             label: $this->getLabel(),
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
+            orderBy: $this->orderBy,
             mandatory: $this->mandatory,
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
@@ -213,6 +217,14 @@ final readonly class DimensionMetadata extends PropertyMetadata
     public function getNullLabel(): TranslatableInterface
     {
         return $this->nullLabel;
+    }
+
+    /**
+     * @return Order|array<string,Order>
+     */
+    public function getOrderBy(): Order|array
+    {
+        return $this->orderBy;
     }
 
     /**
