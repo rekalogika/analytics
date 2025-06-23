@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 
-final readonly class DimensionClassMetadata
+final readonly class DimensionGroupMetadata
 {
     /**
      * @param class-string $class

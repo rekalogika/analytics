@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
-interface DimensionClassMetadataFactory
+interface DimensionGroupMetadataFactory
 {
     /**
      * @param class-string $class
      */
-    public function getDimensionClassMetadata(
+    public function getDimensionGroupMetadata(
         string $class,
-    ): DimensionClassMetadata;
+    ): DimensionGroupMetadata;
 
     public function with(
         DimensionMetadataFactory $dimensionMetadataFactory,

@@ -71,7 +71,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunne
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Implementation\CachingAttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultAttributeCollectionFactory;
-use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionClassMetadataFactory;
+use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionGroupMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
@@ -123,7 +123,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
-            '$dimensionClassMetadataFactory' => service('rekalogika.analytics.dimension_class_metadata_factory'),
+            '$dimensionGroupMetadataFactory' => service('rekalogika.analytics.dimension_class_metadata_factory'),
         ])
     ;
 
@@ -133,7 +133,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set('rekalogika.analytics.dimension_class_metadata_factory')
-        ->class(DefaultDimensionClassMetadataFactory::class)
+        ->class(DefaultDimensionGroupMetadataFactory::class)
         ->args([
             '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
         ])

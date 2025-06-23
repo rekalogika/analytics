@@ -18,12 +18,12 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\Metadata\Summary;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
-use Rekalogika\Analytics\Metadata\Summary\DimensionClassMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionClassMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
-final readonly class DefaultDimensionClassMetadataFactory implements DimensionClassMetadataFactory
+final readonly class DefaultDimensionGroupMetadataFactory implements DimensionGroupMetadataFactory
 {
     public function __construct(
         private AttributeCollectionFactory $attributeCollectionFactory,
@@ -49,9 +49,9 @@ final readonly class DefaultDimensionClassMetadataFactory implements DimensionCl
     }
 
     #[\Override]
-    public function getDimensionClassMetadata(
+    public function getDimensionGroupMetadata(
         string $class,
-    ): DimensionClassMetadata {
+    ): DimensionGroupMetadata {
         $classAttributes = $this->attributeCollectionFactory
             ->getClassAttributes($class);
 
@@ -98,7 +98,7 @@ final readonly class DefaultDimensionClassMetadataFactory implements DimensionCl
             ));
         }
 
-        return new DimensionClassMetadata(
+        return new DimensionGroupMetadata(
             class: $class,
             groupingStrategy: $dimensionGroup->getGroupingStrategy(),
             dimensions: $dimensions,

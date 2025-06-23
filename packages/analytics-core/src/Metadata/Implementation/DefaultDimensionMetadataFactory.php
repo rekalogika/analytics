@@ -25,7 +25,7 @@ use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
-use Rekalogika\Analytics\Metadata\Summary\DimensionClassMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
@@ -33,14 +33,14 @@ use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
 final readonly class DefaultDimensionMetadataFactory implements DimensionMetadataFactory
 {
-    private DimensionClassMetadataFactory $dimensionClassMetadataFactory;
+    private DimensionGroupMetadataFactory $dimensionGroupMetadataFactory;
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private AttributeCollectionFactory $attributeCollectionFactory,
-        DimensionClassMetadataFactory $dimensionClassMetadataFactory,
+        DimensionGroupMetadataFactory $dimensionGroupMetadataFactory,
     ) {
-        $this->dimensionClassMetadataFactory = $dimensionClassMetadataFactory
+        $this->dimensionGroupMetadataFactory = $dimensionGroupMetadataFactory
             ->with($this);
     }
 
@@ -159,10 +159,10 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
         // dimension class metadata
 
         if ($typeClass !== null && $this->isDimensionGroup($typeClass)) {
-            $dimensionClassMetadata = $this->dimensionClassMetadataFactory
-                ->getDimensionClassMetadata($typeClass);
+            $dimensionGroupMetadata = $this->dimensionGroupMetadataFactory
+                ->getDimensionGroupMetadata($typeClass);
         } else {
-            $dimensionClassMetadata = null;
+            $dimensionGroupMetadata = null;
         }
 
         return new DimensionMetadata(
@@ -174,8 +174,8 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
             mandatory: $dimensionAttribute->isMandatory(),
             hidden: $dimensionAttribute->isHidden(),
             attributes: $propertyAttributes,
-            groupingStrategy: $dimensionClassMetadata?->getGroupingStrategy(),
-            children: $dimensionClassMetadata?->getDimensions() ?? [],
+            groupingStrategy: $dimensionGroupMetadata?->getGroupingStrategy(),
+            children: $dimensionGroupMetadata?->getDimensions() ?? [],
         );
     }
 
