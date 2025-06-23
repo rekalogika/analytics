@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Summary;
 
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
-use Rekalogika\Analytics\Contracts\Model\GroupingFields;
-use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
@@ -36,30 +34,4 @@ interface GroupingStrategy
     public function getGroupByExpression(
         GroupByExpressions $fields,
     ): FieldSet|Cube|RollUp|GroupingSet;
-
-    /**
-     * Grouping fields used by this dimension.
-     *
-     * @param iterable<string> $fields All the field names of the children.
-     * Fields are not fully qualified.
-     */
-    public function initializeGroupings(
-        GroupingsConfiguration $configuration,
-        iterable $fields,
-    ): void;
-
-    /**
-     * Called when a property is selected for the query. The strategy must
-     * call GroupingFields::selectField() to select the grouping field
-     * for the given field name. The grouping field must be one of provided
-     * by the initializeGroupings() method.
-     *
-     * @param string $fieldName
-     * @param GroupingFields $groupingFields
-     * @return void
-     */
-    public function onSelect(
-        string $fieldName,
-        GroupingFields $groupingFields,
-    ): void;
 }

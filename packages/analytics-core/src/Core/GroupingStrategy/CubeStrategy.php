@@ -15,8 +15,6 @@ namespace Rekalogika\Analytics\Core\GroupingStrategy;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
-use Rekalogika\Analytics\Contracts\Model\GroupingFields;
-use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -49,26 +47,5 @@ final readonly class CubeStrategy implements GroupingStrategy
         }
 
         return $cube;
-    }
-
-    #[\Override]
-    public function initializeGroupings(
-        GroupingsConfiguration $configuration,
-        iterable $fields,
-    ): void {
-        foreach ($fields as $field) {
-            $configuration->addGroupingField(
-                identifier: $field,
-                sourcePropertyname: $field,
-            );
-        }
-    }
-
-    #[\Override]
-    public function onSelect(
-        string $fieldName,
-        GroupingFields $groupingFields,
-    ): void {
-        $groupingFields->selectField($fieldName);
     }
 }

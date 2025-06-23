@@ -20,7 +20,6 @@ use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
-use Rekalogika\Analytics\Metadata\Summary\Util\DefaultGroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -45,13 +44,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
     private string $dqlAlias;
 
     private Field|FieldSet|Cube|RollUp|GroupingSet $groupByExpression;
-
-    /**
-     * Identifier to source property name, non fully qualified.
-     *
-     * @var array<string,string>
-     */
-    private array $groupingFields;
 
     /**
      * @param null|class-string $typeClass
@@ -129,18 +121,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
 
         $this->children = $newChildren;
         $this->childrenByPropertyName = $newChildrenByPropertyName;
-
-        // grouping fields
-
-        $fields = array_keys($this->childrenByPropertyName);
-        $groupingConfiguration = new DefaultGroupingsConfiguration($fields);
-
-        $this->groupingStrategy?->initializeGroupings(
-            configuration: $groupingConfiguration,
-            fields: $fields,
-        );
-
-        $this->groupingFields = $groupingConfiguration->getGroupingFields();
 
         // group by expression
 
@@ -314,68 +294,5 @@ final readonly class DimensionMetadata extends PropertyMetadata
     public function getGroupByExpression(): Field|FieldSet|Cube|RollUp|GroupingSet
     {
         return $this->groupByExpression;
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function getGroupingFields(): array
-    {
-        return $this->groupingFields;
-    }
-
-    /**
-     * @return iterable<string,string>
-     */
-    public function getFullyQualifiedGroupingFields(): iterable
-    {
-        foreach ($this->groupingFields as $field => $sourcePropertyName) {
-            $key = \sprintf(
-                '%s.%s',
-                $this->getName(),
-                $field,
-            );
-
-            $value = \sprintf(
-                '%s.%s',
-                $this->getName(),
-                $sourcePropertyName,
-            );
-
-            yield $key => $value;
-        }
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function getChildrenGroupingFields(
-        string $groupingFieldBase,
-    ): array {
-        $fields = [];
-
-        foreach ($this->groupingFields as $groupingField => $sourceProperty) {
-            $dimensionMetadata = $this->getChild($sourceProperty);
-
-            $groupingField = \sprintf(
-                '%s.%s',
-                $groupingFieldBase,
-                $groupingField,
-            );
-
-            if (!$dimensionMetadata->hasChildren()) {
-                $fields[$groupingField] = $dimensionMetadata->getName();
-            } else {
-                $childrenFields = $dimensionMetadata->getChildrenGroupingFields(
-                    groupingFieldBase: $groupingField,
-                );
-
-                foreach ($childrenFields as $childField => $childSourceProperty) {
-                    $fields[$childField] = $childSourceProperty;
-                }
-            }
-        }
-
-        return $fields;
     }
 }

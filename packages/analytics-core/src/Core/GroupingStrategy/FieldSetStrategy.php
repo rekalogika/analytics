@@ -15,8 +15,6 @@ namespace Rekalogika\Analytics\Core\GroupingStrategy;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
-use Rekalogika\Analytics\Contracts\Model\GroupingFields;
-use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -43,31 +41,5 @@ final readonly class FieldSetStrategy implements GroupingStrategy
         }
 
         return $fieldSet;
-    }
-
-    /**
-     * This strategy uses only a single grouping field for all its children.
-     */
-    #[\Override]
-    public function initializeGroupings(
-        GroupingsConfiguration $configuration,
-        iterable $fields,
-    ): void {
-        foreach ($fields as $field) {
-            $configuration->addGroupingField(
-                identifier: 'all',
-                sourcePropertyname: $field,
-            );
-
-            return;
-        }
-    }
-
-    #[\Override]
-    public function onSelect(
-        string $fieldName,
-        GroupingFields $groupingFields,
-    ): void {
-        $groupingFields->selectField('all');
     }
 }

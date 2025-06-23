@@ -17,8 +17,7 @@ use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Core\GroupingStrategy\RootStrategy;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
-use Rekalogika\Analytics\Metadata\Summary\Util\DefaultGroupingsConfiguration;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
+use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -49,6 +48,11 @@ final readonly class SummaryMetadata
     private array $allDimensions;
 
     /**
+     * @var array<string,DimensionMetadata>
+     */
+    private array $aliasToDimension;
+
+    /**
      * @var non-empty-array<string,MeasureMetadata>
      */
     private array $measures;
@@ -60,17 +64,7 @@ final readonly class SummaryMetadata
      */
     private array $involvedSourceProperties;
 
-    private GroupingSet $groupByExpression;
-
-    /**
-     * @var array<string,string>
-     */
-    private array $groupingFields;
-
-    /**
-     * @var array<string,string>
-     */
-    private array $allGroupingFields;
+    private GroupBy $groupByExpression;
 
     /**
      *
@@ -90,7 +84,6 @@ final readonly class SummaryMetadata
         private TranslatableInterface $label,
     ) {
         $allProperties = [];
-        $strategy = new RootStrategy();
 
         //
         // partition
@@ -120,6 +113,7 @@ final readonly class SummaryMetadata
         $allDimensions = [];
         $rootDimensions = [];
         $leafDimensions = [];
+        $aliasToDimension = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
             $dimension = $dimension->withSummaryMetadata(
@@ -132,12 +126,14 @@ final readonly class SummaryMetadata
 
             if (!$dimension->hasChildren()) {
                 $leafDimensions[$dimension->getName()] = $dimension;
+                $aliasToDimension[$dimension->getDqlAlias()] = $dimension;
             }
 
             foreach ($dimension->getDescendants() as $dimensionKey => $descendant) {
                 if (!$descendant->hasChildren()) {
                     // this is a leaf dimension
                     $leafDimensions[$descendant->getName()] = $descendant;
+                    $aliasToDimension[$descendant->getDqlAlias()] = $descendant;
                 }
 
                 $allDimensions[$descendant->getName()] = $descendant;
@@ -153,6 +149,9 @@ final readonly class SummaryMetadata
 
         /** @var non-empty-array<string,DimensionMetadata> $leafDimensions */
         $this->leafDimensions = $leafDimensions;
+
+        /** @var non-empty-array<string,DimensionMetadata> $leafDimensions */
+        $this->aliasToDimension = $aliasToDimension;
 
         //
         // all properties
@@ -188,6 +187,7 @@ final readonly class SummaryMetadata
         // group by expression
         //
 
+        $strategy = new RootStrategy();
         $childrenExpressions = [];
 
         foreach ($this->rootDimensions as $key => $dimension) {
@@ -195,48 +195,14 @@ final readonly class SummaryMetadata
         }
 
         $childrenExpressions = new DefaultGroupByExpressions($childrenExpressions);
-        $groupByExpression = $strategy->getGroupByExpression($childrenExpressions);
+        $groupingSets = $strategy->getGroupByExpression($childrenExpressions);
+        $groupBy = new GroupBy();
 
-        $this->groupByExpression = $groupByExpression;
-
-        //
-        // grouping fields
-        //
-
-        $fields = array_keys($this->rootDimensions);
-        $groupingConfiguration = new DefaultGroupingsConfiguration($fields);
-
-        (new RootStrategy())
-            ->initializeGroupings(
-                configuration: $groupingConfiguration,
-                fields: $fields,
-            );
-
-        $this->groupingFields = $groupingConfiguration->getGroupingFields();
-
-        //
-        // all grouping fields
-        //
-
-        $fields = [];
-
-        foreach ($this->groupingFields as $groupingField => $sourceProperty) {
-            $dimensionMetadata = $this->getDimension($sourceProperty);
-
-            if (!$dimensionMetadata->hasChildren()) {
-                $fields[$groupingField] = $sourceProperty;
-            } else {
-                $childrenFields = $dimensionMetadata->getChildrenGroupingFields(
-                    groupingFieldBase: $groupingField,
-                );
-
-                foreach ($childrenFields as $childField => $childSourceProperty) {
-                    $fields[$childField] = $childSourceProperty;
-                }
-            }
+        foreach ($groupingSets as $groupingSet) {
+            $groupBy->add($groupingSet);
         }
 
-        $this->allGroupingFields = $fields;
+        $this->groupByExpression = $groupBy;
     }
 
     /**
@@ -379,6 +345,20 @@ final readonly class SummaryMetadata
             ));
     }
 
+    /**
+     * Returns the dimension by its DQL alias.
+     *
+     * @return DimensionMetadata
+     */
+    public function getDimensionByAlias(string $alias): DimensionMetadata
+    {
+        return $this->aliasToDimension[$alias]
+            ?? throw new MetadataException(\sprintf(
+                'Dimension not found by alias: %s',
+                $alias,
+            ));
+    }
+
     //
     // measures
     //
@@ -418,24 +398,8 @@ final readonly class SummaryMetadata
     // group by expression
     //
 
-    public function getGroupByExpression(): GroupingSet
+    public function getGroupByExpression(): GroupBy
     {
         return $this->groupByExpression;
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function getGroupingFields(): array
-    {
-        return $this->groupingFields;
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    public function getAllGroupingFields(): array
-    {
-        return $this->allGroupingFields;
     }
 }

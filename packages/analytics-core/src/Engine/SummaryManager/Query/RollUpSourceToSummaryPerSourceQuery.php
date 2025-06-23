@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 
 final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 {
@@ -213,14 +212,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
 
-        $groupBy = new GroupBy();
+        $groupBy = $this->summaryMetadata->getGroupByExpression();
         $groupBy->add(new Field('par_key'));
         $groupBy->add(new Field('par_level'));
-
-        foreach ($this->summaryMetadata->getGroupByExpression() as $groupByExpression) {
-            $groupBy->add($groupByExpression);
-        }
-
         $groupBy->apply($query);
 
         return DecomposedQuery::createFromQuery($query);
