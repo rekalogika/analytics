@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
-use Rekalogika\Analytics\Metadata\Summary\Util\GroupingFieldsHelper;
+use Rekalogika\Analytics\Metadata\Summary\Util\DefaultGroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -47,9 +47,11 @@ final readonly class DimensionMetadata extends PropertyMetadata
     private Field|FieldSet|Cube|RollUp|GroupingSet $groupByExpression;
 
     /**
-     * @var array<string,string>|null
+     * Identifier to source property name, non fully qualified.
+     *
+     * @var array<string,string>
      */
-    private ?array $groupingFields;
+    private array $groupingFields;
 
     /**
      * @param null|class-string $typeClass
@@ -71,7 +73,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
         ?string $parentPath = null,
         ?ValueResolver $parentValueResolver = null,
         ?SummaryMetadata $summaryMetadata = null,
-        private ?string $groupingField = null,
     ) {
         // name
 
@@ -110,22 +111,9 @@ final readonly class DimensionMetadata extends PropertyMetadata
         $newChildrenByPropertyName = [];
 
         foreach ($children as $child) {
-            $groupingField = $this->groupingStrategy
-                ?->getAssociatedGroupingField($child->getPropertyName())
-                ?? $propertyName;
-
-            if ($this->groupingField !== null) {
-                $groupingField = \sprintf(
-                    '%s.%s',
-                    $this->groupingField,
-                    $groupingField,
-                );
-            }
-
             if ($summaryMetadata !== null) {
                 $child = $child->withSummaryMetadata(
                     summaryMetadata: $summaryMetadata,
-                    groupingField: $groupingField,
                 );
             }
 
@@ -133,7 +121,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
                 parent: $this,
                 parentPath: $name,
                 parentValueResolver: $valueResolver,
-                groupingField: $groupingField,
             );
 
             $newChildren[$child->getName()] = $child;
@@ -142,6 +129,18 @@ final readonly class DimensionMetadata extends PropertyMetadata
 
         $this->children = $newChildren;
         $this->childrenByPropertyName = $newChildrenByPropertyName;
+
+        // grouping fields
+
+        $fields = array_keys($this->childrenByPropertyName);
+        $groupingConfiguration = new DefaultGroupingsConfiguration($fields);
+
+        $this->groupingStrategy?->initializeGroupings(
+            configuration: $groupingConfiguration,
+            fields: $fields,
+        );
+
+        $this->groupingFields = $groupingConfiguration->getGroupingFields();
 
         // group by expression
 
@@ -160,19 +159,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
             $this->groupByExpression = new Field($this->dqlAlias);
         }
 
-        // grouping field mappings
-
-        if ($this->groupingStrategy !== null) {
-            $groupingFields = GroupingFieldsHelper::getGroupingFields(
-                children: $this->children,
-                groupingStrategy: $this->groupingStrategy,
-            );
-        } else {
-            $groupingFields = null;
-        }
-
-        $this->groupingFields = $groupingFields;
-
         // parent constructor
 
         parent::__construct(
@@ -189,7 +175,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
 
     public function withSummaryMetadata(
         SummaryMetadata $summaryMetadata,
-        string $groupingField,
     ): self {
         return new self(
             propertyName: $this->getPropertyName(),
@@ -201,7 +186,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
             groupingStrategy: $this->groupingStrategy,
-            groupingField: $groupingField,
             children: $this->children,
             summaryMetadata: $summaryMetadata,
         );
@@ -211,7 +195,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
         self $parent,
         string $parentPath,
         ValueResolver $parentValueResolver,
-        string $groupingField,
     ): self {
         try {
             $summaryMetadata = $this->getSummaryMetadata();
@@ -229,7 +212,6 @@ final readonly class DimensionMetadata extends PropertyMetadata
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
             groupingStrategy: $this->groupingStrategy,
-            groupingField: $groupingField,
             children: $this->children,
             parent: $parent,
             parentPath: $parentPath,
@@ -261,12 +243,8 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->mandatory;
     }
 
-    public function getParent(): self
+    public function getParent(): ?self
     {
-        if ($this->parent === null) {
-            throw new LogicException('DimensionMetadata does not have a parent.');
-        }
-
         return $this->parent;
     }
 
@@ -339,22 +317,65 @@ final readonly class DimensionMetadata extends PropertyMetadata
     }
 
     /**
-     * @return null|array<string,string>
+     * @return array<string,string>
      */
-    public function getGroupingFields(): ?array
+    public function getGroupingFields(): array
     {
         return $this->groupingFields;
     }
 
-    public function getGroupingField(): string
+    /**
+     * @return iterable<string,string>
+     */
+    public function getFullyQualifiedGroupingFields(): iterable
     {
-        if ($this->groupingField === null) {
-            throw new LogicException(\sprintf(
-                'Dimension "%s" does not have a grouping field.',
+        foreach ($this->groupingFields as $field => $sourcePropertyName) {
+            $key = \sprintf(
+                '%s.%s',
                 $this->getName(),
-            ));
+                $field,
+            );
+
+            $value = \sprintf(
+                '%s.%s',
+                $this->getName(),
+                $sourcePropertyName,
+            );
+
+            yield $key => $value;
+        }
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getChildrenGroupingFields(
+        string $groupingFieldBase,
+    ): array {
+        $fields = [];
+
+        foreach ($this->groupingFields as $groupingField => $sourceProperty) {
+            $dimensionMetadata = $this->getChild($sourceProperty);
+
+            $groupingField = \sprintf(
+                '%s.%s',
+                $groupingFieldBase,
+                $groupingField,
+            );
+
+            if (!$dimensionMetadata->hasChildren()) {
+                $fields[$groupingField] = $dimensionMetadata->getName();
+            } else {
+                $childrenFields = $dimensionMetadata->getChildrenGroupingFields(
+                    groupingFieldBase: $groupingField,
+                );
+
+                foreach ($childrenFields as $childField => $childSourceProperty) {
+                    $fields[$childField] = $childSourceProperty;
+                }
+            }
         }
 
-        return $this->groupingField;
+        return $fields;
     }
 }

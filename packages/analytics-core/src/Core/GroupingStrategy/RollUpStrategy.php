@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Core\GroupingStrategy;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
+use Rekalogika\Analytics\Contracts\Model\GroupingFields;
 use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -82,9 +83,10 @@ final readonly class RollUpStrategy implements GroupingStrategy
     }
 
     #[\Override]
-    public function getAssociatedGroupingField(
+    public function onSelect(
         string $fieldName,
-    ): string {
-        return $fieldName;
+        GroupingFields $groupingFields,
+    ): void {
+        $groupingFields->selectField($fieldName);
     }
 }

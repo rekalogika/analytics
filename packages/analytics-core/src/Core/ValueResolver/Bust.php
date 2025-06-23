@@ -23,7 +23,7 @@ use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
  * to have identical clauses in the group by and grouping clauses without
  * confusing the database.
  */
-final readonly class Smash implements ValueResolver, HierarchyAware
+final readonly class Bust implements ValueResolver, HierarchyAware
 {
     public function __construct(
         private ?ValueResolver $property = null,

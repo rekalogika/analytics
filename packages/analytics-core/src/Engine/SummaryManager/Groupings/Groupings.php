@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Groupings;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final class Groupings
@@ -30,28 +31,19 @@ final class Groupings
     private array $selected = [];
 
     /**
-     * @param array<string,string> $groupingFieldToName
-     * @param array<string,string> $nameToGroupingField
+     * @var array<string,string>
      */
+    private readonly array $groupingFieldToName;
+
     private function __construct(
-        private readonly array $groupingFieldToName,
-        private array $nameToGroupingField,
-    ) {}
+        private readonly SummaryMetadata $summaryMetadata,
+    ) {
+        $this->groupingFieldToName = $summaryMetadata->getAllGroupingFields();
+    }
 
     public static function create(SummaryMetadata $summaryMetadata): self
     {
-        $groupingFieldToDimension = [];
-        $nameToGroupingField = [];
-
-        foreach ($summaryMetadata->getLeafDimensions() as $dimension) {
-            $groupingFieldToDimension[$dimension->getGroupingField()] = $dimension;
-            $nameToGroupingField[$dimension->getName()] = $dimension->getGroupingField();
-        }
-
-        return new self(
-            groupingFieldToName: $summaryMetadata->getGroupingFields(),
-            nameToGroupingField: $nameToGroupingField,
-        );
+        return new self($summaryMetadata);
     }
 
     /**
@@ -103,25 +95,11 @@ final class Groupings
 
     public function addSelected(string $name): void
     {
-        if (!isset($this->nameToGroupingField[$name])) {
-            throw new InvalidArgumentException(\sprintf(
-                'Grouping field "%s" is not registered in the groupings. Make sure to register the grouping field before calling addSelected().',
-                $name,
-            ));
-        }
-
         $this->selected[$name] = true;
     }
 
     public function isSelected(string $name): bool
     {
-        if (!isset($this->nameToGroupingField[$name])) {
-            throw new InvalidArgumentException(\sprintf(
-                'Grouping field "%s" is not registered in the groupings. Make sure to register the grouping field before calling isSelected().',
-                $name,
-            ));
-        }
-
         return isset($this->selected[$name]);
     }
 
@@ -142,15 +120,14 @@ final class Groupings
         }
 
         foreach ($this->selected as $name => $_) {
-            if (!isset($this->nameToGroupingField[$name])) {
-                throw new InvalidArgumentException(\sprintf(
-                    'Field "%s" does not have a mapping to a grouping field.',
-                    $name,
-                ));
-            }
+            $dimensionMetadata = $this->summaryMetadata->getDimension($name);
+            $parentMetadata = $dimensionMetadata->getParent();
 
-            $groupingField = $this->nameToGroupingField[$name];
-            $groupingFields[$groupingField] = false;
+            $selectedFields = $groupingFieldsObject->getSelectedFields();
+
+            foreach ($selectedFields as $selectedField) {
+                $groupingFields[$selectedField] = false;
+            }
         }
 
         ksort($groupingFields);
@@ -163,4 +140,30 @@ final class Groupings
 
         return $groupingString;
     }
+
+    private function processSelect(
+        string $propertyName,
+        DimensionMetadata $dimensionMetadata,
+    ): void {
+        $groupingFields = new DefaultGroupingFields($dimensionMetadata);
+        $groupingStrategy = $dimensionMetadata->getGroupingStrategy();
+
+        $groupingStrategy?->onSelect(
+            fieldName: $propertyName,
+            groupingFields: $groupingFields,
+        );
+
+        $selectedGroupingFields = $groupingFields->getSelectedFields();
+    }
+
+
+    // private function getSelectedFields(string $fieldName): iterable
+    // {
+    //     $dimensionMetadata = $this->summaryMetadata->getDimension($fieldName);
+
+    //     $groupingFieldsObject = new DefaultGroupingFields($dimensionMetadata);
+
+    //     $groupingFieldsObject->selectField($fieldName);
+    //     $selectedFields = $groupingFieldsObject->getSelectedFields();
+    // }
 }

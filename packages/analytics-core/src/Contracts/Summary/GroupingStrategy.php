@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Summary;
 
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
+use Rekalogika\Analytics\Contracts\Model\GroupingFields;
 use Rekalogika\Analytics\Contracts\Model\GroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -47,7 +48,18 @@ interface GroupingStrategy
         iterable $fields,
     ): void;
 
-    public function getAssociatedGroupingField(
+    /**
+     * Called when a property is selected for the query. The strategy must
+     * call GroupingFields::selectField() to select the grouping field
+     * for the given field name. The grouping field must be one of provided
+     * by the initializeGroupings() method.
+     *
+     * @param string $fieldName
+     * @param GroupingFields $groupingFields
+     * @return void
+     */
+    public function onSelect(
         string $fieldName,
-    ): ?string;
+        GroupingFields $groupingFields,
+    ): void;
 }

@@ -45,6 +45,7 @@ final class DebugTestCommand extends Command implements SignalableCommandInterfa
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata(OrderSummary::class);
 
+
         return Command::SUCCESS;
     }
 }

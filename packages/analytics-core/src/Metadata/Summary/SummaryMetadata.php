@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Core\GroupingStrategy\RootStrategy;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
-use Rekalogika\Analytics\Metadata\Summary\Util\GroupingFieldsHelper;
+use Rekalogika\Analytics\Metadata\Summary\Util\DefaultGroupingsConfiguration;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -68,6 +68,12 @@ final readonly class SummaryMetadata
     private array $groupingFields;
 
     /**
+     * @var array<string,string>
+     */
+    private array $allGroupingFields;
+
+    /**
+     *
      * @param class-string $sourceClass
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
@@ -116,12 +122,8 @@ final readonly class SummaryMetadata
         $leafDimensions = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
-            $groupingField = $strategy
-                ->getAssociatedGroupingField($dimensionKey);
-
             $dimension = $dimension->withSummaryMetadata(
                 summaryMetadata: $this,
-                groupingField: $groupingField,
             );
 
             $allDimensions[$dimension->getName()] = $dimension;
@@ -201,10 +203,40 @@ final readonly class SummaryMetadata
         // grouping fields
         //
 
-        $this->groupingFields = GroupingFieldsHelper::getGroupingFields(
-            children: $this->rootDimensions,
-            groupingStrategy: $strategy,
-        );
+        $fields = array_keys($this->rootDimensions);
+        $groupingConfiguration = new DefaultGroupingsConfiguration($fields);
+
+        (new RootStrategy())
+            ->initializeGroupings(
+                configuration: $groupingConfiguration,
+                fields: $fields,
+            );
+
+        $this->groupingFields = $groupingConfiguration->getGroupingFields();
+
+        //
+        // all grouping fields
+        //
+
+        $fields = [];
+
+        foreach ($this->groupingFields as $groupingField => $sourceProperty) {
+            $dimensionMetadata = $this->getDimension($sourceProperty);
+
+            if (!$dimensionMetadata->hasChildren()) {
+                $fields[$groupingField] = $sourceProperty;
+            } else {
+                $childrenFields = $dimensionMetadata->getChildrenGroupingFields(
+                    groupingFieldBase: $groupingField,
+                );
+
+                foreach ($childrenFields as $childField => $childSourceProperty) {
+                    $fields[$childField] = $childSourceProperty;
+                }
+            }
+        }
+
+        $this->allGroupingFields = $fields;
     }
 
     /**
@@ -397,5 +429,13 @@ final readonly class SummaryMetadata
     public function getGroupingFields(): array
     {
         return $this->groupingFields;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getAllGroupingFields(): array
+    {
+        return $this->allGroupingFields;
     }
 }
