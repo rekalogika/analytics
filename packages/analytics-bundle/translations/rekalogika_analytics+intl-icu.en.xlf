@@ -301,5 +301,23 @@
         <target>{field} is a mandatory dimension, and must be the first dimension of the row.</target>
       </segment>
     </unit>
+    <unit id="BM121zc" name="Civil">
+      <segment>
+        <source>Civil</source>
+        <target>Civil</target>
+      </segment>
+    </unit>
+    <unit id="8GmRgHr" name="ISO Week">
+      <segment>
+        <source>ISO Week</source>
+        <target>ISO Week</target>
+      </segment>
+    </unit>
+    <unit id="mucsQRY" name="Day of WeekYear">
+      <segment>
+        <source>Day of WeekYear</source>
+        <target>Day of WeekYear</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

@@ -7,16 +7,32 @@
 
     {% set output %}
         <div class="mt-5" style="min-height: 500px;">
-            <div class="mb-5">
-                {% if chart %}{{ render_chart(chart) }}{% endif %}
-            </div>
+            {% if chartError %}
+                {% if not pivotTableError %}
+                    <div class="alert alert-danger">
+                        <h4 class="alert-heading">{{ 'Error'|trans }}</h4>
+                        <p>{{ chartError|trans }}</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="mb-5">
+                    {% if chart %}{{ render_chart(chart) }}{% endif %}
+                </div>
+            {% endif %}
 
-            <a download
-               target="_blank"
-               class="btn btn-secondary btn-sm float-end mb-2"
-               href="{{ path('download', {hash: hash, parameters: app.request.query.get('parameters') }) }}">Download</a>
+            {% if pivotTableError %}
+                <div class="alert alert-danger">
+                    <h4 class="alert-heading">{{ 'Error'|trans }}</h4>
+                    <p>{{ pivotTableError|trans }}</p>
+                </div>
+            {% else %}
+                <a download
+                   target="_blank"
+                   class="btn btn-secondary btn-sm float-end mb-2"
+                   href="{{ path('download', {hash: hash, parameters: app.request.query.get('parameters') }) }}">Download</a>
 
-            <div>{{ pivotTable|raw }}</div>
+                <div>{{ pivotTable|raw }}</div>
+            {% endif %}
         </div>
     {% endset %}
 

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\ValueResolver;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
@@ -29,7 +29,7 @@ use Rekalogika\Analytics\Time\Util\TimeZoneUtil;
  */
 final readonly class TimeBin implements
     ValueResolver,
-    HierarchyAware,
+    DimensionGroupAware,
     UserValueTransformer
 {
     public function __construct(

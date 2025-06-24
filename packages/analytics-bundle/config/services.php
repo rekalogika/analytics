@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\ChartConfiguration;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\DefaultAnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
@@ -69,10 +70,10 @@ use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\CachingAttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultAttributeCollectionFactory;
-use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionHierarchyMetadataFactory;
+use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionGroupMetadataFactory;
+use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
@@ -114,17 +115,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ]);
 
     //
-    // dimension hierarchy metadata factory
+    // dimension metadata factory
     //
 
-    $services->alias(
-        DimensionHierarchyMetadataFactory::class,
-        'rekalogika.analytics.dimension_hierarchy_metadata_factory',
-    );
+    $services
+        ->set('rekalogika.analytics.dimension_metadata_factory')
+        ->class(DefaultDimensionMetadataFactory::class)
+        ->args([
+            '$managerRegistry' => service('doctrine'),
+            '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
+            '$dimensionGroupMetadataFactory' => service('rekalogika.analytics.dimension_class_metadata_factory'),
+        ])
+    ;
+
+    //
+    // dimension class metadata factory
+    //
 
     $services
-        ->set('rekalogika.analytics.dimension_hierarchy_metadata_factory')
-        ->class(DefaultDimensionHierarchyMetadataFactory::class)
+        ->set('rekalogika.analytics.dimension_class_metadata_factory')
+        ->class(DefaultDimensionGroupMetadataFactory::class)
         ->args([
             '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
         ])
@@ -144,8 +154,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DefaultSummaryMetadataFactory::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
-            '$dimensionHierarchyMetadataFactory' => service(DimensionHierarchyMetadataFactory::class),
             '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
+            '$dimensionMetadataFactory' => service('rekalogika.analytics.dimension_metadata_factory'),
         ])
     ;
 
@@ -309,6 +319,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set('rekalogika.analytics.command.uuid_convert_summary_to_source')
         ->class(UuidConvertSummaryToSourceCommand::class)
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.debug_summary')
+        ->class(DebugSummaryCommand::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$translator' => service('translator'),
+        ])
         ->tag('console.command')
     ;
 

@@ -46,7 +46,7 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
-        $dimensionMetadata = $metadata->getAnyDimension($dimension);
+        $dimensionMetadata = $metadata->getDimension($dimension);
         $label = $dimensionMetadata->getLabel();
         $valueResolver = $dimensionMetadata->getValueResolver();
 

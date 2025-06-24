@@ -13,16 +13,19 @@ parameters:
     excludePaths:
         - tests/var
         - tests/src/App/Factory
+        - packages/analytics-core/src/Engine/SummaryManager/Query/RollUpSummaryToSummaryCubingStrategyQuery.php
     doctrine:
         objectManagerLoader: tests/object-manager.php
     ignoreErrors:
+        -
+            identifier: property.unusedType
+            path: packages/analytics-core/src/Time/Dimension/*
         -
             identifier: property.onlyRead
             path: tests/src/App/Entity/*
         -
             identifier: property.unusedType
             paths:
-                - packages/analytics-core/src/Model/Hierarchy/*
                 - tests/src/App/Entity/OrderSummary.php
         -
             identifier: return.unusedType

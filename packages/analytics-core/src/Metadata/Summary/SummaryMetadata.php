@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Core\GroupingStrategy\RootStrategy;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
+use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class SummaryMetadata
@@ -32,17 +35,22 @@ final readonly class SummaryMetadata
     /**
      * @var non-empty-array<string,DimensionMetadata>
      */
-    private array $dimensions;
+    private array $rootDimensions;
 
     /**
-     * @var array<string,DimensionPropertyMetadata>
-     */
-    private array $dimensionProperties;
-
-    /**
-     * @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @var non-empty-array<string,DimensionMetadata>
      */
     private array $leafDimensions;
+
+    /**
+     * @var non-empty-array<string,DimensionMetadata>
+     */
+    private array $allDimensions;
+
+    /**
+     * @var array<string,DimensionMetadata>
+     */
+    private array $aliasToDimension;
 
     /**
      * @var non-empty-array<string,MeasureMetadata>
@@ -56,7 +64,10 @@ final readonly class SummaryMetadata
      */
     private array $involvedSourceProperties;
 
+    private GroupBy $groupByExpression;
+
     /**
+     *
      * @param class-string $sourceClass
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
@@ -99,37 +110,48 @@ final readonly class SummaryMetadata
         // dimensions
         //
 
-        $newDimensions = [];
-        $dimensionProperties = [];
+        $allDimensions = [];
+        $rootDimensions = [];
         $leafDimensions = [];
+        $aliasToDimension = [];
 
         foreach ($dimensions as $dimensionKey => $dimension) {
-            $dimension = $dimension->withSummaryMetadata($this);
+            $dimension = $dimension->withSummaryMetadata(
+                summaryMetadata: $this,
+            );
 
-            $newDimensions[$dimensionKey] = $dimension;
-            $allProperties[$dimensionKey] = $dimension;
+            $allDimensions[$dimension->getName()] = $dimension;
+            $rootDimensions[$dimension->getName()] = $dimension;
+            $allProperties[$dimension->getName()] = $dimension;
 
-            if (!$dimension->isHierarchical()) {
-                $leafDimensions[$dimensionKey] = $dimension;
-
-                continue;
+            if (!$dimension->hasChildren()) {
+                $leafDimensions[$dimension->getName()] = $dimension;
+                $aliasToDimension[$dimension->getDqlAlias()] = $dimension;
             }
 
-            // if hierarchical
-            foreach ($dimension->getProperties() as $dimensionPropertyKey => $dimensionProperty) {
-                $dimensionProperties[$dimensionPropertyKey] = $dimensionProperty;
-                $allProperties[$dimensionPropertyKey] = $dimensionProperty;
-                $leafDimensions[$dimensionPropertyKey] = $dimensionProperty;
+            foreach ($dimension->getDescendants() as $dimensionKey => $descendant) {
+                if (!$descendant->hasChildren()) {
+                    // this is a leaf dimension
+                    $leafDimensions[$descendant->getName()] = $descendant;
+                    $aliasToDimension[$descendant->getDqlAlias()] = $descendant;
+                }
+
+                $allDimensions[$descendant->getName()] = $descendant;
+                $allProperties[$descendant->getName()] = $descendant;
             }
         }
 
-        $this->dimensionProperties = $dimensionProperties;
+        /** @var non-empty-array<string,DimensionMetadata> $rootDimensions */
+        $this->allDimensions = $allDimensions;
 
-        /** @var non-empty-array<string,DimensionMetadata> $newDimensions */
-        $this->dimensions = $newDimensions;
+        /** @var non-empty-array<string,DimensionMetadata> $rootDimensions */
+        $this->rootDimensions = $rootDimensions;
 
-        /** @var non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata> $leafDimensions */
+        /** @var non-empty-array<string,DimensionMetadata> $leafDimensions */
         $this->leafDimensions = $leafDimensions;
+
+        /** @var non-empty-array<string,DimensionMetadata> $leafDimensions */
+        $this->aliasToDimension = $aliasToDimension;
 
         //
         // all properties
@@ -143,7 +165,7 @@ final readonly class SummaryMetadata
 
         $properties = [];
         $dimensionsAndMeasures = [
-            ...$this->dimensions,
+            ...$this->rootDimensions,
             ...$this->measures,
         ];
 
@@ -160,6 +182,27 @@ final readonly class SummaryMetadata
         }
 
         $this->involvedSourceProperties = array_values(array_unique($properties));
+
+        //
+        // group by expression
+        //
+
+        $strategy = new RootStrategy();
+        $childrenExpressions = [];
+
+        foreach ($this->rootDimensions as $key => $dimension) {
+            $childrenExpressions[$key] = $dimension->getGroupByExpression();
+        }
+
+        $childrenExpressions = new DefaultGroupByExpressions($childrenExpressions);
+        $groupingSets = $strategy->getGroupByExpression($childrenExpressions);
+        $groupBy = new GroupBy();
+
+        foreach ($groupingSets as $groupingSet) {
+            $groupBy->add($groupingSet);
+        }
+
+        $this->groupByExpression = $groupBy;
     }
 
     /**
@@ -209,6 +252,19 @@ final readonly class SummaryMetadata
             ));
     }
 
+    /**
+     * @return array<string,PropertyMetadata>
+     */
+    public function getChildren(): array
+    {
+        return $this->getProperties();
+    }
+
+    public function getChild(string $propertyName): PropertyMetadata
+    {
+        return $this->getProperty($propertyName);
+    }
+
     //
     // partition
     //
@@ -235,12 +291,12 @@ final readonly class SummaryMetadata
      */
     public function getRootDimensions(): array
     {
-        return $this->dimensions;
+        return $this->rootDimensions;
     }
 
     public function getRootDimension(string $dimensionName): DimensionMetadata
     {
-        return $this->dimensions[$dimensionName]
+        return $this->rootDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
                 'Dimension not found: %s',
                 $dimensionName,
@@ -253,16 +309,15 @@ final readonly class SummaryMetadata
      * or a DimensionPropertyMetadata. The DimensionMetadata of a
      * DimensionPropertyMetadata is not included in this list.
      *
-     * @return non-empty-array<string,DimensionMetadata|DimensionPropertyMetadata>
+     * @return non-empty-array<string,DimensionMetadata>
      */
     public function getLeafDimensions(): array
     {
         return $this->leafDimensions;
     }
 
-    public function getLeafDimension(
-        string $dimensionName,
-    ): DimensionMetadata|DimensionPropertyMetadata {
+    public function getLeafDimension(string $dimensionName): DimensionMetadata
+    {
         return $this->leafDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
                 'Leaf dimension not found: %s',
@@ -271,34 +326,36 @@ final readonly class SummaryMetadata
     }
 
     /**
-     * Returns all the dimension properties, which are subdimensions of
-     * DimensionMetadata. The DimensionMetadata itself is not included in this
-     * list.
+     * Returns all the dimensions, including root, leaf, and intermediate
+     * dimensions.
      *
-     * @return array<string,DimensionPropertyMetadata>
+     * @return non-empty-array<string,DimensionMetadata>
      */
-    public function getDimensionProperties(): array
+    public function getAllDimensions(): array
     {
-        return $this->dimensionProperties;
+        return $this->allDimensions;
     }
 
-    public function getDimensionProperty(string $propertyName): DimensionPropertyMetadata
+    public function getDimension(string $dimensionName): DimensionMetadata
     {
-        return $this->dimensionProperties[$propertyName]
+        return $this->allDimensions[$dimensionName]
             ?? throw new MetadataException(\sprintf(
-                'Dimension property not found: %s',
-                $propertyName,
+                'Dimension not found: %s',
+                $dimensionName,
             ));
     }
 
-    public function getAnyDimension(
-        string $dimensionName,
-    ): DimensionMetadata|DimensionPropertyMetadata {
-        return $this->dimensions[$dimensionName]
-            ?? $this->dimensionProperties[$dimensionName]
+    /**
+     * Returns the dimension by its DQL alias.
+     *
+     * @return DimensionMetadata
+     */
+    public function getDimensionByAlias(string $alias): DimensionMetadata
+    {
+        return $this->aliasToDimension[$alias]
             ?? throw new MetadataException(\sprintf(
-                'Dimension or dimension property not found: %s',
-                $dimensionName,
+                'Dimension not found by alias: %s',
+                $alias,
             ));
     }
 
@@ -335,5 +392,14 @@ final readonly class SummaryMetadata
     public function getInvolvedSourceProperties(): array
     {
         return $this->involvedSourceProperties;
+    }
+
+    //
+    // group by expression
+    //
+
+    public function getGroupByExpression(): GroupBy
+    {
+        return $this->groupByExpression;
     }
 }

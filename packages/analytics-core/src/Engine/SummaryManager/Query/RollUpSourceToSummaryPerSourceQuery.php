@@ -14,28 +14,21 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
+use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
+use Rekalogika\Analytics\Engine\SummaryManager\ValueResolver\Bust;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
-use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
-use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
-use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
-use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 {
-    private readonly GroupBy $groupBy;
-
     private Groupings $groupings;
 
     public function __construct(
@@ -53,8 +46,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         parent::__construct($simpleQueryBuilder);
 
-        $this->groupBy = new GroupBy();
-        $this->groupings = new Groupings();
+        $this->groupings = Groupings::create($summaryMetadata);
     }
 
     /**
@@ -102,136 +94,38 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf(
-                '%s AS p_key',
+                '%s AS par_key',
                 $function,
             ))
             ->addSelect(\sprintf(
-                '%s AS p_level',
+                '%s AS par_level',
                 $lowestLevel,
             ));
-
-        $this->groupBy->add(new Field('p_key'));
-        $this->groupBy->add(new Field('p_level'));
     }
 
     private function processDimensions(): void
     {
-        $i = 0;
+        foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
+            $valueResolver = $dimensionMetadata->getValueResolver();
+            $valueResolver = Bust::create($valueResolver);
 
-        foreach ($this->summaryMetadata->getRootDimensions() as $dimensionMetadata) {
-            $summaryProperty = $dimensionMetadata->getName();
-            $dimensionHierarchyMetadata = $dimensionMetadata->getHierarchy();
+            $expression = $valueResolver->getExpression(
+                context: new SourceQueryContext(
+                    queryBuilder: $this->getSimpleQueryBuilder(),
+                    summaryMetadata: $this->summaryMetadata,
+                    dimensionMetadata: $dimensionMetadata,
+                ),
+            );
 
-            // if hierarchical
-            if ($dimensionHierarchyMetadata !== null) {
-                $groupingSet = new GroupingSet();
-                $dimensionPathsMetadata = $dimensionHierarchyMetadata->getPaths();
-                $propertyToAlias = [];
+            $alias = $dimensionMetadata->getDqlAlias();
 
-                // add a field set for all of the properties
+            $this->getSimpleQueryBuilder()
+                ->addSelect(\sprintf('%s AS %s', $expression, $alias));
 
-                $fieldSet = new FieldSet();
-
-                foreach ($dimensionHierarchyMetadata->getProperties() as $dimensionPropertyMetadata) {
-                    $name = $dimensionPropertyMetadata->getName();
-                    $alias = $propertyToAlias[$name] ??= \sprintf('d%d_', $i++);
-                    $fieldSet->add(new Field($alias));
-                }
-
-                $groupingSet->add($fieldSet);
-
-                // add rollup group by for each of the dimension paths
-
-                foreach ($dimensionPathsMetadata as $dimensionPathMetadata) {
-                    $rollUp = new RollUp();
-
-                    foreach ($dimensionPathMetadata as $levelMetadata) {
-                        $fieldSet = new FieldSet();
-
-                        foreach ($levelMetadata as $propertyMetadata) {
-                            $name = $propertyMetadata->getName();
-                            $alias = $propertyToAlias[$name] ??= \sprintf('d%d_', $i++);
-                            $fieldSet->add(new Field($alias));
-                        }
-
-                        if (\count($fieldSet) === 1) {
-                            $rollUp->add($fieldSet->toArray()[0]);
-                        } else {
-                            $rollUp->add($fieldSet);
-                        }
-                    }
-
-                    $groupingSet->add($rollUp);
-                }
-
-                $this->groupBy->add($groupingSet);
-
-                // add select for each of the properties
-
-                foreach ($dimensionHierarchyMetadata->getProperties() as $dimensionPropertyMetadata) {
-                    $name = $dimensionPropertyMetadata->getName();
-                    $fullyQualifiedName = \sprintf('%s.%s', $summaryProperty, $name);
-
-                    $dimensionPropertyMetadata = $this->summaryMetadata
-                        ->getDimensionProperty($fullyQualifiedName);
-
-                    $alias = $propertyToAlias[$name]
-                        ?? throw new InvalidArgumentException(\sprintf(
-                            'Alias for property "%s" not found.',
-                            $name,
-                        ));
-
-                    $valueResolver = $dimensionPropertyMetadata
-                        ->getValueResolver();
-
-                    $expression = $valueResolver->getExpression(
-                        context: new SourceQueryContext(
-                            queryBuilder: $this->getSimpleQueryBuilder(),
-                            summaryMetadata: $this->summaryMetadata,
-                            dimensionMetadata: $dimensionMetadata,
-                            dimensionPropertyMetadata: $dimensionPropertyMetadata,
-                        ),
-                    );
-
-                    $this->getSimpleQueryBuilder()
-                        ->addSelect(\sprintf(
-                            '%s AS %s',
-                            $expression,
-                            $alias,
-                        ));
-
-                    $this->groupings->add(
-                        property: $fullyQualifiedName,
-                        expression: $expression,
-                    );
-                }
-            } else {
-                // if not hierarchical
-
-                $valueResolver = $dimensionMetadata->getValueResolver();
-
-                $expression = $valueResolver->getExpression(
-                    context: new SourceQueryContext(
-                        queryBuilder: $this->getSimpleQueryBuilder(),
-                        summaryMetadata: $this->summaryMetadata,
-                        dimensionMetadata: $dimensionMetadata,
-                    ),
-                );
-
-                $alias = \sprintf('d%d_', $i++);
-
-                $this->getSimpleQueryBuilder()
-                    ->addSelect(\sprintf('%s AS %s', $expression, $alias));
-
-                $cube = new Cube();
-                $cube->add(new Field($alias));
-                $this->groupBy->add($cube);
-
-                $this->groupings->add(
-                    property: $summaryProperty,
-                    expression: $expression,
-                );
-            }
+            $this->groupings->registerExpression(
+                name: $dimensionMetadata->getName(),
+                expression: $expression,
+            );
         }
     }
 
@@ -312,16 +206,18 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processGroupings(): void
     {
-        $this->getSimpleQueryBuilder()->addSelect(\sprintf(
-            "REKALOGIKA_GROUPING_CONCAT(%s)",
-            $this->groupings->getExpression(),
-        ));
+        $this->getSimpleQueryBuilder()
+            ->addSelect($this->groupings->getExpression());
     }
 
     private function createSqlStatement(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
-        $this->groupBy->apply($query);
+
+        $groupBy = $this->summaryMetadata->getGroupByExpression();
+        $groupBy->add(new Field('par_key'));
+        $groupBy->add(new Field('par_level'));
+        $groupBy->apply($query);
 
         return DecomposedQuery::createFromQuery($query);
     }

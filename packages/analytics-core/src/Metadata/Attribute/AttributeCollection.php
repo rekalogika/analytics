@@ -13,56 +13,28 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Attribute;
 
-use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
-
-final readonly class AttributeCollection
+interface AttributeCollection
 {
     /**
-     * @var array<class-string,non-empty-list<object>>
+     * @template T of object
+     * @param class-string<T> $class
+     * @return T
      */
-    private array $classToAttributes;
-
-    /**
-     * @param iterable<object> $attributes
-     */
-    public function __construct(iterable $attributes)
-    {
-        $classToAttributes = [];
-
-        foreach ($attributes as $attribute) {
-            $classes = AttributeUtil::getAllClassesFromObject($attribute);
-
-            foreach ($classes as $class) {
-                $classToAttributes[$class][] = $attribute;
-            }
-        }
-
-        $this->classToAttributes = $classToAttributes;
-    }
+    public function getAttribute(string $class): object;
 
     /**
      * @template T of object
      * @param class-string<T> $class
-     * @return T|null
+     * @return ?T
      */
-    public function getAttribute(string $class): ?object
-    {
-        return $this->getAttributes($class)[0] ?? null;
-    }
+    public function tryGetAttribute(string $class): ?object;
 
     /**
      * @template T of object
      * @param class-string<T> $class
      * @return list<T>
      */
-    public function getAttributes(string $class): array
-    {
-        /** @var list<T> */
-        return $this->classToAttributes[$class] ?? [];
-    }
+    public function getAttributes(string $class): array;
 
-    public function hasAttribute(string $class): bool
-    {
-        return isset($this->classToAttributes[$class]);
-    }
+    public function hasAttribute(string $class): bool;
 }

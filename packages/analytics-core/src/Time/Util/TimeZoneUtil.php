@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Time\Util;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 
@@ -31,8 +30,6 @@ final readonly class TimeZoneUtil
     ): array {
         if ($propertyMetadata instanceof DimensionMetadata) {
             $dimensionMetadata = $propertyMetadata;
-        } elseif ($propertyMetadata instanceof DimensionPropertyMetadata) {
-            $dimensionMetadata = $propertyMetadata->getDimension();
         } else {
             throw new InvalidArgumentException(\sprintf(
                 'Unknown property metadata type: %s',
@@ -42,7 +39,7 @@ final readonly class TimeZoneUtil
 
         $timeProperties = $dimensionMetadata
             ->getAttributes()
-            ->getAttribute(TimeProperties::class);
+            ->tryGetAttribute(TimeProperties::class);
 
         if ($timeProperties instanceof TimeProperties) {
             return [

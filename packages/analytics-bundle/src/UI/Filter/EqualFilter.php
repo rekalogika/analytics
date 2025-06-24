@@ -67,7 +67,7 @@ final class EqualFilter implements Filter
     {
         return $this->label ??= $this->summaryMetadataFactory
             ->getSummaryMetadata($this->class)
-            ->getAnyDimension($this->dimension)
+            ->getDimension($this->dimension)
             ->getLabel();
     }
 
@@ -160,7 +160,7 @@ final class EqualFilter implements Filter
 
         $nullLabel = $this->summaryMetadataFactory
             ->getSummaryMetadata($this->class)
-            ->getAnyDimension($this->dimension)
+            ->getDimension($this->dimension)
             ->getNullLabel();
 
         $choices2[] = new Choice(

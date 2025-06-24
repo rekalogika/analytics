@@ -45,6 +45,8 @@ jobs:
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
+      env:
+        GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
         php-version: ${{ matrix.php }}
         extensions: intl
@@ -64,6 +66,8 @@ jobs:
     
     - name: phive
       run: phive install --trust-gpg-keys E82B2FB314E9906E
+      env:
+        GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
     - name: Install dependencies
       uses: ramsey/composer-install@v3
@@ -103,6 +107,9 @@ jobs:
 
     - name: Load fixtures
       run: php tests/bin/console doctrine:fixtures:load --no-interaction
+
+    - name: Run migrations
+      run: php tests/bin/console doctrine:migrations:migrate --no-interaction
 
     - name: Refresh
       run: |

@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Bundle\Chart\UnsupportedData;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
+use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
@@ -76,16 +77,28 @@ final class AppController extends AbstractController
         $result = $query->getResult();
 
         // create pivot table
-        $pivotTable = $pivotTableRenderer->createPivotTable(
-            result: $result,
-            pivotedDimensions: $query->getPivotedDimensions(),
-        );
+        try {
+            $pivotTable = $pivotTableRenderer->createPivotTable(
+                result: $result,
+                pivotedDimensions: $query->getPivotedDimensions(),
+            );
+
+            $pivotTableError = null;
+        } catch (OverflowException $e) {
+            $pivotTable = null;
+            $pivotTableError = 'The pivot table is too large to be displayed. Please refine your query parameters.';
+        }
 
         // create chart
         try {
             $chart = $chartBuilder->createChart($result);
+            $chartError = null;
         } catch (UnsupportedData) {
             $chart = null;
+            $chartError = null;
+        } catch (\Throwable $e) {
+            $chart = null;
+            $chartError = 'An error occurred while creating the chart: ' . $e->getMessage();
         }
 
         return $this->render('app/summary.html.twig', [
@@ -93,7 +106,9 @@ final class AppController extends AbstractController
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'query' => $query,
             'pivotTable' => $pivotTable,
+            'pivotTableError' => $pivotTableError,
             'chart' => $chart,
+            'chartError' => $chartError,
             'hash' => $hash,
         ]);
     }

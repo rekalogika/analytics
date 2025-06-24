@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -66,12 +67,17 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             $partitionProperty,
         );
 
-        $result = $this->getSimpleQueryBuilder()
+        $query = $this->getSimpleQueryBuilder()
             ->select($field)
             ->orderBy($field, 'ASC')
             ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->getQuery();
+
+        try {
+            $result = $query->getSingleScalarResult();
+        } catch (NoResultException) {
+            $result = null;
+        }
 
         if ($result === null || \is_int($result)) {
             return $result;
@@ -94,12 +100,17 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             $partitionProperty,
         );
 
-        $result = $this->getSimpleQueryBuilder()
+        $query = $this->getSimpleQueryBuilder()
             ->select($field)
             ->orderBy($field, 'DESC')
             ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->getQuery();
+
+        try {
+            $result = $query->getSingleScalarResult();
+        } catch (NoResultException) {
+            $result = null;
+        }
 
         if ($result === null || \is_int($result)) {
             return $result;

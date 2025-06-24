@@ -35,12 +35,18 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
 
-                // dependencies
+                // doctrine dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Migrations'),
                 Selector::inNamespace('Doctrine\Common\Collections'),
+
+                // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // rekalogika dependencies
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -50,6 +56,7 @@ final class ArchitectureTest
                 // misc
                 Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
+                Selector::classname(\UnitEnum::class),
 
                 // exceptions
                 Selector::classname(\Error::class),
@@ -72,6 +79,7 @@ final class ArchitectureTest
                 Selector::classname(\Override::class),
 
                 // php exception
+                Selector::classname(\Throwable::class),
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\LogicException::class),
                 Selector::classname(\InvalidArgumentException::class),
@@ -139,6 +147,7 @@ final class ArchitectureTest
 
                 // exceptions
                 Selector::classname(\Error::class),
+                Selector::classname(\Throwable::class),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\InvalidArgumentException::class),
 
@@ -249,6 +258,9 @@ final class ArchitectureTest
 
                 // symfony components
                 Selector::inNamespace('Symfony\Component\Cache'),
+
+                // other third-party libraries
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // php misc
                 Selector::classname(\Override::class),

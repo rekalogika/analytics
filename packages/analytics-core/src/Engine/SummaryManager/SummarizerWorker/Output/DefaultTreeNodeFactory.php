@@ -80,7 +80,7 @@ final class DefaultTreeNodeFactory
         ?DefaultMeasure $measure,
     ): DefaultTreeNode {
         if ($this->fillingNodesCount >= $this->fillingNodesLimit) {
-            throw new OverflowException('Maximum filling nodes reached');
+            throw new OverflowException('Maximum number of interpolation nodes reached');
         }
 
         $this->fillingNodesCount++;

@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\Helper\Groupings;
+use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
@@ -32,6 +32,8 @@ use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 /**
  * Roll up lower level summary to higher level by cubing the non-grouping row
  * of the lower level summary
+ *
+ * @todo fix
  */
 final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
 {
@@ -54,7 +56,7 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
 
         $this->groupBy = new GroupBy();
-        $this->groupings = new Groupings();
+        $this->groupings = Groupings::create($metadata);
     }
 
     /**
@@ -176,8 +178,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                             $alias,
                         ));
 
-                    $this->groupings->add(
-                        property: \sprintf('%s.%s', $summaryProperty, $name),
+                    $this->groupings->registerExpression(
+                        name: \sprintf('%s.%s', $summaryProperty, $name),
                         expression: \sprintf(
                             'root.%s.%s',
                             $dimensionProperty,
@@ -199,8 +201,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings->add(
-                    property: $summaryProperty,
+                $this->groupings->registerExpression(
+                    name: $summaryProperty,
                     expression: \sprintf(
                         'IDENTITY(root.%s)',
                         $levelProperty,
@@ -220,8 +222,8 @@ final class RollUpSummaryToSummaryCubingStrategyQuery extends AbstractQuery
                 $cube->add(new Field($alias));
                 $this->groupBy->add($cube);
 
-                $this->groupings->add(
-                    property: $summaryProperty,
+                $this->groupings->registerExpression(
+                    name: $summaryProperty,
                     expression: \sprintf(
                         'root.%s',
                         $levelProperty,

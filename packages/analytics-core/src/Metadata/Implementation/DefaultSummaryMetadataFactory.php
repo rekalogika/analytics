@@ -19,9 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Common\Model\LiteralString;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
-use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\Groupings;
 use Rekalogika\Analytics\Core\Metadata\Measure;
@@ -29,15 +27,10 @@ use Rekalogika\Analytics\Core\Metadata\Partition;
 use Rekalogika\Analytics\Core\Metadata\PartitionKey;
 use Rekalogika\Analytics\Core\Metadata\PartitionLevel;
 use Rekalogika\Analytics\Core\Metadata\Summary;
-use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
-use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadata;
-use Rekalogika\Analytics\Metadata\DimensionHierarchy\DimensionHierarchyMetadataFactory;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
-use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -49,8 +42,8 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private DimensionHierarchyMetadataFactory $dimensionHierarchyMetadataFactory,
         private AttributeCollectionFactory $attributeCollectionFactory,
+        private DimensionMetadataFactory $dimensionMetadataFactory,
     ) {}
 
     /**
@@ -93,8 +86,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
-     * @todo remove $sourceClasses remnant, change to single $sourceClass
-     * instead
      * @param class-string $summaryClassName
      */
     #[\Override]
@@ -107,11 +98,15 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
 
         $summaryAttribute = $this->attributeCollectionFactory
             ->getClassAttributes($summaryClassName)
-            ->getAttribute(Summary::class)
-            ?? throw new SummaryNotFound($summaryClassName);
+            ->tryGetAttribute(Summary::class);
+
+        if ($summaryAttribute === null) {
+            throw new SummaryNotFound(
+                \sprintf('Class "%s" is not a summary class', $summaryClassName),
+            );
+        }
 
         $sourceClass = $summaryAttribute->getSourceClass();
-        $sourceClassMetadata = $this->getDoctrineClassMetadata($sourceClass);
         $summaryClassMetadata = $this->getDoctrineClassMetadata($summaryClassName);
 
         $properties = AttributeUtil::getPropertiesOfClass($summaryClassName);
@@ -131,35 +126,26 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 ->getPropertyAttributes($summaryClassName, $property);
 
             $dimensionAttribute = $propertyAttributes
-                ->getAttribute(Dimension::class);
+                ->tryGetAttribute(Dimension::class);
 
             $measureAttribute = $propertyAttributes
-                ->getAttribute(Measure::class);
+                ->tryGetAttribute(Measure::class);
 
             $partitionAttribute = $propertyAttributes
-                ->getAttribute(Partition::class);
+                ->tryGetAttribute(Partition::class);
 
             $groupingsAttribute = $propertyAttributes
-                ->getAttribute(Groupings::class);
+                ->tryGetAttribute(Groupings::class);
 
-            $typeClass = AttributeUtil::getTypeClass($reflectionProperty);
+            $typeClass = AttributeUtil::getTypeClassFromReflection($reflectionProperty);
 
             if ($dimensionAttribute !== null && $measureAttribute !== null) {
                 throw new MetadataException('Property cannot have both Dimension and Measure attributes');
             }
 
             if ($dimensionAttribute !== null) {
-                $dimensionMetadata = $this->createDimensionMetadata(
-                    summaryProperty: $property,
-                    dimensionAttribute: $dimensionAttribute,
-                    summaryClass: $summaryClassName,
-                    sourceClassMetadata: $sourceClassMetadata,
-                    summaryClassMetadata: $summaryClassMetadata,
-                    attributes: $propertyAttributes,
-                    typeClass: $typeClass,
-                );
-
-                $dimensionMetadatas[$property] = $dimensionMetadata;
+                $dimensionMetadatas[$property] = $this->dimensionMetadataFactory
+                    ->createDimensionMetadata($summaryClassName, $property);
             } elseif ($measureAttribute !== null) {
                 $measureMetadatas[$property] =
                     $this->createMeasureMetadata(
@@ -213,120 +199,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     }
 
     /**
-     * @param class-string $summaryClass
-     * @param class-string|null $typeClass
-     */
-    private function createDimensionMetadata(
-        string $summaryProperty,
-        string $summaryClass,
-        Dimension $dimensionAttribute,
-        ClassMetadataWrapper $sourceClassMetadata,
-        AttributeCollection $attributes,
-        ?string $typeClass,
-        ClassMetadataWrapper $summaryClassMetadata,
-    ): DimensionMetadata {
-        $sourceProperty = $dimensionAttribute->getSource();
-
-        // if source property is not provided, use summary property name as
-        // source property name
-
-        if ($sourceProperty === null) {
-            $sourceProperty = $summaryProperty;
-        }
-
-        // normalize source property
-
-        if (!$sourceProperty instanceof ValueResolver) {
-            $isEntity = $sourceClassMetadata->isPropertyEntity($sourceProperty);
-            $isField = $sourceClassMetadata->isPropertyField($sourceProperty);
-
-            if ($isEntity) {
-                $sourceProperty = new IdentifierValue($sourceProperty);
-            } elseif ($isField) {
-                $sourceProperty = new PropertyValue($sourceProperty);
-            } else {
-                // @todo ensure validity
-                $sourceProperty = new PropertyValue($sourceProperty);
-            }
-        }
-
-        // label
-
-        $label = $dimensionAttribute->getLabel() ?? $summaryProperty;
-        $label = TranslatableUtil::normalize($label);
-
-        $nullLabel = TranslatableUtil::normalize($dimensionAttribute->getNullLabel())
-            ?? new TranslatableMessage('(None)');
-
-        // hierarchy
-
-        if ($summaryClassMetadata->isPropertyEmbedded($summaryProperty)) {
-            $embeddedClass = $summaryClassMetadata
-                ->getEmbeddedClassOfProperty($summaryProperty);
-
-            $dimensionHierarchy = $this->dimensionHierarchyMetadataFactory
-                ->getDimensionHierarchyMetadata($embeddedClass);
-
-            $dimensionProperties = $this->createDimensionProperties(
-                summaryClass: $summaryClass,
-                summaryProperty: $summaryProperty,
-                dimensionHierarchy: $dimensionHierarchy,
-            );
-        } else {
-            $dimensionHierarchy = null;
-            $dimensionProperties = [];
-        }
-
-        return new DimensionMetadata(
-            valueResolver: $sourceProperty,
-            summaryProperty: $summaryProperty,
-            label: $label,
-            hierarchy: $dimensionHierarchy,
-            orderBy: $dimensionAttribute->getOrderBy(),
-            typeClass: $typeClass,
-            nullLabel: $nullLabel,
-            mandatory: $dimensionAttribute->isMandatory(),
-            hidden: $dimensionAttribute->isHidden(),
-            attributes: $attributes,
-            properties: $dimensionProperties,
-        );
-    }
-
-    /**
-     * @param class-string $summaryClass
-     * @return array<string,DimensionPropertyMetadata>
-     */
-    private function createDimensionProperties(
-        string $summaryClass,
-        string $summaryProperty,
-        DimensionHierarchyMetadata $dimensionHierarchy,
-    ): array {
-        $dimensionProperties = [];
-
-        foreach ($dimensionHierarchy->getProperties() as $dimensionLevelProperty) {
-            $attributes = $this->attributeCollectionFactory
-                ->getPropertyAttributes($summaryClass, $dimensionLevelProperty->getName());
-
-            $dimensionProperty = new DimensionPropertyMetadata(
-                summaryProperty: $summaryProperty,
-                hierarchyProperty: $dimensionLevelProperty->getName(),
-                label: $dimensionLevelProperty->getLabel(),
-                nullLabel: $dimensionLevelProperty->getNullLabel(),
-                typeClass: $dimensionLevelProperty->getTypeClass(),
-                dimensionLevelProperty: $dimensionLevelProperty,
-                attributes: $attributes,
-                hidden: $dimensionLevelProperty->isHidden(),
-            );
-
-            $dimensionProperties[$dimensionProperty->getName()] = $dimensionProperty;
-        }
-
-        return $dimensionProperties;
-    }
-
-    /**
-     * @todo change $sourceProperty to be a single ValueResolver instead of an
-     * array
      * @param Partition<mixed> $partitionAttribute
      */
     private function createPartitionMetadata(
@@ -362,10 +234,10 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                 ->getPropertyAttributes($partitionClass, $property);
 
             $partitionLevelAttribute = $attributes
-                ->getAttribute(PartitionLevel::class);
+                ->tryGetAttribute(PartitionLevel::class);
 
             $partitionKeyAttribute = $attributes
-                ->getAttribute(PartitionKey::class);
+                ->tryGetAttribute(PartitionKey::class);
 
             if ($partitionLevelAttribute !== null) {
                 if ($partitionLevelPropertyName !== null) {

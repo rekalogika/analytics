@@ -16,6 +16,7 @@
         <ignoreFiles>
             <directory name="vendor" />
             <directory name="tests/src/App/Factory" />
+            <file name="packages/analytics-core/src/Engine/SummaryManager/Query/RollUpSummaryToSummaryCubingStrategyQuery.php" />
         </ignoreFiles>
     </projectFiles>
 
@@ -23,7 +24,6 @@
         <MissingConstructor>
             <errorLevel type="suppress">
                 <directory name="tests/src/App/Entity" />
-                <directory name="packages/analytics-core/src/Time/Hierarchy" />
             </errorLevel>
         </MissingConstructor>
         <ClassMustBeFinal>
@@ -32,6 +32,7 @@
                 <directory name="packages/analytics-core/src/Core/Entity" />
                 <directory name="packages/analytics-core/src/Common/Exception" />
                 <directory name="packages/analytics-core/src/Engine/Entity" />
+                <directory name="packages/analytics-core/src/Time/Dimension" />
             </errorLevel>
         </ClassMustBeFinal>
     </issueHandlers>

@@ -89,42 +89,20 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $i = 0;
 
-        foreach ($this->metadata->getRootDimensions() as $levelProperty => $metadata) {
-            $isEntity = $this->getSimpleQueryBuilder()
-                ->getEntityManager()
-                ->getClassMetadata($this->metadata->getSummaryClass())
-                ->hasAssociation($levelProperty);
+        $classMetadata = $this->getSimpleQueryBuilder()
+            ->getEntityManager()
+            ->getClassMetadata($this->metadata->getSummaryClass());
 
-            $hierarchyMetadata = $metadata->getHierarchy();
+        foreach ($this->metadata->getLeafDimensions() as $name => $dimensionMetadata) {
+            $isEntity = $classMetadata->hasAssociation($name);
 
-            // hierarchical dimension
-
-            if ($hierarchyMetadata !== null) {
-                $dimensionProperty = $metadata->getName();
-
-                // add select for each of the properties
-
-                foreach ($hierarchyMetadata->getProperties() as $property) {
-                    $name = $property->getName();
-                    $alias = \sprintf('d%d_', $i++);
-
-                    $this->getSimpleQueryBuilder()
-                        ->addSelect(\sprintf(
-                            'root.%s.%s AS %s',
-                            $dimensionProperty,
-                            $name,
-                            $alias,
-                        ))
-                        ->addGroupBy($alias)
-                    ;
-                }
-            } elseif ($isEntity) {
+            if ($isEntity) {
                 $alias = \sprintf('d%d_', $i++);
 
                 $this->getSimpleQueryBuilder()
                     ->addSelect(\sprintf(
                         'IDENTITY(root.%s) AS %s',
-                        $levelProperty,
+                        $name,
                         $alias,
                     ))
                     ->addGroupBy($alias)
@@ -135,7 +113,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
                 $this->getSimpleQueryBuilder()
                     ->addSelect(\sprintf(
                         'root.%s AS %s',
-                        $levelProperty,
+                        $name,
                         $alias,
                     ))
                     ->addGroupBy($alias)

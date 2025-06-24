@@ -42,7 +42,7 @@ final readonly class QueryResultToTableTransformer
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->dimensionFactory = new DimensionFactory();
-        $this->helper = new QueryResultToTableHelper($this->metadata);
+        $this->helper = new QueryResultToTableHelper();
     }
 
     /**
@@ -176,10 +176,11 @@ final readonly class QueryResultToTableTransformer
                 value: $input[$name],
             );
 
-            $this->helper->writeValueDirectly(
+            $this->helper->setValue(
                 object: $summaryObject,
-                propertyName: $name,
+                property: $name,
                 value: $rawValue,
+                metadata: $this->metadata,
             );
         }
     }
@@ -204,10 +205,11 @@ final readonly class QueryResultToTableTransformer
                 value: $input[$name],
             );
 
-            $this->helper->writeValueDirectly(
+            $this->helper->setValue(
                 object: $summaryObject,
-                propertyName: $name,
+                property: $name,
                 value: $rawValue,
+                metadata: $this->metadata,
             );
         }
     }
@@ -227,9 +229,10 @@ final readonly class QueryResultToTableTransformer
             }
 
             /** @psalm-suppress MixedAssignment */
-            $rawValue = $this->helper->readValueDirectly(
+            $rawValue = $this->helper->getValue(
                 object: $summaryObject,
-                propertyName: $name,
+                property: $name,
+                metadata: $this->metadata,
             );
 
             /** @psalm-suppress MixedAssignment */
@@ -263,9 +266,10 @@ final readonly class QueryResultToTableTransformer
 
         foreach ($measures as $name) {
             /** @psalm-suppress MixedAssignment */
-            $rawValue = $this->helper->readValueDirectly(
+            $rawValue = $this->helper->getValue(
                 object: $summaryObject,
-                propertyName: $name,
+                property: $name,
+                metadata: $this->metadata,
             );
 
             /** @psalm-suppress MixedAssignment */
@@ -343,7 +347,7 @@ final readonly class QueryResultToTableTransformer
     private function getNullValue(string $dimension): TranslatableInterface
     {
         return $this->metadata
-            ->getAnyDimension($dimension)
+            ->getDimension($dimension)
             ->getNullLabel();
     }
 }

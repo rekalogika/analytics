@@ -13,4 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Common\Exception;
 
-interface AnalyticsException {}
+interface AnalyticsException extends \Throwable {}

@@ -36,7 +36,7 @@ use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Hierarchy\TimeDimensionHierarchy;
+use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
@@ -71,7 +71,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
     )]
-    private TimeDimensionHierarchy $time;
+    private TimeGroup $time;
 
     #[ORM\Column(
         type: TimeBinType::TypeDate,
@@ -154,7 +154,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     #[Analytics\Dimension(
         source: new IdentifierValue('item.countryOfOrigin'),
         label: new TranslatableMessage('Item Country of Origin'),
-        orderBy: ['name' => DoctrineOrder::Ascending],
+        // orderBy: ['name' => DoctrineOrder::Ascending],
     )]
     private ?Country $itemCountryOfOrigin = null;
 
@@ -268,7 +268,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         return $this->partition;
     }
 
-    public function getTime(): TimeDimensionHierarchy
+    public function getTime(): TimeGroup
     {
         return $this->time;
     }
