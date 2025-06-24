@@ -20,6 +20,8 @@ trait BalancedTreeChildrenTrait
      */
     private ?array $balancedChildren = null;
 
+    private ?\Throwable $balancedChildrenException = null;
+
     /**
      * @return list<DefaultTreeNode>
      */
@@ -29,34 +31,43 @@ trait BalancedTreeChildrenTrait
             return $this->balancedChildren;
         }
 
+        if ($this->balancedChildrenException !== null) {
+            throw $this->balancedChildrenException;
+        }
+
         if ($this->childrenKey === null) {
             return $this->children;
         }
 
-        $childrenDimensions = $this->items
-            ->getDimensions($this->childrenKey);
+        try {
+            $childrenDimensions = $this->items
+                ->getDimensions($this->childrenKey);
 
-        $balancedChildren = [];
+            $balancedChildren = [];
 
-        foreach ($childrenDimensions as $dimension) {
-            $child = $this->getChildEqualTo($dimension);
+            foreach ($childrenDimensions as $dimension) {
+                $child = $this->getChildEqualTo($dimension);
 
-            if ($child === null) {
-                /** @psalm-suppress InaccessibleProperty */
-                $child = $this->treeNodeFactory->createFillingNode(
-                    summaryClass: $this->summaryClass,
-                    childrenKey: $this->items->getKeyAfter($this->childrenKey),
-                    dimension: $dimension,
-                    parent: $this instanceof DefaultTreeNode ? $this : null,
-                    measure: null,
-                    items: $this->items,
-                );
+                if ($child === null) {
+                    /** @psalm-suppress InaccessibleProperty */
+                    $child = $this->treeNodeFactory->createFillingNode(
+                        summaryClass: $this->summaryClass,
+                        childrenKey: $this->items->getKeyAfter($this->childrenKey),
+                        dimension: $dimension,
+                        parent: $this instanceof DefaultTreeNode ? $this : null,
+                        measure: null,
+                        items: $this->items,
+                    );
+                }
+
+                $balancedChildren[] = $child;
             }
 
-            $balancedChildren[] = $child;
+            return $this->balancedChildren = $balancedChildren;
+        } catch (\Throwable $e) {
+            $this->balancedChildrenException = $e;
+            throw $e;
         }
-
-        return $this->balancedChildren = $balancedChildren;
     }
 
     private function getChildEqualTo(

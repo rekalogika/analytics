@@ -83,12 +83,12 @@ final class DefaultResult implements Result
     /**
      * @return list<array<string,mixed>>
      */
-    public function getQueryResult(): array
+    private function getQueryResult(): array
     {
         return $this->queryResult ??= $this->summarizerQuery->getQueryResult();
     }
 
-    public function getUnbalancedTable(): DefaultTable
+    private function getUnbalancedTable(): DefaultTable
     {
         return $this->unbalancedTable ??= QueryResultToTableTransformer::transform(
             query: $this->query,
@@ -99,7 +99,7 @@ final class DefaultResult implements Result
         );
     }
 
-    public function getUnbalancedNormalTable(): DefaultNormalTable
+    private function getUnbalancedNormalTable(): DefaultNormalTable
     {
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             query: $this->query,
