@@ -72,7 +72,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->info('The maximum number of results to be returned from the query. If a query exceeds this limit, OverflowException will be thrown.');
 
         $root->children()->integerNode('filling_nodes_limit')
-            ->defaultValue(10000000)
+            ->defaultValue(10000)
             ->min(1)
             ->info('The maximum number of nodes created due to gaps between values. If the amount of created nodes exceeds this limit, OverflowException will be thrown.');
     }
