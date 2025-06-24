@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
-use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
+use Rekalogika\Analytics\Contracts\Context\DimensionGroupContext;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -317,7 +317,7 @@ final readonly class QueryResultToTableHelper
         $newClassReflection = new \ReflectionClass($class);
         $newObject = $newClassReflection->newInstanceWithoutConstructor();
 
-        if ($newObject instanceof ContextAwareHierarchy) {
+        if ($newObject instanceof ContextAwareDimensionGroup) {
             // if (!$metadata instanceof DimensionMetadata) {
             //     throw new LogicException(\sprintf(
             //         'Metadata for property "%s" is not a dimension metadata',
@@ -334,7 +334,7 @@ final readonly class QueryResultToTableHelper
                 ));
             }
 
-            $this->initializeContextAwareHierarchyObject(
+            $this->initializeContextAwareDimensionGroup(
                 object: $newObject,
                 metadata: $metadata,
             );
@@ -345,12 +345,12 @@ final readonly class QueryResultToTableHelper
         return $newObject;
     }
 
-    private function initializeContextAwareHierarchyObject(
-        ContextAwareHierarchy $object,
+    private function initializeContextAwareDimensionGroup(
+        ContextAwareDimensionGroup $object,
         PropertyMetadata $metadata,
     ): void {
         if ($metadata instanceof DimensionMetadata) {
-            $context = new HierarchyContext(
+            $context = new DimensionGroupContext(
                 dimensionMetadata: $metadata,
             );
         } else {

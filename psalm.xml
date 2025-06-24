@@ -24,7 +24,6 @@
         <MissingConstructor>
             <errorLevel type="suppress">
                 <directory name="tests/src/App/Entity" />
-                <directory name="packages/analytics-core/src/Time/Hierarchy" />
             </errorLevel>
         </MissingConstructor>
         <ClassMustBeFinal>

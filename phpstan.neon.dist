@@ -26,7 +26,6 @@ parameters:
         -
             identifier: property.unusedType
             paths:
-                - packages/analytics-core/src/Model/Hierarchy/*
                 - tests/src/App/Entity/OrderSummary.php
         -
             identifier: return.unusedType

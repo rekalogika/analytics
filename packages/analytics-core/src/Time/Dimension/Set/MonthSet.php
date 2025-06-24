@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\Time\Dimension\Set;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
-use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
+use Rekalogika\Analytics\Core\Entity\ContextAwareDimensionGroupTrait;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
@@ -30,9 +30,13 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 #[DimensionGroup(
     groupingStrategy: new FieldSetStrategy(),
 )]
-class MonthSet implements ContextAwareHierarchy
+class MonthSet implements ContextAwareDimensionGroup
 {
-    use ContextAwareHierarchyTrait;
+    use ContextAwareDimensionGroupTrait;
+
+    //
+    // properties
+    //
 
     #[Column(
         type: TimeBinType::TypeMonth,
@@ -54,6 +58,10 @@ class MonthSet implements ContextAwareHierarchy
         source: new TimeBin(TimeBinType::MonthOfYear),
     )]
     private ?MonthOfYear $monthOfYear = null;
+
+    //
+    // getters
+    //
 
     public function getMonth(): ?Month
     {

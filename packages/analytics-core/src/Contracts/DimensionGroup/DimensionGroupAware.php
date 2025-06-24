@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Hierarchy;
+namespace Rekalogika\Analytics\Contracts\DimensionGroup;
 
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
 /**
- * Allows a value resolver to be used inside a hierarchy. The framework will
- * call `withInput()` method with the input value resolver of the dimension as
- * defined in the summary class.
+ * Allows a value resolver to be used inside a dimension group. The framework
+ * will call `withInput()` method with the input value resolver of the dimension
+ * as defined in the summary class.
  */
-interface HierarchyAware
+interface DimensionGroupAware
 {
     /**
      * Sets the input value resolver defined in the dimension.

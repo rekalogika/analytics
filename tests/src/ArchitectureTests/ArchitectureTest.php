@@ -51,6 +51,7 @@ final class ArchitectureTest
                 // misc
                 Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
+                Selector::classname(\UnitEnum::class),
 
                 // exceptions
                 Selector::classname(\Error::class),

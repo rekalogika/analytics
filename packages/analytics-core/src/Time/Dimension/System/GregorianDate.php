@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Dimension\System;
 
 use Doctrine\ORM\Mapping\Embeddable;
-use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
-use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
+use Rekalogika\Analytics\Core\Entity\ContextAwareDimensionGroupTrait;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Dimension\System\Trait\GregorianDateTrait;
@@ -29,8 +29,8 @@ use Rekalogika\Analytics\Time\Dimension\System\Trait\GregorianDateTrait;
         'date',
     ]),
 )]
-class GregorianDate implements ContextAwareHierarchy
+class GregorianDate implements ContextAwareDimensionGroup
 {
-    use ContextAwareHierarchyTrait;
+    use ContextAwareDimensionGroupTrait;
     use GregorianDateTrait;
 }

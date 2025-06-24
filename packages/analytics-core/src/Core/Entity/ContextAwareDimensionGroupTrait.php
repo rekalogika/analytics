@@ -14,22 +14,22 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Core\Entity;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Context\HierarchyContext;
-use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
+use Rekalogika\Analytics\Contracts\Context\DimensionGroupContext;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
 
 /**
- * @phpstan-require-implements ContextAwareHierarchy
+ * @phpstan-require-implements ContextAwareDimensionGroup
  */
-trait ContextAwareHierarchyTrait
+trait ContextAwareDimensionGroupTrait
 {
-    private ?HierarchyContext $context = null;
+    private ?DimensionGroupContext $context = null;
 
-    final public function setContext(HierarchyContext $context): void
+    final public function setContext(DimensionGroupContext $context): void
     {
         $this->context = $context;
     }
 
-    protected function getContext(): HierarchyContext
+    protected function getContext(): DimensionGroupContext
     {
         if (null === $this->context) {
             throw new LogicException('Context is not set.');

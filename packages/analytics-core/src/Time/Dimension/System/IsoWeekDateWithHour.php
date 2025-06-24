@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\Time\Dimension\System;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Contracts\Hierarchy\ContextAwareHierarchy;
-use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
+use Rekalogika\Analytics\Core\Entity\ContextAwareDimensionGroupTrait;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
@@ -34,9 +34,9 @@ use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
         'hour',
     ]),
 )]
-class IsoWeekDateWithHour implements ContextAwareHierarchy
+class IsoWeekDateWithHour implements ContextAwareDimensionGroup
 {
-    use ContextAwareHierarchyTrait;
+    use ContextAwareDimensionGroupTrait;
     use IsoWeekDateTrait;
 
     #[Embedded()]

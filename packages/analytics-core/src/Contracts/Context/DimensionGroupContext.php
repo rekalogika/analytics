@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
-final readonly class HierarchyContext
+final readonly class DimensionGroupContext
 {
     public function __construct(
         private DimensionMetadata $dimensionMetadata,

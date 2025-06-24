@@ -47,7 +47,6 @@ final class DoctrineEntityPass implements CompilerPassInterface
                     'Rekalogika\Analytics\Core\Entity',
                     'Rekalogika\Analytics\Core\Partition',
                     'Rekalogika\Analytics\Engine\Entity',
-                    'Rekalogika\Analytics\Time\Hierarchy',
                     'Rekalogika\Analytics\Time\Dimension',
                     'Rekalogika\Analytics\Uuid\Partition',
                 ],
@@ -91,7 +90,6 @@ final class DoctrineEntityPass implements CompilerPassInterface
                 throw new LogicException('Reflection failed');
             }
 
-            $directories[] = \dirname($fileName, 2) . '/Hierarchy';
             $directories[] = \dirname($fileName, 2) . '/Dimension';
         }
 

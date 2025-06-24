@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Core\ValueResolver;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
 /**
  * Value resolver that does nothing.
  */
-final readonly class Noop implements ValueResolver, HierarchyAware
+final readonly class Noop implements ValueResolver, DimensionGroupAware
 {
     public function __construct(
         private ?ValueResolver $property = null,

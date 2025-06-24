@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\Dimension\System\Trait;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Core\Entity\ContextAwareHierarchyTrait;
+use Rekalogika\Analytics\Core\Entity\ContextAwareDimensionGroupTrait;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Time\Bin\WeekYear;
@@ -27,7 +27,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
 
 trait IsoWeekDateTrait
 {
-    use ContextAwareHierarchyTrait;
+    use ContextAwareDimensionGroupTrait;
 
     #[Column(
         type: TimeBinType::TypeWeekYear,

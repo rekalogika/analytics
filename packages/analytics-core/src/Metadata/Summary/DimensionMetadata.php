@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Contracts\Hierarchy\HierarchyAware;
+use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
@@ -86,11 +86,11 @@ final readonly class DimensionMetadata extends PropertyMetadata
         // valueResolver
 
         if ($parentValueResolver !== null) {
-            if (!$valueResolver instanceof HierarchyAware) {
+            if (!$valueResolver instanceof DimensionGroupAware) {
                 throw new LogicException(\sprintf(
                     'Value resolver for dimension "%s" must implement "%s" interface because it is a child of another dimension.',
                     $name,
-                    HierarchyAware::class,
+                    DimensionGroupAware::class,
                 ));
             }
 
