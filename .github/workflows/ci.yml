@@ -106,6 +106,9 @@ jobs:
     - name: Load fixtures
       run: php tests/bin/console doctrine:fixtures:load --no-interaction
 
+    - name: Run migrations
+      run: php tests/bin/console doctrine:migrations:migrate --no-interaction
+
     - name: Refresh
       run: |
         php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
