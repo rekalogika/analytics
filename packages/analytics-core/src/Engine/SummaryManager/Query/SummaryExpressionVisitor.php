@@ -220,6 +220,15 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $hasNull = \in_array(null, $values, true);
         $valuesWithoutNull = array_values(array_filter($values, fn($v): bool => $v !== null));
 
+        if ($hasNull && $valuesWithoutNull === []) {
+            // if has null and no other values, return the null expression
+            if ($comparisonOperator === Comparison::NIN) {
+                return $this->queryBuilder->expr()->isNotNull($fieldWithAlias);
+            } else {
+                return $this->queryBuilder->expr()->isNull($fieldWithAlias);
+            }
+        }
+
         // transform valuesWithoutNull to string of named parameters
 
         $valuesWithoutNullParameters = $this->queryBuilder

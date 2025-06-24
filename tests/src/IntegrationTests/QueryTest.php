@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\Hour;
@@ -449,5 +450,73 @@ final class QueryTest extends KernelTestCase
             $this->assertInstanceOf(MonthOfYear::class, $month->getMember());
             $this->assertNotNull($month->traverse('count')?->getMeasure());
         }
+    }
+
+    public function testWhereWithEnumCondition(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->eq(
+                'customerType',
+                CustomerType::Individual,
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+    }
+
+    public function testWhereWithEnumInCondition(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->in(
+                'customerType',
+                [CustomerType::Individual],
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+    }
+
+    public function testWhereWithNullCondition(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->eq(
+                'customerGender',
+                null,
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+    }
+
+    public function testWhereWithInNullCondition(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->in(
+                'customerGender',
+                [null],
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
     }
 }
