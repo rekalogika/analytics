@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
+use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\Hour;
@@ -518,5 +519,38 @@ final class QueryTest extends KernelTestCase
         $count = $result->traverse('count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
         $this->assertGreaterThan(0, $count);
+    }
+
+    public function testWhereWithInItemAndNullCondition(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->in(
+                'customerGender',
+                [null, Gender::Female],
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+    }
+
+    public function testWhereWithEmptyIn(): void
+    {
+        $result = $this->getQuery()
+            ->select('count')
+            ->where(Criteria::expr()->in(
+                'customerGender',
+                [],
+            ))
+            ->getResult()
+            ->getTree();
+
+        $this->assertCount(1, $result);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertNull($count);
     }
 }
