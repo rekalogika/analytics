@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\ChartConfiguration;
 use Rekalogika\Analytics\Bundle\Chart\Implementation\DefaultAnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
@@ -318,6 +319,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set('rekalogika.analytics.command.uuid_convert_summary_to_source')
         ->class(UuidConvertSummaryToSourceCommand::class)
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.debug_summary')
+        ->class(DebugSummaryCommand::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$translator' => service('translator'),
+        ])
         ->tag('console.command')
     ;
 
