@@ -301,5 +301,23 @@
         <target>{field} adalah dimensi wajib, dan harus merupakan dimensi pertama dari baris.</target>
       </segment>
     </unit>
+    <unit id="BM121zc" name="Civil">
+      <segment>
+        <source>Civil</source>
+        <target>Umum</target>
+      </segment>
+    </unit>
+    <unit id="8GmRgHr" name="ISO Week">
+      <segment>
+        <source>ISO Week</source>
+        <target>Minggu ISO</target>
+      </segment>
+    </unit>
+    <unit id="mucsQRY" name="Day of WeekYear">
+      <segment>
+        <source>Day of WeekYear</source>
+        <target>Hari dalam Tahun Minggu</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
