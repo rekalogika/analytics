@@ -133,6 +133,12 @@ final class SimpleQueryBuilder
         int|string|ParameterType|ArrayParameterType|null $type = null,
     ): string {
         $name = 'boundparameter' . $this->boundCounter++;
+
+        // @todo Doctrine workaround. make sure this is correct
+        if ($value instanceof \UnitEnum) {
+            $type = null;
+        }
+
         $this->queryBuilder->setParameter($name, $value, $type);
 
         return ':' . $name;
