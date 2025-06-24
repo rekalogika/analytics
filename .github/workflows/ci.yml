@@ -45,6 +45,8 @@ jobs:
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
+      env:
+        GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
         php-version: ${{ matrix.php }}
         extensions: intl
