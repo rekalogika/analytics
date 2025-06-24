@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin as TimeBinValueResolver;
 
 /**
  * @implements SpecificFilterFactory<DateRangeFilter>
@@ -47,13 +48,23 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
 
         $dimensionMetadata = $metadata->getAnyDimension($dimension);
         $label = $dimensionMetadata->getLabel();
-        $typeClass = $dimensionMetadata->getTypeClass();
+        $valueResolver = $dimensionMetadata->getValueResolver();
 
-        if ($typeClass === null || !is_a($typeClass, TimeBin::class, true)) {
+        if (!$valueResolver instanceof TimeBinValueResolver) {
             throw new InvalidArgumentException(\sprintf(
-                'DateRangeFilter needs a specific type class of %s, %s given',
+                'NumberRangesFilter needs the value resolver of "%s", "%s" given',
+                TimeBinValueResolver::class,
+                get_debug_type($valueResolver),
+            ));
+        }
+
+        $typeClass = $valueResolver->getTypeClass();
+
+        if (!is_a($typeClass, TimeBin::class, true)) {
+            throw new InvalidArgumentException(\sprintf(
+                'DateRangeFilter needs the type class of "%s", "%s" given',
                 TimeBin::class,
-                get_debug_type($typeClass),
+                $typeClass,
             ));
         }
 

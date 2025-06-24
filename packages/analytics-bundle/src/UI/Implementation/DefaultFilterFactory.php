@@ -24,18 +24,8 @@ use Rekalogika\Analytics\Bundle\UI\FilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
-use Rekalogika\Analytics\Time\Bin\DayOfYear;
-use Rekalogika\Analytics\Time\Bin\HourOfDay;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\Week;
-use Rekalogika\Analytics\Time\Bin\WeekDate;
-use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
-use Rekalogika\Analytics\Time\Bin\WeekOfYear;
-use Rekalogika\Analytics\Time\Bin\WeekYear;
-use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\Bin\Date;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin as TimeBinValueResolver;
 
 final readonly class DefaultFilterFactory implements FilterFactory
 {
@@ -57,30 +47,22 @@ final readonly class DefaultFilterFactory implements FilterFactory
 
         $dimension = $metadata->getAnyDimension($dimension);
         $typeClass = $dimension->getTypeClass();
+        $valueResolver = $dimension->getValueResolver();
 
         if (
-            $typeClass === null
-            || $this->isDoctrineRelation($summaryClass, $dimension->getName())
+            $this->isDoctrineRelation($summaryClass, $dimension->getName())
         ) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
-        } elseif (\in_array($typeClass, [
-            Year::class,
-            Quarter::class,
-            Month::class,
-            WeekDate::class,
-            DayOfMonth::class,
-            DayOfYear::class,
-            WeekOfMonth::class,
-            WeekOfYear::class,
-            HourOfDay::class,
-            WeekYear::class,
-            Week::class,
-        ], true)) {
-            $filterFactory = $this->getSpecificFilterFactory(NumberRangesFilter::class);
-        } elseif (enum_exists($typeClass)) {
+        } elseif ($valueResolver instanceof TimeBinValueResolver) {
+            $typeClass = $valueResolver->getTypeClass();
+
+            if (is_a($typeClass, Date::class, true)) {
+                $filterFactory = $this->getSpecificFilterFactory(DateRangeFilter::class);
+            } else {
+                $filterFactory = $this->getSpecificFilterFactory(NumberRangesFilter::class);
+            }
+        } elseif ($typeClass !== null && enum_exists($typeClass)) {
             $filterFactory = $this->getSpecificFilterFactory(EqualFilter::class);
-        } elseif (is_a($typeClass, TimeBin::class, true)) {
-            $filterFactory = $this->getSpecificFilterFactory(DateRangeFilter::class);
         } else {
             $filterFactory = $this->getSpecificFilterFactory(NullFilter::class);
         }

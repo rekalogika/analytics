@@ -17,8 +17,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\RecurringTimeBin;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBin as TimeBinValueResolver;
 
 /**
  * @implements SpecificFilterFactory<NumberRangesFilter>
@@ -47,21 +46,17 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
 
         $dimensionMetadata = $metadata->getAnyDimension($dimension);
         $label = $dimensionMetadata->getLabel();
-        $typeClass = $dimensionMetadata->getTypeClass();
+        $valueResolver = $dimensionMetadata->getValueResolver();
 
-        if (
-            $typeClass === null || (
-                !is_a($typeClass, TimeBin::class, true)
-                && !is_a($typeClass, RecurringTimeBin::class, true)
-            )
-        ) {
+        if (!$valueResolver instanceof TimeBinValueResolver) {
             throw new InvalidArgumentException(\sprintf(
-                'NumberRangesFilter needs the type class of "%s" or "%s", "%s" given',
-                TimeBin::class,
-                RecurringTimeBin::class,
-                get_debug_type($typeClass),
+                'NumberRangesFilter needs the value resolver of "%s", "%s" given',
+                TimeBinValueResolver::class,
+                get_debug_type($valueResolver),
             ));
         }
+
+        $typeClass = $valueResolver->getTypeClass();
 
         return new NumberRangesFilter(
             dimension: $dimension,

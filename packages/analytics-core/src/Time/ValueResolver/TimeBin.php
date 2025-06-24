@@ -46,6 +46,14 @@ final readonly class TimeBin implements
         );
     }
 
+    /**
+     * @return class-string<TimeBinInterface|RecurringTimeBin>
+     */
+    public function getTypeClass(): string
+    {
+        return $this->type->getBinClass();
+    }
+
     #[\Override]
     public function getInvolvedProperties(): array
     {
