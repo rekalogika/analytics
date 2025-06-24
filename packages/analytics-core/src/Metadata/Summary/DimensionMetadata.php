@@ -29,7 +29,7 @@ use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DimensionMetadata extends PropertyMetadata
+final readonly class DimensionMetadata extends PropertyMetadata implements \Stringable
 {
     /**
      * @var array<string,DimensionMetadata>
@@ -154,6 +154,12 @@ final readonly class DimensionMetadata extends PropertyMetadata
             involvedSourceProperties: $valueResolver->getInvolvedProperties(),
             summaryMetadata: $summaryMetadata,
         );
+    }
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return $this->getPropertyName();
     }
 
     public function withSummaryMetadata(
