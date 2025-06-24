@@ -35,11 +35,16 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
 
-                // dependencies
+                // doctrine dependencies
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Migrations'),
                 Selector::inNamespace('Doctrine\Common\Collections'),
+
+                // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // rekalogika dependencies
                 Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
                 Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 

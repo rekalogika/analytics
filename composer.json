@@ -15,6 +15,8 @@
         "doctrine/collections": "^2.2",
         "doctrine/dbal": "^3 || ^4",
         "doctrine/doctrine-bundle": "^2.12",
+        "doctrine/doctrine-migrations-bundle": "^3.0",
+        "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.20 || ^3.2",
         "doctrine/persistence": "^3.1 || ^4.0",
         "ozdemirburak/iris": "^3.1",

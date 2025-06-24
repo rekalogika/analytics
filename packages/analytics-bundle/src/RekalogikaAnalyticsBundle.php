@@ -23,6 +23,8 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
+use Rekalogika\Analytics\Core\Doctrine\Migrations\BustMigration;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
@@ -70,7 +72,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->info('The maximum number of results to be returned from the query. If a query exceeds this limit, OverflowException will be thrown.');
 
         $root->children()->integerNode('filling_nodes_limit')
-            ->defaultValue(10000)
+            ->defaultValue(10000000)
             ->min(1)
             ->info('The maximum number of nodes created due to gaps between values. If the amount of created nodes exceeds this limit, OverflowException will be thrown.');
     }
@@ -126,6 +128,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $this->prependTwig($builder);
         $this->prependAssetMapper($builder);
         $this->prependDQLFunctions($builder);
+        $this->prependMigrations($builder);
     }
 
     private function prependDQLFunctions(ContainerBuilder $builder): void
@@ -135,6 +138,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 'dql' => [
                     'string_functions' => [
                         'REKALOGIKA_NEXTVAL' => NextValFunction::class,
+                        'REKALOGIKA_BUST' => BustFunction::class,
                         'REKALOGIKA_TRUNCATE_BIGINT'  => TruncateBigIntFunction::class,
                         'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
                         'REKALOGIKA_HLL_ADD_AGG' => HllAddAggregateFunction::class,
@@ -150,6 +154,15 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                         'REKALOGIKA_UUID_TO_DATETIME' => UuidToDateTimeFunction::class,
                     ],
                 ],
+            ],
+        ]);
+    }
+
+    private function prependMigrations(ContainerBuilder $builder): void
+    {
+        $builder->prependExtensionConfig('doctrine_migrations', [
+            'migrations' => [
+                BustMigration::class,
             ],
         ]);
     }

@@ -163,6 +163,7 @@ translation: translation-clean $(TRANSLATION_EXTRACT_TARGETS)
 doctrine-schema-create: compose-restart
 	$(PHP) tests/bin/console doctrine:schema:drop --no-interaction --force --full-database
 	$(PHP) tests/bin/console doctrine:schema:create --no-interaction
+	$(PHP) tests/bin/console doctrine:migrations:migrate --no-interaction
 	make fixtures-load
 
 #

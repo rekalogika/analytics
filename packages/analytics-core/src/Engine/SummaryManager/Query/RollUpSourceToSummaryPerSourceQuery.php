@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
+use Rekalogika\Analytics\Engine\SummaryManager\ValueResolver\Bust;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
@@ -106,6 +107,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
             $valueResolver = $dimensionMetadata->getValueResolver();
+            $valueResolver = Bust::create($valueResolver);
 
             $expression = $valueResolver->getExpression(
                 context: new SourceQueryContext(

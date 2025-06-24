@@ -40,20 +40,20 @@ class TimeGroup implements ContextAwareDimensionGroup
     )]
     private ?GregorianDateWithHour $civil = null;
 
-    // #[Embedded()]
-    // #[Dimension(
-    //     label: new TranslatableMessage('ISO Week'),
-    //     source: new Noop(),
-    // )]
-    // private ?IsoWeekDateWithHour $isoWeek = null;
+    #[Embedded()]
+    #[Dimension(
+        label: new TranslatableMessage('ISO Week'),
+        source: new Noop(),
+    )]
+    private ?IsoWeekDateWithHour $isoWeek = null;
 
     public function getCivil(): ?GregorianDateWithHour
     {
         return $this->civil;
     }
 
-    // public function getIsoWeek(): ?IsoWeekDateWithHour
-    // {
-    //     return $this->isoWeek;
-    // }
+    public function getIsoWeek(): ?IsoWeekDateWithHour
+    {
+        return $this->isoWeek;
+    }
 }

@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Tests\App;
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
+use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Rekalogika\Analytics\Bundle\RekalogikaAnalyticsBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -69,6 +70,7 @@ final class Kernel extends BaseKernel
         yield new DAMADoctrineTestBundle();
         yield new ZenstruckMessengerTestBundle();
         yield new ChartjsBundle();
+        yield new DoctrineMigrationsBundle();
     }
 
     #[\Override]
