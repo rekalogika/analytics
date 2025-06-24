@@ -188,13 +188,24 @@ final class DoctrineQueryTest extends KernelTestCase
         $parameters = $queryExtractor->getParameters();
 
         $this->assertEquals([
-            0 => [1, 'integer'],
-            1 => [$uuid, ParameterType::STRING],
-            2 => [1, 'integer'],
-            3 => [$uuid, ParameterType::STRING],
-            4 => [new \DateTimeImmutable('2021-01-01 00:00:00'), 'datetime_immutable'],
-            5 => [$itemIds, ArrayParameterType::INTEGER],
+            0 => 1,
+            1 => $uuid,
+            2 => 1,
+            3 => $uuid,
+            4 => new \DateTimeImmutable('2021-01-01 00:00:00'),
+            5 => $itemIds,
         ], $parameters);
+
+        $types = $queryExtractor->getTypes();
+
+        $this->assertEquals([
+            0 => 'integer',
+            1 => ParameterType::STRING,
+            2 => 'integer',
+            3 => ParameterType::STRING,
+            4 => 'datetime_immutable',
+            5 => ArrayParameterType::INTEGER,
+        ], $types);
     }
 
     public function testNestedEmbeddable(): void
