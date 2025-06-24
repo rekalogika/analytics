@@ -42,11 +42,7 @@ final readonly class DefaultAttributeCollection implements AttributeCollection
         $this->classToAttributes = $classToAttributes;
     }
 
-    /**
-     * @template T of object
-     * @param class-string<T> $class
-     * @return T
-     */
+    #[\Override]
     public function getAttribute(string $class): object
     {
         return $this->tryGetAttribute($class) ?? throw new RuntimeException(
@@ -54,11 +50,7 @@ final readonly class DefaultAttributeCollection implements AttributeCollection
         );
     }
 
-    /**
-     * @template T of object
-     * @param class-string<T> $class
-     * @return ?T
-     */
+    #[\Override]
     public function tryGetAttribute(string $class): ?object
     {
         return $this->getAttributes($class)[0] ?? null;
@@ -69,12 +61,14 @@ final readonly class DefaultAttributeCollection implements AttributeCollection
      * @param class-string<T> $class
      * @return list<T>
      */
+    #[\Override]
     public function getAttributes(string $class): array
     {
         /** @var list<T> */
         return $this->classToAttributes[$class] ?? [];
     }
 
+    #[\Override]
     public function hasAttribute(string $class): bool
     {
         return isset($this->classToAttributes[$class]);

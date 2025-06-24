@@ -147,6 +147,7 @@ final class ArchitectureTest
 
                 // exceptions
                 Selector::classname(\Error::class),
+                Selector::classname(\Throwable::class),
                 Selector::classname(\TypeError::class),
                 Selector::classname(\InvalidArgumentException::class),
 

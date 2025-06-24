@@ -42,6 +42,11 @@ final readonly class DimensionAwareAttributeCollectionDecorator implements
             ->tryGetAttribute($class);
     }
 
+    /**
+     * @template T of object
+     * @param class-string<T> $class
+     * @return list<T>
+     */
     #[\Override]
     public function getAttributes(string $class): array
     {

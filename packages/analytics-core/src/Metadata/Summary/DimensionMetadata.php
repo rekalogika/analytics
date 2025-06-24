@@ -309,6 +309,7 @@ final readonly class DimensionMetadata extends PropertyMetadata
         return $this->groupByExpression;
     }
 
+    #[\Override]
     public function getAttributes(): AttributeCollection
     {
         $parent = $this->getParent();
