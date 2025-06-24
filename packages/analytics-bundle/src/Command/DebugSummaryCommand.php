@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Util\DimensionMetadataIterator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -68,6 +70,17 @@ final class DebugSummaryCommand extends Command
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
+        $this->printHeaders(io: $io, summaryMetadata: $summaryMetadata);
+        $this->printDimensions(io: $io, summaryMetadata: $summaryMetadata);
+        $this->printMeasures(io: $io, summaryMetadata: $summaryMetadata);
+
+        return Command::SUCCESS;
+    }
+
+    private function printHeaders(
+        SymfonyStyle $io,
+        SummaryMetadata $summaryMetadata,
+    ): void {
         $io->title('Summary Class Information for ' . $summaryMetadata->getSummaryClass());
         $io->section('General Information');
 
@@ -79,11 +92,16 @@ final class DebugSummaryCommand extends Command
                 ['Label', $summaryMetadata->getLabel()->trans($this->translator)],
             ],
         );
+    }
 
-        // dimensions
-
+    private function printDimensions(
+        SymfonyStyle $io,
+        SummaryMetadata $summaryMetadata,
+    ): void {
         $io->section('Dimensions');
         $dimensionRows = [];
+
+        $asciiArt = $this->getDimensionAsciiArt($summaryMetadata);
 
         foreach ($summaryMetadata->getRootDimensions() as $dimension) {
             /** @psalm-suppress InvalidArgument */
@@ -93,13 +111,22 @@ final class DebugSummaryCommand extends Command
             );
         }
 
+        $dimensionRows = array_map(
+            static fn(array $row, string $ascii) => array_merge([$ascii], $row),
+            $dimensionRows,
+            $asciiArt,
+        );
+
         $io->table(
             headers: ['Property', 'Label', 'Type', 'Hidden'],
             rows: $dimensionRows,
         );
+    }
 
-        // measures
-
+    private function printMeasures(
+        SymfonyStyle $io,
+        SummaryMetadata $summaryMetadata,
+    ): void {
         $io->section('Measures');
         $measureRows = [];
 
@@ -117,8 +144,6 @@ final class DebugSummaryCommand extends Command
             headers: ['Property', 'Label', 'Function', 'Virtual', 'Hidden'],
             rows: $measureRows,
         );
-
-        return Command::SUCCESS;
     }
 
     /**
@@ -128,29 +153,36 @@ final class DebugSummaryCommand extends Command
         DimensionMetadata $dimension,
         int $depth,
     ): iterable {
-        $prefix = str_repeat('   ', $depth);
-
         yield [
-            $prefix . $dimension->getPropertyName(),
             $dimension->getLabel()->trans($this->translator),
             $dimension->getTypeClass() ?? 'N/A',
             $dimension->isHidden() ? 'Yes' : 'No',
         ];
 
         $children = $dimension->getChildren();
-        $count = \count($children);
-        $i = 0;
-
         foreach ($children as $child) {
-            $isFirst = $i === 0;
-            $isLast = $i === $count - 1;
-
             yield from $this->getDimensionTableRows(
                 dimension: $child,
                 depth: $depth + 1,
             );
-
-            $i++;
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getDimensionAsciiArt(SummaryMetadata $summaryMetadata): array
+    {
+        $iterator = new DimensionMetadataIterator($summaryMetadata->getRootDimensions());
+
+        $iterator = new \RecursiveTreeIterator($iterator);
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_LEFT, '');
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_MID_HAS_NEXT, '│  ');
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_MID_LAST, '   ');
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_END_HAS_NEXT, '├─ ');
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_END_LAST, '└─ ');
+        $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_RIGHT, '');
+
+        return iterator_to_array($iterator, false);
     }
 }

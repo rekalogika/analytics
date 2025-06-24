@@ -223,6 +223,7 @@ final class ArchitectureTest
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\ArrayIterator::class),
                 Selector::classname(\Traversable::class),
+                Selector::classname(\RecursiveTreeIterator::class),
 
                 // php datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -264,6 +265,7 @@ final class ArchitectureTest
 
                 // php misc
                 Selector::classname(\Override::class),
+                Selector::classname(\Stringable::class),
 
                 // php enum
                 Selector::classname(\UnitEnum::class),
@@ -281,6 +283,7 @@ final class ArchitectureTest
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\ArrayIterator::class),
                 Selector::classname(\Traversable::class),
+                Selector::classname(\RecursiveIterator::class),
 
                 // exceptions
                 Selector::classname(\Error::class),
