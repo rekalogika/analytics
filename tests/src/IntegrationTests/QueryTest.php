@@ -53,7 +53,7 @@ final class QueryTest extends KernelTestCase
     public function testDimensionWithoutMeasure(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.year')
+            ->groupBy('time.civil.year')
             ->getResult()
             ->getTree();
 
@@ -105,7 +105,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->groupBy('time.year', 'customerCountry')
+            ->groupBy('time.civil.year', 'customerCountry')
             ->select('count', 'price')
             ->getResult()
             ->getTree();
@@ -150,7 +150,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->groupBy('time.year', '@values', 'customerCountry')
+            ->groupBy('time.civil.year', '@values', 'customerCountry')
             ->select('count', 'price')
             ->getResult()
             ->getTree();
@@ -171,7 +171,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->groupBy('@values', 'time.year', 'customerCountry')
+            ->groupBy('@values', 'time.civil.year', 'customerCountry')
             ->select('count', 'price')
             ->getResult()
             ->getTree();
@@ -192,7 +192,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->groupBy('time.year', 'customerCountry', '@values')
+            ->groupBy('time.civil.year', 'customerCountry', '@values')
             ->select('count', 'price')
             ->getResult()
             ->getTree();
@@ -204,9 +204,9 @@ final class QueryTest extends KernelTestCase
     public function testWhere(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.year')
+            ->groupBy('time.civil.year')
             ->select('count')
-            ->where(Criteria::expr()->eq('time.year', 2024))
+            ->where(Criteria::expr()->eq('time.civil.year', 2024))
             ->getResult()
             ->getTree();
 
@@ -218,9 +218,9 @@ final class QueryTest extends KernelTestCase
         $month = Month::createFromDatabaseValue(202410);
 
         $result = $this->getQuery()
-            ->groupBy('time.month')
+            ->groupBy('time.civil.month.month')
             ->select('count')
-            ->where(Criteria::expr()->eq('time.month', $month))
+            ->where(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getTree();
 
@@ -236,9 +236,9 @@ final class QueryTest extends KernelTestCase
         ];
 
         $result = $this->getQuery()
-            ->groupBy('time.month')
+            ->groupBy('time.civil.month.month')
             ->select('count')
-            ->where(Criteria::expr()->in('time.month', $months))
+            ->where(Criteria::expr()->in('time.civil.month.month', $months))
             ->getResult()
             ->getTree();
 
@@ -250,9 +250,9 @@ final class QueryTest extends KernelTestCase
         $month = 202410;
 
         $result = $this->getQuery()
-            ->groupBy('time.month')
+            ->groupBy('time.civil.month.month')
             ->select('count')
-            ->where(Criteria::expr()->eq('time.month', $month))
+            ->where(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getTree();
 
@@ -262,11 +262,11 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithOr(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.year')
+            ->groupBy('time.civil.year')
             ->select('count')
             ->where(Criteria::expr()->orX(
-                Criteria::expr()->eq('time.year', 2024),
-                Criteria::expr()->eq('time.year', 2023),
+                Criteria::expr()->eq('time.civil.year', 2024),
+                Criteria::expr()->eq('time.civil.year', 2023),
             ))
             ->getResult()
             ->getTree();
@@ -287,7 +287,7 @@ final class QueryTest extends KernelTestCase
 
         $withWhere = $this->getQuery()
             ->select('count')
-            ->where(Criteria::expr()->eq('time.year', 2024))
+            ->where(Criteria::expr()->eq('time.civil.year', 2024))
             ->getResult()
             ->getTree()
             ->traverse('count')
@@ -301,9 +301,9 @@ final class QueryTest extends KernelTestCase
     public function testOrderByDimension(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.month')
+            ->groupBy('time.civil.month.month')
             ->select('count')
-            ->orderBy('time.month', Order::Descending)
+            ->orderBy('time.civil.month.month', Order::Descending)
             ->getResult()
             ->getTree();
 
@@ -327,7 +327,7 @@ final class QueryTest extends KernelTestCase
     public function testOrderByMeasure(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.month')
+            ->groupBy('time.civil.month.month')
             ->select('count')
             ->orderBy('count', Order::Descending)
             ->getResult()
@@ -352,7 +352,7 @@ final class QueryTest extends KernelTestCase
         $this->expectException(OverflowException::class);
 
         $result = $this->getQuery(queryResultLimit: 1)
-            ->groupBy('time.hour')
+            ->groupBy('time.civil.hour.hour')
             ->select('count')
             ->getResult()
             ->getTree();
@@ -363,10 +363,10 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithTimeBin(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.hour')
+            ->groupBy('time.civil.hour.hour')
             ->select('count')
             ->where(Criteria::expr()->gte(
-                'time.hour',
+                'time.civil.hour.hour',
                 Hour::createFromDatabaseValue(2024101010),
             ))
             ->getResult()
@@ -378,15 +378,15 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithTimeBinRange(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.hour')
+            ->groupBy('time.civil.hour.hour')
             ->select('count')
             ->where(Criteria::expr()->andX(
                 Criteria::expr()->gte(
-                    'time.hour',
+                    'time.civil.hour.hour',
                     Hour::createFromDatabaseValue(2024101010),
                 ),
                 Criteria::expr()->lte(
-                    'time.hour',
+                    'time.civil.hour.hour',
                     Hour::createFromDatabaseValue(2024101011),
                 ),
             ))
@@ -399,11 +399,11 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithRecurringTimeBinRangeEnum(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.dayOfMonth')
+            ->groupBy('time.civil.date.dayOfMonth')
             ->select('count')
             ->where(Criteria::expr()->andX(
-                Criteria::expr()->gte('time.dayOfMonth', DayOfMonth::Day10),
-                Criteria::expr()->lte('time.dayOfMonth', DayOfMonth::Day12),
+                Criteria::expr()->gte('time.civil.date.dayOfMonth', DayOfMonth::Day10),
+                Criteria::expr()->lte('time.civil.date.dayOfMonth', DayOfMonth::Day12),
             ))
             ->getResult()
             ->getTree();
@@ -414,11 +414,11 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithRecurringTimeBinRangeInteger(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.dayOfMonth')
+            ->groupBy('time.civil.date.dayOfMonth')
             ->select('count')
             ->where(Criteria::expr()->andX(
-                Criteria::expr()->gte('time.dayOfMonth', 10),
-                Criteria::expr()->lte('time.dayOfMonth', 12),
+                Criteria::expr()->gte('time.civil.date.dayOfMonth', 10),
+                Criteria::expr()->lte('time.civil.date.dayOfMonth', 12),
             ))
             ->getResult()
             ->getTree();
@@ -429,7 +429,7 @@ final class QueryTest extends KernelTestCase
     public function testYearByMonthOfYear(): void
     {
         $result = $this->getQuery()
-            ->groupBy('time.year', 'time.monthOfYear')
+            ->groupBy('time.civil.year', 'time.civil.month.monthOfYear')
             ->select('count')
             ->getResult()
             ->getTree();

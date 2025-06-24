@@ -88,7 +88,7 @@ final class SourceQueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->from(OrderSummary::class)
-            ->groupBy('time.year')
+            ->groupBy('time.civil.year')
             ->select('count')
             ->getResult()
             ->getTree();

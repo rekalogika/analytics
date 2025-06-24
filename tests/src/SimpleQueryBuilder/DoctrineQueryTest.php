@@ -82,7 +82,7 @@ final class DoctrineQueryTest extends KernelTestCase
             $sql = $sqlStatements[0];
         }
 
-        $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.item_id AS item_id_2, o0_.customer_id AS customer_id_3 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sql);
+        $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.shipped AS shipped_2, o0_.item_id AS item_id_3, o0_.customer_id AS customer_id_4 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sql);
 
         $parametersMapping = $parserResult->getParameterMappings();
 
@@ -183,7 +183,7 @@ final class DoctrineQueryTest extends KernelTestCase
         $this->assertTrue($queryExtractor->getResultSetMapping()->isSelect);
         $sqlStatement = $queryExtractor->getSqlStatement();
 
-        $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.item_id AS item_id_2, o0_.customer_id AS customer_id_3 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sqlStatement);
+        $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.shipped AS shipped_2, o0_.item_id AS item_id_3, o0_.customer_id AS customer_id_4 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sqlStatement);
 
         $parameters = $queryExtractor->getParameters();
 

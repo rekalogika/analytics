@@ -71,7 +71,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $result = $summaryManager->createQuery()
             ->from(OrderSummary::class)
-            ->groupBy('time.year')
+            ->groupBy('time.civil.year')
             ->select('count')
             ->getResult()
             ->getTree();
@@ -88,6 +88,15 @@ final class SourceChangeTest extends KernelTestCase
 
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
+
+        // clear existing dirty flags if exists
+
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
         // get the current result
 
@@ -200,6 +209,15 @@ final class SourceChangeTest extends KernelTestCase
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
 
+        // clear existing dirty flags if exists
+
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
+
         // get the current result
 
         $this->assertEquals(0, $this->getOrderCountIn2030());
@@ -271,6 +289,15 @@ final class SourceChangeTest extends KernelTestCase
 
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
+
+        // clear existing dirty flags if exists
+
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
         // get the current result
 

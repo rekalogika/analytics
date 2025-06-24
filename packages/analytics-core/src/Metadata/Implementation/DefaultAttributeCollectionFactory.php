@@ -28,7 +28,7 @@ final readonly class DefaultAttributeCollectionFactory implements AttributeColle
     ): AttributeCollection {
         $attributes = AttributeUtil::getClassAttributes($class);
 
-        return new AttributeCollection($attributes);
+        return new DefaultAttributeCollection($attributes);
     }
 
     /**
@@ -41,6 +41,6 @@ final readonly class DefaultAttributeCollectionFactory implements AttributeColle
     ): AttributeCollection {
         $attributes = AttributeUtil::getPropertyAttributes($class, $property);
 
-        return new AttributeCollection($attributes);
+        return new DefaultAttributeCollection($attributes);
     }
 }

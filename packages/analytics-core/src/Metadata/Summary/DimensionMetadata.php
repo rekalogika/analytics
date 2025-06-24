@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
+use Rekalogika\Analytics\Metadata\Implementation\DimensionAwareAttributeCollectionDecorator;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
@@ -306,5 +307,19 @@ final readonly class DimensionMetadata extends PropertyMetadata
     public function getGroupByExpression(): Field|FieldSet|Cube|RollUp|GroupingSet
     {
         return $this->groupByExpression;
+    }
+
+    public function getAttributes(): AttributeCollection
+    {
+        $parent = $this->getParent();
+
+        if ($parent === null) {
+            return parent::getAttributes();
+        }
+
+        return new DimensionAwareAttributeCollectionDecorator(
+            decorated: parent::getAttributes(),
+            dimensionMetadata: $parent,
+        );
     }
 }
