@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
@@ -46,35 +44,6 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
 
     /**
      * @param class-string $class
-     */
-    private function getManagerForClass(string $class): EntityManagerInterface
-    {
-        $entityManager = $this->managerRegistry->getManagerForClass($class);
-
-        if (!$entityManager instanceof EntityManagerInterface) {
-            throw new InvalidArgumentException(\sprintf(
-                'Class "%s" is not managed by Doctrine ORM.',
-                $class,
-            ));
-        }
-
-        return $entityManager;
-    }
-
-    /**
-     * @template T of object
-     * @param class-string<T> $class
-     * @return ClassMetadata<T>
-     */
-    private function getDoctrineMetadata(string $class): ClassMetadata
-    {
-        $entityManager = $this->getManagerForClass($class);
-
-        return $entityManager->getClassMetadata($class);
-    }
-
-    /**
-     * @param class-string $class
      * @param null|ValueResolver|string $source
      * @return ValueResolver
      */
@@ -102,8 +71,7 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
         }
 
         if (!$source instanceof ValueResolver) {
-            $sourceClassMetadata = $this->getDoctrineMetadata($class);
-            $sourceClassMetadata = new ClassMetadataWrapper($sourceClassMetadata);
+            $sourceClassMetadata = new ClassMetadataWrapper($this->managerRegistry, $class);
 
             $isEntity = $sourceClassMetadata->isPropertyEntity($source);
             $isField = $sourceClassMetadata->isPropertyField($source);

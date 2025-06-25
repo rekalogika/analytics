@@ -236,6 +236,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(SummaryPostGenerateSchemaTableListener::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
         ])
         ->tag('doctrine.event_listener', [
             'event' => ToolEvents::postGenerateSchemaTable,

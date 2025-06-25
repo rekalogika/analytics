@@ -44,15 +44,9 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         string $dimension,
         int $limit,
     ): null|iterable {
-        $manager = $this->managerRegistry->getManagerForClass($class);
-
-        if (!$manager instanceof EntityManagerInterface) {
-            return null;
-        }
-
         // make sure the field exists
 
-        $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
+        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
 
         if (!$metadata->hasProperty($dimension)) {
             throw new MetadataException(\sprintf(
@@ -112,19 +106,24 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
         string $dimension,
         string $id,
     ): mixed {
-        $manager = $this->managerRegistry->getManagerForClass($class);
-
-        if (!$manager instanceof EntityManagerInterface) {
-            return null;
-        }
-
-        $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
+        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
 
         if (!$metadata->hasProperty($dimension)) {
             throw new MetadataException(\sprintf(
                 'The class "%s" does not have a field named "%s"',
                 $class,
                 $dimension,
+            ));
+        }
+
+        // manager
+
+        $manager = $this->managerRegistry->getManagerForClass($class);
+
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new MetadataException(\sprintf(
+                'The class "%s" is not managed by Doctrine ORM',
+                $class,
             ));
         }
 

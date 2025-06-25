@@ -49,10 +49,10 @@ final class SqlFactory
         $this->summaryToSummaryRollUpClass = $summaryToSummaryRollUpClass
             ?? RollUpSummaryToSummaryGroupAllStrategyQuery::class;
 
-        $classMetadata = $entityManager
-            ->getClassMetadata($this->summaryMetadata->getSummaryClass());
-
-        $this->doctrineClassMetadata = new ClassMetadataWrapper($classMetadata);
+        $this->doctrineClassMetadata = new ClassMetadataWrapper(
+            manager: $this->entityManager,
+            class: $this->summaryMetadata->getSummaryClass(),
+        );
     }
 
     /**

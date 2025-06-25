@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Metadata\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 
@@ -26,31 +27,58 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 final readonly class ClassMetadataWrapper
 {
     /**
-     * @param ClassMetadata<object> $classMetadata
+     * @var ClassMetadata<object>
      */
-    public function __construct(private ClassMetadata $classMetadata) {}
+    private ClassMetadata $classMetadata;
+
+    private EntityManagerInterface $manager;
 
     /**
      * @param class-string $class
      */
-    public static function get(
-        EntityManagerInterface|ManagerRegistry $manager,
+    public function __construct(
+        ObjectManager|ManagerRegistry|null $manager,
         string $class,
-    ): self {
+    ) {
+        if ($manager === null) {
+            throw new UnexpectedValueException('Manager is not found.');
+        }
+
         if ($manager instanceof ManagerRegistry) {
             $manager = $manager->getManagerForClass($class);
+
+            if (!$manager instanceof EntityManagerInterface) {
+                throw new UnexpectedValueException(\sprintf(
+                    'ManagerRegistry does not have a manager for class "%s"',
+                    $class,
+                ));
+            }
         }
 
         if (!$manager instanceof EntityManagerInterface) {
             throw new UnexpectedValueException(\sprintf(
-                'ManagerRegistry does not have a manager for class "%s"',
-                $class,
+                'Expected an instance of EntityManagerInterface, got "%s"',
+                get_debug_type($manager),
             ));
         }
 
-        $classMetadata = $manager->getClassMetadata($class);
+        $this->manager = $manager;
+        $this->classMetadata = $this->manager->getClassMetadata($class);
+    }
 
-        return new self($classMetadata);
+    public function getParent(): ?self
+    {
+        $parentClass = $this->classMetadata->parentClasses[0] ?? null;
+
+        if ($parentClass === null) {
+            return null;
+        }
+
+        if (!class_exists($parentClass)) {
+            throw new MetadataException(\sprintf('Parent class "%s" not found', $parentClass));
+        }
+
+        return new self($this->manager, $parentClass);
     }
 
     /**

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
@@ -329,12 +328,6 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
             throw new MetadataException(\sprintf('No manager found for class %s', $class));
         }
 
-        $classMetadata = $manager->getClassMetadata($class);
-
-        if (!$classMetadata instanceof ClassMetadata) {
-            throw new MetadataException('Unsupported class metadata object returned');
-        }
-
-        return new ClassMetadataWrapper($classMetadata);
+        return new ClassMetadataWrapper($manager, $class);
     }
 }
