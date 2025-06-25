@@ -55,7 +55,7 @@ final class UuidToDateTimeFunction extends FunctionNode implements TypedExpressi
         }
 
         return \sprintf(
-            "TO_TIMESTAMP((('x' || ENCODE(UUID_SEND(%s::uuid), 'hex'))::bit(48)::bigint) / 1000)::timestamp",
+            "TO_TIMESTAMP((('x' || ENCODE(UUID_SEND(%s::uuid), 'hex'))::bit(48)::bigint) / 1000)",
             $this->variable->dispatch($sqlWalker),
         );
     }
