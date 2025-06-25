@@ -122,7 +122,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.dimension_metadata_factory')
         ->class(DefaultDimensionMetadataFactory::class)
         ->args([
-            '$managerRegistry' => service('doctrine'),
             '$attributeCollectionFactory' => service('rekalogika.analytics.metadata.attribute_collection_factory'),
             '$dimensionGroupMetadataFactory' => service('rekalogika.analytics.dimension_class_metadata_factory'),
         ])
