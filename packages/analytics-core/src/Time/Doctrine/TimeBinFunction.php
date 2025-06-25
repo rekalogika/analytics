@@ -21,6 +21,7 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Common\Exception\QueryException;
+use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
  * REKALOGIKA_TIME_BIN
@@ -85,29 +86,27 @@ final class TimeBinFunction extends FunctionNode
             throw new QueryException('Summary time zone must be a literal');
         }
 
-        $sqlOutputFormat = match ($this->outputFormat->value) {
-            'hour' => 'YYYYMMDDHH24',
-            'hourOfDay' => 'HH24',
-            'date' => 'YYYYMMDD',
-            'dayOfWeek' => 'ID',
-            'dayOfMonth' => 'DD',
-            'dayOfYear' => 'DDD',
-            'dayOfWeekYear' => 'IDDD',
-            'week' => 'IYYYIW',
-            'weekDate' => 'IYYYIWID',
-            'weekYear' => 'IYYY',
-            'weekOfYear' => 'IW',
-            'weekOfMonth' => 'W',
-            'month' => 'YYYYMM',
-            'monthOfYear' => 'MM',
-            'quarter' => 'YYYYQ',
-            'quarterOfYear' => 'Q',
-            'year' => 'YYYY',
-            default => throw new QueryException(\sprintf(
-                'Unsupported output format "%s". Supported formats are: hour, hourOfDay, date, dayOfWeek, dayOfMonth, dayOfYear, week, weekDate, weekYear, weekOfYear, weekOfMonth, month, monthOfYear, quarter, quarterOfYear and year.',
-                get_debug_type($this->outputFormat->value),
-            )),
-        };
+        $value = $this->outputFormat->value;
+
+        if (!\is_string($value)) {
+            throw new QueryException(\sprintf(
+                'Output format must be a string, got %s',
+                get_debug_type($value),
+            ));
+        }
+
+        $outputFormat = TimeBinType::tryFrom($value);
+
+        if ($outputFormat === null) {
+            throw new QueryException(\sprintf(
+                'Unsupported output format "%s". Supported formats are: %s.',
+                $value,
+                implode(', ', array_map(
+                    static fn(TimeBinType $type): string => $type->value,
+                    TimeBinType::cases(),
+                )),
+            ));
+        }
 
         return 'TO_CHAR('
             . $this->sourceDatetime->dispatch($sqlWalker)
@@ -116,7 +115,7 @@ final class TimeBinFunction extends FunctionNode
             . ' AT TIME ZONE '
             . $this->summaryTimeZone->dispatch($sqlWalker)
             . ', '
-            . "'" . $sqlOutputFormat . "'"
+            . "'" . $outputFormat->getSqlToCharArgument() . "'"
             . ')::integer';
     }
 }
