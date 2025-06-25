@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Core\Doctrine\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class BustMigration extends AbstractMigration
+final class Version20250621 extends AbstractMigration
 {
     #[\Override]
     public function getDescription(): string

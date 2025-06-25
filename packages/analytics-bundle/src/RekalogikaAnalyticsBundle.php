@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
-use Rekalogika\Analytics\Core\Doctrine\Migrations\BustMigration;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
@@ -32,8 +31,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
-use Rekalogika\Analytics\Time\Doctrine\TimeBinFunction;
-use Rekalogika\Analytics\Time\Doctrine\TimeBinFunctionMigration;
+use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -161,11 +159,34 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependMigrations(ContainerBuilder $builder): void
     {
+        $migrationsPaths = [];
+
+        try {
+            $bustPath = (new \ReflectionClass(BustFunction::class))->getFileName();
+
+            if ($bustPath === false) {
+                throw new \ReflectionException('Could not get file name for BustFunction');
+            }
+
+            $bustPath = \dirname($bustPath, 2) . '/Migrations';
+            $migrationsPaths['Rekalogika\Analytics\Core\Doctrine\Migrations'] = $bustPath;
+        } catch (\ReflectionException) {
+        }
+
+        try {
+            $timeBinPath = (new \ReflectionClass(TimeBinFunction::class))->getFileName();
+
+            if ($timeBinPath === false) {
+                throw new \ReflectionException('Could not get file name for TimeBinFunction');
+            }
+
+            $timeBinPath = \dirname($timeBinPath, 2) . '/Migrations';
+            $migrationsPaths['Rekalogika\Analytics\Time\Doctrine\Migrations'] = $timeBinPath;
+        } catch (\ReflectionException) {
+        }
+
         $builder->prependExtensionConfig('doctrine_migrations', [
-            'migrations' => [
-                BustMigration::class,
-                TimeBinFunctionMigration::class,
-            ],
+            'migrations_paths' => $migrationsPaths,
         ]);
     }
 

@@ -34,6 +34,10 @@
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "src/"
-        }
+        },
+        "exclude-from-classmap": [
+            "/src/Core/Doctrine/Migrations/",
+            "/src/Time/Doctrine/Migrations/"
+        ]
     }
 }

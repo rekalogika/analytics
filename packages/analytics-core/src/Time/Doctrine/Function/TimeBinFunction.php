@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Doctrine;
+namespace Rekalogika\Analytics\Time\Doctrine\Function;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;

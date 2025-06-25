@@ -90,12 +90,21 @@
         "zenstruck/foundry": "^2.0",
         "zenstruck/messenger-test": "^1.11"
     },
+    "replace": {
+        "rekalogika/analytics-bundle": "0.10.1",
+        "rekalogika/analytics-core": "0.10.1",
+        "rekalogika/pivot-table": "0.10.1"
+    },
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
             "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/",
             "Rekalogika\\PivotTable\\": "packages/pivot-table/src/"
-        }
+        },
+        "exclude-from-classmap": [
+            "packages/analytics-core/src/Core/Doctrine/Migrations/",
+            "packages/analytics-core/src/Time/Doctrine/Migrations/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -108,10 +117,5 @@
             "symfony/runtime": true,
             "symfony/flex": false
         }
-    },
-    "replace": {
-        "rekalogika/analytics-bundle": "0.10.1",
-        "rekalogika/analytics-core": "0.10.1",
-        "rekalogika/pivot-table": "0.10.1"
     }
 }
