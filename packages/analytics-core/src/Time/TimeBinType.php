@@ -18,91 +18,118 @@ use Doctrine\DBAL\Types\Types;
 enum TimeBinType: string
 {
     //
+    // enum cases
+    //
+
+    // Hour
+    case Hour = 'hour';
+    case HourOfDay = 'hourOfDay';
+
+    // Date
+    case Date = 'date';
+    case DayOfWeek = 'dayOfWeek';
+    case DayOfMonth = 'dayOfMonth';
+    case DayOfYear = 'dayOfYear';
+    case DayOfWeekYear = 'dayOfWeekYear';
+    case WeekDate = 'weekDate';
+
+    // Week
+    case Week = 'week';
+    case WeekOfYear = 'weekOfYear';
+    case WeekOfMonth = 'weekOfMonth';
+
+    // Month
+    case Month = 'month';
+    case MonthOfYear = 'monthOfYear';
+
+    // Quarter
+    case Quarter = 'quarter';
+    case QuarterOfYear = 'quarterOfYear';
+
+    // Year
+    case Year = 'year';
+
+    // ISO Week Year
+    case WeekYear = 'weekYear';
+
+    //
     // doctrine types
     //
 
+    // Hour
     public const TypeHour = Types::INTEGER;
     public const TypeHourOfDay = Types::SMALLINT;
 
+    // Date
     public const TypeDate = Types::INTEGER;
     public const TypeWeekDate = Types::INTEGER;
     public const TypeDayOfWeek = Types::SMALLINT;
     public const TypeDayOfMonth = Types::SMALLINT;
     public const TypeDayOfYear = Types::SMALLINT;
+    public const TypeDayOfWeekYear = Types::SMALLINT;
 
+    // Week
     public const TypeWeek = Types::INTEGER;
     public const TypeWeekOfYear = Types::SMALLINT;
     public const TypeWeekOfMonth = Types::SMALLINT;
 
+    // Month
     public const TypeMonth = Types::INTEGER;
     public const TypeMonthOfYear = Types::SMALLINT;
 
+    // Quarter
     public const TypeQuarter = Types::INTEGER;
     public const TypeQuarterOfYear = Types::SMALLINT;
 
-    public const TypeWeekYear = Types::SMALLINT;
+    // Year
     public const TypeYear = Types::SMALLINT;
 
+    // ISO Week Year
+    public const TypeWeekYear = Types::SMALLINT;
+
     //
-    // enum cases
+    // maps types to doctrine types
     //
-
-    case Hour = 'hour';
-    case HourOfDay = 'hourOfDay';
-
-    case Date = 'date';
-    case DayOfWeek = 'dayOfWeek';
-    case DayOfMonth = 'dayOfMonth';
-    case DayOfYear = 'dayOfYear';
-
-    case Week = 'week';
-    case WeekDate = 'weekDate';
-    case WeekYear = 'weekYear';
-    case WeekOfYear = 'weekOfYear';
-    case WeekOfMonth = 'weekOfMonth';
-
-    case Month = 'month';
-    case MonthOfYear = 'monthOfYear';
-
-    case Quarter = 'quarter';
-    case QuarterOfYear = 'quarterOfYear';
-
-    case Year = 'year';
 
     public function getDoctrineType(): string
     {
         return match ($this) {
-            // HourTrait
+            // Hour
             self::Hour => self::TypeHour,
             self::HourOfDay => self::TypeHourOfDay,
 
-            // DayTrait
+            // Date
             self::Date => self::TypeDate,
             self::WeekDate => self::TypeWeekDate,
             self::DayOfWeek => self::TypeDayOfWeek,
             self::DayOfMonth => self::TypeDayOfMonth,
             self::DayOfYear => self::TypeDayOfYear,
+            self::DayOfWeekYear => self::TypeDayOfWeekYear,
 
-            // WeekTrait
+            // Week
             self::Week => self::TypeWeek,
             self::WeekOfYear => self::TypeWeekOfYear,
             self::WeekOfMonth => self::TypeWeekOfMonth,
 
-            // MonthTrait
+            // Month
             self::Month => self::TypeMonth,
             self::MonthOfYear => self::TypeMonthOfYear,
 
-            // QuarterTrait
+            // Quarter
             self::Quarter => self::TypeQuarter,
             self::QuarterOfYear => self::TypeQuarterOfYear,
 
-            // WeekYearTrait
+            // WeekYear
             self::WeekYear => self::TypeWeekYear,
 
-            // YearTrait
+            // Year
             self::Year => self::TypeYear,
         };
     }
+
+    //
+    // maps cases to the corresponding bin classes
+    //
 
     /**
      * @return class-string<TimeBin|RecurringTimeBin>
@@ -110,35 +137,72 @@ enum TimeBinType: string
     public function getBinClass(): string
     {
         return match ($this) {
-            // HourTrait
+            // Hour
             self::Hour => Bin\Hour::class,
             self::HourOfDay => Bin\HourOfDay::class,
 
-            // DayTrait
+            // Date
             self::Date => Bin\Date::class,
             self::WeekDate => Bin\WeekDate::class,
             self::DayOfWeek => Bin\DayOfWeek::class,
             self::DayOfMonth => Bin\DayOfMonth::class,
             self::DayOfYear => Bin\DayOfYear::class,
+            self::DayOfWeekYear => Bin\DayOfWeekYear::class,
 
-            // WeekTrait
+            // Week
             self::Week => Bin\Week::class,
             self::WeekOfYear => Bin\WeekOfYear::class,
             self::WeekOfMonth => Bin\WeekOfMonth::class,
 
-            // MonthTrait
+            // Month
             self::Month => Bin\Month::class,
             self::MonthOfYear => Bin\MonthOfYear::class,
 
-            // QuarterTrait
+            // Quarter
             self::Quarter => Bin\Quarter::class,
             self::QuarterOfYear => Bin\QuarterOfYear::class,
 
-            // WeekYearTrait
+            // WeekYear
             self::WeekYear => Bin\WeekYear::class,
 
-            // YearTrait
+            // Year
             self::Year => Bin\Year::class,
+        };
+    }
+
+    public function getSqlToCharArgument(): string
+    {
+        return match ($this) {
+            // Hour
+            self::Hour => 'YYYYMMDDHH24',
+            self::HourOfDay => 'HH24',
+
+            // Date
+            self::Date => 'YYYYMMDD',
+            self::WeekDate => 'IYYYIWID',
+            self::DayOfWeek => 'ID',
+            self::DayOfMonth => 'DD',
+            self::DayOfYear => 'DDD',
+            self::DayOfWeekYear => 'IDDD',
+
+            // Week
+            self::Week => 'IYYYIW',
+            self::WeekOfYear => 'IW',
+            self::WeekOfMonth => 'W',
+
+            // Month
+            self::Month => 'YYYYMM',
+            self::MonthOfYear => 'MM',
+
+            // Quarter
+            self::Quarter => 'YYYYQ',
+            self::QuarterOfYear => 'Q',
+
+            // WeekYear
+            self::WeekYear => 'IYYY',
+
+            // Year
+            self::Year => 'YYYY',
         };
     }
 }
