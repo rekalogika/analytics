@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Doctrine;
+namespace Rekalogika\Analytics\Time\Doctrine\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class TimeBinFunctionMigration extends AbstractMigration
+final class Version20250625 extends AbstractMigration
 {
     #[\Override]
     public function getDescription(): string
