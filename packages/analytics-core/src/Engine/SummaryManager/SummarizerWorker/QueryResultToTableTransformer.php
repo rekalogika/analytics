@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\HierarchicalTranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\QueryResultToTableHelper;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -26,6 +27,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRo
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultUnit;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -339,9 +341,22 @@ final readonly class QueryResultToTableTransformer
 
     private function getLabel(string $property): TranslatableInterface
     {
-        return $this->metadata
-            ->getProperty($property)
-            ->getLabel();
+        $property = $this->metadata->getProperty($property);
+
+        if (!$property instanceof DimensionMetadata) {
+            return $property->getLabel();
+        }
+
+        $strings = [];
+
+        while ($property !== null) {
+            $strings[] = $property->getLabel();
+            $property = $property->getParent();
+        }
+
+        return new HierarchicalTranslatableMessage(
+            labels: array_reverse($strings),
+        );
     }
 
     private function getNullValue(string $dimension): TranslatableInterface
