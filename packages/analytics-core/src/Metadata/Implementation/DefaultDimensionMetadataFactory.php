@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
@@ -47,11 +47,11 @@ final readonly class DefaultDimensionMetadataFactory implements DimensionMetadat
     /**
      * @param class-string $class
      */
-    private function getManagerForClass(string $class): EntityManager
+    private function getManagerForClass(string $class): EntityManagerInterface
     {
         $entityManager = $this->managerRegistry->getManagerForClass($class);
 
-        if (!$entityManager instanceof EntityManager) {
+        if (!$entityManager instanceof EntityManagerInterface) {
             throw new InvalidArgumentException(\sprintf(
                 'Class "%s" is not managed by Doctrine ORM.',
                 $class,
