@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\Doctrine\Schema;
 
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
+use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -22,6 +23,7 @@ final readonly class SummaryPostGenerateSchemaTableListener
 {
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
+        private ManagerRegistry $managerRegistry,
     ) {}
 
     /**
@@ -29,7 +31,9 @@ final readonly class SummaryPostGenerateSchemaTableListener
      */
     public function postGenerateSchemaTable(GenerateSchemaTableEventArgs $args): void
     {
-        $classMetadata = new ClassMetadataWrapper($args->getClassMetadata());
+        $class = $args->getClassMetadata()->getName();
+        $entityManager = $this->managerRegistry->getManagerForClass($class);
+        $classMetadata = new ClassMetadataWrapper($entityManager, $class);
         $table = $args->getClassTable();
 
         try {

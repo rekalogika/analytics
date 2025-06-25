@@ -408,7 +408,7 @@ final class SummarizerQuery extends AbstractQuery
         $dimensionMetadata = $this->metadata->getDimension($dimension);
         $alias = $this->getAlias($dimension);
 
-        $classMetadata = ClassMetadataWrapper::get(
+        $classMetadata = new ClassMetadataWrapper(
             manager: $this->entityManager,
             class: $this->metadata->getSummaryClass(),
         );
@@ -429,7 +429,7 @@ final class SummarizerQuery extends AbstractQuery
             // by its identifier instead, then we convert back to the object in
             // post
 
-            $joinedClassMetadata = ClassMetadataWrapper::get(
+            $joinedClassMetadata = new ClassMetadataWrapper(
                 manager: $this->entityManager,
                 class: $joinedEntityClass,
             );
