@@ -108,7 +108,7 @@ final class TimeBinFunction extends FunctionNode
             ));
         }
 
-        return sprintf(
+        return \sprintf(
             "REKALOGIKA_TIME_BIN(%s, %s, %s, '%s')",
             $this->sourceDatetime->dispatch($sqlWalker),
             $this->sourceTimeZone->dispatch($sqlWalker),
