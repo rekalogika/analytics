@@ -21,11 +21,10 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final readonly class Dimension
 {
     /**
-     * @param null|string|ValueResolver $source
      * @param Order|array<string,Order> $orderBy
      */
     public function __construct(
-        private null|string|ValueResolver $source,
+        private ValueResolver $source,
         private null|string|TranslatableInterface $label = null,
         private Order|array $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
@@ -34,9 +33,10 @@ final readonly class Dimension
     ) {}
 
     /**
-     * @return null|string|ValueResolver
+     * @return ValueResolver
+     *
      */
-    public function getSource(): null|string|ValueResolver
+    public function getSource(): ValueResolver
     {
         return $this->source;
     }

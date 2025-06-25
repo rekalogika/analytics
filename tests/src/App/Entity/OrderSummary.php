@@ -89,7 +89,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         sourceTimeZone: new \DateTimeZone('UTC'),
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
     )]
-    private ?int $shipped = null;
+    private ?int $shippedDate = null;
 
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
@@ -273,11 +273,11 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         return $this->time;
     }
 
-    public function getShipped(): ?Date
+    public function getShippedDate(): ?Date
     {
         return $this->getContext()->getUserValue(
             property: 'shipped',
-            rawValue: $this->shipped,
+            rawValue: $this->shippedDate,
             class: Date::class,
         );
     }

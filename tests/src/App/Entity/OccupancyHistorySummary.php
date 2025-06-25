@@ -109,7 +109,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(enumType: Gender::class, nullable: true)]
     #[Analytics\Dimension(
-        source: 'gender',
+        source: new PropertyValue('gender'),
         label: new TranslatableMessage('Gender'),
     )]
     private ?Gender $gender = null;
