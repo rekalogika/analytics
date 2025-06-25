@@ -37,7 +37,7 @@ final class TimeBinFunction extends FunctionNode
 {
     public null|Node|string $sourceDatetime = null;
 
-    public null|Node|string $storedTimeZone = null;
+    public null|Node|string $sourceTimeZone = null;
 
     public null|Node|string $summaryTimeZone = null;
 
@@ -51,7 +51,7 @@ final class TimeBinFunction extends FunctionNode
 
         $this->sourceDatetime = $parser->ArithmeticPrimary();
         $parser->match(TokenType::T_COMMA);
-        $this->storedTimeZone = $parser->Literal();
+        $this->sourceTimeZone = $parser->Literal();
         $parser->match(TokenType::T_COMMA);
         $this->summaryTimeZone = $parser->Literal();
         $parser->match(TokenType::T_COMMA);
@@ -78,7 +78,7 @@ final class TimeBinFunction extends FunctionNode
             throw new QueryException('Source datetime must be a node');
         }
 
-        if (!$this->storedTimeZone instanceof Literal) {
+        if (!$this->sourceTimeZone instanceof Literal) {
             throw new QueryException('Stored time zone must be a literal');
         }
 
@@ -108,14 +108,12 @@ final class TimeBinFunction extends FunctionNode
             ));
         }
 
-        return 'TO_CHAR('
-            . $this->sourceDatetime->dispatch($sqlWalker)
-            . ' AT TIME ZONE '
-            . $this->storedTimeZone->dispatch($sqlWalker)
-            . ' AT TIME ZONE '
-            . $this->summaryTimeZone->dispatch($sqlWalker)
-            . ', '
-            . "'" . $outputFormat->getSqlToCharArgument() . "'"
-            . ')::integer';
+        return sprintf(
+            "REKALOGIKA_TIME_BIN(%s, %s, %s, '%s')",
+            $this->sourceDatetime->dispatch($sqlWalker),
+            $this->sourceTimeZone->dispatch($sqlWalker),
+            $this->summaryTimeZone->dispatch($sqlWalker),
+            $outputFormat->getSqlToCharArgument(),
+        );
     }
 }

@@ -33,6 +33,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
 use Rekalogika\Analytics\Time\Doctrine\TimeBinFunction;
+use Rekalogika\Analytics\Time\Doctrine\TimeBinFunctionMigration;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -163,6 +164,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $builder->prependExtensionConfig('doctrine_migrations', [
             'migrations' => [
                 BustMigration::class,
+                TimeBinFunctionMigration::class,
             ],
         ]);
     }

@@ -310,6 +310,7 @@ final class ArchitectureTest
                 // doctrine
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Migrations'),
 
                 // php misc
                 Selector::classname(\Stringable::class),
