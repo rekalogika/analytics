@@ -21,6 +21,7 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Common\Exception\QueryException;
+use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
  * REKALOGIKA_TIME_BIN
@@ -85,40 +86,27 @@ final class TimeBinFunction extends FunctionNode
             throw new QueryException('Summary time zone must be a literal');
         }
 
-        if ($this->outputFormat->value === 'dayOfWeek') {
-            // dayOfWeek is a special case, because TO_CHAR D outputs 1-7 sunday
-            // to saturday, but we want ISO day of week 1-7 monday to sunday
-            return 'EXTRACT(ISODOW FROM '
-                . $this->sourceDatetime->dispatch($sqlWalker)
-                . ' AT TIME ZONE '
-                . $this->storedTimeZone->dispatch($sqlWalker)
-                . ' AT TIME ZONE '
-                . $this->summaryTimeZone->dispatch($sqlWalker)
-                . ')::integer';
+        $value = $this->outputFormat->value;
+
+        if (!\is_string($value)) {
+            throw new QueryException(\sprintf(
+                'Output format must be a string, got %s',
+                get_debug_type($value),
+            ));
         }
 
-        $sqlOutputFormat = match ($this->outputFormat->value) {
-            'hour' => 'YYYYMMDDHH24',
-            'hourOfDay' => 'HH24',
-            'date' => 'YYYYMMDD',
-            // 'dayOfWeek' => 'D',
-            'dayOfMonth' => 'DD',
-            'dayOfYear' => 'DDD',
-            'week' => 'IYYYIW',
-            'weekDate' => 'IYYYIWID',
-            'weekYear' => 'IYYY',
-            'weekOfYear' => 'IW',
-            'weekOfMonth' => 'W',
-            'month' => 'YYYYMM',
-            'monthOfYear' => 'MM',
-            'quarter' => 'YYYYQ',
-            'quarterOfYear' => 'Q',
-            'year' => 'YYYY',
-            default => throw new QueryException(\sprintf(
-                'Unsupported output format "%s". Supported formats are: hour, hourOfDay, date, dayOfWeek, dayOfMonth, dayOfYear, week, weekDate, weekYear, weekOfYear, weekOfMonth, month, monthOfYear, quarter, quarterOfYear and year.',
-                get_debug_type($this->outputFormat->value),
-            )),
-        };
+        $outputFormat = TimeBinType::tryFrom($value);
+
+        if ($outputFormat === null) {
+            throw new QueryException(\sprintf(
+                'Unsupported output format "%s". Supported formats are: %s.',
+                $value,
+                implode(', ', array_map(
+                    static fn(TimeBinType $type): string => $type->value,
+                    TimeBinType::cases(),
+                )),
+            ));
+        }
 
         return 'TO_CHAR('
             . $this->sourceDatetime->dispatch($sqlWalker)
@@ -127,7 +115,7 @@ final class TimeBinFunction extends FunctionNode
             . ' AT TIME ZONE '
             . $this->summaryTimeZone->dispatch($sqlWalker)
             . ', '
-            . "'" . $sqlOutputFormat . "'"
+            . "'" . $outputFormat->getSqlToCharArgument() . "'"
             . ')::integer';
     }
 }
