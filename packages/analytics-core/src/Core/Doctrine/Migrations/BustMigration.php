@@ -21,7 +21,7 @@ final class BustMigration extends AbstractMigration
     #[\Override]
     public function getDescription(): string
     {
-        return 'Creates the REKALOGIKA_BUST function.';
+        return 'Creates the REKALOGIKA_BUST function. This is used to wrap expressions so that two identical expressions will not cause issues in a roll-up queries.';
     }
 
     #[\Override]
