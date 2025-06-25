@@ -18,6 +18,41 @@ use Doctrine\DBAL\Types\Types;
 enum TimeBinType: string
 {
     //
+    // enum cases
+    //
+
+    // Hour
+    case Hour = 'hour';
+    case HourOfDay = 'hourOfDay';
+
+    // Date
+    case Date = 'date';
+    case DayOfWeek = 'dayOfWeek';
+    case DayOfMonth = 'dayOfMonth';
+    case DayOfYear = 'dayOfYear';
+    case DayOfWeekYear = 'dayOfWeekYear';
+    case WeekDate = 'weekDate';
+
+    // Week
+    case Week = 'week';
+    case WeekOfYear = 'weekOfYear';
+    case WeekOfMonth = 'weekOfMonth';
+
+    // Month
+    case Month = 'month';
+    case MonthOfYear = 'monthOfYear';
+
+    // Quarter
+    case Quarter = 'quarter';
+    case QuarterOfYear = 'quarterOfYear';
+
+    // Year
+    case Year = 'year';
+
+    // ISO Week Year
+    case WeekYear = 'weekYear';
+
+    //
     // doctrine types
     //
 
@@ -53,39 +88,8 @@ enum TimeBinType: string
     public const TypeWeekYear = Types::SMALLINT;
 
     //
-    // enum cases
+    // maps types to doctrine types
     //
-
-    // Hour
-    case Hour = 'hour';
-    case HourOfDay = 'hourOfDay';
-
-    // Date
-    case Date = 'date';
-    case DayOfWeek = 'dayOfWeek';
-    case DayOfMonth = 'dayOfMonth';
-    case DayOfYear = 'dayOfYear';
-    case DayOfWeekYear = 'dayOfWeekYear';
-    case WeekDate = 'weekDate';
-
-    // Week
-    case Week = 'week';
-    case WeekOfYear = 'weekOfYear';
-    case WeekOfMonth = 'weekOfMonth';
-
-    // Month
-    case Month = 'month';
-    case MonthOfYear = 'monthOfYear';
-
-    // Quarter
-    case Quarter = 'quarter';
-    case QuarterOfYear = 'quarterOfYear';
-
-    // Year
-    case Year = 'year';
-
-    // ISO Week Year
-    case WeekYear = 'weekYear';
 
     public function getDoctrineType(): string
     {
@@ -123,6 +127,10 @@ enum TimeBinType: string
         };
     }
 
+    //
+    // maps cases to the corresponding bin classes
+    //
+
     /**
      * @return class-string<TimeBin|RecurringTimeBin>
      */
@@ -159,6 +167,42 @@ enum TimeBinType: string
 
             // Year
             self::Year => Bin\Year::class,
+        };
+    }
+
+    public function getSqlToCharArgument(): string
+    {
+        return match ($this) {
+            // Hour
+            self::Hour => 'YYYYMMDDHH24',
+            self::HourOfDay => 'HH24',
+
+            // Date
+            self::Date => 'YYYYMMDD',
+            self::WeekDate => 'IYYYIWID',
+            self::DayOfWeek => 'ID',
+            self::DayOfMonth => 'DD',
+            self::DayOfYear => 'DDD',
+            self::DayOfWeekYear => 'IDDD',
+
+            // Week
+            self::Week => 'IYYYIW',
+            self::WeekOfYear => 'IW',
+            self::WeekOfMonth => 'W',
+
+            // Month
+            self::Month => 'YYYYMM',
+            self::MonthOfYear => 'MM',
+
+            // Quarter
+            self::Quarter => 'YYYYQ',
+            self::QuarterOfYear => 'Q',
+
+            // WeekYear
+            self::WeekYear => 'IYYY',
+
+            // Year
+            self::Year => 'YYYY',
         };
     }
 }
