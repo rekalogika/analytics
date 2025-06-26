@@ -32,7 +32,7 @@ final readonly class GapFiller
     private string $name;
 
     /**
-     * @param non-empty-list<DefaultDimension> $dimensions
+     * @param list<DefaultDimension> $dimensions
      */
     private function __construct(
         array $dimensions,
@@ -90,15 +90,15 @@ final readonly class GapFiller
     }
 
     /**
-     * @param non-empty-list<DefaultDimension> $dimensions
-     * @return non-empty-list<DefaultDimension>
+     * @param list<DefaultDimension> $dimensions
+     * @return list<DefaultDimension>
      */
     public static function process(array $dimensions): array
     {
         $self = new self($dimensions);
 
         /**
-         * @var non-empty-list<DefaultDimension>
+         * @var list<DefaultDimension>
          * @psalm-suppress InvalidArgument
          */
         return array_values(iterator_to_array($self->getOutput()));

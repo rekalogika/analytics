@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Doctrine\Common\Collections\Order;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
@@ -43,9 +44,12 @@ final class DimensionByNameCollector
             );
         }
 
+        // Fill gaps if the first member is a sequence member
+        $dimensions = $this->tryFillGaps(array_values($dimensions));
+
         return new DimensionCollection(
             name: $this->name,
-            dimensions: array_values($dimensions),
+            dimensions: $dimensions,
         );
     }
 
@@ -61,12 +65,18 @@ final class DimensionByNameCollector
         $this->dimensions[$signature] = $dimension;
     }
 
-    // /**
-    //  * @param non-empty-list<DefaultDimension> $dimensions
-    //  * @return non-empty-list<DefaultDimension>
-    //  */
-    // private function fillGaps(array $dimensions): array
-    // {
-    //     return GapFiller::process($dimensions);
-    // }
+    /**
+     * @param list<DefaultDimension> $dimensions
+     * @return list<DefaultDimension>
+     */
+    private function tryFillGaps(array $dimensions): array
+    {
+        $firstMember = $dimensions[0]->getMember();
+
+        if (!$firstMember instanceof SequenceMember) {
+            return $dimensions;
+        }
+
+        return GapFiller::process($dimensions);
+    }
 }
