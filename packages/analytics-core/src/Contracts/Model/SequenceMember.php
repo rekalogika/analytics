@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Contracts\Model;
 /**
  * Represents a sequence in a data set, which is a series of ordered elements.
  */
-interface SequenceMember
+interface SequenceMember extends Comparable
 {
     public function getNext(): ?static;
 
@@ -29,15 +29,4 @@ interface SequenceMember
      * @return Sequence<static>|null
      */
     public function getSequence(): ?Sequence;
-
-    /**
-     * @template U of SequenceMember
-     * @param U $a
-     * @param U $b
-     * @return -1|0|1
-     */
-    public static function compare(
-        SequenceMember $a,
-        SequenceMember $b,
-    ): int;
 }
