@@ -32,14 +32,14 @@ final class DimensionCollectorTest extends TestCase
         $this->dimensions[$id] = $dimension;
     }
 
-    private function getDimension(string $id): DefaultDimension
-    {
-        if (!isset($this->dimensions[$id])) {
-            throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $id));
-        }
+    // private function getDimension(string $id): DefaultDimension
+    // {
+    //     if (!isset($this->dimensions[$id])) {
+    //         throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $id));
+    //     }
 
-        return $this->dimensions[$id];
-    }
+    //     return $this->dimensions[$id];
+    // }
 
     #[\Override]
     protected function setUp(): void
