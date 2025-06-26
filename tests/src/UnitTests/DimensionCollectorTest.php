@@ -78,12 +78,12 @@ final class DimensionCollectorTest extends TestCase
 
     public function testDimensionCollector(): void
     {
-        $collector = new DimensionByNameCollector('gender', true);
+        $collector = new DimensionByNameCollector('gender');
 
-        $collector->addDimension([], $this->getDimension('female'));
-        $collector->addDimension([], $this->getDimension('male'));
-        $collector->addDimension([], $this->getDimension('other'));
-        $collector->addDimension([], $this->getDimension('null'));
+        $collector->addDimension($this->getDimension('female'));
+        $collector->addDimension($this->getDimension('male'));
+        $collector->addDimension($this->getDimension('other'));
+        $collector->addDimension($this->getDimension('null'));
 
         $this->assertEquals([
             Gender::Female,

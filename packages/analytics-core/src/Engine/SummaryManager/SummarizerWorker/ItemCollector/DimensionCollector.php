@@ -28,10 +28,6 @@ final class DimensionCollector
      */
     private array $measures = [];
 
-    public function __construct(
-        private readonly bool $hasTieredOrder,
-    ) {}
-
     public function getResult(): Items
     {
         $uniqueDimensionsByKey = [];
@@ -50,23 +46,14 @@ final class DimensionCollector
     {
         return $this->collectors[$name] ??= new DimensionByNameCollector(
             name: $name,
-            hasTieredOrder: $this->hasTieredOrder,
         );
     }
 
     public function processDimensions(DefaultNormalRow $normalRow): void
     {
-        $earlierDimensions = [];
-
         foreach ($normalRow as $dimension) {
-            $name = $dimension->getName();
-
-            $this->getCollectorForName($name)->addDimension(
-                earlierDimensionsInDimensions: $earlierDimensions,
-                dimension: $dimension,
-            );
-
-            $earlierDimensions[] = $dimension;
+            $this->getCollectorForName($dimension->getName())
+                ->addDimension($dimension);
         }
     }
 
