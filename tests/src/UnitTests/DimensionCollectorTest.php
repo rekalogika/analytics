@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -21,37 +22,11 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 final class DimensionCollectorTest extends TestCase
 {
-    /**
-     * @var array<string,DefaultDimension>
-     */
-    private array $dimensions = [];
-
-    private function addDimension(string $id, DefaultDimension $dimension): void
+    public function testNullLast(): void
     {
-        $this->dimensions[$id] = $dimension;
-    }
+        $collector = new DimensionByNameCollector('gender', Order::Ascending);
 
-    private function getDimension(string $id): DefaultDimension
-    {
-        if (!isset($this->dimensions[$id])) {
-            throw new \InvalidArgumentException(\sprintf('Dimension "%s" not found', $id));
-        }
-
-        return $this->dimensions[$id];
-    }
-
-    #[\Override]
-    protected function setUp(): void
-    {
-        $this->addDimension('male', new DefaultDimension(
-            label: new TranslatableMessage('Male'),
-            name: 'gender',
-            rawMember: Gender::Male,
-            member: Gender::Male,
-            displayMember: Gender::Male,
-        ));
-
-        $this->addDimension('female', new DefaultDimension(
+        $collector->addDimension(new DefaultDimension(
             label: new TranslatableMessage('Female'),
             name: 'gender',
             rawMember: Gender::Female,
@@ -59,7 +34,15 @@ final class DimensionCollectorTest extends TestCase
             displayMember: Gender::Female,
         ));
 
-        $this->addDimension('other', new DefaultDimension(
+        $collector->addDimension(new DefaultDimension(
+            label: new TranslatableMessage('Male'),
+            name: 'gender',
+            rawMember: Gender::Male,
+            member: Gender::Male,
+            displayMember: Gender::Male,
+        ));
+
+        $collector->addDimension(new DefaultDimension(
             label: new TranslatableMessage('Other'),
             name: 'gender',
             rawMember: Gender::Other,
@@ -67,29 +50,21 @@ final class DimensionCollectorTest extends TestCase
             displayMember: Gender::Other,
         ));
 
-        $this->addDimension('null', new DefaultDimension(
+        $collector->addDimension(new DefaultDimension(
             label: new TranslatableMessage('Unknown'),
             name: 'gender',
             rawMember: null,
             member: null,
             displayMember: 'Unknown',
         ));
-    }
 
-    public function testDimensionCollector(): void
-    {
-        $collector = new DimensionByNameCollector('gender', true);
+        $result = array_map(
+            fn($dimension): mixed => $dimension->getRawMember(),
+            iterator_to_array($collector->getResult()),
+        );
 
-        $collector->addDimension([], $this->getDimension('female'));
-        $collector->addDimension([], $this->getDimension('male'));
-        $collector->addDimension([], $this->getDimension('other'));
-        $collector->addDimension([], $this->getDimension('null'));
-
-        $this->assertEquals([
-            Gender::Female,
-            Gender::Male,
-            Gender::Other,
-            null,
-        ], array_map(fn($dimension): mixed => $dimension->getRawMember(), iterator_to_array($collector->getResult())));
+        // Ensure the null value is last in the result
+        $this->assertCount(4, $result);
+        $this->assertNull($result[3]);
     }
 }

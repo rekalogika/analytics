@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
 
+use Doctrine\Common\Collections\Order;
+use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final class DimensionCollector
 {
@@ -29,7 +33,8 @@ final class DimensionCollector
     private array $measures = [];
 
     public function __construct(
-        private readonly bool $hasTieredOrder,
+        private SummaryMetadata $metadata,
+        private DefaultQuery $query,
     ) {}
 
     public function getResult(): Items
@@ -46,11 +51,38 @@ final class DimensionCollector
         );
     }
 
+    private function getOrder(string $name): ?Order
+    {
+        $orderBy = $this->query->getOrderBy();
+
+        foreach ($orderBy as $dimensionName => $order) {
+            if ($dimensionName === $name) {
+                return $order;
+            }
+        }
+
+        try {
+            $metadata = $this->metadata->getDimension($name);
+        } catch (MetadataException) {
+            $metadata = null;
+        }
+
+        if ($metadata !== null) {
+            $order = $metadata->getOrderBy();
+
+            if ($order instanceof Order) {
+                return $order;
+            }
+        }
+
+        return null;
+    }
+
     private function getCollectorForName(string $name): DimensionByNameCollector
     {
         return $this->collectors[$name] ??= new DimensionByNameCollector(
             name: $name,
-            hasTieredOrder: $this->hasTieredOrder,
+            order: $this->getOrder($name),
         );
     }
 
@@ -61,10 +93,7 @@ final class DimensionCollector
         foreach ($normalRow as $dimension) {
             $name = $dimension->getName();
 
-            $this->getCollectorForName($name)->addDimension(
-                earlierDimensionsInDimensions: $earlierDimensions,
-                dimension: $dimension,
-            );
+            $this->getCollectorForName($name)->addDimension($dimension);
 
             $earlierDimensions[] = $dimension;
         }
