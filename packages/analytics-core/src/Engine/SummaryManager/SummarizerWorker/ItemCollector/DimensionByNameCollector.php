@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
 
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
@@ -34,9 +32,7 @@ final class DimensionByNameCollector
 
     public function getResult(): DimensionCollection
     {
-        $firstDimension = $this->dimensions[array_key_first($this->dimensions) ?? throw new UnexpectedValueException('No dimensions found in the collector.')];
-
-        $dimensions = array_values($this->dimensions);
+        $dimensions = $this->dimensions;
 
         if ($dimensions === []) {
             return new DimensionCollection(
@@ -45,9 +41,11 @@ final class DimensionByNameCollector
             );
         }
 
-        if ($firstDimension->isSequence()) {
-            // $dimensions = $this->fillGaps($dimensions);
-        }
+        $dimensions = DimensionUtil::sortDimensions(array_values($dimensions));
+
+        // if ($firstDimension->isSequence()) {
+        //     $dimensions = $this->fillGaps($dimensions);
+        // }
 
         return new DimensionCollection(
             name: $this->name,
@@ -64,14 +62,6 @@ final class DimensionByNameCollector
         }
 
         $this->dimensions[$signature] = $dimension;
-    }
-
-    /**
-     * @return list<Dimension>
-     */
-    public function getDimensions(): array
-    {
-        return array_values($this->dimensions);
     }
 
     // /**

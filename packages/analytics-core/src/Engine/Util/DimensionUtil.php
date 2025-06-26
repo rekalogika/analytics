@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Util;
 
+use Rekalogika\Analytics\Contracts\Model\Comparable;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
@@ -107,5 +108,59 @@ final readonly class DimensionUtil
         }
 
         return true;
+    }
+
+    /**
+     * Sorts dimensions by their names.
+     *
+     * @template T of Dimension
+     * @param list<T> $dimensions
+     * @return list<T>
+     */
+    public static function sortDimensions(array $dimensions): array
+    {
+        if ($dimensions === []) {
+            return [];
+        }
+
+        $first = $dimensions[0];
+        /** @psalm-suppress MixedAssignment */
+        $firstMember = $first->getMember();
+        /** @psalm-suppress MixedAssignment */
+        $firstRawMember = $first->getRawMember();
+
+        // If the members are Comparable, we can sort the dimensions based on
+        // the sequence.
+
+        if ($firstMember instanceof Comparable) {
+            $memberClass = $firstMember::class;
+
+            usort(
+                $dimensions,
+                static function (Dimension $a, Dimension $b) use ($memberClass): int {
+                    /** @psalm-suppress MixedArgument */
+                    return $memberClass::compare($a->getMember(), $b->getMember());
+                },
+            );
+
+            return $dimensions;
+        }
+
+        // if the raw members are integer, we sort by them
+
+        if (\is_int($firstRawMember)) {
+            usort(
+                $dimensions,
+                static function (Dimension $a, Dimension $b): int {
+                    return $a->getRawMember() <=> $b->getRawMember();
+                },
+            );
+
+            return $dimensions;
+        }
+
+        // Otherwise, we return as is
+
+        return $dimensions;
     }
 }

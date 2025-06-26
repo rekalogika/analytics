@@ -47,4 +47,27 @@ final readonly class SequenceUtil
 
         return new DefaultSequence($first, $last);
     }
+
+    /**
+     * @param list<SequenceMember> $members
+     * @return list<SequenceMember>
+     */
+    public static function sortSequenceMembers(array $members): array
+    {
+        if ($members === []) {
+            return [];
+        }
+
+        $first = $members[0];
+        $class = $first::class;
+
+        usort(
+            $members,
+            static function (SequenceMember $a, SequenceMember $b) use ($class): int {
+                return $class::compare($a, $b);
+            },
+        );
+
+        return $members;
+    }
 }

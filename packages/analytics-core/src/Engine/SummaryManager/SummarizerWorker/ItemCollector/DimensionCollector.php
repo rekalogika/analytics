@@ -44,9 +44,7 @@ final class DimensionCollector
 
     private function getCollectorForName(string $name): DimensionByNameCollector
     {
-        return $this->collectors[$name] ??= new DimensionByNameCollector(
-            name: $name,
-        );
+        return $this->collectors[$name] ??= new DimensionByNameCollector($name);
     }
 
     public function processDimensions(DefaultNormalRow $normalRow): void
