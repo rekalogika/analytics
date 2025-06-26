@@ -114,8 +114,8 @@
         }
     },
     "replace": {
-        "rekalogika/analytics-bundle": "0.20.3",
-        "rekalogika/analytics-core": "0.20.3",
-        "rekalogika/pivot-table": "0.20.3"
+        "rekalogika/analytics-bundle": "0.20.4",
+        "rekalogika/analytics-core": "0.20.4",
+        "rekalogika/pivot-table": "0.20.4"
     }
 }
