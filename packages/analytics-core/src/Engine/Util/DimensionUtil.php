@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Util;
 
+use Doctrine\Common\Collections\Order;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Model\Comparable;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
@@ -107,5 +110,91 @@ final readonly class DimensionUtil
         }
 
         return true;
+    }
+
+    /**
+     * @template T of Dimension
+     * @param T $a
+     * @param T $b
+     * @return -1|0|1
+     */
+    public static function compare(Dimension $a, Dimension $b): int
+    {
+        if ($a::class !== $b::class) {
+            throw new UnexpectedValueException(\sprintf(
+                'Cannot compare "%s" with "%s".',
+                $a::class,
+                $b::class,
+            ));
+        }
+
+
+        /** @psalm-suppress MixedAssignment */
+        $aMember = $a->getMember();
+        /** @psalm-suppress MixedAssignment */
+        $bMember = $b->getMember();
+        /** @psalm-suppress MixedAssignment */
+        $aRawMember = $a->getRawMember();
+        /** @psalm-suppress MixedAssignment */
+        $bRawMember = $b->getRawMember();
+
+        // check null in raw member
+        if ($aRawMember === null) {
+            if ($bRawMember === null) {
+                return 0; // Both are null
+            }
+
+            // null is considered less than any non-null value
+            return -1; // $a is less than $b
+        } elseif ($bRawMember === null) {
+            // Any non-null value is considered greater than null
+            return 1; // $a is greater than $b;
+        }
+
+        // check null in member
+        if ($aMember === null) {
+            if ($bMember === null) {
+                return 0; // Both are null
+            }
+
+            // null is considered less than any non-null value
+            return -1; // $a is less than $b
+        } elseif ($bMember === null) {
+            // Any non-null value is considered greater than null
+            return 1; // $a is greater than $b
+        }
+
+        if ($aMember instanceof Comparable && $bMember instanceof Comparable) {
+            return $aMember::compare($aMember, $bMember);
+        }
+
+        return $a->getRawMember() <=> $b->getRawMember();
+    }
+
+    /**
+     * @template K or array-key
+     * @template V of Dimension
+     * @param array<K,V> $dimensions
+     * @return array<K,V>
+     */
+    public static function sort(array $dimensions, Order $order): array
+    {
+        if ($dimensions === []) {
+            return $dimensions;
+        }
+
+        uasort(
+            $dimensions,
+            static function (
+                Dimension $a,
+                Dimension $b,
+            ) use ($order): int {
+                $comparison = self::compare($a, $b);
+
+                return $order === Order::Ascending ? $comparison : -$comparison;
+            },
+        );
+
+        return $dimensions;
     }
 }

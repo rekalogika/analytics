@@ -59,6 +59,7 @@
         "dama/doctrine-test-bundle": "^8.2",
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "ekino/phpstan-banned-code": "^3.0",
+        "nunomaduro/mock-final-classes": "^1.2",
         "phpat/phpat": "^0.11.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0",

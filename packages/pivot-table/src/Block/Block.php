@@ -99,6 +99,7 @@ abstract class Block
 
     final public function createGroupBlock(BranchNode $parentNode, int $level): Block
     {
+
         /** @var \Traversable<array-key,TreeNode> */
         $children = $parentNode->getChildren();
         $children = iterator_to_array($children);
