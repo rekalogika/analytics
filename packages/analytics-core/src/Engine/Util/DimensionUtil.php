@@ -128,7 +128,6 @@ final readonly class DimensionUtil
             ));
         }
 
-
         /** @psalm-suppress MixedAssignment */
         $aMember = $a->getMember();
         /** @psalm-suppress MixedAssignment */
@@ -145,10 +144,10 @@ final readonly class DimensionUtil
             }
 
             // null is considered less than any non-null value
-            return -1; // $a is less than $b
+            return 1; // $a is less than $b
         } elseif ($bRawMember === null) {
             // Any non-null value is considered greater than null
-            return 1; // $a is greater than $b;
+            return -1; // $a is greater than $b;
         }
 
         // check null in member
@@ -158,10 +157,10 @@ final readonly class DimensionUtil
             }
 
             // null is considered less than any non-null value
-            return -1; // $a is less than $b
+            return 1; // $a is less than $b
         } elseif ($bMember === null) {
             // Any non-null value is considered greater than null
-            return 1; // $a is greater than $b
+            return -1; // $a is greater than $b
         }
 
         if ($aMember instanceof Comparable && $bMember instanceof Comparable) {
