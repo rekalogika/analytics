@@ -75,7 +75,7 @@ abstract class Block
      * @param list<string> $superfluousLegends
      */
     final public static function new(
-        TreeNode $treeNode,
+        BranchNode $treeNode,
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Block {

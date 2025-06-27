@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
 use Rekalogika\PivotTable\Table\Table;
 
 final readonly class PivotTableTransformer
@@ -26,7 +26,7 @@ final readonly class PivotTableTransformer
      * @param list<string> $superfluousLegends
      */
     public static function transformTreeNodeToBlock(
-        TreeNode $treeNode,
+        BranchNode $treeNode,
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Block {
@@ -43,7 +43,7 @@ final readonly class PivotTableTransformer
      * @param list<string> $superfluousLegends
      */
     public static function transformTreeNodeToPivotTable(
-        TreeNode $treeNode,
+        BranchNode $treeNode,
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Table {

@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
-use Rekalogika\PivotTable\Contracts\LeafNode;
 use Rekalogika\PivotTable\Contracts\TreeNode;
 
+/**
+ * @template T of TreeNode
+ */
 abstract class NodeBlock extends Block
 {
+    /**
+     * @param T $treeNode
+     */
     protected function __construct(
         private readonly TreeNode $treeNode,
         int $level,
@@ -27,26 +31,11 @@ abstract class NodeBlock extends Block
         parent::__construct($level, $context);
     }
 
+    /**
+     * @return T
+     */
     final protected function getTreeNode(): TreeNode
     {
-        return $this->treeNode;
-    }
-
-    final protected function getBranchNode(): BranchNode
-    {
-        if (!$this->treeNode instanceof BranchNode) {
-            throw new \LogicException('Expected a BranchNode');
-        }
-
-        return $this->treeNode;
-    }
-
-    final protected function getLeafNode(): LeafNode
-    {
-        if (!$this->treeNode instanceof LeafNode) {
-            throw new \LogicException('Expected a LeafNode');
-        }
-
         return $this->treeNode;
     }
 }

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\BranchNode;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\HeaderCell;
@@ -34,7 +34,7 @@ class TableRenderer
      * @param list<string> $pivotedNodes
      */
     final public function render(
-        TreeNode $treeNode,
+        BranchNode $treeNode,
         array $pivotedNodes = [],
     ): string {
         $block = Block::new($treeNode, $pivotedNodes);

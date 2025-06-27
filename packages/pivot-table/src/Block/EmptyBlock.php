@@ -13,8 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
+/**
+ * @extends NodeBlock<TreeNode>
+ */
 final class EmptyBlock extends NodeBlock
 {
     #[\Override]
