@@ -348,12 +348,16 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
 
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
                 // doctrine
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
 
                 // php misc
                 Selector::classname(\Override::class),
+                Selector::classname(\Stringable::class),
 
                 // php enum
                 Selector::classname(\BackedEnum::class),

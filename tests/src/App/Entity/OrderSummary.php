@@ -35,6 +35,7 @@ use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
+use Rekalogika\Analytics\PostgreSQLHll\ApproximateCount;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
@@ -344,9 +345,13 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         return $this->count;
     }
 
-    public function getUniqueCustomers(): ?int
+    public function getUniqueCustomers(): ?ApproximateCount
     {
-        return $this->uniqueCustomers;
+        return $this->getContext()->getUserValue(
+            property: 'uniqueCustomers',
+            rawValue: $this->uniqueCustomers,
+            class: ApproximateCount::class,
+        );
     }
 
     public function getAverageSpendingPerCustomer(): ?Money
