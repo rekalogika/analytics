@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-final class DefaultTableFooter extends DefaultTableSection
+use Rekalogika\PivotTable\Table\TableFooter;
+use Rekalogika\PivotTable\Table\TableVisitor;
+
+final class DefaultTableFooter extends DefaultTableSection implements TableFooter
 {
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'tfoot';
+        $visitor->visitTableFooter($this);
     }
 }

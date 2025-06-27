@@ -16,4 +16,4 @@ namespace Rekalogika\PivotTable\Table;
 /**
  * Represents a HTML table footer (<tfoot>)
  */
-interface TableFooter extends RowGroup, Tag {}
+interface TableFooter extends RowGroup, Element {}

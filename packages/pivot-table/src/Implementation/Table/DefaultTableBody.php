@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-final class DefaultTableBody extends DefaultTableSection
+use Rekalogika\PivotTable\Table\TableBody;
+use Rekalogika\PivotTable\Table\TableVisitor;
+
+final class DefaultTableBody extends DefaultTableSection implements TableBody
 {
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'tbody';
+        $visitor->visitTableBody($this);
     }
 }

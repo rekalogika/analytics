@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Table\Element;
 use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Tag;
 
 /**
  * @implements \IteratorAggregate<Row>
  */
-abstract class DefaultTableSection implements \IteratorAggregate, \Countable, Tag
+abstract class DefaultTableSection implements \IteratorAggregate, \Countable, Element
 {
     final public function __construct(
         private readonly DefaultRows $rows,

@@ -18,7 +18,7 @@ namespace Rekalogika\PivotTable\Table;
  *
  * @extends \Traversable<RowGroup>
  */
-interface Table extends \Traversable, \Countable, Tag
+interface Table extends \Traversable, \Countable, Element
 {
     public function getRows(): RowGroup;
 }
