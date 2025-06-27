@@ -77,6 +77,7 @@ final readonly class CountDistinct implements
             return null;
         }
 
+        /** @psalm-suppress DocblockTypeContradiction */
         if (!\is_int($rawValue)) {
             throw new InvalidArgumentException(\sprintf(
                 'Expected an integer value, got "%s".',
