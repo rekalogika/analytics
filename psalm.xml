@@ -35,28 +35,6 @@
                 <directory name="packages/analytics-core/src/Time/Dimension" />
             </errorLevel>
         </ClassMustBeFinal>
-
-        <!-- weakmap problem -->
-        <PropertyTypeCoercion>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/PivotTable/Model/NodePropertyMap.php" />
-            </errorLevel>
-        </PropertyTypeCoercion>
-        <InvalidNullableReturnType>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/PivotTable/Model/NodePropertyMap.php" />
-            </errorLevel>
-        </InvalidNullableReturnType>
-        <NullableReturnStatement>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/PivotTable/Model/NodePropertyMap.php" />
-            </errorLevel>
-        </NullableReturnStatement>
-        <PossiblyNullArgument>
-            <errorLevel type="suppress">
-                <file name="packages/analytics-core/src/PivotTable/Model/NodePropertyMap.php" />
-            </errorLevel>
-        </PossiblyNullArgument>
     </issueHandlers>
 
     <plugins>

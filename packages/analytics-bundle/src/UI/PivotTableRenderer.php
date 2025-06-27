@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
+use Rekalogika\Analytics\Bundle\UI\Implementation\PivotTableRendererVisitor;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -20,19 +21,13 @@ use Twig\Environment;
 
 final readonly class PivotTableRenderer
 {
-    public function __construct(
-        private Environment $twig,
-        private string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
-    ) {}
+    private PivotTableRendererVisitor $visitor;
 
-    /**
-     * @param array<string,mixed> $parameters
-     */
-    private function renderBlock(string $block, array $parameters): string
-    {
-        return $this->twig
-            ->load($this->theme)
-            ->renderBlock($block, $parameters);
+    public function __construct(
+        Environment $twig,
+        string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
+    ) {
+        $this->visitor = new PivotTableRendererVisitor($twig, $theme);
     }
 
     /**
@@ -51,8 +46,6 @@ final readonly class PivotTableRenderer
             superfluousLegends: ['@values'],
         );
 
-        return $this->renderBlock('table', [
-            'table' => $table,
-        ]);
+        return $this->visitor->visitTable($table);
     }
 }

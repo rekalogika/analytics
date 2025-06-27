@@ -404,7 +404,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // rekalogika dependencies
-                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
+                Selectors::selectPivotTable(),
 
                 // php misc
                 Selector::classname(\Override::class),

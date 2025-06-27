@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\StringifierAware;
-use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class NodePropertyStringifier implements BackendStringifier, StringifierAware
 {
@@ -37,7 +37,7 @@ final readonly class NodePropertyStringifier implements BackendStringifier, Stri
     #[\Override]
     public function toString(mixed $input): ?string
     {
-        if (!$input instanceof NodeProperty) {
+        if (!$input instanceof Property) {
             return null;
         }
 
