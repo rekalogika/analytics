@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Bundle\UI\Implementation\PivotTableRendererVisitor;
+use Rekalogika\Analytics\Bundle\UI\Implementation\HtmlRendererVisitor;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -21,13 +21,13 @@ use Twig\Environment;
 
 final readonly class PivotTableRenderer
 {
-    private PivotTableRendererVisitor $visitor;
+    private HtmlRendererVisitor $visitor;
 
     public function __construct(
         Environment $twig,
         string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
     ) {
-        $this->visitor = new PivotTableRendererVisitor($twig, $theme);
+        $this->visitor = new HtmlRendererVisitor($twig, $theme);
     }
 
     /**

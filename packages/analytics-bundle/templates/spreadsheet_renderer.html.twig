@@ -1,31 +1,13 @@
 {%- extends '@RekalogikaAnalytics/renderer.html.twig' -%}
 
-{%- block cell -%}
-    {% set cell_properties = analytics_cell_properties(cell.content) %}
-    {% set content = cell_properties.content %}
-    {% set type = cell_properties.type %}
-    {% set format_code = cell_properties.formatCode %}
-    {% set attributes = cell_properties.attributes %}
+{%- block td_attr -%}
+    {{- parent() }} {% for key, value in cell_properties %} {{ key -}}="{{- value -}}" {% endfor -%}
+{%- endblock td_attr -%}
 
-    {%- if cell.tagName == 'th' -%}
-        {{ block("header_cell") }}
-    {%- elseif cell.tagName == 'td' -%}
-        {{ block("data_cell") }}
-    {%- endif -%}
-{%- endblock cell -%}
+{%- block th_attr -%}
+    {{- parent() }} {% for key, value in cell_properties %} {{ key -}}="{{- value -}}" {% endfor -%}
+{%- endblock th_attr -%}
 
-{%- block data_cell -%}
-    <td {{ block("td_attr") }} {{ block("attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {{ content }}
-    </td>
-{%- endblock data_cell -%}
-
-{%- block header_cell -%}
-    <th {{ block("th_attr") }} {{ block("attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {{ content }}
-    </th>
-{%- endblock header_cell -%}
-
-{%- block attr -%}
-    data-type="{{ type }}" {% if format_code %}data-format="{{ format_code }}"{% endif %} {{ attributes|raw }}
-{%- endblock -%}
+{%- block tf_attr -%}
+    {{- parent() }} {% for key, value in cell_properties %} {{ key -}}="{{- value -}}" {% endfor -%}
+{%- endblock tf_attr -%}

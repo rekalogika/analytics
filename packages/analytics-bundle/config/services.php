@@ -36,7 +36,6 @@ use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifi
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Twig\CellifierRuntime;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
@@ -443,15 +442,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.twig.runtime.cellifier')
-        ->class(CellifierRuntime::class)
-        ->tag('twig.runtime')
-        ->args([
-            '$cellifier' => service(Cellifier::class),
-        ])
-    ;
-
-    $services
         ->set('rekalogika.analytics.twig.extension.formatter')
         ->class(FormatterExtension::class)
         ->tag('twig.extension')
@@ -498,6 +488,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(SpreadsheetRenderer::class)
         ->args([
             '$twig' => service('twig'),
+            '$cellifier' => service(Cellifier::class),
         ])
     ;
 
