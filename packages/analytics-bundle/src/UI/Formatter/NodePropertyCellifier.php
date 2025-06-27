@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellifierAware;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
-use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class NodePropertyCellifier implements BackendCellifier, CellifierAware
 {
@@ -38,7 +38,7 @@ final readonly class NodePropertyCellifier implements BackendCellifier, Cellifie
     #[\Override]
     public function toCell(mixed $input): ?CellProperties
     {
-        if (!$input instanceof NodeProperty) {
+        if (!$input instanceof Property) {
             return null;
         }
 

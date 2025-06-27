@@ -47,6 +47,7 @@ final readonly class PivotTableTransformer
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Table {
+        
         $block = self::transformTreeNodeToBlock(
             treeNode: $treeNode,
             pivotedNodes: $pivotedNodes,

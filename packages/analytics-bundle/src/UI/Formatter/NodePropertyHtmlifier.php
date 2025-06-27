@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\HtmlifierAware;
-use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class NodePropertyHtmlifier implements BackendHtmlifier, HtmlifierAware
 {
@@ -37,7 +37,7 @@ final readonly class NodePropertyHtmlifier implements BackendHtmlifier, Htmlifie
     #[\Override]
     public function toHtml(mixed $input): ?string
     {
-        if (!$input instanceof NodeProperty) {
+        if (!$input instanceof Property) {
             return null;
         }
 

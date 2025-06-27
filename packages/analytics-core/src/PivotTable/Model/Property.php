@@ -14,12 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-abstract readonly class NodeProperty
+abstract readonly class Property
 {
     final public function __construct(private TreeNode $node) {}
 
     abstract public function getContent(): mixed;
+
+    /**
+     * @template T
+     * @param TableVisitor<T> $visitor
+     * @return T
+     */
+    abstract public function accept(TableVisitor $visitor): mixed;
 
     final public function getNode(): TreeNode
     {

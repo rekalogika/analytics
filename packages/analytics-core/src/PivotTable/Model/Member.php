@@ -13,13 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
-use Symfony\Contracts\Translation\TranslatableInterface;
+use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-final readonly class NodeLabel extends NodeProperty
+final readonly class Member extends Property
 {
     #[\Override]
-    public function getContent(): TranslatableInterface
+    public function accept(TableVisitor $visitor): mixed
     {
-        return $this->getNode()->getLabel();
+        return $visitor->visitMember($this);
+    }
+    
+    #[\Override]
+    public function getContent(): mixed
+    {
+        return $this->getNode()->getDisplayMember();
     }
 }

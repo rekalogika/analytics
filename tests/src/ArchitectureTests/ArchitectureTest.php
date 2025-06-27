@@ -397,6 +397,7 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
+
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
 
@@ -404,7 +405,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // rekalogika dependencies
-                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
+                Selectors::selectPivotTable(),
 
                 // php misc
                 Selector::classname(\Override::class),

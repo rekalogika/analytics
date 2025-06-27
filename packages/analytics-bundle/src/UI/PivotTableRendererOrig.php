@@ -13,21 +13,26 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\UI;
 
-use Rekalogika\Analytics\Bundle\UI\Implementation\PivotTableRendererVisitor;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Twig\Environment;
 
-final readonly class PivotTableRenderer
+final readonly class PivotTableRendererOrig
 {
-    private PivotTableRendererVisitor $visitor;
-
     public function __construct(
-        Environment $twig,
-        string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
-    ) {
-        $this->visitor = new PivotTableRendererVisitor($twig, $theme);
+        private Environment $twig,
+        private string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
+    ) {}
+
+    /**
+     * @param array<string,mixed> $parameters
+     */
+    private function renderBlock(string $block, array $parameters): string
+    {
+        return $this->twig
+            ->load($this->theme)
+            ->renderBlock($block, $parameters);
     }
 
     /**
@@ -40,16 +45,14 @@ final readonly class PivotTableRenderer
         $treeResult = $result->getTree();
         $pivotTable = PivotTableAdapter::adapt($treeResult);
 
-        dump($pivotTable);
-
         $table = PivotTableTransformer::transformTreeNodeToPivotTable(
             treeNode: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             superfluousLegends: ['@values'],
         );
 
-        dump($table);
-
-        return $this->visitor->visitTable($table);
+        return $this->renderBlock('table', [
+            'table' => $table,
+        ]);
     }
 }

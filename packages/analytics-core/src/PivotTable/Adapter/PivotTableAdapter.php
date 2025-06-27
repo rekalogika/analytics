@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Adapter;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\PivotTable\Model\NodePropertyMap;
+use Rekalogika\Analytics\PivotTable\Model\PropertyMap;
 use Rekalogika\PivotTable\Contracts\BranchNode;
 
 final readonly class PivotTableAdapter implements BranchNode
@@ -26,7 +26,7 @@ final readonly class PivotTableAdapter implements BranchNode
 
     private function __construct(
         private TreeNode $node,
-        private NodePropertyMap $propertyMap = new NodePropertyMap(),
+        private PropertyMap $propertyMap = new PropertyMap(),
     ) {}
 
     #[\Override]

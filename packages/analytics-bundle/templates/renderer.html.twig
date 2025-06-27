@@ -1,70 +1,66 @@
 {%- block table -%}
-    {%- if table.rows|length == 0 -%}
+    {%- if element.rows|length == 0 -%}
         {{ block("no_data") }}
     {%- else -%}
         <table {{ block("table_attr") }}>
-            {%- for section in table -%}
-                {%- if section.tagName == 'thead' -%}
-                    {{ block("header") }}
-                {%- elseif section.tagName == 'tbody' -%}
-                    {{ block("body") }}
-                {%- elseif section.tagName == 'tfoot' -%}
-                    {{ block("footer") }}
-                {%- endif -%}
-            {%- endfor -%}
+            {% for child in children %}{{ child|raw }}{% endfor %}
         </table>
     {%- endif -%}
 {%- endblock table -%}
 
-{%- block header -%}
+{%- block thead -%}
     <thead {{ block("thead_attr") }}>
-        {%- for row in section -%}{{ block("row") }}{% endfor %}
+        {% for child in children %}{{ child|raw }}{% endfor %}
     </thead>
-{%- endblock header -%}
+{%- endblock thead -%}
 
-{%- block body -%}
+{%- block tbody -%}
     <tbody {{ block("tbody_attr") }}>
-        {%- for row in section -%}{{ block("row") }}{% endfor %}
+        {% for child in children %}{{ child|raw }}{% endfor %}
     </tbody>
-{%- endblock body -%}
+{%- endblock tbody -%}
 
-{%- block footer -%}
+{%- block tfoot -%}
     <tfoot {{ block("tfoot_attr") }}>
-        {%- for row in section -%}{{ block("row") }}{% endfor %}
+        {% for child in children %}{{ child|raw }}{% endfor %}
     </tfoot>
-{%- endblock footer -%}
+{%- endblock tfoot -%}
 
-{%- block row -%}
+{%- block tr -%}
     <tr {{ block("tr_attr") }}>
-        {%- for cell in row -%}{{ block("cell") }}{% endfor %}
+        {% for child in children %}{{ child|raw }}{% endfor %}
     </tr>
-{%- endblock row -%}
+{%- endblock tr -%}
 
-{%- block cell -%}
-    {%- if cell.tagName == 'th' -%}
-        {{ block("header_cell") }}
-    {%- elseif cell.tagName == 'td' -%}
-        {{ block("data_cell") }}
-    {%- endif -%}
-{%- endblock cell -%}
-
-{%- block data_cell -%}
-    <td {{ block("td_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {%- set content = cell.content -%}
-        {{ block("content") }}
+{%- block td -%}
+    <td {{ block("td_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
+        {{ content|raw }}
     </td>
-{%- endblock data_cell -%}
+{%- endblock td -%}
 
-{%- block header_cell -%}
-    <th {{ block("th_attr") }} colspan="{{ cell.columnSpan }}" rowspan="{{ cell.rowSpan }}">
-        {%- set content = cell.content -%}
-        {{ block("content") }}
+{%- block tf -%}
+    <td {{ block("tf_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
+        {{ content|raw }}
+    </td>
+{%- endblock tf -%}
+
+{%- block th -%}
+    <th {{ block("th_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
+        {{ content|raw }}
     </th>
-{%- endblock header_cell -%}
+{%- endblock th -%}
 
-{%- block content -%}
-    {{ content|analytics_to_html }}
-{%- endblock content -%}
+{%- block label -%}
+    {{ label|analytics_to_html }}
+{%- endblock label -%}
+
+{%- block member -%}
+    {{ member|analytics_to_html }}
+{%- endblock member -%}
+
+{%- block value -%}
+    {{ value|analytics_to_html }}
+{%- endblock value -%}
 
 {%- block no_data -%}
     <p>No Data</p>
@@ -96,6 +92,10 @@
     class="{{ block("td_class") }}"
 {%- endblock td_attr -%}
 
+{%- block tf_attr -%}
+    class="{{ block("tf_class") }}"
+{%- endblock tf_attr -%}
+
 {%- block th_attr -%}
     class="{{ block("th_class") }}"
 {%- endblock th_attr -%}
@@ -118,20 +118,30 @@
 {%- endblock tr_class -%}
 
 {%- block td_class -%}
-    analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
-    {% if cell.content.node.measure.key is defined -%}
+    analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
+    {% if element.content.node.measure.key is defined -%}
         analytics-measure
-        analytics-measure-{{ cell.content.node.measure.key }}
+        analytics-measure-{{ element.content.node.measure.key }}
     {%- else -%}
         analytics-dimension
     {%- endif -%}
 {%- endblock td_class -%}
 
-{%- block th_class -%}
-    analytics-dimension-{{ cell.key|replace({"@": "--", ".": "--"}) }}
-    {% if cell.content.node.measure.key is defined -%}
+{%- block tf_class -%}
+    analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
+    {% if element.content.node.measure.key is defined -%}
         analytics-measure
-        analytics-measure-{{ cell.content.node.measure.key }}
+        analytics-measure-{{ element.content.node.measure.key }}
+    {%- else -%}
+        analytics-dimension
+    {%- endif -%}
+{%- endblock tf_class -%}
+
+{%- block th_class -%}
+    analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
+    {% if element.content.node.measure.key is defined -%}
+        analytics-measure
+        analytics-measure-{{ element.content.node.measure.key }}
     {%- else -%}
         analytics-dimension
     {%- endif -%}

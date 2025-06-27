@@ -19,20 +19,20 @@ use Rekalogika\Analytics\Contracts\Result\TreeNode;
  * Identity map for objects that represent properties of a TreeNode. It needs
  * an identity map because pivot-table depends on identity comparison.
  */
-final class NodePropertyMap
+final class PropertyMap
 {
     /**
-     * @var \WeakMap<TreeNode,NodeLabel>
+     * @var \WeakMap<TreeNode,Label>
      */
     private \WeakMap $labelMap;
 
     /**
-     * @var \WeakMap<TreeNode,NodeMember>
+     * @var \WeakMap<TreeNode,Member>
      */
     private \WeakMap $memberMap;
 
     /**
-     * @var \WeakMap<TreeNode,NodeValue>
+     * @var \WeakMap<TreeNode,Value>
      */
     private \WeakMap $valueMap;
 
@@ -43,18 +43,18 @@ final class NodePropertyMap
         $this->valueMap = new \WeakMap();
     }
 
-    public function getLabel(TreeNode $treeNode): NodeLabel
+    public function getLabel(TreeNode $treeNode): Label
     {
-        return $this->labelMap[$treeNode] ??= new NodeLabel($treeNode);
+        return $this->labelMap[$treeNode] ??= new Label($treeNode);
     }
 
-    public function getMember(TreeNode $treeNode): NodeMember
+    public function getMember(TreeNode $treeNode): Member
     {
-        return $this->memberMap[$treeNode] ??= new NodeMember($treeNode);
+        return $this->memberMap[$treeNode] ??= new Member($treeNode);
     }
 
-    public function getValue(TreeNode $treeNode): NodeValue
+    public function getValue(TreeNode $treeNode): Value
     {
-        return $this->valueMap[$treeNode] ??= new NodeValue($treeNode);
+        return $this->valueMap[$treeNode] ??= new Value($treeNode);
     }
 }

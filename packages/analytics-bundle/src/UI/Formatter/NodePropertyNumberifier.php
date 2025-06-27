@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
-use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class NodePropertyNumberifier implements BackendNumberifier, NumberifierAware
 {
@@ -37,7 +37,7 @@ final readonly class NodePropertyNumberifier implements BackendNumberifier, Numb
     #[\Override]
     public function toNumber(mixed $input): null|int|float
     {
-        if (!$input instanceof NodeProperty) {
+        if (!$input instanceof Property) {
             return null;
         }
 
