@@ -4,11 +4,11 @@
     {%- else -%}
         <table {{ block("table_attr") }}>
             {%- for section in table -%}
-                {%- if section.tag == 'thead' -%}
+                {%- if section.tagName == 'thead' -%}
                     {{ block("header") }}
-                {%- elseif section.tag == 'tbody' -%}
+                {%- elseif section.tagName == 'tbody' -%}
                     {{ block("body") }}
-                {%- elseif section.tag == 'tfoot' -%}
+                {%- elseif section.tagName == 'tfoot' -%}
                     {{ block("footer") }}
                 {%- endif -%}
             {%- endfor -%}
@@ -41,9 +41,9 @@
 {%- endblock row -%}
 
 {%- block cell -%}
-    {%- if cell.tag == 'th' -%}
+    {%- if cell.tagName == 'th' -%}
         {{ block("header_cell") }}
-    {%- elseif cell.tag == 'td' -%}
+    {%- elseif cell.tagName == 'td' -%}
         {{ block("data_cell") }}
     {%- endif -%}
 {%- endblock cell -%}

@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Implementation\Table;
 
 use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\RowGroup;
+use Rekalogika\PivotTable\Table\TableSection;
 
 /**
  * @implements \IteratorAggregate<Row>
  */
-abstract class DefaultRowGroup implements RowGroup, \IteratorAggregate
+abstract class DefaultRowGroup implements TableSection, \IteratorAggregate
 {
     public function __construct(
         private readonly DefaultRows $rows,

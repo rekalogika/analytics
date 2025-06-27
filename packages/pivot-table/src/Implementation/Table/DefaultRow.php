@@ -30,9 +30,15 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
     ) {}
 
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitRow($this);
+        return $visitor->visitRow($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'tr';
     }
 
     /**

@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML table body (<tbody>)
+ * Represents a HTML footer cell. This is conceptual only as HTML does not have
+ * a specific footer cell element. It should be rendered as a regular cell
+ * (<td> or <th>).
  */
-interface TableBody extends TableSection {}
+interface FooterCell extends Cell {}

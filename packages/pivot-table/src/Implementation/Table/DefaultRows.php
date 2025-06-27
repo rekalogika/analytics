@@ -19,7 +19,7 @@ use Rekalogika\PivotTable\Table\RowGroup;
 /**
  * @implements \IteratorAggregate<Row>
  */
-final class DefaultRows implements \IteratorAggregate, \Countable, RowGroup
+final class DefaultRows implements \IteratorAggregate, RowGroup
 {
     /**
      * @var int<0,max>|null

@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Table\DataCell;
+use Rekalogika\PivotTable\Table\FooterCell;
 use Rekalogika\PivotTable\Table\TableVisitor;
 
-final readonly class DefaultDataCell extends DefaultCell implements DataCell
+final readonly class DefaultFooterCell extends DefaultCell implements FooterCell
 {
     #[\Override]
     public function accept(TableVisitor $visitor): mixed
     {
-        return $visitor->visitDataCell($this);
+        return $visitor->visitFooterCell($this);
     }
 
     #[\Override]

@@ -15,20 +15,48 @@ namespace Rekalogika\PivotTable\Table;
 
 /**
  * Visitor for table and its elements
+ *
+ * @template T
  */
 interface TableVisitor
 {
-    public function visitTable(Table $table): void;
+    /**
+     * @return T
+     */
+    public function visitTable(Table $table): mixed;
 
-    public function visitTableHeader(TableHeader $tableHeader): void;
+    /**
+     * @return T
+     */
+    public function visitTableHeader(TableHeader $tableHeader): mixed;
 
-    public function visitTableBody(TableBody $tableBody): void;
+    /**
+     * @return T
+     */
+    public function visitTableBody(TableBody $tableBody): mixed;
 
-    public function visitTableFooter(TableFooter $tableFooter): void;
+    /**
+     * @return T
+     */
+    public function visitTableFooter(TableFooter $tableFooter): mixed;
 
-    public function visitRow(Row $tableRow): void;
+    /**
+     * @return T
+     */
+    public function visitRow(Row $tableRow): mixed;
 
-    public function visitHeaderCell(HeaderCell $headerCell): void;
+    /**
+     * @return T
+     */
+    public function visitHeaderCell(HeaderCell $headerCell): mixed;
 
-    public function visitDataCell(DataCell $dataCell): void;
+    /**
+     * @return T
+     */
+    public function visitDataCell(DataCell $dataCell): mixed;
+
+    /**
+     * @return T
+     */
+    public function visitFooterCell(FooterCell $footerCell): mixed;
 }

@@ -19,8 +19,14 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final class DefaultTableHeader extends DefaultTableSection implements TableHeader
 {
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitTableHeader($this);
+        return $visitor->visitTableHeader($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'thead';
     }
 }

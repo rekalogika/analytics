@@ -18,5 +18,12 @@ namespace Rekalogika\PivotTable\Table;
  */
 interface Element
 {
-    public function accept(TableVisitor $visitor): void;
+    public function getTagName(): string;
+
+    /**
+     * @template T
+     * @param TableVisitor<T> $visitor
+     * @return T
+     */
+    public function accept(TableVisitor $visitor): mixed;
 }

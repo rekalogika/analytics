@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML tag containing rows, including table header, table body, or
- * table footer (<thead>, <tbody>, or <tfoot>)
+ * Represents a collection of HTML rows (<tr>) grouped together.
  *
  * @extends \Traversable<Row>
  */
