@@ -11,47 +11,54 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\PivotTableAdapter;
+namespace Rekalogika\Analytics\PivotTable\Adapter;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\PivotTable\Model\NodePropertyMap;
 use Rekalogika\PivotTable\Contracts\BranchNode;
 
 final readonly class PivotTableAdapter implements BranchNode
 {
-    public function __construct(
-        private TreeNode $result,
+    public static function adapt(TreeNode $node): self
+    {
+        return new self($node);
+    }
+
+    private function __construct(
+        private TreeNode $node,
+        private NodePropertyMap $propertyMap = new NodePropertyMap(),
     ) {}
 
     #[\Override]
     public function getKey(): string
     {
-        return '';
+        return $this->node->getName();
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
-        return null;
+        return $this->propertyMap->getLabel($this->node);
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return null;
+        return $this->propertyMap->getMember($this->node);
     }
 
     #[\Override]
     public function getChildren(): iterable
     {
-        foreach ($this->result as $item) {
+        foreach ($this->node as $item) {
             if ($item->isNull()) {
                 continue;
             }
 
             if ($item->getMeasure() === null) {
-                yield new PivotTableBranch($item);
+                yield new PivotTableAdapter($item, $this->propertyMap);
             } else {
-                yield new PivotTableLeaf($item);
+                yield new PivotTableAdapterLeaf($item, $this->propertyMap);
             }
         }
     }

@@ -11,13 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper;
+namespace Rekalogika\Analytics\PivotTable\Model;
 
-final readonly class NodeValue extends NodeWrapper
+final readonly class NodeMember extends NodeProperty
 {
     #[\Override]
     public function getContent(): mixed
     {
-        return $this->node->getMeasure()?->getValue();
+        return $this->getNode()->getDisplayMember();
     }
 }

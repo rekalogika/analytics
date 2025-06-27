@@ -42,12 +42,12 @@ use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
+use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyCellifier;
+use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyHtmlifier;
+use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyNumberifier;
+use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyStringifier;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperCellifier;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperHtmlifier;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperNumberifier;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter\NodeWrapperStringifier;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
@@ -659,28 +659,28 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set(NodeWrapperHtmlifier::class)
+        ->set(NodePropertyHtmlifier::class)
         ->tag('rekalogika.analytics.backend_htmlifier', [
             'priority' => -100,
         ])
     ;
 
     $services
-        ->set(NodeWrapperNumberifier::class)
+        ->set(NodePropertyNumberifier::class)
         ->tag('rekalogika.analytics.backend_numberifier', [
             'priority' => -100,
         ])
     ;
 
     $services
-        ->set(NodeWrapperStringifier::class)
+        ->set(NodePropertyStringifier::class)
         ->tag('rekalogika.analytics.backend_stringifier', [
             'priority' => -100,
         ])
     ;
 
     $services
-        ->set(NodeWrapperCellifier::class)
+        ->set(NodePropertyCellifier::class)
         ->tag('rekalogika.analytics.backend_cellifier', [
             'priority' => -100,
         ])

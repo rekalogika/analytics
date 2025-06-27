@@ -148,7 +148,7 @@ class BasicTableRenderer implements TableVisitor
         $rowspanString = $rowspan > 1
             ? \sprintf(' rowspan="%d"', $rowspan) : '';
 
-        $attributes = ' ' . $this->getDataCellAttributes() . $colspanString . $rowspanString;
+        $attributes = ' ' . $this->getFooterCellAttributes() . $colspanString . $rowspanString;
 
         return \sprintf(
             '<td%s>%s</td>',
@@ -209,6 +209,11 @@ class BasicTableRenderer implements TableVisitor
     }
 
     protected function getHeaderCellAttributes(): string
+    {
+        return '';
+    }
+
+    protected function getFooterCellAttributes(): string
     {
         return '';
     }

@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter;
+namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellifierAware;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
+use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
 
-final readonly class NodeWrapperCellifier implements BackendCellifier, CellifierAware
+final readonly class NodePropertyCellifier implements BackendCellifier, CellifierAware
 {
     public function __construct(
         private ?Cellifier $cellifier = null,
@@ -38,7 +38,7 @@ final readonly class NodeWrapperCellifier implements BackendCellifier, Cellifier
     #[\Override]
     public function toCell(mixed $input): ?CellProperties
     {
-        if (!$input instanceof NodeWrapper) {
+        if (!$input instanceof NodeProperty) {
             return null;
         }
 
