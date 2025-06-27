@@ -41,10 +41,6 @@ use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
 use Rekalogika\Analytics\Bundle\UI\FilterFactory;
-use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyCellifier;
-use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyHtmlifier;
-use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyNumberifier;
-use Rekalogika\Analytics\Bundle\UI\Formatter\NodePropertyStringifier;
 use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
 use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
@@ -643,37 +639,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.specific_filter_factory')
-    ;
-
-    //
-    // node wrapper
-    //
-
-    $services
-        ->set(NodePropertyHtmlifier::class)
-        ->tag('rekalogika.analytics.backend_htmlifier', [
-            'priority' => -100,
-        ])
-    ;
-
-    $services
-        ->set(NodePropertyNumberifier::class)
-        ->tag('rekalogika.analytics.backend_numberifier', [
-            'priority' => -100,
-        ])
-    ;
-
-    $services
-        ->set(NodePropertyStringifier::class)
-        ->tag('rekalogika.analytics.backend_stringifier', [
-            'priority' => -100,
-        ])
-    ;
-
-    $services
-        ->set(NodePropertyCellifier::class)
-        ->tag('rekalogika.analytics.backend_cellifier', [
-            'priority' => -100,
-        ])
     ;
 };
