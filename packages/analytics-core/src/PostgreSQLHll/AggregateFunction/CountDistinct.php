@@ -13,12 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PostgreSQLHll\AggregateFunction;
 
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
+use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\PostgreSQLHll\ApproximateCount;
 
-final readonly class CountDistinct implements SummarizableAggregateFunction
+/**
+ * @implements UserValueTransformer<int,ApproximateCount>
+ */
+final readonly class CountDistinct implements
+    SummarizableAggregateFunction,
+    UserValueTransformer
 {
     private ValueResolver $property;
 
@@ -57,5 +66,24 @@ final readonly class CountDistinct implements SummarizableAggregateFunction
     public function getInvolvedProperties(): array
     {
         return $this->property->getInvolvedProperties();
+    }
+
+    #[\Override]
+    public function getUserValue(
+        mixed $rawValue,
+        ValueTransformerContext $context,
+    ): mixed {
+        if ($rawValue === null) {
+            return null;
+        }
+
+        if (!\is_int($rawValue)) {
+            throw new InvalidArgumentException(\sprintf(
+                'Expected an integer value, got "%s".',
+                \gettype($rawValue),
+            ));
+        }
+
+        return new ApproximateCount($rawValue);
     }
 }

@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Contracts\Context;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class SummaryContext
@@ -42,27 +43,29 @@ final readonly class SummaryContext
         $propertyMetadata = $this->summaryMetadata
             ->getProperty($property);
 
-        if (!$propertyMetadata instanceof DimensionMetadata) {
+        if ($propertyMetadata instanceof DimensionMetadata) {
+            $transformer = $propertyMetadata->getValueResolver();
+        } elseif ($propertyMetadata instanceof MeasureMetadata) {
+            $transformer = $propertyMetadata->getFunction();
+        } else {
             throw new InvalidArgumentException(\sprintf(
-                'Getting user value is not supported, the property "%s" is not a dimension property.',
+                'Getting user value is not supported, the property "%s" is not a dimension or measure.',
                 $property,
             ));
         }
 
-        $valueResolver = $propertyMetadata->getValueResolver();
-
-        if (!$valueResolver instanceof UserValueTransformer) {
+        if (!$transformer instanceof UserValueTransformer) {
             throw new InvalidArgumentException(\sprintf(
-                'Getting user value is not supported, but the value resolver of property "%s" is "%s" which is not an instance of "%s".',
+                'Getting user value is not supported, but the value resolver or aggregate function of property "%s" is "%s" which is not an instance of "%s".',
                 $property,
-                $valueResolver::class,
+                $transformer::class,
                 UserValueTransformer::class,
             ));
         }
 
         $valueTransformerContext = new ValueTransformerContext($propertyMetadata);
         /** @psalm-suppress MixedAssignment */
-        $result = $valueResolver->getUserValue($rawValue, $valueTransformerContext);
+        $result = $transformer->getUserValue($rawValue, $valueTransformerContext);
 
         if (
             $class !== null
