@@ -35,15 +35,20 @@ use Twig\TemplateWrapper;
  * @implements TableVisitor<string>
  * @internal
  */
-final readonly class PivotTableRendererVisitor implements TableVisitor
+readonly class HtmlRendererVisitor implements TableVisitor
 {
     private TemplateWrapper $template;
 
     public function __construct(
         Environment $twig,
-        string $theme = '@RekalogikaAnalytics/bootstrap_5_renderer.html.twig',
+        string $theme,
     ) {
         $this->template = $twig->load($theme);
+    }
+
+    protected function getTemplate(): TemplateWrapper
+    {
+        return $this->template;
     }
 
     /**
@@ -52,20 +57,26 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
      * @param array<string,mixed> $parameters
      * @return string
      */
-    private function renderWithChildren(
+    private function renderElementWithChildren(
         \Traversable $element,
         string $block,
         array $parameters = [],
     ): string {
-        return $this->template->renderBlock($block, [
+        return $this->getTemplate()->renderBlock($block, [
             'element' => $element,
-            'children' => $this->getChildren($element),
+            'children' => $this->renderChildren($element),
             ...$parameters,
         ]);
     }
 
-    private function renderCell(Cell $cell, string $block): string
-    {
+    /**
+     * @param array<string,mixed> $parameters
+     */
+    private function renderCell(
+        Cell $cell,
+        string $block,
+        array $parameters = [],
+    ): string {
         /** @psalm-suppress MixedAssignment */
         $content = $cell->getContent();
 
@@ -73,9 +84,10 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
             $content = $content->accept($this);
         }
 
-        return $this->template->renderBlock($block, [
+        return $this->getTemplate()->renderBlock($block, [
             'element' => $cell,
             'content' => $content,
+            ...$parameters,
         ]);
     }
 
@@ -83,7 +95,7 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
      * @param \Traversable<Element> $node
      * @return \Traversable<string>
      */
-    private function getChildren(\Traversable $node): \Traversable
+    protected function renderChildren(\Traversable $node): \Traversable
     {
         foreach ($node as $child) {
             yield $child->accept($this);
@@ -93,31 +105,31 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
     #[\Override]
     public function visitTable(Table $table): mixed
     {
-        return $this->renderWithChildren($table, 'table');
+        return $this->renderElementWithChildren($table, 'table');
     }
 
     #[\Override]
     public function visitTableHeader(TableHeader $tableHeader): mixed
     {
-        return $this->renderWithChildren($tableHeader, 'thead');
+        return $this->renderElementWithChildren($tableHeader, 'thead');
     }
 
     #[\Override]
     public function visitTableBody(TableBody $tableBody): mixed
     {
-        return $this->renderWithChildren($tableBody, 'tbody');
+        return $this->renderElementWithChildren($tableBody, 'tbody');
     }
 
     #[\Override]
     public function visitTableFooter(TableFooter $tableFooter): mixed
     {
-        return $this->renderWithChildren($tableFooter, 'tfoot');
+        return $this->renderElementWithChildren($tableFooter, 'tfoot');
     }
 
     #[\Override]
     public function visitRow(Row $tableRow): mixed
     {
-        return $this->renderWithChildren($tableRow, 'tr');
+        return $this->renderElementWithChildren($tableRow, 'tr');
     }
 
     #[\Override]
@@ -141,7 +153,7 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
     #[\Override]
     public function visitLabel(Label $label): mixed
     {
-        return $this->template->renderBlock('label', [
+        return $this->getTemplate()->renderBlock('label', [
             'label' => $label,
         ]);
     }
@@ -149,7 +161,7 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
     #[\Override]
     public function visitMember(Member $member): mixed
     {
-        return $this->template->renderBlock('member', [
+        return $this->getTemplate()->renderBlock('member', [
             'member' => $member,
         ]);
     }
@@ -157,7 +169,7 @@ final readonly class PivotTableRendererVisitor implements TableVisitor
     #[\Override]
     public function visitValue(Value $value): mixed
     {
-        return $this->template->renderBlock('value', [
+        return $this->getTemplate()->renderBlock('value', [
             'value' => $value,
         ]);
     }

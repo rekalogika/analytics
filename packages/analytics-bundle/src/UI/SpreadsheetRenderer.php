@@ -15,22 +15,23 @@ namespace Rekalogika\Analytics\Bundle\UI;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
+use Rekalogika\Analytics\Bundle\UI\Implementation\SpreadSheetRendererVisitor;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
+use Rekalogika\PivotTable\PivotTableTransformer;
 use Twig\Environment;
 
 final readonly class SpreadsheetRenderer
 {
-    public function __construct(
-        private Environment $twig,
-        private string $theme = '@RekalogikaAnalytics/spreadsheet_renderer.html.twig',
-    ) {}
+    private SpreadSheetRendererVisitor $visitor;
 
-    private function createPivotTableRenderer(): PivotTableRenderer
-    {
-        return new PivotTableRenderer(
-            twig: $this->twig,
-            theme: $this->theme,
-        );
+    public function __construct(
+        Environment $twig,
+        Cellifier $cellifier,
+        string $theme = '@RekalogikaAnalytics/spreadsheet_renderer.html.twig',
+    ) {
+        $this->visitor = new SpreadSheetRendererVisitor($twig, $theme, $cellifier);
     }
 
     /**
@@ -40,10 +41,16 @@ final readonly class SpreadsheetRenderer
         Result $result,
         array $pivotedDimensions = [],
     ): Spreadsheet {
-        $html = $this->createPivotTableRenderer()->createPivotTable(
-            result: $result,
-            pivotedDimensions: $pivotedDimensions,
+        $treeResult = $result->getTree();
+        $pivotTable = PivotTableAdapter::adapt($treeResult);
+
+        $table = PivotTableTransformer::transformTreeNodeToPivotTable(
+            treeNode: $pivotTable,
+            pivotedNodes: $pivotedDimensions,
+            superfluousLegends: ['@values'],
         );
+
+        $html = $this->visitor->visitTable($table);
 
         $reader = new Html();
         $spreadsheet = $reader->loadFromString($html);
