@@ -45,7 +45,6 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // rekalogika dependencies
-                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
                 Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // datetime
@@ -175,8 +174,9 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsEngine(),
-                Selector::inNamespace('OzdemirBurak\Iris\Color'),
                 Selectors::selectAnalyticsPivotTable(),
+                Selector::inNamespace('OzdemirBurak\Iris\Color'),
+                Selectors::selectPivotTable(),
 
                 // optional dependencies
                 Selectors::selectAnalyticsUuid(),
@@ -397,6 +397,32 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCommon(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // rekalogika dependencies
+                Selector::inNamespace('Rekalogika\PivotTable\Contracts'),
+
+                // php misc
+                Selector::classname(\Override::class),
+
+                // php array
+                Selector::classname(\WeakMap::class),
+            );
+    }
+
+    public function testPackageRekalogikaPivotTable(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectPivotTable(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectPivotTable(),
 
                 // exceptions
                 Selector::classname(\LogicException::class),

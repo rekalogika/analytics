@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter;
+namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\HtmlifierAware;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
+use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
 
-final readonly class NodeWrapperHtmlifier implements BackendHtmlifier, HtmlifierAware
+final readonly class NodePropertyHtmlifier implements BackendHtmlifier, HtmlifierAware
 {
     public function __construct(
         private ?Htmlifier $htmlifier = null,
@@ -37,7 +37,7 @@ final readonly class NodeWrapperHtmlifier implements BackendHtmlifier, Htmlifier
     #[\Override]
     public function toHtml(mixed $input): ?string
     {
-        if (!$input instanceof NodeWrapper) {
+        if (!$input instanceof NodeProperty) {
             return null;
         }
 

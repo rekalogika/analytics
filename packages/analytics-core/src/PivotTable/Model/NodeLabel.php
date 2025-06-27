@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper;
+namespace Rekalogika\Analytics\PivotTable\Model;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class NodeLabel extends NodeWrapper
+final readonly class NodeLabel extends NodeProperty
 {
     #[\Override]
     public function getContent(): TranslatableInterface
     {
-        return $this->node->getLabel();
+        return $this->getNode()->getLabel();
     }
 }

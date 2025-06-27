@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Formatter;
+namespace Rekalogika\Analytics\Bundle\UI\Formatter;
 
 use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
-use Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper\NodeWrapper;
+use Rekalogika\Analytics\PivotTable\Model\NodeProperty;
 
-final readonly class NodeWrapperNumberifier implements BackendNumberifier, NumberifierAware
+final readonly class NodePropertyNumberifier implements BackendNumberifier, NumberifierAware
 {
     public function __construct(
         private ?Numberifier $numberifier = null,
@@ -37,7 +37,7 @@ final readonly class NodeWrapperNumberifier implements BackendNumberifier, Numbe
     #[\Override]
     public function toNumber(mixed $input): null|int|float
     {
-        if (!$input instanceof NodeWrapper) {
+        if (!$input instanceof NodeProperty) {
             return null;
         }
 

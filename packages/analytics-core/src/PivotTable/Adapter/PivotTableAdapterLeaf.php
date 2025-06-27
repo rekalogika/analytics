@@ -11,19 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\PivotTableAdapter;
+namespace Rekalogika\Analytics\PivotTable\Adapter;
 
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\PivotTable\Model\NodePropertyMap;
 use Rekalogika\PivotTable\Contracts\LeafNode;
 
-final readonly class PivotTableLeaf implements LeafNode
+final readonly class PivotTableAdapterLeaf implements LeafNode
 {
-    private Measure $measure;
-
     public function __construct(
         private TreeNode $node,
+        private NodePropertyMap $propertyMap,
     ) {
         $measure = $node->getMeasure();
 
@@ -33,14 +32,12 @@ final readonly class PivotTableLeaf implements LeafNode
                 $node->getName(),
             ));
         }
-
-        $this->measure = $measure;
     }
 
     #[\Override]
     public function getValue(): mixed
     {
-        return $this->measure->getValue();
+        return $this->propertyMap->getValue($this->node);
     }
 
     #[\Override]
@@ -52,13 +49,13 @@ final readonly class PivotTableLeaf implements LeafNode
     #[\Override]
     public function getLegend(): mixed
     {
-        return $this->node->getLabel();
+        return $this->propertyMap->getLabel($this->node);
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return $this->node->getDisplayMember();
+        return $this->propertyMap->getMember($this->node);
     }
 
     public function getTreeNode(): TreeNode

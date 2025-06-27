@@ -11,13 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\UI\PivotTableAdapter\Wrapper;
+namespace Rekalogika\Analytics\PivotTable\Model;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 
-abstract readonly class NodeWrapper
+abstract readonly class NodeProperty
 {
-    final public function __construct(protected TreeNode $node) {}
+    final public function __construct(private TreeNode $node) {}
 
     abstract public function getContent(): mixed;
 
