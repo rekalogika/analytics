@@ -13,19 +13,20 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class TranslatableStringifier implements BackendStringifier
+final readonly class TranslatableStringifier implements Stringifier
 {
     public function __construct(
         private TranslatorInterface $translator,
     ) {}
 
     #[\Override]
-    public function toString(mixed $input): ?string
+    public function toString(mixed $input): string
     {
         if ($input instanceof TranslatableInterface) {
             return $input->trans($this->translator);
@@ -41,6 +42,6 @@ final readonly class TranslatableStringifier implements BackendStringifier
                 : (new TranslatableMessage('False'))->trans($this->translator);
         }
 
-        return null;
+        throw new Unsupported();
     }
 }

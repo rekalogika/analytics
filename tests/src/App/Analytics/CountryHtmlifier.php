@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 
-final class CountryHtmlifier implements BackendHtmlifier
+final class CountryHtmlifier implements Htmlifier
 {
     #[\Override]
-    public function toHtml(mixed $input): ?string
+    public function toHtml(mixed $input): string
     {
         if (!$input instanceof Country) {
-            return null;
+            throw new Unsupported();
         }
 
         $emoji = $this->countryCodeToEmojiFlag($input->getCode() ?? '');

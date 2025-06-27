@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 
-final readonly class DefaultBackendStringifier implements BackendStringifier
+final readonly class DefaultStringifier implements Stringifier
 {
     #[\Override]
     public function toString(mixed $input): string

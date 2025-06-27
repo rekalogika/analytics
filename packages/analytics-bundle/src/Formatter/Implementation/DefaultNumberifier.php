@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
-final readonly class DefaultBackendNumberifier implements BackendNumberifier
+final readonly class DefaultNumberifier implements Numberifier
 {
     #[\Override]
-    public function toNumber(mixed $input): null|int|float
+    public function toNumber(mixed $input): int|float
     {
         if (\is_int($input) || \is_float($input)) {
             return $input;
@@ -40,6 +41,6 @@ final readonly class DefaultBackendNumberifier implements BackendNumberifier
             return (float) $input;
         }
 
-        return null;
+        throw new Unsupported();
     }
 }

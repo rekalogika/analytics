@@ -30,9 +30,9 @@ use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\ChainStringifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendCellifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendNumberifier;
-use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultBackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultCellifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultNumberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Implementation\DefaultStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
@@ -517,8 +517,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services
-        ->set(DefaultBackendStringifier::class)
-        ->tag('rekalogika.analytics.backend_stringifier', [
+        ->set(DefaultStringifier::class)
+        ->tag('rekalogika.analytics.stringifier', [
             'priority' => -1000,
         ])
     ;
@@ -528,7 +528,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$translator' => service('translator'),
         ])
-        ->tag('rekalogika.analytics.backend_stringifier', [
+        ->tag('rekalogika.analytics.stringifier', [
             'priority' => -900,
         ])
     ;
@@ -537,7 +537,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(Stringifier::class)
         ->class(ChainStringifier::class)
         ->args([
-            '$backendStringifiers' => tagged_iterator('rekalogika.analytics.backend_stringifier'),
+            '$stringifiers' => tagged_iterator('rekalogika.analytics.stringifier'),
         ])
     ;
 
@@ -549,7 +549,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(Htmlifier::class)
         ->class(ChainHtmlifier::class)
         ->args([
-            '$backendHtmlifiers' => tagged_iterator('rekalogika.analytics.backend_htmlifier'),
+            '$htmlifiers' => tagged_iterator('rekalogika.analytics.htmlifier'),
             '$stringifier' => service(Stringifier::class),
         ])
     ;
@@ -562,13 +562,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(Numberifier::class)
         ->class(ChainNumberifier::class)
         ->args([
-            '$backendNumberifiers' => tagged_iterator('rekalogika.analytics.backend_numberifier'),
+            '$numberifiers' => tagged_iterator('rekalogika.analytics.numberifier'),
         ])
     ;
 
     $services
-        ->set(DefaultBackendNumberifier::class)
-        ->tag('rekalogika.analytics.backend_numberifier', [
+        ->set(DefaultNumberifier::class)
+        ->tag('rekalogika.analytics.numberifier', [
             'priority' => -1000,
         ])
     ;
@@ -581,14 +581,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(Cellifier::class)
         ->class(ChainCellifier::class)
         ->args([
-            '$backendCellifiers' => tagged_iterator('rekalogika.analytics.backend_cellifier'),
+            '$cellifiers' => tagged_iterator('rekalogika.analytics.cellifier'),
             '$stringifier' => service(Stringifier::class),
         ])
     ;
 
     $services
-        ->set(DefaultBackendCellifier::class)
-        ->tag('rekalogika.analytics.backend_cellifier', [
+        ->set(DefaultCellifier::class)
+        ->tag('rekalogika.analytics.cellifier', [
             'priority' => -1000,
         ])
     ;

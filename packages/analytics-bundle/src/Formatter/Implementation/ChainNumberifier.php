@@ -13,50 +13,49 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\NumberifierAware;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 
 final readonly class ChainNumberifier implements Numberifier
 {
     /**
-     * @var list<BackendNumberifier>
+     * @var list<Numberifier>
      */
-    private array $backendNumberifiers;
+    private array $numberifiers;
 
     /**
-     * @param iterable<BackendNumberifier> $backendNumberifiers
+     * @param iterable<Numberifier> $numberifiers
      */
     public function __construct(
-        iterable $backendNumberifiers,
+        iterable $numberifiers,
     ) {
-        $newBackendNumberifiers = [];
+        $newNumberifiers = [];
 
-        foreach ($backendNumberifiers as $backendNumberifier) {
-            if ($backendNumberifier instanceof NumberifierAware) {
-                $backendNumberifier = $backendNumberifier->withNumberifier($this);
+        foreach ($numberifiers as $numberifier) {
+            if ($numberifier instanceof NumberifierAware) {
+                $numberifier = $numberifier->withNumberifier($this);
             }
 
-            $newBackendNumberifiers[] = $backendNumberifier;
+            $newNumberifiers[] = $numberifier;
         }
 
-        $this->backendNumberifiers = $newBackendNumberifiers;
+        $this->numberifiers = $newNumberifiers;
     }
 
     #[\Override]
     public function toNumber(mixed $input): int|float
     {
-        foreach ($this->backendNumberifiers as $numberifier) {
-            $result = $numberifier->toNumber($input);
-
-            if ($result !== null) {
-                return $result;
+        foreach ($this->numberifiers as $numberifier) {
+            try {
+                return $numberifier->toNumber($input);
+            } catch (Unsupported) {
             }
         }
 
         throw new InvalidArgumentException(\sprintf(
-            'Cannot convert "%s" to a number. To fix this problem, you need to create a custom implementation of "BackendNumberifier" for "%s".',
+            'Cannot convert "%s" to a number. To fix this problem, you need to create a custom implementation of "Numberifier" for "%s".',
             get_debug_type($input),
             get_debug_type($input),
         ));

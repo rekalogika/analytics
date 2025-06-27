@@ -13,46 +13,45 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
 final readonly class ChainHtmlifier implements Htmlifier
 {
     /**
-     * @var list<BackendHtmlifier>
+     * @var list<Htmlifier>
      */
-    private array $backendHtmlifiers;
+    private array $htmlifiers;
 
     /**
-     * @param iterable<BackendHtmlifier> $backendHtmlifiers
+     * @param iterable<Htmlifier> $htmlifiers
      */
     public function __construct(
-        iterable $backendHtmlifiers,
+        iterable $htmlifiers,
         private Stringifier $stringifier,
     ) {
-        $newBackendHtmlifiers = [];
+        $newHtmlifiers = [];
 
-        foreach ($backendHtmlifiers as $backendHtmlifier) {
-            if ($backendHtmlifier instanceof HtmlifierAware) {
-                $backendHtmlifier = $backendHtmlifier->withHtmlifier($this);
+        foreach ($htmlifiers as $htmlifier) {
+            if ($htmlifier instanceof HtmlifierAware) {
+                $htmlifier = $htmlifier->withHtmlifier($this);
             }
 
-            $newBackendHtmlifiers[] = $backendHtmlifier;
+            $newHtmlifiers[] = $htmlifier;
         }
 
-        $this->backendHtmlifiers = $newBackendHtmlifiers;
+        $this->htmlifiers = $newHtmlifiers;
     }
 
     #[\Override]
     public function toHtml(mixed $input): string
     {
-        foreach ($this->backendHtmlifiers as $htmlifier) {
-            $result = $htmlifier->toHtml($input);
-
-            if ($result !== null) {
-                return $result;
+        foreach ($this->htmlifiers as $htmlifier) {
+            try {
+                return $htmlifier->toHtml($input);
+            } catch (Unsupported) {
             }
         }
 

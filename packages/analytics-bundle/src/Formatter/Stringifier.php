@@ -15,5 +15,8 @@ namespace Rekalogika\Analytics\Bundle\Formatter;
 
 interface Stringifier
 {
+    /**
+     * @throws Unsupported If this stringifier cannot handle the input type.
+     */
     public function toString(mixed $input): string;
 }

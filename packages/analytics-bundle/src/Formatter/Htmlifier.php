@@ -15,5 +15,8 @@ namespace Rekalogika\Analytics\Bundle\Formatter;
 
 interface Htmlifier
 {
+    /**
+     * @throws Unsupported If this htmlifier cannot handle the input type.
+     */
     public function toHtml(mixed $input): string;
 }

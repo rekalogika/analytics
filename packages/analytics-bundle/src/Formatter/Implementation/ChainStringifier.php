@@ -13,44 +13,43 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\StringifierAware;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
 final readonly class ChainStringifier implements Stringifier
 {
     /**
-     * @var list<BackendStringifier>
+     * @var list<Stringifier>
      */
-    private array $backendStringifiers;
+    private array $stringifiers;
 
     /**
-     * @param iterable<BackendStringifier> $backendStringifiers
+     * @param iterable<Stringifier> $stringifiers
      */
     public function __construct(
-        iterable $backendStringifiers,
+        iterable $stringifiers,
     ) {
-        $newBackendStringifiers = [];
+        $newStringifiers = [];
 
-        foreach ($backendStringifiers as $backendStringifier) {
-            if ($backendStringifier instanceof StringifierAware) {
-                $backendStringifier = $backendStringifier->withStringifier($this);
+        foreach ($stringifiers as $stringifier) {
+            if ($stringifier instanceof StringifierAware) {
+                $stringifier = $stringifier->withStringifier($this);
             }
 
-            $newBackendStringifiers[] = $backendStringifier;
+            $newStringifiers[] = $stringifier;
         }
 
-        $this->backendStringifiers = $newBackendStringifiers;
+        $this->stringifiers = $newStringifiers;
     }
 
     #[\Override]
     public function toString(mixed $input): string
     {
-        foreach ($this->backendStringifiers as $stringifier) {
-            $result = $stringifier->toString($input);
-
-            if ($result !== null) {
-                return $result;
+        foreach ($this->stringifiers as $stringifier) {
+            try {
+                return $stringifier->toString($input);
+            } catch (Unsupported) {
             }
         }
 

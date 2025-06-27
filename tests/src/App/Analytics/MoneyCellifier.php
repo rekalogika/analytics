@@ -15,16 +15,17 @@ namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Brick\Money\Money;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
-final class MoneyCellifier implements BackendCellifier
+final class MoneyCellifier implements Cellifier
 {
     #[\Override]
-    public function toCell(mixed $input): null|CellProperties
+    public function toCell(mixed $input): CellProperties
     {
         if (!$input instanceof Money) {
-            return null;
+            throw new Unsupported();
         }
 
         return  new CellProperties(

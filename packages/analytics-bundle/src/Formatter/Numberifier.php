@@ -15,5 +15,8 @@ namespace Rekalogika\Analytics\Bundle\Formatter;
 
 interface Numberifier
 {
+    /**
+     * @throws Unsupported If this numberifier cannot handle the input type.
+     */
     public function toNumber(mixed $input): int|float;
 }
