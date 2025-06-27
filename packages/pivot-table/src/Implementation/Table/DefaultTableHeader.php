@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-final class DefaultTableHeader extends DefaultTableSection
+use Rekalogika\PivotTable\Table\TableHeader;
+use Rekalogika\PivotTable\Table\TableVisitor;
+
+final class DefaultTableHeader extends DefaultTableSection implements TableHeader
 {
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'thead';
+        $visitor->visitTableHeader($this);
     }
 }

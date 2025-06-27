@@ -16,4 +16,4 @@ namespace Rekalogika\PivotTable\Table;
 /**
  * Represents a HTML table header (<thead>)
  */
-interface TableHeader extends RowGroup, Tag {}
+interface TableHeader extends RowGroup, Element {}

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Implementation\Table;
 
 use Rekalogika\PivotTable\Table\Table;
+use Rekalogika\PivotTable\Table\TableVisitor;
 
 /**
  * @implements \IteratorAggregate<DefaultTableSection>
@@ -49,9 +50,9 @@ final readonly class DefaultTable implements \Countable, Table, \IteratorAggrega
     }
 
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'table';
+        $visitor->visitTable($this);
     }
 
     #[\Override]

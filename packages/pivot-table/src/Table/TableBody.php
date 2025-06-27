@@ -16,4 +16,4 @@ namespace Rekalogika\PivotTable\Table;
 /**
  * Represents a HTML table body (<tbody>)
  */
-interface TableBody extends RowGroup, Tag {}
+interface TableBody extends RowGroup, Element {}

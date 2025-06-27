@@ -15,6 +15,7 @@ namespace Rekalogika\PivotTable\Implementation\Table;
 
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\Row;
+use Rekalogika\PivotTable\Table\TableVisitor;
 
 /**
  * @implements \IteratorAggregate<Cell>
@@ -29,9 +30,9 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
     ) {}
 
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'tr';
+        $visitor->visitRow($this);
     }
 
     /**

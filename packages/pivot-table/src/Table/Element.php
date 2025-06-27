@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML tag
+ * Represents a HTML element
  */
-interface Tag
+interface Element
 {
-    public function getTag(): string;
+    public function accept(TableVisitor $visitor): void;
 }

@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Implementation\Table;
 
 use Rekalogika\PivotTable\Table\HeaderCell;
+use Rekalogika\PivotTable\Table\TableVisitor;
 
 final readonly class DefaultHeaderCell extends DefaultCell implements HeaderCell
 {
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'th';
+        $visitor->visitHeaderCell($this);
     }
 }

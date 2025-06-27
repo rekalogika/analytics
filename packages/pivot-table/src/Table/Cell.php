@@ -16,7 +16,7 @@ namespace Rekalogika\PivotTable\Table;
 /**
  * Represents a HTML tabel cell (<td> or <th>).
  */
-interface Cell extends Tag
+interface Cell extends Element
 {
     public function getColumnSpan(): int;
 

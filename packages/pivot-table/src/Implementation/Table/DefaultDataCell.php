@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Implementation\Table;
 
 use Rekalogika\PivotTable\Table\DataCell;
+use Rekalogika\PivotTable\Table\TableVisitor;
 
 final readonly class DefaultDataCell extends DefaultCell implements DataCell
 {
     #[\Override]
-    public function getTag(): string
+    public function accept(TableVisitor $visitor): void
     {
-        return 'td';
+        $visitor->visitDataCell($this);
     }
 }

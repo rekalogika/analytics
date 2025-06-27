@@ -18,4 +18,4 @@ namespace Rekalogika\PivotTable\Table;
  *
  * @extends \Traversable<Cell>
  */
-interface Row extends \Traversable, \Countable, Tag {}
+interface Row extends \Traversable, \Countable, Element {}
