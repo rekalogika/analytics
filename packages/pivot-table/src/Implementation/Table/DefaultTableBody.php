@@ -19,8 +19,14 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final class DefaultTableBody extends DefaultTableSection implements TableBody
 {
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitTableBody($this);
+        return $visitor->visitTableBody($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'tbody';
     }
 }

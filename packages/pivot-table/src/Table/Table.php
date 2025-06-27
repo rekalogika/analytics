@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML table (<table>)
+ * Represents a HTML table (<table>).
  *
- * @extends \Traversable<RowGroup>
+ * @extends \Traversable<TableSection>
  */
 interface Table extends \Traversable, \Countable, Element
 {

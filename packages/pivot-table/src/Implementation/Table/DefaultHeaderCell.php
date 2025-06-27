@@ -19,8 +19,14 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final readonly class DefaultHeaderCell extends DefaultCell implements HeaderCell
 {
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitHeaderCell($this);
+        return $visitor->visitHeaderCell($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'th';
     }
 }

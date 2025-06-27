@@ -7,9 +7,9 @@
     {% set format_code = cell_properties.formatCode %}
     {% set attributes = cell_properties.attributes %}
 
-    {%- if cell.tag == 'th' -%}
+    {%- if cell.tagName == 'th' -%}
         {{ block("header_cell") }}
-    {%- elseif cell.tag == 'td' -%}
+    {%- elseif cell.tagName == 'td' -%}
         {{ block("data_cell") }}
     {%- endif -%}
 {%- endblock cell -%}

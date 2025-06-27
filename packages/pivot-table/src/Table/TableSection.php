@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Table;
 
 /**
- * Represents a HTML table body (<tbody>)
+ * Represents a HTML tag containing rows, including table header, table body, or
+ * table footer (<thead>, <tbody>, or <tfoot>)
  */
-interface TableBody extends TableSection {}
+interface TableSection extends RowGroup, Element {}

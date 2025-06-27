@@ -19,8 +19,14 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final class DefaultTableFooter extends DefaultTableSection implements TableFooter
 {
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitTableFooter($this);
+        return $visitor->visitTableFooter($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'tfoot';
     }
 }

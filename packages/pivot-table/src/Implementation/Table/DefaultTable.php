@@ -50,9 +50,15 @@ final readonly class DefaultTable implements \Countable, Table, \IteratorAggrega
     }
 
     #[\Override]
-    public function accept(TableVisitor $visitor): void
+    public function accept(TableVisitor $visitor): mixed
     {
-        $visitor->visitTable($this);
+        return $visitor->visitTable($this);
+    }
+
+    #[\Override]
+    public function getTagName(): string
+    {
+        return 'table';
     }
 
     #[\Override]
