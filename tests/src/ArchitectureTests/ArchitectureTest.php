@@ -397,7 +397,6 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
-
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
 

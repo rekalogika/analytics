@@ -40,15 +40,11 @@ final readonly class PivotTableRenderer
         $treeResult = $result->getTree();
         $pivotTable = PivotTableAdapter::adapt($treeResult);
 
-        dump($pivotTable);
-
         $table = PivotTableTransformer::transformTreeNodeToPivotTable(
             treeNode: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             superfluousLegends: ['@values'],
         );
-
-        dump($table);
 
         return $this->visitor->visitTable($table);
     }

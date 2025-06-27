@@ -22,7 +22,7 @@ final readonly class Member extends Property
     {
         return $visitor->visitMember($this);
     }
-    
+
     #[\Override]
     public function getContent(): mixed
     {
