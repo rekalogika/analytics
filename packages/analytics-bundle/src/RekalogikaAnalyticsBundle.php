@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
-use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
-use Rekalogika\Analytics\Bundle\Formatter\BackendHtmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
-use Rekalogika\Analytics\Bundle\Formatter\BackendStringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
+use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
@@ -100,17 +100,17 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
             ->addTag('rekalogika.analytics.distinct_values_resolver');
 
-        $builder->registerForAutoconfiguration(BackendStringifier::class)
-            ->addTag('rekalogika.analytics.backend_stringifier');
+        $builder->registerForAutoconfiguration(Stringifier::class)
+            ->addTag('rekalogika.analytics.stringifier');
 
-        $builder->registerForAutoconfiguration(BackendHtmlifier::class)
-            ->addTag('rekalogika.analytics.backend_htmlifier');
+        $builder->registerForAutoconfiguration(Htmlifier::class)
+            ->addTag('rekalogika.analytics.htmlifier');
 
-        $builder->registerForAutoconfiguration(BackendNumberifier::class)
-            ->addTag('rekalogika.analytics.backend_numberifier');
+        $builder->registerForAutoconfiguration(Numberifier::class)
+            ->addTag('rekalogika.analytics.numberifier');
 
-        $builder->registerForAutoconfiguration(BackendCellifier::class)
-            ->addTag('rekalogika.analytics.backend_cellifier');
+        $builder->registerForAutoconfiguration(Cellifier::class)
+            ->addTag('rekalogika.analytics.cellifier');
 
         $builder->registerForAutoconfiguration(SpecificFilterFactory::class)
             ->addTag('rekalogika.analytics.specific_filter_factory');

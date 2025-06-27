@@ -14,47 +14,46 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellifierAware;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
 final readonly class ChainCellifier implements Cellifier
 {
     /**
-     * @var list<BackendCellifier>
+     * @var list<Cellifier>
      */
-    private array $backendCellifier;
+    private array $cellifier;
 
     /**
-     * @param iterable<BackendCellifier> $backendCellifiers
+     * @param iterable<Cellifier> $cellifiers
      */
     public function __construct(
-        iterable $backendCellifiers,
+        iterable $cellifiers,
         private Stringifier $stringifier,
     ) {
-        $newBackendCellifiers = [];
+        $newCellifiers = [];
 
-        foreach ($backendCellifiers as $backendCellifier) {
-            if ($backendCellifier instanceof CellifierAware) {
-                $backendCellifier = $backendCellifier->withCellifier($this);
+        foreach ($cellifiers as $cellifier) {
+            if ($cellifier instanceof CellifierAware) {
+                $cellifier = $cellifier->withCellifier($this);
             }
 
-            $newBackendCellifiers[] = $backendCellifier;
+            $newCellifiers[] = $cellifier;
         }
 
-        $this->backendCellifier = $newBackendCellifiers;
+        $this->cellifier = $newCellifiers;
     }
 
     #[\Override]
     public function toCell(mixed $input): CellProperties
     {
-        foreach ($this->backendCellifier as $cellifier) {
-            $result = $cellifier->toCell($input);
-
-            if ($result !== null) {
-                return $result;
+        foreach ($this->cellifier as $cellifier) {
+            try {
+                return $cellifier->toCell($input);
+            } catch (Unsupported) {
             }
         }
 

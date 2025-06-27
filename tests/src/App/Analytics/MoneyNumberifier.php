@@ -14,15 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Brick\Money\Money;
-use Rekalogika\Analytics\Bundle\Formatter\BackendNumberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
-final class MoneyNumberifier implements BackendNumberifier
+final class MoneyNumberifier implements Numberifier
 {
     #[\Override]
-    public function toNumber(mixed $input): null|float
+    public function toNumber(mixed $input): float
     {
         if (!$input instanceof Money) {
-            return null;
+            throw new Unsupported();
         }
 
         return $input->getAmount()->toFloat();

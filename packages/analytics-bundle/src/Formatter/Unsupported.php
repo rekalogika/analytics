@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Formatter;
 
-interface BackendHtmlifier
-{
-    public function toHtml(mixed $input): ?string;
-}
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+
+final class Unsupported extends InvalidArgumentException {}

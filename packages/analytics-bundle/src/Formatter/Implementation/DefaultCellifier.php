@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Formatter\Implementation;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use Rekalogika\Analytics\Bundle\Formatter\BackendCellifier;
+use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
+use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
 
-final readonly class DefaultBackendCellifier implements BackendCellifier
+final readonly class DefaultCellifier implements Cellifier
 {
     #[\Override]
-    public function toCell(mixed $input): ?CellProperties
+    public function toCell(mixed $input): CellProperties
     {
         if ($input === null) {
             return new CellProperties(
@@ -42,6 +43,6 @@ final readonly class DefaultBackendCellifier implements BackendCellifier
             );
         }
 
-        return null;
+        throw new Unsupported();
     }
 }
