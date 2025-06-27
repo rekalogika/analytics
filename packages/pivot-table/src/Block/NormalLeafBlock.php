@@ -13,19 +13,23 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
+/**
+ * @extends NodeBlock<LeafNode>
+ */
 final class NormalLeafBlock extends NodeBlock
 {
     #[\Override]
     protected function createHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
-            name: $this->getLeafNode()->getKey(),
-            content: $this->getLeafNode()->getLegend(),
+            name: $this->getTreeNode()->getKey(),
+            content: $this->getTreeNode()->getLegend(),
             columnSpan: 2,
         );
 
@@ -38,13 +42,13 @@ final class NormalLeafBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         $name = new DefaultDataCell(
-            name: $this->getLeafNode()->getKey(),
-            content: $this->getLeafNode()->getItem(),
+            name: $this->getTreeNode()->getKey(),
+            content: $this->getTreeNode()->getItem(),
         );
 
         $value = new DefaultDataCell(
-            name: $this->getLeafNode()->getKey(),
-            content: $this->getLeafNode()->getValue(),
+            name: $this->getTreeNode()->getKey(),
+            content: $this->getTreeNode()->getValue(),
         );
 
         $row = new DefaultRow([$name, $value]);

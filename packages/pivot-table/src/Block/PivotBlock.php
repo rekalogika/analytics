@@ -13,30 +13,34 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
+/**
+ * @extends NodeBlock<BranchNode>
+ */
 final class PivotBlock extends NodeBlock
 {
     #[\Override]
     protected function createHeaderRows(): DefaultRows
     {
         if (
-            $this->getContext()->hasSuperfluousLegend($this->getBranchNode())
+            $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
         ) {
             $valueCell = new DefaultHeaderCell(
-                name: $this->getBranchNode()->getKey(),
-                content: $this->getBranchNode()->getItem(),
+                name: $this->getTreeNode()->getKey(),
+                content: $this->getTreeNode()->getItem(),
             );
         } else {
             $valueCell = new DefaultDataCell(
-                name: $this->getBranchNode()->getKey(),
-                content: $this->getBranchNode()->getItem(),
+                name: $this->getTreeNode()->getKey(),
+                content: $this->getTreeNode()->getItem(),
             );
         }
 
-        $blockGroup = $this->createGroupBlock($this->getBranchNode(), $this->getLevel());
+        $blockGroup = $this->createGroupBlock($this->getTreeNode(), $this->getLevel());
         $rows = $blockGroup->getHeaderRows();
 
         $rows = $valueCell->appendRowsBelow($rows);
@@ -48,7 +52,7 @@ final class PivotBlock extends NodeBlock
     protected function createDataRows(): DefaultRows
     {
         return $this
-            ->createGroupBlock($this->getBranchNode(), $this->getLevel())
+            ->createGroupBlock($this->getTreeNode(), $this->getLevel())
             ->getDataRows();
     }
 }
