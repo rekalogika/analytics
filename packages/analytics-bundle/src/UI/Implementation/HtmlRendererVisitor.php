@@ -154,7 +154,7 @@ readonly class HtmlRendererVisitor implements TableVisitor
     public function visitLabel(Label $label): mixed
     {
         return $this->getTemplate()->renderBlock('label', [
-            'label' => $label,
+            'label' => $label->getContent(),
         ]);
     }
 
@@ -162,7 +162,7 @@ readonly class HtmlRendererVisitor implements TableVisitor
     public function visitMember(Member $member): mixed
     {
         return $this->getTemplate()->renderBlock('member', [
-            'member' => $member,
+            'member' => $member->getContent(),
         ]);
     }
 
@@ -170,7 +170,7 @@ readonly class HtmlRendererVisitor implements TableVisitor
     public function visitValue(Value $value): mixed
     {
         return $this->getTemplate()->renderBlock('value', [
-            'value' => $value,
+            'value' => $value->getContent(),
         ]);
     }
 }

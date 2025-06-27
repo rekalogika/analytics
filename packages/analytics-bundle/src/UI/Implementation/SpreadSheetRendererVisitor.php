@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\UI\Implementation;
 
 use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\FooterCell;
@@ -43,6 +44,12 @@ final readonly class SpreadSheetRendererVisitor extends HtmlRendererVisitor
     ): string {
         /** @psalm-suppress MixedAssignment */
         $content = $cell->getContent();
+
+        if ($content instanceof Property) {
+            /** @psalm-suppress MixedAssignment */
+            $content = $content->getContent();
+        }
+
         $cellProperties = $this->cellifier->toCell($content);
 
         return $this->getTemplate()->renderBlock($block, [
