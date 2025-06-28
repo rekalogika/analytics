@@ -93,6 +93,7 @@
     "replace": {
         "rekalogika/analytics-bundle": "0.20.6",
         "rekalogika/analytics-core": "0.20.6",
+        "rekalogika/analytics-frontend": "self.version",
         "rekalogika/analytics-ux-panel": "self.version",
         "rekalogika/pivot-table": "0.20.6"
     },
@@ -100,6 +101,7 @@
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
             "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/",
+            "Rekalogika\\Analytics\\Frontend\\": "packages/analytics-frontend/src/",
             "Rekalogika\\Analytics\\UX\\PanelBundle\\": "packages/analytics-ux-panel/src/",
             "Rekalogika\\Analytics\\UX\\Panel\\": "packages/analytics-ux-panel/src/",
             "Rekalogika\\PivotTable\\": "packages/pivot-table/src/"

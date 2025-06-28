@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Brick\Money\Money;
-use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
-use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
 
 final class MoneyNumberifier implements Numberifier
 {

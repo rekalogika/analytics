@@ -22,6 +22,7 @@ jobs:
                     - analytics-bundle
                     - analytics-core
                     - analytics-ux-panel
+                    - analytics-frontend
                     - pivot-table
     
         steps:

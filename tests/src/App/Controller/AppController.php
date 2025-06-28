@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Rekalogika\Analytics\Bundle\UI\Chart\AnalyticsChartBuilder;
-use Rekalogika\Analytics\Bundle\UI\Chart\UnsupportedData;
-use Rekalogika\Analytics\Bundle\UI\Html\PivotTableRenderer;
-use Rekalogika\Analytics\Bundle\UI\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
+use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
+use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -16,15 +16,17 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
-use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
-use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
-use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
-use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
+use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
+use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
+use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
@@ -188,9 +190,22 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependTwig(ContainerBuilder $builder): void
     {
+        if (!class_exists(PivotTableRenderer::class)) {
+            return;
+        }
+
+        $path = (new \ReflectionClass(PivotTableRenderer::class))->getFileName();
+
+        if ($path === false) {
+            throw new InvalidArgumentException('Could not get file name for PivotTableRenderer');
+        }
+
+        $templatePath = \dirname($path, 3) . '/templates';
+
+
         $builder->prependExtensionConfig('twig', [
             'paths' => [
-                __DIR__ . '/../templates' => 'RekalogikaAnalytics',
+                $templatePath => 'RekalogikaAnalyticsFrontend',
             ],
         ]);
     }
