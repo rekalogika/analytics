@@ -20,18 +20,15 @@ use Rekalogika\Analytics\Bundle\UI\Implementation\SpreadSheetRendererVisitor;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Twig\Environment;
 
 final readonly class SpreadsheetRenderer
 {
     private SpreadSheetRendererVisitor $visitor;
 
     public function __construct(
-        Environment $twig,
         Cellifier $cellifier,
-        string $theme = '@RekalogikaAnalytics/spreadsheet_renderer.html.twig',
     ) {
-        $this->visitor = new SpreadSheetRendererVisitor($twig, $theme, $cellifier);
+        $this->visitor = new SpreadSheetRendererVisitor($cellifier);
     }
 
     /**

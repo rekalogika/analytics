@@ -144,7 +144,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.spreadsheet_renderer')
         ->class(SpreadsheetRenderer::class)
         ->args([
-            '$twig' => service('twig'),
             '$cellifier' => service(Cellifier::class),
         ])
     ;

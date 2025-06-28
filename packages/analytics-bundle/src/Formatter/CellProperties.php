@@ -27,19 +27,31 @@ final readonly class CellProperties implements \IteratorAggregate
 {
     /**
      * @param DataType::TYPE_* $type
-     * @param array<string,string> $attributes Extra HTML attributes
      */
     public function __construct(
         private string $content = '',
         private string $type = DataType::TYPE_STRING,
         private ?string $formatCode = null,
-        private array $attributes = [],
     ) {}
+
+    public function getHtmlAttributesAsString(): string
+    {
+        $attributes = [];
+
+        foreach ($this->getIterator() as $key => $value) {
+            $attributes[] = \sprintf(
+                '%s="%s"',
+                $key,
+                htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE),
+            );
+        }
+
+        return implode(' ', $attributes);
+    }
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        yield from $this->attributes;
         yield 'data-type' => $this->type;
 
         if ($this->formatCode !== null) {
@@ -60,16 +72,5 @@ final readonly class CellProperties implements \IteratorAggregate
     public function getFormatCode(): ?string
     {
         return $this->formatCode;
-    }
-
-    public function getAttributes(): string
-    {
-        $attributes = [];
-
-        foreach ($this->attributes as $key => $value) {
-            $attributes[] = \sprintf('%s="%s"', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return implode(' ', $attributes);
     }
 }

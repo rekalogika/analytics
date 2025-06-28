@@ -59,13 +59,10 @@ final readonly class ChainCellifier implements Cellifier
 
         $result = $this->stringifier->toString($input);
 
-        $content = htmlspecialchars($result, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
-
         return new CellProperties(
-            content: $content,
+            content: $result,
             type: DataType::TYPE_STRING,
             formatCode: null,
-            attributes: [],
         );
     }
 }
