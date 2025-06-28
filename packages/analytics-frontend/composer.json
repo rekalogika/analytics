@@ -15,7 +15,15 @@
     ],
     "type": "package",
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "ozdemirburak/iris": "^3.1",
+        "phpoffice/phpspreadsheet": "^4.0",
+        "rekalogika/analytics-core": "0.20.6",
+        "rekalogika/pivot-table": "0.20.6",
+        "symfony/translation": "^6.4 || ^7.0",
+        "symfony/translation-contracts": "^3",
+        "symfony/ux-chartjs": "^2.23",
+        "twig/twig": "^3.15 || ^4.0"
     },
     "autoload": {
         "psr-4": {

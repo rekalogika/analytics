@@ -1,6 +1,6 @@
 {
     "name": "rekalogika/analytics-bundle",
-    "description": "TBD",
+    "description": "Symfony bundle for Rekalogika Analytics, adds OLAP functionality to Doctrine entities in Symfony applications.",
     "homepage": "https://rekalogika.dev/analytics",
     "license": "MIT",
     "keywords": [

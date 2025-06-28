@@ -1,6 +1,6 @@
 {
     "name": "rekalogika/analytics-core",
-    "description": "TBD",
+    "description": "Adds OLAP functionality to Doctrine entities",
     "homepage": "https://rekalogika.dev/analytics",
     "license": "MIT",
     "authors": [
