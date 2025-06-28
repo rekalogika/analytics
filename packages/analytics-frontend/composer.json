@@ -1,0 +1,25 @@
+{
+    "name": "rekalogika/analytics-frontend",
+    "description": "Transforms analytical query results into pivot tables, charts, and spreadsheets.",
+    "homepage": "https://rekalogika.dev/analytics",
+    "license": "MIT",
+    "keywords": [
+        "analytics",
+        "symfony"
+    ],
+    "authors": [
+        {
+            "name": "Priyadi Iman Nurcahyo",
+            "email": "priyadi@rekalogika.com"
+        }
+    ],
+    "type": "package",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rekalogika\\Analytics\\Frontend\\": "src/"
+        }
+    }
+}

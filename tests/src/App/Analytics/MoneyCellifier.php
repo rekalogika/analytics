@@ -15,9 +15,9 @@ namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Brick\Money\Money;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
-use Rekalogika\Analytics\Bundle\Formatter\CellProperties;
-use Rekalogika\Analytics\Bundle\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
+use Rekalogika\Analytics\Frontend\Formatter\CellProperties;
+use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
 
 final class MoneyCellifier implements Cellifier
 {

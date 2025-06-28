@@ -170,6 +170,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
+                Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsEngine(),
                 Selectors::selectAnalyticsPivotTable(),
                 Selector::inNamespace('OzdemirBurak\Iris\Color'),
@@ -207,10 +208,6 @@ final class ArchitectureTest
                 Selector::inNamespace('Doctrine\Common\Collections'),
                 Selector::inNamespace('Doctrine\DBAL\Types'),
 
-                // other third-party libraries
-                Selector::inNamespace('Twig'),
-                Selector::inNamespace('PhpOffice\PhpSpreadsheet'),
-
                 // php misc
                 Selector::classname(\Override::class),
                 Selector::classname(\Stringable::class),
@@ -232,6 +229,45 @@ final class ArchitectureTest
             );
     }
 
+    public function testPackageAnalyticsFrontend(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsFrontend(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsFrontend(),
+
+                // dependencies
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsCore(),
+                Selectors::selectAnalyticsCommon(),
+                Selectors::selectAnalyticsPivotTable(),
+                Selectors::selectPivotTable(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // symfony
+                Selector::inNamespace('Symfony\Component\Translation'),
+                Selector::inNamespace('Symfony\UX\Chartjs'),
+
+                // other third-party libraries
+                Selector::inNamespace('Twig'),
+                Selector::inNamespace('OzdemirBurak\Iris\Color'),
+                Selector::inNamespace('PhpOffice\PhpSpreadsheet'),
+
+                // php misc
+                Selector::classname(\Override::class),
+                Selector::classname(\UnitEnum::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\Traversable::class),
+            );
+    }
+
     public function testPackageAnalyticsUXPanel(): Rule
     {
         return PHPat::rule()
@@ -246,6 +282,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsBundle(),
                 Selectors::selectAnalyticsCommon(),
+                Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsTime(),
 

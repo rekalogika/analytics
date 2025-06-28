@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
 
-use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\EqualFilter;
