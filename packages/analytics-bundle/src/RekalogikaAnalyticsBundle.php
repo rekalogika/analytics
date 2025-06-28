@@ -85,7 +85,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerConfigurator $container,
         ContainerBuilder $builder,
     ): void {
-        $container->import('../config/services.php');
+        $container->import('../config/metadata.php');
+        $container->import('../config/engine.php');
+        $container->import('../config/bundle.php');
+        $container->import('../config/ui.php');
 
         $container->parameters()
             ->set(
