@@ -108,6 +108,7 @@ final readonly class QueryResultToTableTransformer
             $summaryObject->setContext(
                 context: new SummaryContext(
                     summaryMetadata: $this->metadata,
+                    rawInput: $input,
                 ),
             );
         }

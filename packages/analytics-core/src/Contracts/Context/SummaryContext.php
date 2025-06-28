@@ -21,8 +21,12 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class SummaryContext
 {
+    /**
+     * @param array<string,mixed> $rawInput
+     */
     public function __construct(
         private SummaryMetadata $summaryMetadata,
+        private array $rawInput,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -37,9 +41,18 @@ final readonly class SummaryContext
      */
     public function getUserValue(
         string $property,
-        mixed $rawValue,
         ?string $class = null,
     ): mixed {
+        if (!\array_key_exists($property, $this->rawInput)) {
+            throw new InvalidArgumentException(\sprintf(
+                'Expecting property "%s" to be present in the raw input, but it is not found.',
+                $property,
+            ));
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $rawValue = $this->rawInput[$property];
+
         $propertyMetadata = $this->summaryMetadata
             ->getProperty($property);
 
@@ -56,7 +69,7 @@ final readonly class SummaryContext
 
         if (!$transformer instanceof UserValueTransformer) {
             throw new InvalidArgumentException(\sprintf(
-                'Getting user value is not supported, but the value resolver or aggregate function of property "%s" is "%s" which is not an instance of "%s".',
+                'Getting user value is not supported. The value resolver or aggregate function of property "%s" is "%s" which is not an instance of "%s".',
                 $property,
                 $transformer::class,
                 UserValueTransformer::class,

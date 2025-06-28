@@ -278,7 +278,6 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     {
         return $this->getContext()->getUserValue(
             property: 'shippedDate',
-            rawValue: $this->shippedDate,
             class: Date::class,
         );
     }
@@ -349,7 +348,6 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
     {
         return $this->getContext()->getUserValue(
             property: 'uniqueCustomers',
-            rawValue: $this->uniqueCustomers,
             class: ApproximateCount::class,
         );
     }
