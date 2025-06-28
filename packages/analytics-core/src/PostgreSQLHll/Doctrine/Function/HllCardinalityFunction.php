@@ -13,14 +13,24 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\AST\TypedExpression;
+
 /**
  * REKALOGIKA_HLL_CARDINALITY
  */
-final class HllCardinalityFunction extends AbstractSimpleFunction
+final class HllCardinalityFunction extends AbstractSimpleFunction implements TypedExpression
 {
     #[\Override]
     public function getFunctionName(): string
     {
         return 'hll_cardinality';
+    }
+
+    #[\Override]
+    public function getReturnType(): Type
+    {
+        return Type::getType(Types::INTEGER);
     }
 }
