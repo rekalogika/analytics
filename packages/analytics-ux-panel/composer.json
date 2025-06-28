@@ -1,0 +1,26 @@
+{
+    "name": "rekalogika/analytics-ux-panel",
+    "description": "User interface for modifying the parameters of a pivot table.",
+    "homepage": "https://rekalogika.dev/analytics",
+    "license": "MIT",
+    "keywords": [
+        "analytics",
+        "symfony",
+        "symfony-ux"
+    ],
+    "authors": [
+        {
+            "name": "Priyadi Iman Nurcahyo",
+            "email": "priyadi@rekalogika.com"
+        }
+    ],
+    "type": "symfony-bundle",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rekalogika\\Analytics\\UX\\PanelBundle\\": "src/"
+        }
+    }
+}

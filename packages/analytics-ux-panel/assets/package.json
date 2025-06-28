@@ -1,0 +1,89 @@
+{
+    "name": "@rekalogika/analytics-ux-panel",
+    "description": "TBD",
+    "license": "MIT",
+    "version": "0.0.1",
+    "symfony": {
+        "controllers": {
+            "pivot-table": {
+                "main": "dist/pivot-table-controller.js",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "equal-filter": {
+                "main": "dist/equal-filter-controller.js",
+                "fetch": "eager",
+                "enabled": true,
+                "autoimport": {
+                    "tom-select/dist/css/tom-select.default.css": true,
+                    "tom-select/dist/css/tom-select.bootstrap4.css": false,
+                    "tom-select/dist/css/tom-select.bootstrap5.css": false
+                }
+            },
+            "date-range-filter": {
+                "main": "dist/date-range-filter-controller.js",
+                "fetch": "eager",
+                "enabled": true,
+                "autoimport": {
+                    "flatpickr/dist/flatpickr.css": true
+                }
+            },
+            "number-ranges-filter": {
+                "main": "dist/number-ranges-filter-controller.js",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "help": {
+                "main": "dist/help-controller.js",
+                "fetch": "eager",
+                "enabled": true,
+                "autoimport": {
+                    "tippy.js/dist/tippy.css": true,
+                    "tippy.js/animations/scale-extreme.css": true
+                }
+            }
+        },
+        "importmap": {
+            "@hotwired/stimulus": "^3.0",
+            "@hotwired/turbo": "^7.0",
+            "sortablejs": "^1.14.0",
+            "tom-select": "^2.4.3",
+            "flatpickr": "^4.6.13",
+            "flatpickr/dist/l10n/ar.js": "^4.6.13",
+            "flatpickr/dist/l10n/da.js": "^4.6.13",
+            "flatpickr/dist/l10n/de.js": "^4.6.13",
+            "flatpickr/dist/l10n/fr.js": "^4.6.13",
+            "flatpickr/dist/l10n/it.js": "^4.6.13",
+            "flatpickr/dist/l10n/ms.js": "^4.6.13",
+            "flatpickr/dist/l10n/nl.js": "^4.6.13",
+            "flatpickr/dist/l10n/no.js": "^4.6.13",
+            "flatpickr/dist/l10n/pl.js": "^4.6.13",
+            "flatpickr/dist/l10n/pt.js": "^4.6.13",
+            "flatpickr/dist/l10n/ru.js": "^4.6.13",
+            "flatpickr/dist/l10n/th.js": "^4.6.13",
+            "flatpickr/dist/l10n/uk.js": "^4.6.13",
+            "flatpickr/dist/l10n/vn.js": "^4.6.13",
+            "flatpickr/dist/l10n/zh.js": "^4.6.13",
+            "flatpickr/dist/l10n/zh_tw.js": "^4.6.13",
+            "flatpickr/dist/l10n/id.js": "^4.6.13"
+        }
+    },
+    "scripts": {
+        "build": "babel src -d dist"
+    },
+    "peerDependencies": {
+        "@hotwired/stimulus": "^3.0.0",
+        "sortablejs": "^1.14.0",
+        "tom-select": "^2.4.3",
+        "flatpickr": "^4.6.13",
+        "tippy.js": "^6.3"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.26",
+        "@babel/core": "^7.26",
+        "@babel/plugin-proposal-class-properties": "^7.18.6",
+        "@babel/preset-env": "^7.26.0",
+        "@hotwired/stimulus": "^3.0",
+        "@hotwired/turbo": "^7.0"
+    }
+}

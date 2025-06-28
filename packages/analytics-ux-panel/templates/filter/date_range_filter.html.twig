@@ -1,0 +1,14 @@
+{%- block filter -%}
+    <input type="text"
+           value="{{ filter.rawValue }}"
+           data-start="{{ filter.rawStart }}"
+           data-end="{{ filter.rawEnd }}"
+           placeholder="{{ t('(All)', domain = 'rekalogika_analytics') |trans }}"
+           aria-label="{{ t('Date range', domain = 'rekalogika_analytics') |trans }}"
+           lang="{{ app.request.locale }}"
+           class="form-control filterelement"
+           data-controller="rekalogika--analytics-ux-panel--date-range-filter"
+           data-dimension="{{ filter.dimension }}"
+           data-action="rekalogika--analytics-ux-panel--date-range-filter:change->rekalogika--analytics-ux-panel--pivot-table#filter"
+           data-lang="{{ app.request.locale }}">
+{%- endblock filter -%}

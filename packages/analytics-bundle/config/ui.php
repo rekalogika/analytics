@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Bundle\Chart\AnalyticsChartBuilder;
-use Rekalogika\Analytics\Bundle\Chart\Implementation\ChartConfiguration;
-use Rekalogika\Analytics\Bundle\Chart\Implementation\DefaultAnalyticsChartBuilder;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
@@ -31,20 +28,21 @@ use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Bundle\Formatter\Twig\HtmlifierRuntime;
-use Rekalogika\Analytics\Bundle\UI\FilterFactory;
-use Rekalogika\Analytics\Bundle\UI\Implementation\DefaultFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\PivotAwareQueryFactory;
-use Rekalogika\Analytics\Bundle\UI\PivotTableRenderer;
-use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\DateRangeFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\EqualFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NullFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory\NumberRangesFilterFactory;
-use Rekalogika\Analytics\Bundle\UI\SpreadsheetRenderer;
-use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsExtension;
-use Rekalogika\Analytics\Bundle\UI\Twig\AnalyticsRuntime;
+use Rekalogika\Analytics\Bundle\UI\Chart\AnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\UI\Chart\Implementation\ChartConfiguration;
+use Rekalogika\Analytics\Bundle\UI\Chart\Implementation\DefaultAnalyticsChartBuilder;
+use Rekalogika\Analytics\Bundle\UI\Html\PivotTableRenderer;
+use Rekalogika\Analytics\Bundle\UI\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Internal\DefaultFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
+use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\DateRangeFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\EqualFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\NullFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\NumberRangesFilterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
@@ -75,19 +73,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
     // frontend
     //
-
-    $services
-        ->set('rekalogika.analytics.twig.runtime.analytics')
-        ->class(AnalyticsRuntime::class)
-        ->tag('twig.runtime')
-        ->args([
-            '$twig' => service('twig'),
-        ]);
-
-    $services
-        ->set('rekalogika.analytics.twig.extension.analytics')
-        ->class(AnalyticsExtension::class)
-        ->tag('twig.extension');
 
     $services
         ->set('rekalogika.analytics.twig.runtime.htmlifier')

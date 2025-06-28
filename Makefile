@@ -112,7 +112,7 @@ fixtures-load: compose-up
 
 .PHONY: js-compile
 js-compile:
-	cd packages/analytics-bundle/assets && npm run build
+	cd packages/analytics-ux-panel/assets && npm run build
 
 .PHONY: asset-map
 asset-map:
@@ -120,7 +120,7 @@ asset-map:
 
 .PHONY: js-symlink
 js-symlink:
-	cd tests/assets/controllers/rekalogika/analytics-bundle && rm -f * ; for A in ../../../../../packages/analytics-bundle/assets/dist/*; do ln -sf $$A ; done
+	mkdir -p tests/assets/controllers/rekalogika/analytics-ux-panel && cd tests/assets/controllers/rekalogika/analytics-ux-panel && rm -f * ; for A in ../../../../../packages/analytics-ux-panel/assets/dist/*; do ln -sf $$A ; done
 
 .PHONY: importmap-install
 importmap-install:
