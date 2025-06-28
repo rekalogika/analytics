@@ -35,7 +35,7 @@ use Twig\TemplateWrapper;
  * @implements TableVisitor<string>
  * @internal
  */
-readonly class HtmlRendererVisitor implements TableVisitor
+final readonly class HtmlRendererVisitor implements TableVisitor
 {
     private TemplateWrapper $template;
 
