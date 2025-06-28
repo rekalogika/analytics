@@ -54,6 +54,11 @@ final readonly class Selectors
         return Selector::inNamespace('Rekalogika\Analytics\Bundle');
     }
 
+    public static function selectAnalyticsUXPanel(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\UX\PanelBundle');
+    }
+
     public static function selectAnalyticsEngine(): SelectorInterface
     {
         return Selector::inNamespace('Rekalogika\Analytics\Engine');
