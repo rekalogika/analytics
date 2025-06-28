@@ -26,7 +26,7 @@ use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\TimeBinType;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
 #[DimensionGroup(
@@ -46,7 +46,7 @@ class DateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Date'),
-        source: new TimeBin(TimeBinType::Date),
+        source: new TimeBinValueResolver(TimeBinType::Date),
     )]
     private ?int $date = null;
 
@@ -57,7 +57,7 @@ class DateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Week'),
-        source: new TimeBin(TimeBinType::DayOfWeek),
+        source: new TimeBinValueResolver(TimeBinType::DayOfWeek),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -68,7 +68,7 @@ class DateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Month'),
-        source: new TimeBin(TimeBinType::DayOfMonth),
+        source: new TimeBinValueResolver(TimeBinType::DayOfMonth),
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
@@ -79,7 +79,7 @@ class DateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Year'),
-        source: new TimeBin(TimeBinType::DayOfYear),
+        source: new TimeBinValueResolver(TimeBinType::DayOfYear),
     )]
     private ?DayOfYear $dayOfYear = null;
 

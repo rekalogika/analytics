@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Bundle\UI\Filter\NumberRangesFilter;
 use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin as TimeBinValueResolver;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 /**
  * @implements SpecificFilterFactory<NumberRangesFilter>

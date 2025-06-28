@@ -20,14 +20,14 @@ use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
-use Rekalogika\Analytics\Time\TimeBin as TimeBinInterface;
+use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\Util\TimeZoneUtil;
 
 /**
- * @implements UserValueTransformer<RecurringTimeBin|int,TimeBinInterface|RecurringTimeBin>
+ * @implements UserValueTransformer<RecurringTimeBin|int,TimeBin|RecurringTimeBin>
  */
-final readonly class TimeBin implements
+final readonly class TimeBinValueResolver implements
     ValueResolver,
     DimensionGroupAware,
     UserValueTransformer
@@ -47,7 +47,7 @@ final readonly class TimeBin implements
     }
 
     /**
-     * @return class-string<TimeBinInterface|RecurringTimeBin>
+     * @return class-string<TimeBin|RecurringTimeBin>
      */
     public function getTypeClass(): string
     {
@@ -109,7 +109,7 @@ final readonly class TimeBin implements
 
         $binClass = $this->type->getBinClass();
 
-        if (!is_a($binClass, TimeBinInterface::class, true)) {
+        if (!is_a($binClass, TimeBin::class, true)) {
             throw new InvalidArgumentException(\sprintf(
                 'The class "%s" is not a valid TimeBin class.',
                 $binClass,
