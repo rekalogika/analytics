@@ -65,7 +65,6 @@ trait GregorianDateTrait
     {
         return $this->getContext()->getUserValue(
             property: 'year',
-            rawValue: $this->year,
             class: Year::class,
         );
     }

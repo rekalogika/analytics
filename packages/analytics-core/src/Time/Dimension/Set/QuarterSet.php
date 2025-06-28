@@ -68,7 +68,6 @@ class QuarterSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'quarter',
-            rawValue: $this->quarter,
             class: Quarter::class,
         );
     }
@@ -77,7 +76,6 @@ class QuarterSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'quarterOfYear',
-            rawValue: $this->quarterOfYear,
             class: QuarterOfYear::class,
         );
     }

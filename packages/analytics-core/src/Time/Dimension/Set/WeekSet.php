@@ -79,7 +79,6 @@ class WeekSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'week',
-            rawValue: $this->week,
             class: Week::class,
         );
     }
@@ -88,7 +87,6 @@ class WeekSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'weekOfYear',
-            rawValue: $this->weekOfYear,
             class: WeekOfYear::class,
         );
     }
@@ -97,7 +95,6 @@ class WeekSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'weekOfMonth',
-            rawValue: $this->weekOfMonth,
             class: WeekOfMonth::class,
         );
     }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Context;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -22,6 +23,7 @@ final readonly class DimensionGroupContext
 {
     public function __construct(
         private DimensionMetadata $dimensionMetadata,
+        private ContextAwareDimensionGroup $rawObject,
     ) {}
 
     public function getSummaryMetadata(): SummaryMetadata
@@ -41,9 +43,14 @@ final readonly class DimensionGroupContext
      */
     public function getUserValue(
         string $property,
-        mixed $rawValue,
         ?string $class = null,
     ): mixed {
+        $reflectionClass = new \ReflectionClass($this->rawObject);
+        $reflectionProperty = $reflectionClass->getProperty($property);
+
+        /** @psalm-suppress MixedAssignment */
+        $rawValue = $reflectionProperty->getValue($this->rawObject);
+
         $fullyQualifiedProperty = \sprintf(
             '%s.%s',
             $this->dimensionMetadata->getName(),

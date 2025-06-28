@@ -67,7 +67,6 @@ class MonthSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'month',
-            rawValue: $this->month,
             class: Month::class,
         );
     }
@@ -76,7 +75,6 @@ class MonthSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'monthOfYear',
-            rawValue: $this->monthOfYear,
             class: MonthOfYear::class,
         );
     }

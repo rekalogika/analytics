@@ -67,7 +67,6 @@ class HourSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'hour',
-            rawValue: $this->hour,
             class: Hour::class,
         );
     }
@@ -76,7 +75,6 @@ class HourSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'hourOfDay',
-            rawValue: $this->hourOfDay,
             class: HourOfDay::class,
         );
     }

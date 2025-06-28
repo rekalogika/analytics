@@ -57,7 +57,6 @@ trait IsoWeekDateTrait
     {
         return $this->getContext()->getUserValue(
             property: 'weekYear',
-            rawValue: $this->weekYear,
             class: WeekYear::class,
         );
     }

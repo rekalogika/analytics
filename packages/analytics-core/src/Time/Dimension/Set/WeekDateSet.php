@@ -79,7 +79,6 @@ class WeekDateSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'weekDate',
-            rawValue: $this->weekDate,
             class: WeekDate::class,
         );
     }

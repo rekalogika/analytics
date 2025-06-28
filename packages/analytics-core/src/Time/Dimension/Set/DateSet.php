@@ -91,7 +91,6 @@ class DateSet implements ContextAwareDimensionGroup
     {
         return $this->getContext()->getUserValue(
             property: 'date',
-            rawValue: $this->date,
             class: Date::class,
         );
     }
