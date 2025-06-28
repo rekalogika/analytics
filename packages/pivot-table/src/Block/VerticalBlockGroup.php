@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
 
@@ -46,7 +45,7 @@ final class VerticalBlockGroup extends BlockGroup
         // If there are no data rows, we create a NullBranchNode to indicate an
         // error, as this should never happen
 
-        if (count($dataRows) === 0) {
+        if (\count($dataRows) === 0) {
             $childBlock = $this->createBlock(new NullBranchNode('error', 'error', null), $this->getLevel() + 1);
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
