@@ -352,6 +352,7 @@ final readonly class QueryResultToTableHelper
         if ($metadata instanceof DimensionMetadata) {
             $context = new DimensionGroupContext(
                 dimensionMetadata: $metadata,
+                rawObject: $object,
             );
         } else {
             throw new LogicException(\sprintf(
