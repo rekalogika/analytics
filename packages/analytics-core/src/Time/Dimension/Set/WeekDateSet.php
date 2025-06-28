@@ -25,7 +25,7 @@ use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfWeekYear;
 use Rekalogika\Analytics\Time\Bin\WeekDate;
 use Rekalogika\Analytics\Time\TimeBinType;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
 #[DimensionGroup(
@@ -45,7 +45,7 @@ class WeekDateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Week Date'),
-        source: new TimeBin(TimeBinType::WeekDate),
+        source: new TimeBinValueResolver(TimeBinType::WeekDate),
     )]
     private ?int $weekDate = null;
 
@@ -56,7 +56,7 @@ class WeekDateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Week'),
-        source: new TimeBin(TimeBinType::DayOfWeek),
+        source: new TimeBinValueResolver(TimeBinType::DayOfWeek),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -67,7 +67,7 @@ class WeekDateSet implements ContextAwareDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of WeekYear'),
-        source: new TimeBin(TimeBinType::DayOfWeekYear),
+        source: new TimeBinValueResolver(TimeBinType::DayOfWeekYear),
     )]
     private ?DayOfWeekYear $dayOfWeekYear = null;
 

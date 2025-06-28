@@ -23,7 +23,7 @@ use Rekalogika\Analytics\Time\Bin\WeekYear;
 use Rekalogika\Analytics\Time\Dimension\Set\WeekDateSet;
 use Rekalogika\Analytics\Time\Dimension\Set\WeekSet;
 use Rekalogika\Analytics\Time\TimeBinType;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 trait IsoWeekDateTrait
 {
@@ -35,7 +35,7 @@ trait IsoWeekDateTrait
     )]
     #[Dimension(
         label: new TranslatableMessage('Week Year'),
-        source: new TimeBin(TimeBinType::WeekYear),
+        source: new TimeBinValueResolver(TimeBinType::WeekYear),
     )]
     private ?int $weekYear = null;
 

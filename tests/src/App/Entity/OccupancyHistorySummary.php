@@ -28,7 +28,7 @@ use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\DateToInteger;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]
@@ -52,7 +52,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: TimeBinType::TypeDate, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeBin(
+        source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
             type: TimeBinType::Date,
         ),
@@ -67,7 +67,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeBin(
+        source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfWeek,
         ),
@@ -81,7 +81,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeBin(
+        source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfMonth,
         ),
@@ -95,7 +95,7 @@ class OccupancyHistorySummary extends Summary
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     #[Analytics\Dimension(
-        source: new TimeBin(
+        source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
             type: TimeBinType::DayOfYear,
         ),

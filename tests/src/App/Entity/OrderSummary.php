@@ -40,7 +40,7 @@ use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\TimeBinType;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBin;
+use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
 #[ORM\Entity()]
@@ -79,7 +79,7 @@ class OrderSummary extends Summary implements HasQueryBuilderModifier
         nullable: true,
     )]
     #[Analytics\Dimension(
-        source: new TimeBin(
+        source: new TimeBinValueResolver(
             type: TimeBinType::Date,
             input: new PropertyValue('shipped'),
         ),
