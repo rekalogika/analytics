@@ -1,0 +1,11 @@
+{%- block filter -%}
+    <input type="text"
+           value="{{ filter.value }}"
+           placeholder="{{ t('(All)', domain = 'rekalogika_analytics') |trans }}"
+           aria-label="{{ filter.label |trans }}"
+           class="form-control filterelement"
+           data-controller="rekalogika--analytics-ux-panel--number-ranges-filter"
+           data-dimension="{{ filter.dimension }}"
+           data-action="rekalogika--analytics-ux-panel--number-ranges-filter:change->rekalogika--analytics-ux-panel--pivot-table#filter">
+    <div class="form-text">{{ filter.help|trans }}</div>
+{%- endblock filter -%}

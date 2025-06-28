@@ -1,0 +1,26 @@
+{%- block filter -%}
+    {%- set choices = filter.choices -%}
+
+    {%- if choices|length > 0 -%}
+        <select id="{{ filter.dimension }}-{{ id }}"
+                class="filterelement"
+                placeholder="{{ t('Select items...', domain = 'rekalogika_analytics') }}"
+                multiple
+                data-controller="rekalogika--analytics-ux-panel--equal-filter"
+                data-dimension="{{ filter.dimension }}"
+                data-action="rekalogika--analytics-ux-panel--equal-filter:change->rekalogika--analytics-ux-panel--pivot-table#filter"
+                data-label-empty="{{ t('(All)', domain = 'rekalogika_analytics')|trans }}"
+                data-label-selected="{{ t('Select items...', domain = 'rekalogika_analytics')|trans }}">
+            {%- for choice in choices -%}
+                <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }}>{{ choice.label }}</option>
+            {%- endfor -%}
+        </select>
+    {%- else -%}
+        <input id="{{ filter.dimension }}-{{ id }}"
+               type="text"
+               readonly
+               disabled
+               class="form-control text-secondary"
+               value="{{ t('Unable to find choices to present.', domain = 'rekalogika_analytics', domain = 'rekalogika_analytics') |trans }}">
+    {%- endif -%}
+{%- endblock filter -%}

@@ -1,15 +1,15 @@
 {
     "name": "rekalogika/analytics",
     "description": "TBD",
-    "homepage": "https://rekalogika.dev/analytics",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Priyadi Iman Nurcahyo",
             "email": "priyadi@rekalogika.com"
         }
     ],
-    "type": "library",
+    "homepage": "https://rekalogika.dev/analytics",
     "require": {
         "php": "^8.2",
         "doctrine/collections": "^2.2",
@@ -90,10 +90,18 @@
         "zenstruck/foundry": "^2.0",
         "zenstruck/messenger-test": "^1.11"
     },
+    "replace": {
+        "rekalogika/analytics-bundle": "0.20.6",
+        "rekalogika/analytics-core": "0.20.6",
+        "rekalogika/analytics-ux-panel": "self.version",
+        "rekalogika/pivot-table": "0.20.6"
+    },
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
             "Rekalogika\\Analytics\\Bundle\\": "packages/analytics-bundle/src/",
+            "Rekalogika\\Analytics\\UX\\PanelBundle\\": "packages/analytics-ux-panel/src/",
+            "Rekalogika\\Analytics\\UX\\Panel\\": "packages/analytics-ux-panel/src/",
             "Rekalogika\\PivotTable\\": "packages/pivot-table/src/"
         },
         "exclude-from-classmap": [
@@ -112,10 +120,5 @@
             "symfony/runtime": true,
             "symfony/flex": false
         }
-    },
-    "replace": {
-        "rekalogika/analytics-bundle": "0.20.6",
-        "rekalogika/analytics-core": "0.20.6",
-        "rekalogika/pivot-table": "0.20.6"
     }
 }

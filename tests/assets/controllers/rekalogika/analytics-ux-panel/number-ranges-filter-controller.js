@@ -1,0 +1,1 @@
+../../../../../packages/analytics-ux-panel/assets/dist/number-ranges-filter-controller.js

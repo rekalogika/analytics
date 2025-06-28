@@ -1,1 +1,0 @@
-../../../../../packages/analytics-bundle/assets/dist/pivot-table-controller.js

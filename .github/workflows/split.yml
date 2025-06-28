@@ -21,6 +21,7 @@ jobs:
                 name:
                     - analytics-bundle
                     - analytics-core
+                    - analytics-ux-panel
                     - pivot-table
     
         steps:

@@ -18,6 +18,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Rekalogika\Analytics\Bundle\RekalogikaAnalyticsBundle;
+use Rekalogika\Analytics\UX\PanelBundle\RekalogikaPanelBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -71,6 +72,7 @@ final class Kernel extends BaseKernel
         yield new ZenstruckMessengerTestBundle();
         yield new ChartjsBundle();
         yield new DoctrineMigrationsBundle();
+        yield new RekalogikaPanelBundle();
     }
 
     #[\Override]

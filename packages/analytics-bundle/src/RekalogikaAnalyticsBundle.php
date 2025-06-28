@@ -20,8 +20,6 @@ use Rekalogika\Analytics\Bundle\Formatter\Cellifier;
 use Rekalogika\Analytics\Bundle\Formatter\Htmlifier;
 use Rekalogika\Analytics\Bundle\Formatter\Numberifier;
 use Rekalogika\Analytics\Bundle\Formatter\Stringifier;
-use Rekalogika\Analytics\Bundle\UI\SpecificFilterFactory;
-use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
@@ -34,7 +32,6 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFuncti
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
-use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -114,9 +111,6 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $builder->registerForAutoconfiguration(Cellifier::class)
             ->addTag('rekalogika.analytics.cellifier');
-
-        $builder->registerForAutoconfiguration(SpecificFilterFactory::class)
-            ->addTag('rekalogika.analytics.specific_filter_factory');
     }
 
     /**
@@ -128,7 +122,6 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         ContainerBuilder $builder,
     ): void {
         $this->prependTwig($builder);
-        $this->prependAssetMapper($builder);
         $this->prependDQLFunctions($builder);
         $this->prependMigrations($builder);
     }
@@ -200,49 +193,5 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 __DIR__ . '/../templates' => 'RekalogikaAnalytics',
             ],
         ]);
-    }
-
-    /**
-     * @see https://symfony.com/doc/current/frontend/create_ux_bundle.html
-     */
-    private function prependAssetMapper(ContainerBuilder $builder): void
-    {
-        if (!$this->isAssetMapperAvailable($builder)) {
-            return;
-        }
-
-        $builder->prependExtensionConfig('framework', [
-            'asset_mapper' => [
-                'paths' => [
-                    __DIR__ . '/../assets/dist' => '@rekalogika/analytics-bundle',
-                ],
-            ],
-        ]);
-    }
-
-    private function isAssetMapperAvailable(ContainerBuilder $container): bool
-    {
-        if (!interface_exists(AssetMapperInterface::class)) {
-            return false;
-        }
-
-        // check that FrameworkBundle 6.3 or higher is installed
-        $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
-
-        if (!\is_array($bundlesMetadata)) {
-            throw new LogicException('Kernel bundles metadata not found.');
-        }
-
-        if (!isset($bundlesMetadata['FrameworkBundle']) || !\is_array($bundlesMetadata['FrameworkBundle'])) {
-            throw new LogicException('FrameworkBundle metadata not found.');
-        }
-
-        $dir = $bundlesMetadata['FrameworkBundle']['path'] ?? throw new LogicException('FrameworkBundle path not found.');
-
-        if (!\is_string($dir)) {
-            throw new LogicException('FrameworkBundle path is not a string.');
-        }
-
-        return is_file($dir . '/Resources/config/asset_mapper.php');
     }
 }
