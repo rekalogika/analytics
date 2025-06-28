@@ -21,9 +21,6 @@ use PHPat\Test\PHPat;
 
 final class ArchitectureTest
 {
-    /**
-     * @todo cleanup
-     */
     public function testPackageAnalyticsCore(): Rule
     {
         return PHPat::rule()
@@ -162,7 +159,7 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(
-                Selector::inNamespace('Rekalogika\Analytics\Bundle'),
+                Selectors::selectAnalyticsBundle(),
             )
             ->canOnlyDependOn()
             ->classes(
@@ -232,6 +229,53 @@ final class ArchitectureTest
                 // php reflection
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\ReflectionException::class),
+            );
+    }
+
+    public function testPackageAnalyticsUXPanel(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsUXPanel(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsUXPanel(),
+
+                // dependencies
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsBundle(),
+                Selectors::selectAnalyticsCommon(),
+                Selectors::selectAnalyticsMetadata(),
+                Selectors::selectAnalyticsTime(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Psr\Container'),
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // symfony
+                Selector::inNamespace('Symfony\Component\AssetMapper'),
+                Selector::inNamespace('Symfony\Component\DependencyInjection'),
+                Selector::inNamespace('Symfony\Component\HttpKernel'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\Persistence'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+
+                // other third-party libraries
+                Selector::inNamespace('Twig'),
+
+                // php misc
+                Selector::classname(\Override::class),
+                Selector::classname(\Stringable::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Traversable::class),
+
+                // php datetime
+                Selector::classname(\DateTimeImmutable::class),
             );
     }
 
