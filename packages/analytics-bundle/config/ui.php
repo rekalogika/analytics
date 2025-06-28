@@ -36,19 +36,11 @@ use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Equal\EqualFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Internal\DefaultFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
@@ -92,20 +84,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
     // pivot table
     //
-
-    $services->alias(
-        PivotAwareQueryFactory::class,
-        'rekalogika.analytics.pivot_aware_query_factory',
-    );
-
-    $services
-        ->set('rekalogika.analytics.pivot_aware_query_factory')
-        ->class(PivotAwareQueryFactory::class)
-        ->args([
-            '$filterFactory' => service(FilterFactory::class),
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-        ])
-    ;
 
     $services->alias(
         PivotTableRenderer::class,
@@ -236,53 +214,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('rekalogika.analytics.cellifier', [
             'priority' => -1000,
         ])
-    ;
-
-    //
-    // filter
-    //
-
-    $services
-        ->set(FilterFactory::class)
-        ->class(DefaultFilterFactory::class)
-        ->args([
-            '$specificFilterFactories' => tagged_locator('rekalogika.analytics.specific_filter_factory', defaultIndexMethod: 'getFilterClass'),
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-            '$managerRegistry' => service('doctrine'),
-        ])
-    ;
-
-    $services
-        ->set(DateRangeFilterFactory::class)
-        ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-        ])
-        ->tag('rekalogika.analytics.specific_filter_factory')
-    ;
-
-    $services
-        ->set(EqualFilterFactory::class)
-        ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
-            '$stringifier' => service(Stringifier::class),
-        ])
-        ->tag('rekalogika.analytics.specific_filter_factory')
-    ;
-
-    $services
-        ->set(NumberRangesFilterFactory::class)
-        ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-        ])
-        ->tag('rekalogika.analytics.specific_filter_factory')
-    ;
-
-    $services
-        ->set(NullFilterFactory::class)
-        ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-        ])
-        ->tag('rekalogika.analytics.specific_filter_factory')
     ;
 };
