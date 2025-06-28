@@ -20,10 +20,10 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRangeFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\EqualFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\NullFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRangesFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Equal\EqualFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
 

@@ -11,14 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRangeFilter;
 use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
 
 /**
