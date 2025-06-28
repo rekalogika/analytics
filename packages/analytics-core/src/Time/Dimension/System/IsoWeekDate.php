@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Dimension\System;
 
 use Doctrine\ORM\Mapping\Embeddable;
-use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
-use Rekalogika\Analytics\Core\Entity\ContextAwareDimensionGroupTrait;
+use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
@@ -28,8 +27,7 @@ use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
         'weekDate',
     ]),
 )]
-class IsoWeekDate implements ContextAwareDimensionGroup
+class IsoWeekDate extends BaseDimensionGroup
 {
-    use ContextAwareDimensionGroupTrait;
     use IsoWeekDateTrait;
 }

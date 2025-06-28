@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Core\Metadata as Analytics;
  * required to have the properties defined in this class.
  */
 #[ORM\MappedSuperclass()]
-abstract class Summary implements ContextAwareSummary
+abstract class BaseSummary implements ContextAwareSummary
 {
     use ContextAwareSummaryTrait;
 
