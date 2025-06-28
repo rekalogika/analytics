@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;

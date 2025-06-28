@@ -36,13 +36,13 @@ use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Equal\EqualFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\DefaultFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\DateRangeFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\EqualFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\NullFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory\NumberRangesFilterFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 

@@ -11,18 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Null;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRangesFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
 
 /**
- * @implements SpecificFilterFactory<NumberRangesFilter>
+ * @implements SpecificFilterFactory<NullFilter>
  */
-final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
+final readonly class NullFilterFactory implements SpecificFilterFactory
 {
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -31,7 +29,7 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
     #[\Override]
     public static function getFilterClass(): string
     {
-        return NumberRangesFilter::class;
+        return NullFilter::class;
     }
 
     #[\Override]
@@ -40,29 +38,16 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
         string $dimension,
         array $inputArray,
         ?object $options = null,
-    ): NumberRangesFilter {
+    ): Filter {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
 
         $dimensionMetadata = $metadata->getDimension($dimension);
         $label = $dimensionMetadata->getLabel();
-        $valueResolver = $dimensionMetadata->getValueResolver();
 
-        if (!$valueResolver instanceof TimeBinValueResolver) {
-            throw new InvalidArgumentException(\sprintf(
-                'NumberRangesFilter needs the value resolver of "%s", "%s" given',
-                TimeBinValueResolver::class,
-                get_debug_type($valueResolver),
-            ));
-        }
-
-        $typeClass = $valueResolver->getTypeClass();
-
-        return new NumberRangesFilter(
+        return new NullFilter(
             dimension: $dimension,
             label: $label,
-            inputArray: $inputArray,
-            typeClass: $typeClass,
         );
     }
 }

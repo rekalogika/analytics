@@ -11,13 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Equal;
 
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\EqualFilter;
 use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
 
 /**

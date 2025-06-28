@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
@@ -33,8 +33,6 @@ use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Model\Number;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Model\NumberRange;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class NumberRangesFilter implements Filter
