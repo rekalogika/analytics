@@ -143,7 +143,6 @@ class OccupancyHistorySummary extends Summary
     {
         return $this->getContext()->getUserValue(
             property: 'date',
-            rawValue: $this->date,
             class: Date::class,
         );
     }
