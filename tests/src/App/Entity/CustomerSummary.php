@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
-use Rekalogika\Analytics\Core\Entity\Summary;
+use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Core\Metadata as Analytics;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
@@ -28,7 +28,7 @@ use Symfony\Component\Translation\TranslatableMessage;
     sourceClass: Customer::class,
     label: new TranslatableMessage('Customers'),
 )]
-class CustomerSummary extends Summary
+class CustomerSummary extends BaseSummary
 {
     //
     // partition

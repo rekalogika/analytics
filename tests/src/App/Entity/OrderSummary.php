@@ -28,7 +28,7 @@ use Rekalogika\Analytics\Core\AggregateFunction\Range;
 use Rekalogika\Analytics\Core\AggregateFunction\StdDev;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\AggregateFunction\SumSquare;
-use Rekalogika\Analytics\Core\Entity\Summary;
+use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Core\Metadata as Analytics;
 use Rekalogika\Analytics\Core\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
@@ -48,7 +48,7 @@ use Symfony\Component\Translation\TranslatableMessage;
     sourceClass: Order::class,
     label: new TranslatableMessage('Orders'),
 )]
-class OrderSummary extends Summary implements HasQueryBuilderModifier
+class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
 {
     //
     // partition
