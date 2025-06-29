@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle;
 
-/**
- * @implements \IteratorAggregate<string,Filter>
- */
-final readonly class Filters implements \IteratorAggregate
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+
+interface FilterResolver
 {
     /**
-     * @param array<string,Filter> $filters
+     * Gets a suitable filter factory for the given dimension.
+     *
+     * @return class-string<Filter>
+     * @throws NotSupported
      */
-    public function __construct(private array $filters) {}
-
-    #[\Override]
-    public function getIterator(): \Traversable
-    {
-        return new \ArrayIterator($this->filters);
-    }
+    public function getFilterFactory(DimensionMetadata $dimension): string;
 }

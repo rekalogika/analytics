@@ -13,16 +13,30 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle;
 
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+
+/**
+ * Creates a filter instance based on the provided dimension metadata and input
+ * array.
+ *
+ * @template-covariant T of Filter
+ */
 interface FilterFactory
 {
     /**
-     * @param class-string $summaryClass
+     * @return class-string<T>
+     */
+    public static function getFilterClass(): string;
+
+    /**
+     * Instantate a filter instance based on the provided dimension metadata and
+     * input array.
+     *
      * @param array<string,mixed> $inputArray
+     * @return T
      */
     public function createFilter(
-        string $summaryClass,
-        string $dimension,
+        DimensionMetadata $dimension,
         array $inputArray,
-        ?object $options = null,
     ): Filter;
 }

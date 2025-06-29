@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Null;
 
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements SpecificFilterFactory<NullFilter>
+ * @implements FilterFactory<NullFilter>
  */
-final readonly class NullFilterFactory implements SpecificFilterFactory
+final readonly class NullFilterFactory implements FilterFactory
 {
-    public function __construct(
-        private SummaryMetadataFactory $summaryMetadataFactory,
-    ) {}
-
     #[\Override]
     public static function getFilterClass(): string
     {
@@ -34,20 +30,12 @@ final readonly class NullFilterFactory implements SpecificFilterFactory
 
     #[\Override]
     public function createFilter(
-        string $summaryClass,
-        string $dimension,
+        DimensionMetadata $dimension,
         array $inputArray,
-        ?object $options = null,
     ): Filter {
-        $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($summaryClass);
-
-        $dimensionMetadata = $metadata->getDimension($dimension);
-        $label = $dimensionMetadata->getLabel();
-
         return new NullFilter(
-            dimension: $dimension,
-            label: $label,
+            dimension: $dimension->getName(),
+            label: $dimension->getLabel(),
         );
     }
 }

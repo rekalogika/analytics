@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Equal;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
 final readonly class Choice
 {

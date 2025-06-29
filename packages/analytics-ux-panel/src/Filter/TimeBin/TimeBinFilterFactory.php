@@ -11,41 +11,30 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements SpecificFilterFactory<NumberRangesFilter>
+ * @implements FilterFactory<TimeBinFilter>
  */
-final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
+final readonly class TimeBinFilterFactory implements FilterFactory
 {
-    public function __construct(
-        private SummaryMetadataFactory $summaryMetadataFactory,
-    ) {}
-
     #[\Override]
     public static function getFilterClass(): string
     {
-        return NumberRangesFilter::class;
+        return TimeBinFilter::class;
     }
 
     #[\Override]
     public function createFilter(
-        string $summaryClass,
-        string $dimension,
+        DimensionMetadata $dimension,
         array $inputArray,
-        ?object $options = null,
-    ): NumberRangesFilter {
-        $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($summaryClass);
-
-        $dimensionMetadata = $metadata->getDimension($dimension);
-        $label = $dimensionMetadata->getLabel();
-        $valueResolver = $dimensionMetadata->getValueResolver();
+    ): TimeBinFilter {
+        $valueResolver = $dimension->getValueResolver();
 
         if (!$valueResolver instanceof TimeBinValueResolver) {
             throw new InvalidArgumentException(\sprintf(
@@ -57,9 +46,9 @@ final readonly class NumberRangesFilterFactory implements SpecificFilterFactory
 
         $typeClass = $valueResolver->getTypeClass();
 
-        return new NumberRangesFilter(
-            dimension: $dimension,
-            label: $label,
+        return new TimeBinFilter(
+            dimension: $dimension->getName(),
+            label: $dimension->getLabel(),
             inputArray: $inputArray,
             typeClass: $typeClass,
         );

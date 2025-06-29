@@ -38,7 +38,7 @@ final class RekalogikaPanelBundle extends AbstractBundle
     ): void {
         $container->import('../config/services.php');
 
-        $builder->registerForAutoconfiguration(SpecificFilterFactory::class)
+        $builder->registerForAutoconfiguration(FilterFactory::class)
             ->addTag('rekalogika.analytics.specific_filter_factory');
     }
 

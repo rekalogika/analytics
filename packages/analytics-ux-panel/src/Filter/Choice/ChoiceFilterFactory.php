@@ -11,21 +11,20 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Equal;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements SpecificFilterFactory<EqualFilter>
+ * @implements FilterFactory<ChoiceFilter>
  */
-final readonly class EqualFilterFactory implements SpecificFilterFactory
+final readonly class ChoiceFilterFactory implements FilterFactory
 {
     public function __construct(
-        private SummaryMetadataFactory $summaryMetadataFactory,
         private DistinctValuesResolver $distinctValuesResolver,
         private Stringifier $stringifier,
     ) {}
@@ -33,21 +32,18 @@ final readonly class EqualFilterFactory implements SpecificFilterFactory
     #[\Override]
     public static function getFilterClass(): string
     {
-        return EqualFilter::class;
+        return ChoiceFilter::class;
     }
 
     #[\Override]
     public function createFilter(
-        string $summaryClass,
-        string $dimension,
+        DimensionMetadata $dimension,
         array $inputArray,
-        ?object $options = null,
     ): Filter {
-        return new EqualFilter(
-            class: $summaryClass,
+        return new ChoiceFilter(
+            class: $dimension->getSummaryMetadata()->getSummaryClass(),
             stringifier: $this->stringifier,
             distinctValuesResolver: $this->distinctValuesResolver,
-            summaryMetadataFactory: $this->summaryMetadataFactory,
             dimension: $dimension,
             inputArray: $inputArray,
         );
