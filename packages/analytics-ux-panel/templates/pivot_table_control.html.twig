@@ -151,8 +151,12 @@
 {%- block item_choices -%}
     <select class="form-select form-select-sm py-0">
         {%- set selected = query.getSelectedSubItem(item.key) -%}
-        {%- for key, choice in item.choices -%}
-            <option value="{{ key }}" {{ selected == key ? 'selected' }}>{{ choice|trans }}
+        {%- for optgroup in item.choices -%}
+            <optgroup label="{{ optgroup|trans }}">
+                {% for option in optgroup %}
+                    <option value="{{ option.key }}" {{ selected == option.key ? 'selected' }}>{{ option|trans }}
+                {% endfor %}
+            </optgroup>
             </option>
         {%- endfor -%}
     </select>
