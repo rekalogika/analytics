@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterSpecification;
 
 final readonly class ChainFilterResolver implements FilterResolver
 {
@@ -28,7 +29,7 @@ final readonly class ChainFilterResolver implements FilterResolver
     ) {}
 
     #[\Override]
-    public function getFilterFactory(DimensionMetadata $dimension): string
+    public function getFilterFactory(DimensionMetadata $dimension): FilterSpecification
     {
         foreach ($this->chainFilterResolvers as $resolver) {
             try {
@@ -38,6 +39,6 @@ final readonly class ChainFilterResolver implements FilterResolver
             }
         }
 
-        return NullFilter::class;
+        return new FilterSpecification(NullFilter::class);
     }
 }

@@ -20,7 +20,7 @@ use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements FilterFactory<ChoiceFilter>
+ * @implements FilterFactory<ChoiceFilter,object>
  */
 final readonly class ChoiceFilterFactory implements FilterFactory
 {
@@ -36,9 +36,16 @@ final readonly class ChoiceFilterFactory implements FilterFactory
     }
 
     #[\Override]
+    public static function getOptionObjectClass(): ?string
+    {
+        return null;
+    }
+
+    #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter {
         return new ChoiceFilter(
             class: $dimension->getSummaryMetadata()->getSummaryClass(),

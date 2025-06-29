@@ -11,21 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Time\RecurringTimeBin;
-use Rekalogika\Analytics\Time\TimeBin;
 
+/**
+ * @template T of object
+ */
 final readonly class Number implements \Stringable
 {
     /**
-     * @param class-string<TimeBin|RecurringTimeBin> $typeClass
+     * @param NumberRangesFilterOptions<T> $options
      */
     public function __construct(
-        private readonly string $dimension,
-        private string $typeClass,
+        private string $dimension,
+        private NumberRangesFilterOptions $options,
         private int $number,
     ) {}
 
@@ -35,9 +36,12 @@ final readonly class Number implements \Stringable
         return (string) $this->number;
     }
 
-    private function getObject(): TimeBin|RecurringTimeBin
+    /**
+     * @return T
+     */
+    private function getObject(): object
     {
-        return ($this->typeClass)::createFromDatabaseValue($this->number);
+        return $this->options->transformNumberToObject($this->number);
     }
 
     public function createExpression(): Expression

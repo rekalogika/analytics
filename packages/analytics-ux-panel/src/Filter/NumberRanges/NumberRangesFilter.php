@@ -11,51 +11,34 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
-use Rekalogika\Analytics\Time\Bin\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\DayOfYear;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\HourOfDay;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\MonthOfYear;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
-use Rekalogika\Analytics\Time\Bin\Week;
-use Rekalogika\Analytics\Time\Bin\WeekDate;
-use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
-use Rekalogika\Analytics\Time\Bin\WeekOfYear;
-use Rekalogika\Analytics\Time\Bin\WeekYear;
-use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\RecurringTimeBin;
-use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class TimeBinFilter implements Filter
+/**
+ * @template T of object
+ */
+final class NumberRangesFilter implements Filter
 {
     private readonly string $rawValue;
 
     private string $value = '';
 
     /**
-     * @var list<NumberRange|Number>|null
+     * @var list<NumberRange<T>|Number<T>>|null
      */
     private ?array $numbers = null;
 
     /**
-     * @param class-string<TimeBin|RecurringTimeBin> $typeClass
+     * @param NumberRangesFilterOptions<T> $options
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly TranslatableInterface $label,
+        private readonly NumberRangesFilterOptions $options,
         private readonly string $dimension,
-        private readonly string $typeClass,
         array $inputArray,
     ) {
         /** @psalm-suppress MixedAssignment */
@@ -83,36 +66,12 @@ final class TimeBinFilter implements Filter
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return $this->label;
+        return $this->options->getLabel();
     }
 
     public function getHelp(): ?TranslatableInterface
     {
-        return match ($this->typeClass) {
-            Hour::class => new TranslatableMessage('Example: 2024010107-2024033115,2024050111 (2024010107 means 1 January 2024, 07:00)'),
-            HourOfDay::class => new TranslatableMessage('Example: 8-12,13-17'),
-
-            Date::class => new TranslatableMessage('Example: 20240101-20240331,20240501 (20240101 means 1 January 2024)'),
-            DayOfWeek::class => new TranslatableMessage('Example: 1,3-5 (1 is Monday, 7 is Sunday)'),
-            DayOfMonth::class => new TranslatableMessage('Example: 1-5,10,15-20'),
-            DayOfYear::class => new TranslatableMessage('Example: 1-90,100'),
-            WeekDate::class => new TranslatableMessage('Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)'),
-
-            Week::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
-            WeekOfMonth::class => new TranslatableMessage('Example: 1-2,4'),
-            WeekOfYear::class => new TranslatableMessage('Example: 1-2,4'),
-
-            Month::class => new TranslatableMessage('Example: 202401-202403,202501 (202401 means January 2024)'),
-            MonthOfYear::class => new TranslatableMessage('Example: 1-3,5,7-12'),
-
-            Quarter::class => new TranslatableMessage('Example: 20241-20243,20252 (20241 means 2024 Q1)'),
-            QuarterOfYear::class => new TranslatableMessage('Example: 1-2,4'),
-
-            Year::class => new TranslatableMessage('Example: 2020-2022,2024'),
-
-            WeekYear::class => new TranslatableMessage('Example: 2020-2022,2024'),
-            default => null,
-        };
+        return $this->options->getHelp();
     }
 
     public function getRawValue(): string
@@ -133,7 +92,7 @@ final class TimeBinFilter implements Filter
     }
 
     /**
-     * @return list<Number|NumberRange>
+     * @return list<Number<T>|NumberRange<T>>
      */
     public function getNumbers(): array
     {
@@ -157,7 +116,7 @@ final class TimeBinFilter implements Filter
 
                 $output[] = new NumberRange(
                     dimension: $this->dimension,
-                    typeClass: $this->typeClass,
+                    options: $this->options,
                     start: $start,
                     end: $end,
                 );
@@ -170,7 +129,7 @@ final class TimeBinFilter implements Filter
 
                 $output[] = new Number(
                     dimension: $this->dimension,
-                    typeClass: $this->typeClass,
+                    options: $this->options,
                     number: $nums,
                 );
             }

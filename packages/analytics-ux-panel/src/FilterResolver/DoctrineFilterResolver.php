@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterSpecification;
 
 final readonly class DoctrineFilterResolver implements FilterResolver
 {
@@ -26,13 +27,13 @@ final readonly class DoctrineFilterResolver implements FilterResolver
     ) {}
 
     #[\Override]
-    public function getFilterFactory(DimensionMetadata $dimension): string
+    public function getFilterFactory(DimensionMetadata $dimension): FilterSpecification
     {
         $summaryClass = $dimension->getSummaryMetadata()->getSummaryClass();
         $name = $dimension->getName();
 
         if ($this->isDoctrineRelation($summaryClass, $name)) {
-            return ChoiceFilter::class;
+            return new FilterSpecification(ChoiceFilter::class);
         }
 
         throw new DimensionNotSupportedByFilter();
