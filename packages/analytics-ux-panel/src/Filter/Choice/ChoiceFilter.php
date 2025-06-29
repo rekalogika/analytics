@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
@@ -39,10 +38,9 @@ final class ChoiceFilter implements Filter
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly string $class,
-        private readonly Stringifier $stringifier,
-        private readonly DistinctValuesResolver $distinctValuesResolver,
+        private readonly ChoiceFilterOptions $options,
         private readonly DimensionMetadata $dimension,
+        private readonly Stringifier $stringifier,
         private readonly array $inputArray,
     ) {}
 
@@ -93,11 +91,7 @@ final class ChoiceFilter implements Filter
                 throw new InvalidArgumentException('Invalid input value');
             }
 
-            $values[] = $this->distinctValuesResolver->getValueFromId(
-                class: $this->class,
-                dimension: $this->dimension->getName(),
-                id: $v,
-            );
+            $values[] = $this->options->getValueFromId($v);
         }
 
         return $this->values = $values;
@@ -125,12 +119,7 @@ final class ChoiceFilter implements Filter
             return $this->choices;
         }
 
-        $choices = $this->distinctValuesResolver->getDistinctValues(
-            class: $this->class,
-            dimension: $this->dimension->getName(),
-            limit: 100,
-        ) ?? [];
-
+        $choices = $this->options->getChoices();
         $choices2 = [];
 
         /** @psalm-suppress MixedAssignment */

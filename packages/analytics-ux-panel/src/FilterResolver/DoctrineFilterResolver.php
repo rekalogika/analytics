@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\DefaultChoiceFilterOptions;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterSpecification;
 
@@ -24,6 +26,7 @@ final readonly class DoctrineFilterResolver implements FilterResolver
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
+        private DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
     #[\Override]
@@ -32,11 +35,27 @@ final readonly class DoctrineFilterResolver implements FilterResolver
         $summaryClass = $dimension->getSummaryMetadata()->getSummaryClass();
         $name = $dimension->getName();
 
-        if ($this->isDoctrineRelation($summaryClass, $name)) {
-            return new FilterSpecification(ChoiceFilter::class);
+        if (!$this->isDoctrineRelation($summaryClass, $name)) {
+            throw new DimensionNotSupportedByFilter();
         }
 
-        throw new DimensionNotSupportedByFilter();
+        $choices = $this->distinctValuesResolver
+            ->getDistinctValues($summaryClass, $name, 100);
+
+        if ($choices === null) {
+            throw new DimensionNotSupportedByFilter();
+        }
+
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var array<string,mixed> $choices
+         * */
+        $choices = iterator_to_array($choices, true);
+
+        $options = new DefaultChoiceFilterOptions($choices);
+
+        return new FilterSpecification(ChoiceFilter::class, $options);
+
     }
 
     /**

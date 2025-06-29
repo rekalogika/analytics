@@ -90,6 +90,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DoctrineFilterResolver::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
         ])
         ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
             'priority' => -100,
