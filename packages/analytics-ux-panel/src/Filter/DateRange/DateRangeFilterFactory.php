@@ -14,21 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
+use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
-use Rekalogika\Analytics\UX\PanelBundle\SpecificFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements SpecificFilterFactory<DateRangeFilter>
+ * @implements FilterFactory<DateRangeFilter>
  */
-final readonly class DateRangeFilterFactory implements SpecificFilterFactory
+final readonly class DateRangeFilterFactory implements FilterFactory
 {
-    public function __construct(
-        private SummaryMetadataFactory $summaryMetadataFactory,
-    ) {}
-
     #[\Override]
     public static function getFilterClass(): string
     {
@@ -37,17 +34,12 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
 
     #[\Override]
     public function createFilter(
-        string $summaryClass,
-        string $dimension,
+        DimensionMetadata $dimension,
         array $inputArray,
         ?object $options = null,
     ): Filter {
-        $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($summaryClass);
-
-        $dimensionMetadata = $metadata->getDimension($dimension);
-        $label = $dimensionMetadata->getLabel();
-        $valueResolver = $dimensionMetadata->getValueResolver();
+        $label = $dimension->getLabel();
+        $valueResolver = $dimension->getValueResolver();
 
         if (!$valueResolver instanceof TimeBinValueResolver) {
             throw new InvalidArgumentException(\sprintf(
@@ -59,7 +51,7 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
 
         $typeClass = $valueResolver->getTypeClass();
 
-        if (!is_a($typeClass, TimeBin::class, true)) {
+        if (!is_a($typeClass, Date::class, true)) {
             throw new InvalidArgumentException(\sprintf(
                 'DateRangeFilter needs the type class of "%s", "%s" given',
                 TimeBin::class,
@@ -69,7 +61,7 @@ final readonly class DateRangeFilterFactory implements SpecificFilterFactory
 
         return new DateRangeFilter(
             label: $label,
-            dimension: $dimension,
+            dimension: $dimension->getName(),
             typeClass: $typeClass,
             inputArray: $inputArray,
         );

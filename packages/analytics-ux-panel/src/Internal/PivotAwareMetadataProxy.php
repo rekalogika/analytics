@@ -62,6 +62,15 @@ final readonly class PivotAwareMetadataProxy
         return $this->leafDimensions;
     }
 
+    public function getLeafDimension(string $summaryProperty): DimensionMetadata
+    {
+        return $this->leafDimensions[$summaryProperty]
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Leaf dimension with summary property "%s" not found.',
+                $summaryProperty,
+            ));
+    }
+
     /**
      * @return array<string,DimensionMetadata>
      */

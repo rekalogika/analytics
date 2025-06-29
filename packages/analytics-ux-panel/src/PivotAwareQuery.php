@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\PivotAwareMetadataProxy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -50,7 +51,8 @@ final class PivotAwareQuery
         private readonly Query $query,
         SummaryMetadata $metadata,
         array $parameters,
-        FilterFactory $filterFactory,
+        FilterResolver $filterResolver,
+        FilterFactoryLocator $filterFactoryLocator,
     ) {
         $this->metadata = new PivotAwareMetadataProxy($metadata);
 
@@ -105,21 +107,34 @@ final class PivotAwareQuery
             $this->filters,
         );
 
-        $filterDimensions = array_values(array_unique(array_filter(
-            $filterDimensions,
-            static fn(string $dimension): bool => $dimension !== '@values',
-        )));
+        $filters = [];
 
-        /**
-         * @psalm-suppress MixedArgument
-         */
-        $this->filterExpressions = new Filters(
-            summaryClass: $this->query->getFrom(),
-            dimensions: $filterDimensions,
-            // @phpstan-ignore argument.type
-            arrayExpressions: $parameters['filterExpressions'] ?? [],
-            filterFactory: $filterFactory,
-        );
+        /** @var array<string,mixed> */
+        $filterExpressionsArray = $parameters['filterExpressions'] ?? [];
+
+        foreach ($filterDimensions as $dimensionName) {
+            if ($dimensionName === '@values') {
+                continue;
+            }
+
+            $dimensionMetadata = $this->metadata->getLeafDimension($dimensionName);
+
+            /** @var array<string,mixed> */
+            $arrayExpression = $filterExpressionsArray[$dimensionName] ?? [];
+
+            /** @psalm-suppress DocblockTypeContradiction */
+            if (!\is_array($arrayExpression)) {
+                $arrayExpression = [];
+            }
+
+            $filterClass = $filterResolver->getFilterFactory($dimensionMetadata);
+            $filterFactory = $filterFactoryLocator->locate($filterClass);
+
+            $filters[$dimensionName] = $filterFactory
+                ->createFilter($dimensionMetadata, $arrayExpression);
+        }
+
+        $this->filterExpressions = new Filters($filters);
 
         foreach ($this->filterExpressions as $filterExpression) {
             $expression = $filterExpression->createExpression();

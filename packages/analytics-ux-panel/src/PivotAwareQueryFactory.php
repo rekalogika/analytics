@@ -15,12 +15,14 @@ namespace Rekalogika\Analytics\UX\PanelBundle;
 
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 
 final readonly class PivotAwareQueryFactory
 {
     public function __construct(
-        private FilterFactory $filterFactory,
+        private FilterResolver $filterFactory,
         private SummaryMetadataFactory $summaryMetadataFactory,
+        private FilterFactoryLocator $filterFactoryLocator,
     ) {}
 
     /**
@@ -38,7 +40,8 @@ final readonly class PivotAwareQueryFactory
             query: $query,
             metadata: $metadata,
             parameters: $parameters,
-            filterFactory: $this->filterFactory,
+            filterResolver: $this->filterFactory,
+            filterFactoryLocator: $this->filterFactoryLocator,
         );
     }
 }

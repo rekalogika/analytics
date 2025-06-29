@@ -19,6 +19,10 @@ use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * DateRangeFilter is a filter that allows users to select a range of dates.
+ * Implemented using flatpickr date range picker.
+ */
 final class DateRangeFilter implements Filter
 {
     private ?string $rawUpperBound = null;

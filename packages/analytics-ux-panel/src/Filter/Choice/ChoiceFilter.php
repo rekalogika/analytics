@@ -11,18 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Equal;
+namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final class EqualFilter implements Filter
+final class ChoiceFilter implements Filter
 {
     /**
      * @var list<mixed>|null
@@ -34,8 +34,6 @@ final class EqualFilter implements Filter
      */
     private ?array $choices = null;
 
-    private ?TranslatableInterface $label = null;
-
     /**
      * @param class-string $class
      * @param array<string,mixed> $inputArray
@@ -44,8 +42,7 @@ final class EqualFilter implements Filter
         private readonly string $class,
         private readonly Stringifier $stringifier,
         private readonly DistinctValuesResolver $distinctValuesResolver,
-        private readonly SummaryMetadataFactory $summaryMetadataFactory,
-        private readonly string $dimension,
+        private readonly DimensionMetadata $dimension,
         private readonly array $inputArray,
     ) {}
 
@@ -58,16 +55,13 @@ final class EqualFilter implements Filter
     #[\Override]
     public function getDimension(): string
     {
-        return $this->dimension;
+        return $this->dimension->getName();
     }
 
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return $this->label ??= $this->summaryMetadataFactory
-            ->getSummaryMetadata($this->class)
-            ->getDimension($this->dimension)
-            ->getLabel();
+        return $this->dimension->getLabel();
     }
 
     /**
@@ -101,7 +95,7 @@ final class EqualFilter implements Filter
 
             $values[] = $this->distinctValuesResolver->getValueFromId(
                 class: $this->class,
-                dimension: $this->dimension,
+                dimension: $this->dimension->getName(),
                 id: $v,
             );
         }
@@ -117,7 +111,7 @@ final class EqualFilter implements Filter
         }
 
         return Criteria::expr()->in(
-            $this->dimension,
+            $this->dimension->getName(),
             $this->getValues(),
         );
     }
@@ -133,7 +127,7 @@ final class EqualFilter implements Filter
 
         $choices = $this->distinctValuesResolver->getDistinctValues(
             class: $this->class,
-            dimension: $this->dimension,
+            dimension: $this->dimension->getName(),
             limit: 100,
         ) ?? [];
 
@@ -157,10 +151,7 @@ final class EqualFilter implements Filter
             );
         }
 
-        $nullLabel = $this->summaryMetadataFactory
-            ->getSummaryMetadata($this->class)
-            ->getDimension($this->dimension)
-            ->getNullLabel();
+        $nullLabel = $this->dimension->getNullLabel();
 
         $choices2[] = new Choice(
             id: Choice::NULL,
