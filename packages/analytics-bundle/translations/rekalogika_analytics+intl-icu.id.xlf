@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="id" trgLang="id">
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="id">
   <file id="rekalogika_analytics.id">
     <unit id="6sAtc6u" name="Example: 1-5,10,15-20">
       <segment>
@@ -317,6 +317,18 @@
       <segment>
         <source>Day of WeekYear</source>
         <target>Hari dalam Tahun Minggu</target>
+      </segment>
+    </unit>
+    <unit id="VEcUN6O">
+      <segment>
+        <source>Example: 2024010107-2024033115,2024050111 (2024010107 means 1 January 2024, 07:00)</source>
+        <target>Contoh: 2024010107-2024033115,2024050111 (2024010107 artinya 1 Januari 2024, 07:00)</target>
+      </segment>
+    </unit>
+    <unit id="iRmFoG8" name="Example: 20240101-20240331,20240501 (20240101 means 1 January 2024)">
+      <segment>
+        <source>Example: 20240101-20240331,20240501 (20240101 means 1 January 2024)</source>
+        <target>Contoh: 20240101-20240331,20240501 (20240101 artinya 1 Januari 2024)</target>
       </segment>
     </unit>
   </file>
