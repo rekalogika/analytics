@@ -19,9 +19,6 @@ interface FilterResolver
 {
     /**
      * Gets a suitable filter factory for the given dimension.
-     *
-     * @return class-string<Filter>
-     * @throws DimensionNotSupportedByFilter
      */
-    public function getFilterFactory(DimensionMetadata $dimension): string;
+    public function getFilterFactory(DimensionMetadata $dimension): FilterSpecification;
 }

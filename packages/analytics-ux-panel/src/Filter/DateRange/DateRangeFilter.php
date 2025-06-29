@@ -15,32 +15,39 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * DateRangeFilter is a filter that allows users to select a range of dates.
  * Implemented using flatpickr date range picker.
+ *
+ * @template T of object
  */
 final class DateRangeFilter implements Filter
 {
     private ?string $rawUpperBound = null;
 
-    private ?TimeBin $upperBound = null;
+    /**
+     * @var T|null
+     */
+    private ?object $upperBound = null;
 
     private ?string $rawLowerBound = null;
 
-    private ?TimeBin $lowerBound = null;
+    /**
+     * @var T|null
+     */
+    private ?object $lowerBound = null;
 
     /**
-     * @param class-string<TimeBin> $typeClass
+     * @param DateRangeFilterOptions<T> $options
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly TranslatableInterface $label,
+        private readonly DateRangeFilterOptions $options,
         private readonly string $dimension,
-        private readonly string $typeClass,
         private readonly array $inputArray,
     ) {}
 
@@ -59,7 +66,7 @@ final class DateRangeFilter implements Filter
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return $this->label;
+        return $this->options->getLabel();
     }
 
     public function getRawStart(): string
@@ -110,7 +117,10 @@ final class DateRangeFilter implements Filter
         return \sprintf('%s - %s', $start, $end);
     }
 
-    public function getStart(): ?TimeBin
+    /**
+     * @return ?T
+     */
+    public function getStart(): ?object
     {
         if ($this->lowerBound !== null) {
             return $this->lowerBound;
@@ -122,12 +132,14 @@ final class DateRangeFilter implements Filter
             return null;
         }
 
-        $dateTime = new \DateTimeImmutable($rawStart);
-
-        return $this->lowerBound = ($this->typeClass)::createFromDateTime($dateTime);
+        return $this->lowerBound = $this->options
+            ->transformDateToObject(new \DateTimeImmutable($rawStart));
     }
 
-    public function getEnd(): ?TimeBin
+    /**
+     * @return ?T
+     */
+    public function getEnd(): ?object
     {
         if ($this->upperBound !== null) {
             return $this->upperBound;
@@ -139,9 +151,8 @@ final class DateRangeFilter implements Filter
             return null;
         }
 
-        $dateTime = new \DateTimeImmutable($rawEnd);
-
-        return $this->upperBound = ($this->typeClass)::createFromDateTime($dateTime);
+        return $this->upperBound = $this->options
+            ->transformDateToObject(new \DateTimeImmutable($rawEnd));
     }
 
     #[\Override]

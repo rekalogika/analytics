@@ -284,7 +284,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsMetadata(),
-                Selectors::selectAnalyticsTime(),
+                // Selectors::selectAnalyticsTime(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Psr\Container'),
@@ -313,6 +313,7 @@ final class ArchitectureTest
 
                 // php datetime
                 Selector::classname(\DateTimeImmutable::class),
+                Selector::classname(\DateTimeInterface::class),
             );
     }
 
@@ -384,6 +385,9 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
+
+                // optional deps
+                Selectors::selectAnalyticsUXPanel(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),

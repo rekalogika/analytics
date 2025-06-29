@@ -25,7 +25,7 @@ final readonly class FilterFactoryLocator
     /**
      * @template T of Filter
      * @param class-string<T> $id
-     * @return FilterFactory<T>
+     * @return FilterFactory<T,object>
      */
     public function locate(string $id): FilterFactory
     {
@@ -46,7 +46,7 @@ final readonly class FilterFactoryLocator
             ));
         }
 
-        /** @var FilterFactory<T> $filterFactory */
+        /** @var FilterFactory<T,object> $filterFactory */
 
         return $filterFactory;
     }

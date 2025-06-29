@@ -18,7 +18,7 @@ use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements FilterFactory<NullFilter>
+ * @implements FilterFactory<NullFilter,object>
  */
 final readonly class NullFilterFactory implements FilterFactory
 {
@@ -29,9 +29,16 @@ final readonly class NullFilterFactory implements FilterFactory
     }
 
     #[\Override]
+    public static function getOptionObjectClass(): ?string
+    {
+        return null;
+    }
+
+    #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter {
         return new NullFilter(
             dimension: $dimension->getName(),

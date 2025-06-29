@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
  * array.
  *
  * @template-covariant T of Filter
+ * @template O of object
  */
 interface FilterFactory
 {
@@ -29,14 +30,21 @@ interface FilterFactory
     public static function getFilterClass(): string;
 
     /**
+     * @return class-string<O>|null
+     */
+    public static function getOptionObjectClass(): ?string;
+
+    /**
      * Instantate a filter instance based on the provided dimension metadata and
      * input array.
      *
      * @param array<string,mixed> $inputArray
+     * @param O|null $options
      * @return T
      */
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,
+        ?object $options = null,
     ): Filter;
 }

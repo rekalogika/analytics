@@ -19,12 +19,11 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilterFactory;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin\TimeBinFilterFactory;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\ChainFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\DoctrineFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\EnumFilterResolver;
-use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\TimeBinFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Twig\AnalyticsExtension;
@@ -98,14 +97,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.ux_panel.filter_resolver.time_bin')
-        ->class(TimeBinFilterResolver::class)
-        ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
-            'priority' => -150,
-        ])
-    ;
-
-    $services
         ->set('rekalogika.analytics.ux_panel.filter_resolver.enum')
         ->class(EnumFilterResolver::class)
         ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
@@ -145,7 +136,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(TimeBinFilterFactory::class)
+        ->set(NumberRangesFilterFactory::class)
         ->tag('rekalogika.analytics.specific_filter_factory')
     ;
 

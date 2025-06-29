@@ -127,11 +127,17 @@ final class PivotAwareQuery
                 $arrayExpression = [];
             }
 
-            $filterClass = $filterResolver->getFilterFactory($dimensionMetadata);
-            $filterFactory = $filterFactoryLocator->locate($filterClass);
+            $filterSpecification = $filterResolver
+                ->getFilterFactory($dimensionMetadata);
 
-            $filters[$dimensionName] = $filterFactory
-                ->createFilter($dimensionMetadata, $arrayExpression);
+            $filterFactory = $filterFactoryLocator
+                ->locate($filterSpecification->getFilterClass());
+
+            $filters[$dimensionName] = $filterFactory->createFilter(
+                dimension: $dimensionMetadata,
+                inputArray: $arrayExpression,
+                options: $filterSpecification->getFilterOptions(),
+            );
         }
 
         $this->filterExpressions = new Filters($filters);
