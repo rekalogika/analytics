@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle;
 
 use Rekalogika\Analytics\Common\Exception\RuntimeException;
 
-final class NotSupported extends RuntimeException
+final class DimensionNotSupportedByFilter extends RuntimeException
 {
     public function __construct()
     {

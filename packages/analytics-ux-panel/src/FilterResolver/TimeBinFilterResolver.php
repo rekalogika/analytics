@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
+use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin\TimeBinFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
@@ -30,7 +30,7 @@ final readonly class TimeBinFilterResolver implements FilterResolver
         $valueResolver = $dimension->getValueResolver();
 
         if (!$valueResolver instanceof TimeBinValueResolver) {
-            throw new Unsupported();
+            throw new DimensionNotSupportedByFilter();
         }
 
         $typeClass = $valueResolver->getTypeClass();

@@ -15,29 +15,20 @@ namespace Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
-final readonly class ChainFilterResolver implements FilterResolver
+final readonly class EnumFilterResolver implements FilterResolver
 {
-    /**
-     * @param iterable<FilterResolver> $chainFilterResolvers
-     */
-    public function __construct(
-        private iterable $chainFilterResolvers,
-    ) {}
-
     #[\Override]
     public function getFilterFactory(DimensionMetadata $dimension): string
     {
-        foreach ($this->chainFilterResolvers as $resolver) {
-            try {
-                return $resolver->getFilterFactory($dimension);
-            } catch (DimensionNotSupportedByFilter $e) {
-                // Continue to the next resolver
-            }
+        $typeClass = $dimension->getTypeClass();
+
+        if ($typeClass !== null && enum_exists($typeClass)) {
+            return ChoiceFilter::class;
         }
 
-        return NullFilter::class;
+        throw new DimensionNotSupportedByFilter();
     }
 }

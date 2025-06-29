@@ -15,15 +15,11 @@ namespace Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
+use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin\TimeBinFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 
-final readonly class DefaultFilterResolver implements FilterResolver
+final readonly class DoctrineFilterResolver implements FilterResolver
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
@@ -33,26 +29,13 @@ final readonly class DefaultFilterResolver implements FilterResolver
     public function getFilterFactory(DimensionMetadata $dimension): string
     {
         $summaryClass = $dimension->getSummaryMetadata()->getSummaryClass();
-        $typeClass = $dimension->getTypeClass();
-        $valueResolver = $dimension->getValueResolver();
+        $name = $dimension->getName();
 
-        if (
-            $this->isDoctrineRelation($summaryClass, $dimension->getName())
-        ) {
-            return ChoiceFilter::class;
-        } elseif ($valueResolver instanceof TimeBinValueResolver) {
-            $typeClass = $valueResolver->getTypeClass();
-
-            if (is_a($typeClass, Date::class, true)) {
-                return DateRangeFilter::class;
-            } else {
-                return TimeBinFilter::class;
-            }
-        } elseif ($typeClass !== null && enum_exists($typeClass)) {
+        if ($this->isDoctrineRelation($summaryClass, $name)) {
             return ChoiceFilter::class;
         }
 
-        return NullFilter::class;
+        throw new DimensionNotSupportedByFilter();
     }
 
     /**

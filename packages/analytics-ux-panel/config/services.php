@@ -21,7 +21,10 @@ use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\TimeBin\TimeBinFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
-use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\DefaultFilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\ChainFilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\DoctrineFilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\EnumFilterResolver;
+use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\TimeBinFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Twig\AnalyticsExtension;
@@ -29,6 +32,7 @@ use Rekalogika\Analytics\UX\PanelBundle\Twig\AnalyticsRuntime;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -71,16 +75,52 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('twig.extension');
 
     //
-    // filter
+    // filter resolver
     //
 
     $services
-        ->set(FilterResolver::class)
-        ->class(DefaultFilterResolver::class)
+        ->set('rekalogika.analytics.ux_panel.filter_resolver')
+        ->class(ChainFilterResolver::class)
+        ->args([
+            '$chainFilterResolvers' => tagged_iterator('rekalogika.analytics.ux-panel.filter_resolver'),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.ux_panel.filter_resolver.doctrine')
+        ->class(DoctrineFilterResolver::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
         ])
+        ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
+            'priority' => -100,
+        ])
     ;
+
+    $services
+        ->set('rekalogika.analytics.ux_panel.filter_resolver.time_bin')
+        ->class(TimeBinFilterResolver::class)
+        ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
+            'priority' => -150,
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.ux_panel.filter_resolver.enum')
+        ->class(EnumFilterResolver::class)
+        ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
+            'priority' => -200,
+        ])
+    ;
+
+    //
+    // filter
+    //
+
+    $services->alias(
+        FilterResolver::class,
+        'rekalogika.analytics.ux_panel.filter_resolver',
+    );
 
     $services
         ->set('rekalogika.analytics.filter_factory_locator')

@@ -21,7 +21,7 @@ interface FilterResolver
      * Gets a suitable filter factory for the given dimension.
      *
      * @return class-string<Filter>
-     * @throws NotSupported
+     * @throws DimensionNotSupportedByFilter
      */
     public function getFilterFactory(DimensionMetadata $dimension): string;
 }

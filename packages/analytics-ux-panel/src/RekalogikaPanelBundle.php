@@ -40,6 +40,9 @@ final class RekalogikaPanelBundle extends AbstractBundle
 
         $builder->registerForAutoconfiguration(FilterFactory::class)
             ->addTag('rekalogika.analytics.specific_filter_factory');
+
+        $builder->registerForAutoconfiguration(FilterResolver::class)
+            ->addTag('rekalogika.analytics.ux-panel.filter_resolver');
     }
 
     /**
