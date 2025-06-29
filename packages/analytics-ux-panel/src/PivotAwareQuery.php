@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\PivotAwareMetadataProxy;
-use Symfony\Contracts\Translation\TranslatableInterface;
+use Rekalogika\Analytics\UX\PanelBundle\Internal\PivotTableItem;
+use Rekalogika\Analytics\UX\PanelBundle\Internal\PivotTableValues;
 
 final class PivotAwareQuery
 {
@@ -173,12 +173,12 @@ final class PivotAwareQuery
     }
 
     /**
-     * @var array<string,array{key:string,label:TranslatableInterface,choices:array<string,TranslatableInterface>|null,type?:'dimension'|'mandatorydimension'|'measure'|'values'}>|null
+     * @var array<string,PivotTableItem>|null
      */
     private ?array $allChoices = null;
 
     /**
-     * @return array<string,array{key:string,label:TranslatableInterface,choices:array<string,TranslatableInterface>|null,type?:'dimension'|'mandatorydimension'|'measure'|'values'}>
+     * @return array<string,PivotTableItem>
      */
     private function getAllChoices(): array
     {
@@ -189,45 +189,19 @@ final class PivotAwareQuery
         $result = [];
 
         foreach ($this->metadata->getDimensions() as $name => $dimension) {
-            $result[$name]['key'] = $name;
-            $result[$name]['choices'] = null;
-
-            if ($dimension->isMandatory()) {
-                $result[$name]['type'] = 'mandatorydimension';
-            } else {
-                $result[$name]['type'] = 'dimension';
-            }
-
-            foreach ($dimension->getLeaves() as $child) {
-                $result[$name]['choices'][$child->getName()] = $child->getLabel();
-            }
-
-            $result[$name]['label'] = $dimension->getLabel();
+            $result[$name] = new PivotTableItem($dimension);
         }
 
         foreach ($this->metadata->getMeasures() as $name => $measure) {
-            $result[$name] = [
-                'key' => $name,
-                'type' => 'measure',
-                'label' => $measure->getLabel(),
-                'choices' => null,
-            ];
+            $result[$name] = new PivotTableItem($measure);
         }
 
-        $result['@values'] = [
-            'key' => '@values',
-            'type' => 'values',
-            'label' => new TranslatableMessage('Values'),
-            'choices' => null,
-        ];
+        $result['@values'] = new PivotTableItem(new PivotTableValues());
 
         return $this->allChoices = $result;
     }
 
-    /**
-     * @return array{key:string,label:TranslatableInterface,choices:?array<string,TranslatableInterface>,type?:'dimension'|'mandatorydimension'|'measure'|'values'}
-     */
-    public function resolve(string $key): array
+    public function resolve(string $key): PivotTableItem
     {
         $rootKey = explode('.', $key)[0];
 
