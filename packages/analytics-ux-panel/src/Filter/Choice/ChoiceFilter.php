@@ -47,7 +47,7 @@ final class ChoiceFilter implements Filter
     #[\Override]
     public function getTemplate(): string
     {
-        return '@RekalogikaAnalyticsUXPanel/filter/equal_filter.html.twig';
+        return '@RekalogikaAnalyticsUXPanel/filter/choice_filter.html.twig';
     }
 
     #[\Override]
