@@ -1,1 +1,0 @@
-../../../../../packages/analytics-ux-panel/assets/dist/equal-filter-controller.js

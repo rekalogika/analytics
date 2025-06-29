@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements FilterFactory<ChoiceFilter,object>
+ * @implements FilterFactory<ChoiceFilter,ChoiceFilterOptions>
  */
 final readonly class ChoiceFilterFactory implements FilterFactory
 {
     public function __construct(
-        private DistinctValuesResolver $distinctValuesResolver,
         private Stringifier $stringifier,
+        private Htmlifier $htmlifier,
     ) {}
 
     #[\Override]
@@ -36,21 +36,33 @@ final readonly class ChoiceFilterFactory implements FilterFactory
     }
 
     #[\Override]
-    public static function getOptionObjectClass(): ?string
+    public static function getOptionObjectClass(): string
     {
-        return null;
+        return ChoiceFilterOptions::class;
     }
 
+    /**
+     * @param ChoiceFilterOptions<mixed>|null $options
+     * @param array<string,mixed> $inputArray
+     */
     #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,
         ?object $options = null,
-    ): Filter {
+    ): ChoiceFilter {
+        if (!$options instanceof ChoiceFilterOptions) {
+            throw new InvalidArgumentException(\sprintf(
+                'ChoiceFilter needs the options of "%s", "%s" given',
+                ChoiceFilterOptions::class,
+                get_debug_type($options),
+            ));
+        }
+
         return new ChoiceFilter(
-            class: $dimension->getSummaryMetadata()->getSummaryClass(),
+            options: $options,
             stringifier: $this->stringifier,
-            distinctValuesResolver: $this->distinctValuesResolver,
+            htmlifier: $this->htmlifier,
             dimension: $dimension,
             inputArray: $inputArray,
         );

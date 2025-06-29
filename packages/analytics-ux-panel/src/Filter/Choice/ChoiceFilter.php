@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
@@ -35,21 +35,21 @@ final class ChoiceFilter implements Filter
     private ?array $choices = null;
 
     /**
-     * @param class-string $class
+     * @param ChoiceFilterOptions<mixed> $options
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
-        private readonly string $class,
-        private readonly Stringifier $stringifier,
-        private readonly DistinctValuesResolver $distinctValuesResolver,
+        private readonly ChoiceFilterOptions $options,
         private readonly DimensionMetadata $dimension,
+        private readonly Stringifier $stringifier,
+        private readonly Htmlifier $htmlifier,
         private readonly array $inputArray,
     ) {}
 
     #[\Override]
     public function getTemplate(): string
     {
-        return '@RekalogikaAnalyticsUXPanel/filter/equal_filter.html.twig';
+        return '@RekalogikaAnalyticsUXPanel/filter/choice_filter.html.twig';
     }
 
     #[\Override]
@@ -93,11 +93,7 @@ final class ChoiceFilter implements Filter
                 throw new InvalidArgumentException('Invalid input value');
             }
 
-            $values[] = $this->distinctValuesResolver->getValueFromId(
-                class: $this->class,
-                dimension: $this->dimension->getName(),
-                id: $v,
-            );
+            $values[] = $this->options->getValueFromId($v);
         }
 
         return $this->values = $values;
@@ -125,12 +121,7 @@ final class ChoiceFilter implements Filter
             return $this->choices;
         }
 
-        $choices = $this->distinctValuesResolver->getDistinctValues(
-            class: $this->class,
-            dimension: $this->dimension->getName(),
-            limit: 100,
-        ) ?? [];
-
+        $choices = $this->options->getChoices();
         $choices2 = [];
 
         /** @psalm-suppress MixedAssignment */
@@ -143,6 +134,7 @@ final class ChoiceFilter implements Filter
                 id: $id,
                 value: $value,
                 label: $this->stringifier->toString($value),
+                htmlLabel: $this->htmlifier->toHtml($value),
                 selected: \in_array(
                     $value,
                     $this->getValues(),
@@ -157,6 +149,7 @@ final class ChoiceFilter implements Filter
             id: Choice::NULL,
             value: null,
             label: $this->stringifier->toString($nullLabel),
+            htmlLabel: $this->htmlifier->toHtml($nullLabel),
             selected: \in_array(
                 null,
                 $this->getValues(),

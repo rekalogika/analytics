@@ -27,6 +27,15 @@ var _default = /*#__PURE__*/function (_Controller) {
       plugins: {
         remove_button: {},
         clear_button: {}
+      },
+      render: {
+        option: function option(data, escape) {
+          console.log(data);
+          return "<div>" + data.html + "</div>";
+        },
+        item: function item(_item, escape) {
+          return "<div>" + _item.html + "</div>";
+        }
       }
     });
     this.element.addEventListener('change', function () {

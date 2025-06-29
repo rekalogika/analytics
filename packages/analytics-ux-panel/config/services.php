@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Engine\Filter\DoctrineFilterResolver;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilterFactory;
@@ -22,7 +24,6 @@ use Rekalogika\Analytics\UX\PanelBundle\Filter\Null\NullFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterFactory;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\ChainFilterResolver;
-use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\DoctrineFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver\EnumFilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
@@ -90,6 +91,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DoctrineFilterResolver::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
+            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
         ])
         ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
             'priority' => -100,
@@ -129,8 +131,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services
         ->set(ChoiceFilterFactory::class)
         ->args([
-            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
             '$stringifier' => service(Stringifier::class),
+            '$htmlifier' => service(Htmlifier::class),
         ])
         ->tag('rekalogika.analytics.specific_filter_factory')
     ;

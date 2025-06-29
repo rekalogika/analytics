@@ -6,13 +6,13 @@
                 class="filterelement"
                 placeholder="{{ t('Select items...', domain = 'rekalogika_analytics') }}"
                 multiple
-                data-controller="rekalogika--analytics-ux-panel--equal-filter"
+                data-controller="rekalogika--analytics-ux-panel--choice-filter"
                 data-dimension="{{ filter.dimension }}"
-                data-action="rekalogika--analytics-ux-panel--equal-filter:change->rekalogika--analytics-ux-panel--pivot-table#filter"
+                data-action="rekalogika--analytics-ux-panel--choice-filter:change->rekalogika--analytics-ux-panel--pivot-table#filter"
                 data-label-empty="{{ t('(All)', domain = 'rekalogika_analytics')|trans }}"
                 data-label-selected="{{ t('Select items...', domain = 'rekalogika_analytics')|trans }}">
             {%- for choice in choices -%}
-                <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }}>{{ choice.label }}</option>
+                <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }} data-html="{{ choice.htmlLabel }}">{{ choice.label }}</option>
             {%- endfor -%}
         </select>
     {%- else -%}

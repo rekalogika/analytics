@@ -24,6 +24,7 @@ final readonly class Choice
         private string $id,
         private mixed $value,
         private string $label,
+        private string $htmlLabel,
         private bool $selected,
     ) {}
 
@@ -40,6 +41,11 @@ final readonly class Choice
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function getHtmlLabel(): string
+    {
+        return $this->htmlLabel;
     }
 
     public function isSelected(): bool
