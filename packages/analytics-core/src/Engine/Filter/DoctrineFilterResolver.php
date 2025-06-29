@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
+namespace Rekalogika\Analytics\Engine\Filter;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;

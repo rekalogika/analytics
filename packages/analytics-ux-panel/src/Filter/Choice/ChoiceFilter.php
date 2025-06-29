@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
@@ -34,13 +35,14 @@ final class ChoiceFilter implements Filter
     private ?array $choices = null;
 
     /**
-     * @param class-string $class
+     * @param ChoiceFilterOptions<mixed> $options
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
         private readonly ChoiceFilterOptions $options,
         private readonly DimensionMetadata $dimension,
         private readonly Stringifier $stringifier,
+        private readonly Htmlifier $htmlifier,
         private readonly array $inputArray,
     ) {}
 
@@ -132,6 +134,7 @@ final class ChoiceFilter implements Filter
                 id: $id,
                 value: $value,
                 label: $this->stringifier->toString($value),
+                htmlLabel: $this->htmlifier->toHtml($value),
                 selected: \in_array(
                     $value,
                     $this->getValues(),
@@ -146,6 +149,7 @@ final class ChoiceFilter implements Filter
             id: Choice::NULL,
             value: null,
             label: $this->stringifier->toString($nullLabel),
+            htmlLabel: $this->htmlifier->toHtml($nullLabel),
             selected: \in_array(
                 null,
                 $this->getValues(),

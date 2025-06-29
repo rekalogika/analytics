@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
@@ -26,8 +25,8 @@ use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 final readonly class ChoiceFilterFactory implements FilterFactory
 {
     public function __construct(
-        private DistinctValuesResolver $distinctValuesResolver,
         private Stringifier $stringifier,
+        private Htmlifier $htmlifier,
     ) {}
 
     #[\Override]
@@ -42,12 +41,16 @@ final readonly class ChoiceFilterFactory implements FilterFactory
         return ChoiceFilterOptions::class;
     }
 
+    /**
+     * @param ChoiceFilterOptions<mixed>|null $options
+     * @param array<string,mixed> $inputArray
+     */
     #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,
         ?object $options = null,
-    ): Filter {
+    ): ChoiceFilter {
         if (!$options instanceof ChoiceFilterOptions) {
             throw new InvalidArgumentException(\sprintf(
                 'ChoiceFilter needs the options of "%s", "%s" given',
@@ -59,6 +62,7 @@ final readonly class ChoiceFilterFactory implements FilterFactory
         return new ChoiceFilter(
             options: $options,
             stringifier: $this->stringifier,
+            htmlifier: $this->htmlifier,
             dimension: $dimension,
             inputArray: $inputArray,
         );

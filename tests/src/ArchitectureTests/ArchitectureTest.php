@@ -103,6 +103,9 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsMetadata(),
 
+                // optional dependencies
+                Selectors::selectAnalyticsUXPanel(),
+
                 // dependencies
                 Selector::inNamespace('Rekalogika\Analytics\SimpleQueryBuilder'),
                 Selector::inNamespace('Rekalogika\Contracts\Rekapager'),
@@ -305,6 +308,8 @@ final class ArchitectureTest
                 // php misc
                 Selector::classname(\Override::class),
                 Selector::classname(\Stringable::class),
+                Selector::classname(\UnitEnum::class),
+                Selector::classname(\BackedEnum::class),
 
                 // php array
                 Selector::classname(\IteratorAggregate::class),

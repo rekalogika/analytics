@@ -18,6 +18,14 @@ export default class extends Controller {
                 remove_button: {},
                 clear_button: {}
             },
+            render: {
+                option: function (data, escape) {
+                    return `<div>${data.html}</div>`;
+                },
+                item: function (item, escape) {
+                    return `<div>${item.html}</div>`;
+                }
+            }
         })
 
         this.element.addEventListener('change', () => {
