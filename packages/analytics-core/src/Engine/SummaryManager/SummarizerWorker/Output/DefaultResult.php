@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
@@ -46,7 +47,7 @@ final class DefaultResult implements Result
 
     private ?DefaultTable $table = null;
 
-    private ?bool $hasTieredOrder = null;
+    private ?bool $hasHierarchicalOrdering = null;
 
     private readonly DefaultTreeNodeFactory $treeNodeFactory;
 
@@ -101,11 +102,14 @@ final class DefaultResult implements Result
 
     private function getUnbalancedNormalTable(): DefaultNormalTable
     {
+        if (!$this->hasHierarchicalOrdering()) {
+            throw new HierarchicalOrderingRequired();
+        }
+
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             input: $this->getUnbalancedTable(),
-            hasTieredOrder: $this->hasTieredOrder(),
         );
     }
 
@@ -128,28 +132,28 @@ final class DefaultResult implements Result
     #[\Override]
     public function getTable(): DefaultTable
     {
+        if (!$this->hasHierarchicalOrdering()) {
+            return $this->getUnbalancedTable();
+        }
+
         return $this->table ??= BalancedNormalTableToBalancedTableTransformer::transform(normalTable: $this->getNormalTable());
     }
 
-    private function hasTieredOrder(): bool
+    private function hasHierarchicalOrdering(): bool
     {
-        if ($this->hasTieredOrder !== null) {
-            return $this->hasTieredOrder;
+        if ($this->hasHierarchicalOrdering !== null) {
+            return $this->hasHierarchicalOrdering;
         }
 
         $orderBy = $this->query->getOrderBy();
 
         if ($orderBy === []) {
-            return $this->hasTieredOrder = true;
+            return $this->hasHierarchicalOrdering = true;
         }
 
         $orderFields = array_keys($orderBy);
+        $groupByFields = $this->query->getGroupBy();
 
-        $dimensionWithoutValues = array_filter(
-            array_keys($this->metadata->getLeafDimensions()),
-            fn(string $dimension): bool => $dimension !== '@values',
-        );
-
-        return $this->hasTieredOrder = $orderFields === $dimensionWithoutValues;
+        return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;
     }
 }

@@ -66,7 +66,6 @@ final class TableToNormalTableTransformer
         DefaultQuery $query,
         DefaultTable $input,
         SummaryMetadata $metadata,
-        bool $hasTieredOrder,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
