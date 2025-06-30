@@ -56,6 +56,14 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         );
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getNames(): array
+    {
+        return array_keys($this->dimensions);
+    }
+
     #[\Override]
     public function getByName(string $name): ?DefaultDimension
     {
@@ -135,6 +143,13 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return hash('xxh128', serialize($signatures));
     }
 
+    public function getNamesSignature(): string
+    {
+        $names = array_keys($this->dimensions);
+
+        return hash('xxh128', serialize($names));
+    }
+
     public function getWithoutValues(): self
     {
         $dimensionsWithoutValues = [];
@@ -150,6 +165,32 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: $dimensionsWithoutValues,
+        );
+    }
+
+    /**
+     * @param int<0,max> $n
+     */
+    public function withFirstNDimensions(int $n): self
+    {
+        $dimensions = \array_slice($this->dimensions, 0, $n);
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            dimensions: $dimensions,
+        );
+    }
+
+    /**
+     * @param int<0,max> $n
+     */
+    public function withUntilLastNthDimension(int $n): self
+    {
+        $dimensions = \array_slice($this->dimensions, 0, -$n);
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            dimensions: $dimensions,
         );
     }
 }

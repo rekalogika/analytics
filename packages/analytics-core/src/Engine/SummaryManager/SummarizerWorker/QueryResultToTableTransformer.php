@@ -38,6 +38,11 @@ final readonly class QueryResultToTableTransformer
     private DimensionFactory $dimensionFactory;
     private QueryResultToTableHelper $helper;
 
+    /**
+     * @var list<string>
+     */
+    private array $dimensions;
+
     private function __construct(
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
@@ -46,6 +51,11 @@ final readonly class QueryResultToTableTransformer
     ) {
         $this->dimensionFactory = new DimensionFactory();
         $this->helper = new QueryResultToTableHelper();
+
+        $this->dimensions = array_values(array_filter(
+            $this->query->getGroupBy(),
+            static fn(string $dimension): bool => $dimension !== '@values',
+        ));
     }
 
     /**
@@ -75,23 +85,13 @@ final readonly class QueryResultToTableTransformer
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return list<DefaultRow>
+     * @return iterable<DefaultRow>
      */
-    private function doTransform(array $input): array
+    private function doTransform(array $input): iterable
     {
-        $rows = [];
-
         foreach ($input as $item) {
-            $row = $this->transformOne($item);
-
-            if ($row->isSubtotal()) {
-                continue;
-            }
-
-            $rows[] = $row;
+            yield $this->transformOne($item);
         }
-
-        return $rows;
     }
 
     /**
@@ -107,7 +107,7 @@ final readonly class QueryResultToTableTransformer
         // create groupings
         $groupings = new GroupingField(
             groupingField: $input['__grouping'] ?? null,
-            dimensions: $this->query->getGroupBy(),
+            dimensions: $this->dimensions,
         );
 
         // contextawareness init
@@ -160,13 +160,7 @@ final readonly class QueryResultToTableTransformer
         array $input,
         object $summaryObject,
     ): void {
-        $dimensions = $this->query->getGroupBy();
-
-        foreach ($dimensions as $name) {
-            if ($name === '@values') {
-                continue;
-            }
-
+        foreach ($this->dimensions as $name) {
             if (!\array_key_exists($name, $input)) {
                 throw new LogicException(\sprintf('Dimension "%s" not found', $name));
             }
@@ -226,10 +220,6 @@ final readonly class QueryResultToTableTransformer
         $dimensionValues = [];
 
         foreach ($dimensions as $name) {
-            if ($name === '@values') {
-                continue;
-            }
-
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->helper->getValue(
                 object: $summaryObject,
