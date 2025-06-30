@@ -67,7 +67,7 @@ final class BalancedNormalTableToBalancedTableTransformer
             $row = new DefaultRow(
                 tuple: $tuple,
                 measures: $measureValues,
-                groupings: '',
+                groupings: null,
             );
 
             $this->rows[] = $row;

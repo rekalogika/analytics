@@ -89,9 +89,9 @@ final readonly class DefaultDimension implements Dimension
     public function getSignature(): string
     {
         if (\is_object($this->rawMember)) {
-            return $this->name . ':' . spl_object_id($this->rawMember);
+            return hash('xxh128', $this->name . ':' . spl_object_id($this->rawMember));
         }
 
-        return $this->name . ':' . serialize($this->rawMember);
+        return hash('xxh128', $this->name . ':' . serialize($this->rawMember));
     }
 }
