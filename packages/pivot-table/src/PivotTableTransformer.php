@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
-use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Table\Table;
 
 final readonly class PivotTableTransformer

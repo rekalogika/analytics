@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 
 final readonly class DefaultLeafNode implements LeafNode
 {
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $item,
+        private mixed $field,
         private mixed $value,
     ) {}
 
@@ -29,7 +29,7 @@ final readonly class DefaultLeafNode implements LeafNode
         return new self(
             name: $leafNode->getKey(),
             legend: $leafNode->getLegend(),
-            item: $leafNode->getItem(),
+            field: $leafNode->getField(),
             value: $leafNode->getValue(),
         );
     }
@@ -47,9 +47,9 @@ final readonly class DefaultLeafNode implements LeafNode
     }
 
     #[\Override]
-    public function getItem(): mixed
+    public function getField(): mixed
     {
-        return $this->item;
+        return $this->field;
     }
 
     #[\Override]

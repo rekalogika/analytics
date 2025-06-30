@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 
 final readonly class NullBranchNode implements BranchNode
 {
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $item,
+        private mixed $field,
     ) {}
 
     public static function fromInterface(BranchNode $branchNode): self
@@ -28,7 +28,7 @@ final readonly class NullBranchNode implements BranchNode
         return new self(
             name: $branchNode->getKey(),
             legend: $branchNode->getLegend(),
-            item: $branchNode->getItem(),
+            field: $branchNode->getField(),
         );
     }
 
@@ -45,9 +45,9 @@ final readonly class NullBranchNode implements BranchNode
     }
 
     #[\Override]
-    public function getItem(): mixed
+    public function getField(): mixed
     {
-        return $this->item;
+        return $this->field;
     }
 
     #[\Override]

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 final readonly class DefaultBranchNode implements BranchNode
 {
@@ -24,7 +24,7 @@ final readonly class DefaultBranchNode implements BranchNode
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $item,
+        private mixed $field,
         private iterable $children,
     ) {}
 
@@ -41,9 +41,9 @@ final readonly class DefaultBranchNode implements BranchNode
     }
 
     #[\Override]
-    public function getItem(): mixed
+    public function getField(): mixed
     {
-        return $this->item;
+        return $this->field;
     }
 
     #[\Override]

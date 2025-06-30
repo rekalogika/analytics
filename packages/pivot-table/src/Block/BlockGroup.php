@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 abstract class BlockGroup extends Block
 {
