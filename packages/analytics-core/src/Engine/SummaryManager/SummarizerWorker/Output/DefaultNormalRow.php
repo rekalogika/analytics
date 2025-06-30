@@ -27,7 +27,7 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
     public function __construct(
         private DefaultTuple $tuple,
         private DefaultMeasure $measure,
-        private string $groupings,
+        private ?GroupingField $groupings,
     ) {}
 
     #[\Override]
@@ -42,7 +42,7 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
         return $this->measure;
     }
 
-    public function getGroupings(): string
+    public function getGroupings(): ?GroupingField
     {
         return $this->groupings;
     }

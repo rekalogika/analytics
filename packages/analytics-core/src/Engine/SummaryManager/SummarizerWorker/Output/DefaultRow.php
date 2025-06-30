@@ -24,7 +24,7 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     public function __construct(
         private DefaultTuple $tuple,
         private DefaultMeasures $measures,
-        private string $groupings,
+        private ?GroupingField $groupings,
     ) {}
 
     #[\Override]
@@ -45,14 +45,14 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
         return $this->measures;
     }
 
-    public function getGroupings(): string
+    public function getGroupings(): ?GroupingField
     {
         return $this->groupings;
     }
 
     public function isSubtotal(): bool
     {
-        return substr_count($this->groupings, '1') !== 0;
+        return $this->groupings?->isSubtotal() ?? false;
     }
 
     #[\Override]

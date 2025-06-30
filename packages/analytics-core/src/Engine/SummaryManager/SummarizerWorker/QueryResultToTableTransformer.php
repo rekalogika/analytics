@@ -27,6 +27,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRo
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultUnit;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\GroupingField;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -103,6 +104,12 @@ final readonly class QueryResultToTableTransformer
         $reflectionClass = new \ReflectionClass($summaryClass);
         $summaryObject = $reflectionClass->newInstanceWithoutConstructor();
 
+        // create groupings
+        $groupings = new GroupingField(
+            groupingField: $input['__grouping'] ?? null,
+            dimensions: $this->query->getGroupBy(),
+        );
+
         // contextawareness init
         if ($summaryObject instanceof ContextAwareSummary) {
             $summaryObject->setContext(
@@ -126,19 +133,10 @@ final readonly class QueryResultToTableTransformer
         );
 
         // get dimensions from object
-        $dimensionValues = $this->createDimensionValues($summaryObject);
+        $dimensionValues = $this->createDimensionValues($summaryObject, $groupings);
 
         // get measures from object
         $measureValues = $this->createMeasureValues($summaryObject);
-
-        // get groupings
-        /** @psalm-suppress MixedAssignment */
-        $groupings = $input['__grouping']
-            ?? throw new LogicException('Grouping not found');
-
-        if (!\is_string($groupings)) {
-            throw new LogicException('Grouping is not a string');
-        }
 
         // instantiate
         $tuple = new DefaultTuple(
@@ -222,8 +220,9 @@ final readonly class QueryResultToTableTransformer
      */
     private function createDimensionValues(
         object $summaryObject,
+        GroupingField $groupingField,
     ): array {
-        $dimensions = $this->query->getGroupBy();
+        $dimensions = $groupingField->getNonGroupingFields();
         $dimensionValues = [];
 
         foreach ($dimensions as $name) {
