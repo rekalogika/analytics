@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
+use Rekalogika\Analytics\Engine\SummaryManager\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -330,8 +331,9 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.civil.month.month')
             ->select('count')
             ->orderBy('time.civil.month.month', Order::Descending)
-            ->getResult()
-            ->getTree();
+            ->getResult();
+
+        $result = $result->getTree();
 
         $months = [];
 
@@ -350,28 +352,55 @@ final class QueryTest extends KernelTestCase
         $this->assertEquals($sorted, $months);
     }
 
-    // public function testOrderByMeasure(): void
-    // {
-    //     $result = $this->getQuery()
-    //         ->groupBy('time.civil.month.month')
-    //         ->select('count')
-    //         ->orderBy('count', Order::Descending)
-    //         ->getResult()
-    //         ->getTree();
+    public function testOrderByDimensionNonHierarchical(): void
+    {
+        $this->expectException(HierarchicalOrderingRequired::class);
 
-    //     $counts = [];
+        $result = $this->getQuery()
+            ->groupBy('time.civil.month.month', 'customerType')
+            ->select('count')
+            ->orderBy('customerType', Order::Descending)
+            ->addOrderBy('time.civil.month.month', Order::Descending)
+            ->getResult()
+            ->getTree();
+    }
 
-    //     foreach ($result as $node) {
-    //         /** @psalm-suppress MixedAssignment */
-    //         $counts[] = $node->traverse('count')?->getMeasure()?->getValue();
-    //     }
+    public function testOrderByDimensionHierarchical(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.civil.year', 'customerType')
+            ->select('count')
+            ->orderBy('time.civil.year', Order::Descending)
+            ->addOrderBy('customerType', Order::Descending)
+            ->getResult()
+            ->getTree();
 
-    //     // assert that the counts are sorted in descending order
-    //     $sorted = $counts;
-    //     rsort($sorted);
+        $this->assertCount(2, $result);
+    }
 
-    //     $this->assertEquals($counts, $sorted);
-    // }
+    public function testOrderByMeasureOnlyGetTree(): void
+    {
+        $this->expectException(HierarchicalOrderingRequired::class);
+
+        $result = $this->getQuery()
+            ->groupBy('time.civil.month.month')
+            ->select('count')
+            ->orderBy('count', Order::Descending)
+            ->getResult()
+            ->getTree();
+    }
+
+    public function testOrderByMeasureOnlyGetTable(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.civil.year')
+            ->select('count')
+            ->orderBy('count', Order::Descending)
+            ->getResult()
+            ->getTable();
+
+        $this->assertCount(2, $result);
+    }
 
     public function testQueryResultLimit(): void
     {
