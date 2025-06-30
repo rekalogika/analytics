@@ -21,6 +21,9 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Exception\HierarchicalOrderingRequired;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRow;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTable;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -607,5 +610,27 @@ final class QueryTest extends KernelTestCase
         $this->assertCount(1, $result);
         $count = $result->traverse('count')?->getMeasure()?->getValue();
         $this->assertNull($count);
+    }
+
+    /**
+     * @todo complete this test
+     */
+    public function testTableSubtotal(): void
+    {
+        $result = $this->getQuery()
+            ->groupBy('time.civil.year', 'customerType', 'customerGender')
+            ->select('count')
+            ->getResult()
+            ->getTable();
+
+        $this->assertInstanceOf(DefaultTable::class, $result);
+
+        $rows = iterator_to_array($result);
+        $first = array_shift($rows);
+
+        $this->assertInstanceOf(DefaultRow::class, $first);
+
+        // $tuple = $first->getTuple();
+        // $this->assertInstanceOf(DefaultTuple::class, $tuple);
     }
 }
