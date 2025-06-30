@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\PivotTable\Adapter;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
-use Rekalogika\PivotTable\Contracts\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 
 final readonly class PivotTableAdapter implements BranchNode
 {
@@ -42,7 +42,7 @@ final readonly class PivotTableAdapter implements BranchNode
     }
 
     #[\Override]
-    public function getItem(): mixed
+    public function getField(): mixed
     {
         return $this->propertyMap->getMember($this->node);
     }

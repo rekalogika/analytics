@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 /**
  * @template T of TreeNode

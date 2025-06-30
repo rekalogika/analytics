@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
@@ -32,12 +32,12 @@ final class PivotLeafBlock extends NodeBlock
         ) {
             $cell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                content: $this->getTreeNode()->getField(),
             );
         } else {
             $cell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                content: $this->getTreeNode()->getField(),
             );
         }
 

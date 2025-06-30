@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
-use Rekalogika\PivotTable\Contracts\LeafNode;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullLeafNode;
 
@@ -75,9 +75,9 @@ final readonly class DistinctNodeListResolver
                         $merged[$level] = [];
                     }
 
-                    if (!\in_array($node->getItem(), $values[$level], true)) {
+                    if (!\in_array($node->getField(), $values[$level], true)) {
                         /** @psalm-suppress MixedAssignment */
-                        $values[$level][] = $node->getItem();
+                        $values[$level][] = $node->getField();
 
                         if ($node instanceof BranchNode) {
                             $merged[$level][] = NullBranchNode::fromInterface($node);

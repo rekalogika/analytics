@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\BranchNode;
-use Rekalogika\PivotTable\Contracts\LeafNode;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
@@ -141,7 +141,7 @@ abstract class Block
 
             foreach ($branchNodes as $branchNode) {
                 // @todo fix identity comparison
-                if ($branchNode->getItem() === $distinctBranchNode->getItem()) {
+                if ($branchNode->getField() === $distinctBranchNode->getField()) {
                     $result[] = $branchNode;
                     $found = true;
                     break;

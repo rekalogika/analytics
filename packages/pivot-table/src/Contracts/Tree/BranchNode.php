@@ -11,9 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Contracts;
+namespace Rekalogika\PivotTable\Contracts\Tree;
 
-interface LeafNode extends TreeNode
+interface BranchNode extends TreeNode
 {
-    public function getValue(): mixed;
+    /**
+     * @return iterable<TreeNode>
+     */
+    public function getChildren(): iterable;
 }

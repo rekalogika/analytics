@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\PivotTable\Model\Value;
 use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
-use Rekalogika\PivotTable\Contracts\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 
 final readonly class PivotTableAdapterLeaf implements LeafNode
 {
@@ -54,7 +54,7 @@ final readonly class PivotTableAdapterLeaf implements LeafNode
     }
 
     #[\Override]
-    public function getItem(): mixed
+    public function getField(): mixed
     {
         return $this->propertyMap->getMember($this->node);
     }
