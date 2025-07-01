@@ -75,9 +75,9 @@ final readonly class DistinctNodeListResolver
                         $merged[$level] = [];
                     }
 
-                    if (!\in_array($node->getField(), $values[$level], true)) {
+                    if (!\in_array($node->getItem(), $values[$level], true)) {
                         /** @psalm-suppress MixedAssignment */
-                        $values[$level][] = $node->getField();
+                        $values[$level][] = $node->getItem();
 
                         if ($node instanceof BranchNode) {
                             $merged[$level][] = NullBranchNode::fromInterface($node);

@@ -29,7 +29,7 @@ final class SingleNodeLeafBlock extends NodeBlock
     {
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getField(),
+            content: $this->getTreeNode()->getItem(),
         );
 
         $row = new DefaultRow([$cell]);

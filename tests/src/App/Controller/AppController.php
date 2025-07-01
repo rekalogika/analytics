@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
-use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
+use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
@@ -51,7 +51,7 @@ final class AppController extends AbstractController
         ?string $parameters,
         PivotAwareQueryFactory $pivotAwareQueryFactory,
         AnalyticsChartBuilder $chartBuilder,
-        PivotTableRenderer $pivotTableRenderer,
+        HtmlRenderer $pivotTableRenderer,
         string $hash,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
@@ -78,7 +78,7 @@ final class AppController extends AbstractController
 
         // create pivot table
         try {
-            $pivotTable = $pivotTableRenderer->createPivotTable(
+            $pivotTable = $pivotTableRenderer->render(
                 result: $result,
                 pivotedDimensions: $query->getPivotedDimensions(),
             );

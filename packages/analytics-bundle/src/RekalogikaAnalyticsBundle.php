@@ -26,7 +26,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Html\PivotTableRenderer;
+use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
@@ -190,11 +190,11 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependTwig(ContainerBuilder $builder): void
     {
-        if (!class_exists(PivotTableRenderer::class)) {
+        if (!class_exists(HtmlRenderer::class)) {
             return;
         }
 
-        $path = (new \ReflectionClass(PivotTableRenderer::class))->getFileName();
+        $path = (new \ReflectionClass(HtmlRenderer::class))->getFileName();
 
         if ($path === false) {
             throw new InvalidArgumentException('Could not get file name for PivotTableRenderer');

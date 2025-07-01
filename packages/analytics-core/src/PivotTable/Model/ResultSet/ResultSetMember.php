@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
 
+use Rekalogika\Analytics\PivotTable\Model\Member;
 use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-interface Property
+final readonly class ResultSetMember extends ResultSetProperty implements Member
 {
-    /**
-     * @template T
-     * @param TableVisitor<T> $visitor
-     * @return T
-     */
-    public function accept(TableVisitor $visitor): mixed;
+    #[\Override]
+    public function accept(TableVisitor $visitor): mixed
+    {
+        return $visitor->visitMember($this);
+    }
 }

@@ -20,7 +20,7 @@ final readonly class NullLeafNode implements LeafNode
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $field,
+        private mixed $item,
     ) {}
 
     public static function fromInterface(LeafNode $branchNode): self
@@ -28,7 +28,7 @@ final readonly class NullLeafNode implements LeafNode
         return new self(
             name: $branchNode->getKey(),
             legend: $branchNode->getLegend(),
-            field: $branchNode->getField(),
+            item: $branchNode->getItem(),
         );
     }
 
@@ -45,9 +45,9 @@ final readonly class NullLeafNode implements LeafNode
     }
 
     #[\Override]
-    public function getField(): mixed
+    public function getItem(): mixed
     {
-        return $this->field;
+        return $this->item;
     }
 
     #[\Override]

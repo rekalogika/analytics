@@ -11,9 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\PivotTable\Contracts\Result;
 
-interface Member extends Property
-{
-    public function getContent(): mixed;
-}
+/**
+ * @extends \Traversable<Value>
+ */
+interface Values extends \Traversable, \Countable {}

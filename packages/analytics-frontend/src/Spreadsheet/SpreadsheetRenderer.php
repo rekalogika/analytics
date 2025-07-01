@@ -18,7 +18,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
-use Rekalogika\Analytics\PivotTable\Adapter\PivotTableAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 
 final readonly class SpreadsheetRenderer
@@ -41,7 +41,7 @@ final readonly class SpreadsheetRenderer
         $treeResult = $result->getTree();
         $pivotTable = PivotTableAdapter::adapt($treeResult);
 
-        $table = PivotTableTransformer::transformTreeNodeToPivotTable(
+        $table = PivotTableTransformer::transformTreeToTable(
             treeNode: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             superfluousLegends: ['@values'],

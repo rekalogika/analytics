@@ -43,7 +43,7 @@ final class NormalLeafBlock extends NodeBlock
     {
         $name = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getField(),
+            content: $this->getTreeNode()->getItem(),
         );
 
         $value = new DefaultDataCell(

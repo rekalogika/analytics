@@ -11,9 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Exception;
-
-use Rekalogika\Analytics\Common\Exception\RuntimeException;
+namespace Rekalogika\Analytics\Common\Exception;
 
 final class HierarchicalOrderingRequired extends RuntimeException
 {
