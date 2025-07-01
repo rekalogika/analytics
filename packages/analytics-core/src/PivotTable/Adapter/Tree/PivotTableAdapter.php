@@ -11,10 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Adapter;
+namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
+use Rekalogika\Analytics\PivotTable\Util\TreePropertyMap;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 
 final readonly class PivotTableAdapter implements BranchNode
@@ -26,7 +26,7 @@ final readonly class PivotTableAdapter implements BranchNode
 
     private function __construct(
         private TreeNode $node,
-        private PropertyMap $propertyMap = new PropertyMap(),
+        private TreePropertyMap $propertyMap = new TreePropertyMap(),
     ) {}
 
     #[\Override]
@@ -42,7 +42,7 @@ final readonly class PivotTableAdapter implements BranchNode
     }
 
     #[\Override]
-    public function getField(): mixed
+    public function getItem(): mixed
     {
         return $this->propertyMap->getMember($this->node);
     }

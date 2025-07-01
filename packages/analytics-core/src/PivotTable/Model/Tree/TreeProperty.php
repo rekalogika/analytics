@@ -11,16 +11,26 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\PivotTable\Model\Tree;
 
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-interface Property
+abstract readonly class TreeProperty
 {
+    final public function __construct(private TreeNode $node) {}
+
+    abstract public function getContent(): mixed;
+
     /**
      * @template T
      * @param TableVisitor<T> $visitor
      * @return T
      */
-    public function accept(TableVisitor $visitor): mixed;
+    abstract public function accept(TableVisitor $visitor): mixed;
+
+    final public function getNode(): TreeNode
+    {
+        return $this->node;
+    }
 }

@@ -11,19 +11,19 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Adapter;
+namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\PivotTable\Model\Value;
-use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
+use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
+use Rekalogika\Analytics\PivotTable\Util\TreePropertyMap;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 
 final readonly class PivotTableAdapterLeaf implements LeafNode
 {
     public function __construct(
         private TreeNode $node,
-        private PropertyMap $propertyMap,
+        private TreePropertyMap $propertyMap,
     ) {
         $measure = $node->getMeasure();
 
@@ -38,7 +38,7 @@ final readonly class PivotTableAdapterLeaf implements LeafNode
     #[\Override]
     public function getValue(): mixed
     {
-        return new Value($this->node);
+        return new TreeValue($this->node);
     }
 
     #[\Override]
@@ -54,7 +54,7 @@ final readonly class PivotTableAdapterLeaf implements LeafNode
     }
 
     #[\Override]
-    public function getField(): mixed
+    public function getItem(): mixed
     {
         return $this->propertyMap->getMember($this->node);
     }

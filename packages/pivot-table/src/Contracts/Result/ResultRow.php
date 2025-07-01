@@ -11,9 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\PivotTable\Contracts\Result;
 
-interface Member extends Property
+interface ResultRow
 {
-    public function getContent(): mixed;
+    public function getTuple(): Tuple;
+
+    public function getValues(): Values;
 }

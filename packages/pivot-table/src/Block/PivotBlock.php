@@ -31,12 +31,12 @@ final class PivotBlock extends NodeBlock
         ) {
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getField(),
+                content: $this->getTreeNode()->getItem(),
             );
         } else {
             $valueCell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getField(),
+                content: $this->getTreeNode()->getItem(),
             );
         }
 

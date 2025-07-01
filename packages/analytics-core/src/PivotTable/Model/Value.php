@@ -13,19 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
-use Rekalogika\Analytics\PivotTable\TableVisitor;
-
-final readonly class Value extends Property
+interface Value extends Property
 {
-    #[\Override]
-    public function accept(TableVisitor $visitor): mixed
-    {
-        return $visitor->visitValue($this);
-    }
-
-    #[\Override]
-    public function getContent(): mixed
-    {
-        return $this->getNode()->getMeasure()?->getValue();
-    }
+    public function getContent(): mixed;
 }

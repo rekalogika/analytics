@@ -19,5 +19,5 @@ interface TreeNode
 
     public function getLegend(): mixed;
 
-    public function getField(): mixed;
+    public function getItem(): mixed;
 }

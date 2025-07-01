@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
 
+use Rekalogika\Analytics\PivotTable\Model\Value;
 use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-interface Property
+final readonly class ResultSetValue extends ResultSetProperty implements Value
 {
-    /**
-     * @template T
-     * @param TableVisitor<T> $visitor
-     * @return T
-     */
-    public function accept(TableVisitor $visitor): mixed;
+    #[\Override]
+    public function accept(TableVisitor $visitor): mixed
+    {
+        return $visitor->visitValue($this);
+    }
 }

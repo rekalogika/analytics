@@ -20,7 +20,7 @@ final readonly class DefaultLeafNode implements LeafNode
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $field,
+        private mixed $item,
         private mixed $value,
     ) {}
 
@@ -29,7 +29,7 @@ final readonly class DefaultLeafNode implements LeafNode
         return new self(
             name: $leafNode->getKey(),
             legend: $leafNode->getLegend(),
-            field: $leafNode->getField(),
+            item: $leafNode->getItem(),
             value: $leafNode->getValue(),
         );
     }
@@ -47,9 +47,9 @@ final readonly class DefaultLeafNode implements LeafNode
     }
 
     #[\Override]
-    public function getField(): mixed
+    public function getItem(): mixed
     {
-        return $this->field;
+        return $this->item;
     }
 
     #[\Override]

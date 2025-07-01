@@ -24,7 +24,7 @@ final readonly class DefaultBranchNode implements BranchNode
     public function __construct(
         private string $name,
         private mixed $legend,
-        private mixed $field,
+        private mixed $item,
         private iterable $children,
     ) {}
 
@@ -41,9 +41,9 @@ final readonly class DefaultBranchNode implements BranchNode
     }
 
     #[\Override]
-    public function getField(): mixed
+    public function getItem(): mixed
     {
-        return $this->field;
+        return $this->item;
     }
 
     #[\Override]

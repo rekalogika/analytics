@@ -504,6 +504,8 @@ final class ArchitectureTest
                 Selector::classname(\Override::class),
 
                 // php array
+                Selector::classname(\Traversable::class),
+                Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\WeakMap::class),
             );
     }
@@ -520,6 +522,7 @@ final class ArchitectureTest
 
                 // exceptions
                 Selector::classname(\LogicException::class),
+                Selector::classname(\RuntimeException::class),
                 Selector::classname(\InvalidArgumentException::class),
 
                 // array

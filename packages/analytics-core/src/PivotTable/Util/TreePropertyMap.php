@@ -14,22 +14,22 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\PivotTable\Model\Label;
-use Rekalogika\Analytics\PivotTable\Model\Member;
+use Rekalogika\Analytics\PivotTable\Model\Tree\TreeLabel;
+use Rekalogika\Analytics\PivotTable\Model\Tree\TreeMember;
 
 /**
  * Identity map for objects that represent properties of a TreeNode. It needs
  * an identity map because pivot-table depends on identity comparison.
  */
-final class PropertyMap
+final class TreePropertyMap
 {
     /**
-     * @var array<string,Label>
+     * @var array<string,TreeLabel>
      */
     private array $labelMap = [];
 
     /**
-     * @var array<string,Member>
+     * @var array<string,TreeMember>
      */
     private array $memberMap = [];
 
@@ -49,17 +49,17 @@ final class PropertyMap
         return hash('xxh128', $objectSeed . $treeNode->getName());
     }
 
-    public function getLabel(TreeNode $treeNode): Label
+    public function getLabel(TreeNode $treeNode): TreeLabel
     {
         $hash = $this->getHash($treeNode);
 
-        return $this->labelMap[$hash] ??= new Label($treeNode);
+        return $this->labelMap[$hash] ??= new TreeLabel($treeNode);
     }
 
-    public function getMember(TreeNode $treeNode): Member
+    public function getMember(TreeNode $treeNode): TreeMember
     {
         $hash = $this->getHash($treeNode);
 
-        return $this->memberMap[$hash] ??= new Member($treeNode);
+        return $this->memberMap[$hash] ??= new TreeMember($treeNode);
     }
 }

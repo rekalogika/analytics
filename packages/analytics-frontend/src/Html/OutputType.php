@@ -11,9 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\Frontend\Html;
 
-interface Member extends Property
+enum OutputType
 {
-    public function getContent(): mixed;
+    case Auto;
+    case PivotTable;
+    case Table;
 }

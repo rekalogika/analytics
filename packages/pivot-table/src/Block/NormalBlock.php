@@ -41,7 +41,7 @@ final class NormalBlock extends NodeBlock
     {
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getField(),
+            content: $this->getTreeNode()->getItem(),
         );
 
         $blockGroup = $this->createGroupBlock($this->getTreeNode(), $this->getLevel());

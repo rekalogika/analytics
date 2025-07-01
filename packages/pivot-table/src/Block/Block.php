@@ -141,7 +141,7 @@ abstract class Block
 
             foreach ($branchNodes as $branchNode) {
                 // @todo fix identity comparison
-                if ($branchNode->getField() === $distinctBranchNode->getField()) {
+                if ($branchNode->getItem() === $distinctBranchNode->getItem()) {
                     $result[] = $branchNode;
                     $found = true;
                     break;
