@@ -14,16 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Tree;
 
 use Rekalogika\Analytics\PivotTable\Model\Member;
-use Rekalogika\Analytics\PivotTable\TableVisitor;
 
 final readonly class TreeMember extends TreeProperty implements Member
 {
-    #[\Override]
-    public function accept(TableVisitor $visitor): mixed
-    {
-        return $visitor->visitMember($this);
-    }
-
     #[\Override]
     public function getContent(): mixed
     {

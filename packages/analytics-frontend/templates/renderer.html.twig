@@ -34,33 +34,21 @@
 
 {%- block td -%}
     <td {{ block("td_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
-        {{ content|raw }}
+        {{ content|analytics_to_html }}
     </td>
 {%- endblock td -%}
 
 {%- block tf -%}
     <td {{ block("tf_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
-        {{ content|raw }}
+        {{ content|analytics_to_html }}
     </td>
 {%- endblock tf -%}
 
 {%- block th -%}
     <th {{ block("th_attr") }} colspan="{{ element.columnSpan }}" rowspan="{{ element.rowSpan }}">
-        {{ content|raw }}
+        {{ content|analytics_to_html }}
     </th>
 {%- endblock th -%}
-
-{%- block label -%}
-    {{ label|analytics_to_html }}
-{%- endblock label -%}
-
-{%- block member -%}
-    {{ member|analytics_to_html }}
-{%- endblock member -%}
-
-{%- block value -%}
-    {{ value|analytics_to_html }}
-{%- endblock value -%}
 
 {%- block no_data -%}
     <p>No Data</p>

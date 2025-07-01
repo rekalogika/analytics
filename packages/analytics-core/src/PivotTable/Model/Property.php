@@ -13,14 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
-use Rekalogika\Analytics\PivotTable\TableVisitor;
-
 interface Property
 {
-    /**
-     * @template T
-     * @param TableVisitor<T> $visitor
-     * @return T
-     */
-    public function accept(TableVisitor $visitor): mixed;
+    public function getContent(): mixed;
 }

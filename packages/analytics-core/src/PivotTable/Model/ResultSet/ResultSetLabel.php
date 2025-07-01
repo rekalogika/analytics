@@ -15,17 +15,10 @@ namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\PivotTable\Model\Label;
-use Rekalogika\Analytics\PivotTable\TableVisitor;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class ResultSetLabel extends ResultSetProperty implements Label
 {
-    #[\Override]
-    public function accept(TableVisitor $visitor): mixed
-    {
-        return $visitor->visitLabel($this);
-    }
-
     #[\Override]
     public function getContent(): TranslatableInterface
     {

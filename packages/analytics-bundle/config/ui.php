@@ -20,16 +20,20 @@ use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\Implementation\ChartConfiguration;
 use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultAnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
+use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainCellifier;
+use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainHtmlifier;
+use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainNumberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
-use Rekalogika\Analytics\Frontend\Formatter\Implementation\ChainCellifier;
-use Rekalogika\Analytics\Frontend\Formatter\Implementation\ChainHtmlifier;
-use Rekalogika\Analytics\Frontend\Formatter\Implementation\ChainNumberifier;
-use Rekalogika\Analytics\Frontend\Formatter\Implementation\ChainStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultCellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultNumberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyCellifier;
+use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyHtmlifier;
+use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyNumberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
@@ -157,6 +161,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
+        ->set(PropertyStringifier::class)
+        ->tag('rekalogika.analytics.stringifier', [
+            'priority' => -500,
+        ])
+    ;
+
+    $services
         ->set(Stringifier::class)
         ->class(ChainStringifier::class)
         ->args([
@@ -174,6 +185,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$htmlifiers' => tagged_iterator('rekalogika.analytics.htmlifier'),
             '$stringifier' => service(Stringifier::class),
+        ])
+    ;
+
+    $services
+        ->set(PropertyHtmlifier::class)
+        ->tag('rekalogika.analytics.htmlifier', [
+            'priority' => -500,
         ])
     ;
 
@@ -196,6 +214,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
     ;
 
+    $services
+        ->set(PropertyNumberifier::class)
+        ->tag('rekalogika.analytics.numberifier', [
+            'priority' => -500,
+        ])
+    ;
+
     //
     // cellifier
     //
@@ -213,6 +238,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(DefaultCellifier::class)
         ->tag('rekalogika.analytics.cellifier', [
             'priority' => -1000,
+        ])
+    ;
+
+    $services
+        ->set(PropertyCellifier::class)
+        ->tag('rekalogika.analytics.cellifier', [
+            'priority' => -500,
         ])
     ;
 };

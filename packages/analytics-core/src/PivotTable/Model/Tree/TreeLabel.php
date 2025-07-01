@@ -14,17 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Tree;
 
 use Rekalogika\Analytics\PivotTable\Model\Label;
-use Rekalogika\Analytics\PivotTable\TableVisitor;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class TreeLabel extends TreeProperty implements Label
 {
-    #[\Override]
-    public function accept(TableVisitor $visitor): mixed
-    {
-        return $visitor->visitLabel($this);
-    }
-
     #[\Override]
     public function getContent(): TranslatableInterface
     {
