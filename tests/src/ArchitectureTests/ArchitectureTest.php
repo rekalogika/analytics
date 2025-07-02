@@ -264,6 +264,7 @@ final class ArchitectureTest
                 // php misc
                 Selector::classname(\Override::class),
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\NumberFormatter::class),
 
                 // php array
                 Selector::classname(\IteratorAggregate::class),
