@@ -39,7 +39,6 @@ use Rekalogika\Analytics\PostgreSQLHll\ApproximateCount;
 use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -80,7 +79,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     )]
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
-            type: TimeBinType::Date,
+            binClass: Date::class,
             input: new PropertyValue('shipped'),
         ),
         label: new TranslatableMessage('Date shipped'),

@@ -15,12 +15,14 @@ namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum MonthOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
@@ -36,6 +38,12 @@ enum MonthOfYear: int implements RecurringTimeBin
     case October = 10;
     case November = 11;
     case December = 12;
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'MM';
+    }
 
     #[\Override]
     public function trans(

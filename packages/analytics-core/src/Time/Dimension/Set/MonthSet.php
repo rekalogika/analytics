@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\Month;
 use Rekalogika\Analytics\Time\Bin\MonthOfYear;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -41,7 +40,7 @@ class MonthSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Month'),
-        source: new TimeBinValueResolver(TimeBinType::Month),
+        source: new TimeBinValueResolver(Month::class),
     )]
     private ?int $month = null;
 
@@ -52,7 +51,7 @@ class MonthSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Month of Year'),
-        source: new TimeBinValueResolver(TimeBinType::MonthOfYear),
+        source: new TimeBinValueResolver(MonthOfYear::class),
     )]
     private ?MonthOfYear $monthOfYear = null;
 

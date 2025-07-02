@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
+use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -57,6 +58,15 @@ final class MonthWeek implements TimeBin
 
         $this->start = $start;
         $this->end = $end;
+    }
+
+    #[\Override]
+    public static function getDQLExpression(
+        string $sourceExpression,
+        \DateTimeZone $sourceTimeZone,
+        \DateTimeZone $summaryTimeZone,
+    ): string {
+        throw new BadMethodCallException('Not implemented yet.');
     }
 
     #[\Override]

@@ -23,7 +23,6 @@ use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\IsoDayOfWeekYear;
 use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -42,7 +41,7 @@ class WeekDateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Week Date'),
-        source: new TimeBinValueResolver(TimeBinType::IsoWeekDate),
+        source: new TimeBinValueResolver(IsoWeekDate::class),
     )]
     private ?int $weekDate = null;
 
@@ -53,7 +52,7 @@ class WeekDateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Week'),
-        source: new TimeBinValueResolver(TimeBinType::DayOfWeek),
+        source: new TimeBinValueResolver(DayOfWeek::class),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -64,7 +63,7 @@ class WeekDateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of WeekYear'),
-        source: new TimeBinValueResolver(TimeBinType::IsoDayOfWeekYear),
+        source: new TimeBinValueResolver(IsoDayOfWeekYear::class),
     )]
     private ?IsoDayOfWeekYear $dayOfWeekYear = null;
 

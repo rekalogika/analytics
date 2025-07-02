@@ -15,12 +15,14 @@ namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum IsoDayOfWeekYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
@@ -395,6 +397,12 @@ enum IsoDayOfWeekYear: int implements RecurringTimeBin
     case Day369 = 369;
     case Day370 = 370;
     case Day371 = 371;
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'IDDD';
+    }
 
     #[\Override]
     public function trans(

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class IsoWeekDate implements TimeBin
 {
     use TimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::INTEGER;
 
@@ -49,6 +51,12 @@ final class IsoWeekDate implements TimeBin
             ->setTime(0, 0, 0);
 
         $this->end = $this->start->modify('+1 day');
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'IYYYIWID';
     }
 
     #[\Override]

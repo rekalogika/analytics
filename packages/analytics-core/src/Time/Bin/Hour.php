@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class Hour implements TimeBin
 {
     use TimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::INTEGER;
 
@@ -50,6 +52,12 @@ final class Hour implements TimeBin
         );
 
         $this->end = $this->start->modify('+1 hour');
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'YYYYMMDDHH24';
     }
 
     #[\Override]

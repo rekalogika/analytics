@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Time\Bin\Date;
 use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -43,7 +42,7 @@ class DateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Date'),
-        source: new TimeBinValueResolver(TimeBinType::Date),
+        source: new TimeBinValueResolver(Date::class),
     )]
     private ?int $date = null;
 
@@ -54,7 +53,7 @@ class DateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Week'),
-        source: new TimeBinValueResolver(TimeBinType::DayOfWeek),
+        source: new TimeBinValueResolver(DayOfWeek::class),
     )]
     private ?DayOfWeek $dayOfWeek = null;
 
@@ -65,7 +64,7 @@ class DateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Month'),
-        source: new TimeBinValueResolver(TimeBinType::DayOfMonth),
+        source: new TimeBinValueResolver(DayOfMonth::class),
     )]
     private ?DayOfMonth $dayOfMonth = null;
 
@@ -76,7 +75,7 @@ class DateSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of Year'),
-        source: new TimeBinValueResolver(TimeBinType::DayOfYear),
+        source: new TimeBinValueResolver(DayOfYear::class),
     )]
     private ?DayOfYear $dayOfYear = null;
 

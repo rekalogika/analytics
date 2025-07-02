@@ -86,34 +86,12 @@ final class TimeBinFunction extends FunctionNode
             throw new QueryException('Summary time zone must be a literal');
         }
 
-        $value = $this->outputFormat->value;
-
-        if (!\is_string($value)) {
-            throw new QueryException(\sprintf(
-                'Output format must be a string, got %s',
-                get_debug_type($value),
-            ));
-        }
-
-        $outputFormat = TimeBinType::tryFrom($value);
-
-        if ($outputFormat === null) {
-            throw new QueryException(\sprintf(
-                'Unsupported output format "%s". Supported formats are: %s.',
-                $value,
-                implode(', ', array_map(
-                    static fn(TimeBinType $type): string => $type->value,
-                    TimeBinType::cases(),
-                )),
-            ));
-        }
-
         return \sprintf(
-            "REKALOGIKA_TIME_BIN(%s, %s, %s, '%s')",
+            "REKALOGIKA_TIME_BIN(%s, %s, %s, %s)",
             $this->sourceDatetime->dispatch($sqlWalker),
             $this->sourceTimeZone->dispatch($sqlWalker),
             $this->summaryTimeZone->dispatch($sqlWalker),
-            $outputFormat->getSqlToCharArgument(),
+            $this->outputFormat->dispatch($sqlWalker),
         );
     }
 }
