@@ -143,10 +143,7 @@ final class AppController extends AbstractController
         $result = $query->getResult();
 
         // create pivot table
-        $spreadsheet = $spreadsheetRenderer->createSpreadsheet(
-            result: $result,
-            pivotedDimensions: $query->getPivotedDimensions(),
-        );
+        $spreadsheet = $spreadsheetRenderer->render(result: $result);
 
         $writer = new Xlsx($spreadsheet);
 
