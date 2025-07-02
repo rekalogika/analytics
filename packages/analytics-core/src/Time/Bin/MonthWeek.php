@@ -43,7 +43,8 @@ final class MonthWeek implements TimeBin
         $m = (int) substr($string, 4, 2); // Month
         $w = (int) substr($string, 6, 1); // Week of the month (1-5)
 
-        $this->start = (new \DateTimeImmutable())
+        /** @var \DateTimeImmutable */
+        $start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
             ->setDate($y, $m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
@@ -51,7 +52,11 @@ final class MonthWeek implements TimeBin
             ->modify('previous monday') // Move to the Monday of the week
             ->modify(\sprintf('+%d weeks', $w - 1)); // Move to the correct week
 
-        $this->end = $this->start->modify('+1 week');
+        /** @var \DateTimeImmutable */
+        $end = $this->start->modify('+1 week');
+
+        $this->start = $start;
+        $this->end = $end;
     }
 
     #[\Override]
