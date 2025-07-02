@@ -53,7 +53,7 @@ final class MonthWeek implements TimeBin
             ->modify(\sprintf('+%d weeks', $w - 1)); // Move to the correct week
 
         /** @var \DateTimeImmutable */
-        $end = $this->start->modify('+1 week');
+        $end = $start->modify('+1 week');
 
         $this->start = $start;
         $this->end = $end;

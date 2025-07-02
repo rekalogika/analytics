@@ -57,7 +57,7 @@ final class MonthWeekDate implements TimeBin
             ->modify(\sprintf('+%d days', $d - 1)); // Move to the correct day
 
         /** @var \DateTimeImmutable */
-        $end = $this->start->modify('+1 day');
+        $end = $start->modify('+1 day');
 
         $this->start = $start;
         $this->end = $end;
