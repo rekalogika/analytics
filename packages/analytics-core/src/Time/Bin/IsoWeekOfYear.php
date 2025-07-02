@@ -22,7 +22,7 @@ enum IsoWeekOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case Week1 = 1;
     case Week2 = 2;

@@ -22,7 +22,7 @@ enum DayOfWeek: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case Monday = 1;
     case Tuesday = 2;

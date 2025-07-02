@@ -22,7 +22,7 @@ final class IsoWeekYear implements TimeBin
 {
     use TimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     private readonly \DateTimeImmutable $start;
 

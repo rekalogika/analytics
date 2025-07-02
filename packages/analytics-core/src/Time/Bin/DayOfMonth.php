@@ -22,7 +22,7 @@ enum DayOfMonth: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case Day1 = 1;
     case Day2 = 2;

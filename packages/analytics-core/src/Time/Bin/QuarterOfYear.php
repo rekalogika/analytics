@@ -22,7 +22,7 @@ enum QuarterOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case Q1 = 1;
     case Q2 = 2;

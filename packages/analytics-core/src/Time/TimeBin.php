@@ -27,7 +27,7 @@ interface TimeBin extends
     Bin,
     DatabaseValueAware
 {
-    public const string TYPE = '__needs_to_be_overriden__';
+    public const TYPE = '__needs_to_be_overriden__';
 
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,

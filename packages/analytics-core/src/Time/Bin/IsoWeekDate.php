@@ -25,7 +25,7 @@ final class IsoWeekDate implements TimeBin
 {
     use TimeBinTrait;
 
-    public const string TYPE = Types::INTEGER;
+    public const TYPE = Types::INTEGER;
 
     private readonly \DateTimeImmutable $start;
 

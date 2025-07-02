@@ -22,7 +22,7 @@ enum MonthOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case January = 1;
     case February = 2;

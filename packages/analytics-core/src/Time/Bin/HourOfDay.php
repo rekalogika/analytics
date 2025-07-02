@@ -22,7 +22,7 @@ enum HourOfDay: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 
-    public const string TYPE = Types::SMALLINT;
+    public const TYPE = Types::SMALLINT;
 
     case Hour0 = 0;
     case Hour1 = 1;
