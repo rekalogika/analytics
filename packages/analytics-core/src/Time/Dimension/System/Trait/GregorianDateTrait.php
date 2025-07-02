@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\Dimension\Set\DateSet;
 use Rekalogika\Analytics\Time\Dimension\Set\MonthSet;
 use Rekalogika\Analytics\Time\Dimension\Set\QuarterSet;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 trait GregorianDateTrait
@@ -33,7 +32,7 @@ trait GregorianDateTrait
     )]
     #[Dimension(
         label: new TranslatableMessage('Year'),
-        source: new TimeBinValueResolver(TimeBinType::Year),
+        source: new TimeBinValueResolver(Year::class),
     )]
     private ?int $year = null;
 

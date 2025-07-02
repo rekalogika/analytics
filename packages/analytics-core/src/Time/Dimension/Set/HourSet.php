@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\Hour;
 use Rekalogika\Analytics\Time\Bin\HourOfDay;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -41,7 +40,7 @@ class HourSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Hour'),
-        source: new TimeBinValueResolver(TimeBinType::Hour),
+        source: new TimeBinValueResolver(Hour::class),
     )]
     private ?int $hour = null;
 
@@ -52,7 +51,7 @@ class HourSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Hour of Day'),
-        source: new TimeBinValueResolver(TimeBinType::HourOfDay),
+        source: new TimeBinValueResolver(HourOfDay::class),
     )]
     private ?HourOfDay $hourOfDay = null;
 

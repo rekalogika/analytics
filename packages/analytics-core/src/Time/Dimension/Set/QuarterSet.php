@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -41,7 +40,7 @@ class QuarterSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Quarter'),
-        source: new TimeBinValueResolver(TimeBinType::Quarter),
+        source: new TimeBinValueResolver(Quarter::class),
     )]
     private ?int $quarter = null;
 
@@ -53,7 +52,7 @@ class QuarterSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Quarter of Year'),
-        source: new TimeBinValueResolver(TimeBinType::QuarterOfYear),
+        source: new TimeBinValueResolver(QuarterOfYear::class),
     )]
     private ?QuarterOfYear $quarterOfYear = null;
 

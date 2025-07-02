@@ -26,7 +26,6 @@ use Rekalogika\Analytics\Time\Bin\DayOfMonth;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\DateToInteger;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -54,7 +53,7 @@ class OccupancyHistorySummary extends BaseSummary
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
-            type: TimeBinType::Date,
+            binClass: Date::class,
         ),
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
         mandatory: true,
@@ -69,7 +68,7 @@ class OccupancyHistorySummary extends BaseSummary
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
-            type: TimeBinType::DayOfWeek,
+            binClass: DayOfWeek::class,
         ),
         label: new TranslatableMessage('Day of Week', domain: 'rekalogika_analytics'),
     )]
@@ -83,7 +82,7 @@ class OccupancyHistorySummary extends BaseSummary
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
-            type: TimeBinType::DayOfMonth,
+            binClass: DayOfMonth::class,
         ),
         label: new TranslatableMessage('Day of Month', domain: 'rekalogika_analytics'),
     )]
@@ -97,7 +96,7 @@ class OccupancyHistorySummary extends BaseSummary
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
             input: new PropertyValue('date'),
-            type: TimeBinType::DayOfYear,
+            binClass: DayOfYear::class,
         ),
         label: new TranslatableMessage('Day of Year', domain: 'rekalogika_analytics'),
     )]

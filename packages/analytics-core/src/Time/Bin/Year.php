@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -22,6 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class Year implements TimeBin
 {
     use TimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
@@ -57,6 +59,12 @@ final class Year implements TimeBin
         $this->end = $this->start
             ->modify('first day of next year')
             ->setTime(0, 0, 0);
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'YYYY';
     }
 
     #[\Override]

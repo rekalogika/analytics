@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Time\Bin;
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -23,6 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class Quarter implements TimeBin
 {
     use TimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::INTEGER;
 
@@ -61,6 +63,12 @@ final class Quarter implements TimeBin
         $this->end = $this->start
             ->setDate($y, $m + 3, 1)
             ->setTime(0, 0, 0);
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'YYYYQ';
     }
 
     #[\Override]

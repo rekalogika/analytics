@@ -40,4 +40,10 @@ interface TimeBin extends
     public function getStart(): \DateTimeInterface;
 
     public function getEnd(): \DateTimeInterface;
+
+    public static function getDQLExpression(
+        string $sourceExpression,
+        \DateTimeZone $sourceTimeZone,
+        \DateTimeZone $summaryTimeZone,
+    ): string;
 }

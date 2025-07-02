@@ -23,7 +23,6 @@ use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\IsoWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeekOfYear;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -42,7 +41,7 @@ class WeekSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Week'),
-        source: new TimeBinValueResolver(TimeBinType::IsoWeek),
+        source: new TimeBinValueResolver(IsoWeek::class),
     )]
     private ?int $week = null;
 
@@ -53,7 +52,7 @@ class WeekSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Week of Year'),
-        source: new TimeBinValueResolver(TimeBinType::IsoWeekOfYear),
+        source: new TimeBinValueResolver(IsoWeekOfYear::class),
     )]
     private ?IsoWeekOfYear $weekOfYear = null;
 
@@ -64,7 +63,7 @@ class WeekSet extends BaseDimensionGroup
     )]
     #[Dimension(
         label: new TranslatableMessage('Week of Month'),
-        source: new TimeBinValueResolver(TimeBinType::WeekOfMonth),
+        source: new TimeBinValueResolver(WeekOfMonth::class),
     )]
     private ?WeekOfMonth $weekOfMonth = null;
 

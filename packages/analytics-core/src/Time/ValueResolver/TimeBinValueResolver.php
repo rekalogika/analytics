@@ -21,7 +21,6 @@ use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
-use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\Util\TimeZoneUtil;
 
 /**
@@ -32,8 +31,12 @@ final readonly class TimeBinValueResolver implements
     DimensionGroupAware,
     UserValueTransformer
 {
+    /**
+     * @param class-string<TimeBin|RecurringTimeBin> $binClass
+     * @param ValueResolver|null $input
+     */
     public function __construct(
-        private TimeBinType $type,
+        private string $binClass,
         private ?ValueResolver $input = null,
     ) {}
 
@@ -41,17 +44,9 @@ final readonly class TimeBinValueResolver implements
     public function withInput(ValueResolver $input): static
     {
         return new static(
-            type: $this->type,
+            binClass: $this->binClass,
             input: $input,
         );
-    }
-
-    /**
-     * @return class-string<TimeBin|RecurringTimeBin>
-     */
-    public function getTypeClass(): string
-    {
-        return $this->type->getBinClass();
     }
 
     #[\Override]
@@ -75,12 +70,12 @@ final readonly class TimeBinValueResolver implements
             $context->getDimensionMetadata(),
         );
 
-        return \sprintf(
-            "REKALOGIKA_TIME_BIN(%s, '%s', '%s', '%s')",
+        $class = $this->binClass;
+
+        return $class::getDQLExpression(
             $this->input->getExpression($context),
-            $sourceTimeZone->getName(),
-            $summaryTimeZone->getName(),
-            $this->type->value,
+            $sourceTimeZone,
+            $summaryTimeZone,
         );
     }
 
@@ -107,7 +102,7 @@ final readonly class TimeBinValueResolver implements
             $dimensionMetadata,
         );
 
-        $binClass = $this->type->getBinClass();
+        $binClass = $this->binClass;
 
         if (!is_a($binClass, TimeBin::class, true)) {
             throw new InvalidArgumentException(\sprintf(
@@ -118,5 +113,13 @@ final readonly class TimeBinValueResolver implements
 
         return $binClass::createFromDatabaseValue($rawValue)
             ->withTimeZone($summaryTimeZone);
+    }
+
+    /**
+     * @return class-string<TimeBin|RecurringTimeBin>
+     */
+    public function getTypeClass(): string
+    {
+        return $this->binClass;
     }
 }

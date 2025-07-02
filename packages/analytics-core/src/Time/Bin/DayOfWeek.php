@@ -15,12 +15,14 @@ namespace Rekalogika\Analytics\Time\Bin;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
+use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum DayOfWeek: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
+    use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
@@ -31,6 +33,12 @@ enum DayOfWeek: int implements RecurringTimeBin
     case Friday = 5;
     case Saturday = 6;
     case Sunday = 7;
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'ID';
+    }
 
     #[\Override]
     public function trans(

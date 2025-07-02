@@ -11,23 +11,23 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time;
+namespace Rekalogika\Analytics\Time\Bin\Trait;
 
-use Rekalogika\Analytics\Contracts\Model\Bin;
-use Symfony\Contracts\Translation\TranslatableInterface;
-
-/**
- * @extends Bin<\DateTimeInterface>
- */
-interface RecurringTimeBin extends TranslatableInterface, Bin, \BackedEnum
+trait RekalogikaTimeBinDQLExpressionTrait
 {
-    public const TYPE = '__needs_to_be_overriden__';
-
-    public static function createFromDatabaseValue(int $databaseValue): static;
+    abstract private static function getSqlToCharArgument(): string;
 
     public static function getDQLExpression(
         string $sourceExpression,
         \DateTimeZone $sourceTimeZone,
         \DateTimeZone $summaryTimeZone,
-    ): string;
+    ): string {
+        return \sprintf(
+            "REKALOGIKA_TIME_BIN(%s, '%s', '%s', '%s')",
+            $sourceExpression,
+            $sourceTimeZone->getName(),
+            $summaryTimeZone->getName(),
+            self::getSqlToCharArgument(),
+        );
+    }
 }
