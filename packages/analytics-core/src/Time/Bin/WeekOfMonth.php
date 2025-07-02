@@ -17,6 +17,9 @@ use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Week of month. First week begins in 1st of the month.
+ */
 enum WeekOfMonth: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;

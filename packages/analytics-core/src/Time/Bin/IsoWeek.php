@@ -17,7 +17,10 @@ use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WeekYear implements TimeBin
+/**
+ * ISO 8601 week (YYYYWW)
+ */
+final class IsoWeek implements TimeBin
 {
     use TimeBinTrait;
 
@@ -31,12 +34,17 @@ final class WeekYear implements TimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
+        $string = \sprintf('%06d', $databaseValue);
+
+        $y = (int) substr($string, 0, 4);
+        $w = (int) substr($string, 4, 2);
+
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($databaseValue, 1)
+            ->setISODate($y, $w)
             ->setTime(0, 0, 0);
 
-        $this->end = $this->start->setISODate($databaseValue + 1, 1);
+        $this->end = $this->start->modify('+1 week');
     }
 
     #[\Override]
@@ -44,7 +52,7 @@ final class WeekYear implements TimeBin
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('o'),
+            (int) $dateTime->format('oW'),
             $dateTime->getTimezone(),
         );
     }
@@ -52,7 +60,7 @@ final class WeekYear implements TimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o');
+        return $this->start->format('o-\WW');
     }
 
     #[\Override]
@@ -60,7 +68,18 @@ final class WeekYear implements TimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->start->format('o');
+        $formatter = new \IntlDateFormatter(
+            locale: $locale,
+            dateType: \IntlDateFormatter::MEDIUM,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
+        );
+
+        return \sprintf(
+            '%s - %s',
+            $formatter->format($this->start),
+            $formatter->format($this->end->modify('-1 day')),
+        );
     }
 
     #[\Override]
@@ -77,29 +96,39 @@ final class WeekYear implements TimeBin
 
     // public function getStartDatabaseValue(): int
     // {
-    //     return (int) $this->start->format('o');
+    //     return (int) $this->start->format('oW');
     // }
 
     // public function getEndDatabaseValue(): int
     // {
-    //     return (int) $this->end->format('o');
+    //     return (int) $this->end->format('oW');
+    // }
+
+    // private function getContainingWeekYear(): WeekYear
+    // {
+    //     return WeekYear::createFromDatabaseValue(
+    //         (int) $this->start->format('o'),
+    //         $this->start->getTimezone(),
+    //     );
     // }
 
     #[\Override]
     public function getNext(): static
     {
         return self::create(
-            $this->databaseValue + 1,
-            $this->start->getTimezone(),
+            (int) $this->end->format('oW'),
+            $this->end->getTimezone(),
         );
     }
 
     #[\Override]
     public function getPrevious(): static
     {
+        $previousWeek = $this->start->modify('-1 week');
+
         return self::create(
-            $this->databaseValue - 1,
-            $this->start->getTimezone(),
+            (int) $previousWeek->format('oW'),
+            $previousWeek->getTimezone(),
         );
     }
 }

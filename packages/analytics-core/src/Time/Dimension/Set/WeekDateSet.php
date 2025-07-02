@@ -21,8 +21,8 @@ use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\DayOfWeekYear;
-use Rekalogika\Analytics\Time\Bin\WeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoDayOfWeekYear;
+use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
 use Rekalogika\Analytics\Time\TimeBinType;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
@@ -60,23 +60,23 @@ class WeekDateSet extends BaseDimensionGroup
     #[Column(
         type: TimeBinType::TypeDayOfWeek,
         nullable: true,
-        enumType: DayOfWeekYear::class,
+        enumType: IsoDayOfWeekYear::class,
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of WeekYear'),
         source: new TimeBinValueResolver(TimeBinType::DayOfWeekYear),
     )]
-    private ?DayOfWeekYear $dayOfWeekYear = null;
+    private ?IsoDayOfWeekYear $dayOfWeekYear = null;
 
     //
     // getters
     //
 
-    public function getWeekDate(): ?WeekDate
+    public function getWeekDate(): ?IsoWeekDate
     {
         return $this->getContext()->getUserValue(
             property: 'weekDate',
-            class: WeekDate::class,
+            class: IsoWeekDate::class,
         );
     }
 
@@ -85,7 +85,7 @@ class WeekDateSet extends BaseDimensionGroup
         return $this->dayOfWeek;
     }
 
-    public function getDayOfWeekYear(): ?DayOfWeekYear
+    public function getDayOfWeekYear(): ?IsoDayOfWeekYear
     {
         return $this->dayOfWeekYear;
     }

@@ -143,15 +143,15 @@ enum TimeBinType: string
 
             // Date
             self::Date => Bin\Date::class,
-            self::WeekDate => Bin\WeekDate::class,
+            self::WeekDate => Bin\IsoWeekDate::class,
             self::DayOfWeek => Bin\DayOfWeek::class,
             self::DayOfMonth => Bin\DayOfMonth::class,
             self::DayOfYear => Bin\DayOfYear::class,
-            self::DayOfWeekYear => Bin\DayOfWeekYear::class,
+            self::DayOfWeekYear => Bin\IsoDayOfWeekYear::class,
 
             // Week
-            self::Week => Bin\Week::class,
-            self::WeekOfYear => Bin\WeekOfYear::class,
+            self::Week => Bin\IsoWeek::class,
+            self::WeekOfYear => Bin\IsoWeekOfYear::class,
             self::WeekOfMonth => Bin\WeekOfMonth::class,
 
             // Month
@@ -163,7 +163,7 @@ enum TimeBinType: string
             self::QuarterOfYear => Bin\QuarterOfYear::class,
 
             // WeekYear
-            self::WeekYear => Bin\WeekYear::class,
+            self::WeekYear => Bin\IsoWeekYear::class,
 
             // Year
             self::Year => Bin\Year::class,

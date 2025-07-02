@@ -17,7 +17,10 @@ use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WeekDate implements TimeBin
+/**
+ * ISO 8601 week date (YYYYWWD)
+ */
+final class IsoWeekDate implements TimeBin
 {
     use TimeBinTrait;
 
