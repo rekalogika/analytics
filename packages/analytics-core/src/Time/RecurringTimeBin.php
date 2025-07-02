@@ -21,5 +21,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 interface RecurringTimeBin extends TranslatableInterface, Bin, \BackedEnum
 {
+    public const string TYPE = '__needs_to_be_overriden__';
+
     public static function createFromDatabaseValue(int $databaseValue): static;
 }

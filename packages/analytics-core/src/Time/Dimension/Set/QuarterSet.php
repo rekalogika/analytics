@@ -36,7 +36,7 @@ class QuarterSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeQuarter,
+        type: Quarter::TYPE,
         nullable: true,
     )]
     #[Dimension(
@@ -47,7 +47,7 @@ class QuarterSet extends BaseDimensionGroup
 
 
     #[Column(
-        type: TimeBinType::TypeQuarterOfYear,
+        type: QuarterOfYear::TYPE,
         nullable: true,
         enumType: QuarterOfYear::class,
     )]

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
+use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -23,6 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 enum WeekOfMonth: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
+
+    public const string TYPE = Types::SMALLINT;
 
     case Week1 = 1;
     case Week2 = 2;

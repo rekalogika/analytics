@@ -38,7 +38,7 @@ class DateSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeDate,
+        type: Date::TYPE,
         nullable: true,
     )]
     #[Dimension(
@@ -48,7 +48,7 @@ class DateSet extends BaseDimensionGroup
     private ?int $date = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfWeek,
+        type: DayOfWeek::TYPE,
         nullable: true,
         enumType: DayOfWeek::class,
     )]
@@ -59,7 +59,7 @@ class DateSet extends BaseDimensionGroup
     private ?DayOfWeek $dayOfWeek = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfMonth,
+        type: DayOfMonth::TYPE,
         nullable: true,
         enumType: DayOfMonth::class,
     )]
@@ -70,7 +70,7 @@ class DateSet extends BaseDimensionGroup
     private ?DayOfMonth $dayOfMonth = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfYear,
+        type: DayOfYear::TYPE,
         nullable: true,
         enumType: DayOfYear::class,
     )]

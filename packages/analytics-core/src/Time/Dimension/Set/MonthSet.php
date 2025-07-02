@@ -36,7 +36,7 @@ class MonthSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeMonth,
+        type: Month::TYPE,
         nullable: true,
     )]
     #[Dimension(
@@ -46,7 +46,7 @@ class MonthSet extends BaseDimensionGroup
     private ?int $month = null;
 
     #[Column(
-        type: TimeBinType::TypeMonthOfYear,
+        type: MonthOfYear::TYPE,
         nullable: true,
         enumType: MonthOfYear::class,
     )]

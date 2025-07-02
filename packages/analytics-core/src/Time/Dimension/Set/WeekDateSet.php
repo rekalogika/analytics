@@ -37,17 +37,17 @@ class WeekDateSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeWeekDate,
+        type: IsoWeekDate::TYPE,
         nullable: true,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week Date'),
-        source: new TimeBinValueResolver(TimeBinType::WeekDate),
+        source: new TimeBinValueResolver(TimeBinType::IsoWeekDate),
     )]
     private ?int $weekDate = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfWeek,
+        type: DayOfWeek::TYPE,
         nullable: true,
         enumType: DayOfWeek::class,
     )]
@@ -58,13 +58,13 @@ class WeekDateSet extends BaseDimensionGroup
     private ?DayOfWeek $dayOfWeek = null;
 
     #[Column(
-        type: TimeBinType::TypeDayOfWeek,
+        type: IsoDayOfWeekYear::TYPE,
         nullable: true,
         enumType: IsoDayOfWeekYear::class,
     )]
     #[Dimension(
         label: new TranslatableMessage('Day of WeekYear'),
-        source: new TimeBinValueResolver(TimeBinType::DayOfWeekYear),
+        source: new TimeBinValueResolver(TimeBinType::IsoDayOfWeekYear),
     )]
     private ?IsoDayOfWeekYear $dayOfWeekYear = null;
 

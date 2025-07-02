@@ -36,7 +36,7 @@ class HourSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeHour,
+        type: Hour::TYPE,
         nullable: true,
     )]
     #[Dimension(
@@ -46,7 +46,7 @@ class HourSet extends BaseDimensionGroup
     private ?int $hour = null;
 
     #[Column(
-        type: TimeBinType::TypeHourOfDay,
+        type: HourOfDay::TYPE,
         nullable: true,
         enumType: HourOfDay::class,
     )]
