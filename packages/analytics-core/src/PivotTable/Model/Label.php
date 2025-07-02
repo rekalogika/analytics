@@ -17,5 +17,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 interface Label extends Property
 {
+    #[\Override]
     public function getContent(): TranslatableInterface;
 }

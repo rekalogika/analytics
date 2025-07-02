@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html\Internal;
 
-use Rekalogika\Analytics\PivotTable\Model\Label;
-use Rekalogika\Analytics\PivotTable\Model\Member;
-use Rekalogika\Analytics\PivotTable\Model\Property;
-use Rekalogika\Analytics\PivotTable\Model\Value;
-use Rekalogika\Analytics\PivotTable\TableVisitor;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\Element;
@@ -28,6 +23,7 @@ use Rekalogika\PivotTable\Table\Table;
 use Rekalogika\PivotTable\Table\TableBody;
 use Rekalogika\PivotTable\Table\TableFooter;
 use Rekalogika\PivotTable\Table\TableHeader;
+use Rekalogika\PivotTable\Table\TableVisitor;
 use Twig\Environment;
 use Twig\TemplateWrapper;
 
@@ -79,10 +75,6 @@ final readonly class HtmlRendererVisitor implements TableVisitor
     ): string {
         /** @psalm-suppress MixedAssignment */
         $content = $cell->getContent();
-
-        if ($content instanceof Property) {
-            $content = $content->accept($this);
-        }
 
         return $this->getTemplate()->renderBlock($block, [
             'element' => $cell,
@@ -148,29 +140,5 @@ final readonly class HtmlRendererVisitor implements TableVisitor
     public function visitFooterCell(FooterCell $footerCell): mixed
     {
         return $this->renderCell($footerCell, 'tf');
-    }
-
-    #[\Override]
-    public function visitLabel(Label $label): mixed
-    {
-        return $this->getTemplate()->renderBlock('label', [
-            'label' => $label->getContent(),
-        ]);
-    }
-
-    #[\Override]
-    public function visitMember(Member $member): mixed
-    {
-        return $this->getTemplate()->renderBlock('member', [
-            'member' => $member->getContent(),
-        ]);
-    }
-
-    #[\Override]
-    public function visitValue(Value $value): mixed
-    {
-        return $this->getTemplate()->renderBlock('value', [
-            'value' => $value->getContent(),
-        ]);
     }
 }

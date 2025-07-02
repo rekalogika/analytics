@@ -19,6 +19,7 @@ abstract readonly class ResultSetProperty implements Property
 {
     final public function __construct(private mixed $value) {}
 
+    #[\Override]
     public function getContent(): mixed
     {
         return $this->value;

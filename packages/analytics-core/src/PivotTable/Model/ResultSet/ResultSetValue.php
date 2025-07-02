@@ -14,13 +14,5 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
 
 use Rekalogika\Analytics\PivotTable\Model\Value;
-use Rekalogika\Analytics\PivotTable\TableVisitor;
 
-final readonly class ResultSetValue extends ResultSetProperty implements Value
-{
-    #[\Override]
-    public function accept(TableVisitor $visitor): mixed
-    {
-        return $visitor->visitValue($this);
-    }
-}
+final readonly class ResultSetValue extends ResultSetProperty implements Value {}

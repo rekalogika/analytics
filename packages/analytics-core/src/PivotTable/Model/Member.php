@@ -13,7 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
-interface Member extends Property
-{
-    public function getContent(): mixed;
-}
+interface Member extends Property {}

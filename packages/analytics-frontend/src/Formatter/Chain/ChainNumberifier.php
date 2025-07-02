@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
+namespace Rekalogika\Analytics\Frontend\Formatter\Chain;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
