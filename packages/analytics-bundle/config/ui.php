@@ -28,6 +28,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultCellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultNumberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultStringifier;
+use Rekalogika\Analytics\Frontend\Formatter\Implementation\NumberFormatStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\TranslatableStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyCellifier;
@@ -218,6 +219,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(PropertyNumberifier::class)
         ->tag('rekalogika.analytics.numberifier', [
             'priority' => -500,
+        ])
+    ;
+
+    $services
+        ->set(NumberFormatStringifier::class)
+        ->args([
+            '$translator' => service('translator'),
+        ])
+        ->tag('rekalogika.analytics.stringifier', [
+            'priority' => -100,
         ])
     ;
 
