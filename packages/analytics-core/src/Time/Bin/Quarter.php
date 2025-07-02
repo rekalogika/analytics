@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
+use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
@@ -22,6 +23,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class Quarter implements TimeBin
 {
     use TimeBinTrait;
+
+    public const TYPE = Types::INTEGER;
 
     private readonly \DateTimeImmutable $start;
 

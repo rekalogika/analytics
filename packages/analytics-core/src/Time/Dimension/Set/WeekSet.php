@@ -37,28 +37,28 @@ class WeekSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: TimeBinType::TypeWeek,
+        type: IsoWeek::TYPE,
         nullable: true,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week'),
-        source: new TimeBinValueResolver(TimeBinType::Week),
+        source: new TimeBinValueResolver(TimeBinType::IsoWeek),
     )]
     private ?int $week = null;
 
     #[Column(
-        type: TimeBinType::TypeWeekOfYear,
+        type: IsoWeekOfYear::TYPE,
         nullable: true,
         enumType: IsoWeekOfYear::class,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week of Year'),
-        source: new TimeBinValueResolver(TimeBinType::WeekOfYear),
+        source: new TimeBinValueResolver(TimeBinType::IsoWeekOfYear),
     )]
     private ?IsoWeekOfYear $weekOfYear = null;
 
     #[Column(
-        type: TimeBinType::TypeWeekOfMonth,
+        type: WeekOfMonth::TYPE,
         nullable: true,
         enumType: WeekOfMonth::class,
     )]

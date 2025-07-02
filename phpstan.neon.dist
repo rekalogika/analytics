@@ -40,6 +40,9 @@ parameters:
         -
             message: '#Attribute class Override does not exist#'
             reportUnmatched: false
+        -
+            message: '#Cannot call method modify\(\) on DateTimeImmutable\|false#'
+            reportUnmatched: false
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon

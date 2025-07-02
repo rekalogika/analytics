@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin;
 
-use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * ISO 8601 week (YYYYWW)
+ * Month based week-date (YYYYMMWD).
+ *
+ * A week starts on Monday and ends on Sunday. The first week of the month is
+ * the week that contains the first Thursday of the month. The first week of the
+ * month can extend into the previous month, and the last week of the month can
+ * extend into the next month.
  */
-final class IsoWeek implements TimeBin
+final class MonthWeekDate implements TimeBin
 {
     use TimeBinTrait;
-
-    public const TYPE = Types::INTEGER;
 
     private readonly \DateTimeImmutable $start;
 
@@ -37,25 +39,53 @@ final class IsoWeek implements TimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
-        $string = \sprintf('%06d', $databaseValue);
+        $string = \sprintf('%08d', $databaseValue);
 
-        $y = (int) substr($string, 0, 4);
-        $w = (int) substr($string, 4, 2);
+        $y = (int) substr($string, 0, 4); // Year
+        $m = (int) substr($string, 4, 2); // Month
+        $w = (int) substr($string, 6, 1); // Week of the month (1-5)
+        $d = (int) substr($string, 7, 1); // Day of the week (1-7, where 1 is Monday)
 
-        $this->start = (new \DateTimeImmutable())
+        /** @var \DateTimeImmutable */
+        $start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($y, $w)
-            ->setTime(0, 0, 0);
+            ->setDate($y, $m, 1) // Start from the first day of the month
+            ->setTime(0, 0, 0)
+            ->modify('first thursday of this month') // Adjust to the first Monday
+            ->modify('previous monday') // Move to the Monday of the week
+            ->modify(\sprintf('+%d weeks', $w - 1)) // Move to the correct week
+            ->modify(\sprintf('+%d days', $d - 1)); // Move to the correct day
 
-        $this->end = $this->start->modify('+1 week');
+        /** @var \DateTimeImmutable */
+        $end = $start->modify('+1 day');
+
+        $this->start = $start;
+        $this->end = $end;
     }
 
     #[\Override]
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
     ): static {
+        $thursdayThisWeek = \DateTimeImmutable::createFromInterface($dateTime)
+            ->modify('this thursday');
+
+        $thursdayDateOfMonth = (int) $thursdayThisWeek->format('d');
+        $weekOfMonth = (int) ceil($thursdayDateOfMonth / 7);
+        $month = (int) $thursdayThisWeek->format('m');
+        $year = (int) $thursdayThisWeek->format('Y');
+        $dayOfWeek = (int) $dateTime->format('N'); // 1 (Monday) to 7 (Sunday)
+
+        $databaseValue = (int) \sprintf(
+            '%04d%02d%01d%01d',
+            $year,
+            $month,
+            $weekOfMonth,
+            $dayOfWeek,
+        );
+
         return self::create(
-            (int) $dateTime->format('oW'),
+            $databaseValue,
             $dateTime->getTimezone(),
         );
     }

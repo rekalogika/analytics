@@ -75,7 +75,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     private TimeGroup $time;
 
     #[ORM\Column(
-        type: TimeBinType::TypeDate,
+        type: Date::TYPE,
         nullable: true,
     )]
     #[Analytics\Dimension(

@@ -50,7 +50,7 @@ class OccupancyHistorySummary extends BaseSummary
     // dimensions
     //
 
-    #[ORM\Column(type: TimeBinType::TypeDate, nullable: true)]
+    #[ORM\Column(type: Date::TYPE, nullable: true)]
     #[Analytics\Dimension(
         source: new TimeBinValueResolver(
             input: new PropertyValue('date'),

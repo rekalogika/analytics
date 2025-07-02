@@ -27,12 +27,12 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 trait IsoWeekDateTrait
 {
     #[Column(
-        type: TimeBinType::TypeWeekYear,
+        type: IsoWeekYear::TYPE,
         nullable: true,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week Year'),
-        source: new TimeBinValueResolver(TimeBinType::WeekYear),
+        source: new TimeBinValueResolver(TimeBinType::IsoWeekYear),
     )]
     private ?int $weekYear = null;
 

@@ -28,7 +28,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 trait GregorianDateTrait
 {
     #[Column(
-        type: TimeBinType::TypeYear,
+        type: Year::TYPE,
         nullable: true,
     )]
     #[Dimension(
