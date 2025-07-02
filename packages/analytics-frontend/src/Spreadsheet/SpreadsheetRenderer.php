@@ -18,8 +18,10 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
+use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
+use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 
 final readonly class SpreadsheetRenderer
 {
@@ -31,10 +33,33 @@ final readonly class SpreadsheetRenderer
         $this->visitor = new SpreadsheetRendererVisitor($cellifier);
     }
 
+    public function render(Result $result): Spreadsheet
+    {
+        $table = new TableAdapter($result->getTable());
+        $table = ResultSetToTableTransformer::transform($table);
+
+        $html = $this->visitor->visitTable($table);
+
+        $reader = new Html();
+        $spreadsheet = $reader->loadFromString($html);
+
+        foreach ($spreadsheet->getActiveSheet()->getColumnIterator() as $column) {
+            $spreadsheet->getActiveSheet()->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+        }
+
+        $spreadsheet->getActiveSheet()->setAutoFilter(
+            $spreadsheet->getActiveSheet()->calculateWorksheetDimension(),
+        );
+
+        $spreadsheet->getActiveSheet()->setTitle('Pivot Table');
+
+        return $spreadsheet;
+    }
+
     /**
      * @param list<string> $pivotedDimensions
      */
-    public function createSpreadsheet(
+    public function renderPivotTable(
         Result $result,
         array $pivotedDimensions = [],
     ): Spreadsheet {
