@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
-use Rekalogika\Analytics\Time\Bin\WeekYear;
+use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
 use Rekalogika\Analytics\Time\Dimension\Set\WeekDateSet;
 use Rekalogika\Analytics\Time\Dimension\Set\WeekSet;
 use Rekalogika\Analytics\Time\TimeBinType;
@@ -50,11 +50,11 @@ trait IsoWeekDateTrait
     )]
     private ?WeekDateSet $weekDate = null;
 
-    public function getWeekYear(): ?WeekYear
+    public function getWeekYear(): ?IsoWeekYear
     {
         return $this->getContext()->getUserValue(
             property: 'weekYear',
-            class: WeekYear::class,
+            class: IsoWeekYear::class,
         );
     }
 

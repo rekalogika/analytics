@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum WeekOfYear: int implements RecurringTimeBin
+enum IsoWeekOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
 

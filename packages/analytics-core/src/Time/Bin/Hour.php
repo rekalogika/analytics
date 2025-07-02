@@ -17,6 +17,9 @@ use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Hour (YYYYMMDDHH)
+ */
 final class Hour implements TimeBin
 {
     use TimeBinTrait;

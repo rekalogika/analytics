@@ -21,15 +21,15 @@ use Rekalogika\Analytics\Time\Bin\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\DayOfYear;
 use Rekalogika\Analytics\Time\Bin\Hour;
 use Rekalogika\Analytics\Time\Bin\HourOfDay;
+use Rekalogika\Analytics\Time\Bin\IsoWeek;
+use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeekOfYear;
+use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\Month;
 use Rekalogika\Analytics\Time\Bin\MonthOfYear;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
-use Rekalogika\Analytics\Time\Bin\Week;
-use Rekalogika\Analytics\Time\Bin\WeekDate;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
-use Rekalogika\Analytics\Time\Bin\WeekOfYear;
-use Rekalogika\Analytics\Time\Bin\WeekYear;
 use Rekalogika\Analytics\Time\Bin\Year;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
@@ -90,11 +90,11 @@ final readonly class TimeBinFilterResolver implements FilterResolver
             DayOfWeek::class => new TranslatableMessage('Example: 1,3-5 (1 is Monday, 7 is Sunday)'),
             DayOfMonth::class => new TranslatableMessage('Example: 1-5,10,15-20'),
             DayOfYear::class => new TranslatableMessage('Example: 1-90,100'),
-            WeekDate::class => new TranslatableMessage('Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)'),
+            IsoWeekDate::class => new TranslatableMessage('Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)'),
 
-            Week::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
+            IsoWeek::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
             WeekOfMonth::class => new TranslatableMessage('Example: 1-2,4'),
-            WeekOfYear::class => new TranslatableMessage('Example: 1-2,4'),
+            IsoWeekOfYear::class => new TranslatableMessage('Example: 1-2,4'),
 
             Month::class => new TranslatableMessage('Example: 202401-202403,202501 (202401 means January 2024)'),
             MonthOfYear::class => new TranslatableMessage('Example: 1-3,5,7-12'),
@@ -104,7 +104,7 @@ final readonly class TimeBinFilterResolver implements FilterResolver
 
             Year::class => new TranslatableMessage('Example: 2020-2022,2024'),
 
-            WeekYear::class => new TranslatableMessage('Example: 2020-2022,2024'),
+            IsoWeekYear::class => new TranslatableMessage('Example: 2020-2022,2024'),
             default => throw new DimensionNotSupportedByFilter(),
         };
     }
