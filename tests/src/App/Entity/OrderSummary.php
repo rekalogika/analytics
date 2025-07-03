@@ -37,6 +37,7 @@ use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\PostgreSQLHll\ApproximateCount;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
@@ -90,6 +91,24 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
         summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
     )]
     private ?int $shippedDate = null;
+
+    #[ORM\Column(
+        type: MonthBasedWeekWeek::TYPE,
+        nullable: true,
+    )]
+    #[Analytics\Dimension(
+        source: new TimeBinValueResolver(
+            binClass: MonthBasedWeekWeek::class,
+            input: new PropertyValue('shipped'),
+        ),
+        label: new TranslatableMessage('Week shipped'),
+        orderBy: DoctrineOrder::Ascending,
+    )]
+    #[TimeProperties(
+        sourceTimeZone: new \DateTimeZone('UTC'),
+        summaryTimeZone: new \DateTimeZone('Asia/Jakarta'),
+    )]
+    private ?int $shippedWeek = null;
 
     #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: true)]
@@ -278,6 +297,14 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
         return $this->getContext()->getUserValue(
             property: 'shippedDate',
             class: Date::class,
+        );
+    }
+
+    public function getShippedWeek(): ?MonthBasedWeekWeek
+    {
+        return $this->getContext()->getUserValue(
+            property: 'shippedWeek',
+            class: MonthBasedWeekWeek::class,
         );
     }
 

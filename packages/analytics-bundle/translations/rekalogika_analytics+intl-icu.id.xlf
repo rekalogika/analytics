@@ -331,5 +331,11 @@
         <target>Contoh: 20240101-20240331,20240501 (20240101 artinya 1 Januari 2024)</target>
       </segment>
     </unit>
+    <unit id="fcDc7DY" name="Week {week}, {month}">
+      <segment>
+        <source>Week {week}, {month}</source>
+        <target>Minggu {week}, {month}</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
