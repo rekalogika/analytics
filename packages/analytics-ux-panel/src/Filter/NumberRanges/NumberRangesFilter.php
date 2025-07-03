@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -28,9 +27,9 @@ final class NumberRangesFilter implements Filter
     private string $value = '';
 
     /**
-     * @var list<NumberRange<T>|Number<T>>|null
+     * @var Numbers<T>
      */
-    private ?array $numbers = null;
+    private ?Numbers $numbers = null;
 
     /**
      * @param NumberRangesFilterOptions<T> $options
@@ -85,74 +84,30 @@ final class NumberRangesFilter implements Filter
             return $this->value;
         }
 
-        return $this->value = implode(',', array_map(
-            static fn(Number|NumberRange $number): string => (string) $number,
-            $this->getNumbers(),
-        ));
+        return $this->value = $this->getNumbers()->__toString();
     }
 
     /**
-     * @return list<Number<T>|NumberRange<T>>
+     * @return Numbers<T>
      */
-    public function getNumbers(): array
+    public function getNumbers(): Numbers
     {
         if ($this->numbers !== null) {
             return $this->numbers;
         }
 
-        $input = str_replace(' ', '', $this->rawValue); // strip out spaces
-        $output = [];
-
-        foreach (explode(',', $input) as $nums) {
-            if (str_contains($nums, '-')) {
-                [$start, $end] = explode('-', $nums);
-
-                if (!is_numeric($start) || !is_numeric($end)) {
-                    continue;
-                }
-
-                $start = (int) $start;
-                $end = (int) $end;
-
-                $output[] = new NumberRange(
-                    dimension: $this->dimension,
-                    options: $this->options,
-                    start: $start,
-                    end: $end,
-                );
-            } else {
-                if (!is_numeric($nums)) {
-                    continue;
-                }
-
-                $nums = (int) $nums;
-
-                $output[] = new Number(
-                    dimension: $this->dimension,
-                    options: $this->options,
-                    number: $nums,
-                );
-            }
-        }
-
-        return $this->numbers = $output;
+        return $this->numbers = Numbers::create(
+            dimension: $this->dimension,
+            options: $this->options,
+            input: $this->rawValue,
+        );
     }
 
     #[\Override]
     public function createExpression(): ?Expression
     {
-        $numbers = $this->getNumbers();
+        $expression = $this->getNumbers()->createExpression();
 
-        if ($numbers === []) {
-            return null;
-        }
-
-        $expressions = [];
-
-        foreach ($numbers as $number) {
-            $expressions[] = $number->createExpression();
-        }
-
-        return Criteria::expr()->orX(...$expressions);
+        return $expression;
     }
 }

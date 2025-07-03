@@ -22,9 +22,32 @@ use Doctrine\Common\Collections\Expr\Expression;
 final readonly class Number implements \Stringable
 {
     /**
+     * @template U of object
+     * @param NumberRangesFilterOptions<U> $options
+     * @return self<U>
+     */
+    public static function create(
+        string $dimension,
+        NumberRangesFilterOptions $options,
+        string $input,
+    ): ?self {
+        if (!is_numeric($input)) {
+            return null;
+        }
+
+        $input = (int) $input;
+
+        return new self(
+            dimension: $dimension,
+            options: $options,
+            number: $input,
+        );
+    }
+
+    /**
      * @param NumberRangesFilterOptions<T> $options
      */
-    public function __construct(
+    private function __construct(
         private string $dimension,
         private NumberRangesFilterOptions $options,
         private int $number,
