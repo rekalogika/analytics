@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 
-use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
+use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -28,9 +29,15 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
 {
     use TimeBinTrait;
 
+    public const TYPE = Types::INTEGER;
+
     private readonly \DateTimeImmutable $start;
 
     private readonly \DateTimeImmutable $end;
+
+    private readonly int $y;
+    private readonly int $m;
+    private readonly int $w;
 
     private function __construct(
         int $databaseValue,
@@ -40,18 +47,18 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
 
         $string = \sprintf('%07d', $databaseValue);
 
-        $y = (int) substr($string, 0, 4); // Year
-        $m = (int) substr($string, 4, 2); // Month
-        $w = (int) substr($string, 6, 1); // Week of the month (1-5)
+        $this->y = (int) substr($string, 0, 4); // Year
+        $this->m = (int) substr($string, 4, 2); // Month
+        $this->w = (int) substr($string, 6, 1); // Week of the month (1-5)
 
         /** @var \DateTimeImmutable */
         $start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setDate($y, $m, 1) // Start from the first day of the month
+            ->setDate($this->y, $this->m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
             ->modify('first thursday of this month') // Adjust to the first thursday
             ->modify('previous monday') // Move to the Monday of the week
-            ->modify(\sprintf('+%d weeks', $w - 1)); // Move to the correct week
+            ->modify(\sprintf('+%d weeks', $this->w - 1)); // Move to the correct week
 
         /** @var \DateTimeImmutable */
         $end = $start->modify('+1 week');
@@ -66,7 +73,12 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
         \DateTimeZone $sourceTimeZone,
         \DateTimeZone $summaryTimeZone,
     ): string {
-        throw new BadMethodCallException('Not implemented yet.');
+        return \sprintf(
+            "REKALOGIKA_TIME_BIN_MBW_WEEK(%s, '%s', '%s')",
+            $sourceExpression,
+            $sourceTimeZone->getName(),
+            $summaryTimeZone->getName(),
+        );
     }
 
     #[\Override]
@@ -97,7 +109,12 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o-\WW');
+        return \sprintf(
+            '%04d-%02d-W%01d',
+            $this->y,
+            $this->m,
+            $this->w,
+        );
     }
 
     #[\Override]
@@ -105,18 +122,31 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $formatter = new \IntlDateFormatter(
-            locale: $locale,
-            dateType: \IntlDateFormatter::MEDIUM,
-            timeType: \IntlDateFormatter::NONE,
-            timezone: $this->start->getTimezone(),
-        );
+        try {
+            $monthDateTime = (new \DateTimeImmutable())
+                ->setDate($this->y, $this->m, 1)
+                ->setTime(0, 0, 0)
+                ->setTimezone($this->start->getTimezone());
 
-        return \sprintf(
-            '%s - %s',
-            $formatter->format($this->start),
-            $formatter->format($this->end->modify('-1 day')),
-        );
+            $intlDateFormatter = new \IntlDateFormatter(
+                locale: $locale,
+                dateType: \IntlDateFormatter::FULL,
+                timeType: \IntlDateFormatter::FULL,
+                timezone: $this->start->getTimezone(),
+                pattern: 'MMMM YYYY',
+            );
+
+            $month = $intlDateFormatter->format($monthDateTime);
+
+            $translation = new TranslatableMessage('Week {week}, {month}', [
+                '{week}' => $this->w,
+                '{month}' => $month,
+            ]);
+
+            return $translation->trans($translator, $locale);
+        } catch (\Error) {
+            return $this->__toString();
+        }
     }
 
     #[\Override]
@@ -131,31 +161,13 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
         return $this->end;
     }
 
-    // public function getStartDatabaseValue(): int
-    // {
-    //     return (int) $this->start->format('oW');
-    // }
-
-    // public function getEndDatabaseValue(): int
-    // {
-    //     return (int) $this->end->format('oW');
-    // }
-
-    // private function getContainingWeekYear(): WeekYear
-    // {
-    //     return WeekYear::createFromDatabaseValue(
-    //         (int) $this->start->format('o'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
 
     #[\Override]
     public function getNext(): static
     {
-        return self::create(
-            (int) $this->end->format('oW'),
-            $this->end->getTimezone(),
-        );
+        $nextWeek = $this->start->modify('+1 week');
+
+        return self::createFromDateTime($nextWeek);
     }
 
     #[\Override]
@@ -163,9 +175,6 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
     {
         $previousWeek = $this->start->modify('-1 week');
 
-        return self::create(
-            (int) $previousWeek->format('oW'),
-            $previousWeek->getTimezone(),
-        );
+        return self::createFromDateTime($previousWeek);
     }
 }

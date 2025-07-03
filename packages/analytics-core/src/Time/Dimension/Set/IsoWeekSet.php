@@ -20,7 +20,6 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Gregorian\WeekOfMonth;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeekOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
@@ -29,7 +28,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 #[DimensionGroup(
     groupingStrategy: new FieldSetStrategy(),
 )]
-class WeekSet extends BaseDimensionGroup
+class IsoWeekSet extends BaseDimensionGroup
 {
     //
     // properties
@@ -56,17 +55,6 @@ class WeekSet extends BaseDimensionGroup
     )]
     private ?IsoWeekWeekOfYear $weekOfYear = null;
 
-    #[Column(
-        type: WeekOfMonth::TYPE,
-        nullable: true,
-        enumType: WeekOfMonth::class,
-    )]
-    #[Dimension(
-        label: new TranslatableMessage('Week of Month'),
-        source: new TimeBinValueResolver(WeekOfMonth::class),
-    )]
-    private ?WeekOfMonth $weekOfMonth = null;
-
     //
     // getters
     //
@@ -84,14 +72,6 @@ class WeekSet extends BaseDimensionGroup
         return $this->getContext()->getUserValue(
             property: 'weekOfYear',
             class: IsoWeekWeekOfYear::class,
-        );
-    }
-
-    public function getWeekOfMonth(): ?WeekOfMonth
-    {
-        return $this->getContext()->getUserValue(
-            property: 'weekOfMonth',
-            class: WeekOfMonth::class,
         );
     }
 }

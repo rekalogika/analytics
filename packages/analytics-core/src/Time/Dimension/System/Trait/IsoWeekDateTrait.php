@@ -19,8 +19,8 @@ use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
-use Rekalogika\Analytics\Time\Dimension\Set\WeekDateSet;
-use Rekalogika\Analytics\Time\Dimension\Set\WeekSet;
+use Rekalogika\Analytics\Time\Dimension\Set\IsoWeekDateSet;
+use Rekalogika\Analytics\Time\Dimension\Set\IsoWeekSet;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 trait IsoWeekDateTrait
@@ -40,14 +40,14 @@ trait IsoWeekDateTrait
         label: new TranslatableMessage('Week'),
         source: new Noop(),
     )]
-    private ?WeekSet $week = null;
+    private ?IsoWeekSet $week = null;
 
     #[Embedded()]
     #[Dimension(
         label: new TranslatableMessage('Week Date'),
         source: new Noop(),
     )]
-    private ?WeekDateSet $weekDate = null;
+    private ?IsoWeekDateSet $weekDate = null;
 
     public function getWeekYear(): ?IsoWeekYear
     {
@@ -57,12 +57,12 @@ trait IsoWeekDateTrait
         );
     }
 
-    public function getWeek(): ?WeekSet
+    public function getWeek(): ?IsoWeekSet
     {
         return $this->week;
     }
 
-    public function getWeekDate(): ?WeekDateSet
+    public function getWeekDate(): ?IsoWeekDateSet
     {
         return $this->weekDate;
     }

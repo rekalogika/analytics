@@ -29,7 +29,7 @@ use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 #[DimensionGroup(
     groupingStrategy: new FieldSetStrategy(),
 )]
-class WeekDateSet extends BaseDimensionGroup
+class IsoWeekDateSet extends BaseDimensionGroup
 {
     //
     // properties

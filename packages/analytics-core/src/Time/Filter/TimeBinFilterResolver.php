@@ -31,6 +31,7 @@ use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeekOfYear;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
+use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
@@ -70,6 +71,7 @@ final readonly class TimeBinFilterResolver implements FilterResolver
                 label: $dimension->getLabel(),
                 help: $this->getHelp($typeClass),
             );
+
         }
 
         return new FilterSpecification($filterClass, $options);
@@ -104,6 +106,8 @@ final readonly class TimeBinFilterResolver implements FilterResolver
             Year::class => new TranslatableMessage('Example: 2020-2022,2024'),
 
             IsoWeekYear::class => new TranslatableMessage('Example: 2020-2022,2024'),
+
+            MonthBasedWeekWeek::class => new TranslatableMessage('Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)'),
             default => throw new DimensionNotSupportedByFilter(),
         };
     }

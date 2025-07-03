@@ -32,6 +32,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
+use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinMbwWeekFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -144,6 +145,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                     ],
                     'numeric_functions' => [
                         'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
+                        'REKALOGIKA_TIME_BIN_MBW_WEEK' => TimeBinMbwWeekFunction::class,
                         'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT' => TruncateUuidToBigintFunction::class,
                         'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
                     ],

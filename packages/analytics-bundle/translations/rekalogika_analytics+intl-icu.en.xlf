@@ -229,12 +229,6 @@
         <target>Week of Year</target>
       </segment>
     </unit>
-    <unit id="cU6hyTv" name="Week of Month">
-      <segment>
-        <source>Week of Month</source>
-        <target>Week of Month</target>
-      </segment>
-    </unit>
     <unit id="br1.iAd" name="Week Year">
       <segment>
         <source>Week Year</source>
@@ -329,6 +323,18 @@
       <segment>
         <source>Example: 20240101-20240331,20240501 (20240101 means 1 January 2024)</source>
         <target>Example: 20240101-20240331,20240501 (20240101 means 1 January 2024)</target>
+      </segment>
+    </unit>
+    <unit id="fcDc7DY" name="Week {week}, {month}">
+      <segment>
+        <source>Week {week}, {month}</source>
+        <target>Week {week}, {month}</target>
+      </segment>
+    </unit>
+    <unit id="8uA4Epm" name="Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)">
+      <segment>
+        <source>Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)</source>
+        <target>Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)</target>
       </segment>
     </unit>
   </file>
