@@ -229,12 +229,6 @@
         <target>Minggu dalam Tahun</target>
       </segment>
     </unit>
-    <unit id="cU6hyTv" name="Week of Month">
-      <segment>
-        <source>Week of Month</source>
-        <target>Minggu dalam Bulan</target>
-      </segment>
-    </unit>
     <unit id="br1.iAd" name="Week Year">
       <segment>
         <source>Week Year</source>
@@ -335,6 +329,12 @@
       <segment>
         <source>Week {week}, {month}</source>
         <target>Minggu {week}, {month}</target>
+      </segment>
+    </unit>
+    <unit id="8uA4Epm" name="Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)">
+      <segment>
+        <source>Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)</source>
+        <target>Contoh: 2024011-2024034,2024052 (2024013 means January 2024, week 3)</target>
       </segment>
     </unit>
   </file>
