@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 
 use Doctrine\DBAL\Types\Types;
-use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
@@ -74,7 +73,7 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
         \DateTimeZone $sourceTimeZone,
         \DateTimeZone $summaryTimeZone,
     ): string {
-        return sprintf(
+        return \sprintf(
             "REKALOGIKA_TIME_BIN_MBW_WEEK(%s, '%s', '%s')",
             $sourceExpression,
             $sourceTimeZone->getName(),
@@ -110,7 +109,7 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return sprintf(
+        return \sprintf(
             '%04d-%02d-W%01d',
             $this->y,
             $this->m,
