@@ -21,8 +21,8 @@ use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDayOfYear;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDayOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]

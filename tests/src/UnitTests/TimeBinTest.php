@@ -19,11 +19,11 @@ use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
-use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
-use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
+use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 
 final class TimeBinTest extends TestCase

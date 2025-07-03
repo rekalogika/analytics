@@ -17,7 +17,7 @@ trait RekalogikaTimeBinDQLExpressionTrait
 {
     /**
      * Returns TO_CHAR() output template string for the SQL expression
-     * 
+     *
      * @see https://www.postgresql.org/docs/current/functions-formatting.html
      */
     abstract private static function getSqlToCharArgument(): string;
