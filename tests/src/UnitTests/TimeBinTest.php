@@ -24,12 +24,12 @@ use Rekalogika\Analytics\Time\Bin\MonthWeek;
 use Rekalogika\Analytics\Time\Bin\MonthWeekDate;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 
 final class TimeBinTest extends TestCase
 {
     /**
-     * @param class-string<TimeBin> $class
+     * @param class-string<MonotonicTimeBin> $class
      * @dataProvider timeBinProvider
      */
     public function testDatabaseValueToObject(
@@ -48,7 +48,7 @@ final class TimeBinTest extends TestCase
     }
 
     /**
-     * @param class-string<TimeBin> $class
+     * @param class-string<MonotonicTimeBin> $class
      * @dataProvider timeBinDateTimeProvider
      */
     public function testDateTimeToObject(
@@ -62,7 +62,7 @@ final class TimeBinTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{class:class-string<TimeBin>,databaseValue:int,expectedStart:string,expectedEnd:string}>
+     * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int,expectedStart:string,expectedEnd:string}>
      */
     public static function timeBinProvider(): iterable
     {
@@ -142,7 +142,7 @@ final class TimeBinTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{class:class-string<TimeBin>,dateTime:\DateTimeImmutable,databaseValue:int}>
+     * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,dateTime:\DateTimeImmutable,databaseValue:int}>
      */
     public static function timeBinDateTimeProvider(): iterable
     {

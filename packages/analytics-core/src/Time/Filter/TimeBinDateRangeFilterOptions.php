@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Filter;
 
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilterOptions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @implements DateRangeFilterOptions<TimeBin>
+ * @implements DateRangeFilterOptions<MonotonicTimeBin>
  */
 final readonly class TimeBinDateRangeFilterOptions implements DateRangeFilterOptions
 {
     /**
-     * @param class-string<TimeBin> $timeBinClass
+     * @param class-string<MonotonicTimeBin> $timeBinClass
      */
     public function __construct(
         private string $timeBinClass,

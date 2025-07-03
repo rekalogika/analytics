@@ -17,7 +17,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappi
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -82,8 +82,8 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
         // time
 
-        if (class_exists(TimeBin::class)) {
-            $reflection = new \ReflectionClass(TimeBin::class);
+        if (class_exists(MonotonicTimeBin::class)) {
+            $reflection = new \ReflectionClass(MonotonicTimeBin::class);
             $fileName = $reflection->getFileName();
 
             if (false === $fileName) {

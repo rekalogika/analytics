@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Filter;
 
-use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterOptions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @implements NumberRangesFilterOptions<TimeBin|RecurringTimeBin>
+ * @implements NumberRangesFilterOptions<TimeBin>
  */
 final readonly class TimeBinNumberRangeFilterOptions implements NumberRangesFilterOptions
 {
     /**
-     * @param class-string<TimeBin|RecurringTimeBin> $timeBinClass
+     * @param class-string<TimeBin> $timeBinClass
      */
     public function __construct(
         private string $timeBinClass,
