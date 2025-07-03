@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\Month;
 use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 
@@ -30,7 +30,7 @@ final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
      * @dataProvider intervalProvider
-     * @param class-string<TimeBin> $class
+     * @param class-string<MonotonicTimeBin> $class
      */
     public function testInterval(
         int $databaseInput,
@@ -55,7 +55,7 @@ final class TimeDimensionHierarchyTest extends TestCase
     }
 
     /**
-     * @return iterable<array-key,array{int,class-string<TimeBin>,\DateTimeInterface,\DateTimeInterface,string,string}>
+     * @return iterable<array-key,array{int,class-string<MonotonicTimeBin>,\DateTimeInterface,\DateTimeInterface,string,string}>
      */
     public static function intervalProvider(): iterable
     {

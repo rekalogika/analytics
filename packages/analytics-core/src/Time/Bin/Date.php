@@ -16,13 +16,13 @@ namespace Rekalogika\Analytics\Time\Bin;
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Normal date (YYYYMMDD)
  */
-final class Date implements TimeBin
+final class Date implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;

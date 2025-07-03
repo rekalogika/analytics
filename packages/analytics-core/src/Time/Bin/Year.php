@@ -17,10 +17,10 @@ use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class Year implements TimeBin
+final class Year implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;

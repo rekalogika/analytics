@@ -19,12 +19,13 @@ use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\Util\TimeZoneUtil;
 
 /**
- * @implements UserValueTransformer<RecurringTimeBin|int,TimeBin|RecurringTimeBin>
+ * @implements UserValueTransformer<RecurringTimeBin|int,TimeBin>
  */
 final readonly class TimeBinValueResolver implements
     ValueResolver,
@@ -32,7 +33,7 @@ final readonly class TimeBinValueResolver implements
     UserValueTransformer
 {
     /**
-     * @param class-string<TimeBin|RecurringTimeBin> $binClass
+     * @param class-string<TimeBin> $binClass
      * @param ValueResolver|null $input
      */
     public function __construct(
@@ -104,19 +105,21 @@ final readonly class TimeBinValueResolver implements
 
         $binClass = $this->binClass;
 
-        if (!is_a($binClass, TimeBin::class, true)) {
+        if (!is_a($binClass, MonotonicTimeBin::class, true)) {
             throw new InvalidArgumentException(\sprintf(
                 'The class "%s" is not a valid TimeBin class.',
                 $binClass,
             ));
         }
 
+        /** @var class-string<MonotonicTimeBin> $binClass */
+
         return $binClass::createFromDatabaseValue($rawValue)
             ->withTimeZone($summaryTimeZone);
     }
 
     /**
-     * @return class-string<TimeBin|RecurringTimeBin>
+     * @return class-string<TimeBin>
      */
     public function getTypeClass(): string
     {

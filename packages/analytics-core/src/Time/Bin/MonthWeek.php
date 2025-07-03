@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\Bin;
 
 use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
-use Rekalogika\Analytics\Time\TimeBin;
+use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * month. The first week of the month can extend into the previous month, and
  * the last week of the month can extend into the next month.
  */
-final class MonthWeek implements TimeBin
+final class MonthWeek implements MonotonicTimeBin
 {
     use TimeBinTrait;
 

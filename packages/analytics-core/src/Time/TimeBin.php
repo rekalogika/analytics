@@ -14,32 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time;
 
 use Rekalogika\Analytics\Contracts\Model\Bin;
-use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @extends Bin<\DateTimeInterface>
- * @extends DatabaseValueAware<int>
  */
-interface TimeBin extends
-    \Stringable,
-    TranslatableInterface,
-    Bin,
-    DatabaseValueAware
+interface TimeBin extends Bin
 {
     public const TYPE = '__needs_to_be_overriden__';
 
-    public static function createFromDateTime(
-        \DateTimeInterface $dateTime,
-    ): static;
-
     public static function createFromDatabaseValue(int $databaseValue): static;
-
-    public function withTimeZone(\DateTimeZone $timeZone): static;
-
-    public function getStart(): \DateTimeInterface;
-
-    public function getEnd(): \DateTimeInterface;
 
     public static function getDQLExpression(
         string $sourceExpression,

@@ -31,7 +31,6 @@ use Rekalogika\Analytics\Time\Bin\Quarter;
 use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
 use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
 use Rekalogika\Analytics\Time\Bin\Year;
-use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
@@ -78,7 +77,7 @@ final readonly class TimeBinFilterResolver implements FilterResolver
 
 
     /**
-     * @param class-string<TimeBin|RecurringTimeBin> $class
+     * @param class-string<TimeBin> $class
      */
     private function getHelp(string $class): TranslatableInterface
     {
