@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
@@ -20,7 +20,9 @@ use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Week of month. First week begins in 1st of the month.
+ * Week of month. First week begins in 1st of the month. Note that a week is not
+ * guaranteed to have 7 days, and not guaranteed to start on Monday or Sunday..
+ * If it is important to have 7 days per week, use `MonthBasedWeekWeek` instead.
  */
 enum WeekOfMonth: int implements RecurringTimeBin
 {

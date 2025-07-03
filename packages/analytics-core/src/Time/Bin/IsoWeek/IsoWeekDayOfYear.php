@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\IsoWeek;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum IsoDayOfWeekYear: int implements RecurringTimeBin
+enum IsoWeekDayOfYear: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;

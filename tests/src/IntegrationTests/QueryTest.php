@@ -27,10 +27,10 @@ use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\MonthOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfMonth;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\MonthOfYear;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueryTest extends KernelTestCase

@@ -36,7 +36,7 @@ use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\PostgreSQLHll\AggregateFunction\CountDistinct;
 use Rekalogika\Analytics\PostgreSQLHll\ApproximateCount;
-use Rekalogika\Analytics\Time\Bin\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Dimension\Group\TimeGroup;
 use Rekalogika\Analytics\Time\Metadata\TimeProperties;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;

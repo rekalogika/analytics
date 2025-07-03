@@ -15,22 +15,22 @@ namespace Rekalogika\Analytics\Time\Filter;
 
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
-use Rekalogika\Analytics\Time\Bin\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\DayOfYear;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\HourOfDay;
-use Rekalogika\Analytics\Time\Bin\IsoWeek;
-use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
-use Rekalogika\Analytics\Time\Bin\IsoWeekOfYear;
-use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\MonthOfYear;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
-use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
-use Rekalogika\Analytics\Time\Bin\Year;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfMonth;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
+use Rekalogika\Analytics\Time\Bin\Gregorian\HourOfDay;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\MonthOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
+use Rekalogika\Analytics\Time\Bin\Gregorian\QuarterOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\WeekOfMonth;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeekOfYear;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
@@ -91,9 +91,9 @@ final readonly class TimeBinFilterResolver implements FilterResolver
             DayOfYear::class => new TranslatableMessage('Example: 1-90,100'),
             IsoWeekDate::class => new TranslatableMessage('Example: 2024021-2024032,2024041 (2024021 means 2024, week 2, Monday)'),
 
-            IsoWeek::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
+            IsoWeekWeek::class => new TranslatableMessage('Example: 202402-202405,202514 (202402 means week 2 of 2024)'),
             WeekOfMonth::class => new TranslatableMessage('Example: 1-2,4'),
-            IsoWeekOfYear::class => new TranslatableMessage('Example: 1-2,4'),
+            IsoWeekWeekOfYear::class => new TranslatableMessage('Example: 1-2,4'),
 
             Month::class => new TranslatableMessage('Example: 202401-202403,202501 (202401 means January 2024)'),
             MonthOfYear::class => new TranslatableMessage('Example: 1-3,5,7-12'),

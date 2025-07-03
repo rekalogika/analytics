@@ -20,9 +20,9 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\IsoWeek;
-use Rekalogika\Analytics\Time\Bin\IsoWeekOfYear;
-use Rekalogika\Analytics\Time\Bin\WeekOfMonth;
+use Rekalogika\Analytics\Time\Bin\Gregorian\WeekOfMonth;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeekOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
@@ -36,25 +36,25 @@ class WeekSet extends BaseDimensionGroup
     //
 
     #[Column(
-        type: IsoWeek::TYPE,
+        type: IsoWeekWeek::TYPE,
         nullable: true,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week'),
-        source: new TimeBinValueResolver(IsoWeek::class),
+        source: new TimeBinValueResolver(IsoWeekWeek::class),
     )]
     private ?int $week = null;
 
     #[Column(
-        type: IsoWeekOfYear::TYPE,
+        type: IsoWeekWeekOfYear::TYPE,
         nullable: true,
-        enumType: IsoWeekOfYear::class,
+        enumType: IsoWeekWeekOfYear::class,
     )]
     #[Dimension(
         label: new TranslatableMessage('Week of Year'),
-        source: new TimeBinValueResolver(IsoWeekOfYear::class),
+        source: new TimeBinValueResolver(IsoWeekWeekOfYear::class),
     )]
-    private ?IsoWeekOfYear $weekOfYear = null;
+    private ?IsoWeekWeekOfYear $weekOfYear = null;
 
     #[Column(
         type: WeekOfMonth::TYPE,
@@ -71,19 +71,19 @@ class WeekSet extends BaseDimensionGroup
     // getters
     //
 
-    public function getWeek(): ?IsoWeek
+    public function getWeek(): ?IsoWeekWeek
     {
         return $this->getContext()->getUserValue(
             property: 'week',
-            class: IsoWeek::class,
+            class: IsoWeekWeek::class,
         );
     }
 
-    public function getWeekOfYear(): ?IsoWeekOfYear
+    public function getWeekOfYear(): ?IsoWeekWeekOfYear
     {
         return $this->getContext()->getUserValue(
             property: 'weekOfYear',
-            class: IsoWeekOfYear::class,
+            class: IsoWeekWeekOfYear::class,
         );
     }
 

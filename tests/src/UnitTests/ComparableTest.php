@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\Util\ComparableUtil;
-use Rekalogika\Analytics\Time\Bin\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 
 final class ComparableTest extends TestCase
 {

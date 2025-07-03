@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
@@ -19,22 +19,42 @@ use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum QuarterOfYear: int implements RecurringTimeBin
+enum HourOfDay: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
-    case Q1 = 1;
-    case Q2 = 2;
-    case Q3 = 3;
-    case Q4 = 4;
+    case Hour0 = 0;
+    case Hour1 = 1;
+    case Hour2 = 2;
+    case Hour3 = 3;
+    case Hour4 = 4;
+    case Hour5 = 5;
+    case Hour6 = 6;
+    case Hour7 = 7;
+    case Hour8 = 8;
+    case Hour9 = 9;
+    case Hour10 = 10;
+    case Hour11 = 11;
+    case Hour12 = 12;
+    case Hour13 = 13;
+    case Hour14 = 14;
+    case Hour15 = 15;
+    case Hour16 = 16;
+    case Hour17 = 17;
+    case Hour18 = 18;
+    case Hour19 = 19;
+    case Hour20 = 20;
+    case Hour21 = 21;
+    case Hour22 = 22;
+    case Hour23 = 23;
 
     #[\Override]
     private static function getSqlToCharArgument(): string
     {
-        return 'Q';
+        return 'HH24';
     }
 
     #[\Override]
@@ -42,6 +62,10 @@ enum QuarterOfYear: int implements RecurringTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->name;
+        return \sprintf(
+            '%02d:00-%02d:59',
+            $this->value,
+            $this->value,
+        );
     }
 }

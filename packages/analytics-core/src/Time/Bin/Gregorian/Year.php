@@ -11,23 +11,21 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Normal date (YYYYMMDD)
- */
-final class Date implements MonotonicTimeBin
+final class Year implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
 
-    public const TYPE = Types::INTEGER;
+    public const TYPE = Types::SMALLINT;
 
     private readonly \DateTimeImmutable $start;
 
@@ -39,18 +37,34 @@ final class Date implements MonotonicTimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
-        $string = \sprintf('%08d', $databaseValue);
+        $string = \sprintf('%04d', $databaseValue);
 
         $y = (int) substr($string, 0, 4);
-        $m = (int) substr($string, 4, 2);
-        $d = (int) substr($string, 6, 2);
 
-        $this->start = new \DateTimeImmutable(
-            \sprintf('%04d-%02d-%02d 00:00:00', $y, $m, $d),
+        $start = \DateTimeImmutable::createFromFormat(
+            'Y-m-d H:i:s',
+            \sprintf('%04d-01-01 00:00:00', $y),
             $timeZone,
         );
 
-        $this->end = $this->start->modify('+1 day');
+        if ($start === false) {
+            throw new UnexpectedValueException(\sprintf(
+                'Invalid date format: %s',
+                \sprintf('%04d-01-01 00:00:00', $y),
+            ));
+        }
+
+        $this->start = $start;
+
+        $this->end = $this->start
+            ->modify('first day of next year')
+            ->setTime(0, 0, 0);
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'YYYY';
     }
 
     #[\Override]
@@ -58,7 +72,7 @@ final class Date implements MonotonicTimeBin
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('Ymd'),
+            (int) $dateTime->format('Y'),
             $dateTime->getTimezone(),
         );
     }
@@ -66,7 +80,7 @@ final class Date implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('Y-m-d');
+        return $this->start->format('Y');
     }
 
     #[\Override]
@@ -74,22 +88,7 @@ final class Date implements MonotonicTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $locale ??= $translator->getLocale();
-
-        $intlDateFormatter = new \IntlDateFormatter(
-            locale: $locale,
-            dateType: \IntlDateFormatter::MEDIUM,
-            timeType: \IntlDateFormatter::NONE,
-            timezone: $this->start->getTimezone(),
-        );
-
-        $formatted = $intlDateFormatter->format($this->start);
-
-        if (!\is_string($formatted)) {
-            $formatted = (string) $this;
-        }
-
-        return $formatted;
+        return $this->start->format('Y');
     }
 
     #[\Override]
@@ -104,13 +103,21 @@ final class Date implements MonotonicTimeBin
         return $this->end;
     }
 
+    // public function getStartDatabaseValue(): int
+    // {
+    //     return (int) $this->start->format('Y');
+    // }
+
+    // public function getEndDatabaseValue(): int
+    // {
+    //     return (int) $this->end->format('Y');
+    // }
+
     #[\Override]
     public function getNext(): static
     {
-        $next = $this->start->modify('+1 day');
-
         return self::create(
-            (int) $next->format('Ymd'),
+            $this->databaseValue + 1,
             $this->start->getTimezone(),
         );
     }
@@ -118,17 +125,9 @@ final class Date implements MonotonicTimeBin
     #[\Override]
     public function getPrevious(): static
     {
-        $previous = $this->start->modify('-1 day');
-
         return self::create(
-            (int) $previous->format('Ymd'),
+            $this->databaseValue - 1,
             $this->start->getTimezone(),
         );
-    }
-
-    #[\Override]
-    private static function getSqlToCharArgument(): string
-    {
-        return 'YYYYMMDD';
     }
 }

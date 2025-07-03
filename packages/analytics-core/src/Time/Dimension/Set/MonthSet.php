@@ -20,8 +20,8 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\MonthOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\MonthOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]

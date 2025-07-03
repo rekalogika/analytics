@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\IsoWeek;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * ISO 8601 week (YYYYWW)
  */
-final class IsoWeek implements MonotonicTimeBin
+final class IsoWeekWeek implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;

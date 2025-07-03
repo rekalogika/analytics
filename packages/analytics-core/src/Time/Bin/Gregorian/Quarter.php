@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
@@ -21,6 +21,9 @@ use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Quarter in YYYYQ format
+ */
 final class Quarter implements MonotonicTimeBin
 {
     use TimeBinTrait;

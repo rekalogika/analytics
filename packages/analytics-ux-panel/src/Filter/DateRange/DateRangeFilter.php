@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Time\Bin\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

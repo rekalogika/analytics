@@ -20,10 +20,10 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\DayOfMonth;
-use Rekalogika\Analytics\Time\Bin\DayOfWeek;
-use Rekalogika\Analytics\Time\Bin\DayOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfMonth;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]
