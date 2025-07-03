@@ -20,8 +20,8 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\HourOfDay;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
+use Rekalogika\Analytics\Time\Bin\Gregorian\HourOfDay;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]

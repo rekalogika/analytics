@@ -20,8 +20,8 @@ use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\QuarterOfYear;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
+use Rekalogika\Analytics\Time\Bin\Gregorian\QuarterOfYear;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 
 #[Embeddable()]

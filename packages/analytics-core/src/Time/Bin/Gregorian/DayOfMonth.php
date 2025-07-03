@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RecurringTimeBinTrait;
@@ -19,42 +19,49 @@ use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\RecurringTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum HourOfDay: int implements RecurringTimeBin
+enum DayOfMonth: int implements RecurringTimeBin
 {
     use RecurringTimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
 
     public const TYPE = Types::SMALLINT;
 
-    case Hour0 = 0;
-    case Hour1 = 1;
-    case Hour2 = 2;
-    case Hour3 = 3;
-    case Hour4 = 4;
-    case Hour5 = 5;
-    case Hour6 = 6;
-    case Hour7 = 7;
-    case Hour8 = 8;
-    case Hour9 = 9;
-    case Hour10 = 10;
-    case Hour11 = 11;
-    case Hour12 = 12;
-    case Hour13 = 13;
-    case Hour14 = 14;
-    case Hour15 = 15;
-    case Hour16 = 16;
-    case Hour17 = 17;
-    case Hour18 = 18;
-    case Hour19 = 19;
-    case Hour20 = 20;
-    case Hour21 = 21;
-    case Hour22 = 22;
-    case Hour23 = 23;
+    case Day1 = 1;
+    case Day2 = 2;
+    case Day3 = 3;
+    case Day4 = 4;
+    case Day5 = 5;
+    case Day6 = 6;
+    case Day7 = 7;
+    case Day8 = 8;
+    case Day9 = 9;
+    case Day10 = 10;
+    case Day11 = 11;
+    case Day12 = 12;
+    case Day13 = 13;
+    case Day14 = 14;
+    case Day15 = 15;
+    case Day16 = 16;
+    case Day17 = 17;
+    case Day18 = 18;
+    case Day19 = 19;
+    case Day20 = 20;
+    case Day21 = 21;
+    case Day22 = 22;
+    case Day23 = 23;
+    case Day24 = 24;
+    case Day25 = 25;
+    case Day26 = 26;
+    case Day27 = 27;
+    case Day28 = 28;
+    case Day29 = 29;
+    case Day30 = 30;
+    case Day31 = 31;
 
     #[\Override]
     private static function getSqlToCharArgument(): string
     {
-        return 'HH24';
+        return 'DD';
     }
 
     #[\Override]
@@ -62,10 +69,6 @@ enum HourOfDay: int implements RecurringTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return \sprintf(
-            '%02d:00-%02d:59',
-            $this->value,
-            $this->value,
-        );
+        return (string) $this->value;
     }
 }

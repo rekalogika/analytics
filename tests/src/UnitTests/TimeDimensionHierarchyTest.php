@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\IsoWeek;
-use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
-use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\Year;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
@@ -115,7 +115,7 @@ final class TimeDimensionHierarchyTest extends TestCase
 
         yield [
             202212,
-            IsoWeek::class,
+            IsoWeekWeek::class,
             new \DateTimeImmutable('2022-03-21T00:00:00+00:00'),
             new \DateTimeImmutable('2022-03-28T00:00:00+00:00'),
             '2022-W12',

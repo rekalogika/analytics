@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
@@ -20,9 +20,9 @@ use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Hour (YYYYMMDDHH)
+ * Gregorian date (YYYYMMDD)
  */
-final class Hour implements MonotonicTimeBin
+final class Date implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
@@ -39,25 +39,18 @@ final class Hour implements MonotonicTimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
-        $ymdh = \sprintf('%010d', $databaseValue);
+        $string = \sprintf('%08d', $databaseValue);
 
-        $y = (int) substr($ymdh, 0, 4);
-        $m = (int) substr($ymdh, 4, 2);
-        $d = (int) substr($ymdh, 6, 2);
-        $h = (int) substr($ymdh, 8, 2);
+        $y = (int) substr($string, 0, 4);
+        $m = (int) substr($string, 4, 2);
+        $d = (int) substr($string, 6, 2);
 
         $this->start = new \DateTimeImmutable(
-            \sprintf('%04d-%02d-%02d %02d:00:00', $y, $m, $d, $h),
+            \sprintf('%04d-%02d-%02d 00:00:00', $y, $m, $d),
             $timeZone,
         );
 
-        $this->end = $this->start->modify('+1 hour');
-    }
-
-    #[\Override]
-    private static function getSqlToCharArgument(): string
-    {
-        return 'YYYYMMDDHH24';
+        $this->end = $this->start->modify('+1 day');
     }
 
     #[\Override]
@@ -65,7 +58,7 @@ final class Hour implements MonotonicTimeBin
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('YmdH'),
+            (int) $dateTime->format('Ymd'),
             $dateTime->getTimezone(),
         );
     }
@@ -73,7 +66,7 @@ final class Hour implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('Y-m-d H:00');
+        return $this->start->format('Y-m-d');
     }
 
     #[\Override]
@@ -81,7 +74,22 @@ final class Hour implements MonotonicTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->start->format('Y-m-d H:00');
+        $locale ??= $translator->getLocale();
+
+        $intlDateFormatter = new \IntlDateFormatter(
+            locale: $locale,
+            dateType: \IntlDateFormatter::MEDIUM,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
+        );
+
+        $formatted = $intlDateFormatter->format($this->start);
+
+        if (!\is_string($formatted)) {
+            $formatted = (string) $this;
+        }
+
+        return $formatted;
     }
 
     #[\Override]
@@ -96,51 +104,31 @@ final class Hour implements MonotonicTimeBin
         return $this->end;
     }
 
-    // public function getStartDatabaseValue(): int
-    // {
-    //     return (int) $this->start->format('YmdH');
-    // }
-
-    // public function getEndDatabaseValue(): int
-    // {
-    //     return (int) $this->end->format('YmdH');
-    // }
-
-    // private function getContainingDate(): Date
-    // {
-    //     return Date::createFromDatabaseValue(
-    //         (int) $this->start->format('Ymd'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
-    // private function getContainingWeekDate(): WeekDate
-    // {
-    //     return WeekDate::createFromDatabaseValue(
-    //         (int) $this->start->format('oWw'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
     #[\Override]
     public function getNext(): static
     {
-        $next = $this->start->modify('+1 hour');
+        $next = $this->start->modify('+1 day');
 
         return self::create(
-            (int) $next->format('YmdH'),
-            $next->getTimezone(),
+            (int) $next->format('Ymd'),
+            $this->start->getTimezone(),
         );
     }
 
     #[\Override]
     public function getPrevious(): static
     {
-        $previous = $this->start->modify('-1 hour');
+        $previous = $this->start->modify('-1 day');
 
         return self::create(
-            (int) $previous->format('YmdH'),
-            $previous->getTimezone(),
+            (int) $previous->format('Ymd'),
+            $this->start->getTimezone(),
         );
+    }
+
+    #[\Override]
+    private static function getSqlToCharArgument(): string
+    {
+        return 'YYYYMMDD';
     }
 }

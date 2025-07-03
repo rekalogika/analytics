@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Time\Bin;
+namespace Rekalogika\Analytics\Time\Bin\IsoWeek;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
@@ -19,15 +19,12 @@ use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * ISO 8601 week date (YYYYWWD)
- */
-final class IsoWeekDate implements MonotonicTimeBin
+final class IsoWeekYear implements MonotonicTimeBin
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
 
-    public const TYPE = Types::INTEGER;
+    public const TYPE = Types::SMALLINT;
 
     private readonly \DateTimeImmutable $start;
 
@@ -39,24 +36,18 @@ final class IsoWeekDate implements MonotonicTimeBin
     ) {
         $this->databaseValue = $databaseValue;
 
-        $string = \sprintf('%07d', $databaseValue);
-
-        $y = (int) substr($string, 0, 4);
-        $w = (int) substr($string, 4, 2);
-        $d = (int) substr($string, 6, 1);
-
         $this->start = (new \DateTimeImmutable())
             ->setTimezone($timeZone)
-            ->setISODate($y, $w, $d)
+            ->setISODate($databaseValue, 1)
             ->setTime(0, 0, 0);
 
-        $this->end = $this->start->modify('+1 day');
+        $this->end = $this->start->setISODate($databaseValue + 1, 1);
     }
 
     #[\Override]
     private static function getSqlToCharArgument(): string
     {
-        return 'IYYYIWID';
+        return 'IYYY';
     }
 
     #[\Override]
@@ -64,7 +55,7 @@ final class IsoWeekDate implements MonotonicTimeBin
         \DateTimeInterface $dateTime,
     ): static {
         return self::create(
-            (int) $dateTime->format('oWN'),
+            (int) $dateTime->format('o'),
             $dateTime->getTimezone(),
         );
     }
@@ -72,7 +63,7 @@ final class IsoWeekDate implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o-\WW-N');
+        return $this->start->format('o');
     }
 
     #[\Override]
@@ -80,7 +71,7 @@ final class IsoWeekDate implements MonotonicTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        return $this->start->format('o-\WW-N');
+        return $this->start->format('o');
     }
 
     #[\Override]
@@ -97,35 +88,29 @@ final class IsoWeekDate implements MonotonicTimeBin
 
     // public function getStartDatabaseValue(): int
     // {
-    //     return (int) $this->start->format('oWN');
+    //     return (int) $this->start->format('o');
     // }
 
     // public function getEndDatabaseValue(): int
     // {
-    //     return (int) $this->end->format('oWN');
-    // }
-
-    // private function getContainingWeek(): Week
-    // {
-    //     return Week::createFromDatabaseValue(
-    //         (int) $this->start->format('oW'),
-    //         $this->start->getTimezone(),
-    //     );
+    //     return (int) $this->end->format('o');
     // }
 
     #[\Override]
     public function getNext(): static
     {
-        $nextDateTime = $this->start->modify('+1 day');
-
-        return self::createFromDateTime($nextDateTime);
+        return self::create(
+            $this->databaseValue + 1,
+            $this->start->getTimezone(),
+        );
     }
 
     #[\Override]
     public function getPrevious(): static
     {
-        $previousDateTime = $this->start->modify('-1 day');
-
-        return self::createFromDateTime($previousDateTime);
+        return self::create(
+            $this->databaseValue - 1,
+            $this->start->getTimezone(),
+        );
     }
 }

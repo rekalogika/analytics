@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Time\Bin\Date;
-use Rekalogika\Analytics\Time\Bin\Hour;
-use Rekalogika\Analytics\Time\Bin\IsoWeek;
-use Rekalogika\Analytics\Time\Bin\IsoWeekDate;
-use Rekalogika\Analytics\Time\Bin\IsoWeekYear;
-use Rekalogika\Analytics\Time\Bin\Month;
-use Rekalogika\Analytics\Time\Bin\MonthWeek;
-use Rekalogika\Analytics\Time\Bin\MonthWeekDate;
-use Rekalogika\Analytics\Time\Bin\Quarter;
-use Rekalogika\Analytics\Time\Bin\Year;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
+use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
+use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
+use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 
 final class TimeBinTest extends TestCase
@@ -111,7 +111,7 @@ final class TimeBinTest extends TestCase
         ];
 
         yield [
-            'class' => IsoWeek::class,
+            'class' => IsoWeekWeek::class,
             'databaseValue' => 202304,
             'expectedStart' => '2023-01-23 00:00:00',
             'expectedEnd' => '2023-01-30 00:00:00',
@@ -127,14 +127,14 @@ final class TimeBinTest extends TestCase
         // month based week
 
         yield [
-            'class' => MonthWeek::class,
+            'class' => MonthBasedWeekWeek::class,
             'databaseValue' => 2025071,
             'expectedStart' => '2025-06-30 00:00:00',
             'expectedEnd' => '2025-07-07 00:00:00',
         ];
 
         yield [
-            'class' => MonthWeekDate::class,
+            'class' => MonthBasedWeekDate::class,
             'databaseValue' => 20250712,
             'expectedStart' => '2025-07-01 00:00:00',
             'expectedEnd' => '2025-07-02 00:00:00',
@@ -185,7 +185,7 @@ final class TimeBinTest extends TestCase
         ];
 
         yield [
-            'class' => IsoWeek::class,
+            'class' => IsoWeekWeek::class,
             'dateTime' => new \DateTimeImmutable('2023-01-23 00:00:00'),
             'databaseValue' => 202304,
         ];
@@ -199,13 +199,13 @@ final class TimeBinTest extends TestCase
         // month based week
 
         yield [
-            'class' => MonthWeek::class,
+            'class' => MonthBasedWeekWeek::class,
             'dateTime' => new \DateTimeImmutable('2025-06-30 00:00:00'),
             'databaseValue' => 2025071,
         ];
 
         yield [
-            'class' => MonthWeekDate::class,
+            'class' => MonthBasedWeekDate::class,
             'dateTime' => new \DateTimeImmutable('2025-07-01 00:00:00'),
             'databaseValue' => 20250712,
         ];

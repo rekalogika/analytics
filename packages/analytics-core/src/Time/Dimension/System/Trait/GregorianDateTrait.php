@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Metadata\Dimension;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
-use Rekalogika\Analytics\Time\Bin\Year;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
 use Rekalogika\Analytics\Time\Dimension\Set\DateSet;
 use Rekalogika\Analytics\Time\Dimension\Set\MonthSet;
 use Rekalogika\Analytics\Time\Dimension\Set\QuarterSet;
