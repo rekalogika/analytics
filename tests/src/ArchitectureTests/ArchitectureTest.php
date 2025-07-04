@@ -173,9 +173,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
-                Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsEngine(),
-                Selectors::selectAnalyticsPivotTable(),
                 Selector::inNamespace('OzdemirBurak\Iris\Color'),
                 Selectors::selectPivotTable(),
 
@@ -183,6 +181,8 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsPostgreSQLHll(),
+                Selectors::selectAnalyticsFrontend(),
+                Selectors::selectAnalyticsPivotTable(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Psr\Cache'),
