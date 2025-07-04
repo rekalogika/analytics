@@ -45,6 +45,8 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
 
     private string $dqlAlias;
 
+    private HierarchyAwareLabel $label;
+
     private Field|FieldSet|Cube|RollUp|GroupingSet $groupByExpression;
 
     /**
@@ -142,6 +144,10 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
             $this->groupByExpression = new Field($this->dqlAlias);
         }
 
+        // label
+
+        $this->label = new HierarchyAwareLabel($this);
+
         // parent constructor
 
         parent::__construct(
@@ -160,6 +166,20 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     public function __toString(): string
     {
         return $this->getPropertyName();
+    }
+
+    #[\Override]
+    public function getLabel(): HierarchyAwareLabel
+    {
+        return $this->label;
+    }
+
+    /**
+     * @internal
+     */
+    public function getRawLabel(): TranslatableInterface
+    {
+        return parent::getLabel();
     }
 
     public function withSummaryMetadata(

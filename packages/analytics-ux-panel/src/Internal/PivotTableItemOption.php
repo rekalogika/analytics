@@ -46,7 +46,7 @@ final readonly class PivotTableItemOption implements TranslatableInterface
 
         // remove from $name the last part containing $propertyName
         if (str_ends_with($name, $propertyName)) {
-            $name = substr($name, 0, -\strlen($propertyName) + 1);
+            $name = substr($name, 0, -\strlen($propertyName) - 1);
         }
 
         return $name;

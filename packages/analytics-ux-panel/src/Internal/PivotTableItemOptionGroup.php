@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle\Internal;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Common\Util\HierarchicalTranslatableMessage;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -56,22 +55,11 @@ final class PivotTableItemOptionGroup implements
 
         // remove from $name the last part containing $propertyName
         if (str_ends_with($name, $propertyName)) {
-            $name = substr($name, 0, -\strlen($propertyName) + 1);
+            $name = substr($name, 0, -\strlen($propertyName) - 1);
         }
 
         $this->key = $name;
-
-        $labels = [];
-
-        while ($dimension instanceof DimensionMetadata) {
-            array_unshift($labels, $dimension->getLabel());
-            $dimension = $dimension->getParent();
-        }
-
-        array_shift($labels); // remove the root label
-        array_pop($labels); // remove the last label which is the property name
-
-        $this->label = new HierarchicalTranslatableMessage($labels);
+        $this->label = $dimension->getLabel()->getRootChildToParent();
     }
 
     public function getKey(): string
