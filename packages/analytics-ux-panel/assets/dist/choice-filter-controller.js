@@ -30,7 +30,6 @@ var _default = /*#__PURE__*/function (_Controller) {
       },
       render: {
         option: function option(data, escape) {
-          console.log(data);
           return "<div>" + data.html + "</div>";
         },
         item: function item(_item, escape) {
