@@ -21,17 +21,15 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @api
  */
 class HtmlRendererExpressionVisitor extends ExpressionVisitor
 {
-    public function __construct(
+    final public function __construct(
         private Htmlifier $htmlifier,
         private SummaryMetadata $summaryMetadata,
-        private TranslatorInterface $translator,
     ) {}
 
     #[\Override]
@@ -122,7 +120,7 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
             default => throw new LogicException('Unsupported composite expression type: ' . $type),
         };
 
-        return htmlspecialchars($translatable->trans($this->translator));
+        return $this->htmlifier->toHtml($translatable);
     }
 
     protected function walkDimension(string $field): string
