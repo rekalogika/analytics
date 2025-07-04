@@ -39,8 +39,8 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
     {
         return \sprintf(
             '%s %s %s',
-            htmlspecialchars($this->walkDimension($comparison->getField())),
-            htmlspecialchars($this->walkOperator($comparison->getOperator())),
+            $this->walkDimension($comparison->getField()),
+            $this->walkOperator($comparison->getOperator()),
             $this->walkValue($comparison->getValue()),
         );
     }
@@ -90,15 +90,12 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
         }
 
         if (\count($parts) === 1) {
-            return \sprintf(
-                '%s %s',
-                $this->walkCompositeExpressionType($expr->getType()),
-                $parts[0],
-            );
-            return implode(' ' . htmlspecialchars($expr->getType()) . ' ', $parts);
-        } else {
-            return '(' . implode(' ' . htmlspecialchars($expr->getType()) . ' ', $parts) . ')';
+            return $parts[0];
         }
+
+        $type = $this->walkCompositeExpressionType($expr->getType());
+
+        return '(' . implode(' ' . $type . ' ', $parts) . ')';
     }
 
     protected function walkOperator(string $operator): string
@@ -125,13 +122,17 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
             default => throw new LogicException('Unsupported composite expression type: ' . $type),
         };
 
-        return $translatable->trans($this->translator);
+        return htmlspecialchars($translatable->trans($this->translator));
     }
 
     protected function walkDimension(string $field): string
     {
         $dimension = $this->summaryMetadata->getDimension($field);
+        $string = $this->htmlifier->toHtml($dimension->getLabel()->getRootAndLeaf());
 
-        return $this->htmlifier->toHtml($dimension->getLabel()->getRootToLeaf());
+        return \sprintf(
+            '<u>%s</u>',
+            $string,
+        );
     }
 }
