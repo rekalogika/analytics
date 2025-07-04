@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
-use Rekalogika\Analytics\Frontend\Html\Internal\HtmlRendererExpressionVisitor;
+use Rekalogika\Analytics\Frontend\Html\Visitor\HtmlRendererExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

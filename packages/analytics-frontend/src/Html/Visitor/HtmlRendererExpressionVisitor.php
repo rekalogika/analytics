@@ -11,21 +11,22 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Frontend\Html\Internal;
+namespace Rekalogika\Analytics\Frontend\Html\Visitor;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @internal
+ * @api
  */
-final class HtmlRendererExpressionVisitor extends ExpressionVisitor
+class HtmlRendererExpressionVisitor extends ExpressionVisitor
 {
     public function __construct(
         private Htmlifier $htmlifier,
@@ -36,14 +37,10 @@ final class HtmlRendererExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkComparison(Comparison $comparison): string
     {
-        $field = $comparison->getField();
-        $dimension = $this->summaryMetadata->getDimension($field);
-        $label = $dimension->getLabel()->trans($this->translator);
-
         return \sprintf(
             '%s %s %s',
-            htmlspecialchars($label),
-            htmlspecialchars($comparison->getOperator()),
+            htmlspecialchars($this->walkDimension($comparison->getField())),
+            htmlspecialchars($this->walkOperator($comparison->getOperator())),
             $this->walkValue($comparison->getValue()),
         );
     }
@@ -85,13 +82,56 @@ final class HtmlRendererExpressionVisitor extends ExpressionVisitor
         }
 
         if ($expr->getType() === CompositeExpression::TYPE_NOT) {
-            return 'NOT (' . implode(' ', $parts) . ')';
+            return sprintf(
+                '%s %s',
+                $this->walkCompositeExpressionType($expr->getType()),
+                implode(' ', $parts)
+            );
         }
 
         if (\count($parts) === 1) {
+            return sprintf(
+                '%s %s',
+                $this->walkCompositeExpressionType($expr->getType()),
+                $parts[0]
+            );
             return implode(' ' . htmlspecialchars($expr->getType()) . ' ', $parts);
         } else {
             return '(' . implode(' ' . htmlspecialchars($expr->getType()) . ' ', $parts) . ')';
         }
+    }
+
+    protected function walkOperator(string $operator): string
+    {
+        return match ($operator) {
+            Comparison::EQ => '=',
+            Comparison::NEQ => '≠',
+            Comparison::LT => '<',
+            Comparison::LTE => '≤',
+            Comparison::GT => '>',
+            Comparison::GTE => '≥',
+            Comparison::IN => '∈',
+            Comparison::NIN => '∉',
+            default => throw new LogicException('Unsupported operator: ' . $operator),
+        };
+    }
+
+    protected function walkCompositeExpressionType(string $type): string
+    {
+        $translatable = match ($type) {
+            CompositeExpression::TYPE_AND => new TranslatableMessage('AND'),
+            CompositeExpression::TYPE_OR => new TranslatableMessage('OR'),
+            CompositeExpression::TYPE_NOT => new TranslatableMessage('NOT'),
+            default => throw new LogicException('Unsupported composite expression type: ' . $type),
+        };
+
+        return $translatable->trans($this->translator);
+    }
+
+    protected function walkDimension(string $field): string
+    {
+        $dimension = $this->summaryMetadata->getDimension($field);
+
+        return $this->htmlifier->toHtml($dimension->getLabel()->getRootToLeaf());
     }
 }
