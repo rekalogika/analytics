@@ -88,7 +88,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $container->import('../config/metadata.php');
         $container->import('../config/engine.php');
         $container->import('../config/bundle.php');
-        $container->import('../config/ui.php');
+
+        if (class_exists(HtmlRenderer::class)) {
+            $container->import('../config/frontend.php');
+        }
 
         $container->parameters()
             ->set(
@@ -131,27 +134,65 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependDQLFunctions(ContainerBuilder $builder): void
     {
+        //
+        // common
+        //
+
+        $stringFunctions = [
+            'REKALOGIKA_NEXTVAL' => NextValFunction::class,
+            'REKALOGIKA_BUST' => BustFunction::class,
+            'REKALOGIKA_TRUNCATE_BIGINT' => TruncateBigIntFunction::class,
+            'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
+        ];
+
+        $numericFunctions = [
+            'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT' => TruncateUuidToBigintFunction::class,
+        ];
+
+        $datetimeFunctions = [
+            'REKALOGIKA_UUID_TO_DATETIME' => UuidToDateTimeFunction::class,
+        ];
+
+        //
+        // time
+        //
+
+        if (!class_exists(TimeBinFunction::class)) {
+            $stringFunctions = [
+                ...$stringFunctions,
+                'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
+                'REKALOGIKA_TIME_BIN_MBW_WEEK' => TimeBinMbwWeekFunction::class,
+            ];
+        }
+
+        //
+        // PostgreSQLHll
+        //
+
+        if (!class_exists(HllAddAggregateFunction::class)) {
+            $stringFunctions = [
+                ...$stringFunctions,
+                'REKALOGIKA_HLL_ADD_AGG' => HllAddAggregateFunction::class,
+                'REKALOGIKA_HLL_UNION_AGG' => HllUnionAggregateFunction::class,
+                'REKALOGIKA_HLL_HASH' => HllHashFunction::class,
+            ];
+
+            $numericFunctions = [
+                ...$numericFunctions,
+                'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
+            ];
+        }
+
+        //
+        // finalize
+        //
+
         $builder->prependExtensionConfig('doctrine', [
             'orm' => [
                 'dql' => [
-                    'string_functions' => [
-                        'REKALOGIKA_NEXTVAL' => NextValFunction::class,
-                        'REKALOGIKA_BUST' => BustFunction::class,
-                        'REKALOGIKA_TRUNCATE_BIGINT'  => TruncateBigIntFunction::class,
-                        'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
-                        'REKALOGIKA_HLL_ADD_AGG' => HllAddAggregateFunction::class,
-                        'REKALOGIKA_HLL_UNION_AGG' => HllUnionAggregateFunction::class,
-                        'REKALOGIKA_HLL_HASH' => HllHashFunction::class,
-                    ],
-                    'numeric_functions' => [
-                        'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
-                        'REKALOGIKA_TIME_BIN_MBW_WEEK' => TimeBinMbwWeekFunction::class,
-                        'REKALOGIKA_TRUNCATE_UUID_TO_BIGINT' => TruncateUuidToBigintFunction::class,
-                        'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
-                    ],
-                    'datetime_functions' => [
-                        'REKALOGIKA_UUID_TO_DATETIME' => UuidToDateTimeFunction::class,
-                    ],
+                    'string_functions' => $stringFunctions,
+                    'numeric_functions' => $numericFunctions,
+                    'datetime_functions' => $datetimeFunctions,
                 ],
             ],
         ]);
@@ -160,6 +201,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
     private function prependMigrations(ContainerBuilder $builder): void
     {
         $migrationsPaths = [];
+
+        //
+        // core
+        //
 
         try {
             $bustPath = (new \ReflectionClass(BustFunction::class))->getFileName();
@@ -173,6 +218,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         } catch (\ReflectionException) {
         }
 
+        //
+        // time
+        //
+
         try {
             $timeBinPath = (new \ReflectionClass(TimeBinFunction::class))->getFileName();
 
@@ -185,6 +234,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         } catch (\ReflectionException) {
         }
 
+        //
+        // finalize
+        //
+
         $builder->prependExtensionConfig('doctrine_migrations', [
             'migrations_paths' => $migrationsPaths,
         ]);
@@ -192,6 +245,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependTwig(ContainerBuilder $builder): void
     {
+        //
+        // frontend
+        //
+
         if (!class_exists(HtmlRenderer::class)) {
             return;
         }

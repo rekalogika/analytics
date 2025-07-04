@@ -16,11 +16,14 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
+use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
 use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -112,4 +115,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             'channel' => 'rekalogika.analytics',
         ])
     ;
+
+    //
+    // distinct values resolver
+    //
+
+    $services
+        ->set(DistinctValuesResolver::class)
+        ->class(ChainDistinctValuesResolver::class);
+
+    $services
+        ->set(DoctrineDistinctValuesResolver::class)
+        ->args([
+            '$managerRegistry' => service('doctrine'),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$propertyAccessor' => service('property_accessor'),
+        ])
+        ->tag('rekalogika.analytics.distinct_values_resolver');
 };

@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\Implementation\ChartConfiguration;
 use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultAnalyticsChartBuilder;
@@ -52,24 +49,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
 
     //
-    // distinct values resolver
-    //
-
-    $services
-        ->set(DistinctValuesResolver::class)
-        ->class(ChainDistinctValuesResolver::class);
-
-    $services
-        ->set(DoctrineDistinctValuesResolver::class)
-        ->args([
-            '$managerRegistry' => service('doctrine'),
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-            '$propertyAccessor' => service('property_accessor'),
-        ])
-        ->tag('rekalogika.analytics.distinct_values_resolver');
-
-    //
-    // frontend
+    // twig
     //
 
     $services
