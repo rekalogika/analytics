@@ -38,6 +38,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
+use Rekalogika\Analytics\Frontend\Html\ExpressionHtmlRenderer;
 use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -115,6 +116,14 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$cellifier' => service(Cellifier::class),
         ])
     ;
+
+    $services
+        ->set(ExpressionHtmlRenderer::class)
+        ->args([
+            '$htmlifier' => service(Htmlifier::class),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$translator' => service('translator'),
+        ]);
 
     //
     // chart

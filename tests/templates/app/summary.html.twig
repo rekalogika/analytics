@@ -31,6 +31,13 @@
                    class="btn btn-secondary btn-sm float-end mb-2"
                    href="{{ path('download', {hash: hash, parameters: app.request.query.get('parameters') }) }}">Download</a>
 
+                {% if expressions|length > 0 %}
+                    <h5 class="">{{ 'Active criteria'|trans }}:</h5>
+                    <ul>
+                        {% for expression in expressions %}<li>{{ expression|raw }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+
                 <div>{{ pivotTable|raw }}</div>
             {% endif %}
         </div>

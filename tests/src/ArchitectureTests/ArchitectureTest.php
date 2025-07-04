@@ -246,6 +246,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
+                Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsPivotTable(),
                 Selectors::selectPivotTable(),
 
@@ -255,6 +256,9 @@ final class ArchitectureTest
                 // symfony
                 Selector::inNamespace('Symfony\Component\Translation'),
                 Selector::inNamespace('Symfony\UX\Chartjs'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\Common\Collections'),
 
                 // other third-party libraries
                 Selector::inNamespace('Twig'),

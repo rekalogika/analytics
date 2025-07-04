@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
+use Rekalogika\Analytics\Frontend\Html\ExpressionHtmlRenderer;
 use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
@@ -52,6 +53,7 @@ final class AppController extends AbstractController
         PivotAwareQueryFactory $pivotAwareQueryFactory,
         AnalyticsChartBuilder $chartBuilder,
         HtmlRenderer $pivotTableRenderer,
+        ExpressionHtmlRenderer $expressionHtmlRenderer,
         string $hash,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
@@ -71,8 +73,8 @@ final class AppController extends AbstractController
 
 
         // populate query from url parameter
-        $query = $this->summaryManager->createQuery()->from($class);
-        $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
+        $origQuery = $this->summaryManager->createQuery()->from($class);
+        $query = $pivotAwareQueryFactory->createFromParameters($origQuery, $parameters);
 
         $result = $query->getResult();
 
@@ -88,6 +90,9 @@ final class AppController extends AbstractController
             $pivotTable = null;
             $pivotTableError = 'The pivot table is too large to be displayed. Please refine your query parameters.';
         }
+
+        // expression rendering
+        $expressions = $expressionHtmlRenderer->renderExpression($origQuery);
 
         // create chart
         try {
@@ -109,6 +114,7 @@ final class AppController extends AbstractController
             'pivotTableError' => $pivotTableError,
             'chart' => $chart,
             'chartError' => $chartError,
+            'expressions' => $expressions,
             'hash' => $hash,
         ]);
     }
