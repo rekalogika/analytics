@@ -82,18 +82,18 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
         }
 
         if ($expr->getType() === CompositeExpression::TYPE_NOT) {
-            return sprintf(
+            return \sprintf(
                 '%s %s',
                 $this->walkCompositeExpressionType($expr->getType()),
-                implode(' ', $parts)
+                implode(' ', $parts),
             );
         }
 
         if (\count($parts) === 1) {
-            return sprintf(
+            return \sprintf(
                 '%s %s',
                 $this->walkCompositeExpressionType($expr->getType()),
-                $parts[0]
+                $parts[0],
             );
             return implode(' ' . htmlspecialchars($expr->getType()) . ' ', $parts);
         } else {
