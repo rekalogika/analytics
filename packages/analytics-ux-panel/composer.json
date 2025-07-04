@@ -22,7 +22,6 @@
         "psr/container": "^2.0",
         "rekalogika/analytics-core": "^0.21.1",
         "rekalogika/analytics-bundle": "^0.21.1",
-        "symfony/asset-mapper": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3",
