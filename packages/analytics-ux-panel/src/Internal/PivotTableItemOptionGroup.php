@@ -25,20 +25,12 @@ final class PivotTableItemOptionGroup implements
     \IteratorAggregate,
     TranslatableInterface
 {
-    private readonly string $key;
-    private readonly TranslatableInterface $label;
-
-    private bool $isNull = false;
-
     /**
-     * @var list<PivotTableItemOption>
+     * @var list<PivotTableItemOption> $options
      */
     private array $options = [];
 
-    /**
-     * @param DimensionMetadata $dimension A leaf dimension
-     */
-    public function __construct(DimensionMetadata $dimension)
+    public static function create(DimensionMetadata $dimension): ?self
     {
         if (\count($dimension->getChildren()) > 0) {
             throw new InvalidArgumentException(
@@ -46,8 +38,10 @@ final class PivotTableItemOptionGroup implements
             );
         }
 
-        if ($dimension->getParent() === null) {
-            $this->isNull = true;
+        $label = $dimension->getLabel()->getRootChildToParent();
+
+        if ($label === null) {
+            return null; // No label available, cannot create group
         }
 
         $name = $dimension->getName();
@@ -58,8 +52,20 @@ final class PivotTableItemOptionGroup implements
             $name = substr($name, 0, -\strlen($propertyName) - 1);
         }
 
-        $this->key = $name;
-        $this->label = $dimension->getLabel()->getRootChildToParent();
+        return new self(
+            key: $name,
+            label: $label,
+        );
+    }
+
+    private function __construct(
+        private readonly string $key,
+        private readonly TranslatableInterface $label,
+    ) {}
+
+    public function getTagName(): string
+    {
+        return 'optgroup';
     }
 
     public function getKey(): string
@@ -95,10 +101,5 @@ final class PivotTableItemOptionGroup implements
         }
 
         $this->options[] = $option;
-    }
-
-    public function isNull(): bool
-    {
-        return $this->isNull;
     }
 }

@@ -101,7 +101,7 @@ final class HierarchyAwareLabel implements TranslatableInterface
         ]);
     }
 
-    public function getRootToParent(): TranslatableInterface
+    public function getRootToParent(): ?TranslatableInterface
     {
         $labels = $this->getLabels();
 
@@ -113,13 +113,13 @@ final class HierarchyAwareLabel implements TranslatableInterface
         $result = \array_slice($labels, 0, -1);
 
         if (\count($result) === 0) {
-            throw new LogicException('DimensionLabel has no parent.');
+            return null;
         }
 
         return new HierarchicalTranslatableMessage($result);
     }
 
-    public function getRootChildToParent(): TranslatableInterface
+    public function getRootChildToParent(): ?TranslatableInterface
     {
         $labels = $this->getLabels();
 
@@ -131,7 +131,7 @@ final class HierarchyAwareLabel implements TranslatableInterface
         $result = \array_slice($labels, 1, -1);
 
         if (\count($result) === 0) {
-            throw new LogicException('DimensionLabel has no parent.');
+            return null;
         }
 
         return new HierarchicalTranslatableMessage($result);
