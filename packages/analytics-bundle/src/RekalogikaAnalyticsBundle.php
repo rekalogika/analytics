@@ -157,7 +157,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         // time
         //
 
-        if (!class_exists(TimeBinFunction::class)) {
+        if (class_exists(TimeBinFunction::class)) {
             $stringFunctions = [
                 ...$stringFunctions,
                 'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
@@ -169,7 +169,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         // PostgreSQLHll
         //
 
-        if (!class_exists(HllAddAggregateFunction::class)) {
+        if (class_exists(HllAddAggregateFunction::class)) {
             $stringFunctions = [
                 ...$stringFunctions,
                 'REKALOGIKA_HLL_ADD_AGG' => HllAddAggregateFunction::class,
