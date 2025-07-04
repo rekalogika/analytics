@@ -36,6 +36,6 @@ final readonly class HierarchicalTranslatableMessage implements TranslatableInte
             $strings[] = $label->trans($translator, $locale);
         }
 
-        return implode(' - ', $strings);
+        return implode(' / ', $strings);
     }
 }

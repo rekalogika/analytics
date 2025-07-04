@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Common\Util\HierarchicalTranslatableMessage;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
@@ -333,20 +332,11 @@ final readonly class QueryResultToTableTransformer
     {
         $property = $this->metadata->getProperty($property);
 
-        if (!$property instanceof DimensionMetadata) {
-            return $property->getLabel();
+        if ($property instanceof DimensionMetadata) {
+            return $property->getLabel()->getRootToLeaf();
         }
 
-        $strings = [];
-
-        while ($property !== null) {
-            $strings[] = $property->getLabel();
-            $property = $property->getParent();
-        }
-
-        return new HierarchicalTranslatableMessage(
-            labels: array_reverse($strings),
-        );
+        return $property->getLabel();
     }
 
     private function getNullValue(string $dimension): TranslatableInterface
