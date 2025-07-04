@@ -23,6 +23,11 @@ final readonly class PivotTableItemOption implements TranslatableInterface
         private DimensionMetadata $dimension,
     ) {}
 
+    public function getTagName(): string
+    {
+        return 'option';
+    }
+
     #[\Override]
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {

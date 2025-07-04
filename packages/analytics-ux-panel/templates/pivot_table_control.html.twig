@@ -2,9 +2,15 @@
     {%- set id = random() -%}
 
     <div data-controller="rekalogika--analytics-ux-panel--pivot-table"
-         {%- if target -%}data-rekalogika--analytics-ux-panel--pivot-table-target-value="{{ target }}"{%- endif -%}
-         {%- if output -%}data-rekalogika--analytics-ux-panel--pivot-table-output-value="{{ output }}"{%- endif -%}
-         {%- if urlParameter -%} data-rekalogika--analytics-ux-panel--pivot-table-url-parameter-value="{{ urlParameter }}" {%- endif -%}>
+         {%- if target -%}
+         data-rekalogika--analytics-ux-panel--pivot-table-target-value="{{ target }}"
+         {%- endif -%}
+         {%- if output -%}
+         data-rekalogika--analytics-ux-panel--pivot-table-output-value="{{ output }}"
+         {%- endif -%}
+         {%- if urlParameter -%}
+         data-rekalogika--analytics-ux-panel--pivot-table-url-parameter-value="{{ urlParameter }}"
+         {%- endif -%}>
         {{ block("fields") }}
         <turbo-frame id="__filters">
         </turbo-frame>
@@ -51,7 +57,7 @@
         <div class="col-md-4">
             {%- set type = "values" -%}
             {{ block("item_block") }}
-            
+
             {%- set type = "filters" -%}
             {{ block("item_block") }}
         </div>
@@ -100,7 +106,9 @@
         <ul data-type="{{ type }}"
             class="{{ type }} list-group list-group-flush"
             style="min-height: 70px">
-            {%- for item in items -%}{{ block("item") }}{%- endfor -%}
+            {%- for item in items -%}
+                {{ block("item") }}
+            {%- endfor -%}
         </ul>
     </div>
 {%- endblock -%}
@@ -151,15 +159,33 @@
 {%- block item_choices -%}
     <select class="form-select form-select-sm py-0">
         {%- set selected = query.getSelectedSubItem(item.key) -%}
-        {%- for optgroup in item.choices -%}
-            <optgroup label="{{ optgroup|trans }}">
-                {% for option in optgroup %}
-                    <option value="{{ option.key }}" {{ selected == option.key ? 'selected' }}>{{ option|trans }}
-                {% endfor %}
-            </optgroup>
-            </option>
+        {%- for optgroup_or_option in item.choices -%}
+            {{ block("item_optgroup_or_option") }}
         {%- endfor -%}
     </select>
+{%- endblock -%}
+
+{%- block item_optgroup_or_option -%}
+    {% if optgroup_or_option.tagName == 'optgroup' %}
+        {% set optgroup = optgroup_or_option %}
+        {{ block('item_optgroup') }}
+    {% else %}
+        {% set option = optgroup_or_option %}
+        {{ block('item_option') }}
+    {% endif %}
+{%- endblock -%}
+
+{%- block item_optgroup -%}
+    <optgroup label="{{ optgroup|trans }}">
+        {% for option in optgroup %}
+            {{ block("item_option") }}
+        {% endfor %}
+    </optgroup>
+{%- endblock -%}
+
+{%- block item_option -%}
+    <option value="{{ option.key }}" {{ selected == option.key ? 'selected' }}>{{ option|trans }}
+    </option>
 {%- endblock -%}
 
 {%- block filters -%}

@@ -54,7 +54,7 @@ final readonly class PivotTableItem
     }
 
     /**
-     * @return null|list<PivotTableItemOptionGroup>
+     * @return null|list<PivotTableItemOptionGroup|PivotTableItemOption>
      */
     public function getChoices(): null|array
     {
@@ -62,19 +62,30 @@ final readonly class PivotTableItem
             return null;
         }
 
-        $optGroups = [];
+        $options = [];
 
         foreach ($this->property->getLeaves() as $leaf) {
             $option = new PivotTableItemOption($leaf);
-            $optGroupId = $option->getOptGroupId();
+            $optGroup = PivotTableItemOptionGroup::create($leaf);
 
-            if (!isset($optGroups[$optGroupId])) {
-                $optGroups[$optGroupId] = new PivotTableItemOptionGroup($leaf);
+            if ($optGroup === null) {
+                // If the option is not part of a group, we can return it directly
+                $options[] = $option;
+                continue;
             }
 
-            $optGroups[$optGroupId]->addOption($option);
+            $optGroupId = $option->getOptGroupId();
+
+            if (!isset($options[$optGroupId])) {
+                $options[$optGroupId] = $optGroup;
+            }
+
+            /** @var PivotTableItemOptionGroup */
+            $optGroup = $options[$optGroupId];
+
+            $optGroup->addOption($option);
         }
 
-        return array_values($optGroups);
+        return array_values($options);
     }
 }
