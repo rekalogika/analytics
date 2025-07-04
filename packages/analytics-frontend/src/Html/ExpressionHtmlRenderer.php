@@ -18,14 +18,12 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Html\Visitor\HtmlRendererExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ExpressionHtmlRenderer
 {
     public function __construct(
         private Htmlifier $htmlifier,
         private SummaryMetadataFactory $summaryMetadataFactory,
-        private TranslatorInterface $translator,
     ) {}
 
     /**
@@ -39,7 +37,6 @@ final readonly class ExpressionHtmlRenderer
         $visitor = new HtmlRendererExpressionVisitor(
             htmlifier: $this->htmlifier,
             summaryMetadata: $summaryMetadata,
-            translator: $this->translator,
         );
 
         $expressions = $query->getWhere();

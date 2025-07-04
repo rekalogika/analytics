@@ -122,7 +122,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$htmlifier' => service(Htmlifier::class),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-            '$translator' => service('translator'),
         ]);
 
     //
