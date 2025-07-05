@@ -400,6 +400,6 @@ final readonly class SummaryMetadata
 
     public function getGroupByExpression(): GroupBy
     {
-        return $this->groupByExpression;
+        return clone $this->groupByExpression;
     }
 }
