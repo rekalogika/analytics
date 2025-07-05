@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Core\Doctrine\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20250621 extends AbstractMigration
+final class Version20250705 extends AbstractMigration
 {
     #[\Override]
     public function getDescription(): string
@@ -27,23 +27,25 @@ final class Version20250621 extends AbstractMigration
     #[\Override]
     public function up(Schema $schema): void
     {
-        // superseded by Version20250705 migration
+        $this->addSql(<<<'SQL'
+            DROP FUNCTION IF EXISTS REKALOGIKA_BUST(anyelement, integer);
+        SQL);
 
-        // $this->addSql(<<<'SQL'
-        //     CREATE OR REPLACE FUNCTION REKALOGIKA_BUST(arg anyelement, dummy integer)
-        //     RETURNS anyelement
-        //     LANGUAGE sql
-        //     AS $$
-        //         SELECT arg;
-        //     $$;
-        // SQL);
+        $this->addSql(<<<'SQL'
+            CREATE OR REPLACE FUNCTION REKALOGIKA_BUST(arg anyelement, dummy anycompatible)
+            RETURNS anyelement
+            LANGUAGE sql
+            AS $$
+                SELECT arg;
+            $$;
+        SQL);
     }
 
     #[\Override]
     public function down(Schema $schema): void
     {
-        // $this->addSql(<<<'SQL'
-        //     DROP FUNCTION IF EXISTS REKALOGIKA_BUST(anyelement, integer);
-        // SQL);
+        $this->addSql(<<<'SQL'
+            DROP FUNCTION IF EXISTS REKALOGIKA_BUST(anyelement, anyelement);
+        SQL);
     }
 }
