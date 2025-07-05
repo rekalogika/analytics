@@ -94,10 +94,25 @@ final readonly class BaseEntity
      */
     private function processProperty(Path $path): string
     {
+        $path = (string) $path;
+
+        // special case: if the path is '__id', we return the identifier
+        // property
+
+        if ($path === '__id') {
+            $idProperty = $this->getIdOfClass();
+
+            return \sprintf(
+                '%s.%s',
+                $this->baseAlias,
+                $idProperty,
+            );
+        }
+
         return \sprintf(
             '%s.%s',
             $this->baseAlias,
-            (string) $path,
+            $path,
         );
     }
 
