@@ -12,7 +12,7 @@
                 data-label-empty="{{ t('(All)', domain = 'rekalogika_analytics')|trans }}"
                 data-label-selected="{{ t('Select items...', domain = 'rekalogika_analytics')|trans }}">
             {%- for choice in choices -%}
-                <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }} data-html="{{ choice.htmlLabel }}">{{ choice.label }}</option>
+                <option value="{{ choice.id }}" {{ choice.selected ? 'selected' }} data-html="{{ choice.label }}">{{ choice.label }}</option>
             {%- endfor -%}
         </select>
     {%- else -%}
