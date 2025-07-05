@@ -14,15 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\IsoWeek;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
+use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * ISO 8601 week (YYYYWW)
  */
-final class IsoWeekWeek implements MonotonicTimeBin
+final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
 {
     use TimeBinTrait;
     use RekalogikaTimeBinDQLExpressionTrait;
@@ -50,6 +53,26 @@ final class IsoWeekWeek implements MonotonicTimeBin
             ->setTime(0, 0, 0);
 
         $this->end = $this->start->modify('+1 week');
+    }
+
+    #[\Override]
+    public function getTitle(): TranslatableInterface
+    {
+        $dateFormatter = new \IntlDateFormatter(
+            locale: 'en',
+            dateType: \IntlDateFormatter::FULL,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
+            pattern: 'D MMMM YYYY',
+        );
+
+        return new TranslatableMessage(
+            'Week starting on {start}, ending on {end}',
+            [
+                '{start}' => $dateFormatter->format($this->start),
+                '{end}' => $dateFormatter->format($this->end),
+            ],
+        );
     }
 
     #[\Override]

@@ -337,5 +337,11 @@
         <target>Example: 2024011-2024034,2024052 (2024013 means January 2024, week 3)</target>
       </segment>
     </unit>
+    <unit id="xbTAoga" name="Week starting on {start}, ending on {end}">
+      <segment>
+        <source>Week starting on {start}, ending on {end}</source>
+        <target>Week starting on {start}, ending on {end}</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
