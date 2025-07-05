@@ -398,6 +398,7 @@ final class ArchitectureTest
 
                 // optional deps
                 Selectors::selectAnalyticsUXPanel(),
+                Selectors::selectAnalyticsFrontend(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
