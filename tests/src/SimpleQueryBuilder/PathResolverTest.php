@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
@@ -96,6 +97,19 @@ final class PathResolverTest extends KernelTestCase
         );
     }
 
+    public function testRootId(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            'root.id',
+            $pathResolver->resolve('__id'),
+        );
+    }
+
     //
     // embeddable
     //
@@ -136,6 +150,22 @@ final class PathResolverTest extends KernelTestCase
         );
     }
 
+    public function testEmbeddableId(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Entity::class,
+            alias: 'root',
+        );
+
+        // an embeddable does not have an identifier
+        $this->expectException(LogicException::class);
+
+        $this->assertEquals(
+            'root.embeddable1.name',
+            $pathResolver->resolve('embeddable1.__id'),
+        );
+    }
+
     //
     // MANY TO ONE
     //
@@ -154,6 +184,24 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testManyToOneEntityId(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0.id',
+            $pathResolver->resolve('country.__id'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.country _a0',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }
@@ -288,6 +336,24 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    public function testOneToManyEntityId(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0.id',
+            $pathResolver->resolve('orders.__id'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.orders _a0',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }
