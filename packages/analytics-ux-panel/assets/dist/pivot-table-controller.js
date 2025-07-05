@@ -110,9 +110,15 @@ var _default = /*#__PURE__*/function (_Controller) {
     var defaultActions = event.detail.render;
     event.detail.render = function (streamElement) {
       if (streamElement.getAttribute('target') === '__filters') {
+        var element = document.getElementById('__filters');
+        if (!element || element.innerHTML.trim() === '') {
+          console.log('No filters element found or it is empty, initializing filters');
+          defaultActions(streamElement);
+          return;
+        }
         if (_this3.changed === true) {
           _this3.changed = false;
-          defaultActions(streamElement);
+          element.innerHTML = streamElement.children[0].innerHTML;
         }
       } else {
         defaultActions(streamElement);
