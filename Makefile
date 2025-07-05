@@ -80,7 +80,7 @@ monorepo-release-%:
 
 .PHONY: clean
 clean:
-	rm -rf tests/var/cache/*
+	rm -rf tests/var/cache/* tests/var/log/*
 	$(PHP) vendor/bin/psalm --clear-cache
 
 .PHONY: dump
