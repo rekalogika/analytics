@@ -35,6 +35,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Property\PropertyStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
+use Rekalogika\Analytics\Frontend\Formatter\Twig\StringifierRuntime;
 use Rekalogika\Analytics\Frontend\Html\ExpressionHtmlRenderer;
 use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
@@ -58,6 +59,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->tag('twig.runtime')
         ->args([
             '$htmlifier' => service(Htmlifier::class),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.twig.runtime.stringifier')
+        ->class(StringifierRuntime::class)
+        ->tag('twig.runtime')
+        ->args([
+            '$stringifier' => service(Stringifier::class),
         ])
     ;
 

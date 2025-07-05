@@ -29,6 +29,11 @@ final class FormatterExtension extends AbstractExtension
                     'is_safe' => ['html'],
                 ],
             ),
+            new TwigFilter(
+                name: 'analytics_to_string',
+                callable: [StringifierRuntime::class, 'toString'],
+                options: [],
+            ),
         ];
     }
 }
