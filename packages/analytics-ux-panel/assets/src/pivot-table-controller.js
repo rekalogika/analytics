@@ -87,9 +87,17 @@ export default class extends Controller {
 
         event.detail.render = (streamElement) => {
             if (streamElement.getAttribute('target') === '__filters') {
+                let element = document.getElementById('__filters')
+
+                if (!element || element.innerHTML.trim() === '') {
+                    console.log('No filters element found or it is empty, initializing filters')
+                    defaultActions(streamElement)
+                    return
+                }
+
                 if (this.changed === true) {
                     this.changed = false
-                    defaultActions(streamElement)
+                    element.innerHTML = streamElement.children[0].innerHTML
                 }
             } else {
                 defaultActions(streamElement)
