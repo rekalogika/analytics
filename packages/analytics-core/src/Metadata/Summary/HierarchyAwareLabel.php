@@ -95,6 +95,13 @@ final class HierarchyAwareLabel implements TranslatableInterface
 
     public function getRootAndLeaf(): TranslatableInterface
     {
+        $root = $this->getRoot();
+        $leaf = $this->getLeaf();
+
+        if ($root === $leaf) {
+            return $root;
+        }
+
         return new HierarchicalTranslatableMessage([
             $this->getRoot(),
             $this->getLeaf(),
