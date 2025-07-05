@@ -29,7 +29,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunne
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Time\Filter\TimeBinFilterResolver;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -187,19 +186,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
-        ])
-    ;
-
-    //
-    // time
-    //
-
-
-    $services
-        ->set('rekalogika.analytics.ux_panel.filter_resolver.time_bin')
-        ->class(TimeBinFilterResolver::class)
-        ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
-            'priority' => -50,
         ])
     ;
 };

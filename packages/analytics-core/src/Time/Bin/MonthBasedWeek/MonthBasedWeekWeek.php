@@ -16,7 +16,9 @@ namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
+use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -25,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * month. The first week of the month can extend into the previous month, and
  * the last week of the month can extend into the next month.
  */
-final class MonthBasedWeekWeek implements MonotonicTimeBin
+final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
 {
     use TimeBinTrait;
 
@@ -65,6 +67,26 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin
 
         $this->start = $start;
         $this->end = $end;
+    }
+
+    #[\Override]
+    public function getTitle(): TranslatableInterface
+    {
+        $dateFormatter = new \IntlDateFormatter(
+            locale: 'en',
+            dateType: \IntlDateFormatter::FULL,
+            timeType: \IntlDateFormatter::NONE,
+            timezone: $this->start->getTimezone(),
+            pattern: 'D MMMM YYYY',
+        );
+
+        return new TranslatableMessage(
+            'Week starting on {start}, ending on {end}',
+            [
+                '{start}' => $dateFormatter->format($this->start),
+                '{end}' => $dateFormatter->format($this->end),
+            ],
+        );
     }
 
     #[\Override]

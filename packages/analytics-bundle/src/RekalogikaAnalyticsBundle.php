@@ -33,6 +33,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinMbwWeekFunction;
+use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -91,6 +92,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         if (class_exists(HtmlRenderer::class)) {
             $container->import('../config/frontend.php');
+        }
+
+        if (interface_exists(TimeBin::class)) {
+            $container->import('../config/time.php');
         }
 
         $container->parameters()
