@@ -76,7 +76,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->min(1)
             ->info('The maximum number of nodes created due to gaps between values. If the amount of created nodes exceeds this limit, OverflowException will be thrown.');
 
-        $root->children()->stringNode('table_theme')
+        $root->children()->scalarNode('table_theme')
             ->defaultValue('@RekalogikaAnalyticsFrontend/renderer.html.twig')
             ->info('The theme to be used for rendering pivot tables. This theme should be a Twig template that extends the `@RekalogikaAnalyticsFrontend/renderer.html.twig` template.');
     }
