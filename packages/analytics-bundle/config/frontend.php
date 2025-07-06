@@ -36,8 +36,8 @@ use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\StringifierRuntime;
-use Rekalogika\Analytics\Frontend\Html\ExpressionHtmlRenderer;
-use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
+use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
+use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -82,15 +82,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services->alias(
-        HtmlRenderer::class,
+        TableRenderer::class,
         'rekalogika.analytics.pivot_table_renderer',
     );
 
     $services
         ->set('rekalogika.analytics.pivot_table_renderer')
-        ->class(HtmlRenderer::class)
+        ->class(TableRenderer::class)
         ->args([
             '$twig' => service('twig'),
+            '$theme' => '%rekalogika.analytics.table_theme%',
         ])
     ;
 
@@ -108,7 +109,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(ExpressionHtmlRenderer::class)
+        ->set(ExpressionRenderer::class)
         ->args([
             '$htmlifier' => service(Htmlifier::class),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),

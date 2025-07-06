@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Frontend\Html\Internal;
+namespace Rekalogika\Analytics\Frontend\Html\Visitor;
 
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
@@ -29,9 +29,8 @@ use Twig\TemplateWrapper;
 
 /**
  * @implements TableVisitor<string>
- * @internal
  */
-final readonly class HtmlRendererVisitor implements TableVisitor
+final readonly class TableRendererVisitor implements TableVisitor
 {
     private TemplateWrapper $template;
 
@@ -42,7 +41,7 @@ final readonly class HtmlRendererVisitor implements TableVisitor
         $this->template = $twig->load($theme);
     }
 
-    protected function getTemplate(): TemplateWrapper
+    private function getTemplate(): TemplateWrapper
     {
         return $this->template;
     }
@@ -87,7 +86,7 @@ final readonly class HtmlRendererVisitor implements TableVisitor
      * @param \Traversable<Element> $node
      * @return \Traversable<string>
      */
-    protected function renderChildren(\Traversable $node): \Traversable
+    private function renderChildren(\Traversable $node): \Traversable
     {
         foreach ($node as $child) {
             yield $child->accept($this);

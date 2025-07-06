@@ -26,7 +26,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Html\HtmlRenderer;
+use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
@@ -75,6 +75,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->defaultValue(10000)
             ->min(1)
             ->info('The maximum number of nodes created due to gaps between values. If the amount of created nodes exceeds this limit, OverflowException will be thrown.');
+
+        $root->children()->scalarNode('table_theme')
+            ->defaultValue('@RekalogikaAnalyticsFrontend/renderer.html.twig')
+            ->info('The theme to be used for rendering pivot tables. This theme should be a Twig template that extends the `@RekalogikaAnalyticsFrontend/renderer.html.twig` template.');
     }
 
     /**
@@ -90,7 +94,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $container->import('../config/engine.php');
         $container->import('../config/bundle.php');
 
-        if (class_exists(HtmlRenderer::class)) {
+        if (class_exists(TableRenderer::class)) {
             $container->import('../config/frontend.php');
         }
 
@@ -106,7 +110,12 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             ->set(
                 'rekalogika.analytics.filling_nodes_limit',
                 $config['filling_nodes_limit'],
-            );
+            )
+            ->set(
+                'rekalogika.analytics.table_theme',
+                $config['table_theme'],
+            )
+        ;
 
         $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
             ->addTag('rekalogika.analytics.distinct_values_resolver');
@@ -254,11 +263,11 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         // frontend
         //
 
-        if (!class_exists(HtmlRenderer::class)) {
+        if (!class_exists(TableRenderer::class)) {
             return;
         }
 
-        $path = (new \ReflectionClass(HtmlRenderer::class))->getFileName();
+        $path = (new \ReflectionClass(TableRenderer::class))->getFileName();
 
         if ($path === false) {
             throw new InvalidArgumentException('Could not get file name for PivotTableRenderer');

@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
-use Rekalogika\Analytics\Frontend\Html\Visitor\HtmlRendererExpressionVisitor;
+use Rekalogika\Analytics\Frontend\Html\Visitor\ExpressionRendererVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
-final readonly class ExpressionHtmlRenderer
+final readonly class ExpressionRenderer
 {
     public function __construct(
         private Htmlifier $htmlifier,
@@ -34,7 +34,7 @@ final readonly class ExpressionHtmlRenderer
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($query->getFrom());
 
-        $visitor = new HtmlRendererExpressionVisitor(
+        $visitor = new ExpressionRendererVisitor(
             htmlifier: $this->htmlifier,
             summaryMetadata: $summaryMetadata,
         );

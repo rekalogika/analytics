@@ -22,14 +22,11 @@ use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
-/**
- * @api
- */
-class HtmlRendererExpressionVisitor extends ExpressionVisitor
+final class ExpressionRendererVisitor extends ExpressionVisitor
 {
-    final public function __construct(
-        private Htmlifier $htmlifier,
-        private SummaryMetadata $summaryMetadata,
+    public function __construct(
+        private readonly Htmlifier $htmlifier,
+        private readonly SummaryMetadata $summaryMetadata,
     ) {}
 
     #[\Override]
@@ -96,7 +93,7 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
         return '(' . implode(' ' . $type . ' ', $parts) . ')';
     }
 
-    protected function walkOperator(string $operator): string
+    private function walkOperator(string $operator): string
     {
         return match ($operator) {
             Comparison::EQ => '=',
@@ -111,7 +108,7 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
         };
     }
 
-    protected function walkCompositeExpressionType(string $type): string
+    private function walkCompositeExpressionType(string $type): string
     {
         $translatable = match ($type) {
             CompositeExpression::TYPE_AND => new TranslatableMessage('AND'),
@@ -123,7 +120,7 @@ class HtmlRendererExpressionVisitor extends ExpressionVisitor
         return $this->htmlifier->toHtml($translatable);
     }
 
-    protected function walkDimension(string $field): string
+    private function walkDimension(string $field): string
     {
         $dimension = $this->summaryMetadata->getDimension($field);
         $string = $this->htmlifier->toHtml($dimension->getLabel()->getRootAndLeaf());
