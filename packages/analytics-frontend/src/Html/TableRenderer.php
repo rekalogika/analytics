@@ -42,7 +42,7 @@ final readonly class TableRenderer
      */
     public function render(
         Result $result,
-        array $pivotedDimensions = [],
+        array $pivotedDimensions = ['@values'],
     ): string {
         try {
             return $this->renderPivotTable($result, $pivotedDimensions);
@@ -56,7 +56,7 @@ final readonly class TableRenderer
      */
     public function renderPivotTable(
         Result $result,
-        array $pivotedDimensions = [],
+        array $pivotedDimensions = ['@values'],
         ?string $theme = null,
     ): string {
         $treeResult = $result->getTree();
