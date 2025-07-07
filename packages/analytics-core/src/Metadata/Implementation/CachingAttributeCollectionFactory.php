@@ -32,7 +32,7 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
     public function getClassAttributes(
         string $class,
     ): AttributeCollection {
-        $cacheKey = 'attributes_class_' . $class;
+        $cacheKey = hash('xxh128', 'attributes_class_' . $class);
 
         return $this->cache->get(
             $cacheKey,
@@ -50,7 +50,7 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
         string $class,
         string $property,
     ): AttributeCollection {
-        $cacheKey = 'attributes_property_' . $class . '_' . $property;
+        $cacheKey = hash('xxh128', 'attributes_property_' . $class . '_' . $property);
 
         return $this->cache->get(
             $cacheKey,
