@@ -273,6 +273,9 @@ final class ArchitectureTest
                 // php array
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\Traversable::class),
+
+                // exception
+                Selector::classname(\Throwable::class),
             );
     }
 

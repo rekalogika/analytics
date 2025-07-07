@@ -343,5 +343,17 @@
         <target>Minggu yang dimulai pada {start}, berakhir pada {end}</target>
       </segment>
     </unit>
+    <unit id="erU4V32">
+      <segment>
+        <source>The query returns more than the safeguard limit of {limit} records. Modify your query to return less records.</source>
+        <target>Query memberi hasil yang jumlahnya di atas batas {limit}. Ubahlah query agar memberi hasil dengan jumlah lebih sedikit.</target>
+      </segment>
+    </unit>
+    <unit id="68wN5c6">
+      <segment>
+        <source>The limit of {limit} nodes has been reached when trying to fill gaps in the result. Please modify your query to return less records or use a narrower range.</source>
+        <target>Batasan {limit} jumlah simpul telah tercapai saat sedang melakukan interpolasi celah pada hasil query. Ubahlah query agar memberi hasil lebih sedikit atau gunakan bentangan yang lebih kecil.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
