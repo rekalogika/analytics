@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Common\Exception\OverflowException;
+use Rekalogika\Analytics\Common\Exception\QueryResultOverflowException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
@@ -156,10 +156,7 @@ final class SummarizerQuery extends AbstractQuery
         // check safeguard
 
         if (\count($result) > $this->queryResultLimit) {
-            throw new OverflowException(\sprintf(
-                'The query result exceeds the safeguard limit of %d. Modify your query to return less records.',
-                $this->queryResultLimit,
-            ));
+            throw new QueryResultOverflowException($this->queryResultLimit);
         }
 
         // change alias to dimension name

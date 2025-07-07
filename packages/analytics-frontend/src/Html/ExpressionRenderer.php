@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Frontend\Html;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
+use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Html\Visitor\ExpressionRendererVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -31,28 +32,32 @@ final readonly class ExpressionRenderer
      */
     public function renderExpression(Query $query): array
     {
-        $summaryMetadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($query->getFrom());
+        try {
+            $summaryMetadata = $this->summaryMetadataFactory
+                ->getSummaryMetadata($query->getFrom());
 
-        $visitor = new ExpressionRendererVisitor(
-            htmlifier: $this->htmlifier,
-            summaryMetadata: $summaryMetadata,
-        );
+            $visitor = new ExpressionRendererVisitor(
+                htmlifier: $this->htmlifier,
+                summaryMetadata: $summaryMetadata,
+            );
 
-        $expressions = $query->getWhere();
+            $expressions = $query->getWhere();
 
-        $results = [];
+            $results = [];
 
-        foreach ($expressions as $expression) {
-            $result = $visitor->dispatch($expression);
+            foreach ($expressions as $expression) {
+                $result = $visitor->dispatch($expression);
 
-            if (!\is_string($result)) {
-                throw new LogicException('Expected string result from expression rendering, got: ' . get_debug_type($result));
+                if (!\is_string($result)) {
+                    throw new LogicException('Expected string result from expression rendering, got: ' . get_debug_type($result));
+                }
+
+                $results[] = $result;
             }
 
-            $results[] = $result;
+            return $results;
+        } catch (\Throwable $e) {
+            throw FrontendWrapperException::selectiveWrap($e);
         }
-
-        return $results;
     }
 }

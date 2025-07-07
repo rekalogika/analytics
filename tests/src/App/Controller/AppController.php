@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Rekalogika\Analytics\Common\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
+use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
 use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
@@ -29,12 +29,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AppController extends AbstractController
 {
     public function __construct(
         private readonly SummaryManager $summaryManager,
         private readonly SummaryClassRegistry $summaryClassRegistry,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/', name: 'index')]
@@ -71,7 +73,6 @@ final class AppController extends AbstractController
 
         /** @var array<string,mixed> $parameters */
 
-
         // populate query from url parameter
         $origQuery = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($origQuery, $parameters);
@@ -86,9 +87,9 @@ final class AppController extends AbstractController
             );
 
             $pivotTableError = null;
-        } catch (OverflowException $e) {
+        } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
-            $pivotTableError = 'The pivot table is too large to be displayed. Please refine your query parameters.';
+            $pivotTableError = $e->trans($this->translator);
         }
 
         // expression rendering

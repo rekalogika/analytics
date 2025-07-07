@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Frontend\Html;
 
 use Rekalogika\Analytics\Common\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableAdapter;
@@ -45,9 +46,13 @@ final readonly class TableRenderer
         array $pivotedDimensions = ['@values'],
     ): string {
         try {
-            return $this->renderPivotTable($result, $pivotedDimensions);
-        } catch (HierarchicalOrderingRequired) {
-            return $this->renderTable($result);
+            try {
+                return $this->doRenderPivotTable($result, $pivotedDimensions);
+            } catch (HierarchicalOrderingRequired) {
+                return $this->doRenderTable($result);
+            }
+        } catch (\Throwable $e) {
+            throw FrontendWrapperException::selectiveWrap($e);
         }
     }
 
@@ -55,6 +60,39 @@ final readonly class TableRenderer
      * @param list<string> $pivotedDimensions
      */
     public function renderPivotTable(
+        Result $result,
+        array $pivotedDimensions = ['@values'],
+        ?string $theme = null,
+    ): string {
+        try {
+            return $this->doRenderPivotTable(
+                result: $result,
+                pivotedDimensions: $pivotedDimensions,
+                theme: $theme,
+            );
+        } catch (\Throwable $e) {
+            throw FrontendWrapperException::selectiveWrap($e);
+        }
+    }
+
+    public function renderTable(
+        Result $result,
+        ?string $theme = null,
+    ): string {
+        try {
+            return $this->doRenderTable(
+                result: $result,
+                theme: $theme,
+            );
+        } catch (\Throwable $e) {
+            throw FrontendWrapperException::selectiveWrap($e);
+        }
+    }
+
+    /**
+     * @param list<string> $pivotedDimensions
+     */
+    private function doRenderPivotTable(
         Result $result,
         array $pivotedDimensions = ['@values'],
         ?string $theme = null,
@@ -71,7 +109,7 @@ final readonly class TableRenderer
         return $this->getVisitor($theme)->visitTable($table);
     }
 
-    public function renderTable(
+    private function doRenderTable(
         Result $result,
         ?string $theme = null,
     ): string {
