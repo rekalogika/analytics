@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter\Chain;
 
+use Rekalogika\Analytics\Frontend\Formatter\Exception\StringifierFailureException;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\StringifierAware;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class ChainStringifier implements Stringifier
 {
@@ -49,10 +50,10 @@ final readonly class ChainStringifier implements Stringifier
         foreach ($this->stringifiers as $stringifier) {
             try {
                 return $stringifier->toString($input);
-            } catch (Unsupported) {
+            } catch (ValueNotSupportedException) {
             }
         }
 
-        return get_debug_type($input);
+        throw new StringifierFailureException($input);
     }
 }

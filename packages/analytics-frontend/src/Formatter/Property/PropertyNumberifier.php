@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Formatter\Property;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\NumberifierAware;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class PropertyNumberifier implements Numberifier, NumberifierAware
@@ -44,7 +44,7 @@ final readonly class PropertyNumberifier implements Numberifier, NumberifierAwar
     public function toNumber(mixed $input): float
     {
         if (!$input instanceof Property) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         /** @psalm-suppress MixedAssignment */

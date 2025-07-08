@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Formatter\Property;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\StringifierAware;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class PropertyStringifier implements Stringifier, StringifierAware
@@ -44,7 +44,7 @@ final readonly class PropertyStringifier implements Stringifier, StringifierAwar
     public function toString(mixed $input): string
     {
         if (!$input instanceof Property) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         /** @psalm-suppress MixedAssignment */

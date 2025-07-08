@@ -11,8 +11,8 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Frontend\Formatter;
+namespace Rekalogika\Analytics\Frontend\Formatter\Exception;
 
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 
-final class Unsupported extends InvalidArgumentException {}
+abstract class FormatterFailureException extends InvalidArgumentException {}

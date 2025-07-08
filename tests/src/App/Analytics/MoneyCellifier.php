@@ -17,7 +17,7 @@ use Brick\Money\Money;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\CellProperties;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final class MoneyCellifier implements Cellifier
 {
@@ -25,7 +25,7 @@ final class MoneyCellifier implements Cellifier
     public function toCell(mixed $input): CellProperties
     {
         if (!$input instanceof Money) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         return  new CellProperties(

@@ -13,10 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter;
 
-interface Stringifier
-{
-    /**
-     * @throws ValueNotSupportedException If this stringifier cannot handle the input type.
-     */
-    public function toString(mixed $input): string;
-}
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+
+final class ValueNotSupportedException extends InvalidArgumentException {}

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\Formatter;
 
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\TimeBin;
 
@@ -29,7 +29,7 @@ final readonly class TimeBinHtmlifier implements Htmlifier
     public function toHtml(mixed $input): string
     {
         if (!$input instanceof HasTitle || !$input instanceof TimeBin) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         return \sprintf(

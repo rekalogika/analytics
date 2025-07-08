@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
 
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -42,6 +42,6 @@ final readonly class TranslatableStringifier implements Stringifier
                 : (new TranslatableMessage('False'))->trans($this->translator);
         }
 
-        throw new Unsupported();
+        throw new ValueNotSupportedException();
     }
 }

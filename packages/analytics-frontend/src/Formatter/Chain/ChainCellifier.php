@@ -17,8 +17,10 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\CellifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\CellProperties;
+use Rekalogika\Analytics\Frontend\Formatter\Exception\CellifierFailureException;
+use Rekalogika\Analytics\Frontend\Formatter\Exception\StringifierFailureException;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class ChainCellifier implements Cellifier
 {
@@ -53,16 +55,20 @@ final readonly class ChainCellifier implements Cellifier
         foreach ($this->cellifier as $cellifier) {
             try {
                 return $cellifier->toCell($input);
-            } catch (Unsupported) {
+            } catch (ValueNotSupportedException) {
             }
         }
 
-        $result = $this->stringifier->toString($input);
+        try {
+            $result = $this->stringifier->toString($input);
 
-        return new CellProperties(
-            content: $result,
-            type: DataType::TYPE_STRING,
-            formatCode: null,
-        );
+            return new CellProperties(
+                content: $result,
+                type: DataType::TYPE_STRING,
+                formatCode: null,
+            );
+        } catch (StringifierFailureException) {
+            throw new CellifierFailureException($input);
+        }
     }
 }

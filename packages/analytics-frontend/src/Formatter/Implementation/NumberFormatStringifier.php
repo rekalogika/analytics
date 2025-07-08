@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
 
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class NumberFormatStringifier implements Stringifier
@@ -27,7 +27,7 @@ final readonly class NumberFormatStringifier implements Stringifier
     public function toString(mixed $input): string
     {
         if (!\is_int($input) && !\is_float($input)) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         $locale = $this->translator->getLocale();
@@ -37,7 +37,7 @@ final readonly class NumberFormatStringifier implements Stringifier
         $result = $formatter->format($input);
 
         if (!\is_string($result)) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         return $result;
