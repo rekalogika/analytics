@@ -355,5 +355,11 @@
         <target>The limit of {limit} nodes has been reached when trying to fill gaps in the result. Please modify your query to return less records or use a narrower range.</target>
       </segment>
     </unit>
+    <unit id="EbqsjUi" name="An error occurred">
+      <segment>
+        <source>An error occurred</source>
+        <target>An error occurred</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

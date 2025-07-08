@@ -355,5 +355,11 @@
         <target>Batasan {limit} jumlah simpul telah tercapai saat sedang melakukan interpolasi celah pada hasil query. Ubahlah query agar memberi hasil lebih sedikit atau gunakan bentangan yang lebih kecil.</target>
       </segment>
     </unit>
+    <unit id="EbqsjUi" name="An error occurred">
+      <segment>
+        <source>An error occurred</source>
+        <target>Telah terjadi kesalahan</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
