@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Brick\Money\Money;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final class MoneyNumberifier implements Numberifier
 {
@@ -23,7 +23,7 @@ final class MoneyNumberifier implements Numberifier
     public function toNumber(mixed $input): float
     {
         if (!$input instanceof Money) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         return $input->getAmount()->toFloat();

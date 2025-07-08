@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter\Chain;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Frontend\Formatter\Exception\NumberifierFailureException;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\NumberifierAware;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class ChainNumberifier implements Numberifier
 {
@@ -50,14 +50,10 @@ final readonly class ChainNumberifier implements Numberifier
         foreach ($this->numberifiers as $numberifier) {
             try {
                 return $numberifier->toNumber($input);
-            } catch (Unsupported) {
+            } catch (ValueNotSupportedException) {
             }
         }
 
-        throw new InvalidArgumentException(\sprintf(
-            'Cannot convert "%s" to a number. To fix this problem, you need to create a custom implementation of "Numberifier" for "%s".',
-            get_debug_type($input),
-            get_debug_type($input),
-        ));
+        throw new NumberifierFailureException($input);
     }
 }

@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\CellifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\CellProperties;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class PropertyCellifier implements Cellifier, CellifierAware
@@ -45,7 +45,7 @@ final readonly class PropertyCellifier implements Cellifier, CellifierAware
     public function toCell(mixed $input): CellProperties
     {
         if (!$input instanceof Property) {
-            throw new Unsupported();
+            throw new ValueNotSupportedException();
         }
 
         /** @psalm-suppress MixedAssignment */

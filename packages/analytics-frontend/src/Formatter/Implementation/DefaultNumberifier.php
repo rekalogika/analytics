@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
 
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class DefaultNumberifier implements Numberifier
 {
@@ -41,6 +41,6 @@ final readonly class DefaultNumberifier implements Numberifier
             return (float) $input;
         }
 
-        throw new Unsupported();
+        throw new ValueNotSupportedException();
     }
 }

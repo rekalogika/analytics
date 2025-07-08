@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter\Chain;
 
+use Rekalogika\Analytics\Frontend\Formatter\Exception\HtmlifierFailureException;
+use Rekalogika\Analytics\Frontend\Formatter\Exception\StringifierFailureException;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class ChainHtmlifier implements Htmlifier
 {
@@ -51,12 +53,16 @@ final readonly class ChainHtmlifier implements Htmlifier
         foreach ($this->htmlifiers as $htmlifier) {
             try {
                 return $htmlifier->toHtml($input);
-            } catch (Unsupported) {
+            } catch (ValueNotSupportedException) {
             }
         }
 
-        $result = $this->stringifier->toString($input);
+        try {
+            $result = $this->stringifier->toString($input);
 
-        return htmlspecialchars($result, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
+            return htmlspecialchars($result, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
+        } catch (StringifierFailureException) {
+            throw new HtmlifierFailureException($input);
+        }
     }
 }

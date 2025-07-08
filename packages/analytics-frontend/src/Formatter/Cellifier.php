@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Formatter;
 interface Cellifier
 {
     /**
-     * @throws Unsupported If this cellifier cannot handle the input type.
+     * @throws ValueNotSupportedException If this cellifier cannot handle the input type.
      */
     public function toCell(mixed $input): CellProperties;
 }

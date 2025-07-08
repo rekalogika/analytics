@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\CellProperties;
-use Rekalogika\Analytics\Frontend\Formatter\Unsupported;
+use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
 final readonly class DefaultCellifier implements Cellifier
 {
@@ -43,6 +43,6 @@ final readonly class DefaultCellifier implements Cellifier
             );
         }
 
-        throw new Unsupported();
+        throw new ValueNotSupportedException();
     }
 }
