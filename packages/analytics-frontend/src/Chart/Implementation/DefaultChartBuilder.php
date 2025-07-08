@@ -18,8 +18,9 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\ChartBuilder;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
+use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
@@ -27,13 +28,13 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuilder
+final readonly class DefaultChartBuilder implements ChartBuilder
 {
     public function __construct(
         private LocaleSwitcher $localeSwitcher,
         private ChartBuilderInterface $chartBuilder,
         private Stringifier $stringifier,
-        private ChartConfiguration $configuration,
+        private ChartConfigurationFactory $configurationFactory,
         private Numberifier $numberifier,
     ) {}
 
@@ -149,7 +150,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
      */
     private function createBarOrLineChart(Result $result, string $type): Chart
     {
-        $colorDispenser = $this->createColorDispenser();
+        $configuration = $this->configurationFactory->createChartConfiguration();
         $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
@@ -169,13 +170,9 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                     $name,
                 ));
 
+            $dataSets[$name] = $configuration->createChartElementConfiguration()->toArray();
             $dataSets[$name]['label'] = $this->stringifier->toString($measure->getLabel());
             $dataSets[$name]['data'] = [];
-
-            $color = $colorDispenser->dispenseColor();
-            $dataSets[$name]['backgroundColor'] = $color . $this->configuration->areaTransparency;
-            $dataSets[$name]['borderColor'] = $color;
-            $dataSets[$name]['borderWidth'] = $this->configuration->areaBorderWidth;
 
             if ($yTitle === null) {
                 $unit = $measure->getUnit();
@@ -224,8 +221,6 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             foreach ($selectedMeasures as $name) {
                 $measure = $measures->getByName($name);
 
-                /** @todo implement proper gap filling */
-
                 /** @psalm-suppress MixedAssignment */
                 $value = $measure?->getValue() ?? 0;
 
@@ -256,7 +251,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $xTitle = [
                 'display' => true,
                 'text' => $xTitle,
-                'font' => $this->configuration->labelFont,
+                'font' => $configuration->getChartLabelFont()->toArray(),
             ];
         }
 
@@ -270,7 +265,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $yTitle = [
                 'display' => true,
                 'text' => $yTitle,
-                'font' => $this->configuration->labelFont,
+                'font' => $configuration->getChartLabelFont()->toArray(),
             ];
         }
 
@@ -315,7 +310,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
      */
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
-        $colorDispenser = $this->createColorDispenser();
+        $configuration = $this->configurationFactory->createChartConfiguration();
         $measure = $result->getTable()->getRowPrototype()->getMeasures()->getByIndex(0);
 
         if ($measure === null) {
@@ -347,7 +342,6 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
 
         // populate data
-
         foreach ($result->getTree() as $node) {
             $labels[] = $this->stringifier->toString($node->getDisplayMember());
 
@@ -361,11 +355,9 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
                 $signature = $this->getSignature($dimension2);
 
-                if (!isset($dataSets[$signature]['backgroundColor'])) {
-                    $color = $colorDispenser->dispenseColor();
-                    $dataSets[$signature]['backgroundColor'] = $color . $this->configuration->areaTransparency;
-                    $dataSets[$signature]['borderColor'] = $color;
-                    $dataSets[$signature]['borderWidth'] = $this->configuration->areaBorderWidth;
+                if (!isset($dataSets[$signature])) {
+                    $dataSets[$signature] = $configuration->createChartElementConfiguration()->toArray();
+                    $dataSets[$signature]['data'] = [];
                 }
 
                 if ($node2 === null) {
@@ -429,7 +421,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $xTitle = [
                 'display' => true,
                 'text' => $xTitle,
-                'font' => $this->configuration->labelFont,
+                'font' => $configuration->getChartLabelFont()->toArray(),
             ];
         }
 
@@ -443,7 +435,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $yTitle = [
                 'display' => true,
                 'text' => $yTitle,
-                'font' => $this->configuration->labelFont,
+                'font' => $configuration->getChartLabelFont()->toArray(),
             ];
         }
 
@@ -457,7 +449,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
             $legendTitle = [
                 'display' => true,
                 'text' => $legendTitle,
-                'font' => $this->configuration->labelFont,
+                'font' => $configuration->getChartLabelFont()->toArray(),
             ];
         }
 
@@ -485,6 +477,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         $chart->setOptions([
             'responsive' => true,
             'locale' => $this->localeSwitcher->getLocale(),
+            'scales' => $scales,
             'plugins' => [
                 'legend' => [
                     'title' => $legendTitle,
@@ -493,7 +486,6 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
                 'title' => [
                     'display' => false,
                 ],
-                'scales' => $scales,
             ],
 
         ]);
@@ -503,7 +495,7 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
     private function createPieChart(Result $result): Chart
     {
-        $colorDispenser = $this->createColorDispenser();
+        $configuration = $this->configurationFactory->createChartConfiguration();
         $measures = $result->getTable()->getRowPrototype()->getMeasures();
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
@@ -557,8 +549,8 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
 
             // color
 
-            $color = $colorDispenser->dispenseColor();
-            $dataSet['backgroundColor'][] = $color . $this->configuration->areaTransparency;
+            $color = $configuration->createChartElementConfiguration()->getAreaColor();
+            $dataSet['backgroundColor'][] = $color;
         }
 
         $chart = $this->chartBuilder->createChart(Chart::TYPE_PIE);
@@ -613,10 +605,5 @@ final readonly class DefaultAnalyticsChartBuilder implements AnalyticsChartBuild
         }
 
         return hash('xxh128', serialize($variable));
-    }
-
-    private function createColorDispenser(): ColorDispenser
-    {
-        return new ColorDispenser();
     }
 }
