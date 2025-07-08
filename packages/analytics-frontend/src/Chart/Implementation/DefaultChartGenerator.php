@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Frontend\Chart\ChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
 use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
@@ -28,7 +28,7 @@ use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-final readonly class DefaultChartBuilder implements ChartBuilder
+final readonly class DefaultChartGenerator implements ChartGenerator
 {
     public function __construct(
         private LocaleSwitcher $localeSwitcher,

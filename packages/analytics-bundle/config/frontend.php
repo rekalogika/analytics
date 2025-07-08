@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Frontend\Chart\ChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
-use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultChartGenerator;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainCellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainHtmlifier;
@@ -120,13 +120,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services->alias(
-        ChartBuilder::class,
-        'rekalogika.analytics.chart_builder',
+        ChartGenerator::class,
+        'rekalogika.analytics.chart_generator',
     );
 
     $services
-        ->set('rekalogika.analytics.chart_builder')
-        ->class(DefaultChartBuilder::class)
+        ->set('rekalogika.analytics.chart_generator')
+        ->class(DefaultChartGenerator::class)
         ->args([
             '$localeSwitcher' => service('translation.locale_switcher'),
             '$chartBuilder' => service(ChartBuilderInterface::class),
