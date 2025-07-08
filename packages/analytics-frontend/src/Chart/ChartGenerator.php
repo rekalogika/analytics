@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Chart;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Symfony\UX\Chartjs\Model\Chart;
 
-interface ChartBuilder
+interface ChartGenerator
 {
     /**
      * @throws UnsupportedData

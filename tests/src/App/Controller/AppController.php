@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Frontend\Chart\ChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
 use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
@@ -53,7 +53,7 @@ final class AppController extends AbstractController
         #[MapQueryParameter()]
         ?string $parameters,
         PivotAwareQueryFactory $pivotAwareQueryFactory,
-        ChartBuilder $chartBuilder,
+        ChartGenerator $chartGenerator,
         TableRenderer $htmlRenderer,
         ExpressionRenderer $expressionHtmlRenderer,
         string $hash,
@@ -98,7 +98,7 @@ final class AppController extends AbstractController
 
         // create chart
         try {
-            $chart = $chartBuilder->createChart($result);
+            $chart = $chartGenerator->createChart($result);
             $chartError = null;
         } catch (UnsupportedData) {
             $chart = null;
