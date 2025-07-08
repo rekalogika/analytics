@@ -34,6 +34,10 @@ final class FrontendWrapperException extends RuntimeException implements Analyti
      */
     public static function selectiveWrap(\Throwable $previous): \Throwable
     {
+        if ($previous instanceof self) {
+            return $previous;
+        }
+
         if ($previous instanceof TranslatableInterface) {
             return new self($previous);
         }
@@ -43,6 +47,10 @@ final class FrontendWrapperException extends RuntimeException implements Analyti
 
     public static function wrap(\Throwable $previous): self
     {
+        if ($previous instanceof self) {
+            return $previous;
+        }
+
         return new self($previous);
     }
 
