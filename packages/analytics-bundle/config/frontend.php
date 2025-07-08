@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Frontend\Chart\AnalyticsChartBuilder;
-use Rekalogika\Analytics\Frontend\Chart\Implementation\ChartConfiguration;
-use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultAnalyticsChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\ChartBuilder;
+use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
+use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultChartBuilder;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainCellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainHtmlifier;
@@ -120,24 +120,24 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services->alias(
-        AnalyticsChartBuilder::class,
+        ChartBuilder::class,
         'rekalogika.analytics.chart_builder',
     );
 
     $services
         ->set('rekalogika.analytics.chart_builder')
-        ->class(DefaultAnalyticsChartBuilder::class)
+        ->class(DefaultChartBuilder::class)
         ->args([
             '$localeSwitcher' => service('translation.locale_switcher'),
             '$chartBuilder' => service(ChartBuilderInterface::class),
             '$stringifier' => service(Stringifier::class),
-            '$configuration' => service(ChartConfiguration::class),
+            '$configurationFactory' => service(ChartConfigurationFactory::class),
             '$numberifier' => service(Numberifier::class),
         ])
     ;
 
     $services
-        ->set(ChartConfiguration::class);
+        ->set(ChartConfigurationFactory::class);
 
     //
     // stringifier

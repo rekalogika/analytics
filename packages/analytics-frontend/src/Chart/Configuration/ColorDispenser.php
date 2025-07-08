@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Frontend\Chart\Implementation;
+namespace Rekalogika\Analytics\Frontend\Chart\Configuration;
 
 use OzdemirBurak\Iris\Color\Hsl;
 
@@ -24,6 +24,9 @@ final readonly class ColorDispenser
         $this->hsl = new Hsl('hsl(240,40%,50%)');
     }
 
+    /**
+     * @see https://softwareengineering.stackexchange.com/a/303974
+     */
     public function dispenseColor(): string
     {
         $this->hsl->spin(137.5);
