@@ -39,30 +39,69 @@ final readonly class TableRenderer
     }
 
     /**
-     * @param list<string> $pivotedDimensions
+     * Render a pivot table or a regular table based on the result.
+     *
+     * @param list<string> $pivotedDimensions The dimensions that will be
+     * pivoted in the table. Specify the special value '@values' to pivot the
+     * measure dimension.
+     * @param string|null $theme The theme to use for rendering. If null, the
+     * default theme will be used.
+     * @param bool $throwException If true, the method will throw an exception
+     * if an error occurs during rendering. If false, it will return an HTML
+     * string with the error message.
      */
     public function render(
         Result $result,
         array $pivotedDimensions = ['@values'],
+        ?string $theme = null,
+        bool $throwException = false,
     ): string {
         try {
             try {
-                return $this->doRenderPivotTable($result, $pivotedDimensions);
+                return $this->doRenderPivotTable(
+                    result: $result,
+                    pivotedDimensions: $pivotedDimensions,
+                    theme: $theme,
+                );
             } catch (HierarchicalOrderingRequired) {
-                return $this->doRenderTable($result);
+                return $this->doRenderTable(
+                    result: $result,
+                    theme: $theme,
+                );
             }
         } catch (\Throwable $e) {
-            throw FrontendWrapperException::selectiveWrap($e);
+            $e = FrontendWrapperException::selectiveWrap($e);
+
+            if ($throwException) {
+                throw $e;
+            }
+
+            return $this->doRenderException(
+                exception: $e,
+                theme: $theme,
+            );
         }
     }
 
     /**
+     * Render a pivot table with the specified dimensions.
+     *
      * @param list<string> $pivotedDimensions
+     * @param string|null $theme The theme to use for rendering. If null, the
+     * default theme will be used.
+     * @param bool $throwException If true, the method will throw an exception
+     * if an error occurs during rendering. If false, it will return an HTML
+     * string with the error message.
+     *
+     * @throws HierarchicalOrderingRequired Thrown if the result does not have a
+     * hierarchical ordering because a pivot table requires hierarchical
+     * ordering.
      */
     public function renderPivotTable(
         Result $result,
         array $pivotedDimensions = ['@values'],
         ?string $theme = null,
+        bool $throwException = false,
     ): string {
         try {
             return $this->doRenderPivotTable(
@@ -70,14 +109,35 @@ final readonly class TableRenderer
                 pivotedDimensions: $pivotedDimensions,
                 theme: $theme,
             );
+        } catch (HierarchicalOrderingRequired $e) {
+            throw $e;
         } catch (\Throwable $e) {
-            throw FrontendWrapperException::selectiveWrap($e);
+            $e = FrontendWrapperException::selectiveWrap($e);
+
+            if ($throwException) {
+                throw $e;
+            }
+
+            return $this->doRenderException(
+                exception: $e,
+                theme: $theme,
+            );
         }
     }
 
+    /**
+     * Render a regular table from the result.
+     *
+     * @param string|null $theme The theme to use for rendering. If null, the
+     * default theme will be used.
+     * @param bool $throwException If true, the method will throw an exception
+     * if an error occurs during rendering. If false, it will return an HTML
+     * string with the error message.
+     */
     public function renderTable(
         Result $result,
         ?string $theme = null,
+        bool $throwException = false,
     ): string {
         try {
             return $this->doRenderTable(
@@ -85,7 +145,16 @@ final readonly class TableRenderer
                 theme: $theme,
             );
         } catch (\Throwable $e) {
-            throw FrontendWrapperException::selectiveWrap($e);
+            $e = FrontendWrapperException::selectiveWrap($e);
+
+            if ($throwException) {
+                throw $e;
+            }
+
+            return $this->doRenderException(
+                exception: $e,
+                theme: $theme,
+            );
         }
     }
 
@@ -117,5 +186,18 @@ final readonly class TableRenderer
         $table = ResultSetToTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);
+    }
+
+    private function doRenderException(
+        \Throwable $exception,
+        ?string $theme = null,
+    ): string {
+        $exception = FrontendWrapperException::wrap($exception);
+
+        return $this->twig
+            ->load($theme ?? $this->theme)
+            ->renderBlock('exception', [
+                'exception' => $exception,
+            ]);
     }
 }

@@ -84,6 +84,7 @@ final class AppController extends AbstractController
             $pivotTable = $htmlRenderer->render(
                 result: $result,
                 pivotedDimensions: $query->getPivotedDimensions(),
+                throwException: true,
             );
 
             $pivotTableError = null;

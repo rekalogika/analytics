@@ -1,3 +1,11 @@
+{%- block no_data -%}
+    <p>No Data</p>
+{%- endblock no_data -%}
+
+{%- block exception -%}
+    <p>{{ exception|analytics_to_html }}</p>
+{%- endblock exception -%}
+
 {%- block table -%}
     {%- if element.rows|length == 0 -%}
         {{ block("no_data") }}
@@ -49,10 +57,6 @@
         {{ content|analytics_to_html }}
     </th>
 {%- endblock th -%}
-
-{%- block no_data -%}
-    <p>No Data</p>
-{%- endblock no_data -%}
 
 {# tag attrs #}
 
