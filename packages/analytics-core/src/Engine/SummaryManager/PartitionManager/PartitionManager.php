@@ -21,6 +21,9 @@ use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Manages the partitions of a specific summary class.
+ */
 final readonly class PartitionManager
 {
     private PartitionMetadata $partitionMetadata;
@@ -32,7 +35,7 @@ final readonly class PartitionManager
         $this->partitionMetadata = $metadata->getPartition();
     }
 
-    public function getLowestPartitionFromEntity(object $entity): Partition
+    private function getSourceProperty(): string
     {
         $source = $this->partitionMetadata->getSource();
 
@@ -42,7 +45,16 @@ final readonly class PartitionManager
                 get_debug_type($source),
             ));
 
-        $sourceValue = $this->propertyAccessor->getValue($entity, $sourceProperty);
+        return $sourceProperty;
+    }
+
+    /**
+     * Gets the partitioning key from the entity, takes its value, then
+     * determines the lowest partition from the value.
+     */
+    public function getLowestPartitionFromEntity(object $entity): Partition
+    {
+        $sourceValue = $this->propertyAccessor->getValue($entity, $this->getSourceProperty());
 
         if ($sourceValue instanceof \Stringable) {
             $sourceValue = $sourceValue->__toString();
@@ -58,6 +70,10 @@ final readonly class PartitionManager
         return $this->createLowestPartitionFromSourceValue($sourceValue);
     }
 
+    /**
+     * Takes a value of the partitioning key from the source, then creates the
+     * partition object from the value and the specified level.
+     */
     public function createPartitionFromSourceValue(
         mixed $sourceValue,
         int $level,
@@ -69,6 +85,10 @@ final readonly class PartitionManager
         return $partitionClass::createFromSourceValue($inputValue, $level);
     }
 
+    /**
+     * Creates the lowest partition level from the source partitioning key
+     * value.
+     */
     public function createLowestPartitionFromSourceValue(
         mixed $sourceValue,
     ): Partition {
@@ -78,6 +98,10 @@ final readonly class PartitionManager
         return $this->createPartitionFromSourceValue($sourceValue, $lowestLevel);
     }
 
+    /**
+     * Creates the highest partition level from the source partitioning key
+     * value.
+     */
     public function createHighestPartitionFromSourceValue(
         mixed $sourceValue,
     ): Partition {
@@ -87,19 +111,19 @@ final readonly class PartitionManager
         return $this->createPartitionFromSourceValue($sourceValue, $highestLevel);
     }
 
-    /**
-     * @param 'lower'|'upper' $type
-     */
-    public function calculateSourceBoundValueFromPartition(
+    public function getUpperBoundSourceValueFromPartition(
         Partition $partition,
-        string $type,
     ): mixed {
-        if ($type === 'upper') {
-            $inputBound = $partition->getUpperBound();
-        } else {
-            $inputBound = $partition->getLowerBound();
-        }
+        $inputBound = $partition->getUpperBound();
+        $valueResolver = $this->partitionMetadata->getSource();
 
+        return $valueResolver->transformSummaryValueToSourceValue($inputBound);
+    }
+
+    public function getLowerBoundSourceValueFromPartition(
+        Partition $partition,
+    ): mixed {
+        $inputBound = $partition->getLowerBound();
         $valueResolver = $this->partitionMetadata->getSource();
 
         return $valueResolver->transformSummaryValueToSourceValue($inputBound);
