@@ -20,9 +20,6 @@ use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-/**
- * Roll up lower level summary to higher level by grouping by the entire row set
- */
 final class SourceIdRangeDeterminer extends AbstractQuery
 {
     /**
@@ -57,7 +54,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             ->getSource();
     }
 
-    public function getMinId(): int|string|null
+    public function getMinKey(): int|string|null
     {
         $partitionProperty = $this->valueResolver
             ->getInvolvedProperties()[0];
@@ -90,7 +87,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
         return (string) $result;
     }
 
-    public function getMaxId(): int|string|null
+    public function getMaxKey(): int|string|null
     {
         $partitionProperty = $this->valueResolver
             ->getInvolvedProperties()[0];

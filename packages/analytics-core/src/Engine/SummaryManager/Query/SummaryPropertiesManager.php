@@ -18,19 +18,19 @@ use Rekalogika\Analytics\Engine\Entity\SummaryProperties;
 
 final readonly class SummaryPropertiesManager
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-    ) {}
-
     /**
      * @param class-string $summaryClass
      */
-    public function getMax(
-        string $summaryClass,
-    ): int|string|null {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private string $summaryClass,
+    ) {}
+
+    public function getMax(): int|string|null
+    {
         $properties = $this->entityManager
             ->getRepository(SummaryProperties::class)
-            ->find($summaryClass);
+            ->find($this->summaryClass);
 
         if ($properties !== null) {
             $this->entityManager->detach($properties);
@@ -45,10 +45,8 @@ final readonly class SummaryPropertiesManager
         return $result;
     }
 
-    public function updateMax(
-        string $summaryClass,
-        int|string|null $max,
-    ): void {
+    public function updateMax(int|string|null $max): void
+    {
         $connection = $this->entityManager->getConnection();
         $metadata = $this->entityManager
             ->getClassMetadata(SummaryProperties::class);
@@ -73,7 +71,7 @@ final readonly class SummaryPropertiesManager
         );
 
         $statement = $connection->prepare($sql);
-        $statement->bindValue('summaryClass', $summaryClass);
+        $statement->bindValue('summaryClass', $this->summaryClass);
         $statement->bindValue('lastId', $max);
         $statement->executeStatement();
     }

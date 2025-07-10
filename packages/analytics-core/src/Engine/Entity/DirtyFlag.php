@@ -30,6 +30,9 @@ class DirtyFlag
     #[ORM\Column(type: Types::GUID, nullable: false)]
     private string $id;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+    private \DateTimeInterface $created;
+
     /**
      * Level and key are partition properties, indicating the partition that
      * needs refreshing. Null level and keys means there are new records.
@@ -45,6 +48,7 @@ class DirtyFlag
         private ?int $key,
     ) {
         $this->id = Uuid::v7()->toRfc4122();
+        $this->created = new \DateTimeImmutable();
     }
 
     public function getSignature(): string
@@ -55,6 +59,11 @@ class DirtyFlag
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getCreated(): \DateTimeInterface
+    {
+        return $this->created;
     }
 
     public function getUuid(): UuidV7
