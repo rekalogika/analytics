@@ -18,12 +18,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\SummaryComponent;
+use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -31,6 +33,8 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 
 final class SummaryRefresher
 {
+    private readonly SummaryComponent $summaryComponent;
+
     private readonly SqlFactory $sqlFactory;
 
     private int|string|null $minIdOfSource = null;
@@ -41,12 +45,17 @@ final class SummaryRefresher
 
 
     public function __construct(
+        ComponentFactory $componentFactory,
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly PartitionManager $partitionManager,
         private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
+        $this->summaryComponent = $componentFactory->getSummary(
+            summaryClass: $this->metadata->getSummaryClass(),
+        );
+
         $this->sqlFactory = new SqlFactory(
             entityManager: $this->entityManager,
             summaryMetadata: $this->metadata,
@@ -498,56 +507,18 @@ final class SummaryRefresher
     // min-max determiner
     //
 
-    /**
-     * @param class-string $class
-     */
-    private function createRangeDeterminer(string $class): SourceIdRangeDeterminer
-    {
-        return new SourceIdRangeDeterminer(
-            class: $class,
-            entityManager: $this->entityManager,
-            summaryMetadata: $this->metadata,
-        );
-    }
-
-    /**
-     * @param class-string $class
-     */
-    private function getMaxIdOfClass(string $class): int|string|null
-    {
-        return $this->createRangeDeterminer($class)->getMaxId();
-    }
-
-    /**
-     * @param class-string $class
-     */
-    private function getMinIdOfClass(string $class): int|string|null
-    {
-        return $this->createRangeDeterminer($class)->getMinId();
-    }
-
     private function getMaxIdOfSource(): int|string|null
     {
-        if ($this->maxIdOfSource !== null) {
-            return $this->maxIdOfSource;
-        }
-
-        $class = $this->metadata->getSourceClass();
-        $max = $this->getMaxIdOfClass($class);
-
-        return $this->maxIdOfSource = $max;
+        return $this->maxIdOfSource ??= $this->summaryComponent
+            ->getSource()
+            ->getHighestIdentifier();
     }
 
     private function getMinIdOfSource(): int|string|null
     {
-        if ($this->minIdOfSource !== null) {
-            return $this->minIdOfSource;
-        }
-
-        $class = $this->metadata->getSourceClass();
-        $min = $this->getMinIdOfClass($class);
-
-        return $this->minIdOfSource = $min;
+        return $this->minIdOfSource ??= $this->summaryComponent
+            ->getSource()
+            ->getLowestIdentifier();
     }
 
     private function getMaxIdOfSummary(): int|string|null

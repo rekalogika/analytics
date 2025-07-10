@@ -21,8 +21,9 @@ use Rekalogika\Analytics\Engine\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlagGenerator;
+use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
@@ -83,6 +84,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.summary_refresher_factory')
         ->class(SummaryRefresherFactory::class)
         ->args([
+            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
@@ -186,6 +188,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.summary_manager.component_factory')
+        ->class(ComponentFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
         ])
     ;
 };
