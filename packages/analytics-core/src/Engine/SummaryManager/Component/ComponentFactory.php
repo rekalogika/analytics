@@ -19,11 +19,12 @@ use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Represents a summary class
  */
-final class ComponentFactory
+final class ComponentFactory implements ResetInterface
 {
     /**
      * @var array<class-string,SummaryComponent>
@@ -41,6 +42,22 @@ final class ComponentFactory
         private readonly ManagerRegistry $managerRegistry,
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {}
+
+    #[\Override]
+    public function reset(): void
+    {
+        foreach ($this->summaryComponents as $component) {
+            if ($component instanceof ResetInterface) {
+                $component->reset();
+            }
+        }
+
+        foreach ($this->sourceComponents as $component) {
+            if ($component instanceof ResetInterface) {
+                $component->reset();
+            }
+        }
+    }
 
     /**
      * @param class-string $class

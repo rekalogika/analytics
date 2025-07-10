@@ -17,17 +17,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Represents a summary class
  */
-final readonly class SummaryComponent
+final readonly class SummaryComponent implements ResetInterface
 {
+    private SourceOfSummaryComponent $sourceOfSummaryComponent;
+
     public function __construct(
         private SummaryMetadata $summaryMetadata,
         private EntityManagerInterface $entityManager,
         private PropertyAccessorInterface $propertyAccessor,
-    ) {}
+    ) {
+        $this->sourceOfSummaryComponent = new SourceOfSummaryComponent(
+            summaryMetadata: $this->summaryMetadata,
+            entityManager: $this->entityManager,
+        );
+    }
+
+    #[\Override]
+    public function reset()
+    {
+        $this->sourceOfSummaryComponent->reset();
+    }
 
     /**
      * @return class-string
@@ -39,10 +53,7 @@ final readonly class SummaryComponent
 
     public function getSource(): SourceOfSummaryComponent
     {
-        return new SourceOfSummaryComponent(
-            summaryMetadata: $this->summaryMetadata,
-            entityManager: $this->entityManager,
-        );
+        return $this->sourceOfSummaryComponent;
     }
 
     public function getPartition(): PartitionComponent
@@ -61,12 +72,18 @@ final readonly class SummaryComponent
         );
     }
 
-    public function getHighestIdentifier(): int|string|null
+    /**
+     * Gets the latest partitioning key that has been summarized
+     */
+    public function getLatestKey(): int|string|null
     {
         return $this->createSummaryPropertiesManager()->getMax();
     }
 
-    public function updateHighestIdentifier(int|string|null $max): void
+    /**
+     * Updates the latest partitioning key that has been summarized.
+     */
+    public function updateLatestKey(int|string|null $max): void
     {
         $this->createSummaryPropertiesManager()->updateMax($max);
     }

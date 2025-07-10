@@ -35,10 +35,6 @@ final class SummaryRefresher
 
     private readonly SqlFactory $sqlFactory;
 
-    private int|string|null $minIdOfSource = null;
-
-    private int|string|null $maxIdOfSource = null;
-
     private int|string|null $maxIdOfSummary = null;
 
 
@@ -92,7 +88,10 @@ final class SummaryRefresher
         $inputStart = $start;
         $inputEnd = $end;
 
-        $maxOfSource = $this->getMaxIdOfSource();
+        $maxOfSource = $this->summaryComponent
+            ->getSource()
+            ->getLatestKey();
+
         $maxOfSummary = $this->getMaxIdOfSummary();
 
         // determine start
@@ -111,7 +110,10 @@ final class SummaryRefresher
         // if still null, then start from the lowest id of the source entity
 
         if ($start === null) {
-            $start = $this->getMinIdOfSource();
+            $start = $this->summaryComponent
+                ->getSource()
+                ->getEarliestKey();
+
             $startIsExclusive = false; // not used yet
         }
 
@@ -173,14 +175,17 @@ final class SummaryRefresher
         // update the max
 
         if ($end > $maxOfSummary) {
-            $this->summaryComponent->updateHighestIdentifier($end);
+            $this->summaryComponent->updateLatestKey($end);
         }
 
         // remove new entity flags
 
         $this->getConnection()->beginTransaction();
         $this->removeNewFlags();
-        $maxOfSource = $this->getMaxIdOfSource();
+
+        $maxOfSource = $this->summaryComponent
+            ->getSource()
+            ->getLatestKey();
 
         if ($end === null || $end >= $maxOfSource) {
             $this->getConnection()->commit();
@@ -498,24 +503,10 @@ final class SummaryRefresher
     // min-max determiner
     //
 
-    private function getMaxIdOfSource(): int|string|null
-    {
-        return $this->maxIdOfSource ??= $this->summaryComponent
-            ->getSource()
-            ->getHighestIdentifier();
-    }
-
-    private function getMinIdOfSource(): int|string|null
-    {
-        return $this->minIdOfSource ??= $this->summaryComponent
-            ->getSource()
-            ->getLowestIdentifier();
-    }
-
     private function getMaxIdOfSummary(): int|string|null
     {
         return $this->maxIdOfSummary
-            ??= $this->summaryComponent->getHighestIdentifier();
+            ??= $this->summaryComponent->getLatestKey();
     }
 
     /**
@@ -550,10 +541,15 @@ final class SummaryRefresher
     private function getNewEntitiesRange(): ?PartitionRange
     {
         $maxOfSummary = $this->getMaxIdOfSummary();
-        $maxOfSource = $this->getMaxIdOfSource();
+
+        $maxOfSource = $this->summaryComponent
+            ->getSource()
+            ->getLatestKey();
 
         if ($maxOfSummary === null) {
-            $minOfSource = $this->getMinIdOfSource();
+            $minOfSource = $this->summaryComponent
+                ->getSource()
+                ->getEarliestKey();
 
             if ($minOfSource === null) {
                 return null;

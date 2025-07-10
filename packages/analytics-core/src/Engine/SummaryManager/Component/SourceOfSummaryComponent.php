@@ -16,19 +16,30 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Symfony\Contracts\Service\ResetInterface;
 
-final readonly class SourceOfSummaryComponent
+final class SourceOfSummaryComponent implements ResetInterface
 {
+    private int|string|null $latestKey = null;
+    private int|string|null $earliestKey = null;
+
     /**
      * @var class-string $sourceClass
      */
-    private string $sourceClass;
+    private readonly string $sourceClass;
 
     public function __construct(
         private readonly SummaryMetadata $summaryMetadata,
         private readonly EntityManagerInterface $entityManager,
     ) {
         $this->sourceClass = $summaryMetadata->getSourceClass();
+    }
+
+    #[\Override]
+    public function reset(): void
+    {
+        $this->latestKey = null;
+        $this->earliestKey = null;
     }
 
     /**
@@ -48,13 +59,15 @@ final readonly class SourceOfSummaryComponent
         );
     }
 
-    public function getHighestIdentifier(): int|string|null
+    public function getLatestKey(): int|string|null
     {
-        return $this->createRangeDeterminer()->getMaxId();
+        return $this->latestKey
+            ??= $this->createRangeDeterminer()->getMaxKey();
     }
 
-    public function getLowestIdentifier(): int|string|null
+    public function getEarliestKey(): int|string|null
     {
-        return $this->createRangeDeterminer()->getMinId();
+        return  $this->earliestKey
+            ??= $this->createRangeDeterminer()->getMinKey();
     }
 }

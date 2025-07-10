@@ -54,7 +54,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
             ->getSource();
     }
 
-    public function getMinId(): int|string|null
+    public function getMinKey(): int|string|null
     {
         $partitionProperty = $this->valueResolver
             ->getInvolvedProperties()[0];
@@ -87,7 +87,7 @@ final class SourceIdRangeDeterminer extends AbstractQuery
         return (string) $result;
     }
 
-    public function getMaxId(): int|string|null
+    public function getMaxKey(): int|string|null
     {
         $partitionProperty = $this->valueResolver
             ->getInvolvedProperties()[0];
