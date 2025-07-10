@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -50,5 +51,23 @@ final readonly class SummaryComponent
             metadata: $this->summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
         );
+    }
+
+    private function createSummaryPropertiesManager(): SummaryPropertiesManager
+    {
+        return new SummaryPropertiesManager(
+            entityManager: $this->entityManager,
+            summaryClass: $this->getSummaryClass(),
+        );
+    }
+
+    public function getHighestIdentifier(): int|string|null
+    {
+        return $this->createSummaryPropertiesManager()->getMax();
+    }
+
+    public function updateHighestIdentifier(int|string|null $max): void
+    {
+        $this->createSummaryPropertiesManager()->updateMax($max);
     }
 }

@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
@@ -64,11 +63,6 @@ final class SummaryRefresher
     private function getConnection(): Connection
     {
         return $this->entityManager->getConnection();
-    }
-
-    private function getSummaryPropertiesManager(): SummaryPropertiesManager
-    {
-        return new SummaryPropertiesManager($this->entityManager);
     }
 
     /**
@@ -179,10 +173,7 @@ final class SummaryRefresher
         // update the max
 
         if ($end > $maxOfSummary) {
-            $this->getSummaryPropertiesManager()->updateMax(
-                summaryClass: $this->metadata->getSummaryClass(),
-                max: $end,
-            );
+            $this->summaryComponent->updateHighestIdentifier($end);
         }
 
         // remove new entity flags
@@ -523,8 +514,8 @@ final class SummaryRefresher
 
     private function getMaxIdOfSummary(): int|string|null
     {
-        return $this->maxIdOfSummary ??= $this->getSummaryPropertiesManager()
-            ->getMax($this->metadata->getSummaryClass());
+        return $this->maxIdOfSummary
+            ??= $this->summaryComponent->getHighestIdentifier();
     }
 
     /**
