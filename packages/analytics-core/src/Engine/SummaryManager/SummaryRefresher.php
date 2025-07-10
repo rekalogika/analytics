@@ -35,9 +35,6 @@ final class SummaryRefresher
 
     private readonly SqlFactory $sqlFactory;
 
-    private int|string|null $maxIdOfSummary = null;
-
-
     public function __construct(
         ComponentFactory $componentFactory,
         private readonly EntityManagerInterface $entityManager,
@@ -88,17 +85,14 @@ final class SummaryRefresher
         $inputStart = $start;
         $inputEnd = $end;
 
-        $maxOfSource = $this->summaryComponent
-            ->getSource()
-            ->getLatestKey();
-
-        $maxOfSummary = $this->getMaxIdOfSummary();
+        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
+        $summaryLatestKey = $this->summaryComponent->getLatestKey();
 
         // determine start
-        // first check the stored max value, and start from there
+        // first check the stored latest key, and start from there
 
         if ($start === null) {
-            $start = $maxOfSummary;
+            $start = $summaryLatestKey;
             $startIsExclusive = true; // not used yet
 
             // @todo refactor, should use the $startIsExclusive flag above
@@ -123,10 +117,10 @@ final class SummaryRefresher
             return;
         }
 
-        // if end is not provided, then use the max value
+        // if end is not provided, then use the latest value
 
         if ($end === null) {
-            $end = $maxOfSource;
+            $end = $sourceLatestKey;
         }
 
         // if start is greater than end, then return
@@ -147,7 +141,7 @@ final class SummaryRefresher
 
         // if end is same as start, and not yet recorded in the summary,
 
-        if ($start === $end && $maxOfSummary !== null) {
+        if ($start === $end && $summaryLatestKey !== null) {
             $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
             return;
         }
@@ -172,9 +166,9 @@ final class SummaryRefresher
             }
         }
 
-        // update the max
+        // update latest key
 
-        if ($end > $maxOfSummary) {
+        if ($end > $summaryLatestKey) {
             $this->summaryComponent->updateLatestKey($end);
         }
 
@@ -183,11 +177,11 @@ final class SummaryRefresher
         $this->getConnection()->beginTransaction();
         $this->removeNewFlags();
 
-        $maxOfSource = $this->summaryComponent
+        $sourceLatestKey = $this->summaryComponent
             ->getSource()
             ->getLatestKey();
 
-        if ($end === null || $end >= $maxOfSource) {
+        if ($end === null || $end >= $sourceLatestKey) {
             $this->getConnection()->commit();
         } else {
             $this->getConnection()->rollBack();
@@ -208,54 +202,6 @@ final class SummaryRefresher
 
         return $this->refreshRange($range);
     }
-
-    // public function refreshNew(): void
-    // {
-    //     $this->getConnection()->beginTransaction();
-
-    //     $this->removeNewFlags();
-    //     $maxOfSource = $this->getMaxIdOfSource();
-
-    //     $maxOfSummary = $this->getSummaryPropertiesManager()
-    //         ->getMax($this->metadata->getSummaryClass());
-
-    //     $start = $this->partitionManager
-    //         ->createLowestPartitionFromSourceValue($maxOfSummary);
-
-    //     $end = $this->partitionManager
-    //         ->createLowestPartitionFromSourceValue($maxOfSource);
-
-    //     $range = new PartitionRange($start, $end);
-    //     $this->refreshRange($range);
-
-    //     $this->getSummaryPropertiesManager()->updateMax(
-    //         summaryClass: $this->metadata->getSummaryClass(),
-    //         max: $maxOfSource,
-    //     );
-
-    //     // special case for refresh new: only mark the upper partition as dirty
-    //     // if the current partition is at the end of the upper partition
-
-    //     foreach ($range as $partition) {
-    //         $upperLevel = $partition->getContaining();
-
-    //         if (
-    //             $upperLevel !== null
-    //             && $upperLevel->getUpperBound() === $partition->getUpperBound()
-    //         ) {
-    //             $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
-    //                 class: $this->metadata->getSummaryClass(),
-    //                 partition: $upperLevel,
-    //             );
-
-    //             $this->entityManager->persist($dirtyFlag);
-    //         }
-    //     }
-
-    //     $this->entityManager->flush();
-
-    //     $this->getConnection()->commit();
-    // }
 
     /**
      * @return iterable<PartitionRange>
@@ -326,10 +272,6 @@ final class SummaryRefresher
         }
     }
 
-    //
-    // roll up methods
-    //
-
     /**
      * @return iterable<DirtyFlag>
      */
@@ -342,8 +284,8 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        // get the max of the summary at the beginning
-        $maxOfSummary = $this->getMaxIdOfSummary();
+        // get the latest key of the summary at the beginning
+        $summaryLatestKey = $this->summaryComponent->getLatestKey();
 
         $this->getConnection()->beginTransaction();
         $this->deleteSummaryRange($range);
@@ -361,7 +303,7 @@ final class SummaryRefresher
             $necessaryToMarkUpperAsDirty =
                 $this->isNecessaryToMarkUpperPartitionAsDirty(
                     partition: $partition,
-                    maxOfSummary: $maxOfSummary,
+                    summaryLatestKey: $summaryLatestKey,
                 );
 
             if ($necessaryToMarkUpperAsDirty) {
@@ -390,9 +332,11 @@ final class SummaryRefresher
 
     private function isNecessaryToMarkUpperPartitionAsDirty(
         Partition $partition,
-        int|string|null $maxOfSummary,
+        int|string|null $summaryLatestKey,
     ): bool {
-        $isNew = $maxOfSummary === null || $partition->getUpperBound() > $maxOfSummary;
+        $isNew = $summaryLatestKey === null
+            || $partition->getUpperBound() > $summaryLatestKey;
+
         $upperPartition = $partition->getContaining();
 
         if ($upperPartition === null) {
@@ -406,10 +350,11 @@ final class SummaryRefresher
             return $upperPartition->getUpperBound() === $partition->getUpperBound();
         }
 
-        // if upper partition's upper bound is greater than max of summary, then
-        // it is not necessary to mark the upper partition as dirty
+        // if upper partition's upper bound is greater than latest key in
+        // summary, then it is not necessary to mark the upper partition as
+        // dirty
 
-        return $upperPartition->getUpperBound() <= $maxOfSummary;
+        return $upperPartition->getUpperBound() <= $summaryLatestKey;
     }
 
     private function deleteSummaryRange(PartitionRange $range): void
@@ -427,7 +372,6 @@ final class SummaryRefresher
         );
 
         $this->executeQueries($queries);
-
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
@@ -447,7 +391,6 @@ final class SummaryRefresher
             );
 
         $this->executeQueries($queries);
-
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
@@ -467,7 +410,6 @@ final class SummaryRefresher
             );
 
         $this->executeQueries($queries);
-
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
@@ -497,16 +439,6 @@ final class SummaryRefresher
             ->setParameter('class', $this->metadata->getSummaryClass())
             ->getQuery()
             ->execute();
-    }
-
-    //
-    // min-max determiner
-    //
-
-    private function getMaxIdOfSummary(): int|string|null
-    {
-        return $this->maxIdOfSummary
-            ??= $this->summaryComponent->getLatestKey();
     }
 
     /**
@@ -540,37 +472,32 @@ final class SummaryRefresher
 
     private function getNewEntitiesRange(): ?PartitionRange
     {
-        $maxOfSummary = $this->getMaxIdOfSummary();
+        $summaryLatestKey = $this->summaryComponent->getLatestKey();
+        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
 
-        $maxOfSource = $this->summaryComponent
-            ->getSource()
-            ->getLatestKey();
+        if ($summaryLatestKey === null) {
+            $sourceEarliestKey = $this->summaryComponent->getSource()->getEarliestKey();
 
-        if ($maxOfSummary === null) {
-            $minOfSource = $this->summaryComponent
-                ->getSource()
-                ->getEarliestKey();
-
-            if ($minOfSource === null) {
+            if ($sourceEarliestKey === null) {
                 return null;
             }
 
             $start = $this->summaryComponent
                 ->getPartition()
-                ->createLowestPartitionFromSourceValue($minOfSource);
+                ->createLowestPartitionFromSourceValue($sourceEarliestKey);
         } else {
             $start = $this->summaryComponent
                 ->getPartition()
-                ->createLowestPartitionFromSourceValue($maxOfSummary);
+                ->createLowestPartitionFromSourceValue($summaryLatestKey);
         }
 
-        if ($maxOfSource === null) {
+        if ($sourceLatestKey === null) {
             return null;
         }
 
         $end = $this->summaryComponent
             ->getPartition()
-            ->createLowestPartitionFromSourceValue($maxOfSource);
+            ->createLowestPartitionFromSourceValue($sourceLatestKey);
 
         if (PartitionUtil::isGreaterThan($start, $end)) {
             return null;

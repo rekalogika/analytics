@@ -47,15 +47,7 @@ final class ComponentFactory implements ResetInterface
     public function reset(): void
     {
         foreach ($this->summaryComponents as $component) {
-            if ($component instanceof ResetInterface) {
-                $component->reset();
-            }
-        }
-
-        foreach ($this->sourceComponents as $component) {
-            if ($component instanceof ResetInterface) {
-                $component->reset();
-            }
+            $component->reset();
         }
     }
 

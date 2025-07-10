@@ -185,5 +185,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$propertyAccessor' => service('property_accessor'),
         ])
+        ->tag('kernel.reset', [
+            'method' => 'reset',
+        ])
     ;
 };

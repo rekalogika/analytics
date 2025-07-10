@@ -22,14 +22,16 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Represents a summary class
  */
-final readonly class SummaryComponent implements ResetInterface
+final class SummaryComponent implements ResetInterface
 {
-    private SourceOfSummaryComponent $sourceOfSummaryComponent;
+    private readonly SourceOfSummaryComponent $sourceOfSummaryComponent;
+
+    private int|string|null $latestKey = null;
 
     public function __construct(
-        private SummaryMetadata $summaryMetadata,
-        private EntityManagerInterface $entityManager,
-        private PropertyAccessorInterface $propertyAccessor,
+        private readonly SummaryMetadata $summaryMetadata,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->sourceOfSummaryComponent = new SourceOfSummaryComponent(
             summaryMetadata: $this->summaryMetadata,
@@ -77,7 +79,8 @@ final readonly class SummaryComponent implements ResetInterface
      */
     public function getLatestKey(): int|string|null
     {
-        return $this->createSummaryPropertiesManager()->getMax();
+        return $this->latestKey
+            ??= $this->createSummaryPropertiesManager()->getMax();
     }
 
     /**
