@@ -19,7 +19,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class SummaryRefresherFactory
@@ -28,7 +27,6 @@ final readonly class SummaryRefresherFactory
         private ComponentFactory $componentFactory,
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $metadataFactory,
-        private PartitionManagerRegistry $partitionManagerRegistry,
         private DirtyFlagGenerator $dirtyFlagGenerator,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
@@ -49,14 +47,10 @@ final readonly class SummaryRefresherFactory
 
         $metadata = $this->metadataFactory->getSummaryMetadata($class);
 
-        $partitionManager = $this->partitionManagerRegistry
-            ->createPartitionManager($class);
-
         return new SummaryRefresher(
             componentFactory: $this->componentFactory,
             entityManager: $entityManager,
             metadata: $metadata,
-            partitionManager: $partitionManager,
             dirtyFlagGenerator: $this->dirtyFlagGenerator,
             eventDispatcher: $this->eventDispatcher,
         );

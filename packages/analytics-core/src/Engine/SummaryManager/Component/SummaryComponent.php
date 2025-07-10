@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Represents a summary class
@@ -24,6 +25,7 @@ final readonly class SummaryComponent
     public function __construct(
         private SummaryMetadata $summaryMetadata,
         private EntityManagerInterface $entityManager,
+        private PropertyAccessorInterface $propertyAccessor,
     ) {}
 
     /**
@@ -39,6 +41,14 @@ final readonly class SummaryComponent
         return new SourceOfSummaryComponent(
             summaryMetadata: $this->summaryMetadata,
             entityManager: $this->entityManager,
+        );
+    }
+
+    public function getPartition(): PartitionComponent
+    {
+        return new PartitionComponent(
+            metadata: $this->summaryMetadata,
+            propertyAccessor: $this->propertyAccessor,
         );
     }
 }

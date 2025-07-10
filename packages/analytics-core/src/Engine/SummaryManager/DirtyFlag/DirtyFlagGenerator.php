@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag;
 
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 
 /**
@@ -25,7 +25,7 @@ final readonly class DirtyFlagGenerator
 {
     public function __construct(
         private SourceMetadataFactory $sourceMetadataFactory,
-        private PartitionManagerRegistry $partitionManagerRegistry,
+        private ComponentFactory $componentFactory,
     ) {}
 
     /**
@@ -54,8 +54,9 @@ final readonly class DirtyFlagGenerator
         $summaryClasses = $sourceMetadata->getAllInvolvedSummaryClasses();
 
         foreach ($summaryClasses as $summaryClass) {
-            $partitionManager = $this->partitionManagerRegistry
-                ->createPartitionManager($summaryClass);
+            $partitionManager = $this->componentFactory
+                ->getSummary($summaryClass)
+                ->getPartition();
 
             $partition = $partitionManager->getLowestPartitionFromEntity($entity);
             yield $this->createDirtyFlag($summaryClass, $partition);
@@ -77,8 +78,9 @@ final readonly class DirtyFlagGenerator
             ->getInvolvedSummaryClassesByChangedProperties($modifiedProperties);
 
         foreach ($summaryClasses as $summaryClass) {
-            $partitionManager = $this->partitionManagerRegistry
-                ->createPartitionManager($summaryClass);
+            $partitionManager = $this->componentFactory
+                ->getSummary($summaryClass)
+                ->getPartition();
 
             $partition = $partitionManager->getLowestPartitionFromEntity($entity);
             yield $this->createDirtyFlag($summaryClass, $partition);

@@ -19,8 +19,8 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\PartitionComponent;
 use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\ValueResolver\Bust;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
@@ -33,7 +33,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        private readonly PartitionManager $partitionManager,
+        private readonly PartitionComponent $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
         private readonly Partition $start,
         private readonly Partition $end,

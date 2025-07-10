@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Represents a summary class
@@ -38,6 +39,7 @@ final class ComponentFactory
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly SourceMetadataFactory $sourceMetadataFactory,
         private readonly ManagerRegistry $managerRegistry,
+        private readonly PropertyAccessorInterface $propertyAccessor,
     ) {}
 
     /**
@@ -81,6 +83,7 @@ final class ComponentFactory
         return $this->summaryComponents[$summaryClass] = new SummaryComponent(
             summaryMetadata: $summaryMetadata,
             entityManager: $manager,
+            propertyAccessor: $this->propertyAccessor,
         );
     }
 

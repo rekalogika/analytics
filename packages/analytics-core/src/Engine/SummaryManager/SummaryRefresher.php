@@ -25,7 +25,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -48,7 +47,6 @@ final class SummaryRefresher
         ComponentFactory $componentFactory,
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
-        private readonly PartitionManager $partitionManager,
         private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
@@ -59,7 +57,7 @@ final class SummaryRefresher
         $this->sqlFactory = new SqlFactory(
             entityManager: $this->entityManager,
             summaryMetadata: $this->metadata,
-            partitionManager: $this->partitionManager,
+            partitionManager: $this->summaryComponent->getPartition(),
         );
     }
 
@@ -270,10 +268,12 @@ final class SummaryRefresher
         mixed $start,
         mixed $end,
     ): iterable {
-        $end = $this->partitionManager
+        $end = $this->summaryComponent
+            ->getPartition()
             ->createLowestPartitionFromSourceValue($end);
 
-        $start = $this->partitionManager
+        $start = $this->summaryComponent
+            ->getPartition()
             ->createLowestPartitionFromSourceValue($start);
 
         if (PartitionUtil::isGreaterThan($start, $end)) {
@@ -568,10 +568,12 @@ final class SummaryRefresher
                 return null;
             }
 
-            $start = $this->partitionManager
+            $start = $this->summaryComponent
+                ->getPartition()
                 ->createLowestPartitionFromSourceValue($minOfSource);
         } else {
-            $start = $this->partitionManager
+            $start = $this->summaryComponent
+                ->getPartition()
                 ->createLowestPartitionFromSourceValue($maxOfSummary);
         }
 
@@ -579,7 +581,8 @@ final class SummaryRefresher
             return null;
         }
 
-        $end = $this->partitionManager
+        $end = $this->summaryComponent
+            ->getPartition()
             ->createLowestPartitionFromSourceValue($maxOfSource);
 
         if (PartitionUtil::isGreaterThan($start, $end)) {

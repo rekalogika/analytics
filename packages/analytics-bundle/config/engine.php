@@ -24,7 +24,6 @@ use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManagerRegistry;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
@@ -44,19 +43,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
     $parameters->set('rekalogika.analytics.query_result_limit', 5000);
     $parameters->set('rekalogika.analytics.filling_nodes_limit', 10000);
-
-    //
-    // partition
-    //
-
-    $services
-        ->set('rekalogika.analytics.partition_manager_registry')
-        ->class(PartitionManagerRegistry::class)
-        ->args([
-            '$metadataFactory' => service(SummaryMetadataFactory::class),
-            '$propertyAccessor' => service('property_accessor'),
-        ])
-    ;
 
     //
     // summary manager
@@ -87,7 +73,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
-            '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
             '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ]);
@@ -97,7 +82,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DirtyFlagGenerator::class)
         ->args([
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
-            '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
+            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
         ])
     ;
 
@@ -159,7 +144,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.new_dirty_flag_listener')
         ->class(NewDirtyFlagListener::class)
         ->args([
-            '$partitionManagerRegistry' => service('rekalogika.analytics.partition_manager_registry'),
+            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
             '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
         ])
         ->tag('kernel.event_listener', [
@@ -198,6 +183,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
             '$managerRegistry' => service('doctrine'),
+            '$propertyAccessor' => service('property_accessor'),
         ])
     ;
 };

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionManager\PartitionManager;
+use Rekalogika\Analytics\Engine\SummaryManager\Component\PartitionComponent;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\InsertIntoSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSourceToSummaryPerSourceQuery;
@@ -43,7 +43,7 @@ final class SqlFactory
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
-        private readonly PartitionManager $partitionManager,
+        private readonly PartitionComponent $partitionManager,
         ?string $summaryToSummaryRollUpClass = null,
     ) {
         $this->summaryToSummaryRollUpClass = $summaryToSummaryRollUpClass
