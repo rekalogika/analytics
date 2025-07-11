@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
-use Rekalogika\Analytics\Bundle\Command\RefreshSummaryCommand;
+use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
+use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
@@ -60,11 +61,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
 
     $services
-        ->set('rekalogika.analytics.command.refresh_summary')
-        ->class(RefreshSummaryCommand::class)
+        ->set('rekalogika.analytics.command.refresh_range')
+        ->class(RefreshRangeCommand::class)
         ->args([
             '$summaryManager' => service(SummaryManager::class),
             '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.refresh')
+        ->class(RefreshCommand::class)
+        ->args([
+            '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
+            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
         ])
         ->tag('console.command')
     ;

@@ -27,10 +27,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'rekalogika:analytics:refresh',
-    description: 'Refresh summary table.',
+    name: 'rekalogika:analytics:refresh:range',
+    description: 'Refresh a summary table using the specified range, or start from the last summarized key if unspecified.',
 )]
-final class RefreshSummaryCommand extends Command implements SignalableCommandInterface
+final class RefreshRangeCommand extends Command implements SignalableCommandInterface
 {
     private ?SymfonyStyle $io = null;
 

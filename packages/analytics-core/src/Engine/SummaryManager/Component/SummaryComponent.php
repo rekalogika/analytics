@@ -25,6 +25,7 @@ use Symfony\Contracts\Service\ResetInterface;
 final class SummaryComponent implements ResetInterface
 {
     private readonly SourceOfSummaryComponent $sourceOfSummaryComponent;
+    private readonly DirtyFlagsComponent $dirtyFlagsComponent;
 
     private int|string|null $latestKey = null;
 
@@ -35,6 +36,11 @@ final class SummaryComponent implements ResetInterface
     ) {
         $this->sourceOfSummaryComponent = new SourceOfSummaryComponent(
             summaryMetadata: $this->summaryMetadata,
+            entityManager: $this->entityManager,
+        );
+
+        $this->dirtyFlagsComponent = new DirtyFlagsComponent(
+            metadata: $this->summaryMetadata,
             entityManager: $this->entityManager,
         );
     }
@@ -63,6 +69,7 @@ final class SummaryComponent implements ResetInterface
         return new PartitionComponent(
             metadata: $this->summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
+            entityManager: $this->entityManager,
         );
     }
 
@@ -89,5 +96,10 @@ final class SummaryComponent implements ResetInterface
     public function updateLatestKey(int|string|null $max): void
     {
         $this->createSummaryPropertiesManager()->updateMax($max);
+    }
+
+    public function getDirtyFlags(): DirtyFlagsComponent
+    {
+        return $this->dirtyFlagsComponent;
     }
 }

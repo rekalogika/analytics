@@ -175,12 +175,12 @@ summary-refresh: summary-refresh-order summary-refresh-customer summary-refresh-
 
 .PHONY: summary-refresh-order
 summary-refresh-order:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
 
 .PHONY: summary-refresh-customer
 summary-refresh-customer:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
+	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
 
 .PHONY: summary-refresh-occupancy-history
 summary-refresh-occupancy-history:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
+	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
