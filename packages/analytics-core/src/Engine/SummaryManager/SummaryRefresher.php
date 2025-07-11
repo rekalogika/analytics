@@ -76,13 +76,22 @@ final class SummaryRefresher
     {
         $this->convertNewRecordsToDirtyFlags();
 
+        do {
+            $count = $this->refreshOne();
+        } while ($count > 0);
+    }
+
+    private function refreshOne(): int
+    {
         $dirtyPartitions = $this->summaryComponent
             ->getDirtyFlags()
-            ->getDirtyPartitions();
+            ->getDirtyPartitions(100);
 
         foreach ($dirtyPartitions as $partition) {
             $this->refreshPartition($partition->getPartition());
         }
+
+        return \count($dirtyPartitions);
     }
 
     /**
@@ -207,9 +216,9 @@ final class SummaryRefresher
 
 
     /**
-     * @return iterable<DirtyFlag>
+     * @return array<DirtyFlag>
      */
-    public function refreshPartition(Partition $partition): iterable
+    public function refreshPartition(Partition $partition): array
     {
         $range = new PartitionRange($partition, $partition);
 
@@ -286,9 +295,9 @@ final class SummaryRefresher
     }
 
     /**
-     * @return iterable<DirtyFlag>
+     * @return array<DirtyFlag>
      */
-    private function refreshRange(PartitionRange $range): iterable
+    private function refreshRange(PartitionRange $range): array
     {
         $startEvent = new RefreshRangeStartEvent(
             class: $this->metadata->getSummaryClass(),
@@ -337,6 +346,7 @@ final class SummaryRefresher
             }
         }
 
+        $this->entityManager->flush();
         $this->getConnection()->commit();
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
 
