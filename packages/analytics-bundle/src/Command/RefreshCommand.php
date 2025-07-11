@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of rekalogika/analytics package.
+ *
+ * (c) Priyadi Iman Nurcahyo <https://rekalogika.dev>
+ *
+ * For the full copyright and license information, please view the LICENSE file
+ * that was distributed with this source code.
+ */
+
+namespace Rekalogika\Analytics\Bundle\Command;
+
+use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
+use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+#[AsCommand(
+    name: 'rekalogika:analytics:refresh',
+    description: 'Refresh dirty partitions of a summary table.',
+)]
+final class RefreshCommand extends Command
+{
+    private ?SymfonyStyle $io = null;
+
+    public function __construct(
+        private readonly RefreshCommandOutputEventSubscriber $refreshCommandOutputEventSubscriber,
+        private readonly SummaryRefresherFactory $summaryRefresherFactory,
+    ) {
+        parent::__construct();
+    }
+
+    #[\Override]
+    protected function configure(): void
+    {
+        $this->addArgument(
+            name: 'class',
+            mode: InputArgument::REQUIRED,
+            description: 'Summary Class',
+        );
+    }
+
+    #[\Override]
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->io = new SymfonyStyle($input, $output);
+
+        $this->refreshCommandOutputEventSubscriber->initialize($this->io);
+
+        $class = $input->getArgument('class');
+
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (!\is_string($class)) {
+            throw new UnexpectedValueException(\sprintf(
+                'Class name must be a string, got "%s".',
+                get_debug_type($class),
+            ));
+        }
+
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (!class_exists($class)) {
+            throw new UnexpectedValueException(\sprintf(
+                'Class "%s" not found.',
+                $class,
+            ));
+        }
+
+        $this->summaryRefresherFactory
+            ->createSummaryRefresher($class)
+            ->refresh();
+
+        return Command::SUCCESS;
+    }
+}

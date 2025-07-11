@@ -113,9 +113,9 @@ jobs:
 
     - name: Refresh
       run: |
-        php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
-        php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
-        php tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
+        php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+        php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
+        php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
 
     - name: Run phpunit
       run: |

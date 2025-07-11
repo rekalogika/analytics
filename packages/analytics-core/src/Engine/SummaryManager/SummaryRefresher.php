@@ -72,6 +72,19 @@ final class SummaryRefresher
         }
     }
 
+    public function refresh(): void
+    {
+        $this->convertNewRecordsToDirtyFlags();
+
+        $dirtyPartitions = $this->summaryComponent
+            ->getDirtyFlags()
+            ->getDirtyPartitions();
+
+        foreach ($dirtyPartitions as $partition) {
+            $this->refreshPartition($partition->getPartition());
+        }
+    }
+
     /**
      * Refreshes the specified range. If start and end is not specified, it
      * does the refresh for new entities, not previously processed.
@@ -442,9 +455,9 @@ final class SummaryRefresher
     }
 
     /**
-     * @return iterable<DirtyFlag>
+     * @return array<DirtyFlag>
      */
-    public function convertNewRecordsToDirtyFlags(): iterable
+    public function convertNewRecordsToDirtyFlags(): array
     {
         $this->getConnection()->beginTransaction();
 
@@ -452,31 +465,56 @@ final class SummaryRefresher
 
         if ($range === null) {
             $this->getConnection()->rollBack();
-            return;
+            return [];
         }
 
         $this->removeNewFlags();
 
+        $dirtyFlags = [];
+
         foreach ($range as $partition) {
-            yield $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
+            $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
                 class: $this->metadata->getSummaryClass(),
                 partition: $partition,
             );
 
+            $dirtyFlags[] = $dirtyFlag;
             $this->entityManager->persist($dirtyFlag);
         }
 
+        // update the latest key of the summary component
+
+        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
+
+        if ($sourceLatestKey !== null) {
+            $this->summaryComponent->updateLatestKey($sourceLatestKey);
+        }
+
+        // flush the changes
+
         $this->entityManager->flush();
         $this->getConnection()->commit();
+
+        return $dirtyFlags;
     }
 
+    /**
+     * Gets the range of the new entities that are not yet summarized. Returns
+     * null if there are no new entities.
+     */
     private function getNewEntitiesRange(): ?PartitionRange
     {
         $summaryLatestKey = $this->summaryComponent->getLatestKey();
         $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
 
         if ($summaryLatestKey === null) {
+            // if there are no record about the latest processed key, then we start
+            // from the first key of the source
+
             $sourceEarliestKey = $this->summaryComponent->getSource()->getEarliestKey();
+
+            // if there is no earliest key in the source, then the source table
+            // must be empty, so we return null
 
             if ($sourceEarliestKey === null) {
                 return null;
@@ -485,11 +523,21 @@ final class SummaryRefresher
             $start = $this->summaryComponent
                 ->getPartition()
                 ->createLowestPartitionFromSourceValue($sourceEarliestKey);
+        } elseif ($summaryLatestKey >= $sourceLatestKey) {
+            // if the latest key in the summary is greater than or equal to the
+            // latest key in the source, then there are no new entities to process,
+
+            return null;
         } else {
+            // if there is a record about the latest processed key, then we
+            // start from there.
+
             $start = $this->summaryComponent
                 ->getPartition()
                 ->createLowestPartitionFromSourceValue($summaryLatestKey);
         }
+
+        // this probably should not happen, but just in case
 
         if ($sourceLatestKey === null) {
             return null;

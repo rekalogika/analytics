@@ -155,6 +155,7 @@ final class ArchitectureTest
                 Selector::classname(\Traversable::class),
                 Selector::classname(\Iterator::class),
                 Selector::classname(\Countable::class),
+                Selector::classname(\ArrayIterator::class),
             );
     }
 
