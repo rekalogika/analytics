@@ -29,10 +29,7 @@ final readonly class DirtyFlagsComponent
         private EntityManagerInterface $entityManager,
     ) {}
 
-    /**
-     * @return iterable<DirtyPartition>
-     */
-    public function getDirtyPartitions(int $limit = 100): iterable
+    public function getDirtyPartitions(int $limit = 100): DirtyPartitionCollection
     {
         $summaryClass = $this->metadata->getSummaryClass();
         $partitionClass = $this->metadata->getPartition()->getPartitionClass();
