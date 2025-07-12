@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartition;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartitionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 /**
@@ -69,5 +70,33 @@ final readonly class DirtyFlagsHandler
             summaryClass: $summaryClass,
             dirtyPartitions: $result,
         );
+    }
+
+    public function removeDirtyFlags(PartitionRange $range): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level = :level')
+            ->andWhere('s.key >= :start')
+            ->andWhere('s.key < :end')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getLowerBound())
+            ->setParameter('end', $range->getUpperBound())
+            ->getQuery()
+            ->execute();
+    }
+
+    public function removeNewFlags(): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level IS NULL')
+            ->andWhere('s.key IS NULL')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->getQuery()
+            ->execute();
     }
 }

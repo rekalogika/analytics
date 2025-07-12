@@ -195,7 +195,7 @@ final class SummaryRefresher
         // remove new entity flags
 
         $this->getConnection()->beginTransaction();
-        $this->removeNewFlags();
+        $this->summaryHandler->getDirtyFlags()->removeNewFlags();
 
         $sourceLatestKey = $this->summaryHandler
             ->getSource()
@@ -308,8 +308,9 @@ final class SummaryRefresher
         $summaryLatestKey = $this->summaryHandler->getLatestKey();
 
         $this->getConnection()->beginTransaction();
+
         $this->deleteSummaryRange($range);
-        $this->removeDirtyFlags($range);
+        $this->summaryHandler->getDirtyFlags()->removeDirtyFlags($range);
 
         if (PartitionUtil::isLowestLevel($range)) {
             $this->rollUpSourceToSummary($range);
@@ -433,33 +434,7 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
-    private function removeDirtyFlags(PartitionRange $range): void
-    {
-        $this->entityManager->createQueryBuilder()
-            ->delete(DirtyFlag::class, 's')
-            ->where('s.class = :class')
-            ->andWhere('s.level = :level')
-            ->andWhere('s.key >= :start')
-            ->andWhere('s.key < :end')
-            ->setParameter('class', $this->metadata->getSummaryClass())
-            ->setParameter('level', $range->getLevel())
-            ->setParameter('start', $range->getLowerBound())
-            ->setParameter('end', $range->getUpperBound())
-            ->getQuery()
-            ->execute();
-    }
 
-    private function removeNewFlags(): void
-    {
-        $this->entityManager->createQueryBuilder()
-            ->delete(DirtyFlag::class, 's')
-            ->where('s.class = :class')
-            ->andWhere('s.level IS NULL')
-            ->andWhere('s.key IS NULL')
-            ->setParameter('class', $this->metadata->getSummaryClass())
-            ->getQuery()
-            ->execute();
-    }
 
     /**
      * @return array<DirtyFlag>
@@ -475,7 +450,7 @@ final class SummaryRefresher
             return [];
         }
 
-        $this->removeNewFlags();
+        $this->summaryHandler->getDirtyFlags()->removeNewFlags();
 
         $dirtyFlags = [];
 
