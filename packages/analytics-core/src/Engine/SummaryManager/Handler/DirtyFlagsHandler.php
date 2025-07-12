@@ -37,10 +37,10 @@ final readonly class DirtyFlagsHandler
     {
         $partition = $this->partitionHandler->getLowestPartitionFromEntity($entity);
 
-        return $this->createDirtyFlag($partition);
+        return $this->createDirtyFlagForPartition($partition);
     }
 
-    public function createDirtyFlag(Partition $partition): DirtyFlag
+    public function createDirtyFlagForPartition(Partition $partition): DirtyFlag
     {
         return new DirtyFlag(
             class: $this->metadata->getSummaryClass(),
