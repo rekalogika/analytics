@@ -113,22 +113,18 @@ final class SummaryRefresher
 
         if ($start === null) {
             $start = $summaryLatestKey;
-            $startIsExclusive = true; // not used yet
 
-            // @todo refactor, should use the $startIsExclusive flag above
             if (\is_int($start)) {
                 $start++;
             }
         }
 
-        // if still null, then start from the lowest id of the source entity
+        // if still null, then start from the earliest id of the source entity
 
         if ($start === null) {
             $start = $this->summaryHandler
                 ->getSource()
                 ->getEarliestKey();
-
-            $startIsExclusive = false; // not used yet
         }
 
         // if still null, then return
@@ -443,7 +439,7 @@ final class SummaryRefresher
     {
         $this->getConnection()->beginTransaction();
 
-        $range = $this->getNewEntitiesRange();
+        $range = $this->summaryHandler->getNewEntitiesRange();
 
         if ($range === null) {
             $this->getConnection()->rollBack();
@@ -479,59 +475,4 @@ final class SummaryRefresher
         return $dirtyFlags;
     }
 
-    /**
-     * Gets the range of the new entities that are not yet summarized. Returns
-     * null if there are no new entities.
-     */
-    private function getNewEntitiesRange(): ?PartitionRange
-    {
-        $summaryLatestKey = $this->summaryHandler->getLatestKey();
-        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
-
-        if ($summaryLatestKey === null) {
-            // if there are no record about the latest processed key, then we start
-            // from the first key of the source
-
-            $sourceEarliestKey = $this->summaryHandler->getSource()->getEarliestKey();
-
-            // if there is no earliest key in the source, then the source table
-            // must be empty, so we return null
-
-            if ($sourceEarliestKey === null) {
-                return null;
-            }
-
-            $start = $this->summaryHandler
-                ->getPartition()
-                ->createLowestPartitionFromSourceValue($sourceEarliestKey);
-        } elseif ($summaryLatestKey >= $sourceLatestKey) {
-            // if the latest key in the summary is greater than or equal to the
-            // latest key in the source, then there are no new entities to process,
-
-            return null;
-        } else {
-            // if there is a record about the latest processed key, then we
-            // start from there.
-
-            $start = $this->summaryHandler
-                ->getPartition()
-                ->createLowestPartitionFromSourceValue($summaryLatestKey);
-        }
-
-        // this probably should not happen, but just in case
-
-        if ($sourceLatestKey === null) {
-            return null;
-        }
-
-        $end = $this->summaryHandler
-            ->getPartition()
-            ->createLowestPartitionFromSourceValue($sourceLatestKey);
-
-        if (PartitionUtil::isGreaterThan($start, $end)) {
-            return null;
-        }
-
-        return new PartitionRange($start, $end);
-    }
 }
