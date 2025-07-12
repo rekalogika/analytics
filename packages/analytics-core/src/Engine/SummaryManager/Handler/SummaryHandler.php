@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryPropertiesManager;
@@ -22,10 +22,10 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Represents a summary class
  */
-final class SummaryComponent implements ResetInterface
+final class SummaryHandler implements ResetInterface
 {
-    private readonly SourceOfSummaryComponent $sourceOfSummaryComponent;
-    private readonly DirtyFlagsComponent $dirtyFlagsComponent;
+    private readonly SourceOfSummaryHandler $sourceOfSummaryHandler;
+    private readonly DirtyFlagsHandler $dirtyFlagsHandler;
 
     private int|string|null $latestKey = null;
 
@@ -34,12 +34,12 @@ final class SummaryComponent implements ResetInterface
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
     ) {
-        $this->sourceOfSummaryComponent = new SourceOfSummaryComponent(
+        $this->sourceOfSummaryHandler = new SourceOfSummaryHandler(
             summaryMetadata: $this->summaryMetadata,
             entityManager: $this->entityManager,
         );
 
-        $this->dirtyFlagsComponent = new DirtyFlagsComponent(
+        $this->dirtyFlagsHandler = new DirtyFlagsHandler(
             metadata: $this->summaryMetadata,
             entityManager: $this->entityManager,
         );
@@ -48,7 +48,7 @@ final class SummaryComponent implements ResetInterface
     #[\Override]
     public function reset()
     {
-        $this->sourceOfSummaryComponent->reset();
+        $this->sourceOfSummaryHandler->reset();
     }
 
     /**
@@ -59,14 +59,14 @@ final class SummaryComponent implements ResetInterface
         return $this->summaryMetadata->getSummaryClass();
     }
 
-    public function getSource(): SourceOfSummaryComponent
+    public function getSource(): SourceOfSummaryHandler
     {
-        return $this->sourceOfSummaryComponent;
+        return $this->sourceOfSummaryHandler;
     }
 
-    public function getPartition(): PartitionComponent
+    public function getPartition(): PartitionHandler
     {
-        return new PartitionComponent(
+        return new PartitionHandler(
             metadata: $this->summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
             entityManager: $this->entityManager,
@@ -98,8 +98,8 @@ final class SummaryComponent implements ResetInterface
         $this->createSummaryPropertiesManager()->updateMax($max);
     }
 
-    public function getDirtyFlags(): DirtyFlagsComponent
+    public function getDirtyFlags(): DirtyFlagsHandler
     {
-        return $this->dirtyFlagsComponent;
+        return $this->dirtyFlagsHandler;
     }
 }

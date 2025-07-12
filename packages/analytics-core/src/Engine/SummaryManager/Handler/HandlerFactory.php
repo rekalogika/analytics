@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,17 +24,17 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Represents a summary class
  */
-final class ComponentFactory implements ResetInterface
+final class HandlerFactory implements ResetInterface
 {
     /**
-     * @var array<class-string,SummaryComponent>
+     * @var array<class-string,SummaryHandler>
      */
-    private array $summaryComponents = [];
+    private array $summaryHandlers = [];
 
     /**
-     * @var array<class-string,SourceComponent>
+     * @var array<class-string,SourceHandler>
      */
-    private array $sourceComponents = [];
+    private array $sourceHandlers = [];
 
     public function __construct(
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
@@ -46,8 +46,8 @@ final class ComponentFactory implements ResetInterface
     #[\Override]
     public function reset(): void
     {
-        foreach ($this->summaryComponents as $component) {
-            $component->reset();
+        foreach ($this->summaryHandlers as $handler) {
+            $handler->reset();
         }
     }
 
@@ -78,10 +78,10 @@ final class ComponentFactory implements ResetInterface
     /**
      * @param class-string $summaryClass
      */
-    public function getSummary(string $summaryClass): SummaryComponent
+    public function getSummary(string $summaryClass): SummaryHandler
     {
-        if (isset($this->summaryComponents[$summaryClass])) {
-            return $this->summaryComponents[$summaryClass];
+        if (isset($this->summaryHandlers[$summaryClass])) {
+            return $this->summaryHandlers[$summaryClass];
         }
 
         $summaryMetadata = $this->summaryMetadataFactory
@@ -89,7 +89,7 @@ final class ComponentFactory implements ResetInterface
 
         $manager = $this->getManager($summaryMetadata->getSummaryClass());
 
-        return $this->summaryComponents[$summaryClass] = new SummaryComponent(
+        return $this->summaryHandlers[$summaryClass] = new SummaryHandler(
             summaryMetadata: $summaryMetadata,
             entityManager: $manager,
             propertyAccessor: $this->propertyAccessor,
@@ -99,10 +99,10 @@ final class ComponentFactory implements ResetInterface
     /**
      * @param class-string $sourceClass
      */
-    public function getSource(string $sourceClass): SourceComponent
+    public function getSource(string $sourceClass): SourceHandler
     {
-        if (isset($this->sourceComponents[$sourceClass])) {
-            return $this->sourceComponents[$sourceClass];
+        if (isset($this->sourceHandlers[$sourceClass])) {
+            return $this->sourceHandlers[$sourceClass];
         }
 
         $sourceMetadata = $this->sourceMetadataFactory
@@ -110,7 +110,7 @@ final class ComponentFactory implements ResetInterface
 
         $manager = $this->getManager($sourceMetadata->getClass());
 
-        return $this->sourceComponents[$sourceClass] = new SourceComponent(
+        return $this->sourceHandlers[$sourceClass] = new SourceHandler(
             sourceMetadata: $sourceMetadata,
             entityManager: $manager,
         );

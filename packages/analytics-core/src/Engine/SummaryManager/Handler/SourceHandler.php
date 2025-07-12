@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
 /**
  * Represents a source class
  */
-final readonly class SourceComponent
+final readonly class SourceHandler
 {
     public function __construct(
         private SourceMetadata $sourceMetadata,

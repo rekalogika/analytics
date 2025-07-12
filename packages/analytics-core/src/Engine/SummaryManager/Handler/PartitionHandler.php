@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
@@ -27,7 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Manages the partitions of a specific summary class.
  */
-final readonly class PartitionComponent
+final readonly class PartitionHandler
 {
     private PartitionMetadata $partitionMetadata;
 
