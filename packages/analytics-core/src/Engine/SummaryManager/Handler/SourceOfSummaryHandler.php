@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Service\ResetInterface;
 
-final class SourceOfSummaryComponent implements ResetInterface
+final class SourceOfSummaryHandler implements ResetInterface
 {
     private int|string|null $latestKey = null;
     private int|string|null $earliestKey = null;

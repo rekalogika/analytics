@@ -18,38 +18,38 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\Component\SummaryComponent;
 use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeStartEvent;
+use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\Handler\SummaryHandler;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 
 final class SummaryRefresher
 {
-    private readonly SummaryComponent $summaryComponent;
+    private readonly SummaryHandler $summaryHandler;
 
     private readonly SqlFactory $sqlFactory;
 
     public function __construct(
-        ComponentFactory $componentFactory,
+        HandlerFactory $handlerFactory,
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
-        $this->summaryComponent = $componentFactory->getSummary(
+        $this->summaryHandler = $handlerFactory->getSummary(
             summaryClass: $this->metadata->getSummaryClass(),
         );
 
         $this->sqlFactory = new SqlFactory(
             entityManager: $this->entityManager,
             summaryMetadata: $this->metadata,
-            partitionManager: $this->summaryComponent->getPartition(),
+            partitionManager: $this->summaryHandler->getPartition(),
         );
     }
 
@@ -83,7 +83,7 @@ final class SummaryRefresher
 
     private function refreshOne(): int
     {
-        $dirtyPartitions = $this->summaryComponent
+        $dirtyPartitions = $this->summaryHandler
             ->getDirtyFlags()
             ->getDirtyPartitions(100);
 
@@ -107,8 +107,8 @@ final class SummaryRefresher
         $inputStart = $start;
         $inputEnd = $end;
 
-        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
-        $summaryLatestKey = $this->summaryComponent->getLatestKey();
+        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
+        $summaryLatestKey = $this->summaryHandler->getLatestKey();
 
         // determine start
         // first check the stored latest key, and start from there
@@ -126,7 +126,7 @@ final class SummaryRefresher
         // if still null, then start from the lowest id of the source entity
 
         if ($start === null) {
-            $start = $this->summaryComponent
+            $start = $this->summaryHandler
                 ->getSource()
                 ->getEarliestKey();
 
@@ -191,7 +191,7 @@ final class SummaryRefresher
         // update latest key
 
         if ($end > $summaryLatestKey) {
-            $this->summaryComponent->updateLatestKey($end);
+            $this->summaryHandler->updateLatestKey($end);
         }
 
         // remove new entity flags
@@ -199,7 +199,7 @@ final class SummaryRefresher
         $this->getConnection()->beginTransaction();
         $this->removeNewFlags();
 
-        $sourceLatestKey = $this->summaryComponent
+        $sourceLatestKey = $this->summaryHandler
             ->getSource()
             ->getLatestKey();
 
@@ -232,11 +232,11 @@ final class SummaryRefresher
         mixed $start,
         mixed $end,
     ): iterable {
-        $end = $this->summaryComponent
+        $end = $this->summaryHandler
             ->getPartition()
             ->createLowestPartitionFromSourceValue($end);
 
-        $start = $this->summaryComponent
+        $start = $this->summaryHandler
             ->getPartition()
             ->createLowestPartitionFromSourceValue($start);
 
@@ -307,7 +307,7 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         // get the latest key of the summary at the beginning
-        $summaryLatestKey = $this->summaryComponent->getLatestKey();
+        $summaryLatestKey = $this->summaryHandler->getLatestKey();
 
         $this->getConnection()->beginTransaction();
         $this->deleteSummaryRange($range);
@@ -492,12 +492,12 @@ final class SummaryRefresher
             $this->entityManager->persist($dirtyFlag);
         }
 
-        // update the latest key of the summary component
+        // update the latest key of the summary handler
 
-        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
+        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
 
         if ($sourceLatestKey !== null) {
-            $this->summaryComponent->updateLatestKey($sourceLatestKey);
+            $this->summaryHandler->updateLatestKey($sourceLatestKey);
         }
 
         // flush the changes
@@ -514,14 +514,14 @@ final class SummaryRefresher
      */
     private function getNewEntitiesRange(): ?PartitionRange
     {
-        $summaryLatestKey = $this->summaryComponent->getLatestKey();
-        $sourceLatestKey = $this->summaryComponent->getSource()->getLatestKey();
+        $summaryLatestKey = $this->summaryHandler->getLatestKey();
+        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
 
         if ($summaryLatestKey === null) {
             // if there are no record about the latest processed key, then we start
             // from the first key of the source
 
-            $sourceEarliestKey = $this->summaryComponent->getSource()->getEarliestKey();
+            $sourceEarliestKey = $this->summaryHandler->getSource()->getEarliestKey();
 
             // if there is no earliest key in the source, then the source table
             // must be empty, so we return null
@@ -530,7 +530,7 @@ final class SummaryRefresher
                 return null;
             }
 
-            $start = $this->summaryComponent
+            $start = $this->summaryHandler
                 ->getPartition()
                 ->createLowestPartitionFromSourceValue($sourceEarliestKey);
         } elseif ($summaryLatestKey >= $sourceLatestKey) {
@@ -542,7 +542,7 @@ final class SummaryRefresher
             // if there is a record about the latest processed key, then we
             // start from there.
 
-            $start = $this->summaryComponent
+            $start = $this->summaryHandler
                 ->getPartition()
                 ->createLowestPartitionFromSourceValue($summaryLatestKey);
         }
@@ -553,7 +553,7 @@ final class SummaryRefresher
             return null;
         }
 
-        $end = $this->summaryComponent
+        $end = $this->summaryHandler
             ->getPartition()
             ->createLowestPartitionFromSourceValue($sourceLatestKey);
 

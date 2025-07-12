@@ -21,9 +21,9 @@ use Rekalogika\Analytics\Engine\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
-use Rekalogika\Analytics\Engine\SummaryManager\Component\ComponentFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
+use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
@@ -70,7 +70,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.summary_refresher_factory')
         ->class(SummaryRefresherFactory::class)
         ->args([
-            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
@@ -82,7 +82,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DirtyFlagGenerator::class)
         ->args([
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
-            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
         ])
     ;
 
@@ -144,7 +144,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.new_dirty_flag_listener')
         ->class(NewDirtyFlagListener::class)
         ->args([
-            '$componentFactory' => service('rekalogika.analytics.summary_manager.component_factory'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
         ])
         ->tag('kernel.event_listener', [
@@ -177,8 +177,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set('rekalogika.analytics.summary_manager.component_factory')
-        ->class(ComponentFactory::class)
+        ->set('rekalogika.analytics.summary_manager.handler_factory')
+        ->class(HandlerFactory::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),

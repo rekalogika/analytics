@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Component;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 /**
  * Manages the partitions of a specific summary class.
  */
-final readonly class DirtyFlagsComponent
+final readonly class DirtyFlagsHandler
 {
     public function __construct(
         private SummaryMetadata $metadata,
