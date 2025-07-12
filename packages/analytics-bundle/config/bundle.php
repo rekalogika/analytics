@@ -20,14 +20,12 @@ use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
-use Rekalogika\Analytics\Bundle\RefreshWorker\RefreshMessageHandler;
-use Rekalogika\Analytics\Bundle\RefreshWorker\SymfonyRefreshFrameworkAdapter;
+use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -97,37 +95,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     //
-    // refresh worker
-    //
-
-    $services
-        ->set('rekalogika.analytics.refresh_worker.refresh_framework_adapter')
-        ->class(SymfonyRefreshFrameworkAdapter::class)
-        ->args([
-            '$lockFactory' => service('lock.factory'),
-            '$cache' => service('cache.app'),
-            '$messageBus' => service(MessageBusInterface::class),
-            '$logger' => service('logger')->ignoreOnInvalid(),
-        ])
-        ->tag('monolog.logger', [
-            'channel' => 'rekalogika.analytics',
-        ])
-    ;
-
-    $services
-        ->set('rekalogika.analytics.refresh_worker.refresh_message_handler')
-        ->class(RefreshMessageHandler::class)
-        ->args([
-            '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
-            '$logger' => service('logger')->ignoreOnInvalid(),
-        ])
-        ->tag('messenger.message_handler')
-        ->tag('monolog.logger', [
-            'channel' => 'rekalogika.analytics',
-        ])
-    ;
-
-    //
     // distinct values resolver
     //
 
@@ -143,4 +110,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$propertyAccessor' => service('property_accessor'),
         ])
         ->tag('rekalogika.analytics.distinct_values_resolver');
+
+    //
+    // refresh agent
+    //
+
+    $services
+        ->set('rekalogika.analytics.bundle.refresh.dispatcher')
+        ->class(SymfonyRefreshAgentDispatcher::class)
+        ->args([
+            '$messageBus' => service('messenger.bus.default'),
+        ])
+    ;
 };
