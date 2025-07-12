@@ -29,26 +29,10 @@ final readonly class PartitionHandler
     private PartitionMetadata $partitionMetadata;
 
     public function __construct(
-        private SummaryMetadata $metadata,
+        SummaryMetadata $metadata,
         private PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->partitionMetadata = $metadata->getPartition();
-    }
-
-    public function createDirtyFlagForSourceEntity(object $entity): DirtyFlag
-    {
-        $partition = $this->getLowestPartitionFromEntity($entity);
-
-        return $this->createDirtyFlag($partition);
-    }
-
-    public function createDirtyFlag(Partition $partition): DirtyFlag
-    {
-        return new DirtyFlag(
-            class: $this->metadata->getSummaryClass(),
-            level: $partition->getLevel(),
-            key: $partition->getKey(),
-        );
     }
 
     private function getSourceProperty(): string

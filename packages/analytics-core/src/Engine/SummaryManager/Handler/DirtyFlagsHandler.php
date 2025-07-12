@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartition;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartitionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 /**
@@ -27,7 +29,25 @@ final readonly class DirtyFlagsHandler
     public function __construct(
         private SummaryMetadata $metadata,
         private EntityManagerInterface $entityManager,
+        private PartitionHandler $partitionHandler,
     ) {}
+
+
+    public function createDirtyFlagForSourceEntity(object $entity): DirtyFlag
+    {
+        $partition = $this->partitionHandler->getLowestPartitionFromEntity($entity);
+
+        return $this->createDirtyFlagForPartition($partition);
+    }
+
+    public function createDirtyFlagForPartition(Partition $partition): DirtyFlag
+    {
+        return new DirtyFlag(
+            class: $this->metadata->getSummaryClass(),
+            level: $partition->getLevel(),
+            key: $partition->getKey(),
+        );
+    }
 
     public function getDirtyPartitions(int $limit = 100): DirtyPartitionCollection
     {
@@ -69,5 +89,33 @@ final readonly class DirtyFlagsHandler
             summaryClass: $summaryClass,
             dirtyPartitions: $result,
         );
+    }
+
+    public function removeDirtyFlags(PartitionRange $range): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level = :level')
+            ->andWhere('s.key >= :start')
+            ->andWhere('s.key < :end')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getLowerBound())
+            ->setParameter('end', $range->getUpperBound())
+            ->getQuery()
+            ->execute();
+    }
+
+    public function removeNewFlags(): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level IS NULL')
+            ->andWhere('s.key IS NULL')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->getQuery()
+            ->execute();
     }
 }

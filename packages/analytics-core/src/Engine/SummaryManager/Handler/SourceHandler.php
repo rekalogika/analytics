@@ -58,11 +58,11 @@ final readonly class SourceHandler
         $summaryClasses = $this->sourceMetadata->getAllInvolvedSummaryClasses();
 
         foreach ($summaryClasses as $summaryClass) {
-            $partitionHandler = $this->handlerFactory
+            $dirtyFlagHandler = $this->handlerFactory
                 ->getSummary($summaryClass)
-                ->getPartition();
+                ->getDirtyFlags();
 
-            yield $partitionHandler->createDirtyFlagForSourceEntity($entity);
+            yield $dirtyFlagHandler->createDirtyFlagForSourceEntity($entity);
         }
     }
 
@@ -78,11 +78,11 @@ final readonly class SourceHandler
             ->getInvolvedSummaryClassesByChangedProperties($modifiedProperties);
 
         foreach ($summaryClasses as $summaryClass) {
-            $partitionHandler = $this->handlerFactory
+            $dirtyFlagHandler = $this->handlerFactory
                 ->getSummary($summaryClass)
-                ->getPartition();
+                ->getDirtyFlags();
 
-            yield $partitionHandler->createDirtyFlagForSourceEntity($entity);
+            yield $dirtyFlagHandler->createDirtyFlagForSourceEntity($entity);
         }
     }
 }

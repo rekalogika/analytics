@@ -26,6 +26,7 @@ final class SummaryHandler implements ResetInterface
 {
     private readonly SourceOfSummaryHandler $sourceOfSummaryHandler;
     private readonly DirtyFlagsHandler $dirtyFlagsHandler;
+    private readonly PartitionHandler $partitionHandler;
 
     private int|string|null $latestKey = null;
 
@@ -39,9 +40,15 @@ final class SummaryHandler implements ResetInterface
             entityManager: $this->entityManager,
         );
 
+        $this->partitionHandler = new PartitionHandler(
+            metadata: $this->summaryMetadata,
+            propertyAccessor: $this->propertyAccessor,
+        );
+
         $this->dirtyFlagsHandler = new DirtyFlagsHandler(
             metadata: $this->summaryMetadata,
             entityManager: $this->entityManager,
+            partitionHandler: $this->partitionHandler,
         );
     }
 
@@ -66,10 +73,7 @@ final class SummaryHandler implements ResetInterface
 
     public function getPartition(): PartitionHandler
     {
-        return new PartitionHandler(
-            metadata: $this->summaryMetadata,
-            propertyAccessor: $this->propertyAccessor,
-        );
+        return $this->partitionHandler;
     }
 
     private function createSummaryPropertiesManager(): SummaryPropertiesManager
