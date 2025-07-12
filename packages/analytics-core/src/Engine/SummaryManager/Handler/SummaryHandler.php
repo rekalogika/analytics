@@ -69,7 +69,6 @@ final class SummaryHandler implements ResetInterface
         return new PartitionHandler(
             metadata: $this->summaryMetadata,
             propertyAccessor: $this->propertyAccessor,
-            entityManager: $this->entityManager,
         );
     }
 

@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\Entity\DirtyPartition;
-use Rekalogika\Analytics\Engine\Entity\DirtyPartitionCollection;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -32,11 +29,26 @@ final readonly class PartitionHandler
     private PartitionMetadata $partitionMetadata;
 
     public function __construct(
-        SummaryMetadata $metadata,
+        private SummaryMetadata $metadata,
         private PropertyAccessorInterface $propertyAccessor,
-        private EntityManagerInterface $entityManager,
     ) {
         $this->partitionMetadata = $metadata->getPartition();
+    }
+
+    public function createDirtyFlagForSourceEntity(object $entity): DirtyFlag
+    {
+        $partition = $this->getLowestPartitionFromEntity($entity);
+
+        return $this->createDirtyFlag($partition);
+    }
+
+    public function createDirtyFlag(Partition $partition): DirtyFlag
+    {
+        return new DirtyFlag(
+            class: $this->metadata->getSummaryClass(),
+            level: $partition->getLevel(),
+            key: $partition->getKey(),
+        );
     }
 
     private function getSourceProperty(): string
@@ -145,50 +157,5 @@ final readonly class PartitionHandler
         }
 
         return $partitionClass::createFromSourceValue($key, $level);
-    }
-
-    /**
-     * @return iterable<DirtyPartition>
-     */
-    public function getDirtyPartitionsForSummaryClass(int $limit = 100): iterable
-    {
-        $summaryClass = $this->partitionMetadata->getSummaryMetadata()->getSummaryClass();
-        $partitionClass = $this->partitionMetadata->getPartitionClass();
-
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->select(\sprintf(
-                'NEW %s(
-                    df.class,
-                    df.level,
-                    df.key,
-                    MIN(df.created),
-                    MAX(df.created),
-                    COUNT(df.id),
-                    \'%s\'
-                )',
-                DirtyPartition::class,
-                $partitionClass,
-            ))
-            ->addSelect('MIN(df.created) AS HIDDEN earliest')
-            ->from(DirtyFlag::class, 'df')
-            ->where('df.class = :class')
-            ->setParameter('class', $summaryClass)
-            ->andWhere('df.level IS NOT NULL')
-            ->andWhere('df.key IS NOT NULL')
-            ->groupBy('df.class, df.level, df.key')
-            ->orderBy('earliest', 'ASC')
-            ->setMaxResults($limit);
-
-        $query = $queryBuilder->getQuery();
-
-        /**
-         * @var list<DirtyPartition> $result
-         */
-        $result = $query->getResult();
-
-        return new DirtyPartitionCollection(
-            summaryClass: $summaryClass,
-            dirtyPartitions: $result,
-        );
     }
 }

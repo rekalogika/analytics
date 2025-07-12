@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
@@ -27,7 +26,6 @@ final readonly class SummaryRefresherFactory
         private HandlerFactory $handlerFactory,
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $metadataFactory,
-        private DirtyFlagGenerator $dirtyFlagGenerator,
         private ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
@@ -51,7 +49,6 @@ final readonly class SummaryRefresherFactory
             handlerFactory: $this->handlerFactory,
             entityManager: $entityManager,
             metadata: $metadata,
-            dirtyFlagGenerator: $this->dirtyFlagGenerator,
             eventDispatcher: $this->eventDispatcher,
         );
     }

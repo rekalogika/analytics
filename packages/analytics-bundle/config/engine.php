@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
@@ -73,18 +72,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
-            '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ]);
-
-    $services
-        ->set('rekalogika.analytics.dirty_flag_generator')
-        ->class(DirtyFlagGenerator::class)
-        ->args([
-            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
-            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
-        ])
-    ;
 
     $services
         ->set('rekalogika.analytics.doctrine.schema.post_generate')
@@ -102,7 +91,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.doctrine.source_entity_listener')
         ->class(SourceEntityListener::class)
         ->args([
-            '$dirtyFlagGenerator' => service('rekalogika.analytics.dirty_flag_generator'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
         ->tag('doctrine.event_listener', [

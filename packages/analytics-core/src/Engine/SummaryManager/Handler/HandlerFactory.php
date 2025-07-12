@@ -97,22 +97,24 @@ final class HandlerFactory implements ResetInterface
     }
 
     /**
-     * @param class-string $sourceClass
+     * @param class-string|object $source
      */
-    public function getSource(string $sourceClass): SourceHandler
+    public function getSource(string|object $source): SourceHandler
     {
-        if (isset($this->sourceHandlers[$sourceClass])) {
-            return $this->sourceHandlers[$sourceClass];
+        if (\is_object($source)) {
+            $source = $source::class;
+        }
+
+        if (isset($this->sourceHandlers[$source])) {
+            return $this->sourceHandlers[$source];
         }
 
         $sourceMetadata = $this->sourceMetadataFactory
-            ->getSourceMetadata($sourceClass);
+            ->getSourceMetadata($source);
 
-        $manager = $this->getManager($sourceMetadata->getClass());
-
-        return $this->sourceHandlers[$sourceClass] = new SourceHandler(
+        return $this->sourceHandlers[$source] = new SourceHandler(
             sourceMetadata: $sourceMetadata,
-            entityManager: $manager,
+            handlerFactory: $this,
         );
     }
 }

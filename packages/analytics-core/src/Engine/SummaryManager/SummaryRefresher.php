@@ -18,7 +18,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
@@ -39,7 +38,6 @@ final class SummaryRefresher
         HandlerFactory $handlerFactory,
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
-        private readonly DirtyFlagGenerator $dirtyFlagGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->summaryHandler = $handlerFactory->getSummary(
@@ -335,10 +333,9 @@ final class SummaryRefresher
                     continue;
                 }
 
-                $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
-                    class: $this->metadata->getSummaryClass(),
-                    partition: $upperPartition,
-                );
+                $dirtyFlag = $this->summaryHandler
+                    ->getPartition()
+                    ->createDirtyFlag($upperPartition);
 
                 $this->entityManager->persist($dirtyFlag);
 
@@ -483,10 +480,9 @@ final class SummaryRefresher
         $dirtyFlags = [];
 
         foreach ($range as $partition) {
-            $dirtyFlag = $this->dirtyFlagGenerator->createDirtyFlag(
-                class: $this->metadata->getSummaryClass(),
-                partition: $partition,
-            );
+            $dirtyFlag = $this->summaryHandler
+                ->getPartition()
+                ->createDirtyFlag($partition);
 
             $dirtyFlags[] = $dirtyFlag;
             $this->entityManager->persist($dirtyFlag);
