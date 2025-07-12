@@ -335,7 +335,7 @@ final class SummaryRefresher
                 }
 
                 $dirtyFlag = $this->summaryHandler
-                    ->getPartition()
+                    ->getDirtyFlags()
                     ->createDirtyFlag($upperPartition);
 
                 $this->entityManager->persist($dirtyFlag);
@@ -456,7 +456,7 @@ final class SummaryRefresher
 
         foreach ($range as $partition) {
             $dirtyFlag = $this->summaryHandler
-                ->getPartition()
+                ->getDirtyFlags()
                 ->createDirtyFlag($partition);
 
             $dirtyFlags[] = $dirtyFlag;
