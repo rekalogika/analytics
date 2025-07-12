@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
 
 /**
@@ -23,7 +23,7 @@ final readonly class SourceHandler
 {
     public function __construct(
         private SourceMetadata $sourceMetadata,
-        private EntityManagerInterface $entityManager,
+        private HandlerFactory $handlerFactory,
     ) {}
 
     /**
@@ -34,10 +34,55 @@ final readonly class SourceHandler
         return $this->sourceMetadata->getClass();
     }
 
-    public function getManager(): EntityManagerInterface
+    /**
+     * @return iterable<DirtyFlag>
+     */
+    public function generateDirtyFlagsForEntityCreation(object $entity): iterable
     {
-        return $this->entityManager;
+        $summaryClasses = $this->sourceMetadata->getAllInvolvedSummaryClasses();
+
+        foreach ($summaryClasses as $summaryClass) {
+            yield new DirtyFlag(
+                class: $summaryClass,
+                level: null,
+                key: null,
+            );
+        }
     }
 
+    /**
+     * @return iterable<DirtyFlag>
+     */
+    public function generateDirtyFlagsForEntityDeletion(object $entity): iterable
+    {
+        $summaryClasses = $this->sourceMetadata->getAllInvolvedSummaryClasses();
 
+        foreach ($summaryClasses as $summaryClass) {
+            $partitionHandler = $this->handlerFactory
+                ->getSummary($summaryClass)
+                ->getPartition();
+
+            yield $partitionHandler->createDirtyFlagForSourceEntity($entity);
+        }
+    }
+
+    /**
+     * @param list<string> $modifiedProperties
+     * @return iterable<DirtyFlag>
+     */
+    public function generateDirtyFlagsForEntityModification(
+        object $entity,
+        array $modifiedProperties,
+    ): iterable {
+        $summaryClasses = $this->sourceMetadata
+            ->getInvolvedSummaryClassesByChangedProperties($modifiedProperties);
+
+        foreach ($summaryClasses as $summaryClass) {
+            $partitionHandler = $this->handlerFactory
+                ->getSummary($summaryClass)
+                ->getPartition();
+
+            yield $partitionHandler->createDirtyFlagForSourceEntity($entity);
+        }
+    }
 }

@@ -18,8 +18,8 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\SummaryManager\DirtyFlag\DirtyFlagGenerator;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
+use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SourceEntityListener implements ResetInterface
@@ -30,7 +30,7 @@ final class SourceEntityListener implements ResetInterface
     private array $dirtyFlags = [];
 
     public function __construct(
-        private readonly DirtyFlagGenerator $dirtyFlagGenerator,
+        private readonly HandlerFactory $handlerFactory,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {}
 
@@ -53,8 +53,9 @@ final class SourceEntityListener implements ResetInterface
         // process deletions
 
         foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
-            $newDirtyFlags = $this->dirtyFlagGenerator
-                ->generateForEntityDeletion(entity: $entity);
+            $newDirtyFlags = $this->handlerFactory
+                ->getSource($entity)
+                ->generateDirtyFlagsForEntityDeletion($entity);
 
             foreach ($newDirtyFlags as $dirtyFlag) {
                 $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
@@ -66,8 +67,9 @@ final class SourceEntityListener implements ResetInterface
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
             $changedProperties = array_keys($unitOfWork->getEntityChangeSet($entity));
 
-            $newDirtyFlags = $this->dirtyFlagGenerator
-                ->generateForEntityModification(
+            $newDirtyFlags = $this->handlerFactory
+                ->getSource($entity)
+                ->generateDirtyFlagsForEntityModification(
                     entity: $entity,
                     modifiedProperties: $changedProperties,
                 );
@@ -80,8 +82,9 @@ final class SourceEntityListener implements ResetInterface
         // process inserts
 
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            $newDirtyFlags = $this->dirtyFlagGenerator
-                ->generateForEntityCreation(entity: $entity);
+            $newDirtyFlags = $this->handlerFactory
+                ->getSource($entity)
+                ->generateDirtyFlagsForEntityCreation($entity);
 
             foreach ($newDirtyFlags as $dirtyFlag) {
                 $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
@@ -103,8 +106,9 @@ final class SourceEntityListener implements ResetInterface
             }
 
             foreach ($collection as $entity) {
-                $newDirtyFlags = $this->dirtyFlagGenerator
-                    ->generateForEntityModification(
+                $newDirtyFlags = $this->handlerFactory
+                    ->getSource($entity)
+                    ->generateDirtyFlagsForEntityModification(
                         entity: $entity,
                         modifiedProperties: [$backRefFieldName],
                     );
