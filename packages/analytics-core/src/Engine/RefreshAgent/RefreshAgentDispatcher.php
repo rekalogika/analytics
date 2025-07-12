@@ -11,12 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\RefreshWorker;
+namespace Rekalogika\Analytics\Engine\RefreshAgent;
 
-interface RefreshClassPropertiesResolver
+interface RefreshAgentDispatcher
 {
     /**
-     * @param class-string $class
+     * Executes `RefreshAgent::run()` method in a separate process with the
+     * provided command.
      */
-    public function getProperties(string $class): RefreshClassProperties;
+    public function dispatch(RefreshAgentStartCommand $command): void;
 }

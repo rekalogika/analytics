@@ -13,18 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\EventListener;
 
-use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 
 final readonly class NewDirtyFlagListener
 {
-    /**
-     * @param RefreshScheduler<object> $refreshScheduler
-     */
     public function __construct(
-        private HandlerFactory $handlerFactory,
-        private RefreshScheduler $refreshScheduler,
+        private RefreshAgentRunner $refreshAgentRunner,
     ) {}
 
     public function onNewDirtyFlag(NewDirtyFlagEvent $event): void
@@ -32,12 +27,6 @@ final readonly class NewDirtyFlagListener
         $dirtyFlag = $event->getDirtyFlag();
         $class = $dirtyFlag->getClass();
 
-        $partitionHandler = $this->handlerFactory
-            ->getSummary($class)
-            ->getPartition();
-
-        $partition = $partitionHandler->getPartitionFromDirtyFlag($dirtyFlag);
-
-        $this->refreshScheduler->scheduleWorker($class, $partition);
+        $this->refreshAgentRunner->refresh($class);
     }
 }

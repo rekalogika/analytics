@@ -20,11 +20,11 @@ use Rekalogika\Analytics\Engine\Doctrine\Schema\SummaryPostGenerateSchemaTableLi
 use Rekalogika\Analytics\Engine\EventListener\NewDirtyFlagListener;
 use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
-use Rekalogika\Analytics\Engine\RefreshWorker\RefreshScheduler;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshClassPropertiesResolver;
-use Rekalogika\Analytics\Engine\SummaryManager\RefreshWorker\DefaultRefreshRunner;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -126,42 +126,46 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     //
-    // refresh worker framework
+    // listener
     //
 
     $services
         ->set('rekalogika.analytics.new_dirty_flag_listener')
         ->class(NewDirtyFlagListener::class)
         ->args([
-            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
-            '$refreshScheduler' => service('rekalogika.analytics.refresh_worker.refresh_scheduler'),
+            '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
         ])
         ->tag('kernel.event_listener', [
             'method' => 'onNewDirtyFlag',
         ])
     ;
 
+    //
+    // refresh agent
+    //
+
     $services
-        ->set('rekalogika.analytics.refresh_worker.refresh_scheduler')
-        ->class(RefreshScheduler::class)
+        ->set('rekalogika.analytics.engine.refresh.lock')
+        ->class(RefreshAgentLock::class)
         ->args([
-            '$adapter' => service('rekalogika.analytics.refresh_worker.refresh_framework_adapter')->nullOnInvalid(),
-            '$runner' => service('rekalogika.analytics.refresh_worker.default_refresh_runner'),
-            '$propertiesResolver' => service('rekalogika.analytics.refresh_worker.class_properties_resolver'),
+            '$managerRegistry' => service('doctrine'),
+        ]);
+
+    $services
+        ->set('rekalogika.analytics.engine.refresh.runner')
+        ->class(RefreshAgentRunner::class)
+        ->args([
+            '$refreshAgentDispatcher' => service('rekalogika.analytics.bundle.refresh.dispatcher'),
+            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
         ])
     ;
 
     $services
-        ->set('rekalogika.analytics.refresh_worker.class_properties_resolver')
-        ->class(DefaultRefreshClassPropertiesResolver::class)
-    ;
-
-    $services
-        ->set('rekalogika.analytics.refresh_worker.default_refresh_runner')
-        ->class(DefaultRefreshRunner::class)
+        ->set('rekalogika.analytics.engine.refresh.agent')
+        ->class(RefreshAgent::class)
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
-            '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
+            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
         ])
     ;
 

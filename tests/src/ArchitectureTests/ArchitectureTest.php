@@ -121,6 +121,7 @@ final class ArchitectureTest
                 // symfony
                 Selector::inNamespace('Symfony\Component\PropertyAccess'),
                 Selector::inNamespace('Symfony\Component\Translation'),
+                Selector::inNamespace('Symfony\Component\Lock'),
                 Selector::inNamespace('Symfony\Component\Uid'),
 
                 // doctrine
@@ -156,6 +157,7 @@ final class ArchitectureTest
                 Selector::classname(\Iterator::class),
                 Selector::classname(\Countable::class),
                 Selector::classname(\ArrayIterator::class),
+                Selector::classname(\WeakMap::class),
             );
     }
 
