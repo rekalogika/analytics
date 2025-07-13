@@ -75,4 +75,24 @@ final readonly class SummaryPropertiesManager
         $statement->bindValue('lastId', $max);
         $statement->executeStatement();
     }
+
+    public function remove(): void
+    {
+        $connection = $this->entityManager->getConnection();
+        $metadata = $this->entityManager
+            ->getClassMetadata(SummaryProperties::class);
+
+        $tableName = $metadata->getTableName();
+        $summaryClassColumn = $metadata->getColumnName('summaryClass');
+
+        $sql = \sprintf(
+            "DELETE FROM %s WHERE %s = :summaryClass",
+            $tableName,
+            $summaryClassColumn,
+        );
+
+        $statement = $connection->prepare($sql);
+        $statement->bindValue('summaryClass', $this->summaryClass);
+        $statement->executeStatement();
+    }
 }

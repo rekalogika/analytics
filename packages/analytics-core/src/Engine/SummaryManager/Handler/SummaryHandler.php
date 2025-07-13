@@ -161,4 +161,24 @@ final class SummaryHandler implements ResetInterface
 
         return new PartitionRange($start, $end);
     }
+
+    public function truncate(): void
+    {
+        $connection = $this->entityManager->getConnection();
+        $metadata = $this->entityManager
+            ->getClassMetadata($this->summaryMetadata->getSummaryClass());
+
+        $tableName = $metadata->getTableName();
+
+        $sql = \sprintf(
+            "TRUNCATE TABLE %s",
+            $tableName,
+        );
+
+        $statement = $connection->prepare($sql);
+        $statement->executeStatement();
+
+        $this->createSummaryPropertiesManager()->remove();
+        $this->dirtyFlagsHandler->removeAllDirtyFlags();
+    }
 }
