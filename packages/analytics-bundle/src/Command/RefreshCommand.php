@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscribe
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,6 +36,7 @@ final class RefreshCommand extends Command
     public function __construct(
         private readonly RefreshCommandOutputEventSubscriber $refreshCommandOutputEventSubscriber,
         private readonly SummaryRefresherFactory $summaryRefresherFactory,
+        private readonly SummaryMetadataFactory $summaryMetadataFactory,
     ) {
         parent::__construct();
     }
@@ -44,7 +46,7 @@ final class RefreshCommand extends Command
     {
         $this->addArgument(
             name: 'class',
-            mode: InputArgument::REQUIRED,
+            mode: InputArgument::OPTIONAL,
             description: 'Summary Class',
         );
     }
@@ -56,7 +58,11 @@ final class RefreshCommand extends Command
 
         $this->refreshCommandOutputEventSubscriber->initialize($this->io);
 
-        $class = $input->getArgument('class');
+        $class = $input->getArgument('class') ?? $this->io->choice(
+            question: 'Please select the summary class to refresh',
+            choices: $this->summaryMetadataFactory->getSummaryClasses(),
+            default: null,
+        );
 
         /** @psalm-suppress TypeDoesNotContainType */
         if (!\is_string($class)) {
