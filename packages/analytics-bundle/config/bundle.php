@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
+use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
@@ -91,6 +92,19 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$translator' => service('translator'),
+        ])
+        ->tag('console.command')
+    ;
+
+    // truncate command
+
+    $services
+        ->set('rekalogika.analytics.command.truncate')
+        ->class(TruncateCommand::class)
+        ->args([
+            '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
         ])
         ->tag('console.command')
     ;

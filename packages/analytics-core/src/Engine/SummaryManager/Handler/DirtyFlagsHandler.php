@@ -170,4 +170,14 @@ final readonly class DirtyFlagsHandler
             ->getQuery()
             ->execute();
     }
+
+    public function removeAllDirtyFlags(): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->getQuery()
+            ->execute();
+    }
 }
