@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -73,9 +74,15 @@ final class RefreshCommand extends Command
             ));
         }
 
+        $strategy = new DefaultRefreshAgentStrategy(
+            minimumAge: null,
+            maximumAge: null,
+            minimumIdleDelay: null,
+        );
+
         $this->summaryRefresherFactory
             ->createSummaryRefresher($class)
-            ->refresh();
+            ->refresh($strategy, maxIterations: null);
 
         return Command::SUCCESS;
     }

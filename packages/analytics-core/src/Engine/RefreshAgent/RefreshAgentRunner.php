@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\RefreshAgent;
 
+/**
+ * Calls refresh agent dispatcher to run the refresh agent.
+ */
 final readonly class RefreshAgentRunner
 {
     public function __construct(
@@ -29,8 +32,9 @@ final readonly class RefreshAgentRunner
             return;
         }
 
-        $command = new RefreshAgentStartCommand($summaryClass);
+        $this->refreshAgentLock->release($summaryClass);
 
-        $this->refreshAgentDispatcher->dispatch($command);
+        $command = new RefreshAgentStartCommand($summaryClass);
+        $this->refreshAgentDispatcher->dispatch($command, new \DateTimeImmutable('now + 1 second'));
     }
 }

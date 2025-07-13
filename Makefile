@@ -104,7 +104,7 @@ compose-restart: compose-down compose-up
 
 .PHONY: fixtures-load
 fixtures-load: compose-up
-	$(PHP) tests/bin/console doctrine:fixtures:load --no-interaction
+	$(PHP) tests/bin/console doctrine:fixtures:load --no-interaction -vv
 
 #
 # js
@@ -194,12 +194,12 @@ summary-refresh: summary-refresh-order summary-refresh-customer summary-refresh-
 
 .PHONY: summary-refresh-order
 summary-refresh-order:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
 
 .PHONY: summary-refresh-customer
 summary-refresh-customer:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
+	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
 
 .PHONY: summary-refresh-occupancy-history
 summary-refresh-occupancy-history:
-	tests/bin/console rekalogika:analytics:refresh 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
+	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
