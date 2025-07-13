@@ -35,7 +35,6 @@ use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
-use Rekalogika\Analytics\UX\PanelBundle\Filter\DateRange\DateRangeFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterResolver;
 use Rekalogika\Analytics\UX\PanelBundle\FilterSpecification;
@@ -54,25 +53,13 @@ final readonly class TimeBinFilterResolver implements FilterResolver
         }
 
         $typeClass = $valueResolver->getTypeClass();
+        $filterClass = NumberRangesFilter::class;
 
-        if (is_a($typeClass, Date::class, true)) {
-            $filterClass = DateRangeFilter::class;
-
-            $options = new TimeBinDateRangeFilterOptions(
-                timeBinClass: $typeClass,
-                label: $dimension->getLabel(),
-                help: $this->getHelp($typeClass),
-            );
-        } else {
-            $filterClass = NumberRangesFilter::class;
-
-            $options = new TimeBinNumberRangeFilterOptions(
-                timeBinClass: $typeClass,
-                label: $dimension->getLabel(),
-                help: $this->getHelp($typeClass),
-            );
-
-        }
+        $options = new TimeBinNumberRangeFilterOptions(
+            timeBinClass: $typeClass,
+            label: $dimension->getLabel(),
+            help: $this->getHelp($typeClass),
+        );
 
         return new FilterSpecification($filterClass, $options);
     }
