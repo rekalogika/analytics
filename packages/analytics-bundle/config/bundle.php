@@ -24,6 +24,7 @@ use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -122,4 +123,17 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$messageBus' => service('messenger.bus.default'),
         ])
     ;
+
+    $services
+        ->set('rekalogika.analytics.refresh.agent')
+        ->class(RefreshAgent::class)
+        ->args([
+            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
+        ])
+        ->tag('messenger.message_handler', [
+            'method' => 'run',
+        ])
+    ;
+
 };

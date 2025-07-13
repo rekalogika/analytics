@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartition;
 use Rekalogika\Analytics\Engine\Entity\DirtyPartitionCollection;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
@@ -49,8 +51,10 @@ final readonly class DirtyFlagsHandler
         );
     }
 
-    public function getDirtyPartitions(int $limit = 100): DirtyPartitionCollection
-    {
+    public function getDirtyPartitions(
+        RefreshAgentStrategy $refreshAgentStrategy,
+        int $batchSize = 1000,
+    ): DirtyPartitionCollection {
         $summaryClass = $this->metadata->getSummaryClass();
         $partitionClass = $this->metadata->getPartition()->getPartitionClass();
 
@@ -69,14 +73,62 @@ final readonly class DirtyFlagsHandler
                 $partitionClass,
             ))
             ->addSelect('MIN(df.created) AS HIDDEN earliest')
+            ->addSelect('MAX(df.created) AS HIDDEN latest')
             ->from(DirtyFlag::class, 'df')
+
             ->where('df.class = :class')
-            ->setParameter('class', $summaryClass)
             ->andWhere('df.level IS NOT NULL')
             ->andWhere('df.key IS NOT NULL')
+            ->setParameter('class', $summaryClass)
+
             ->groupBy('df.class, df.level, df.key')
+
             ->orderBy('earliest', 'ASC')
-            ->setMaxResults($limit);
+
+            ->setMaxResults($batchSize);
+
+        if (($minimumAge = $refreshAgentStrategy->getMinimumAge()) !== null) {
+            $minimumAgeThreshold = (new \DateTimeImmutable())
+                ->modify(\sprintf('-%d seconds', $minimumAge));
+
+            $queryBuilder
+                ->andHaving('MIN(df.created) <= :minimumAgeThreshold')
+                ->setParameter(
+                    'minimumAgeThreshold',
+                    $minimumAgeThreshold,
+                    Types::DATETIME_IMMUTABLE,
+                );
+        }
+
+        if (($minimumIdleDelay = $refreshAgentStrategy->getMinimumIdleDelay()) !== null) {
+            $minimumIdleDelayThreshold = (new \DateTimeImmutable())
+                ->modify(\sprintf('-%d seconds', $minimumIdleDelay));
+
+            $expression = $queryBuilder->expr()->lte(
+                'MAX(df.created)',
+                ':minimumIdleDelayThreshold',
+            );
+
+            $queryBuilder->setParameter(
+                'minimumIdleDelayThreshold',
+                $minimumIdleDelayThreshold,
+                Types::DATETIME_IMMUTABLE,
+            );
+
+            if (($maximumAge = $refreshAgentStrategy->getMaximumAge()) === null) {
+                $expression = $queryBuilder->expr()->orX(
+                    $expression,
+                    $queryBuilder->expr()->gte(
+                        'DATE_SUB(MAX(df.created), :range, \'second\')',
+                        'MIN(df.created)',
+                    ),
+                );
+
+                $queryBuilder->setParameter('range', $maximumAge);
+            }
+
+            $queryBuilder->andHaving($expression);
+        }
 
         $query = $queryBuilder->getQuery();
 

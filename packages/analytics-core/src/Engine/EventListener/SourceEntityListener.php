@@ -18,6 +18,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\SummaryManager\Event\DirtySummaryEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
 use Symfony\Contracts\Service\ResetInterface;
@@ -142,8 +143,16 @@ final class SourceEntityListener implements ResetInterface
      */
     public function postFlush(PostFlushEventArgs $doctrineEvent): void
     {
+        $summaryClassses = [];
+
         foreach ($this->dirtyFlags as $dirtyFlag) {
             $event = new NewDirtyFlagEvent($dirtyFlag);
+            $summaryClassses[$dirtyFlag->getClass()] = true;
+            $this->eventDispatcher?->dispatch($event);
+        }
+
+        foreach (array_keys($summaryClassses) as $summaryClass) {
+            $event = new DirtySummaryEvent($summaryClass);
             $this->eventDispatcher?->dispatch($event);
         }
 

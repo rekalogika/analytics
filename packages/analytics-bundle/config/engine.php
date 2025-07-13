@@ -17,7 +17,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
-use Rekalogika\Analytics\Engine\EventListener\NewDirtyFlagListener;
+use Rekalogika\Analytics\Engine\EventListener\DirtySummaryEventListener;
 use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
 use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
@@ -131,12 +131,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set('rekalogika.analytics.new_dirty_flag_listener')
-        ->class(NewDirtyFlagListener::class)
+        ->class(DirtySummaryEventListener::class)
         ->args([
             '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
         ])
         ->tag('kernel.event_listener', [
-            'method' => 'onNewDirtyFlag',
+            'method' => 'onDirtySummaryEvent',
         ])
     ;
 
@@ -149,7 +149,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(RefreshAgentLock::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
-        ]);
+        ])
+        ->tag('kernel.reset', [
+            'method' => 'reset',
+        ])
+    ;
 
     $services
         ->set('rekalogika.analytics.engine.refresh.runner')

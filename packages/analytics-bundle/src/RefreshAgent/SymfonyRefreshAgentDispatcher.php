@@ -15,7 +15,9 @@ namespace Rekalogika\Analytics\Bundle\RefreshAgent;
 
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentDispatcher;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentStartCommand;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 final readonly class SymfonyRefreshAgentDispatcher implements RefreshAgentDispatcher
 {
@@ -24,8 +26,14 @@ final readonly class SymfonyRefreshAgentDispatcher implements RefreshAgentDispat
     ) {}
 
     #[\Override]
-    public function dispatch(RefreshAgentStartCommand $command): void
-    {
-        $this->messageBus->dispatch($command);
+    public function dispatch(
+        RefreshAgentStartCommand $command,
+        \DateTimeInterface $runAt,
+    ): void {
+        $envelope = new Envelope($command, [
+            DelayStamp::delayUntil($runAt),
+        ]);
+
+        $this->messageBus->dispatch($envelope);
     }
 }

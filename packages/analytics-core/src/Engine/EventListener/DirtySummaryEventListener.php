@@ -14,19 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\EventListener;
 
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
+use Rekalogika\Analytics\Engine\SummaryManager\Event\DirtySummaryEvent;
 
-final readonly class NewDirtyFlagListener
+final readonly class DirtySummaryEventListener
 {
     public function __construct(
         private RefreshAgentRunner $refreshAgentRunner,
     ) {}
 
-    public function onNewDirtyFlag(NewDirtyFlagEvent $event): void
+    public function onDirtySummaryEvent(DirtySummaryEvent $event): void
     {
-        $dirtyFlag = $event->getDirtyFlag();
-        $class = $dirtyFlag->getClass();
-
-        $this->refreshAgentRunner->refresh($class);
+        $this->refreshAgentRunner->refresh($event->getSummaryClass());
     }
 }

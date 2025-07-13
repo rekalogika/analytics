@@ -16,8 +16,11 @@ namespace Rekalogika\Analytics\Engine\RefreshAgent;
 interface RefreshAgentDispatcher
 {
     /**
-     * Executes `RefreshAgent::run()` method in a separate process with the
-     * provided command.
+     * Implmentation must execute `RefreshAgent::run()` method in a separate
+     * process with the provided command, at the specified time.
      */
-    public function dispatch(RefreshAgentStartCommand $command): void;
+    public function dispatch(
+        RefreshAgentStartCommand $command,
+        \DateTimeInterface $runAt,
+    ): void;
 }

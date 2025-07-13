@@ -18,6 +18,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
@@ -70,20 +72,37 @@ final class SummaryRefresher
         }
     }
 
-    public function refresh(): void
-    {
-        $this->convertNewRecordsToDirtyFlags();
+    public function refresh(
+        ?RefreshAgentStrategy $refreshAgentStrategy = null,
+        ?int $maxIterations = null,
+    ): void {
+        if ($refreshAgentStrategy === null) {
+            $refreshAgentStrategy = new DefaultRefreshAgentStrategy();
+        }
+
+        $i = 0;
 
         do {
-            $count = $this->refreshOne();
-        } while ($count > 0);
+            $i++;
+
+            $this->convertNewRecordsToDirtyFlags();
+            $count = $this->refreshOne($refreshAgentStrategy);
+
+            if ($count === 0) {
+                break;
+            }
+
+            if ($maxIterations !== null && $i >= $maxIterations) {
+                break;
+            }
+        } while (true);
     }
 
-    private function refreshOne(): int
+    private function refreshOne(RefreshAgentStrategy $refreshAgentStrategy): int
     {
         $dirtyPartitions = $this->summaryHandler
             ->getDirtyFlags()
-            ->getDirtyPartitions(100);
+            ->getDirtyPartitions($refreshAgentStrategy);
 
         foreach ($dirtyPartitions as $partition) {
             $this->refreshPartition($partition->getPartition());
@@ -474,5 +493,4 @@ final class SummaryRefresher
 
         return $dirtyFlags;
     }
-
 }

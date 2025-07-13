@@ -23,6 +23,9 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
 use Symfony\Contracts\Service\ResetInterface;
 
+/**
+ * Locking service for the refresh agent.
+ */
 final class RefreshAgentLock implements ResetInterface
 {
     /**
@@ -107,7 +110,8 @@ final class RefreshAgentLock implements ResetInterface
             ));
         }
 
-        return new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
+        return $this->summaryClassToKey[$summaryClass] =
+            new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
     }
 
     /**
