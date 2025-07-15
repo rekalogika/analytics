@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Bundle;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\ToolEvents;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Engine\Doctrine\Schema\SummaryPostGenerateSchemaTableListener;
+use Rekalogika\Analytics\Engine\Doctrine\EventListener\SourceEntityListener;
+use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryEntityListener;
+use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\Engine\EventListener\DirtySummaryEventListener;
-use Rekalogika\Analytics\Engine\EventListener\SourceEntityListener;
-use Rekalogika\Analytics\Engine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
@@ -75,6 +75,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ]);
 
+    //
+    // doctrine event listeners
+    //
+
     $services
         ->set('rekalogika.analytics.doctrine.schema.post_generate')
         ->class(SummaryPostGenerateSchemaTableListener::class)
@@ -126,7 +130,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     //
-    // listener
+    // event listeners
     //
 
     $services
