@@ -29,6 +29,9 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     use NodeTrait;
     use BalancedTreeChildrenTrait;
 
+    private DefaultTuple $tuple;
+    private DefaultMeasures $subtotals;
+
     /**
      * @param class-string $summaryClass
      * @param list<DefaultTreeNode> $children
@@ -53,6 +56,13 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
                 );
             }
         }
+
+        $this->tuple = new DefaultTuple(
+            summaryClass: $summaryClass,
+            dimensions: [],
+        );
+
+        $this->subtotals = $rowCollection->getMeasures($this->tuple);
     }
 
     #[\Override]
@@ -64,10 +74,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getTuple(): DefaultTuple
     {
-        return new DefaultTuple(
-            summaryClass: $this->summaryClass,
-            dimensions: [],
-        );
+        return $this->tuple;
     }
 
     #[\Override]
@@ -79,7 +86,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getSubtotals(): Measures
     {
-        return new DefaultMeasures([]);
+        return $this->subtotals;
     }
 
     #[\Override]

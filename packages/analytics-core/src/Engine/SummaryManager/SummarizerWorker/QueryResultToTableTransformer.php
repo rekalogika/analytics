@@ -67,6 +67,7 @@ final readonly class QueryResultToTableTransformer
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
+        RowCollection $rowCollection,
         array $input,
     ): DefaultTable {
         $transformer = new self(
@@ -76,7 +77,6 @@ final readonly class QueryResultToTableTransformer
             propertyAccessor: $propertyAccessor,
         );
 
-        $rowCollection = new RowCollection();
         /** @psalm-suppress InvalidArgument */
         $rows = iterator_to_array($transformer->doTransform($input), false);
 

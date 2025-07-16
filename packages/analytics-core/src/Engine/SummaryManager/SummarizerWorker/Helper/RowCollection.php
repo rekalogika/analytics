@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
@@ -29,6 +30,8 @@ final class RowCollection
      * @var array<string,DefaultNormalRow>
      */
     private array $normalRows = [];
+
+    public function __construct() {}
 
     public function collectRow(DefaultRow $row): void
     {
@@ -63,6 +66,21 @@ final class RowCollection
         return $this->rows[$signature]
             ?? $this->normalRows[$signature]
             ?? null;
+    }
+
+    public function getMeasures(DefaultTuple $tuple): DefaultMeasures
+    {
+        $row = $this->getByTuple($tuple);
+
+        if ($row === null) {
+            return new DefaultMeasures([]);
+        }
+
+        if ($row instanceof DefaultRow) {
+            return $row->getMeasures();
+        }
+
+        return new DefaultMeasures([$row->getMeasure()]);
     }
 
     /**

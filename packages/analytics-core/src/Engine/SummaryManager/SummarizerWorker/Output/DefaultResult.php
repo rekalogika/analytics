@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
@@ -51,6 +52,8 @@ final class DefaultResult implements Result
 
     private readonly DefaultTreeNodeFactory $treeNodeFactory;
 
+    private readonly RowCollection $rowCollection;
+
     /**
      * @param class-string $summaryClass
      */
@@ -64,8 +67,11 @@ final class DefaultResult implements Result
         private readonly EntityManagerInterface $entityManager,
         int $fillingNodesLimit,
     ) {
+        $this->rowCollection = new RowCollection();
+
         $this->treeNodeFactory = new DefaultTreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,
+            rowCollection: $this->rowCollection,
         );
     }
 
@@ -96,6 +102,7 @@ final class DefaultResult implements Result
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
+            rowCollection: $this->rowCollection,
             input: $this->getQueryResult(),
         );
     }
