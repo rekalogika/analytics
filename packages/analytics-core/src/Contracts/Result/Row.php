@@ -21,7 +21,5 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Row extends Tuple
 {
-    public function getTuple(): Tuple;
-
     public function getMeasures(): Measures;
 }

@@ -129,4 +129,14 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
     {
         return $this->tuple->getIterator();
     }
+
+    public function getSignature(): string
+    {
+        return $this->tuple->getSignature();
+    }
+
+    public function isSubtotal(): bool
+    {
+        return $this->groupings?->isSubtotal() ?? false;
+    }
 }

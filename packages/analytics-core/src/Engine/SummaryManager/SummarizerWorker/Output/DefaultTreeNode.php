@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -163,6 +164,13 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         return $this->measure = $measure;
     }
+
+    #[\Override]
+    public function getSubtotals(): Measures
+    {
+        return new DefaultMeasures([]);
+    }
+
 
     public function getParent(): null|DefaultTreeNode
     {

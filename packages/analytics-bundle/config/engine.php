@@ -73,7 +73,22 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
-        ]);
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.summary_manager.handler_factory')
+        ->class(HandlerFactory::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
+            '$propertyAccessor' => service('property_accessor'),
+        ])
+        ->tag('kernel.reset', [
+            'method' => 'reset',
+        ])
+    ;
 
     //
     // doctrine event listeners
@@ -174,20 +189,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
-        ])
-    ;
-
-    $services
-        ->set('rekalogika.analytics.summary_manager.handler_factory')
-        ->class(HandlerFactory::class)
-        ->args([
-            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
-            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
-            '$managerRegistry' => service('doctrine'),
-            '$propertyAccessor' => service('property_accessor'),
-        ])
-        ->tag('kernel.reset', [
-            'method' => 'reset',
         ])
     ;
 };

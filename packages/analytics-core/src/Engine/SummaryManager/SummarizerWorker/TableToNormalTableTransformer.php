@@ -81,11 +81,7 @@ final class TableToNormalTableTransformer
     {
         $rows = [];
 
-        foreach ($input as $row) {
-            if ($row->isSubtotal()) {
-                continue;
-            }
-
+        foreach ($input->getAllRows() as $row) {
             foreach ($this->unpivotRow($row) as $row2) {
                 $rows[] = $row2;
                 $this->dimensionCollector->processDimensions($row2);
@@ -126,7 +122,13 @@ final class TableToNormalTableTransformer
                 // be set in the next loop
                 $newRow['@values'] = true;
             } else {
-                $newRow[$dimension] = $row->getByName($dimension);
+                $d = $row->getByName($dimension);
+
+                if ($d === null) {
+                    continue;
+                }
+
+                $newRow[$dimension] = $d;
             }
         }
 

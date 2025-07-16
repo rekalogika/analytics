@@ -40,12 +40,6 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     }
 
     #[\Override]
-    public function getTuple(): DefaultTuple
-    {
-        return $this->tuple;
-    }
-
-    #[\Override]
     public function getMeasures(): DefaultMeasures
     {
         return $this->measures;
@@ -95,5 +89,10 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     public function count(): int
     {
         return $this->tuple->count();
+    }
+
+    public function getSignature(): string
+    {
+        return $this->tuple->getSignature();
     }
 }

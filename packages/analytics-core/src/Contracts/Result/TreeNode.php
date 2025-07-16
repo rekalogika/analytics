@@ -35,6 +35,8 @@ interface TreeNode extends \Traversable, \Countable, Dimension
 
     public function getMeasure(): ?Measure;
 
+    public function getSubtotals(): Measures;
+
     public function traverse(mixed ...$members): ?TreeNode;
 
     /**
