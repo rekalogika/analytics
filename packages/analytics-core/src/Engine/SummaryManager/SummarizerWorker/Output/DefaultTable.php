@@ -48,7 +48,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         $newAllRows = [];
 
         foreach ($rows as $row) {
-            $signature = $row->getTuple()->getSignature();
+            $signature = $row->getSignature();
 
             if (isset($newRows[$signature])) {
                 throw new LogicException(
@@ -96,6 +96,18 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->rows as $row) {
+            yield $row;
+        }
+    }
+
+    /**
+     * Get all rows including subtotals.
+     *
+     * @return \Traversable<int,DefaultRow>
+     */
+    public function getAllRows(): \Traversable
+    {
+        foreach ($this->allRows as $row) {
             yield $row;
         }
     }
