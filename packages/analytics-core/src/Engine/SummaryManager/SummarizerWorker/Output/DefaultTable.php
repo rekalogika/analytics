@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
-use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Table;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 
 /**
  * @implements \IteratorAggregate<int,DefaultRow>
@@ -25,16 +25,9 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     /**
      * Rows without subtotals.
      *
-     * @var array<string,DefaultRow>
+     * @var list<DefaultRow>
      */
     private array $rows;
-
-    /**
-     * All rows including subtotals.
-     *
-     * @var array<string,DefaultRow>
-     */
-    private array $allRows;
 
     /**
      * @param class-string $summaryClass
@@ -43,28 +36,19 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         iterable $rows,
+        private RowCollection $rowCollection,
     ) {
         $newRows = [];
-        $newAllRows = [];
 
         foreach ($rows as $row) {
-            $signature = $row->getSignature();
-
-            if (isset($newRows[$signature])) {
-                throw new LogicException(
-                    \sprintf('Row with signature "%s" already exists.', $signature),
-                );
+            if ($row->isSubtotal()) {
+                continue;
             }
 
-            if (!$row->isSubtotal()) {
-                $newRows[$signature] = $row;
-            }
-
-            $newAllRows[$signature] = $row;
+            $newRows[] = $row;
         }
 
         $this->rows = $newRows;
-        $this->allRows = $newAllRows;
     }
 
     #[\Override]
@@ -100,22 +84,8 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         }
     }
 
-    /**
-     * Get all rows including subtotals.
-     *
-     * @return \Traversable<int,DefaultRow>
-     */
-    public function getAllRows(): \Traversable
+    public function getRowCollection(): RowCollection
     {
-        foreach ($this->allRows as $row) {
-            yield $row;
-        }
-    }
-
-    public function getRowByTuple(DefaultTuple $tuple): ?DefaultRow
-    {
-        $signature = $tuple->getSignature();
-
-        return $this->allRows[$signature] ?? null;
+        return $this->rowCollection;
     }
 }

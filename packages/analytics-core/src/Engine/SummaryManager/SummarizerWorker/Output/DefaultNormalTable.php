@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
-use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 
 /**
@@ -24,18 +24,9 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\It
 final readonly class DefaultNormalTable implements NormalTable, \IteratorAggregate
 {
     /**
-     * Rows without subtotals.
-     *
-     * @var array<string,DefaultNormalRow>
+     * @var list<DefaultNormalRow>
      */
     private array $rows;
-
-    /**
-     * All rows including subtotals.
-     *
-     * @var array<string,DefaultNormalRow>
-     */
-    private array $allRows;
 
     /**
      * @param class-string $summaryClass
@@ -45,28 +36,19 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         private string $summaryClass,
         array $rows,
         private ItemCollection $itemCollection,
+        private RowCollection $rowCollection,
     ) {
         $newRows = [];
-        $newAllRows = [];
 
         foreach ($rows as $row) {
-            $signature = $row->getSignature();
-
-            if (isset($newRows[$signature])) {
-                throw new LogicException(
-                    \sprintf('Row with signature "%s" already exists.', $signature),
-                );
+            if ($row->isSubtotal()) {
+                continue;
             }
 
-            if (!$row->isSubtotal()) {
-                $newRows[$signature] = $row;
-            }
-
-            $newAllRows[$signature] = $row;
+            $newRows[] = $row;
         }
 
         $this->rows = $newRows;
-        $this->allRows = $newAllRows;
     }
 
     #[\Override]
@@ -107,10 +89,8 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         return $this->itemCollection;
     }
 
-    public function getRowByTuple(DefaultTuple $tuple): ?DefaultNormalRow
+    public function getRowCollection(): RowCollection
     {
-        $signature = $tuple->getSignature();
-
-        return $this->allRows[$signature] ?? null;
+        return $this->rowCollection;
     }
 }
