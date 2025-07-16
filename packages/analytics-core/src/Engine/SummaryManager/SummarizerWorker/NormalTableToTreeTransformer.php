@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
@@ -45,6 +46,7 @@ final class NormalTableToTreeTransformer
         private readonly array $names,
         private readonly ItemCollection $itemCollection,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
+        private readonly RowCollection $rowCollection,
     ) {}
 
     public static function transform(
@@ -65,6 +67,7 @@ final class NormalTableToTreeTransformer
                 children: [],
                 itemCollection: $normalTable->getItemCollection(),
                 treeNodeFactory: $treeNodeFactory,
+                rowCollection: $normalTable->getRowCollection(),
             );
         }
 
@@ -80,6 +83,7 @@ final class NormalTableToTreeTransformer
             names: $names,
             itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
+            rowCollection: $normalTable->getRowCollection(),
         );
 
         return new DefaultTree(
@@ -89,6 +93,7 @@ final class NormalTableToTreeTransformer
             children: $transformer->doTransform($normalTable),
             itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
+            rowCollection: $normalTable->getRowCollection(),
         );
     }
 
@@ -184,5 +189,10 @@ final class NormalTableToTreeTransformer
         }
 
         return $this->tree;
+    }
+
+    public function getRowCollection(): RowCollection
+    {
+        return $this->rowCollection;
     }
 }

@@ -18,7 +18,9 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\QueryResultToTableHelper;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
@@ -74,17 +76,25 @@ final readonly class QueryResultToTableTransformer
             propertyAccessor: $propertyAccessor,
         );
 
-        $rows = $transformer->doTransform($input);
+        $rowCollection = new RowCollection();
+        /** @psalm-suppress InvalidArgument */
+        $rows = iterator_to_array($transformer->doTransform($input), false);
+
+        /** @var iterable<int,DefaultRow> $rows */
+        foreach ($rows as $row) {
+            $rowCollection->collectRow($row);
+        }
 
         return new DefaultTable(
             summaryClass: $metadata->getSummaryClass(),
             rows: $rows,
+            rowCollection: $rowCollection,
         );
     }
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return iterable<DefaultRow>
+     * @return iterable<int,DefaultRow>
      */
     private function doTransform(array $input): iterable
     {

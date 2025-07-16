@@ -79,13 +79,15 @@ final class TableToNormalTableTransformer
 
     private function doTransform(DefaultTable $input): DefaultNormalTable
     {
+        $rowCollection = $input->getRowCollection();
         $rows = [];
 
-        foreach ($input->getAllRows() as $row) {
-            foreach ($this->unpivotRow($row) as $row2) {
-                $rows[] = $row2;
-                $this->dimensionCollector->processDimensions($row2);
-                $this->dimensionCollector->processMeasure($row2->getMeasure());
+        foreach ($rowCollection->getRows() as $row) {
+            foreach ($this->unpivotRow($row) as $normalRow) {
+                $rows[] = $normalRow;
+                $this->dimensionCollector->processDimensions($normalRow);
+                $this->dimensionCollector->processMeasure($normalRow->getMeasure());
+                $rowCollection->collectNormalRow($normalRow);
             }
         }
 
@@ -98,6 +100,7 @@ final class TableToNormalTableTransformer
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
             itemCollection: $itemCollection,
+            rowCollection: $rowCollection,
         );
     }
 

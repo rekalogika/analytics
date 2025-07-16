@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -39,6 +40,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         private readonly array $children,
         private readonly ItemCollection $itemCollection,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
+        private readonly RowCollection $rowCollection,
     ) {
         if ($childrenKey === null && $children !== []) {
             throw new UnexpectedValueException('Children key cannot be null if children is not empty');
@@ -138,5 +140,10 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     public function getChildrenKey(): ?string
     {
         return $this->childrenKey;
+    }
+
+    public function getRowCollection(): RowCollection
+    {
+        return $this->rowCollection;
     }
 }
