@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -45,7 +45,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly null|DefaultTreeNode $parent,
         private readonly DefaultDimension $dimension,
         private ?DefaultMeasure $measure,
-        private readonly Items $items,
+        private readonly ItemCollection $itemCollection,
         private readonly bool $null,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {
@@ -160,7 +160,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         $measureProperty = $measureMember->getMeasureProperty();
 
         // get the null measure
-        $measure = $this->items->getMeasure($measureProperty);
+        $measure = $this->itemCollection->getMeasure($measureProperty);
 
         return $this->measure = $measure;
     }

@@ -92,12 +92,12 @@ final class TableToNormalTableTransformer
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
-        $uniqueDimensions = $this->dimensionCollector->getResult();
+        $itemCollection = $this->dimensionCollector->getItemCollection();
 
         return new DefaultNormalTable(
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
-            uniqueDimensions: $uniqueDimensions,
+            itemCollection: $itemCollection,
         );
     }
 
@@ -121,15 +121,17 @@ final class TableToNormalTableTransformer
                 // temporary value, we book the place in the row, the value will
                 // be set in the next loop
                 $newRow['@values'] = true;
-            } else {
-                $d = $row->getByName($dimension);
 
-                if ($d === null) {
-                    continue;
-                }
-
-                $newRow[$dimension] = $d;
+                continue;
             }
+
+            $d = $row->getByName($dimension);
+
+            if ($d === null) {
+                continue;
+            }
+
+            $newRow[$dimension] = $d;
         }
 
         // @phpstan-ignore identical.alwaysFalse

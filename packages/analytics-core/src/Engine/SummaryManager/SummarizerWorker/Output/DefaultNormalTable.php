@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 
 /**
  * @implements \IteratorAggregate<int,DefaultNormalRow>
@@ -44,7 +44,7 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function __construct(
         private string $summaryClass,
         array $rows,
-        private Items $uniqueDimensions,
+        private ItemCollection $itemCollection,
     ) {
         $newRows = [];
         $newAllRows = [];
@@ -102,9 +102,9 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         }
     }
 
-    public function getUniqueDimensions(): Items
+    public function getItemCollection(): ItemCollection
     {
-        return $this->uniqueDimensions;
+        return $this->itemCollection;
     }
 
     public function getRowByTuple(DefaultTuple $tuple): ?DefaultNormalRow
