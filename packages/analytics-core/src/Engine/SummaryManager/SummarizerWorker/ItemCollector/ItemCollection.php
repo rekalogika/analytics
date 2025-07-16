@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMe
 /**
  * @implements \IteratorAggregate<DimensionCollection>
  */
-final readonly class Items implements \IteratorAggregate, \Countable
+final readonly class ItemCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @param array<string,DimensionCollection> $dimensions

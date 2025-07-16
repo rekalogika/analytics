@@ -95,4 +95,9 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     {
         return $this->tuple->getSignature();
     }
+
+    public function getTuple(): DefaultTuple
+    {
+        return $this->tuple;
+    }
 }

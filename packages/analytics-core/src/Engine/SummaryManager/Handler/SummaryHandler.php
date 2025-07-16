@@ -55,7 +55,7 @@ final class SummaryHandler implements ResetInterface
     }
 
     #[\Override]
-    public function reset()
+    public function reset(): void
     {
         $this->sourceOfSummaryHandler->reset();
     }

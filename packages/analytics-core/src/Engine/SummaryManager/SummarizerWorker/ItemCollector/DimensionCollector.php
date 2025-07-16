@@ -37,7 +37,7 @@ final class DimensionCollector
         private DefaultQuery $query,
     ) {}
 
-    public function getResult(): Items
+    public function getItemCollection(): ItemCollection
     {
         $uniqueDimensionsByKey = [];
 
@@ -45,7 +45,7 @@ final class DimensionCollector
             $uniqueDimensionsByKey[$name] = $collector->getResult();
         }
 
-        return new Items(
+        return new ItemCollection(
             dimensions: $uniqueDimensionsByKey,
             measures: $this->measures,
         );

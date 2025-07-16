@@ -40,7 +40,7 @@ trait BalancedTreeChildrenTrait
         }
 
         try {
-            $childrenDimensions = $this->items
+            $childrenDimensions = $this->itemCollection
                 ->getDimensions($this->childrenKey);
 
             $balancedChildren = [];
@@ -52,11 +52,11 @@ trait BalancedTreeChildrenTrait
                     /** @psalm-suppress InaccessibleProperty */
                     $child = $this->treeNodeFactory->createFillingNode(
                         summaryClass: $this->summaryClass,
-                        childrenKey: $this->items->getKeyAfter($this->childrenKey),
+                        childrenKey: $this->itemCollection->getKeyAfter($this->childrenKey),
                         dimension: $dimension,
                         parent: $this instanceof DefaultTreeNode ? $this : null,
                         measure: null,
-                        items: $this->items,
+                        itemCollection: $this->itemCollection,
                     );
                 }
 

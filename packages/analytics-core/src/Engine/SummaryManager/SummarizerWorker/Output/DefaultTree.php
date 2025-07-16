@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -37,7 +37,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         private readonly TranslatableInterface $label,
         private readonly ?string $childrenKey,
         private readonly array $children,
-        private readonly Items $items,
+        private readonly ItemCollection $itemCollection,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {
         if ($childrenKey === null && $children !== []) {
@@ -130,9 +130,9 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
     }
 
-    public function getUniqueDimensions(): Items
+    public function getItemCollection(): ItemCollection
     {
-        return $this->items;
+        return $this->itemCollection;
     }
 
     public function getChildrenKey(): ?string

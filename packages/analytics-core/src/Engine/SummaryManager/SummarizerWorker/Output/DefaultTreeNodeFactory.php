@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Common\Exception\InterpolationOverflowException;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 
 final class DefaultTreeNodeFactory
 {
@@ -32,7 +32,7 @@ final class DefaultTreeNodeFactory
         string $childrenKey,
         ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
-        Items $items,
+        ItemCollection $itemCollection,
     ): DefaultTreeNode {
         return new DefaultTreeNode(
             summaryClass: $summaryClass,
@@ -40,7 +40,7 @@ final class DefaultTreeNodeFactory
             dimension: $dimension,
             parent: $parent,
             measure: null,
-            items: $items,
+            itemCollection: $itemCollection,
             null: false,
             treeNodeFactory: $this,
         );
@@ -53,7 +53,7 @@ final class DefaultTreeNodeFactory
         string $summaryClass,
         ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
-        Items $items,
+        ItemCollection $itemCollection,
         DefaultMeasure $measure,
     ): DefaultTreeNode {
         return new DefaultTreeNode(
@@ -61,7 +61,7 @@ final class DefaultTreeNodeFactory
             childrenKey: null,
             dimension: $dimension,
             parent: $parent,
-            items: $items,
+            itemCollection: $itemCollection,
             measure: $measure,
             null: false,
             treeNodeFactory: $this,
@@ -76,7 +76,7 @@ final class DefaultTreeNodeFactory
         ?string $childrenKey,
         ?DefaultTreeNode $parent,
         DefaultDimension $dimension,
-        Items $items,
+        ItemCollection $itemCollection,
         ?DefaultMeasure $measure,
     ): DefaultTreeNode {
         if ($this->fillingNodesCount >= $this->fillingNodesLimit) {
@@ -90,7 +90,7 @@ final class DefaultTreeNodeFactory
             childrenKey: $childrenKey,
             dimension: $dimension,
             parent: $parent,
-            items: $items,
+            itemCollection: $itemCollection,
             measure: $measure,
             null: true,
             treeNodeFactory: $this,

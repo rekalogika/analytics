@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\Items;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
@@ -43,7 +43,7 @@ final class NormalTableToTreeTransformer
     public function __construct(
         private readonly string $summaryClass,
         private readonly array $names,
-        private readonly Items $uniqueDimensions,
+        private readonly ItemCollection $itemCollection,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
     ) {}
 
@@ -63,7 +63,7 @@ final class NormalTableToTreeTransformer
                 label: $label,
                 childrenKey: null,
                 children: [],
-                items: $normalTable->getUniqueDimensions(),
+                itemCollection: $normalTable->getItemCollection(),
                 treeNodeFactory: $treeNodeFactory,
             );
         }
@@ -78,7 +78,7 @@ final class NormalTableToTreeTransformer
         $transformer = new self(
             summaryClass: $summaryClass,
             names: $names,
-            uniqueDimensions: $normalTable->getUniqueDimensions(),
+            itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
         );
 
@@ -87,7 +87,7 @@ final class NormalTableToTreeTransformer
             label: $label,
             childrenKey: $names[0],
             children: $transformer->doTransform($normalTable),
-            items: $normalTable->getUniqueDimensions(),
+            itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
         );
     }
@@ -108,7 +108,7 @@ final class NormalTableToTreeTransformer
             childrenKey: $childrenKey,
             parent: $parent,
             dimension: $dimension,
-            items: $this->uniqueDimensions,
+            itemCollection: $this->itemCollection,
         );
     }
 
@@ -121,7 +121,7 @@ final class NormalTableToTreeTransformer
             summaryClass: $this->summaryClass,
             dimension: $dimension,
             parent: $parent,
-            items: $this->uniqueDimensions,
+            itemCollection: $this->itemCollection,
             measure: $measure,
         );
     }
