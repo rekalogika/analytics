@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Common\Exception\InterpolationOverflowException;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 
 final class DefaultTreeNodeFactory
@@ -22,6 +23,7 @@ final class DefaultTreeNodeFactory
 
     public function __construct(
         private readonly int $fillingNodesLimit,
+        private readonly RowCollection $rowCollection,
     ) {}
 
     /**
@@ -43,6 +45,7 @@ final class DefaultTreeNodeFactory
             itemCollection: $itemCollection,
             null: false,
             treeNodeFactory: $this,
+            rowCollection: $this->rowCollection,
         );
     }
 
@@ -65,6 +68,7 @@ final class DefaultTreeNodeFactory
             measure: $measure,
             null: false,
             treeNodeFactory: $this,
+            rowCollection: $this->rowCollection,
         );
     }
 
@@ -94,6 +98,7 @@ final class DefaultTreeNodeFactory
             measure: $measure,
             null: true,
             treeNodeFactory: $this,
+            rowCollection: $this->rowCollection,
         );
     }
 }

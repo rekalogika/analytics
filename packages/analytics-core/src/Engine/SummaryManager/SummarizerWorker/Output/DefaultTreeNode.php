@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -35,6 +36,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     private array $children = [];
 
     private DefaultTuple $tuple;
+    private DefaultMeasures $subtotals;
 
     /**
      * @param class-string $summaryClass
@@ -48,6 +50,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         private readonly ItemCollection $itemCollection,
         private readonly bool $null,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
+        RowCollection $rowCollection,
     ) {
         $parent?->addChild($this);
 
@@ -59,6 +62,8 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
                 dimensions: [$this->dimension],
             );
         }
+
+        $this->subtotals = $rowCollection->getMeasures($this->tuple);
     }
 
     #[\Override]
@@ -168,7 +173,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getSubtotals(): Measures
     {
-        return new DefaultMeasures([]);
+        return $this->subtotals;
     }
 
 
