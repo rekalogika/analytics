@@ -14,18 +14,21 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 final readonly class DefaultBranchNode implements BranchNode
 {
     /**
      * @param iterable<TreeNode> $children
+     * @param iterable<LeafNode> $subtotals
      */
     public function __construct(
         private string $name,
         private mixed $legend,
         private mixed $item,
         private iterable $children,
+        private iterable $subtotals,
     ) {}
 
     #[\Override]
@@ -50,5 +53,11 @@ final readonly class DefaultBranchNode implements BranchNode
     public function getChildren(): iterable
     {
         return $this->children;
+    }
+
+    #[\Override]
+    public function getSubtotals(): iterable
+    {
+        return $this->subtotals;
     }
 }

@@ -55,4 +55,10 @@ final readonly class NullBranchNode implements BranchNode
     {
         return [];
     }
+
+    #[\Override]
+    public function getSubtotals(): iterable
+    {
+        yield from [];
+    }
 }

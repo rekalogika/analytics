@@ -62,4 +62,14 @@ final readonly class PivotTableAdapter implements BranchNode
             }
         }
     }
+
+    #[\Override]
+    public function getSubtotals(): iterable
+    {
+        $subtotals = $this->node->getSubtotals();
+
+        foreach ($subtotals as $subtotal) {
+            yield MeasureAdapter::adapt($subtotal);
+        }
+    }
 }
