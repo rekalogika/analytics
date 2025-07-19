@@ -13,16 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
-/**
- * @extends NodeBlock<LeafNode>
- */
-final class SingleNodeLeafBlock extends NodeBlock
+final class SingleNodeLeafBlock extends LeafBlock
 {
     #[\Override]
     protected function createHeaderRows(): DefaultRows

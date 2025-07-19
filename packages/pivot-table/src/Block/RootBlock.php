@@ -16,10 +16,7 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
-/**
- * @extends NodeBlock<BranchNode>
- */
-final class RootBlock extends NodeBlock
+final class RootBlock extends BranchBlock
 {
     protected function __construct(
         BranchNode $treeNode,
@@ -32,16 +29,20 @@ final class RootBlock extends NodeBlock
     protected function createHeaderRows(): DefaultRows
     {
         return $this
-            ->createGroupBlock($this->getTreeNode(), $this->getLevel())
+            ->getChildrenBlockGroup()
             ->getHeaderRows();
     }
 
     #[\Override]
     protected function createDataRows(): DefaultRows
     {
-        return $this
-            ->createGroupBlock($this->getTreeNode(), $this->getLevel())
-            ->getDataRows();
+        return $this->getChildrenBlockGroup()->getDataRows();
         ;
     }
+
+    // #[\Override]
+    // protected function createSubtotalRows(array $leafNodes): null
+    // {
+    //     return null;
+    // }
 }
