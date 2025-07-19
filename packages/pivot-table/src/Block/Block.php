@@ -97,30 +97,6 @@ abstract class Block
         return self::createByType($treeNode, $level, new BlockContext($distinct));
     }
 
-    final public function createGroupBlock(BranchNode $parentNode, int $level): Block
-    {
-
-        /** @var \Traversable<array-key,TreeNode> */
-        $children = $parentNode->getChildren();
-        $children = iterator_to_array($children);
-
-        $firstChild = $children[0] ?? null;
-
-        if ($firstChild === null) {
-            $firstChild = $this->getContext()->getDistinctNodesOfLevel($level)[0] ?? null;
-        }
-
-        if ($firstChild === null) {
-            return new EmptyBlock($parentNode, $level, $this->getContext());
-        }
-
-        if ($this->context->isPivoted($firstChild)) {
-            return new HorizontalBlockGroup($parentNode, $level, $this->getContext());
-        } else {
-            return new VerticalBlockGroup($parentNode, $level, $this->getContext());
-        }
-    }
-
     final protected function getContext(): BlockContext
     {
         return $this->context;

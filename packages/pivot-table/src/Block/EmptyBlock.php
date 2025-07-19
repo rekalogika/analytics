@@ -13,13 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
-/**
- * @extends NodeBlock<TreeNode>
- */
-final class EmptyBlock extends NodeBlock
+final class EmptyBlock extends BranchBlock
 {
     #[\Override]
     protected function createHeaderRows(): DefaultRows

@@ -18,7 +18,7 @@ use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 abstract class BlockGroup extends Block
 {
-    final protected function __construct(
+    final public function __construct(
         private readonly BranchNode $parentNode,
         int $level,
         BlockContext $context,
