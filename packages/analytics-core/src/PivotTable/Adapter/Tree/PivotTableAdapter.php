@@ -69,7 +69,7 @@ final readonly class PivotTableAdapter implements BranchNode
         $subtotals = $this->node->getSubtotals();
 
         foreach ($subtotals as $subtotal) {
-            yield MeasureAdapter::adapt($subtotal);
+            yield SubtotalAdapter::adapt($subtotal);
         }
     }
 }
