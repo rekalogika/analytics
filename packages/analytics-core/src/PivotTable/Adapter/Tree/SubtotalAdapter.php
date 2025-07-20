@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
+use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class MeasureAdapter implements LeafNode
+final readonly class SubtotalAdapter implements LeafNode, TranslatableInterface
 {
     public static function adapt(Measure $measure): self
     {
@@ -28,6 +31,16 @@ final readonly class MeasureAdapter implements LeafNode
     ) {}
 
     #[\Override]
+    public function trans(
+        TranslatorInterface $translator,
+        ?string $locale = null,
+    ): string {
+        $message = new TranslatableMessage('All');
+
+        return $message->trans($translator, $locale);
+    }
+
+    #[\Override]
     public function getValue(): mixed
     {
         return $this->measure->getValue();
@@ -36,7 +49,7 @@ final readonly class MeasureAdapter implements LeafNode
     #[\Override]
     public function getKey(): string
     {
-        return $this->measure->getName();
+        return '@values';
     }
 
     #[\Override]
@@ -51,6 +64,6 @@ final readonly class MeasureAdapter implements LeafNode
     #[\Override]
     public function getItem(): mixed
     {
-        return 'subtotal';
+        return $this->measure->getLabel();
     }
 }
