@@ -25,10 +25,6 @@ use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
 abstract class Block implements \Stringable
 {
-    private ?DefaultRows $headerRowsCache = null;
-
-    private ?DefaultRows $dataRowsCache = null;
-
     protected function __construct(
         private readonly int $level,
         private readonly BlockContext $context,
@@ -143,32 +139,14 @@ abstract class Block implements \Stringable
         return $result;
     }
 
-    final protected function getHeaderRows(): DefaultRows
-    {
-        return $this->headerRowsCache ??= $this->createHeaderRows();
-    }
+    abstract protected function getHeaderRows(): DefaultRows;
 
-    final protected function getDataRows(): DefaultRows
-    {
-        return $this->dataRowsCache ??= $this->createDataRows();
-    }
+    abstract protected function getDataRows(): DefaultRows;
 
     /**
      * @param list<LeafNode> $leafNodes
      */
-    final protected function getSubtotalRows(array $leafNodes): DefaultRows
-    {
-        return $this->createSubtotalRows($leafNodes);
-    }
-
-    abstract protected function createHeaderRows(): DefaultRows;
-
-    abstract protected function createDataRows(): DefaultRows;
-
-    /**
-     * @param list<LeafNode> $leafNodes
-     */
-    abstract protected function createSubtotalRows(array $leafNodes): DefaultRows;
+    abstract protected function getSubtotalRows(array $leafNodes): DefaultRows;
 
     final public function generateTable(): DefaultTable
     {

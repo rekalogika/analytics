@@ -13,71 +13,93 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
-use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
-    #[\Override]
-    protected function createHeaderRows(): DefaultRows
-    {
-        $rows = new DefaultRows([], $this);
+    private DefaultRows $headerRows;
+
+    private DefaultRows $dataRows;
+
+    public function __construct(
+        BranchNode $parentNode,
+        int $level,
+        BlockContext $context,
+    ) {
+        parent::__construct($parentNode, $level, $context);
+        $childBlock = $this->getOneChildBlock();
         $children = $this->getBalancedChildren();
 
+        $headerRows = new DefaultRows([], $this);
+        $dataRows = new DefaultRows([], $this);
+
+        // add a header and data column for each of the child blocks
         foreach ($children as $childNode) {
             $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
-            $childRows = $childBlock->getHeaderRows();
-            $rows = $rows->appendRight($childRows);
+
+            $childHeaderRows = $childBlock->getHeaderRows();
+            $headerRows = $headerRows->appendRight($childHeaderRows);
+
+            $childDataRows = $childBlock->getDataRows();
+            $dataRows = $dataRows->appendRight($childDataRows);
         }
 
+        // add subtotals if there are more than one child blocks
+        if (\count($children) > 1) {
+            /**
+             * @psalm-suppress InvalidArgument
+             * @var list<LeafNode> $subtotals
+             */
+            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
+            $subtotalRows = $this->getSubtotalRows($subtotals);
+
+            $subtotalHeaderCell = new DefaultHeaderCell(
+                name: 'All',
+                content: 'All',
+                generatingBlock: $this,
+            );
+            $subtotalHeaderRow = new DefaultRow([$subtotalHeaderCell], $this);
+            $subtotalHeaderRows = new DefaultRows([$subtotalHeaderRow], $this);
+
+            $headerRows = $headerRows->appendRight($subtotalHeaderRows);
+            $dataRows = $dataRows->appendRight($subtotalRows);
+        }
+
+        // add a legend if the dimension is not marked as superfluous
         $firstChild = $children[0];
 
-        if (
-            !$this->getContext()->hasSuperfluousLegend($firstChild)
-        ) {
+        if (!$this->getContext()->hasSuperfluousLegend($firstChild)) {
             $nameCell = new DefaultHeaderCell(
                 name: $firstChild->getKey(),
                 content: $firstChild->getLegend(),
                 generatingBlock: $this,
             );
 
-            $rows = $nameCell->appendRowsBelow($rows);
+            $headerRows = $nameCell->appendRowsBelow($headerRows);
         }
 
-        return $rows;
+        $this->dataRows = $dataRows;
+        $this->headerRows = $headerRows;
     }
 
     #[\Override]
-    protected function createDataRows(): DefaultRows
+    protected function getHeaderRows(): DefaultRows
     {
-        $rows = new DefaultRows([], $this);
-
-        foreach ($this->getBalancedChildren() as $childNode) {
-            $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
-            $childRows = $childBlock->getDataRows();
-            $rows = $rows->appendRight($childRows);
-        }
-
-        if (\count($this->getBalancedChildren()) === 1) {
-            // if there is only one child, we don't need to add a subtotal
-            return $rows;
-        }
-
-        /**
-         * @psalm-suppress InvalidArgument
-         * @var list<LeafNode> $subtotals
-         */
-        $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
-        $subtotalRows = $this->getSubtotalRows($subtotals);
-        $rows = $rows->appendRight($subtotalRows);
-
-        return $rows;
+        return $this->headerRows;
     }
 
     #[\Override]
-    protected function createSubtotalRows(iterable $leafNodes): DefaultRows
+    protected function getDataRows(): DefaultRows
+    {
+        return $this->dataRows;
+    }
+
+    #[\Override]
+    protected function getSubtotalRows(iterable $leafNodes): DefaultRows
     {
         $rows = new DefaultRows([], $this);
 

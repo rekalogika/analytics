@@ -545,6 +545,7 @@ final class ArchitectureTest
 
                 // misc
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
             );
     }
