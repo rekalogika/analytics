@@ -18,12 +18,44 @@ use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 abstract class BlockGroup extends Block
 {
-    final public function __construct(
+    /**
+     * @var list<Block>
+     */
+    private readonly array $childBlocks;
+
+    public function __construct(
         private readonly BranchNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
         parent::__construct($level, $context);
+
+        $childBlocks = [];
+
+        foreach ($this->getChildren() as $childNode) {
+            $childBlocks[] = $this->createBlock($childNode, $this->getLevel() + 1);
+        }
+
+        $this->childBlocks = $childBlocks;
+    }
+
+    /**
+     * @return list<Block>
+     */
+    protected function getChildBlocks(): array
+    {
+        return $this->childBlocks;
+    }
+
+    protected function getOneChildBlock(): Block
+    {
+        $childBlock = $this->childBlocks[0] ?? null;
+
+        if ($childBlock === null) {
+            throw new \RuntimeException('No child blocks found in the parent node.');
+        }
+
+        return $childBlock;
     }
 
     final protected function getParentNode(): BranchNode

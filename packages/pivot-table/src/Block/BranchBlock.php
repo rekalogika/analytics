@@ -32,7 +32,7 @@ abstract class BranchBlock extends NodeBlock
         $this->childrenBlockGroup = $this->createBlockGroup($treeNode, $level);
     }
 
-    final protected function getChildrenBlockGroup(): BlockGroup
+    final public function getChildrenBlockGroup(): BlockGroup
     {
         return $this->childrenBlockGroup;
     }

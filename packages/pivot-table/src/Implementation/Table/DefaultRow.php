@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\Row;
 use Rekalogika\PivotTable\Table\TableVisitor;
@@ -23,11 +24,48 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final readonly class DefaultRow implements \IteratorAggregate, Row
 {
     /**
+     * @var list<DefaultCell> $cells
+     */
+    private array $cells;
+
+    /**
      * @param list<DefaultCell> $cells
      */
     public function __construct(
-        private array $cells = [],
-    ) {}
+        array $cells,
+        private ?Block $generatingBlock,
+    ) {
+        $newCells = [];
+
+        // merge cells with the same content
+        $lastCell = null;
+
+        foreach ($cells as $cell) {
+            if (
+                $lastCell instanceof DefaultCell
+                && $lastCell->getContent() !== null
+                && $lastCell->getContent() === $cell->getContent()
+            ) {
+                $lastCell = $lastCell
+                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
+                array_pop($newCells); // remove last cell
+                $newCells[] = $lastCell; // add last cell or current
+
+                continue;
+            }
+
+            $newCells[] = $cell;
+
+            $lastCell = $cell;
+        }
+
+        $this->cells = $newCells;
+    }
+
+    public function getGeneratingBlock(): ?Block
+    {
+        return $this->generatingBlock;
+    }
 
     #[\Override]
     public function accept(TableVisitor $visitor): mixed
@@ -67,11 +105,11 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
 
     public function appendCell(DefaultCell $cell): static
     {
-        return new self([...$this->cells, $cell]);
+        return new self([...$this->cells, $cell], $this->generatingBlock);
     }
 
     public function appendRow(DefaultRow $row): static
     {
-        return new self([...$this->cells, ...$row->cells]);
+        return new self([...$this->cells, ...$row->cells], $this->generatingBlock);
     }
 }

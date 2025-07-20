@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -27,11 +28,12 @@ final class NormalLeafBlock extends LeafBlock
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
             columnSpan: 2,
+            generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell]);
+        $row = new DefaultRow([$cell], $this);
 
-        return new DefaultRows([$row]);
+        return new DefaultRows([$row], $this);
     }
 
     #[\Override]
@@ -40,15 +42,43 @@ final class NormalLeafBlock extends LeafBlock
         $name = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
+            generatingBlock: $this,
         );
 
         $value = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getValue(),
+            generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$name, $value]);
+        $row = new DefaultRow([$name, $value], $this);
 
-        return new DefaultRows([$row]);
+        return new DefaultRows([$row], $this);
+    }
+
+    #[\Override]
+    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    {
+        if (\count($leafNodes) !== 1) {
+            throw new \LogicException('NormalLeafBlock should only have one leaf node for subtotal rows.');
+        }
+
+        $leafNode = $leafNodes[0];
+
+        $name = new DefaultFooterCell(
+            name: $leafNode->getKey(),
+            content: 'All',
+            generatingBlock: $this,
+        );
+
+        $value = new DefaultFooterCell(
+            name: $leafNode->getKey(),
+            content: $leafNode->getValue(),
+            generatingBlock: $this,
+        );
+
+        $row = new DefaultRow([$name, $value], $this);
+
+        return new DefaultRows([$row], $this);
     }
 }

@@ -54,16 +54,19 @@ final class ResultSetToTableTransformer
             throw new \RuntimeException('ResultSet must have at least one row with a tuple.');
         }
 
-        $this->tableBody = new DefaultTableBody(new DefaultRows($rows));
-        $this->tableHeader = new DefaultTableHeader(new DefaultRows([$thead]));
+        $this->tableBody = new DefaultTableBody(new DefaultRows($rows, null), null);
+        $this->tableHeader = new DefaultTableHeader(new DefaultRows([$thead], null), null);
     }
 
     private function getTable(): DefaultTable
     {
-        return new DefaultTable([
-            $this->tableHeader,
-            $this->tableBody,
-        ]);
+        return new DefaultTable(
+            [
+                $this->tableHeader,
+                $this->tableBody,
+            ],
+            generatingBlock: null,
+        );
     }
 
     private function getMaxTupleCount(ResultSet $resultSet): int
@@ -83,7 +86,7 @@ final class ResultSetToTableTransformer
 
     private function getTableHeader(ResultRow $row): DefaultRow
     {
-        $htmlRow = new DefaultRow();
+        $htmlRow = new DefaultRow([], null);
 
         foreach ($row->getTuple() as $field) {
             $cell = new DefaultHeaderCell(
@@ -91,6 +94,7 @@ final class ResultSetToTableTransformer
                 content: $field->getLegend(),
                 columnSpan: 1,
                 rowSpan: 1,
+                generatingBlock: null,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -102,6 +106,7 @@ final class ResultSetToTableTransformer
                 content: $value->getLegend(),
                 columnSpan: 1,
                 rowSpan: 1,
+                generatingBlock: null,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -112,7 +117,7 @@ final class ResultSetToTableTransformer
 
     private function resultRowToTableRow(ResultRow $row): DefaultRow
     {
-        $htmlRow = new DefaultRow();
+        $htmlRow = new DefaultRow([], null);
 
         foreach ($row->getTuple() as $field) {
             $cell = new DefaultDataCell(
@@ -120,6 +125,7 @@ final class ResultSetToTableTransformer
                 content: $field->getItem(),
                 columnSpan: 1,
                 rowSpan: 1,
+                generatingBlock: null,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -131,6 +137,7 @@ final class ResultSetToTableTransformer
                 content: $value->getValue(),
                 columnSpan: 1,
                 rowSpan: 1,
+                generatingBlock: null,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);

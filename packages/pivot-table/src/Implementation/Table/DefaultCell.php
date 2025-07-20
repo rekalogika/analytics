@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
 
 abstract readonly class DefaultCell implements Cell
@@ -20,9 +21,15 @@ abstract readonly class DefaultCell implements Cell
     final public function __construct(
         private string $name,
         private mixed $content,
+        private ?Block $generatingBlock,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
     ) {}
+
+    public function getGeneratingBlock(): ?Block
+    {
+        return $this->generatingBlock;
+    }
 
     final public function getKey(): string
     {
@@ -48,6 +55,7 @@ abstract readonly class DefaultCell implements Cell
             content: $this->content,
             columnSpan: $columnSpan,
             rowSpan: $this->rowSpan,
+            generatingBlock: $this->generatingBlock,
         );
     }
 
@@ -64,6 +72,7 @@ abstract readonly class DefaultCell implements Cell
             content: $this->content,
             columnSpan: $this->columnSpan,
             rowSpan: $rowSpan,
+            generatingBlock: $this->generatingBlock,
         );
     }
 
@@ -71,27 +80,40 @@ abstract readonly class DefaultCell implements Cell
     {
         $cell = $this->withRowSpan($rows->getHeight());
 
-        $firstRow = (new DefaultRow([$cell]))
+        $firstRow = (new DefaultRow([$cell], $this->generatingBlock))
             ->appendRow($rows->getFirstRow());
 
         $secondToLastRows = $rows->getSecondToLastRows()->toArray();
 
-        return new DefaultRows([$firstRow, ...$secondToLastRows]);
+        return new DefaultRows([$firstRow, ...$secondToLastRows], $this->generatingBlock);
     }
 
     final public function appendRowsBelow(DefaultRows $rows): DefaultRows
     {
         $cell = $this->withColumnSpan($rows->getWidth());
-        $first = new DefaultRows([new DefaultRow([$cell])]);
+        $first = new DefaultRows(
+            [new DefaultRow([$cell], $this->generatingBlock)],
+            $this->generatingBlock,
+        );
 
         return $first->appendBelow($rows);
     }
 
     final public function appendCellBelow(DefaultCell $cell): DefaultRows
     {
-        $row1 = new DefaultRow([$this]);
-        $row2 = new DefaultRow([$cell]);
+        $row1 = new DefaultRow([$this], $this->generatingBlock);
+        $row2 = new DefaultRow([$cell], $this->generatingBlock);
 
-        return new DefaultRows([$row1, $row2]);
+        return new DefaultRows([$row1, $row2], $this->generatingBlock);
+    }
+
+    private function getSignature(): string
+    {
+        return hash('xxh128', serialize($this));
+    }
+
+    final public function isSameAs(DefaultCell $cell): bool
+    {
+        return $this->getSignature() === $cell->getSignature();
     }
 }

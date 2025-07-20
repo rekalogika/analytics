@@ -37,12 +37,11 @@ final class RootBlock extends BranchBlock
     protected function createDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
-        ;
     }
 
-    // #[\Override]
-    // protected function createSubtotalRows(array $leafNodes): null
-    // {
-    //     return null;
-    // }
+    #[\Override]
+    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    {
+        return $this->getChildrenBlockGroup()->getSubtotalRows($leafNodes);
+    }
 }

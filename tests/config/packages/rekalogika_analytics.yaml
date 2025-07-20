@@ -1,4 +1,4 @@
 rekalogika_analytics:
-    table_theme: "@RekalogikaAnalyticsFrontend/bootstrap_5_renderer.html.twig"
+    table_theme: "debug_renderer.html.twig"
     query_result_limit: 5000
     filling_nodes_limit: 10000

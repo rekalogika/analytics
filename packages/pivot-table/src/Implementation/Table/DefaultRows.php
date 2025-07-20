@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Row;
 use Rekalogika\PivotTable\Table\RowGroup;
 
@@ -29,7 +30,15 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
     /**
      * @param list<DefaultRow> $rows
      */
-    public function __construct(private readonly array $rows = []) {}
+    public function __construct(
+        private readonly array $rows,
+        private ?Block $generatingBlock,
+    ) {}
+
+    public function getGeneratingBlock(): ?Block
+    {
+        return $this->generatingBlock;
+    }
 
     #[\Override]
     public function count(): int
@@ -79,17 +88,17 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
 
     public function getFirstRow(): DefaultRow
     {
-        return $this->rows[0] ?? new DefaultRow([]);
+        return $this->rows[0] ?? new DefaultRow([], null);
     }
 
     public function getSecondToLastRows(): DefaultRows
     {
-        return new self(\array_slice($this->rows, 1));
+        return new self(\array_slice($this->rows, 1), $this->generatingBlock);
     }
 
     public function appendBelow(DefaultRows $rows): DefaultRows
     {
-        return new self([...$this->rows, ...$rows->toArray()]);
+        return new self([...$this->rows, ...$rows->toArray()], $this->generatingBlock);
     }
 
     public function appendRight(DefaultRows $rows): DefaultRows
@@ -100,10 +109,10 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
         $newRows = [];
 
         for ($i = 0; $i < $height; $i++) {
-            $newRows[$i] = $this->rows[$i] ?? new DefaultRow([]);
-            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([]));
+            $newRows[$i] = $this->rows[$i] ?? new DefaultRow([], null);
+            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([], null));
         }
 
-        return new self(array_values($newRows));
+        return new self(array_values($newRows), $this->generatingBlock);
     }
 }

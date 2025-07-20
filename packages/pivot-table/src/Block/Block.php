@@ -23,7 +23,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
 use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
-abstract class Block
+abstract class Block implements \Stringable
 {
     private ?DefaultRows $headerRowsCache = null;
 
@@ -33,6 +33,16 @@ abstract class Block
         private readonly int $level,
         private readonly BlockContext $context,
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return \sprintf(
+            '%s(level: %d)',
+            static::class,
+            $this->level,
+        );
+    }
 
     private static function createByType(
         TreeNode $treeNode,
@@ -143,16 +153,32 @@ abstract class Block
         return $this->dataRowsCache ??= $this->createDataRows();
     }
 
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    final protected function getSubtotalRows(array $leafNodes): DefaultRows
+    {
+        return $this->createSubtotalRows($leafNodes);
+    }
+
     abstract protected function createHeaderRows(): DefaultRows;
 
     abstract protected function createDataRows(): DefaultRows;
 
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract protected function createSubtotalRows(array $leafNodes): DefaultRows;
+
     final public function generateTable(): DefaultTable
     {
-        return new DefaultTable([
-            new DefaultTableHeader($this->getHeaderRows()),
-            new DefaultTableBody($this->getDataRows()),
-            new DefaultTableFooter(new DefaultRows([])),
-        ]);
+        return new DefaultTable(
+            [
+                new DefaultTableHeader($this->getHeaderRows(), $this),
+                new DefaultTableBody($this->getDataRows(), $this),
+                new DefaultTableFooter(new DefaultRows([], $this), $this),
+            ],
+            generatingBlock: $this,
+        );
     }
 }

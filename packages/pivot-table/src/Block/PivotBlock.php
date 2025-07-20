@@ -28,11 +28,13 @@ final class PivotBlock extends BranchBlock
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
+                generatingBlock: $this,
             );
         } else {
             $valueCell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
+                generatingBlock: $this,
             );
         }
 
@@ -46,5 +48,11 @@ final class PivotBlock extends BranchBlock
     protected function createDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
+    }
+
+    #[\Override]
+    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    {
+        return $this->getChildrenBlockGroup()->getSubtotalRows($leafNodes);
     }
 }

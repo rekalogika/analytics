@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Table;
 use Rekalogika\PivotTable\Table\TableVisitor;
 
@@ -33,6 +34,7 @@ final readonly class DefaultTable implements \Countable, Table, \IteratorAggrega
      */
     public function __construct(
         iterable $rowGroups,
+        private ?Block $generatingBlock,
     ) {
         $newRowGroups = [];
         $newRows = [];
@@ -46,7 +48,12 @@ final readonly class DefaultTable implements \Countable, Table, \IteratorAggrega
         }
 
         $this->rowGroups = $newRowGroups;
-        $this->rows = new DefaultRows($newRows);
+        $this->rows = new DefaultRows($newRows, null);
+    }
+
+    public function getGeneratingBlock(): ?Block
+    {
+        return $this->generatingBlock;
     }
 
     #[\Override]

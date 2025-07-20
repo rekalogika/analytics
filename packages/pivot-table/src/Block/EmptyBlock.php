@@ -20,12 +20,18 @@ final class EmptyBlock extends BranchBlock
     #[\Override]
     protected function createHeaderRows(): DefaultRows
     {
-        return new DefaultRows([]);
+        return new DefaultRows([], $this);
     }
 
     #[\Override]
     protected function createDataRows(): DefaultRows
     {
-        return new DefaultRows([]);
+        return new DefaultRows([], $this);
+    }
+
+    #[\Override]
+    protected function createSubtotalRows(iterable $leafNodes): DefaultRows
+    {
+        return new DefaultRows([], $this);
     }
 }

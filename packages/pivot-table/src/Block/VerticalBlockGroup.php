@@ -13,43 +13,50 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
 
 final class VerticalBlockGroup extends BlockGroup
 {
     #[\Override]
     protected function createHeaderRows(): DefaultRows
     {
-        $firstChildren = $this->getChildren()[0] ?? null;
-
-        if ($firstChildren === null) {
-            $firstChildren = $this->getBalancedChildren()[0];
-        }
-
-        $childBlock = $this->createBlock($firstChildren, $this->getLevel() + 1);
-
-        return $childBlock->getHeaderRows();
+        return $this->getOneChildBlock()->getHeaderRows();
     }
 
     #[\Override]
     protected function createDataRows(): DefaultRows
     {
-        $dataRows = new DefaultRows([]);
+        $dataRows = new DefaultRows([], $this);
 
-        foreach ($this->getChildren() as $childNode) {
-            $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
+        foreach ($this->getChildBlocks() as $childBlock) {
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        // If there are no data rows, we create a NullBranchNode to indicate an
-        // error, as this should never happen
-
-        if (\count($dataRows) === 0) {
-            $childBlock = $this->createBlock(new NullBranchNode('error', 'error', null), $this->getLevel() + 1);
-            $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
+        if (\count($this->getChildBlocks()) === 1) {
+            return $dataRows;
         }
+
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var list<LeafNode> $subtotals
+         */
+        $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
+        $subtotalRows = $this->getSubtotalRows($subtotals);
+        $dataRows = $dataRows->appendBelow($subtotalRows);
 
         return $dataRows;
+    }
+
+    #[\Override]
+    protected function createSubtotalRows(iterable $leafNodes): DefaultRows
+    {
+        $rows = new DefaultRows([], $this);
+
+        foreach ($leafNodes as $leafNode) {
+            $rows = $rows->appendBelow($this->getOneChildBlock()->getSubtotalRows([$leafNode]));
+        }
+
+        return $rows;
     }
 }
