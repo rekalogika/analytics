@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
-use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineTypesPass;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
@@ -31,6 +30,7 @@ use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllUnionAggregateFunction;
+use Rekalogika\Analytics\PostgreSQLHll\Doctrine\HllType;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinFunction;
 use Rekalogika\Analytics\Time\Doctrine\Function\TimeBinMbwWeekFunction;
 use Rekalogika\Analytics\Time\TimeBin;
@@ -57,7 +57,6 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $container->addCompilerPass(new DoctrineEntityPass());
         $container->addCompilerPass(new DistinctValuesResolverPass());
-        $container->addCompilerPass(new DoctrineTypesPass());
     }
 
     #[\Override]
@@ -148,6 +147,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
     private function prependDQLFunctions(ContainerBuilder $builder): void
     {
+        $types = [];
+        $mappingTypes = [];
+
         //
         // common
         //
@@ -195,6 +197,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 ...$numericFunctions,
                 'REKALOGIKA_HLL_CARDINALITY' => HllCardinalityFunction::class,
             ];
+
+            $types['rekalogika_hll'] = HllType::class;
+            $mappingTypes['hll'] = 'rekalogika_hll';
         }
 
         //
@@ -202,6 +207,10 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         //
 
         $builder->prependExtensionConfig('doctrine', [
+            'dbal' => [
+                'types' => $types,
+                'mapping_types' => $mappingTypes,
+            ],
             'orm' => [
                 'dql' => [
                     'string_functions' => $stringFunctions,
