@@ -51,8 +51,7 @@ abstract class BranchBlock extends NodeBlock
         }
 
         if ($firstChild === null) {
-            // return new EmptyBlock($parentNode, $level, $this->getContext());
-            throw new \RuntimeException('No child nodes found in the parent node.');
+            return new EmptyBlockGroup($parentNode, $level, $this->getContext());
         }
 
         if ($this->getContext()->isPivoted($firstChild)) {
