@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
@@ -20,35 +21,54 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class NormalBlock extends BranchBlock
 {
-    #[\Override]
-    protected function createHeaderRows(): DefaultRows
-    {
+    private DefaultRows $headerRows;
+    private DefaultRows $dataRows;
+
+    protected function __construct(
+        BranchNode $treeNode,
+        int $level,
+        BlockContext $context,
+    ) {
+        parent::__construct($treeNode, $level, $context);
+
+        // Create header rows
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
             generatingBlock: $this,
         );
 
-        return $cell->appendRowsRight($this->getChildrenBlockGroup()->getHeaderRows());
-    }
+        $this->headerRows = $cell
+            ->appendRowsRight($this->getChildrenBlockGroup()->getHeaderRows());
 
-    #[\Override]
-    protected function createDataRows(): DefaultRows
-    {
+        // Create data rows
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
             generatingBlock: $this,
         );
 
-        return $cell->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
+        $this->dataRows = $cell
+            ->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
+    }
+
+    #[\Override]
+    protected function getHeaderRows(): DefaultRows
+    {
+        return $this->headerRows;
+    }
+
+    #[\Override]
+    protected function getDataRows(): DefaultRows
+    {
+        return $this->dataRows;
     }
 
     /**
      * @todo make 'Total' string configurable
      */
     #[\Override]
-    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalRows(array $leafNodes): DefaultRows
     {
         $cell = new DefaultFooterCell(
             name: '',

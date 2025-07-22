@@ -20,7 +20,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class PivotBlock extends BranchBlock
 {
     #[\Override]
-    protected function createHeaderRows(): DefaultRows
+    protected function getHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
@@ -45,13 +45,13 @@ final class PivotBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function createDataRows(): DefaultRows
+    protected function getDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
     }
 
     #[\Override]
-    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalRows(array $leafNodes): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getSubtotalRows($leafNodes);
     }

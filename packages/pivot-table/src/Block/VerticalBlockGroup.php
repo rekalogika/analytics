@@ -50,8 +50,8 @@ final class VerticalBlockGroup extends BlockGroup
             $subtotalRows = [];
 
             foreach ($this->getSubtotalRows($subtotals) as $subtotalRow) {
-                $subtotalCells = \iterator_to_array($subtotalRow, false);
-                $first = \array_shift($subtotalCells);
+                $subtotalCells = iterator_to_array($subtotalRow, false);
+                $first = array_shift($subtotalCells);
 
                 if (!$first instanceof DefaultCell) {
                     throw new \LogicException('Subtotal row must have at least one cell.');
@@ -61,7 +61,7 @@ final class VerticalBlockGroup extends BlockGroup
 
                 $subtotalRow = new DefaultRow(
                     [$first, ...$subtotalCells],
-                    $this
+                    $this,
                 );
 
                 $subtotalRows[] = $subtotalRow;

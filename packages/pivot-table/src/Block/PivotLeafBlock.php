@@ -22,7 +22,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class PivotLeafBlock extends LeafBlock
 {
     #[\Override]
-    protected function createHeaderRows(): DefaultRows
+    protected function getHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
@@ -46,7 +46,7 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function createDataRows(): DefaultRows
+    protected function getDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
@@ -60,7 +60,7 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function createSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalRows(array $leafNodes): DefaultRows
     {
         if (\count($leafNodes) !== 1) {
             throw new \LogicException('PivotLeafBlock should only have one leaf node for subtotal rows.');

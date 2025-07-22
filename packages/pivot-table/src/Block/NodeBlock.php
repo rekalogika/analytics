@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -22,10 +21,6 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
  */
 abstract class NodeBlock extends Block
 {
-    private ?DefaultRows $headerRowsCache = null;
-
-    private ?DefaultRows $dataRowsCache = null;
-
     /**
      * @param T $treeNode
      */
@@ -46,32 +41,5 @@ abstract class NodeBlock extends Block
     }
 
     #[\Override]
-    final protected function getHeaderRows(): DefaultRows
-    {
-        return $this->headerRowsCache ??= $this->createHeaderRows();
-    }
-
-    #[\Override]
-    final protected function getDataRows(): DefaultRows
-    {
-        return $this->dataRowsCache ??= $this->createDataRows();
-    }
-
-    /**
-     * @param list<LeafNode> $leafNodes
-     */
-    #[\Override]
-    final protected function getSubtotalRows(array $leafNodes): DefaultRows
-    {
-        return $this->createSubtotalRows($leafNodes);
-    }
-
-    /**
-     * @param list<LeafNode> $leafNodes
-     */
-    abstract protected function createSubtotalRows(array $leafNodes): DefaultRows;
-
-    abstract protected function createHeaderRows(): DefaultRows;
-
-    abstract protected function createDataRows(): DefaultRows;
+    abstract protected function getSubtotalRows(array $leafNodes): DefaultRows;
 }
