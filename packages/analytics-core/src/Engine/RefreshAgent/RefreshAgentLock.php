@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Engine\RefreshAgent;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Common\Exception\RuntimeException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
