@@ -88,6 +88,24 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         return new \ArrayIterator($this->cells);
     }
 
+    public function getFirstCell(): DefaultCell
+    {
+        if ($this->cells === []) {
+            throw new \LogicException('Row has no cells.');
+        }
+
+        return $this->cells[0];
+    }
+
+    public function getLastCell(): DefaultCell
+    {
+        if ($this->cells === []) {
+            throw new \LogicException('Row has no cells.');
+        }
+
+        return $this->cells[\count($this->cells) - 1];
+    }
+
     #[\Override]
     public function count(): int
     {

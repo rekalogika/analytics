@@ -15,6 +15,8 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
@@ -45,7 +47,27 @@ final class VerticalBlockGroup extends BlockGroup
              * @var list<LeafNode> $subtotals
              */
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
-            $subtotalRows = $this->getSubtotalRows($subtotals);
+            $subtotalRows = [];
+
+            foreach ($this->getSubtotalRows($subtotals) as $subtotalRow) {
+                $subtotalCells = \iterator_to_array($subtotalRow, false);
+                $first = \array_shift($subtotalCells);
+
+                if (!$first instanceof DefaultCell) {
+                    throw new \LogicException('Subtotal row must have at least one cell.');
+                }
+
+                $first = $first->withColumnSpan($dataRows->getWidth() - \count($subtotalCells));
+
+                $subtotalRow = new DefaultRow(
+                    [$first, ...$subtotalCells],
+                    $this
+                );
+
+                $subtotalRows[] = $subtotalRow;
+            }
+
+            $subtotalRows = new DefaultRows($subtotalRows, $this);
             $dataRows = $dataRows->appendBelow($subtotalRows);
         }
 

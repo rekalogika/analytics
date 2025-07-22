@@ -47,6 +47,13 @@ abstract class BlockGroup extends Block
         return $this->childBlocks;
     }
 
+    protected function getOneChild(): TreeNode
+    {
+        $children = $this->getChildren();
+
+        return $children[0] ?? throw new \RuntimeException('No child nodes found in the parent node.');
+    }
+
     protected function getOneChildBlock(): Block
     {
         $childBlock = $this->childBlocks[0] ?? null;

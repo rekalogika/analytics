@@ -45,14 +45,14 @@ final class NormalBlock extends BranchBlock
     }
 
     /**
-     * @todo make 'All' string configurable
+     * @todo make 'Total' string configurable
      */
     #[\Override]
     protected function createSubtotalRows(array $leafNodes): DefaultRows
     {
         $cell = new DefaultFooterCell(
             name: '',
-            content: 'All',
+            content: 'Total',
             generatingBlock: $this,
         );
 

@@ -67,7 +67,7 @@ final class NormalLeafBlock extends LeafBlock
 
         $name = new DefaultFooterCell(
             name: $leafNode->getKey(),
-            content: 'All',
+            content: 'Total',
             generatingBlock: $this,
         );
 

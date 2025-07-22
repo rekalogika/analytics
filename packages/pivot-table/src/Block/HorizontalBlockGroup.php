@@ -31,16 +31,12 @@ final class HorizontalBlockGroup extends BlockGroup
         BlockContext $context,
     ) {
         parent::__construct($parentNode, $level, $context);
-        $childBlock = $this->getOneChildBlock();
-        $children = $this->getBalancedChildren();
 
         $headerRows = new DefaultRows([], $this);
         $dataRows = new DefaultRows([], $this);
 
         // add a header and data column for each of the child blocks
-        foreach ($children as $childNode) {
-            $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
-
+        foreach ($this->getChildBlocks() as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
 
@@ -49,7 +45,7 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         // add subtotals if there are more than one child blocks
-        if (\count($children) > 1) {
+        if (\count($this->getChildren()) > 1) {
             /**
              * @psalm-suppress InvalidArgument
              * @var list<LeafNode> $subtotals
@@ -57,25 +53,42 @@ final class HorizontalBlockGroup extends BlockGroup
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
             $subtotalRows = $this->getSubtotalRows($subtotals);
 
+
             $subtotalHeaderCell = new DefaultHeaderCell(
-                name: 'All',
-                content: 'All',
+                name: 'Total',
+                content: 'Total',
                 generatingBlock: $this,
+                rowSpan: $headerRows->getHeight(),
             );
             $subtotalHeaderRow = new DefaultRow([$subtotalHeaderCell], $this);
             $subtotalHeaderRows = new DefaultRows([$subtotalHeaderRow], $this);
+
+            // foreach ($children as $childNode) {
+            //     $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
+
+            //     $childHeaderRows = $childBlock->getHeaderRows();
+            //     $headerRows = $headerRows->appendRight($childHeaderRows);
+
+            //     $childDataRows = $childBlock->getDataRows();
+            //     $dataRows = $dataRows->appendRight($childDataRows);
+            // }
+
+
+            $subtotalHeaderRows = $this->getOneChildBlock()->getHeaderRows();
+
 
             $headerRows = $headerRows->appendRight($subtotalHeaderRows);
             $dataRows = $dataRows->appendRight($subtotalRows);
         }
 
         // add a legend if the dimension is not marked as superfluous
-        $firstChild = $children[0];
 
-        if (!$this->getContext()->hasSuperfluousLegend($firstChild)) {
+        $child = $this->getOneChild();
+
+        if (!$this->getContext()->hasSuperfluousLegend($child)) {
             $nameCell = new DefaultHeaderCell(
-                name: $firstChild->getKey(),
-                content: $firstChild->getLegend(),
+                name: $child->getKey(),
+                content: $child->getLegend(),
                 generatingBlock: $this,
             );
 
