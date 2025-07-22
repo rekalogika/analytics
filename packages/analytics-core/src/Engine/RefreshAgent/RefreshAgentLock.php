@@ -101,40 +101,14 @@ final class RefreshAgentLock implements ResetInterface
     /**
      * @param class-string $summaryClass
      */
-    private function createKey(string $summaryClass): Key
-    {
-        if (isset($this->summaryClassToKey[$summaryClass])) {
-            throw new LogicException(\sprintf(
-                'Lock key for summary class "%s" already exists.',
-                $summaryClass,
-            ));
-        }
-
-        return $this->summaryClassToKey[$summaryClass] =
-            new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
-    }
-
-    /**
-     * @param class-string $summaryClass
-     */
     private function getKey(string $summaryClass): Key
     {
         return $this->summaryClassToKey[$summaryClass]
-            ?? throw new LogicException(\sprintf(
-                'Lock key for summary class "%s" does not exist.',
-                $summaryClass,
-            ));
+            ?? new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
     }
 
     private function removeKey(string $summaryClass): void
     {
-        if (!isset($this->summaryClassToKey[$summaryClass])) {
-            throw new LogicException(\sprintf(
-                'Lock key for summary class "%s" does not exist.',
-                $summaryClass,
-            ));
-        }
-
         unset($this->summaryClassToKey[$summaryClass]);
     }
 
@@ -146,7 +120,7 @@ final class RefreshAgentLock implements ResetInterface
     public function acquire(string $summaryClass): bool
     {
         $store = $this->getStoreBySummaryClass($summaryClass);
-        $key = $this->createKey($summaryClass);
+        $key = $this->getKey($summaryClass);
 
         try {
             $store->save($key);
