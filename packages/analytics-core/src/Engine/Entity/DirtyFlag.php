@@ -15,8 +15,6 @@ namespace Rekalogika\Analytics\Engine\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Uid\UuidV7;
 
 /**
  * A flag indicating that a partition in a summary table needs refreshing.
@@ -27,8 +25,9 @@ use Symfony\Component\Uid\UuidV7;
 class DirtyFlag
 {
     #[ORM\Id]
-    #[ORM\Column(type: Types::GUID, nullable: false)]
-    private string $id;
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: Types::BIGINT, nullable: false)]
+    private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     private \DateTimeInterface $created;
@@ -47,7 +46,6 @@ class DirtyFlag
         #[ORM\Column(type: Types::BIGINT, nullable: true)]
         private ?int $key,
     ) {
-        $this->id = Uuid::v7()->toRfc4122();
         $this->created = new \DateTimeImmutable();
     }
 
@@ -56,7 +54,7 @@ class DirtyFlag
         return \sprintf('%s(%d,%s)', $this->class, $this->level ?? '-', $this->key ?? '-');
     }
 
-    public function getId(): string
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -64,11 +62,6 @@ class DirtyFlag
     public function getCreated(): \DateTimeInterface
     {
         return $this->created;
-    }
-
-    public function getUuid(): UuidV7
-    {
-        return UuidV7::fromString($this->id);
     }
 
     /**
@@ -87,10 +80,5 @@ class DirtyFlag
     public function getKey(): ?int
     {
         return $this->key;
-    }
-
-    public function getTime(): \DateTimeInterface
-    {
-        return $this->getUuid()->getDateTime();
     }
 }
