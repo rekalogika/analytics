@@ -15,6 +15,7 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -36,7 +37,7 @@ final class HorizontalBlockGroup extends BlockGroup
         $dataRows = new DefaultRows([], $this);
 
         // add a header and data column for each of the child blocks
-        foreach ($this->getChildBlocks() as $childBlock) {
+        foreach ($this->getBalancedChildBlocks() as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
 
@@ -45,7 +46,7 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         // add subtotals if there are more than one child blocks
-        if (\count($this->getChildren()) > 1) {
+        if (\count($this->getBalancedChildren()) > 1) {
             /**
              * @psalm-suppress InvalidArgument
              * @var list<LeafNode> $subtotals
@@ -121,5 +122,11 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         return $rows;
+    }
+
+    private function getOneChild(): TreeNode
+    {
+        return $this->getBalancedChildren()[0]
+            ?? throw new \RuntimeException('No child nodes found in the parent node.');
     }
 }
