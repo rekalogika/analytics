@@ -30,7 +30,7 @@ final class EmptyBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         return new DefaultRows([], $this);
     }

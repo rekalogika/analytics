@@ -68,7 +68,7 @@ final class NormalBlock extends BranchBlock
      * @todo make 'Total' string configurable
      */
     #[\Override]
-    protected function getSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         $cell = new DefaultFooterCell(
             name: '',
@@ -76,7 +76,7 @@ final class NormalBlock extends BranchBlock
             generatingBlock: $this,
         );
 
-        $childredSubtotalRows = $this->getChildrenBlockGroup()->getSubtotalRows($leafNodes);
+        $childredSubtotalRows = $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
 
         return $cell->appendRowsRight($childredSubtotalRows);
     }

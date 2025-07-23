@@ -49,7 +49,7 @@ final class VerticalBlockGroup extends BlockGroup
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
             $subtotalRows = [];
 
-            foreach ($this->getSubtotalRows($subtotals) as $subtotalRow) {
+            foreach ($this->getSubtotalDataRows($subtotals) as $subtotalRow) {
                 $subtotalCells = iterator_to_array($subtotalRow, false);
                 $first = array_shift($subtotalCells);
 
@@ -88,12 +88,12 @@ final class VerticalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function getSubtotalRows(iterable $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         $rows = new DefaultRows([], $this);
 
         foreach ($leafNodes as $leafNode) {
-            $rows = $rows->appendBelow($this->getOneChildBlock()->getSubtotalRows([$leafNode]));
+            $rows = $rows->appendBelow($this->getOneChildBlock()->getSubtotalDataRows([$leafNode]));
         }
 
         return $rows;

@@ -52,7 +52,7 @@ final class HorizontalBlockGroup extends BlockGroup
              * @var list<LeafNode> $subtotals
              */
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
-            $subtotalRows = $this->getSubtotalRows($subtotals);
+            $subtotalRows = $this->getSubtotalDataRows($subtotals);
 
 
             $subtotalHeaderCell = new DefaultHeaderCell(
@@ -113,12 +113,12 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function getSubtotalRows(iterable $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         $rows = new DefaultRows([], $this);
 
         foreach ($leafNodes as $leafNode) {
-            $rows = $rows->appendRight($this->getOneChildBlock()->getSubtotalRows([$leafNode]));
+            $rows = $rows->appendRight($this->getOneChildBlock()->getSubtotalDataRows([$leafNode]));
         }
 
         return $rows;

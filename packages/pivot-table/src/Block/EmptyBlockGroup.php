@@ -30,7 +30,7 @@ final class EmptyBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function getSubtotalRows(iterable $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         return new DefaultRows([], $this);
     }

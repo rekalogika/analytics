@@ -41,5 +41,5 @@ abstract class NodeBlock extends Block
     }
 
     #[\Override]
-    abstract protected function getSubtotalRows(array $leafNodes): DefaultRows;
+    abstract protected function getSubtotalDataRows(array $leafNodes): DefaultRows;
 }

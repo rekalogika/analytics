@@ -60,7 +60,7 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function getSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         if (\count($leafNodes) !== 1) {
             throw new \LogicException('PivotLeafBlock should only have one leaf node for subtotal rows.');

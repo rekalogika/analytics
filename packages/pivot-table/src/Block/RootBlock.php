@@ -40,8 +40,8 @@ final class RootBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getSubtotalRows(array $leafNodes): DefaultRows
+    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
-        return $this->getChildrenBlockGroup()->getSubtotalRows($leafNodes);
+        return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
     }
 }
