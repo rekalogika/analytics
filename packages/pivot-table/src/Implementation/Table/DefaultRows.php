@@ -35,6 +35,13 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
         private ?Block $generatingBlock,
     ) {}
 
+    public static function createFromCell(
+        DefaultCell $cell,
+        ?Block $generatingBlock = null,
+    ): self {
+        return new self([new DefaultRow([$cell], $generatingBlock)], $generatingBlock);
+    }
+
     public function getGeneratingBlock(): ?Block
     {
         return $this->generatingBlock;

@@ -113,6 +113,19 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        $cell = new DefaultHeaderCell(
+            name: 'Total',
+            content: 'Total',
+            generatingBlock: $this,
+            columnSpan: $this->getHeaderRows()->getHeight(),
+        );
+
+        return DefaultRows::createFromCell($cell, $this);
+    }
+
+    #[\Override]
     protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         $rows = new DefaultRows([], $this);

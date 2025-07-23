@@ -60,6 +60,12 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
     protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         if (\count($leafNodes) !== 1) {

@@ -146,6 +146,11 @@ abstract class Block implements \Stringable
     /**
      * @param list<LeafNode> $leafNodes
      */
+    abstract protected function getSubtotalHeaderRows(array $leafNodes): DefaultRows;
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
     abstract protected function getSubtotalDataRows(array $leafNodes): DefaultRows;
 
     final public function generateTable(): DefaultTable

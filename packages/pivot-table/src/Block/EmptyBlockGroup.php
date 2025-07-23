@@ -30,6 +30,12 @@ final class EmptyBlockGroup extends BlockGroup
     }
 
     #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
     protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         return new DefaultRows([], $this);

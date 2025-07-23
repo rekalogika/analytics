@@ -64,6 +64,19 @@ final class NormalBlock extends BranchBlock
         return $this->dataRows;
     }
 
+    #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        $cell = new DefaultHeaderCell(
+            name: 'Total',
+            content: 'Total',
+            generatingBlock: $this,
+            columnSpan: $this->getHeaderRows()->getHeight(),
+        );
+
+        return DefaultRows::createFromCell($cell, $this);
+    }
+
     /**
      * @todo make 'Total' string configurable
      */

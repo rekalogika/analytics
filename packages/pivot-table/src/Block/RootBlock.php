@@ -40,6 +40,12 @@ final class RootBlock extends BranchBlock
     }
 
     #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
     protected function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);

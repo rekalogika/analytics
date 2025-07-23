@@ -88,6 +88,12 @@ final class VerticalBlockGroup extends BlockGroup
     }
 
     #[\Override]
+    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
     protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
         $rows = new DefaultRows([], $this);
