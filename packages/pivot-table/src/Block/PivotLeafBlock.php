@@ -16,7 +16,6 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class PivotLeafBlock extends LeafBlock
@@ -40,9 +39,7 @@ final class PivotLeafBlock extends LeafBlock
             );
         }
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]
@@ -54,15 +51,23 @@ final class PivotLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]
     protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
-        throw new \BadMethodCallException('Not implemented yet');
+        if (\count($leafNodes) !== 1) {
+            throw new \LogicException('PivotLeafBlock should only have one leaf node for subtotal rows.');
+        }
+
+        $cell = new DefaultDataCell(
+            name: 'total',
+            content: 'Total',
+            generatingBlock: $this,
+        );
+
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]
@@ -80,8 +85,6 @@ final class PivotLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 }

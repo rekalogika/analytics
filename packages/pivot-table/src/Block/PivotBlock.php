@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -53,7 +54,19 @@ final class PivotBlock extends BranchBlock
     #[\Override]
     protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
-        throw new \BadMethodCallException('Not implemented yet');
+        if ($this->getTreeNode() instanceof BranchNode) {
+            return $this->getChildrenBlockGroup()->getSubtotalHeaderRows($leafNodes);
+        }
+
+        $valueCell = new DefaultHeaderCell(
+            name: 'Total',
+            content: 'Total',
+            generatingBlock: $this,
+            columnSpan: $this->getSubtotalDataRows($leafNodes)->getWidth(),
+            rowSpan: $this->getSubtotalDataRows($leafNodes)->getHeight(),
+        );
+
+        return DefaultRows::createFromCell($valueCell, $this);
     }
 
     #[\Override]

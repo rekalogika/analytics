@@ -16,7 +16,6 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class SingleNodeLeafBlock extends LeafBlock
@@ -30,9 +29,7 @@ final class SingleNodeLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]
@@ -44,9 +41,7 @@ final class SingleNodeLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]
@@ -70,8 +65,6 @@ final class SingleNodeLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 }

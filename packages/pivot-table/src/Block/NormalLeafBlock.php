@@ -31,9 +31,7 @@ final class NormalLeafBlock extends LeafBlock
             generatingBlock: $this,
         );
 
-        $row = new DefaultRow([$cell], $this);
-
-        return new DefaultRows([$row], $this);
+        return DefaultRows::createFromCell($cell, $this);
     }
 
     #[\Override]

@@ -120,6 +120,27 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
             $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([], null));
         }
 
+        // Calculate the maximum width of the new rows
+
+        $width = 0;
+
+        foreach ($newRows as $row) {
+            $width = max($width, $row->getWidth());
+        }
+
+        // if a row has less width than the maximum width, and it has a single
+        // cell, we increase the columnSpan of the cell to fill the gap
+
+        foreach ($newRows as $i => $row) {
+            if ($row->getWidth() === $width || \count($row) !== 1) {
+                continue;
+            }
+
+            $cells = iterator_to_array($row, false);
+            $cells[0] = $cells[0]->withColumnSpan($width);
+            $newRows[$i] = new DefaultRow($cells, $this->generatingBlock);
+        }
+
         return new self(array_values($newRows), $this->generatingBlock);
     }
 }
