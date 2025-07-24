@@ -24,32 +24,15 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\It
 final readonly class DefaultNormalTable implements NormalTable, \IteratorAggregate
 {
     /**
-     * @var list<DefaultNormalRow>
-     */
-    private array $rows;
-
-    /**
      * @param class-string $summaryClass
      * @param list<DefaultNormalRow> $rows
      */
     public function __construct(
         private string $summaryClass,
-        array $rows,
+        private array $rows,
         private ItemCollection $itemCollection,
         private RowCollection $rowCollection,
-    ) {
-        $newRows = [];
-
-        foreach ($rows as $row) {
-            if ($row->isSubtotal()) {
-                continue;
-            }
-
-            $newRows[] = $row;
-        }
-
-        $this->rows = $newRows;
-    }
+    ) {}
 
     #[\Override]
     public function getSummaryClass(): string
