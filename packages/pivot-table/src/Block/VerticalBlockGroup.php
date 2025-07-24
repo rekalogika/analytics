@@ -132,4 +132,10 @@ final class VerticalBlockGroup extends BlockGroup
             'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
         );
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
 }

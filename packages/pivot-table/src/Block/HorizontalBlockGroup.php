@@ -15,10 +15,7 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
-use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class HorizontalBlockGroup extends BlockGroup
@@ -51,7 +48,7 @@ final class HorizontalBlockGroup extends BlockGroup
             && $this->getOneChild()->getKey() !== '@values'
         ) {
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals(), false);
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
+            $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
 
             // $subtotalHeaderRows = $this->getOneChildBlock()
             //     ->getSubtotalHeaderRows($subtotals);
@@ -118,8 +115,10 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    public function getSubtotalDataRows(iterable $leafNodes): DefaultRows
-    {
+    public function getSubtotalDataRows(
+        iterable $leafNodes,
+        bool $requirePadding = true,
+    ): DefaultRows {
         $oneChildBlock = $this->getOneChildBlock();
 
         if ($oneChildBlock instanceof LeafBlock) {
@@ -147,57 +146,36 @@ final class HorizontalBlockGroup extends BlockGroup
             $oneChildBlock instanceof BlockGroup
             || $oneChildBlock instanceof BranchBlock
         ) {
-            return $oneChildBlock->getSubtotalDataRows($leafNodes);
+            $rows = new DefaultRows([], $this);
+            $childSubtotalDataRows = $oneChildBlock->getSubtotalDataRows($leafNodes);
 
+            if ($requirePadding) {
+                foreach ($this->getChildBlocks() as $childBlock) {
+                    $paddingRows = $childBlock->getDataPaddingRows();
+                    $rows = $rows->appendRight($paddingRows);
+                }
+            }
 
-            // $rows = new DefaultRows([], $this);
-            // $row = new DefaultRow([], $this);
+            $rows = $rows->appendRight($childSubtotalDataRows);
 
-            // $childSubtotalDataRows = iterator_to_array($oneChildBlock->getSubtotalDataRows($leafNodes), false);
-
-            // $subtotalDataRow = array_shift($childSubtotalDataRows);
-
-            // if ($subtotalDataRow === null) {
-            //     return $rows;
-            // }
-
-            // $subtotalDataRow = \iterator_to_array($subtotalDataRow, false);
-
-            // foreach ($this->getChildBlocks() as $childBlock) {
-            //     $childDataRows = $childBlock->getDataRows();
-
-            //     foreach ($childDataRows as $childDataRow) {
-            //         $subtotalDataCell = array_shift($subtotalDataRow);
-
-            //         if ($subtotalDataCell === null) {
-            //             continue;
-            //         }
-
-            //         foreach ($childDataRow as $childDataCell) {
-            //             if (!$childDataCell instanceof DefaultDataCell) {
-            //                 continue;
-            //             }
-
-            //             $emptyCell = new DefaultFooterCell(
-            //                 name: '',
-            //                 content: '',
-            //                 generatingBlock: $this,
-            //             );
-
-            //             $row = $row->appendCell($emptyCell);
-            //         }
-
-            //         $row = $row->appendCell($subtotalDataCell);
-            //     }
-            // }
-
-            // $rows = $rows->appendRow($row);
-
-            // return $rows;
+            return $rows;
         }
 
         throw new \RuntimeException(
             'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
         );
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        $dataRows = new DefaultRows([], $this);
+
+        foreach ($this->getBalancedChildBlocks() as $childBlock) {
+            $childDataRows = $childBlock->getDataPaddingRows();
+            $dataRows = $dataRows->appendRight($childDataRows);
+        }
+
+        return $dataRows;
     }
 }

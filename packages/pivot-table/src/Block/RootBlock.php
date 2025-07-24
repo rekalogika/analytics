@@ -50,4 +50,10 @@ final class RootBlock extends BranchBlock
     {
         return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
 }

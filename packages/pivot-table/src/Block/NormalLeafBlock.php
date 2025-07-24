@@ -80,4 +80,10 @@ final class NormalLeafBlock extends LeafBlock
 
         return new DefaultRows([$row], $this);
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
 }

@@ -143,6 +143,8 @@ abstract class Block implements \Stringable
 
     abstract public function getDataRows(): DefaultRows;
 
+    abstract public function getDataPaddingRows(): DefaultRows;
+
     final public function generateTable(): DefaultTable
     {
         return new DefaultTable(

@@ -40,4 +40,16 @@ final class EmptyBlockGroup extends BlockGroup
     {
         return new DefaultRows([], $this);
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
 }

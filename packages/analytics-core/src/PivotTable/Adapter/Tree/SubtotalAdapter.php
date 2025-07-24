@@ -49,7 +49,7 @@ final readonly class SubtotalAdapter implements LeafNode, TranslatableInterface
     #[\Override]
     public function getKey(): string
     {
-        return '@values';
+        return '@subtotal';
     }
 
     #[\Override]

@@ -74,4 +74,10 @@ final class PivotBlock extends BranchBlock
     {
         return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        return $this->getChildrenBlockGroup()->getDataPaddingRows();
+    }
 }

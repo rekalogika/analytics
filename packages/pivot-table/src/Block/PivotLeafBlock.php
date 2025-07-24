@@ -66,16 +66,20 @@ final class PivotLeafBlock extends LeafBlock
 
         $rows = DefaultRows::createFromCell($cell, $this);
 
-        $rows = $rows->appendBelow(
-            DefaultRows::createFromCell(
-                new DefaultHeaderCell(
-                    name: $leafNode->getKey(),
-                    content: $leafNode->getItem(),
-                    generatingBlock: $this,
+        if (
+            $leafNode->getKey() === '@values'
+        ) {
+            $rows = $rows->appendBelow(
+                DefaultRows::createFromCell(
+                    new DefaultHeaderCell(
+                        name: $leafNode->getKey(),
+                        content: $leafNode->getItem(),
+                        generatingBlock: $this,
+                    ),
+                    $this,
                 ),
-                $this,
-            ),
-        );
+            );
+        }
 
         return $rows;
     }
@@ -86,6 +90,18 @@ final class PivotLeafBlock extends LeafBlock
         $cell = new DefaultFooterCell(
             name: $leafNode->getKey(),
             content: $leafNode->getValue(),
+            generatingBlock: $this,
+        );
+
+        return DefaultRows::createFromCell($cell, $this);
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        $cell = new DefaultFooterCell(
+            name: '',
+            content: '',
             generatingBlock: $this,
         );
 

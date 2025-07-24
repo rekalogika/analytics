@@ -93,4 +93,10 @@ final class NormalBlock extends BranchBlock
 
         return $cell->appendRowsRight($childredSubtotalRows);
     }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
 }
