@@ -46,9 +46,8 @@ final class HorizontalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
-        // add subtotals if there are more than one child blocks
         if (
-            \count($this->getChildBlocks()) > 1
+            \count($this->getBalancedChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
             $subtotals = iterator_to_array($this->getParentNode()->getSubtotals(), false);
