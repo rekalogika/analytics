@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Common\Exception\EmptyResultException;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<int,Row>
+ * @extends \Traversable<int,NormalRow>
  */
 interface NormalTable extends \Traversable, \Countable
 {
