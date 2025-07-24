@@ -80,11 +80,19 @@ final class TableToNormalTableTransformer
     private function doTransform(DefaultTable $input): DefaultNormalTable
     {
         $rowCollection = $input->getRowCollection();
+
         $rows = [];
+        $subtotalRows = [];
 
         foreach ($rowCollection->getRows() as $row) {
+
             foreach ($this->unpivotRow($row) as $normalRow) {
-                $rows[] = $normalRow;
+                if ($row->isSubtotal()) {
+                    $subtotalRows[] = $normalRow;
+                } else {
+                    $rows[] = $normalRow;
+                }
+
                 $this->dimensionCollector->processDimensions($normalRow);
                 $this->dimensionCollector->processMeasure($normalRow->getMeasure());
                 $rowCollection->collectNormalRow($normalRow);
