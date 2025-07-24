@@ -127,4 +127,10 @@ abstract class BlockGroup extends Block
         /** @var non-empty-list<BranchNode> $children */
         return $this->balancedChildren = $this->balanceBranchNodes($children, $this->getLevel());
     }
+
+    final protected function getOneChild(): TreeNode
+    {
+        return $this->getBalancedChildren()[0]
+            ?? throw new \RuntimeException('No child nodes found in the parent node.');
+    }
 }

@@ -41,7 +41,10 @@ final class VerticalBlockGroup extends BlockGroup
         }
 
         // add subtotals if there are more than one child blocks
-        if (\count($this->getChildBlocks()) > 1) {
+        if (
+            \count($this->getChildBlocks()) > 1
+            && $this->getOneChild()->getKey() !== '@values'
+        ) {
             /**
              * @psalm-suppress InvalidArgument
              * @var list<LeafNode> $subtotals

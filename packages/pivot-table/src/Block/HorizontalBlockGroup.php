@@ -106,10 +106,4 @@ final class HorizontalBlockGroup extends BlockGroup
 
         return $rows;
     }
-
-    private function getOneChild(): TreeNode
-    {
-        return $this->getBalancedChildren()[0]
-            ?? throw new \RuntimeException('No child nodes found in the parent node.');
-    }
 }
