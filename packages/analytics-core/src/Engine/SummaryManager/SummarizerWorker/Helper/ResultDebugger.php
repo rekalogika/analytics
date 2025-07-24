@@ -133,6 +133,9 @@ final readonly class ResultDebugger
         ];
     }
 
+    /**
+     * @return list<array<string,list<string>|string>>
+     */
     public static function debugNormalTable(NormalTable $table): array
     {
         $result = [];
