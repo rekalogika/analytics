@@ -17,12 +17,18 @@ use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DefaultMeasureMember implements MeasureMember
+final readonly class DefaultMeasureMember implements MeasureMember, \Stringable
 {
     public function __construct(
         private TranslatableInterface $label,
         private string $property,
     ) {}
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return $this->property;
+    }
 
     #[\Override]
     public function getMeasureProperty(): string

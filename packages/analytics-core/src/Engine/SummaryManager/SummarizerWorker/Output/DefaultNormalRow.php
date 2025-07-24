@@ -56,8 +56,22 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
         foreach ($row1 as $name => $value1) {
             $value2 = $row2->getByName($name);
 
+            if ($value2 === null) {
+                return 1;
+            }
+
             if ($name === '@values') {
-                break;
+                $measure1Order = $measures[$row1->getMeasure()->getName()]
+                    ?? throw new LogicException('Measure not found');
+
+                $measure2Order = $measures[$row2->getMeasure()->getName()]
+                    ?? throw new LogicException('Measure not found');
+
+                $comparison = $measure1Order <=> $measure2Order;
+
+                if ($comparison !== 0) {
+                    return $comparison;
+                }
             }
 
             if (!DimensionUtil::isDimensionSame($value1, $value2)) {
@@ -65,13 +79,7 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
             }
         }
 
-        $measure1Order = $measures[$row1->getMeasure()->getName()]
-            ?? throw new LogicException('Measure not found');
-
-        $measure2Order = $measures[$row2->getMeasure()->getName()]
-            ?? throw new LogicException('Measure not found');
-
-        return $measure1Order <=> $measure2Order;
+        return 0;
     }
 
     public function hasSameDimensions(self $other): bool
