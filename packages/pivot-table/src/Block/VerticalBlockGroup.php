@@ -129,7 +129,7 @@ final class VerticalBlockGroup extends BlockGroup
         }
 
         throw new \RuntimeException(
-            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
         );
     }
 }

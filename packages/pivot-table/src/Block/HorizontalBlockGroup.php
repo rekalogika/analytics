@@ -15,7 +15,6 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
-use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
@@ -102,7 +101,7 @@ final class HorizontalBlockGroup extends BlockGroup
 
             foreach ($leafNodes as $leafNode) {
                 $rows = $rows->appendRight(
-                    $childBlock->getSubtotalHeaderRow($leafNode)
+                    $childBlock->getSubtotalHeaderRow($leafNode),
                 );
             }
 
@@ -115,7 +114,7 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         throw new \RuntimeException(
-            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
         );
     }
 
@@ -199,7 +198,7 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         throw new \RuntimeException(
-            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
         );
     }
 }
