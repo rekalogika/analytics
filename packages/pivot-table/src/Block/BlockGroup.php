@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 abstract class BlockGroup extends Block
 {
@@ -45,6 +47,18 @@ abstract class BlockGroup extends Block
     ) {
         parent::__construct($level, $context);
     }
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract public function getSubtotalHeaderRows(array $leafNodes): DefaultRows;
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract public function getSubtotalDataRows(array $leafNodes): DefaultRows;
+
+
 
     /**
      * @return list<Block>
@@ -130,7 +144,8 @@ abstract class BlockGroup extends Block
 
     final protected function getOneChild(): TreeNode
     {
-        return $this->getBalancedChildren()[0]
+        return $this->getChildren()[0]
+            ?? $this->getBalancedChildren()[0]
             ?? throw new \RuntimeException('No child nodes found in the parent node.');
     }
 }

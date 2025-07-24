@@ -18,25 +18,25 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class EmptyBlock extends BranchBlock
 {
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         return new DefaultRows([], $this);
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return new DefaultRows([], $this);
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
         return new DefaultRows([], $this);
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         return new DefaultRows([], $this);
     }

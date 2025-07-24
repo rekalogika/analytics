@@ -26,7 +26,7 @@ final class RootBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         return $this
             ->getChildrenBlockGroup()
@@ -34,19 +34,19 @@ final class RootBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
     }

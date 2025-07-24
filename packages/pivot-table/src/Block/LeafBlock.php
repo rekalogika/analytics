@@ -14,8 +14,17 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 /**
  * @extends NodeBlock<LeafNode>
  */
-abstract class LeafBlock extends NodeBlock {}
+abstract class LeafBlock extends NodeBlock
+{
+    abstract public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows;
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract public function getSubtotalDataRow(LeafNode $leafNode): DefaultRows;
+}

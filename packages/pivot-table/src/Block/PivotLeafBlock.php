@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
@@ -21,7 +22,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class PivotLeafBlock extends LeafBlock
 {
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
@@ -43,7 +44,7 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
@@ -55,30 +56,35 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows
     {
-        if (\count($leafNodes) !== 1) {
-            throw new \LogicException('PivotLeafBlock should only have one leaf node for subtotal rows.');
-        }
-
         $cell = new DefaultDataCell(
             name: 'total',
             content: 'Total',
             generatingBlock: $this,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        $rows = DefaultRows::createFromCell($cell, $this);
+
+        if ($leafNode->getKey() !== '@values') {
+            $rows = $rows->appendBelow(
+                DefaultRows::createFromCell(
+                    new DefaultHeaderCell(
+                        name: $leafNode->getKey(),
+                        content: $leafNode->getItem(),
+                        generatingBlock: $this,
+                    ),
+                    $this,
+                ),
+            );
+        }
+
+        return $rows;
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRow(LeafNode $leafNode): DefaultRows
     {
-        if (\count($leafNodes) !== 1) {
-            throw new \LogicException('PivotLeafBlock should only have one leaf node for subtotal rows.');
-        }
-
-        $leafNode = $leafNodes[0];
-
         $cell = new DefaultFooterCell(
             name: $leafNode->getKey(),
             content: $leafNode->getValue(),

@@ -21,7 +21,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class PivotBlock extends BranchBlock
 {
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
@@ -46,13 +46,13 @@ final class PivotBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
         if ($this->getTreeNode() instanceof BranchNode) {
             return $this->getChildrenBlockGroup()->getSubtotalHeaderRows($leafNodes);
@@ -70,7 +70,7 @@ final class PivotBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
     }

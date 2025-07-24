@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
@@ -22,7 +23,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class NormalLeafBlock extends LeafBlock
 {
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
@@ -35,7 +36,7 @@ final class NormalLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         $name = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
@@ -55,23 +56,17 @@ final class NormalLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows
     {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRow(LeafNode $leafNode): DefaultRows
     {
-        if (\count($leafNodes) !== 1) {
-            throw new \LogicException('NormalLeafBlock should only have one leaf node for subtotal rows.');
-        }
-
-        $leafNode = $leafNodes[0];
-
         $name = new DefaultFooterCell(
             name: $leafNode->getKey(),
-            content: 'Total',
+            content: $leafNode->getItem(),
             generatingBlock: $this,
         );
 

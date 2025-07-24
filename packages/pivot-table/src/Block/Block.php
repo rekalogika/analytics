@@ -139,19 +139,9 @@ abstract class Block implements \Stringable
         return $result;
     }
 
-    abstract protected function getHeaderRows(): DefaultRows;
+    abstract public function getHeaderRows(): DefaultRows;
 
-    abstract protected function getDataRows(): DefaultRows;
-
-    /**
-     * @param list<LeafNode> $leafNodes
-     */
-    abstract protected function getSubtotalHeaderRows(array $leafNodes): DefaultRows;
-
-    /**
-     * @param list<LeafNode> $leafNodes
-     */
-    abstract protected function getSubtotalDataRows(array $leafNodes): DefaultRows;
+    abstract public function getDataRows(): DefaultRows;
 
     final public function generateTable(): DefaultTable
     {

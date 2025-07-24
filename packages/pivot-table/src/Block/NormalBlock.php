@@ -53,19 +53,19 @@ final class NormalBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         return $this->headerRows;
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->dataRows;
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
         $cell = new DefaultHeaderCell(
             name: 'Total',
@@ -81,7 +81,7 @@ final class NormalBlock extends BranchBlock
      * @todo make 'Total' string configurable
      */
     #[\Override]
-    protected function getSubtotalDataRows(array $leafNodes): DefaultRows
+    public function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
         $cell = new DefaultFooterCell(
             name: '',

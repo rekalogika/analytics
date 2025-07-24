@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 /**
  * @extends NodeBlock<BranchNode>
@@ -36,6 +38,16 @@ abstract class BranchBlock extends NodeBlock
     {
         return $this->childrenBlockGroup;
     }
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract public function getSubtotalHeaderRows(array $leafNodes): DefaultRows;
+
+    /**
+     * @param list<LeafNode> $leafNodes
+     */
+    abstract public function getSubtotalDataRows(array $leafNodes): DefaultRows;
 
     private function createBlockGroup(BranchNode $parentNode, int $level): BlockGroup
     {

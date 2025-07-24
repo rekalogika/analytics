@@ -32,7 +32,6 @@ final class VerticalBlockGroup extends BlockGroup
     ) {
         parent::__construct($parentNode, $level, $context);
 
-        $childBlock = $this->getOneChildBlock();
         $dataRows = new DefaultRows([], $this);
 
         // add a data row for each of the child blocks
@@ -45,66 +44,87 @@ final class VerticalBlockGroup extends BlockGroup
             \count($this->getChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            /**
-             * @psalm-suppress InvalidArgument
-             * @var list<LeafNode> $subtotals
-             */
-            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
-            $subtotalRows = [];
+            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals(), false);
+            $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
+            $dataRows = $dataRows->appendBelow($subtotalDataRows);
 
-            foreach ($this->getSubtotalDataRows($subtotals) as $subtotalRow) {
-                $subtotalCells = iterator_to_array($subtotalRow, false);
-                $first = array_shift($subtotalCells);
+            // $dataRows = $dataRows->appendBelow($childBlock->getSubtotalDataRows($subtotals));
 
-                if (!$first instanceof DefaultCell) {
-                    throw new \LogicException('Subtotal row must have at least one cell.');
-                }
+            // /**
+            //  * @psalm-suppress InvalidArgument
+            //  * @var list<LeafNode> $subtotals
+            //  */
+            // $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
+            // $subtotalRows = [];
 
-                $first = $first->withColumnSpan($dataRows->getWidth() - \count($subtotalCells));
+            // foreach ($this->getSubtotalDataRows($subtotals) as $subtotalRow) {
+            //     $subtotalCells = iterator_to_array($subtotalRow, false);
+            //     $first = array_shift($subtotalCells);
 
-                $subtotalRow = new DefaultRow(
-                    [$first, ...$subtotalCells],
-                    $this,
-                );
+            //     if (!$first instanceof DefaultCell) {
+            //         throw new \LogicException('Subtotal row must have at least one cell.');
+            //     }
 
-                $subtotalRows[] = $subtotalRow;
-            }
+            //     $first = $first->withColumnSpan($dataRows->getWidth() - \count($subtotalCells));
 
-            $subtotalRows = new DefaultRows($subtotalRows, $this);
-            $dataRows = $dataRows->appendBelow($subtotalRows);
+            //     $subtotalRow = new DefaultRow(
+            //         [$first, ...$subtotalCells],
+            //         $this,
+            //     );
+
+            //     $subtotalRows[] = $subtotalRow;
+            // }
+
+            // $subtotalRows = new DefaultRows($subtotalRows, $this);
+            // $dataRows = $dataRows->appendBelow($subtotalRows);
         }
 
-        $this->headerRows = $childBlock->getHeaderRows();
+        $this->headerRows = $this->getOneChildBlock()->getHeaderRows();
         $this->dataRows = $dataRows;
     }
 
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         return $this->headerRows;
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->dataRows;
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
-        $rows = new DefaultRows([], $this);
+        $childBlock = $this->getOneChildBlock();
 
-        foreach ($leafNodes as $leafNode) {
-            $rows = $rows->appendBelow($this->getOneChildBlock()->getSubtotalDataRows([$leafNode]));
+        if ($childBlock instanceof LeafBlock) {
+            $rows = new DefaultRows([], $this);
+
+            foreach ($leafNodes as $leafNode) {
+                $rows = $rows->appendBelow(
+                    $childBlock->getSubtotalDataRow($leafNode)
+                );
+            }
+
+            return $rows;
+        } elseif (
+            $childBlock instanceof BlockGroup
+            || $childBlock instanceof BranchBlock
+        ) {
+            return $childBlock->getSubtotalDataRows($leafNodes);
         }
 
-        return $rows;
+        throw new \RuntimeException(
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+        );
     }
 }

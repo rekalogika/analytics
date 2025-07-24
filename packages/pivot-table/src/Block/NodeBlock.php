@@ -39,7 +39,4 @@ abstract class NodeBlock extends Block
     {
         return $this->treeNode;
     }
-
-    #[\Override]
-    abstract protected function getSubtotalDataRows(array $leafNodes): DefaultRows;
 }

@@ -45,17 +45,17 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         // add subtotals if there are more than one child blocks
-        if (\count($this->getBalancedChildren()) > 1) {
-            /**
-             * @psalm-suppress InvalidArgument
-             * @var list<LeafNode> $subtotals
-             */
-            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals());
+        if (
+            \count($this->getChildBlocks()) > 1
+            && $this->getOneChild()->getKey() !== '@values'
+        ) {
+            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals(), false);
             $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
 
-            $subtotalHeaderRows = $this->getOneChildBlock()
-                ->getSubtotalHeaderRows($subtotals);
+            // $subtotalHeaderRows = $this->getOneChildBlock()
+            //     ->getSubtotalHeaderRows($subtotals);
 
+            $subtotalHeaderRows = $this->getSubtotalHeaderRows($subtotals);
             $headerRows = $headerRows->appendRight($subtotalHeaderRows);
             $dataRows = $dataRows->appendRight($subtotalDataRows);
         }
@@ -78,32 +78,69 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    protected function getHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         return $this->headerRows;
     }
 
     #[\Override]
-    protected function getDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->dataRows;
     }
 
     #[\Override]
-    protected function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
     {
-        return $this->getOneChildBlock()->getSubtotalHeaderRows($leafNodes);
+        $childBlock = $this->getOneChildBlock();
+
+        if ($childBlock instanceof LeafBlock) {
+            $rows = new DefaultRows([], $this);
+
+            foreach ($leafNodes as $leafNode) {
+                $rows = $rows->appendRight(
+                    $childBlock->getSubtotalHeaderRow($leafNode)
+                );
+            }
+
+            return $rows;
+        } elseif (
+            $childBlock instanceof BlockGroup
+            || $childBlock instanceof BranchBlock
+        ) {
+            return $childBlock->getSubtotalHeaderRows($leafNodes);
+        }
+
+        throw new \RuntimeException(
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+        );
     }
 
     #[\Override]
-    protected function getSubtotalDataRows(iterable $leafNodes): DefaultRows
+    public function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
-        $rows = new DefaultRows([], $this);
+        $childBlock = $this->getOneChildBlock();
 
-        foreach ($leafNodes as $leafNode) {
-            $rows = $rows->appendRight($this->getOneChildBlock()->getSubtotalDataRows([$leafNode]));
+        if ($childBlock instanceof LeafBlock) {
+            $rows = new DefaultRows([], $this);
+
+            foreach ($leafNodes as $leafNode) {
+                $rows = $rows->appendRight(
+                    $childBlock->getSubtotalDataRow($leafNode)
+                );
+            }
+
+            return $rows;
+        } elseif (
+            $childBlock instanceof BlockGroup
+            || $childBlock instanceof BranchBlock
+        ) {
+            return $childBlock->getSubtotalDataRows($leafNodes);
         }
 
-        return $rows;
+
+        throw new \RuntimeException(
+            'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.'
+        );
     }
 }
