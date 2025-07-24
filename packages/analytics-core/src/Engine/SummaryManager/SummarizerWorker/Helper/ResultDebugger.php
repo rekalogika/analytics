@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
  * A helper class for debugging various analytics result items.
- * 
+ *
  * @api
  */
 final readonly class ResultDebugger
