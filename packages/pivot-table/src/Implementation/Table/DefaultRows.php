@@ -103,6 +103,11 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
         return new self(\array_slice($this->rows, 1), $this->generatingBlock);
     }
 
+    public function appendRow(DefaultRow $row): DefaultRows
+    {
+        return new self([...$this->rows, $row], $this->generatingBlock);
+    }
+
     public function appendBelow(DefaultRows $rows): DefaultRows
     {
         return new self([...$this->rows, ...$rows->toArray()], $this->generatingBlock);

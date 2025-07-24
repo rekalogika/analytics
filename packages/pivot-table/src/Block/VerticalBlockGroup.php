@@ -104,23 +104,28 @@ final class VerticalBlockGroup extends BlockGroup
     #[\Override]
     public function getSubtotalDataRows(iterable $leafNodes): DefaultRows
     {
-        $childBlock = $this->getOneChildBlock();
+        $oneChildBlock = $this->getOneChildBlock();
 
-        if ($childBlock instanceof LeafBlock) {
+        if ($oneChildBlock instanceof LeafBlock) {
             $rows = new DefaultRows([], $this);
 
-            foreach ($leafNodes as $leafNode) {
-                $rows = $rows->appendBelow(
-                    $childBlock->getSubtotalDataRow($leafNode)
-                );
+            foreach ($this->getChildBlocks() as $childBlock) {
+                $leafNode = array_shift($leafNodes);
+
+                if (!$leafNode instanceof LeafNode) {
+                    continue;
+                }
+
+                $childSubtotalDataRows = $childBlock->getSubtotalDataRow($leafNode);
+                $rows = $rows->appendBelow($childSubtotalDataRows);
             }
 
             return $rows;
         } elseif (
-            $childBlock instanceof BlockGroup
-            || $childBlock instanceof BranchBlock
+            $oneChildBlock instanceof BlockGroup
+            || $oneChildBlock instanceof BranchBlock
         ) {
-            return $childBlock->getSubtotalDataRows($leafNodes);
+            return $oneChildBlock->getSubtotalDataRows($leafNodes);
         }
 
         throw new \RuntimeException(
