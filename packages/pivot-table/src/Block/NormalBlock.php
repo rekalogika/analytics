@@ -21,8 +21,8 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class NormalBlock extends BranchBlock
 {
-    private DefaultRows $headerRows;
-    private DefaultRows $dataRows;
+    private ?DefaultRows $headerRows = null;
+    private ?DefaultRows $dataRows = null;
 
     protected function __construct(
         BranchNode $treeNode,
@@ -30,38 +30,40 @@ final class NormalBlock extends BranchBlock
         BlockContext $context,
     ) {
         parent::__construct($treeNode, $level, $context);
+    }
 
-        // Create header rows
+    #[\Override]
+    public function getHeaderRows(): DefaultRows
+    {
+        if ($this->headerRows !== null) {
+            return $this->headerRows;
+        }
+
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
             generatingBlock: $this,
         );
 
-        $this->headerRows = $cell
+        return $this->headerRows = $cell
             ->appendRowsRight($this->getChildrenBlockGroup()->getHeaderRows());
+    }
 
-        // Create data rows
+    #[\Override]
+    public function getDataRows(): DefaultRows
+    {
+        if ($this->dataRows !== null) {
+            return $this->dataRows;
+        }
+
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
             generatingBlock: $this,
         );
 
-        $this->dataRows = $cell
+        return $this->dataRows = $cell
             ->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
-    }
-
-    #[\Override]
-    public function getHeaderRows(): DefaultRows
-    {
-        return $this->headerRows;
-    }
-
-    #[\Override]
-    public function getDataRows(): DefaultRows
-    {
-        return $this->dataRows;
     }
 
     #[\Override]
@@ -74,22 +76,31 @@ final class NormalBlock extends BranchBlock
             columnSpan: $this->getHeaderRows()->getHeight(),
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        $subtotalHeaderRows = $this->getChildrenBlockGroup()
+            ->getSubtotalHeaderRows($leafNodes);
+
+        return $cell->appendRowsRight($subtotalHeaderRows);
     }
 
-    /**
-     * @todo make 'Total' string configurable
-     */
     #[\Override]
     public function getSubtotalDataRows(array $leafNodes): DefaultRows
     {
-        $cell = new DefaultFooterCell(
-            name: '',
-            content: 'Total',
-            generatingBlock: $this,
-        );
+        // if ($this->getTreeNode()->getKey() === '@values') {
+        //     $cell = new DefaultFooterCell(
+        //         name: $this->getTreeNode()->getKey(),
+        //         content: $this->getTreeNode()->getItem(),
+        //         generatingBlock: $this,
+        //     );
+        // } else {
+            $cell = new DefaultFooterCell(
+                name: '',
+                content: 'Total',
+                generatingBlock: $this,
+            );
+        // }
 
-        $childredSubtotalRows = $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
+        $childredSubtotalRows = $this->getChildrenBlockGroup()
+            ->getSubtotalDataRows($leafNodes);
 
         return $cell->appendRowsRight($childredSubtotalRows);
     }

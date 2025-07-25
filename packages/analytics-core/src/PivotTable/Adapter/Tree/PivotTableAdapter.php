@@ -72,4 +72,9 @@ final readonly class PivotTableAdapter implements BranchNode
             yield SubtotalAdapter::adapt($subtotal);
         }
     }
+
+    public function getTreeNode(): TreeNode
+    {
+        return $this->node;
+    }
 }

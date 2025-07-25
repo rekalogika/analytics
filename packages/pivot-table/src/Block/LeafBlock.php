@@ -24,7 +24,10 @@ abstract class LeafBlock extends NodeBlock
     abstract public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows;
 
     /**
-     * @param list<LeafNode> $leafNodes
+     * @param list<LeafNode> $allLeafNodes
      */
-    abstract public function getSubtotalDataRow(LeafNode $leafNode): DefaultRows;
+    abstract public function getSubtotalDataRow(
+        LeafNode $leafNode,
+        array $allLeafNodes
+    ): DefaultRows;
 }

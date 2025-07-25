@@ -34,7 +34,7 @@ abstract class NodeBlock extends Block
     /**
      * @return T
      */
-    final protected function getTreeNode(): TreeNode
+    final public function getTreeNode(): TreeNode
     {
         return $this->treeNode;
     }

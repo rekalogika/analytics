@@ -52,8 +52,10 @@ final class SingleNodeLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    public function getSubtotalDataRow(LeafNode $leafNode): DefaultRows
-    {
+    public function getSubtotalDataRow(
+        LeafNode $leafNode,
+        array $allLeafNodes
+    ): DefaultRows {
         $cell = new DefaultFooterCell(
             name: $leafNode->getKey(),
             content: $leafNode->getValue(),
@@ -61,5 +63,11 @@ final class SingleNodeLeafBlock extends LeafBlock
         );
 
         return DefaultRows::createFromCell($cell, $this);
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
     }
 }

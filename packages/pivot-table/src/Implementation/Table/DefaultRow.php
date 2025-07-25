@@ -45,6 +45,7 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
                 $lastCell instanceof DefaultCell
                 && $lastCell->getContent() !== null
                 && $lastCell->getContent() === $cell->getContent()
+                && $lastCell->getRowSpan() === $cell->getRowSpan()
             ) {
                 $lastCell = $lastCell
                     ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());

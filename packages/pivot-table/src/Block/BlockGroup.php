@@ -98,13 +98,8 @@ abstract class BlockGroup extends Block
 
     protected function getOneChildBlock(): Block
     {
-        $childBlock = $this->getChildBlocks()[0] ?? null;
-
-        if ($childBlock === null) {
-            throw new \RuntimeException('No child blocks found in the parent node.');
-        }
-
-        return $childBlock;
+        return $this->getChildBlocks()[0]
+            ?? throw new \RuntimeException('No child blocks found in the parent node.');
     }
 
     final protected function getParentNode(): BranchNode

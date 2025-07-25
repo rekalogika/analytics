@@ -19,14 +19,31 @@ use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 final readonly class NullBranchNode implements BranchNode
 {
     /**
+     * @var iterable<NullLeafNode> $subtotals
+     */
+    private iterable $subtotals;
+
+    /**
      * @param iterable<LeafNode> $subtotals
      */
     public function __construct(
         private string $name,
         private mixed $legend,
         private mixed $item,
-        private iterable $subtotals,
-    ) {}
+        iterable $subtotals,
+    ) {
+        $newSubtotals = [];
+
+        foreach ($subtotals as $subtotal) {
+            $newSubtotals[] = new NullLeafNode(
+                name: $subtotal->getKey(),
+                legend: $subtotal->getLegend(),
+                item: $subtotal->getItem(),
+            );
+        }
+
+        $this->subtotals = $newSubtotals;
+    }
 
     public static function fromInterface(BranchNode $branchNode): self
     {
@@ -65,12 +82,6 @@ final readonly class NullBranchNode implements BranchNode
     #[\Override]
     public function getSubtotals(): iterable
     {
-        foreach ($this->subtotals as $subtotal) {
-            yield new NullLeafNode(
-                name: $subtotal->getKey(),
-                legend: $subtotal->getLegend(),
-                item: $subtotal->getItem(),
-            );
-        }
+        return $this->subtotals;
     }
 }
