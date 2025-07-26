@@ -68,7 +68,7 @@ interface Query
     // where
     //
 
-    public function getWhere(): Expression;
+    public function getWhere(): ?Expression;
 
     public function where(Expression $expression): static;
 

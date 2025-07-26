@@ -311,6 +311,10 @@ final class SummarizerQuery extends AbstractQuery
     {
         $where = $this->query->getWhere();
 
+        if ($where === null) {
+            return;
+        }
+
         $validDimensions = array_values(array_filter(
             array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',

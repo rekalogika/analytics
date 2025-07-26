@@ -109,6 +109,7 @@ final class TableToNormalTableTransformer
             rows: $rows,
             itemCollection: $itemCollection,
             rowCollection: $rowCollection,
+            condition: $input->getCondition(),
         );
     }
 

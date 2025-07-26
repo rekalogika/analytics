@@ -297,8 +297,12 @@ final class DefaultQuery implements Query
     //
 
     #[\Override]
-    public function getWhere(): Expression
+    public function getWhere(): ?Expression
     {
+        if ($this->where === []) {
+            return null;
+        }
+
         return Criteria::expr()->andX(...$this->where);
     }
 

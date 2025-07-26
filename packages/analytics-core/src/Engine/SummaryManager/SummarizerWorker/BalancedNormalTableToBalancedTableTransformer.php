@@ -77,6 +77,7 @@ final class BalancedNormalTableToBalancedTableTransformer
             summaryClass: $summaryClass,
             rows: $this->rows,
             rowCollection: $this->normalTable->getRowCollection(),
+            condition: $this->normalTable->getCondition(),
         );
     }
 }
