@@ -150,7 +150,7 @@ final readonly class ClassMetadataWrapper
             throw new MetadataException('Entity does not have an identifier value.');
         }
 
-        if (is_string($id) || is_numeric($id)) {
+        if (\is_string($id) || is_numeric($id)) {
             return (string) $id;
         }
 
