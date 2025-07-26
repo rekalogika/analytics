@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\Row;
 use Rekalogika\PivotTable\Table\TableVisitor;
@@ -23,11 +24,78 @@ use Rekalogika\PivotTable\Table\TableVisitor;
 final readonly class DefaultRow implements \IteratorAggregate, Row
 {
     /**
+     * @var list<DefaultCell> $cells
+     */
+    private array $cells;
+
+    /**
      * @param list<DefaultCell> $cells
      */
     public function __construct(
-        private array $cells = [],
-    ) {}
+        array $cells,
+        private ?Block $generatingBlock,
+    ) {
+        $this->cells = $this->mergeCells($cells);
+    }
+
+    /**
+     * @param list<DefaultCell> $cells
+     * @return list<DefaultCell>
+     */
+    private function mergeCells(array $cells): array
+    {
+        $mergedCells = [];
+        $lastCell = null;
+
+        foreach ($cells as $cell) {
+            if (
+                (
+                    $lastCell instanceof DefaultFooterCell
+                    || $lastCell instanceof DefaultFooterHeaderCell
+                )
+                && (
+                    $cell instanceof DefaultFooterCell
+                    || $cell instanceof DefaultFooterHeaderCell
+                )
+                && $lastCell->getContent() === $cell->getContent()
+                && $lastCell->getRowSpan() === $cell->getRowSpan()
+            ) {
+                $lastCell = $lastCell
+                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
+                array_pop($mergedCells);
+                $mergedCells[] = $lastCell;
+
+                continue;
+            }
+
+            if (
+                $lastCell instanceof DefaultFooterHeaderCell
+                && (
+                    $cell instanceof DefaultFooterHeaderCell
+                    || $cell instanceof DefaultFooterCell
+                )
+                && $cell->getContent() === ''
+                && $lastCell->getRowSpan() === $cell->getRowSpan()
+            ) {
+                $lastCell = $lastCell
+                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
+                array_pop($mergedCells);
+                $mergedCells[] = $lastCell;
+
+                continue;
+            }
+
+            $mergedCells[] = $cell;
+            $lastCell = $cell;
+        }
+
+        return $mergedCells;
+    }
+
+    public function getGeneratingBlock(): ?Block
+    {
+        return $this->generatingBlock;
+    }
 
     #[\Override]
     public function accept(TableVisitor $visitor): mixed
@@ -50,6 +118,24 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         return new \ArrayIterator($this->cells);
     }
 
+    public function getFirstCell(): DefaultCell
+    {
+        if ($this->cells === []) {
+            throw new \LogicException('Row has no cells.');
+        }
+
+        return $this->cells[0];
+    }
+
+    public function getLastCell(): DefaultCell
+    {
+        if ($this->cells === []) {
+            throw new \LogicException('Row has no cells.');
+        }
+
+        return $this->cells[\count($this->cells) - 1];
+    }
+
     #[\Override]
     public function count(): int
     {
@@ -67,11 +153,11 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
 
     public function appendCell(DefaultCell $cell): static
     {
-        return new self([...$this->cells, $cell]);
+        return new self([...$this->cells, $cell], $this->generatingBlock);
     }
 
     public function appendRow(DefaultRow $row): static
     {
-        return new self([...$this->cells, ...$row->cells]);
+        return new self([...$this->cells, ...$row->cells], $this->generatingBlock);
     }
 }

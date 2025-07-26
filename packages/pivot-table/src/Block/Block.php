@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
@@ -23,37 +24,43 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
 use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
-abstract class Block
+abstract class Block implements \Stringable
 {
-    private ?DefaultRows $headerRowsCache = null;
-
-    private ?DefaultRows $dataRowsCache = null;
-
     protected function __construct(
         private readonly int $level,
         private readonly BlockContext $context,
     ) {}
 
-    private static function createByType(
+    #[\Override]
+    public function __toString(): string
+    {
+        return \sprintf(
+            '%s(level: %d)',
+            static::class,
+            $this->level,
+        );
+    }
+
+    private function createByType(
         TreeNode $treeNode,
         int $level,
         BlockContext $context,
     ): Block {
         if ($treeNode instanceof BranchNode) {
             if ($context->isPivoted($treeNode)) {
-                return new PivotBlock($treeNode, $level, $context);
+                return new PivotBlock($treeNode, $this, $level, $context);
             } else {
-                return new NormalBlock($treeNode, $level, $context);
+                return new NormalBlock($treeNode, $this, $level, $context);
             }
         }
 
         if ($treeNode instanceof LeafNode) {
             if ($context->isPivoted($treeNode)) {
-                return new PivotLeafBlock($treeNode, $level, $context);
+                return new PivotLeafBlock($treeNode, $this, $level, $context);
             } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
-                return new SingleNodeLeafBlock($treeNode, $level, $context);
+                return new SingleNodeLeafBlock($treeNode, $this, $level, $context);
             } else {
-                return new NormalLeafBlock($treeNode, $level, $context);
+                return new NormalLeafBlock($treeNode, $this, $level, $context);
             }
         }
 
@@ -88,13 +95,6 @@ abstract class Block
         );
 
         return new RootBlock($treeNode, $context);
-    }
-
-    final public static function newWithoutRoot(BranchNode $treeNode, int $level): Block
-    {
-        $distinct = DistinctNodeListResolver::getDistinctNodes($treeNode);
-
-        return self::createByType($treeNode, $level, new BlockContext($distinct));
     }
 
     final protected function getContext(): BlockContext
@@ -133,26 +133,29 @@ abstract class Block
         return $result;
     }
 
-    final protected function getHeaderRows(): DefaultRows
-    {
-        return $this->headerRowsCache ??= $this->createHeaderRows();
-    }
+    abstract public function getHeaderRows(): DefaultRows;
 
-    final protected function getDataRows(): DefaultRows
-    {
-        return $this->dataRowsCache ??= $this->createDataRows();
-    }
+    abstract public function getDataRows(): DefaultRows;
 
-    abstract protected function createHeaderRows(): DefaultRows;
+    abstract public function getDataPaddingRows(): DefaultRows;
 
-    abstract protected function createDataRows(): DefaultRows;
+    abstract public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows;
+
+    abstract public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows;
 
     final public function generateTable(): DefaultTable
     {
-        return new DefaultTable([
-            new DefaultTableHeader($this->getHeaderRows()),
-            new DefaultTableBody($this->getDataRows()),
-            new DefaultTableFooter(new DefaultRows([])),
-        ]);
+        return new DefaultTable(
+            [
+                new DefaultTableHeader($this->getHeaderRows(), $this),
+                new DefaultTableBody($this->getDataRows(), $this),
+                new DefaultTableFooter(new DefaultRows([], $this), $this),
+            ],
+            generatingBlock: $this,
+        );
     }
 }

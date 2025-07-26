@@ -18,7 +18,27 @@ use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 abstract class BlockGroup extends Block
 {
-    final public function __construct(
+    /**
+     * @var list<TreeNode>|null
+     */
+    private ?array $children = null;
+
+    /**
+     * @var non-empty-list<TreeNode>|null
+     */
+    private ?array $balancedChildren = null;
+
+    /**
+     * @var list<Block>|null
+     */
+    private ?array $childBlocks = null;
+
+    /**
+     * @var list<Block>|null
+     */
+    private ?array $balancedChildBlocks = null;
+
+    public function __construct(
         private readonly BranchNode $parentNode,
         int $level,
         BlockContext $context,
@@ -26,7 +46,55 @@ abstract class BlockGroup extends Block
         parent::__construct($level, $context);
     }
 
-    final protected function getParentNode(): BranchNode
+    /**
+     * @return list<Block>
+     */
+    public function getChildBlocks(): array
+    {
+        if ($this->childBlocks !== null) {
+            return $this->childBlocks;
+        }
+
+        $childBlocks = [];
+
+        foreach ($this->getChildren() as $childNode) {
+            $childBlocks[] = $this->createBlock($childNode, $this->getLevel() + 1);
+        }
+
+        return $this->childBlocks = $childBlocks;
+    }
+
+    /**
+     * @return list<Block>
+     */
+    public function getBalancedChildBlocks(): array
+    {
+        if ($this->balancedChildBlocks !== null) {
+            return $this->balancedChildBlocks;
+        }
+
+        $balancedChildBlocks = [];
+
+        foreach ($this->getBalancedChildren() as $childNode) {
+            $balancedChildBlocks[] = $this->createBlock($childNode, $this->getLevel() + 1);
+        }
+
+        return $this->balancedChildBlocks = $balancedChildBlocks;
+    }
+
+    public function getOneChildBlock(): Block
+    {
+        return $this->getChildBlocks()[0]
+            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+    }
+
+    public function getOneBalancedChildBlock(): Block
+    {
+        return $this->getBalancedChildBlocks()[0]
+            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+    }
+
+    final public function getParentNode(): BranchNode
     {
         return $this->parentNode;
     }
@@ -34,22 +102,37 @@ abstract class BlockGroup extends Block
     /**
      * @return list<TreeNode>
      */
-    final protected function getChildren(): array
+    final public function getChildren(): array
     {
+        if ($this->children !== null) {
+            return $this->children;
+        }
+
         /** @var \Traversable<array-key,TreeNode> */
         $children = $this->parentNode->getChildren();
 
-        return array_values(iterator_to_array($children));
+        return $this->children = array_values(iterator_to_array($children));
     }
 
     /**
      * @return non-empty-list<TreeNode>
      */
-    final protected function getBalancedChildren(): array
+    final public function getBalancedChildren(): array
     {
+        if ($this->balancedChildren !== null) {
+            return $this->balancedChildren;
+        }
+
         $children = $this->getChildren();
 
         /** @var non-empty-list<BranchNode> $children */
-        return $this->balanceBranchNodes($children, $this->getLevel());
+        return $this->balancedChildren = $this->balanceBranchNodes($children, $this->getLevel());
+    }
+
+    final public function getOneChild(): TreeNode
+    {
+        return $this->getChildren()[0]
+            ?? $this->getBalancedChildren()[0]
+            ?? throw new \RuntimeException('No child nodes found in the parent node.');
     }
 }

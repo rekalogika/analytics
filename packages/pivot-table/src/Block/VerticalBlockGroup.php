@@ -13,43 +13,96 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
+use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
 
 final class VerticalBlockGroup extends BlockGroup
 {
-    #[\Override]
-    protected function createHeaderRows(): DefaultRows
-    {
-        $firstChildren = $this->getChildren()[0] ?? null;
+    private ?DefaultRows $headerRows = null;
 
-        if ($firstChildren === null) {
-            $firstChildren = $this->getBalancedChildren()[0];
-        }
+    private ?DefaultRows $dataRows = null;
 
-        $childBlock = $this->createBlock($firstChildren, $this->getLevel() + 1);
-
-        return $childBlock->getHeaderRows();
+    public function __construct(
+        BranchNode $parentNode,
+        int $level,
+        BlockContext $context,
+    ) {
+        parent::__construct($parentNode, $level, $context);
     }
 
     #[\Override]
-    protected function createDataRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
-        $dataRows = new DefaultRows([]);
+        if ($this->headerRows !== null) {
+            return $this->headerRows;
+        }
 
-        foreach ($this->getChildren() as $childNode) {
-            $childBlock = $this->createBlock($childNode, $this->getLevel() + 1);
+        return $this->headerRows = $this->getOneChildBlock()->getHeaderRows();
+    }
+
+    #[\Override]
+    public function getDataRows(): DefaultRows
+    {
+        if ($this->dataRows !== null) {
+            return $this->dataRows;
+        }
+
+        $dataRows = new DefaultRows([], $this);
+
+        // add a data row for each of the child blocks
+        foreach ($this->getChildBlocks() as $childBlock) {
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        // If there are no data rows, we create a NullBranchNode to indicate an
-        // error, as this should never happen
+        if (
+            \count($this->getChildBlocks()) > 1
+            && $this->getOneChild()->getKey() !== '@values'
+        ) {
+            $subtotals = new Subtotals($this->getParentNode());
+            $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
+            $dataRows = $dataRows->appendBelow($subtotalDataRows);
+        }
 
-        if (\count($dataRows) === 0) {
-            $childBlock = $this->createBlock(new NullBranchNode('error', 'error', null), $this->getLevel() + 1);
-            $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
+        return $this->dataRows = $dataRows;
+    }
+
+    #[\Override]
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        throw new \BadMethodCallException('Not implemented yet');
+    }
+
+    #[\Override]
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        $dataRows = new DefaultRows([], $this);
+        $childBlock = $this->getOneChildBlock();
+
+        if (!$childBlock instanceof NodeBlock) {
+            throw new \RuntimeException(
+                'The child block must be a NodeBlock to get subtotal rows.',
+            );
+        }
+
+        if ($childBlock->getTreeNode()->getKey() === '@values') {
+            foreach ($this->getChildBlocks() as $childBlock) {
+                $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
+                $dataRows = $dataRows->appendBelow($childDataRows);
+            }
+        } else {
+            $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
+            $dataRows = $dataRows->appendBelow($childDataRows);
         }
 
         return $dataRows;
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        throw new \BadMethodCallException('Not implemented yet');
     }
 }

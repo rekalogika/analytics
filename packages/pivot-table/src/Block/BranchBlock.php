@@ -25,14 +25,15 @@ abstract class BranchBlock extends NodeBlock
 
     protected function __construct(
         BranchNode $treeNode,
+        ?Block $parent,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($treeNode, $level, $context);
+        parent::__construct($treeNode, $parent, $level, $context);
         $this->childrenBlockGroup = $this->createBlockGroup($treeNode, $level);
     }
 
-    final protected function getChildrenBlockGroup(): BlockGroup
+    final public function getChildrenBlockGroup(): BlockGroup
     {
         return $this->childrenBlockGroup;
     }
@@ -44,11 +45,9 @@ abstract class BranchBlock extends NodeBlock
         $children = $parentNode->getChildren();
         $children = iterator_to_array($children);
 
-        $firstChild = $children[0] ?? null;
-
-        if ($firstChild === null) {
-            $firstChild = $this->getContext()->getDistinctNodesOfLevel($level)[0] ?? null;
-        }
+        $firstChild = $children[0]
+            ?? $this->getContext()->getDistinctNodesOfLevel($level)[0]
+            ?? null;
 
         if ($firstChild === null) {
             return new EmptyBlockGroup($parentNode, $level, $this->getContext());

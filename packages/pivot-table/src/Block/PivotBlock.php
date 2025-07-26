@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -20,7 +21,7 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class PivotBlock extends BranchBlock
 {
     #[\Override]
-    protected function createHeaderRows(): DefaultRows
+    public function getHeaderRows(): DefaultRows
     {
         if (
             $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
@@ -28,11 +29,13 @@ final class PivotBlock extends BranchBlock
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
+                generatingBlock: $this,
             );
         } else {
             $valueCell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
+                generatingBlock: $this,
             );
         }
 
@@ -43,8 +46,37 @@ final class PivotBlock extends BranchBlock
     }
 
     #[\Override]
-    protected function createDataRows(): DefaultRows
+    public function getDataRows(): DefaultRows
     {
         return $this->getChildrenBlockGroup()->getDataRows();
+    }
+
+    #[\Override]
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        $valueCell = new DefaultHeaderCell(
+            name: 'Total',
+            content: 'Total',
+            generatingBlock: $this,
+        );
+
+        $rows = $this->getChildrenBlockGroup()->getHeaderRows();
+        $rows = $valueCell->appendRowsBelow($rows);
+
+        return $rows;
+    }
+
+    #[\Override]
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        return $this->getChildrenBlockGroup()->getSubtotalDataRows($subtotals);
+    }
+
+    #[\Override]
+    public function getDataPaddingRows(): DefaultRows
+    {
+        return $this->getChildrenBlockGroup()->getDataPaddingRows();
     }
 }
