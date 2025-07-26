@@ -276,7 +276,7 @@ final class ArchitectureTest
                 // php misc
                 Selector::classname(\Override::class),
                 Selector::classname(\UnitEnum::class),
-                Selector::classname(\BackedEnum ::class),
+                Selector::classname(\BackedEnum::class),
                 Selector::classname(\Stringable::class),
                 Selector::classname(\NumberFormatter::class),
 
