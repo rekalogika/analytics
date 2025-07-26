@@ -59,7 +59,7 @@ final class PivotLeafBlock extends LeafBlock
     public function getSubtotalHeaderRows(
         Subtotals $subtotals,
     ): DefaultRows {
-        $leafNode = $subtotals->takeOne();
+        // $leafNode = $subtotals->takeOne();
 
         $cell = new DefaultHeaderCell(
             name: 'total',
@@ -69,18 +69,18 @@ final class PivotLeafBlock extends LeafBlock
 
         $rows = DefaultRows::createFromCell($cell, $this);
 
-        if ($leafNode->getKey() === '@values') {
-            $rows = $rows->appendBelow(
-                DefaultRows::createFromCell(
-                    new DefaultHeaderCell(
-                        name: $leafNode->getKey(),
-                        content: $leafNode->getItem(),
-                        generatingBlock: $this,
-                    ),
-                    $this,
-                ),
-            );
-        }
+        // if ($leafNode->getKey() === '@values') {
+        //     $rows = $rows->appendBelow(
+        //         DefaultRows::createFromCell(
+        //             new DefaultHeaderCell(
+        //                 name: $leafNode->getKey(),
+        //                 content: $leafNode->getItem(),
+        //                 generatingBlock: $this,
+        //             ),
+        //             $this,
+        //         ),
+        //     );
+        // }
 
         return $rows;
     }
