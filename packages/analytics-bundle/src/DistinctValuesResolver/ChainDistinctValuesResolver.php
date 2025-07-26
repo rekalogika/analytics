@@ -20,7 +20,12 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
 {
     /**
-     * @param iterable<DistinctValuesResolver> $nonSpecificResolvers
+     * @param ContainerInterface $specificResolverLocator Services that supplies
+     * the information about the classes that they handle. i.e. their
+     * `getApplicableDimensions()` method returns an iterable.
+     * @param iterable<DistinctValuesResolver> $nonSpecificResolvers Services
+     * that do not supply the information about the classes that they handle.
+     * i.e. their `getApplicableDimensions()` method returns null.
      */
     public function __construct(
         private ContainerInterface $specificResolverLocator,
@@ -69,25 +74,19 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
     }
 
     #[\Override]
-    public function getValueFromId(
+    public function getValueFromIdentifier(
         string $class,
         string $dimension,
         string $id,
     ): mixed {
-        $key = \sprintf('%s::%s', $class, $dimension);
+        $specificResolver = $this->getSpecificResolver($class, $dimension);
 
-        if ($this->specificResolverLocator->has($key)) {
-            $specificResolver = $this->specificResolverLocator->get($key);
-
-            if (!$specificResolver instanceof DistinctValuesResolver) {
-                throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
-            }
-
-            return $specificResolver->getValueFromId($class, $dimension, $id);
+        if ($specificResolver !== null) {
+            return $specificResolver->getValueFromIdentifier($class, $dimension, $id);
         }
 
         foreach ($this->nonSpecificResolvers as $resolver) {
-            $value = $resolver->getValueFromId($class, $dimension, $id);
+            $value = $resolver->getValueFromIdentifier($class, $dimension, $id);
 
             if ($value !== null) {
                 return $value;
@@ -95,5 +94,52 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
         }
 
         return null;
+    }
+
+
+    #[\Override]
+    public function getIdentifierFromValue(
+        string $class,
+        string $dimension,
+        mixed $value,
+    ): ?string {
+        $specificResolver = $this->getSpecificResolver($class, $dimension);
+
+        if ($specificResolver !== null) {
+            return $specificResolver->getIdentifierFromValue($class, $dimension, $value);
+        }
+
+        foreach ($this->nonSpecificResolvers as $resolver) {
+            $id = $resolver->getIdentifierFromValue($class, $dimension, $value);
+
+            if ($id !== null) {
+                return $id;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * @param class-string $class The summary entity class name.
+     */
+    private function getSpecificResolver(
+        string $class,
+        string $dimension,
+    ): ?DistinctValuesResolver {
+        $key = \sprintf('%s::%s', $class, $dimension);
+
+        if (!$this->specificResolverLocator->has($key)) {
+            return null;
+        }
+
+        $specificResolver = $this->specificResolverLocator->get($key);
+
+        if (!$specificResolver instanceof DistinctValuesResolver) {
+            throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+        }
+
+        return $specificResolver;
     }
 }

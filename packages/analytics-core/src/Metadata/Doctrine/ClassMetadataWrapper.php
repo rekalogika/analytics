@@ -135,6 +135,32 @@ final readonly class ClassMetadataWrapper
         return $this->classMetadata->getSingleIdentifierFieldName();
     }
 
+    public function getStringIdentifierFromObject(object $entity): string
+    {
+        $identifierValues = $this->classMetadata->getIdentifierValues($entity);
+
+        if (\count($identifierValues) > 1) {
+            throw new MetadataException('Entity has multiple identifiers, cannot return a single identifier value.');
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $id = reset($identifierValues);
+
+        if ($id === false) {
+            throw new MetadataException('Entity does not have an identifier value.');
+        }
+
+        if (\is_string($id) || is_numeric($id)) {
+            return (string) $id;
+        }
+
+        throw new MetadataException(\sprintf(
+            'Identifier value for entity "%s" cannot be converted to string, got "%s".',
+            $this->getClass(),
+            get_debug_type($id),
+        ));
+    }
+
     public function getSQLTableName(): string
     {
         return $this->classMetadata->getTableName();

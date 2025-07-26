@@ -49,6 +49,9 @@ final class ArchitectureTest
                 Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateTimeImmutable::class),
 
+                // reflections
+                Selector::classname(\ReflectionNamedType::class),
+
                 // misc
                 Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
@@ -144,6 +147,7 @@ final class ArchitectureTest
                 // reflections
                 Selector::classname(\ReflectionClass::class),
                 Selector::classname(\ReflectionProperty::class),
+                Selector::classname(\ReflectionNamedType::class),
 
                 // exceptions
                 Selector::classname(\Error::class),
@@ -228,6 +232,7 @@ final class ArchitectureTest
                 // php datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
+                Selector::classname(\DateInterval::class),
 
                 // php reflection
                 Selector::classname(\ReflectionClass::class),
@@ -271,6 +276,8 @@ final class ArchitectureTest
                 // php misc
                 Selector::classname(\Override::class),
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\BackedEnum::class),
+                Selector::classname(\Stringable::class),
                 Selector::classname(\NumberFormatter::class),
 
                 // php array
@@ -376,6 +383,7 @@ final class ArchitectureTest
                 Selector::classname(\ReflectionAttribute::class),
                 Selector::classname(\ReflectionProperty::class),
                 Selector::classname(\ReflectionException::class),
+                Selector::classname(\ReflectionNamedType::class),
 
                 // php array
                 Selector::classname(\IteratorAggregate::class),
@@ -546,6 +554,7 @@ final class ArchitectureTest
 
                 // misc
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\BackedEnum::class),
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
             );
