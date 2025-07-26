@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
@@ -144,6 +145,14 @@ abstract class Block implements \Stringable
     abstract public function getDataRows(): DefaultRows;
 
     abstract public function getDataPaddingRows(): DefaultRows;
+
+    abstract public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows;
+
+    abstract public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows;
 
     final public function generateTable(): DefaultTable
     {

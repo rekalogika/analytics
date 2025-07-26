@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
@@ -46,16 +46,18 @@ final class SingleNodeLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows
-    {
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    public function getSubtotalDataRow(
-        LeafNode $leafNode,
-        array $allLeafNodes
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
     ): DefaultRows {
+        $leafNode = $subtotals->takeOne();
+
         $cell = new DefaultFooterCell(
             name: $leafNode->getKey(),
             content: $leafNode->getValue(),

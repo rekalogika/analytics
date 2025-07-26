@@ -35,32 +35,61 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         array $cells,
         private ?Block $generatingBlock,
     ) {
-        $newCells = [];
+        $this->cells = $this->mergeCells($cells);
+    }
 
-        // merge cells with the same content
+    /**
+     * @param list<DefaultCell> $cells
+     * @return list<DefaultCell>
+     */
+    private function mergeCells(array $cells): array
+    {
+        $mergedCells = [];
         $lastCell = null;
 
         foreach ($cells as $cell) {
             if (
-                $lastCell instanceof DefaultCell
-                && $lastCell->getContent() !== null
+                (
+                    $lastCell instanceof DefaultFooterCell
+                    || $lastCell instanceof DefaultFooterHeaderCell
+                )
+                && (
+                    $cell instanceof DefaultFooterCell
+                    || $cell instanceof DefaultFooterHeaderCell
+                )
                 && $lastCell->getContent() === $cell->getContent()
                 && $lastCell->getRowSpan() === $cell->getRowSpan()
             ) {
                 $lastCell = $lastCell
                     ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
-                array_pop($newCells); // remove last cell
-                $newCells[] = $lastCell; // add last cell or current
+                array_pop($mergedCells);
+                $mergedCells[] = $lastCell;
 
                 continue;
             }
 
-            $newCells[] = $cell;
+            if (
+                $lastCell instanceof DefaultFooterHeaderCell
+                && (
+                    $cell instanceof DefaultFooterHeaderCell
+                    || $cell instanceof DefaultFooterCell
+                )
+                && $cell->getContent() === ''
+                && $lastCell->getRowSpan() === $cell->getRowSpan()
+            ) {
+                $lastCell = $lastCell
+                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
+                array_pop($mergedCells);
+                $mergedCells[] = $lastCell;
 
+                continue;
+            }
+
+            $mergedCells[] = $cell;
             $lastCell = $cell;
         }
 
-        $this->cells = $newCells;
+        return $mergedCells;
     }
 
     public function getGeneratingBlock(): ?Block

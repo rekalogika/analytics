@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Contracts\Result\Measure;
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\SubtotalNode;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

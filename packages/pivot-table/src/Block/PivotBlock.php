@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -52,27 +52,30 @@ final class PivotBlock extends BranchBlock
     }
 
     #[\Override]
-    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
-    {
-        if ($this->getTreeNode() instanceof BranchNode) {
-            return $this->getChildrenBlockGroup()->getSubtotalHeaderRows($leafNodes);
-        }
-
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
         $valueCell = new DefaultHeaderCell(
             name: 'Total',
             content: 'Total',
             generatingBlock: $this,
-            columnSpan: $this->getSubtotalDataRows($leafNodes)->getWidth(),
-            rowSpan: $this->getSubtotalDataRows($leafNodes)->getHeight(),
+            // columnSpan: $this->getSubtotalDataRows($leafNodes)->getWidth(),
+            // rowSpan: $this->getSubtotalDataRows($leafNodes)->getHeight(),
         );
 
-        return DefaultRows::createFromCell($valueCell, $this);
+        $rows = $this->getChildrenBlockGroup()->getHeaderRows();
+        $rows = $valueCell->appendRowsBelow($rows);
+
+        return $rows;
+
+        // return DefaultRows::createFromCell($valueCell, $this);
     }
 
     #[\Override]
-    public function getSubtotalDataRows(array $leafNodes): DefaultRows
-    {
-        return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        return $this->getChildrenBlockGroup()->getSubtotalDataRows($subtotals);
     }
 
     #[\Override]

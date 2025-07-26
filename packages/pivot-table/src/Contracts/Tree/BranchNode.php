@@ -21,7 +21,7 @@ interface BranchNode extends TreeNode
     public function getChildren(): iterable;
 
     /**
-     * @return iterable<LeafNode>
+     * @return iterable<SubtotalNode>
      */
     public function getSubtotals(): iterable;
 }

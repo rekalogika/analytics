@@ -13,6 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Contracts\Tree;
 
-interface SubtotalNode extends LeafNode
-{
-}
+interface SubtotalNode extends LeafNode {}

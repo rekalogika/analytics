@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\SubtotalNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
+use Rekalogika\PivotTable\Implementation\Table\DefaultFooterHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -57,9 +58,12 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    public function getSubtotalHeaderRow(LeafNode $leafNode): DefaultRows
-    {
-        $cell = new DefaultDataCell(
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        $leafNode = $subtotals->takeOne();
+
+        $cell = new DefaultFooterHeaderCell(
             name: 'total',
             content: 'Total',
             generatingBlock: $this,
@@ -89,10 +93,11 @@ final class PivotLeafBlock extends LeafBlock
     }
 
     #[\Override]
-    public function getSubtotalDataRow(
-        LeafNode $leafNode,
-        array $allLeafNodes,
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
     ): DefaultRows {
+        $leafNode = $subtotals->takeOne();
+
         $cell = new DefaultFooterCell(
             name: $leafNode->getKey(),
             content: $leafNode->getValue(),

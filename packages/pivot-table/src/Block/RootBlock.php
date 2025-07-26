@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -40,15 +41,17 @@ final class RootBlock extends BranchBlock
     }
 
     #[\Override]
-    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
-    {
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    public function getSubtotalDataRows(array $leafNodes): DefaultRows
-    {
-        return $this->getChildrenBlockGroup()->getSubtotalDataRows($leafNodes);
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
+        return $this->getChildrenBlockGroup()->getSubtotalDataRows($subtotals);
     }
 
     #[\Override]

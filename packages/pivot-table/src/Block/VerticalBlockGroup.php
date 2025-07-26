@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
-use Rekalogika\PivotTable\Implementation\Table\DefaultCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
@@ -61,7 +59,7 @@ final class VerticalBlockGroup extends BlockGroup
             \count($this->getChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            $subtotals = iterator_to_array($this->getParentNode()->getSubtotals(), false);
+            $subtotals = new Subtotals($this->getParentNode());
             $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
             $dataRows = $dataRows->appendBelow($subtotalDataRows);
         }
@@ -70,39 +68,66 @@ final class VerticalBlockGroup extends BlockGroup
     }
 
     #[\Override]
-    public function getSubtotalHeaderRows(iterable $leafNodes): DefaultRows
-    {
+    public function getSubtotalHeaderRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
         throw new \BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]
-    public function getSubtotalDataRows(iterable $leafNodes): DefaultRows
-    {
+    public function getSubtotalDataRows(
+        Subtotals $subtotals,
+    ): DefaultRows {
         $dataRows = new DefaultRows([], $this);
         $childBlock = $this->getOneChildBlock();
 
-        if ($childBlock instanceof LeafBlock) {
-            // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
-
-            foreach ($leafNodes as $leafNode) {
-                $childSubtotalDataRows = $childBlock
-                    ->getSubtotalDataRow($leafNode, $leafNodes);
-
-                $dataRows = $dataRows->appendBelow($childSubtotalDataRows);
-            }
-        } elseif (
-            $childBlock instanceof BlockGroup
-            || $childBlock instanceof BranchBlock
-        ) {
-            $dataRows = $dataRows
-                ->appendBelow($childBlock->getSubtotalDataRows($leafNodes));
-        } else {
+        if (!$childBlock instanceof NodeBlock) {
             throw new \RuntimeException(
-                'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
+                'The child block must be a NodeBlock to get subtotal rows.',
             );
         }
 
+        // $dataRows = $dataRows
+        //     ->appendBelow($this->getOneChildBlock()->getSubtotalDataRows($subtotals));
+
+        if ($childBlock->getTreeNode()->getKey() === '@values') {
+            foreach ($this->getChildBlocks() as $childBlock) {
+                $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
+                $dataRows = $dataRows->appendBelow($childDataRows);
+            }
+        } else {
+            $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
+            $dataRows = $dataRows->appendBelow($childDataRows);
+        }
+
         return $dataRows;
+
+
+        // $dataRows = new DefaultRows([], $this);
+        // $childBlock = $this->getOneChildBlock();
+
+        // if ($childBlock instanceof LeafBlock) {
+        //     // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
+
+        //     foreach ($leafNodes as $leafNode) {
+        //         $childSubtotalDataRows = $childBlock
+        //             ->getSubtotalDataRow($leafNode, $leafNodes);
+
+        //         $dataRows = $dataRows->appendBelow($childSubtotalDataRows);
+        //     }
+        // } elseif (
+        //     $childBlock instanceof BlockGroup
+        //     || $childBlock instanceof BranchBlock
+        // ) {
+        //     $dataRows = $dataRows
+        //         ->appendBelow($childBlock->getSubtotalDataRows($leafNodes));
+        // } else {
+        //     throw new \RuntimeException(
+        //         'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
+        //     );
+        // }
+
+        // return $dataRows;
     }
 
     #[\Override]
