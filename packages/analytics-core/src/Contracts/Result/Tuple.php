@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Doctrine\Common\Collections\Expr\Expression;
+
 /**
  * A tuple of dimensions. A collection of dimensions that identifies a unique
  * intersection of members from different dimensions in the cube. A tuple is
@@ -50,4 +52,6 @@ interface Tuple extends \Traversable, \Countable
     public function getMembers(): array;
 
     public function isSame(self $other): bool;
+
+    public function getCondition(): ?Expression;
 }

@@ -311,6 +311,10 @@ final class SummarizerQuery extends AbstractQuery
     {
         $where = $this->query->getWhere();
 
+        if ($where === null) {
+            return;
+        }
+
         $validDimensions = array_values(array_filter(
             array_keys($this->metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
@@ -321,13 +325,11 @@ final class SummarizerQuery extends AbstractQuery
             validFields: $validDimensions,
         );
 
-        foreach ($where as $whereExpression) {
-            /** @psalm-suppress MixedAssignment */
-            $expression = $visitor->dispatch($whereExpression);
+        /** @psalm-suppress MixedAssignment */
+        $expression = $visitor->dispatch($where);
 
-            // @phpstan-ignore argument.type
-            $this->getSimpleQueryBuilder()->andWhere($expression);
-        }
+        // @phpstan-ignore argument.type
+        $this->getSimpleQueryBuilder()->andWhere($expression);
 
         // add dimensions not in the query to the group by clause
 

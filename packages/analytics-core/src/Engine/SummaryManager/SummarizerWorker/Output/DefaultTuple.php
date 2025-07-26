@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
@@ -32,6 +33,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         iterable $dimensions,
+        private ?Expression $condition,
     ) {
         $dimensionsArray = [];
 
@@ -53,6 +55,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: [...$this->dimensions, $dimension],
+            condition: $this->condition,
         );
     }
 
@@ -133,6 +136,12 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return $members;
     }
 
+    #[\Override]
+    public function getCondition(): ?Expression
+    {
+        return $this->condition;
+    }
+
     public function getSignature(): string
     {
         $signatures = array_map(
@@ -165,6 +174,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: $dimensionsWithoutValues,
+            condition: $this->condition,
         );
     }
 
@@ -178,6 +188,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: $dimensions,
+            condition: $this->condition,
         );
     }
 
@@ -191,6 +202,7 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: $dimensions,
+            condition: $this->condition,
         );
     }
 }

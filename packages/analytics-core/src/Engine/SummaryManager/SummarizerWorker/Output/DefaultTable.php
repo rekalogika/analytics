@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
@@ -37,6 +38,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         private string $summaryClass,
         iterable $rows,
         private RowCollection $rowCollection,
+        private ?Expression $condition,
     ) {
         $newRows = [];
 
@@ -87,5 +89,10 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function getRowCollection(): RowCollection
     {
         return $this->rowCollection;
+    }
+
+    public function getCondition(): ?Expression
+    {
+        return $this->condition;
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
@@ -32,6 +33,7 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         private array $rows,
         private ItemCollection $itemCollection,
         private RowCollection $rowCollection,
+        private ?Expression $condition,
     ) {}
 
     #[\Override]
@@ -75,5 +77,10 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function getRowCollection(): RowCollection
     {
         return $this->rowCollection;
+    }
+
+    public function getCondition(): ?Expression
+    {
+        return $this->condition;
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
@@ -295,13 +296,14 @@ final class DefaultQuery implements Query
     // filters
     //
 
-    /**
-     * @return list<Expression>
-     */
     #[\Override]
-    public function getWhere(): array
+    public function getWhere(): ?Expression
     {
-        return $this->where;
+        if ($this->where === []) {
+            return null;
+        }
+
+        return Criteria::expr()->andX(...$this->where);
     }
 
     #[\Override]

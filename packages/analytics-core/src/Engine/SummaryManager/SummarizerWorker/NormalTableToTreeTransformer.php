@@ -68,6 +68,7 @@ final class NormalTableToTreeTransformer
                 itemCollection: $normalTable->getItemCollection(),
                 treeNodeFactory: $treeNodeFactory,
                 rowCollection: $normalTable->getRowCollection(),
+                condition: $normalTable->getCondition(),
             );
         }
 
@@ -94,6 +95,7 @@ final class NormalTableToTreeTransformer
             itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
             rowCollection: $normalTable->getRowCollection(),
+            condition: $normalTable->getRowPrototype()->getCondition(),
         );
     }
 
