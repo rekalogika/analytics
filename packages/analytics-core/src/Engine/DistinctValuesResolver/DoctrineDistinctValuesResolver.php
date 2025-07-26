@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
+use Rekalogika\Analytics\Engine\Util\ProxyUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -88,20 +89,11 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
             })();
         }
 
-        // otherwise we get the unique values from the summary table
-
-        // return $this->getDistinctValuesFromSummary(
-        //     class: $class,
-        //     dimension: $dimension,
-        //     dimensionMetadata: $dimensionMetadata,
-        //     limit: $limit,
-        // );
-
         return null;
     }
 
     #[\Override]
-    public function getValueFromId(
+    public function getValueFromIdentifier(
         string $class,
         string $dimension,
         string $id,
@@ -159,23 +151,32 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
             ));
         }
 
-        // otherwise we get the unique values from the summary table
-
-        // $values = $this->getDistinctValuesFromSummary(
-        //     class: $class,
-        //     dimension: $dimension,
-        //     dimensionMetadata: $dimensionMetadata,
-        //     limit: 100, // @todo remove hardcode
-        // );
-
-        // /** @psalm-suppress InvalidArgument */
-        // $values = iterator_to_array($values);
-
-        // return $values[$id] ?? null;
-
         return null;
     }
 
+    #[\Override]
+    public function getIdentifierFromValue(
+        string $class,
+        string $dimension,
+        mixed $value,
+    ): ?string {
+        // if value is enum, we return the value directly. no type checking is
+        // done here.
+
+        if ($value instanceof \BackedEnum) {
+            return (string) $value->value;
+        }
+
+        if (!\is_object($value)) {
+            return null;
+        }
+
+        $class = ProxyUtil::normalizeClassName($value::class);
+        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
+
+        // again, no checking is done here yet.
+        return $metadata->getStringIdentifierFromObject($value);
+    }
 
     /**
      * @param class-string $class
@@ -201,64 +202,4 @@ final readonly class DoctrineDistinctValuesResolver implements DistinctValuesRes
 
         return $query->getResult();
     }
-
-    // /**
-    //  * @param class-string $class Summary class name
-    //  * @return iterable<string,mixed>
-    //  */
-    // private function getDistinctValuesFromSummary(
-    //     string $class,
-    //     string $dimension,
-    //     DimensionMetadata $dimensionMetadata,
-    //     int $limit,
-    // ): iterable {
-    //     $manager = $this->managerRegistry->getManagerForClass($class);
-
-    //     if (!$manager instanceof EntityManagerInterface) {
-    //         throw new \InvalidArgumentException('Invalid manager');
-    //     }
-
-    //     $queryBuilder = $manager->createQueryBuilder();
-
-    //     $orderBy = $dimensionMetadata->getOrderBy();
-
-    //     $queryBuilder = $manager->createQueryBuilder()
-    //         ->select("DISTINCT e.$dimension AS value")
-    //         ->from($class, 'e')
-    //         ->orderBy("e.$dimension")
-    //         ->setMaxResults($limit);
-
-    //     $metadata = new ClassMetadataWrapper($manager->getClassMetadata($class));
-    //     $idReflection = $metadata->getIdReflectionProperty();
-
-    //     $result = $queryBuilder->getQuery()->getArrayResult();
-
-    //     /** @var array{id:string|int,value:mixed} $row */
-    //     foreach ($result as $row) {
-    //         /** @var mixed */
-    //         $value = $row['value'];
-
-    //         if (\is_object($value)) {
-    //             $id = $idReflection->getValue($value);
-    //         } else {
-    //             /** @psalm-suppress MixedAssignment */
-    //             $id = $value;
-    //         }
-
-    //         if ($id instanceof \Stringable || \is_int($id)) {
-    //             $id = (string) $id;
-    //         } elseif ($id === null) {
-    //             $id = '';
-    //         }
-
-    //         if (!\is_string($id)) {
-    //             throw new \InvalidArgumentException(\sprintf(
-    //                 'The ID "%s" is not a string',
-    //                 get_debug_type($id),
-    //             ));
-    //         }
-
-    //         yield $id => $value;
-    //     }
-    // }
 }

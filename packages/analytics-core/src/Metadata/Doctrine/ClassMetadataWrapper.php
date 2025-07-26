@@ -135,6 +135,25 @@ final readonly class ClassMetadataWrapper
         return $this->classMetadata->getSingleIdentifierFieldName();
     }
 
+    public function getStringIdentifierFromObject(object $entity): string
+    {
+        $identifierValues = $this->classMetadata->getIdentifierValues($entity);
+
+        if (\count($identifierValues) > 1) {
+            throw new MetadataException('Entity has multiple identifiers, cannot return a single identifier value.');
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $firstValue = reset($identifierValues);
+
+        if ($firstValue === false) {
+            throw new MetadataException('Entity does not have an identifier value.');
+        }
+
+        /** @psalm-suppress MixedArgument */
+        return \strval($firstValue);
+    }
+
     public function getSQLTableName(): string
     {
         return $this->classMetadata->getTableName();

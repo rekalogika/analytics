@@ -31,7 +31,8 @@ interface DistinctValuesResolver
      *
      * @param class-string $class The summary entity class name.
      * @param string $dimension The name of the dimension property
-     * @return null|iterable<string,mixed>
+     * @return null|iterable<string,mixed> The distinct values. Key is the
+     * identifier of each of the values.
      */
     public function getDistinctValues(
         string $class,
@@ -40,11 +41,24 @@ interface DistinctValuesResolver
     ): null|iterable;
 
     /**
+     * Gets the value from the supplied identifier.
+     *
      * @param class-string $class The summary entity class name.
      */
-    public function getValueFromId(
+    public function getValueFromIdentifier(
         string $class,
         string $dimension,
         string $id,
     ): mixed;
+
+    /**
+     * Gets the identifier of the supplied value.
+     *
+     * @param class-string $class The summary entity class name.
+     */
+    public function getIdentifierFromValue(
+        string $class,
+        string $dimension,
+        mixed $value,
+    ): ?string;
 }
