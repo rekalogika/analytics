@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class DistinctValuesResolverTest extends KernelTestCase
+final class MemberValuesManagerTest extends KernelTestCase
 {
     public function testDoctrineEntity(): void
     {
-        $distinctValuesResolver = self::getContainer()
-            ->get(DistinctValuesResolver::class);
+        $memberValuesManager = self::getContainer()
+            ->get(MemberValuesManager::class);
 
-        $values = $distinctValuesResolver->getDistinctValues(
+        $values = $memberValuesManager->getDistinctValues(
             class: OrderSummary::class,
             dimension: 'customerCountry',
             limit: 100,
@@ -41,10 +41,10 @@ final class DistinctValuesResolverTest extends KernelTestCase
 
     public function testEnum(): void
     {
-        $distinctValuesResolver = self::getContainer()
-            ->get(DistinctValuesResolver::class);
+        $memberValuesManager = self::getContainer()
+            ->get(MemberValuesManager::class);
 
-        $values = $distinctValuesResolver->getDistinctValues(
+        $values = $memberValuesManager->getDistinctValues(
             class: OrderSummary::class,
             dimension: 'customerType',
             limit: 100,
@@ -66,10 +66,10 @@ final class DistinctValuesResolverTest extends KernelTestCase
 
         $this->assertInstanceOf(EntityManagerInterface::class, $entityManager);
 
-        $distinctValuesResolver = self::getContainer()
-            ->get(DistinctValuesResolver::class);
+        $memberValuesManager = self::getContainer()
+            ->get(MemberValuesManager::class);
 
-        $this->assertInstanceOf(DistinctValuesResolver::class, $distinctValuesResolver);
+        $this->assertInstanceOf(MemberValuesManager::class, $memberValuesManager);
 
         $country = $entityManager
             ->getRepository(Country::class)
@@ -79,7 +79,7 @@ final class DistinctValuesResolverTest extends KernelTestCase
 
         $id = $country->getId();
 
-        $value = $distinctValuesResolver->getValueFromIdentifier(
+        $value = $memberValuesManager->getValueFromIdentifier(
             class: OrderSummary::class,
             dimension: 'customerCountry',
             id: (string) $id,
@@ -96,10 +96,10 @@ final class DistinctValuesResolverTest extends KernelTestCase
 
         $this->assertInstanceOf(EntityManagerInterface::class, $entityManager);
 
-        $distinctValuesResolver = self::getContainer()
-            ->get(DistinctValuesResolver::class);
+        $memberValuesManager = self::getContainer()
+            ->get(MemberValuesManager::class);
 
-        $this->assertInstanceOf(DistinctValuesResolver::class, $distinctValuesResolver);
+        $this->assertInstanceOf(MemberValuesManager::class, $memberValuesManager);
 
         $country = $entityManager
             ->getRepository(Country::class)
@@ -107,7 +107,7 @@ final class DistinctValuesResolverTest extends KernelTestCase
 
         $this->assertInstanceOf(Country::class, $country);
 
-        $id = $distinctValuesResolver->getIdentifierFromValue(
+        $id = $memberValuesManager->getIdentifierFromValue(
             class: OrderSummary::class,
             dimension: 'customerCountry',
             value: $country,

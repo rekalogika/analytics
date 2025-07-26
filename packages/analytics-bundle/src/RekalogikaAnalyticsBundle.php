@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
+use Rekalogika\Analytics\Bundle\DependencyInjection\MemberValuesManagerPass;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
@@ -56,7 +56,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         parent::build($container);
 
         $container->addCompilerPass(new DoctrineEntityPass());
-        $container->addCompilerPass(new DistinctValuesResolverPass());
+        $container->addCompilerPass(new MemberValuesManagerPass());
     }
 
     #[\Override]
@@ -116,8 +116,8 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             )
         ;
 
-        $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
-            ->addTag('rekalogika.analytics.distinct_values_resolver');
+        $builder->registerForAutoconfiguration(MemberValuesManager::class)
+            ->addTag('rekalogika.analytics.member_values_manager');
 
         $builder->registerForAutoconfiguration(Stringifier::class)
             ->addTag('rekalogika.analytics.stringifier');

@@ -11,25 +11,25 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
+namespace Rekalogika\Analytics\Bundle\MemberValuesManager;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 
-final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
+final readonly class ChainMemberValuesManager implements MemberValuesManager
 {
     /**
-     * @param ContainerInterface $specificResolverLocator Services that supplies
+     * @param ContainerInterface $specificManagerLocator Services that supplies
      * the information about the classes that they handle. i.e. their
      * `getApplicableDimensions()` method returns an iterable.
-     * @param iterable<DistinctValuesResolver> $nonSpecificResolvers Services
+     * @param iterable<MemberValuesManager> $nonSpecificManager Services
      * that do not supply the information about the classes that they handle.
      * i.e. their `getApplicableDimensions()` method returns null.
      */
     public function __construct(
-        private ContainerInterface $specificResolverLocator,
-        private iterable $nonSpecificResolvers,
+        private ContainerInterface $specificManagerLocator,
+        private iterable $nonSpecificManager,
     ) {}
 
     #[\Override]
@@ -46,14 +46,14 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
     ): ?iterable {
         $key = \sprintf('%s::%s', $class, $dimension);
 
-        if ($this->specificResolverLocator->has($key)) {
-            $specificResolver = $this->specificResolverLocator->get($key);
+        if ($this->specificManagerLocator->has($key)) {
+            $specificManager = $this->specificManagerLocator->get($key);
 
-            if (!$specificResolver instanceof DistinctValuesResolver) {
-                throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+            if (!$specificManager instanceof MemberValuesManager) {
+                throw new InvalidArgumentException(\sprintf('Service "%s" is not a "%s".', $key, MemberValuesManager::class));
             }
 
-            $result = $specificResolver->getDistinctValues($class, $dimension, $limit);
+            $result = $specificManager->getDistinctValues($class, $dimension, $limit);
 
             if ($result === null) {
                 throw new InvalidArgumentException(\sprintf('Service "%s" returned null', $key));
@@ -62,7 +62,7 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
             return $result;
         }
 
-        foreach ($this->nonSpecificResolvers as $resolver) {
+        foreach ($this->nonSpecificManager as $resolver) {
             $values = $resolver->getDistinctValues($class, $dimension, $limit);
 
             if ($values !== null) {
@@ -79,14 +79,14 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
         string $dimension,
         string $id,
     ): mixed {
-        $specificResolver = $this->getSpecificResolver($class, $dimension);
+        $specificManager = $this->getSpecificManager($class, $dimension);
 
-        if ($specificResolver !== null) {
-            return $specificResolver->getValueFromIdentifier($class, $dimension, $id);
+        if ($specificManager !== null) {
+            return $specificManager->getValueFromIdentifier($class, $dimension, $id);
         }
 
-        foreach ($this->nonSpecificResolvers as $resolver) {
-            $value = $resolver->getValueFromIdentifier($class, $dimension, $id);
+        foreach ($this->nonSpecificManager as $manager) {
+            $value = $manager->getValueFromIdentifier($class, $dimension, $id);
 
             if ($value !== null) {
                 return $value;
@@ -103,14 +103,14 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
         string $dimension,
         mixed $value,
     ): ?string {
-        $specificResolver = $this->getSpecificResolver($class, $dimension);
+        $specificManager = $this->getSpecificManager($class, $dimension);
 
-        if ($specificResolver !== null) {
-            return $specificResolver->getIdentifierFromValue($class, $dimension, $value);
+        if ($specificManager !== null) {
+            return $specificManager->getIdentifierFromValue($class, $dimension, $value);
         }
 
-        foreach ($this->nonSpecificResolvers as $resolver) {
-            $id = $resolver->getIdentifierFromValue($class, $dimension, $value);
+        foreach ($this->nonSpecificManager as $manager) {
+            $id = $manager->getIdentifierFromValue($class, $dimension, $value);
 
             if ($id !== null) {
                 return $id;
@@ -124,22 +124,22 @@ final readonly class ChainDistinctValuesResolver implements DistinctValuesResolv
     /**
      * @param class-string $class The summary entity class name.
      */
-    private function getSpecificResolver(
+    private function getSpecificManager(
         string $class,
         string $dimension,
-    ): ?DistinctValuesResolver {
+    ): ?MemberValuesManager {
         $key = \sprintf('%s::%s', $class, $dimension);
 
-        if (!$this->specificResolverLocator->has($key)) {
+        if (!$this->specificManagerLocator->has($key)) {
             return null;
         }
 
-        $specificResolver = $this->specificResolverLocator->get($key);
+        $specificManager = $this->specificManagerLocator->get($key);
 
-        if (!$specificResolver instanceof DistinctValuesResolver) {
-            throw new InvalidArgumentException(\sprintf('Service "%s" is not a DistinctValuesResolver', $key));
+        if (!$specificManager instanceof MemberValuesManager) {
+            throw new InvalidArgumentException(\sprintf('Service "%s" is not a "%s"', $key, MemberValuesManager::class));
         }
 
-        return $specificResolver;
+        return $specificManager;
     }
 }

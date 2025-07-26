@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
+use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,18 +24,18 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @internal
  */
-final class DistinctValuesResolverPass implements CompilerPassInterface
+final class MemberValuesManagerPass implements CompilerPassInterface
 {
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        $resolvers = $container
-            ->findTaggedServiceIds('rekalogika.analytics.distinct_values_resolver');
+        $managers = $container
+            ->findTaggedServiceIds('rekalogika.analytics.member_values_manager');
 
-        $specificResolvers = [];
-        $nonSpecificResolvers = [];
+        $specificManagers = [];
+        $nonSpecificManagers = [];
 
-        foreach (array_keys($resolvers) as $serviceId) {
+        foreach (array_keys($managers) as $serviceId) {
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass()
                 ?? throw new InvalidArgumentException(\sprintf('Service "%s" does not have a class', $serviceId));
@@ -43,8 +44,8 @@ final class DistinctValuesResolverPass implements CompilerPassInterface
                 throw new InvalidArgumentException(\sprintf('Class "%s" not found', $class));
             }
 
-            if (!is_a($class, DistinctValuesResolver::class, true)) {
-                throw new InvalidArgumentException(\sprintf('Class "%s" does not implement DistinctValuesResolver', $class));
+            if (!is_a($class, MemberValuesManager::class, true)) {
+                throw new InvalidArgumentException(\sprintf('Class "%s" does not implement "%s".', $class, MemberValuesManager::class));
             }
 
             $applicableDimensions = $class::getApplicableDimensions();
@@ -53,24 +54,24 @@ final class DistinctValuesResolverPass implements CompilerPassInterface
                 foreach ($applicableDimensions as [$summaryClass, $dimension]) {
                     $key = \sprintf('%s::%s', $summaryClass, $dimension);
 
-                    if (isset($specificResolvers[$key])) {
-                        throw new InvalidArgumentException(\sprintf('Duplicate resolver for "%s"', $key));
+                    if (isset($specificManagers[$key])) {
+                        throw new InvalidArgumentException(\sprintf('Duplicate managers for "%s"', $key));
                     }
 
-                    $specificResolvers[$key] = $serviceId;
+                    $specificManagers[$key] = $serviceId;
                 }
             } else {
-                $nonSpecificResolvers[] = new Reference($serviceId);
+                $nonSpecificManagers[] = new Reference($serviceId);
             }
         }
 
-        $service = $container->findDefinition(DistinctValuesResolver::class);
+        $service = $container->findDefinition(ChainMemberValuesManager::class);
 
         $service->setArgument(
-            '$specificResolverLocator',
-            ServiceLocatorTagPass::register($container, $specificResolvers),
+            '$specificManagerLocator',
+            ServiceLocatorTagPass::register($container, $specificManagers),
         );
 
-        $service->setArgument('$nonSpecificResolvers', $nonSpecificResolvers);
+        $service->setArgument('$nonSpecificManager', $nonSpecificManagers);
     }
 }

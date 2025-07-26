@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Engine\Filter\DoctrineFilterResolver;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
@@ -91,7 +91,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DoctrineFilterResolver::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
-            '$distinctValuesResolver' => service(DistinctValuesResolver::class),
+            '$memberValuesManager' => service(MemberValuesManager::class),
         ])
         ->tag('rekalogika.analytics.ux-panel.filter_resolver', [
             'priority' => -100,

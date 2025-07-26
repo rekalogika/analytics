@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-interface DistinctValuesResolver
+interface MemberValuesManager
 {
     /**
      * Iterable of arrays containing all the applicable class name and dimension

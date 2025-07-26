@@ -11,13 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\DistinctValuesResolver;
+namespace Rekalogika\Analytics\Engine\MemberValuesManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
 use Rekalogika\Analytics\Engine\Util\ProxyUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
@@ -25,7 +25,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-final readonly class DoctrineDistinctValuesResolver implements DistinctValuesResolver
+final readonly class DoctrineMemberValuesManager implements MemberValuesManager
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
