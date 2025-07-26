@@ -44,6 +44,10 @@ final readonly class ExpressionRenderer
 
             $expressions = $query->getWhere();
 
+            if ($expressions === null) {
+                return [];
+            }
+
             if (!$expressions instanceof CompositeExpression) {
                 throw new LogicException('Expected CompositeExpression, got: ' . get_debug_type($expressions));
             }
