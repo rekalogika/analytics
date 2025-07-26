@@ -165,6 +165,7 @@ final class TableToNormalTableTransformer
             $tuple = new DefaultTuple(
                 summaryClass: $summaryClass,
                 dimensions: $newRow,
+                condition: $row->getCondition(),
             );
 
             $measure = $row->getMeasures()->getByName($measure)

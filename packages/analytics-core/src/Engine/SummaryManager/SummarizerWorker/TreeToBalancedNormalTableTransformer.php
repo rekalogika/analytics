@@ -93,6 +93,7 @@ final class TreeToBalancedNormalTableTransformer
         $tuple = new DefaultTuple(
             summaryClass: $this->tree->getSummaryClass(),
             dimensions: $dimensions,
+            condition: $this->tree->getTuple()->getCondition(),
         );
 
         $this->rows[] = new DefaultNormalRow(

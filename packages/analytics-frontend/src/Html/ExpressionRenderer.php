@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
@@ -43,9 +44,17 @@ final readonly class ExpressionRenderer
 
             $expressions = $query->getWhere();
 
+            if (!$expressions instanceof CompositeExpression) {
+                throw new LogicException('Expected CompositeExpression, got: ' . get_debug_type($expressions));
+            }
+
+            if ($expressions->getType() !== CompositeExpression::TYPE_AND) {
+                throw new LogicException('Expected AND CompositeExpression, got: ' . $expressions->getType());
+            }
+
             $results = [];
 
-            foreach ($expressions as $expression) {
+            foreach ($expressions->getExpressionList() as $expression) {
                 $result = $visitor->dispatch($expression);
 
                 if (!\is_string($result)) {

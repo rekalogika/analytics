@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
@@ -44,6 +45,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         private readonly ItemCollection $itemCollection,
         private readonly DefaultTreeNodeFactory $treeNodeFactory,
         private readonly RowCollection $rowCollection,
+        ?Expression $condition,
     ) {
         if ($childrenKey === null && $children !== []) {
             throw new UnexpectedValueException('Children key cannot be null if children is not empty');
@@ -60,6 +62,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         $this->tuple = new DefaultTuple(
             summaryClass: $summaryClass,
             dimensions: [],
+            condition: $condition,
         );
 
         $this->subtotals = $rowCollection->getMeasures($this->tuple);

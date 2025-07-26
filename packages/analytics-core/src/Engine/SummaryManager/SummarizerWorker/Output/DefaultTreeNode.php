@@ -60,6 +60,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             $this->tuple = new DefaultTuple(
                 summaryClass: $this->summaryClass,
                 dimensions: [$this->dimension],
+                condition: null,
             );
         }
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
@@ -136,6 +137,12 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         return $this->tuple->getIterator();
+    }
+
+    #[\Override]
+    public function getCondition(): ?Expression
+    {
+        return $this->tuple->getCondition();
     }
 
     public function getSignature(): string

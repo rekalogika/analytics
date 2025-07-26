@@ -151,6 +151,7 @@ final readonly class QueryResultToTableTransformer
         $tuple = new DefaultTuple(
             summaryClass: $this->metadata->getSummaryClass(),
             dimensions: array_values($dimensionValues),
+            condition: $this->query->getWhere(),
         );
 
         $measures = new DefaultMeasures($measureValues);

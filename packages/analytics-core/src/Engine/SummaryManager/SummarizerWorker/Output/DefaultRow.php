@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
@@ -89,6 +90,12 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     public function count(): int
     {
         return $this->tuple->count();
+    }
+
+    #[\Override]
+    public function getCondition(): ?Expression
+    {
+        return $this->tuple->getCondition();
     }
 
     public function getSignature(): string
