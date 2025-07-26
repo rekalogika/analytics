@@ -59,16 +59,12 @@ final class PivotBlock extends BranchBlock
             name: 'Total',
             content: 'Total',
             generatingBlock: $this,
-            // columnSpan: $this->getSubtotalDataRows($leafNodes)->getWidth(),
-            // rowSpan: $this->getSubtotalDataRows($leafNodes)->getHeight(),
         );
 
         $rows = $this->getChildrenBlockGroup()->getHeaderRows();
         $rows = $valueCell->appendRowsBelow($rows);
 
         return $rows;
-
-        // return DefaultRows::createFromCell($valueCell, $this);
     }
 
     #[\Override]

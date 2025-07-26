@@ -15,7 +15,6 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
-use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -108,31 +107,6 @@ final class HorizontalBlockGroup extends BlockGroup
         $headerRows = $headerRows
             ->appendRight($this->getOneChildBlock()->getSubtotalHeaderRows($subtotals));
 
-
-        // add a header and data column for each of the child blocks
-        // foreach ($this->getBalancedChildBlocks() as $childBlock) {
-        //     $childHeaderRows = $childBlock->getSubtotalHeaderRows($subtotals);
-        //     $headerRows = $headerRows->appendRight($childHeaderRows);
-        // }
-
-        // if ($childBlock instanceof LeafBlock) {
-        //     foreach ($leafNodes as $leafNode) {
-        //         $childHeaderRows = $childBlock->getSubtotalHeaderRow($leafNode);
-        //         $headerRows = $headerRows->appendRight($childHeaderRows);
-        //     }
-        // } elseif (
-        //     $childBlock instanceof BlockGroup
-        //     || $childBlock instanceof BranchBlock
-        // ) {
-        //     $childHeaderRows = $childBlock->getSubtotalHeaderRows($leafNodes);
-
-        //     $headerRows = $headerRows->appendRight($childHeaderRows);
-        // } else {
-        //     throw new \RuntimeException(
-        //         'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
-        //     );
-        // }
-
         return $headerRows;
     }
 
@@ -141,6 +115,12 @@ final class HorizontalBlockGroup extends BlockGroup
         Subtotals $subtotals,
         bool $requirePadding = true,
     ): DefaultRows {
+        // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%5D%2C%22columns%22%3A%5B%22%40values%22%2C%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
+
+        // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%2C%22%40values%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
+
+        // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
+
         $dataRows = new DefaultRows([], $this);
         $childBlock = $this->getOneBalancedChildBlock();
 
@@ -167,96 +147,7 @@ final class HorizontalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
-        // $dataRows = $dataRows
-        //     ->appendRight($childBlock->getDataPaddingRows());
-
-        // $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-        // $dataRows = $dataRows->appendRight($childDataRows);
-
-        // foreach ($childBlock->getChildBlocks() as $childBlock) {
-        //     $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-        //     $dataRows = $dataRows->appendRight($childDataRows);
-        // }
-
-        // if (
-        //     $childBlock instanceof LeafBlock
-        //     && $childBlock->getTreeNode()->getKey() === '@values'
-        // ) {
-        //     foreach ($this->getBalancedChildBlocks() as $childBlock) {
-        //         $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-        //         $dataRows = $dataRows->appendRight($childDataRows);
-        //     }
-        // } else {
-        //     $dataRows = $dataRows
-        //         ->appendRight($childBlock->getSubtotalDataRows($subtotals));
-        // }
-
-        // $dataRows = $dataRows
-        //     ->appendRight($childBlock->getSubtotalDataRows($subtotals));
-
-        // foreach ($this->getBalancedChildBlocks() as $childBlock) {
-        //     $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-        //     $dataRows = $dataRows->appendRight($childDataRows);
-        // }
-
-        // $childBlock = $this->getOneChildBlock();
-
-        // $childSubtotalDataRows = $childBlock
-        //     ->getSubtotalDataRows($subtotals);
-
-        // $dataRows = $dataRows->appendRight($childSubtotalDataRows);
-
         return $dataRows;
-
-
-        // if ($childBlock instanceof LeafBlock) {
-        //     foreach ($leafNodes as $leafNode) {
-        //         $childDataRows = $childBlock
-        //             ->getSubtotalDataRow($leafNode, $leafNodes);
-
-        //         $dataRows = $dataRows->appendRight($childDataRows);
-        //     }
-        // } elseif ($childBlock instanceof BranchBlock) {
-        //     // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%5D%2C%22columns%22%3A%5B%22%40values%22%2C%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
-
-        //     // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%2C%22%40values%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
-
-        //     // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
-
-        //     // foreach ($leafNodes as $leafNode) {
-        //     //     $paddingRows = $childBlock->getDataPaddingRows();
-        //     //     $dataRows = $dataRows->appendRight($paddingRows);
-
-        //     //     $childDataRows = $childBlock
-        //     //         ->getSubtotalDataRows([$leafNode]);
-
-        //     //     $dataRows = $dataRows->appendRight($childDataRows);
-        //     // }
-
-        //     $childSubtotalDataRows = $childBlock
-        //         ->getSubtotalDataRows($leafNodes);
-
-        //     $dataRows = $dataRows->appendRight($childSubtotalDataRows);
-        // } else {
-        //     throw new \RuntimeException(
-        //         'The child block must be a LeafBlock or BranchBlock to get subtotal rows.',
-        //     );
-        // }
-
-        // // safeguard
-
-        // if (count($dataRows) === 0) {
-        //     $emptyCell = new DefaultDataCell(
-        //         name: '',
-        //         content: '',
-        //         generatingBlock: $this,
-        //     );
-
-        //     $dataRows = $dataRows
-        //         ->appendRight(DefaultRows::createFromCell($emptyCell, $this));
-        // }
-
-        // return $dataRows;
     }
 
     #[\Override]

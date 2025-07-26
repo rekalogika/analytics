@@ -78,6 +78,8 @@ final class VerticalBlockGroup extends BlockGroup
     public function getSubtotalDataRows(
         Subtotals $subtotals,
     ): DefaultRows {
+        // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
+
         $dataRows = new DefaultRows([], $this);
         $childBlock = $this->getOneChildBlock();
 
@@ -86,9 +88,6 @@ final class VerticalBlockGroup extends BlockGroup
                 'The child block must be a NodeBlock to get subtotal rows.',
             );
         }
-
-        // $dataRows = $dataRows
-        //     ->appendBelow($this->getOneChildBlock()->getSubtotalDataRows($subtotals));
 
         if ($childBlock->getTreeNode()->getKey() === '@values') {
             foreach ($this->getChildBlocks() as $childBlock) {
@@ -101,33 +100,6 @@ final class VerticalBlockGroup extends BlockGroup
         }
 
         return $dataRows;
-
-
-        // $dataRows = new DefaultRows([], $this);
-        // $childBlock = $this->getOneChildBlock();
-
-        // if ($childBlock instanceof LeafBlock) {
-        //     // @todo consider http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerCountry%22%2C%22customerType%22%2C%22%40values%22%5D%2C%22columns%22%3A%5B%22itemCategory%22%5D%2C%22values%22%3A%5B%22price%22%2C%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerCountry%22%3A%7B%22dimension%22%3A%22customerCountry%22%2C%22values%22%3A%5B%5D%7D%2C%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%5D%7D%2C%22itemCategory%22%3A%7B%22dimension%22%3A%22itemCategory%22%2C%22values%22%3A%5B%5D%7D%7D%7D
-
-        //     foreach ($leafNodes as $leafNode) {
-        //         $childSubtotalDataRows = $childBlock
-        //             ->getSubtotalDataRow($leafNode, $leafNodes);
-
-        //         $dataRows = $dataRows->appendBelow($childSubtotalDataRows);
-        //     }
-        // } elseif (
-        //     $childBlock instanceof BlockGroup
-        //     || $childBlock instanceof BranchBlock
-        // ) {
-        //     $dataRows = $dataRows
-        //         ->appendBelow($childBlock->getSubtotalDataRows($leafNodes));
-        // } else {
-        //     throw new \RuntimeException(
-        //         'The child block must be a LeafBlock, BlockGroup, or BranchBlock to get subtotal rows.',
-        //     );
-        // }
-
-        // return $dataRows;
     }
 
     #[\Override]

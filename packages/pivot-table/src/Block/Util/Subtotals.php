@@ -15,7 +15,6 @@ namespace Rekalogika\PivotTable\Block\Util;
 
 use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\SubtotalNode;
-use Rekalogika\PivotTable\Implementation\TreeNode\ErrorSubtotalNode;
 
 /**
  * @implements \IteratorAggregate<SubtotalNode>
