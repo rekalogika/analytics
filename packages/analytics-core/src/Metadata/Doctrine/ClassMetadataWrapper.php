@@ -144,14 +144,21 @@ final readonly class ClassMetadataWrapper
         }
 
         /** @psalm-suppress MixedAssignment */
-        $firstValue = reset($identifierValues);
+        $id = reset($identifierValues);
 
-        if ($firstValue === false) {
+        if ($id === false) {
             throw new MetadataException('Entity does not have an identifier value.');
         }
 
-        /** @psalm-suppress MixedArgument */
-        return \strval($firstValue);
+        if (is_string($id) || is_numeric($id)) {
+            return (string) $id;
+        }
+
+        throw new MetadataException(\sprintf(
+            'Identifier value for entity "%s" cannot be converted to string, got "%s".',
+            $this->getClass(),
+            get_debug_type($id),
+        ));
     }
 
     public function getSQLTableName(): string
