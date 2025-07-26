@@ -536,6 +536,7 @@ final class ArchitectureTest
                 Selector::classname(\LogicException::class),
                 Selector::classname(\RuntimeException::class),
                 Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\BadMethodCallException::class),
 
                 // array
                 Selector::classname(\Countable::class),

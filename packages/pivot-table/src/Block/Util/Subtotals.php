@@ -31,9 +31,8 @@ final class Subtotals implements \IteratorAggregate, \Countable
      */
     private array $remainingNodes;
 
-    public function __construct(
-        private readonly BranchNode $treeNode,
-    ) {
+    public function __construct(BranchNode $treeNode)
+    {
         $this->nodes = $this->remainingNodes
             = iterator_to_array($treeNode->getSubtotals(), false);
     }
