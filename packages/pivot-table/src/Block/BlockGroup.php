@@ -49,7 +49,7 @@ abstract class BlockGroup extends Block
     /**
      * @return list<Block>
      */
-    protected function getChildBlocks(): array
+    public function getChildBlocks(): array
     {
         if ($this->childBlocks !== null) {
             return $this->childBlocks;
@@ -67,7 +67,7 @@ abstract class BlockGroup extends Block
     /**
      * @return list<Block>
      */
-    protected function getBalancedChildBlocks(): array
+    public function getBalancedChildBlocks(): array
     {
         if ($this->balancedChildBlocks !== null) {
             return $this->balancedChildBlocks;
@@ -82,19 +82,19 @@ abstract class BlockGroup extends Block
         return $this->balancedChildBlocks = $balancedChildBlocks;
     }
 
-    protected function getOneChildBlock(): Block
+    public function getOneChildBlock(): Block
     {
         return $this->getChildBlocks()[0]
             ?? throw new \RuntimeException('No child blocks found in the parent node.');
     }
 
-    protected function getOneBalancedChildBlock(): Block
+    public function getOneBalancedChildBlock(): Block
     {
         return $this->getBalancedChildBlocks()[0]
             ?? throw new \RuntimeException('No child blocks found in the parent node.');
     }
 
-    final protected function getParentNode(): BranchNode
+    final public function getParentNode(): BranchNode
     {
         return $this->parentNode;
     }
@@ -102,7 +102,7 @@ abstract class BlockGroup extends Block
     /**
      * @return list<TreeNode>
      */
-    final protected function getChildren(): array
+    final public function getChildren(): array
     {
         if ($this->children !== null) {
             return $this->children;
@@ -117,7 +117,7 @@ abstract class BlockGroup extends Block
     /**
      * @return non-empty-list<TreeNode>
      */
-    final protected function getBalancedChildren(): array
+    final public function getBalancedChildren(): array
     {
         if ($this->balancedChildren !== null) {
             return $this->balancedChildren;
@@ -129,7 +129,7 @@ abstract class BlockGroup extends Block
         return $this->balancedChildren = $this->balanceBranchNodes($children, $this->getLevel());
     }
 
-    final protected function getOneChild(): TreeNode
+    final public function getOneChild(): TreeNode
     {
         return $this->getChildren()[0]
             ?? $this->getBalancedChildren()[0]

@@ -41,26 +41,26 @@ abstract class Block implements \Stringable
         );
     }
 
-    private static function createByType(
+    private function createByType(
         TreeNode $treeNode,
         int $level,
         BlockContext $context,
     ): Block {
         if ($treeNode instanceof BranchNode) {
             if ($context->isPivoted($treeNode)) {
-                return new PivotBlock($treeNode, $level, $context);
+                return new PivotBlock($treeNode, $this, $level, $context);
             } else {
-                return new NormalBlock($treeNode, $level, $context);
+                return new NormalBlock($treeNode, $this, $level, $context);
             }
         }
 
         if ($treeNode instanceof LeafNode) {
             if ($context->isPivoted($treeNode)) {
-                return new PivotLeafBlock($treeNode, $level, $context);
+                return new PivotLeafBlock($treeNode, $this, $level, $context);
             } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
-                return new SingleNodeLeafBlock($treeNode, $level, $context);
+                return new SingleNodeLeafBlock($treeNode, $this, $level, $context);
             } else {
-                return new NormalLeafBlock($treeNode, $level, $context);
+                return new NormalLeafBlock($treeNode, $this, $level, $context);
             }
         }
 
@@ -95,13 +95,6 @@ abstract class Block implements \Stringable
         );
 
         return new RootBlock($treeNode, $context);
-    }
-
-    final public static function newWithoutRoot(BranchNode $treeNode, int $level): Block
-    {
-        $distinct = DistinctNodeListResolver::getDistinctNodes($treeNode);
-
-        return self::createByType($treeNode, $level, new BlockContext($distinct));
     }
 
     final protected function getContext(): BlockContext
