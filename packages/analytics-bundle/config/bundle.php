@@ -18,13 +18,13 @@ use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
 use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
-use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
+use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
+use Rekalogika\Analytics\Engine\MemberValuesManager\DoctrineMemberValuesManager;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -114,18 +114,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     // distinct values resolver
     //
 
-    $services
-        ->set(DistinctValuesResolver::class)
-        ->class(ChainDistinctValuesResolver::class);
+    $services->alias(
+        MemberValuesManager::class,
+        ChainMemberValuesManager::class,
+    );
+
+    $services->set(ChainMemberValuesManager::class);
 
     $services
-        ->set(DoctrineDistinctValuesResolver::class)
+        ->set(DoctrineMemberValuesManager::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
         ])
-        ->tag('rekalogika.analytics.distinct_values_resolver');
+        ->tag('rekalogika.analytics.member_values_manager');
 
     //
     // refresh agent

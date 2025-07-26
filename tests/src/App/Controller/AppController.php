@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
+use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
@@ -171,7 +171,7 @@ final class AppController extends AbstractController
     /**
      * Dummy controller to prevent services in arguments from being removed
      */
-    public function dummy(DistinctValuesResolver $distinctValuesResolver): Response
+    public function dummy(MemberValuesManager $memberValuesManager): Response
     {
         return new Response();
     }
