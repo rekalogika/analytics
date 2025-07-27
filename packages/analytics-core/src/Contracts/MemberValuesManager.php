@@ -48,7 +48,7 @@ interface MemberValuesManager
     public function getValueFromIdentifier(
         string $class,
         string $dimension,
-        string $id,
+        string $identifier,
     ): mixed;
 
     /**

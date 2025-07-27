@@ -77,16 +77,16 @@ final readonly class ChainMemberValuesManager implements MemberValuesManager
     public function getValueFromIdentifier(
         string $class,
         string $dimension,
-        string $id,
+        string $identifier,
     ): mixed {
         $specificManager = $this->getSpecificManager($class, $dimension);
 
         if ($specificManager !== null) {
-            return $specificManager->getValueFromIdentifier($class, $dimension, $id);
+            return $specificManager->getValueFromIdentifier($class, $dimension, $identifier);
         }
 
         foreach ($this->nonSpecificManager as $manager) {
-            $value = $manager->getValueFromIdentifier($class, $dimension, $id);
+            $value = $manager->getValueFromIdentifier($class, $dimension, $identifier);
 
             if ($value !== null) {
                 return $value;

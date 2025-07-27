@@ -96,7 +96,7 @@ final readonly class DoctrineMemberValuesManager implements MemberValuesManager
     public function getValueFromIdentifier(
         string $class,
         string $dimension,
-        string $id,
+        string $identifier,
     ): mixed {
         $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
 
@@ -131,7 +131,7 @@ final readonly class DoctrineMemberValuesManager implements MemberValuesManager
         if ($metadata->isPropertyEntity($dimension)) {
             $relatedClass = $metadata->getAssociationTargetClass($dimension);
 
-            return $manager->find($relatedClass, $id);
+            return $manager->find($relatedClass, $identifier);
         }
 
         // if enum
@@ -139,9 +139,9 @@ final readonly class DoctrineMemberValuesManager implements MemberValuesManager
         if (($enumType = $metadata->getEnumType($dimension)) !== null) {
             if (is_a($enumType, \BackedEnum::class, true)) {
                 try {
-                    return $enumType::from($id);
+                    return $enumType::from($identifier);
                 } catch (\TypeError) {
-                    return $enumType::from((int) $id);
+                    return $enumType::from((int) $identifier);
                 }
             }
 
