@@ -25,6 +25,7 @@ use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\ExpressionUtil;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -295,23 +296,11 @@ final class SummarizerQuery extends AbstractQuery
             return;
         }
 
-        $validDimensions = array_values(array_filter(
-            array_keys($this->metadata->getLeafDimensions()),
-            fn(string $dimension): bool => $dimension !== '@values',
-        ));
-
-        $visitor = new SummaryExpressionVisitor(
+        $visitor = ExpressionUtil::addExpressionToSummaryQueryBuilder(
+            metadata: $this->metadata,
             queryBuilder: $this->getSimpleQueryBuilder(),
-            validFields: $validDimensions,
+            expression: $where,
         );
-
-        /** @psalm-suppress MixedAssignment */
-        $expression = $visitor->dispatch($where);
-
-        // @phpstan-ignore argument.type
-        $this->getSimpleQueryBuilder()->andWhere($expression);
-
-        // add dimensions not in the query to the group by clause
 
         $involvedDimensions = $visitor->getInvolvedDimensions();
 
