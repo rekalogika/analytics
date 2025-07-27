@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
@@ -57,14 +58,20 @@ final class SummarizerQuery extends AbstractQuery
     private array $aliases = [];
 
     /**
-     * @var list<array<string, mixed>>|null
+     * @var list<array<string,mixed>>|null
      */
     private ?array $queryResult = null;
+
+    /**
+     * @phpstan-ignore missingType.generics
+     */
+    private Query $doctrineQuery;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
+        private readonly int|string $maxId,
         private readonly int $queryResultLimit,
     ) {
         $summaryClass = $metadata->getSummaryClass();
@@ -83,24 +90,7 @@ final class SummarizerQuery extends AbstractQuery
             $dimensionsInQuery[] = '@values';
         }
 
-        $this->groupings = Groupings::create(
-            summaryMetadata: $metadata,
-        );
-    }
-
-    /**
-     * @return list<array<string,mixed>>
-     */
-    public function getQueryResult(): array
-    {
-        if ($this->queryResult !== null) {
-            return $this->queryResult;
-        }
-
-        // check if select is empty
-        if ($this->query->getSelect() === []) {
-            return $this->queryResult = [];
-        }
+        $this->groupings = Groupings::create($metadata);
 
         // add query builder parameters that are always used
         $this->initializeQueryBuilder();
@@ -109,9 +99,7 @@ final class SummarizerQuery extends AbstractQuery
         $this->processAllDimensions();
 
         // add partition where clause
-        if (!$this->addPartitionWhere()) {
-            return $this->queryResult = [];
-        }
+        $this->addPartitionWhere();
 
         // add where clause supplied by the user
         $this->addUserSuppliedWhere();
@@ -143,15 +131,25 @@ final class SummarizerQuery extends AbstractQuery
 
         // create query & apply group by
 
-        $query = $this->getSimpleQueryBuilder()->getQuery();
+        $this->doctrineQuery = $this->getSimpleQueryBuilder()->getQuery();
 
         if (\count($groupBy) > 0) {
-            $groupBy->apply($query);
+            $groupBy->apply($this->doctrineQuery);
+        }
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    public function getQueryResult(): array
+    {
+        if ($this->queryResult !== null) {
+            return $this->queryResult;
         }
 
         // get result
         /** @var list<array<string,mixed>> */
-        $result = $query->getArrayResult();
+        $result = $this->doctrineQuery->getArrayResult();
 
         // check safeguard
 
@@ -259,35 +257,17 @@ final class SummarizerQuery extends AbstractQuery
         }
     }
 
-    private function addPartitionWhere(): bool
+    private function addPartitionWhere(): void
     {
-        $maxId = $this->getLowestPartitionMaxId();
-
-        if ($maxId === null) {
-            return false;
-        }
-
         $partitionClass = $this->metadata->getPartition()->getPartitionClass();
         $lowestLevel = PartitionUtil::getLowestLevel($partitionClass);
-        $pointPartition = $partitionClass::createFromSourceValue($maxId, $lowestLevel);
+        $pointPartition = $partitionClass::createFromSourceValue($this->maxId, $lowestLevel);
         $conditions = $this->getRangeConditions($pointPartition);
 
         /** @psalm-suppress InvalidArgument */
         $orX = $this->getSimpleQueryBuilder()->expr()->orX(...$conditions);
 
         $this->getSimpleQueryBuilder()->andWhere($orX);
-
-        return true;
-    }
-
-    private function getLowestPartitionMaxId(): int|string|null
-    {
-        $query = new LowestPartitionMaxIdQuery(
-            entityManager: $this->entityManager,
-            metadata: $this->metadata,
-        );
-
-        return $query->getLowestLevelPartitionMaxId();
     }
 
     private function addGroupingWhere(): void
