@@ -17,10 +17,10 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query as DoctrineQuery;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
+use Doctrine\ORM\Query\ParserResult;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Utility\HierarchyDiscriminatorResolver;
@@ -29,53 +29,33 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 /**
  * Extracts information from Doctrine ORM Query objects
  */
-final readonly class QueryComponents
+final class QueryComponents
 {
     /**
-     * @var list<string>
+     * @var list<string>|null
      */
-    private array $sqlStatements;
+    private ?array $sqlStatements = null;
 
-    private ResultSetMapping $resultSetMapping;
+    private ?ResultSetMapping $resultSetMapping = null;
+
+    private ?ParserResult $parserResult = null;
 
     /**
-     * @var array<int<0,max>,mixed>
+     * @var list{list<mixed>,array<array-key, mixed>}
      */
-    private array $parameters;
+    private ?array $parametersAndTypes = null;
 
     /**
-     * @var array<int<0,max>,int|string|ParameterType|ArrayParameterType>
+     * @var null|array<int<0,max>,mixed>
      */
-    private array $types;
+    private ?array $parameters = null;
 
-    public function __construct(DoctrineQuery $query)
-    {
-        $parser = new Parser($query);
-        $parserResult = $parser->parse();
-        $sqlExecutor = $parserResult->prepareSqlExecutor($query);
-        $sqlStatements = $sqlExecutor->getSqlStatements();
+    /**
+     * @var null|array<int<0,max>,int|string|ParameterType|ArrayParameterType>
+     */
+    private ?array $types = null;
 
-        if (\is_string($sqlStatements)) {
-            $this->sqlStatements = [$sqlStatements];
-        } else {
-            $this->sqlStatements = $sqlStatements;
-        }
-
-        $this->resultSetMapping = $parserResult->getResultSetMapping();
-        $parameterMappings = $parserResult->getParameterMappings();
-
-        [$parameters, $types] = $this->processParameterMappings(
-            $parameterMappings,
-            $query,
-        );
-
-        $this->parameters = $parameters;
-        /**
-         * @psalm-suppress MixedPropertyTypeCoercion
-         * @phpstan-ignore assign.propertyType
-         */
-        $this->types = $types;
-    }
+    public function __construct(private Query $query) {}
 
     /**
      * @return mixed[] tuple of (value, type)
@@ -178,25 +158,81 @@ final readonly class QueryComponents
     }
 
     /**
+     * @phpstan-ignore missingType.generics
+     */
+    public function getQuery(): Query
+    {
+        return $this->query;
+    }
+
+    /**
      * @return list<string>
      */
     public function getSqlStatements(): array
     {
-        return $this->sqlStatements;
+        if ($this->sqlStatements !== null) {
+            return $this->sqlStatements;
+        }
+
+        $sqlExecutor = $this->getParserResult()->prepareSqlExecutor($this->query);
+        $sqlStatements = $sqlExecutor->getSqlStatements();
+
+        if (\is_string($sqlStatements)) {
+            $sqlStatements = [$sqlStatements];
+        }
+
+        return $this->sqlStatements = $sqlStatements;
+    }
+
+    private function getParserResult(): ParserResult
+    {
+        if ($this->parserResult !== null) {
+            return $this->parserResult;
+        }
+
+        $parser = new Parser($this->getQuery());
+        $parserResult = $parser->parse();
+
+        return $this->parserResult = $parserResult;
     }
 
     public function getSqlStatement(): string
     {
-        if (\count($this->sqlStatements) !== 1) {
+        $sqlStatements = $this->getSqlStatements();
+
+        if (\count($sqlStatements) !== 1) {
             throw new UnexpectedValueException('Expected exactly one SQL statement');
         }
 
-        return $this->sqlStatements[0];
+        return $sqlStatements[0];
     }
 
     public function getResultSetMapping(): ResultSetMapping
     {
-        return $this->resultSetMapping;
+        if ($this->resultSetMapping !== null) {
+            return $this->resultSetMapping;
+        }
+
+        return $this->resultSetMapping = $this->getParserResult()->getResultSetMapping();
+    }
+
+    /**
+     * @return array{list<mixed>,array<array-key,mixed>}
+     */
+    private function getParametersAndTypes(): array
+    {
+        if ($this->parametersAndTypes !== null) {
+            return $this->parametersAndTypes;
+        }
+
+        $parameterMappings = $this->getParserResult()->getParameterMappings();
+
+        $parametersAndTypes = $this->processParameterMappings(
+            $parameterMappings,
+            $this->getQuery(),
+        );
+
+        return $this->parametersAndTypes = $parametersAndTypes;
     }
 
     /**
@@ -204,7 +240,13 @@ final readonly class QueryComponents
      */
     public function getParameters(): array
     {
-        return $this->parameters;
+        if ($this->parameters !== null) {
+            return $this->parameters;
+        }
+
+        [$parameters,] = $this->getParametersAndTypes();
+
+        return $this->parameters = $parameters;
     }
 
     /**
@@ -212,7 +254,16 @@ final readonly class QueryComponents
      */
     public function getTypes(): array
     {
-        // @phpstan-ignore return.type
-        return $this->types;
+        if ($this->types !== null) {
+            return $this->types;
+        }
+
+        [, $types] = $this->getParametersAndTypes();
+
+        /** @var array<int<0,max>,int|string|ParameterType|ArrayParameterType> $types */
+
+        /** @psalm-suppress MixedReturnTypeCoercion */
+        /** @psalm-suppress MixedPropertyTypeCoercion */
+        return $this->types = $types;
     }
 }
