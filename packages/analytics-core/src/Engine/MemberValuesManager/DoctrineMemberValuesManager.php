@@ -34,12 +34,6 @@ final readonly class DoctrineMemberValuesManager implements MemberValuesManager
     ) {}
 
     #[\Override]
-    public static function getApplicableDimensions(): ?iterable
-    {
-        return null;
-    }
-
-    #[\Override]
     public function getDistinctValues(
         string $class,
         string $dimension,

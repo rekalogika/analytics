@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
+use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsAware;
 use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
@@ -48,20 +49,25 @@ final class MemberValuesManagerPass implements CompilerPassInterface
                 throw new InvalidArgumentException(\sprintf('Class "%s" does not implement "%s".', $class, MemberValuesManager::class));
             }
 
+            if (!is_a($class, ApplicableDimensionsAware::class, true)) {
+                $nonSpecificManagers[] = new Reference($serviceId);
+
+                continue;
+            }
+
             $applicableDimensions = $class::getApplicableDimensions();
 
-            if ($applicableDimensions !== null) {
-                foreach ($applicableDimensions as [$summaryClass, $dimension]) {
-                    $key = \sprintf('%s::%s', $summaryClass, $dimension);
+            foreach ($applicableDimensions as $applicableDimension) {
+                $summaryClass = $applicableDimension->getClass();
+                $dimension = $applicableDimension->getDimension();
 
-                    if (isset($specificManagers[$key])) {
-                        throw new InvalidArgumentException(\sprintf('Duplicate managers for "%s"', $key));
-                    }
+                $key = \sprintf('%s::%s', $summaryClass, $dimension);
 
-                    $specificManagers[$key] = $serviceId;
+                if (isset($specificManagers[$key])) {
+                    throw new InvalidArgumentException(\sprintf('Duplicate managers for "%s"', $key));
                 }
-            } else {
-                $nonSpecificManagers[] = new Reference($serviceId);
+
+                $specificManagers[$key] = $serviceId;
             }
         }
 

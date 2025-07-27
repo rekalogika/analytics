@@ -16,15 +16,6 @@ namespace Rekalogika\Analytics\Contracts;
 interface MemberValuesManager
 {
     /**
-     * Iterable of arrays containing all the applicable class name and dimension
-     * name. Or null if they are not known in advance. Used to optimize the
-     * distinct values retrieval.
-     *
-     * @return null|iterable<array{class-string,string}>
-     */
-    public static function getApplicableDimensions(): null|iterable;
-
-    /**
      * Returns the distinct values for the given dimension of the given class.
      * Returns null if the instance does not know how to handle the given
      * dimension.
