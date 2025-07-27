@@ -103,6 +103,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             ));
     }
 
+    /**
+     * @see SourceExpressionVisitor::visitField()
+     */
     private function processDimensions(): void
     {
         foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {

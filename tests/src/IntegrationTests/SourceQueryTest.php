@@ -13,9 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Criteria;
 use Rekalogika\Analytics\Contracts\Query;
+use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
+use Rekalogika\Analytics\Engine\SummaryManager\SourceResult\DefaultSourceResult;
+use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -53,10 +57,11 @@ final class SourceQueryTest extends KernelTestCase
         $sourceResult = $this->getSummaryManager()
             ->getSource($node->getTuple());
 
+        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root ORDER BY root.id ASC',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -76,10 +81,11 @@ final class SourceQueryTest extends KernelTestCase
         $sourceResult = $this->getSummaryManager()
             ->getSource($node->getTuple());
 
+        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE IDENTITY(_a0.country) = :boundparameter0 ORDER BY root.id ASC',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE root.id > :minId AND IDENTITY(_a0.country) = :boundparameter0 ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -99,11 +105,56 @@ final class SourceQueryTest extends KernelTestCase
         $sourceResult = $this->getSummaryManager()
             ->getSource($node->getTuple());
 
+        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'YYYY') = :boundparameter0 ORDER BY root.id ASC",
+            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId AND REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'YYYY') = :boundparameter0 ORDER BY root.id ASC",
             $dql,
         );
+    }
+
+    public function testCount(): void
+    {
+        $summaryManager = self::getContainer()->get(SummaryManager::class);
+        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        // query
+
+        $query = $summaryManager
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->select('count', 'price')
+            ->groupBy('customerCountry')
+            ->addGroupBy('itemCategory')
+            ->addGroupBy('customerType')
+            ->where(Criteria::expr()->neq('customerGender', Gender::Male));
+
+        $result = $query->getResult();
+
+        // test all rows
+
+        foreach ($result->getTable() as $currentRow) {
+            $this->testOneCount($currentRow);
+        }
+    }
+
+    private function testOneCount(Row $row): void
+    {
+        $summaryManager = self::getContainer()->get(SummaryManager::class);
+        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        /** @psalm-suppress MixedAssignment */
+        $precounted = $row->getMeasures()->getByName('count')?->getValue();
+
+        $sourceResult = $summaryManager->getSource($row);
+
+        $count = 0;
+
+        foreach ($sourceResult->withItemsPerPage(1000)->getPages() as $page) {
+            $count += \count($page);
+        }
+
+        $this->assertEquals($precounted, $count, 'Count from source result should match the precounted value.');
     }
 }

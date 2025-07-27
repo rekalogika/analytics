@@ -21,19 +21,26 @@ final readonly class ExpressionUtil
 {
     private function __construct() {}
 
-    public static function addExpressionToSummaryQueryBuilder(
+    /**
+     * @template T of BaseExpressionVisitor
+     * @param class-string<T> $visitorClass
+     * @return T
+     */
+    public static function addExpressionToQueryBuilder(
         SummaryMetadata $metadata,
         SimpleQueryBuilder $queryBuilder,
         Expression $expression,
-    ): SummaryExpressionVisitor {
+        string $visitorClass,
+    ): BaseExpressionVisitor {
         $validDimensions = array_values(array_filter(
             array_keys($metadata->getLeafDimensions()),
             fn(string $dimension): bool => $dimension !== '@values',
         ));
 
-        $visitor = new SummaryExpressionVisitor(
+        $visitor = new $visitorClass(
             queryBuilder: $queryBuilder,
             validFields: $validDimensions,
+            summaryMetadata: $metadata,
         );
 
         /** @psalm-suppress MixedAssignment */
