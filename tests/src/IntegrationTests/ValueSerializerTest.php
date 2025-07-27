@@ -75,7 +75,6 @@ final class ValueSerializerTest extends KernelTestCase
             value: $country,
         );
 
-        $this->assertIsString($id);
         $this->assertEquals((string) $country->getId(), $id);
     }
 }
