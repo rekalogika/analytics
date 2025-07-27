@@ -103,9 +103,9 @@ final class SimpleQueryBuilder
         return $this->queryBuilder;
     }
 
-    public function getQueryComponents(): QueryExtractor
+    public function getQueryComponents(): QueryComponents
     {
-        return new QueryExtractor($this->queryBuilder->getQuery());
+        return new QueryComponents($this->queryBuilder->getQuery());
     }
 
     public function from(): self

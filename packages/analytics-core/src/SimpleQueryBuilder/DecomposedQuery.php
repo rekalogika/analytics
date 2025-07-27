@@ -34,13 +34,13 @@ final readonly class DecomposedQuery
 
     public static function createFromQuery(Query $query): self
     {
-        $extractor = new QueryExtractor($query);
+        $components = new QueryComponents($query);
 
         return new self(
-            sql: $extractor->getSqlStatement(),
-            parameters: $extractor->getParameters(),
-            types: $extractor->getTypes(),
-            resultSetMapping: $extractor->getResultSetMapping(),
+            sql: $components->getSqlStatement(),
+            parameters: $components->getParameters(),
+            types: $components->getTypes(),
+            resultSetMapping: $components->getResultSetMapping(),
         );
     }
 
