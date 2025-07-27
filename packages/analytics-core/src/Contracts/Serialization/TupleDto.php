@@ -25,7 +25,7 @@ final readonly class TupleDto
     public function __construct(
         private string $summaryClass,
         private array $members,
-        private Expression $condition,
+        private ?Expression $condition,
     ) {}
 
     /**
@@ -44,7 +44,7 @@ final readonly class TupleDto
         return $this->members;
     }
 
-    public function getCondition(): Expression
+    public function getCondition(): ?Expression
     {
         return $this->condition;
     }

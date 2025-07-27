@@ -24,12 +24,14 @@ use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
 use Rekalogika\Analytics\Bundle\Serialization\ChainValueSerializer;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\MemberValuesManager\DoctrineMemberValuesManager;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Serialization\Implementation\DefaultTupleSerializer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -157,6 +159,19 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
         ->tag('rekalogika.analytics.value_serializer');
+
+    //
+    // tuple serializer
+    //
+
+    $services
+        ->set(TupleSerializer::class)
+        ->class(DefaultTupleSerializer::class)
+        ->args([
+            '$valueSerializer' => service(ValueSerializer::class),
+            '$summaryManager' => service(SummaryManager::class),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ]);
 
     //
     // refresh agent
