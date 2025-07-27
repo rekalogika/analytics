@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Common\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\SummarizerQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
@@ -36,7 +36,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DefaultResult implements Result
 {
-    private SummarizerQuery|EmptyResult|null $summarizerQuery = null;
+    private SummaryQuery|EmptyResult|null $summarizerQuery = null;
 
     private QueryComponents|EmptyResult|null $queryComponents = null;
 
@@ -112,7 +112,7 @@ final class DefaultResult implements Result
         return $this->queryResult = $summarizerQuery->getQueryResult();
     }
 
-    private function getSummarizerQuery(): ?SummarizerQuery
+    private function getSummarizerQuery(): ?SummaryQuery
     {
         if ($this->summarizerQuery !== null) {
             if ($this->summarizerQuery instanceof EmptyResult) {
@@ -131,7 +131,7 @@ final class DefaultResult implements Result
             return null;
         }
 
-        return $this->summarizerQuery = new SummarizerQuery(
+        return $this->summarizerQuery = new SummaryQuery(
             entityManager: $this->entityManager,
             query: $this->query,
             metadata: $this->metadata,

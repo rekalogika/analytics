@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query\Expression;
 
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Engine\SummaryManager\ValueResolver\Bust;
 
 final class SourceExpressionVisitor extends BaseExpressionVisitor
 {
@@ -28,7 +27,6 @@ final class SourceExpressionVisitor extends BaseExpressionVisitor
 
         $dimensionMetadata = $this->summaryMetadata->getDimension($fieldName);
         $valueResolver = $dimensionMetadata->getValueResolver();
-        $valueResolver = Bust::create($valueResolver);
 
         $expression = $valueResolver->getExpression(
             context: new SourceQueryContext(

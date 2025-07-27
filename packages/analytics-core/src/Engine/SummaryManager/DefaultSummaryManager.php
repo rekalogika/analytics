@@ -84,10 +84,12 @@ final readonly class DefaultSummaryManager implements SummaryManager
         $sourceQuery = new SourceQuery(
             entityManager: $entityManager,
             summaryMetadata: $metadata,
-            tuple: $tuple,
         );
 
-        $queryBuilder = $sourceQuery->getQueryBuilder();
+        $queryBuilder = $sourceQuery
+            ->selectRoot()
+            ->fromTuple($tuple)
+            ->getQueryBuilder();
 
         return new DefaultSourceResult($queryBuilder);
     }
