@@ -20,5 +20,5 @@ interface TupleSerializer
 {
     public function serialize(Tuple $tuple): TupleDto;
 
-    public function deserialize(TupleDto $dto): ?Row;
+    public function deserialize(TupleDto $dto): Row;
 }
