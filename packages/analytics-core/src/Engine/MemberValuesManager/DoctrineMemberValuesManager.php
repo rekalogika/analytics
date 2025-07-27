@@ -16,10 +16,8 @@ namespace Rekalogika\Analytics\Engine\MemberValuesManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
-use Rekalogika\Analytics\Engine\Util\ProxyUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -84,92 +82,6 @@ final readonly class DoctrineMemberValuesManager implements MemberValuesManager
         }
 
         return null;
-    }
-
-    #[\Override]
-    public function getValueFromIdentifier(
-        string $class,
-        string $dimension,
-        string $identifier,
-    ): mixed {
-        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
-
-        if (!$metadata->hasProperty($dimension)) {
-            throw new MetadataException(\sprintf(
-                'The class "%s" does not have a field named "%s"',
-                $class,
-                $dimension,
-            ));
-        }
-
-        // manager
-
-        $manager = $this->managerRegistry->getManagerForClass($class);
-
-        if (!$manager instanceof EntityManagerInterface) {
-            throw new MetadataException(\sprintf(
-                'The class "%s" is not managed by Doctrine ORM',
-                $class,
-            ));
-        }
-
-        // get dimension metadata
-
-        $summaryMetadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($class);
-
-        $dimensionMetadata = $summaryMetadata->getDimension($dimension);
-
-        // if it is a relation, we get the unique values from the source entity
-
-        if ($metadata->isPropertyEntity($dimension)) {
-            $relatedClass = $metadata->getAssociationTargetClass($dimension);
-
-            return $manager->find($relatedClass, $identifier);
-        }
-
-        // if enum
-
-        if (($enumType = $metadata->getEnumType($dimension)) !== null) {
-            if (is_a($enumType, \BackedEnum::class, true)) {
-                try {
-                    return $enumType::from($identifier);
-                } catch (\TypeError) {
-                    return $enumType::from((int) $identifier);
-                }
-            }
-
-            throw new UnexpectedValueException(\sprintf(
-                'The enum type "%s" is not a BackedEnum',
-                $enumType,
-            ));
-        }
-
-        return null;
-    }
-
-    #[\Override]
-    public function getIdentifierFromValue(
-        string $class,
-        string $dimension,
-        mixed $value,
-    ): ?string {
-        // if value is enum, we return the value directly. no type checking is
-        // done here.
-
-        if ($value instanceof \BackedEnum) {
-            return (string) $value->value;
-        }
-
-        if (!\is_object($value)) {
-            return null;
-        }
-
-        $class = ProxyUtil::normalizeClassName($value::class);
-        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
-
-        // again, no checking is done here yet.
-        return $metadata->getStringIdentifierFromObject($value);
     }
 
     /**

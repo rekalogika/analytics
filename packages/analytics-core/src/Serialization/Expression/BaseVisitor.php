@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 
 /**
  * Base visitor for serialization and deserialization of expressions.
@@ -31,7 +31,7 @@ abstract class BaseVisitor extends ExpressionVisitor
      */
     final public function __construct(
         protected readonly string $summaryClass,
-        protected readonly MemberValuesManager $memberValuesManager,
+        protected readonly ValueSerializer $valueSerializer,
     ) {}
 
     #[\Override]

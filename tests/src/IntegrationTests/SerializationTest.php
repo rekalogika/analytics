@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Serialization\Expression\DeserializationVisitor;
 use Rekalogika\Analytics\Serialization\Expression\SerializationVisitor;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
@@ -34,11 +34,11 @@ final class SerializationTest extends KernelTestCase
 
         $this->assertInstanceOf(Country::class, $country);
 
-        $memberValuesManager = self::getContainer()
-            ->get(MemberValuesManager::class);
+        $valueSerializer = self::getContainer()
+            ->get(ValueSerializer::class);
 
         $serializationVisitor = new SerializationVisitor(
-            memberValuesManager: $memberValuesManager,
+            valueSerializer: $valueSerializer,
             summaryClass: OrderSummary::class,
         );
 
@@ -54,7 +54,7 @@ final class SerializationTest extends KernelTestCase
         );
 
         $deserializationVisitor = new DeserializationVisitor(
-            memberValuesManager: $memberValuesManager,
+            valueSerializer: $valueSerializer,
             summaryClass: OrderSummary::class,
         );
 

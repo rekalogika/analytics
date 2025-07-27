@@ -11,16 +11,17 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\MemberValuesManager;
+namespace Rekalogika\Analytics\Bundle\Serialization;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsTrait;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\UnsupportedValue;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 
-final readonly class ChainMemberValuesManager implements MemberValuesManager
+final readonly class ChainValueSerializer implements ValueSerializer
 {
     /**
-     * @use ApplicableDimensionsTrait<MemberValuesManager>
+     * @use ApplicableDimensionsTrait<ValueSerializer>
      */
     use ApplicableDimensionsTrait;
 
@@ -28,7 +29,7 @@ final readonly class ChainMemberValuesManager implements MemberValuesManager
      * @param ContainerInterface $specificServiceLocator Services that supplies
      * the information about the classes that they handle. i.e. their
      * `getApplicableDimensions()` method returns an iterable.
-     * @param iterable<MemberValuesManager> $nonSpecificServices Services
+     * @param iterable<ValueSerializer> $nonSpecificServices Services
      * that do not supply the information about the classes that they handle.
      * i.e. their `getApplicableDimensions()` method returns null.
      */
@@ -52,29 +53,54 @@ final readonly class ChainMemberValuesManager implements MemberValuesManager
     #[\Override]
     private function getServiceClass(): string
     {
-        return MemberValuesManager::class;
+        return ValueSerializer::class;
     }
 
+
     #[\Override]
-    public function getDistinctValues(
+    public function deserialize(
         string $class,
         string $dimension,
-        int $limit,
-    ): ?iterable {
+        string $identifier,
+    ): mixed {
         $specificService = $this->getSpecificService($class, $dimension);
 
         if ($specificService !== null) {
-            return $specificService->getDistinctValues($class, $dimension, $limit);
+            return $specificService->deserialize($class, $dimension, $identifier);
         }
 
-        foreach ($this->getNonSpecificServices() as $resolver) {
-            $values = $resolver->getDistinctValues($class, $dimension, $limit);
+        foreach ($this->getNonSpecificServices() as $manager) {
+            $value = $manager->deserialize($class, $dimension, $identifier);
 
-            if ($values !== null) {
-                return $values;
+            if (!$value instanceof UnsupportedValue) {
+                return $value;
             }
         }
 
-        return null;
+        return new UnsupportedValue();
+    }
+
+
+    #[\Override]
+    public function serialize(
+        string $class,
+        string $dimension,
+        mixed $value,
+    ): string|UnsupportedValue {
+        $specificManager = $this->getSpecificService($class, $dimension);
+
+        if ($specificManager !== null) {
+            return $specificManager->serialize($class, $dimension, $value);
+        }
+
+        foreach ($this->getNonSpecificServices() as $manager) {
+            $serialized = $manager->serialize($class, $dimension, $value);
+
+            if (!$serialized instanceof UnsupportedValue) {
+                return $serialized;
+            }
+        }
+
+        return new UnsupportedValue();
     }
 }

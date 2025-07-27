@@ -30,26 +30,4 @@ interface MemberValuesManager
         string $dimension,
         int $limit,
     ): null|iterable;
-
-    /**
-     * Gets the value from the supplied identifier.
-     *
-     * @param class-string $class The summary entity class name.
-     */
-    public function getValueFromIdentifier(
-        string $class,
-        string $dimension,
-        string $identifier,
-    ): mixed;
-
-    /**
-     * Gets the identifier of the supplied value.
-     *
-     * @param class-string $class The summary entity class name.
-     */
-    public function getIdentifierFromValue(
-        string $class,
-        string $dimension,
-        mixed $value,
-    ): ?string;
 }

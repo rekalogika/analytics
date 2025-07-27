@@ -48,7 +48,7 @@ final class DeserializationVisitor extends BaseVisitor
             ));
         }
 
-        return $this->memberValuesManager->getValueFromIdentifier(
+        return $this->valueSerializer->deserialize(
             class: $this->summaryClass,
             dimension: $currentDimension,
             identifier: $identifier,
