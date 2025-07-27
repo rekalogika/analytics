@@ -18,7 +18,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\Parser;
-use Rekalogika\Analytics\SimpleQueryBuilder\QueryExtractor;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
@@ -140,7 +140,7 @@ final class DoctrineQueryTest extends KernelTestCase
         ], $bindValues);
     }
 
-    public function testQueryExtractor(): void
+    public function testQueryComponents(): void
     {
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
@@ -178,14 +178,14 @@ final class DoctrineQueryTest extends KernelTestCase
 
         $query = $queryBuilder->getQuery();
 
-        $queryExtractor = new QueryExtractor($query);
+        $queryComponents = new QueryComponents($query);
 
-        $this->assertTrue($queryExtractor->getResultSetMapping()->isSelect);
-        $sqlStatement = $queryExtractor->getSqlStatement();
+        $this->assertTrue($queryComponents->getResultSetMapping()->isSelect);
+        $sqlStatement = $queryComponents->getSqlStatement();
 
         $this->assertEquals('SELECT o0_.id AS id_0, o0_.time AS time_1, o0_.shipped AS shipped_2, o0_.item_id AS item_id_3, o0_.customer_id AS customer_id_4 FROM "order" o0_ WHERE o0_.id = ? AND o0_.customer_id = ? AND o0_.id = ? AND o0_.customer_id = ? AND o0_.time = ? AND o0_.item_id IN (?)', $sqlStatement);
 
-        $parameters = $queryExtractor->getParameters();
+        $parameters = $queryComponents->getParameters();
 
         $this->assertEquals([
             0 => 1,
@@ -196,7 +196,7 @@ final class DoctrineQueryTest extends KernelTestCase
             5 => $itemIds,
         ], $parameters);
 
-        $types = $queryExtractor->getTypes();
+        $types = $queryComponents->getTypes();
 
         $this->assertEquals([
             0 => 'integer',

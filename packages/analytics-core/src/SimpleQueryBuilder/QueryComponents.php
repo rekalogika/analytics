@@ -29,7 +29,7 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 /**
  * Extracts information from Doctrine ORM Query objects
  */
-final readonly class QueryExtractor
+final readonly class QueryComponents
 {
     /**
      * @var list<string>
