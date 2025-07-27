@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
+use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
@@ -73,11 +75,19 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
 
         $content = $this->getHtmlifier()->toHtml($input->getContent());
 
+        $node = $input->getNode();
+
+        if (
+            $node instanceof TreeNode
+            && $node->getMember() instanceof MeasureMember
+        ) {
+            return $content;
+        }
+
         return \sprintf(
             '<a href="%s" target="_blank">%s</a>',
             htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
             $content,
         );
     }
-
 }
