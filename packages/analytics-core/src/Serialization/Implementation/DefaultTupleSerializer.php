@@ -13,18 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Serialization\TupleDto;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 
 final readonly class DefaultTupleSerializer implements TupleSerializer
 {
     public function __construct(
-        private MemberValuesManager $memberValuesManager,
+        private ValueSerializer $valueSerializer,
     ) {}
 
+    #[\Override]
     public function serialize(Tuple $tuple): TupleDto
     {
         $class = $tuple->getSummaryClass();
@@ -37,19 +38,11 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
             $dimensionMember = $dimension->getRawMember();
 
             // Serialize the value to a string representation
-            $serializedValue = $this->memberValuesManager->getIdentifierFromValue(
+            $serializedValue = $this->valueSerializer->serialize(
                 class: $class,
                 dimension: $dimensionName,
                 value: $dimensionMember,
             );
-
-            if ($serializedValue === null) {
-                throw new \UnexpectedValueException(\sprintf(
-                    'The value for dimension "%s" in class "%s" is not serializable.',
-                    $dimensionName,
-                    $class,
-                ));
-            }
 
             $members[$dimensionName] = $serializedValue;
         }
@@ -62,5 +55,6 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         );
     }
 
+    #[\Override]
     public function deserialize(TupleDto $dto): Row {}
 }
