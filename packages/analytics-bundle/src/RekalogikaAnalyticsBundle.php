@@ -15,8 +15,10 @@ namespace Rekalogika\Analytics\Bundle;
 
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\MemberValuesManagerPass;
+use Rekalogika\Analytics\Bundle\DependencyInjection\ValueSerializerPass;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
@@ -57,6 +59,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
         $container->addCompilerPass(new DoctrineEntityPass());
         $container->addCompilerPass(new MemberValuesManagerPass());
+        $container->addCompilerPass(new ValueSerializerPass());
     }
 
     #[\Override]
@@ -115,6 +118,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 $config['table_theme'],
             )
         ;
+
+        $builder->registerForAutoconfiguration(ValueSerializer::class)
+            ->addTag('rekalogika.analytics.value_serializer');
 
         $builder->registerForAutoconfiguration(MemberValuesManager::class)
             ->addTag('rekalogika.analytics.member_values_manager');

@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
@@ -171,8 +172,10 @@ final class AppController extends AbstractController
     /**
      * Dummy controller to prevent services in arguments from being removed
      */
-    public function dummy(MemberValuesManager $memberValuesManager): Response
-    {
+    public function dummy(
+        MemberValuesManager $memberValuesManager,
+        ValueSerializer $valueSerializer,
+    ): Response {
         return new Response();
     }
 }

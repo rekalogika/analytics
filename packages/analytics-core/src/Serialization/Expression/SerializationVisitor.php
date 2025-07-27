@@ -41,7 +41,7 @@ final class SerializationVisitor extends BaseVisitor
             );
         }
 
-        return $this->memberValuesManager->getIdentifierFromValue(
+        return $this->valueSerializer->serialize(
             class: $this->summaryClass,
             dimension: $currentDimension,
             value: $value->getValue(),

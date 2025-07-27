@@ -22,10 +22,13 @@ use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscribe
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
 use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
+use Rekalogika\Analytics\Bundle\Serialization\ChainValueSerializer;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\MemberValuesManager\DoctrineMemberValuesManager;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
+use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -116,19 +119,44 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->alias(
         MemberValuesManager::class,
-        ChainMemberValuesManager::class,
+        'rekalogika.analytics.member_values_manager.chain',
     );
 
-    $services->set(ChainMemberValuesManager::class);
+    $services
+        ->set('rekalogika.analytics.member_values_manager.chain')
+        ->class(ChainMemberValuesManager::class);
 
     $services
-        ->set(DoctrineMemberValuesManager::class)
+        ->set('rekalogika.analytics.member_values_manager.doctrine')
+        ->class(DoctrineMemberValuesManager::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
         ])
         ->tag('rekalogika.analytics.member_values_manager');
+
+    //
+    // value serializer
+    //
+
+    $services->alias(
+        ValueSerializer::class,
+        'rekalogika.analytics.value_serializer.chain',
+    );
+
+    $services
+        ->set('rekalogika.analytics.value_serializer.chain')
+        ->class(ChainValueSerializer::class);
+
+    $services
+        ->set('rekalogika.analytics.value_serializer.doctrine')
+        ->class(DoctrineValueSerializer::class)
+        ->args([
+            '$managerRegistry' => service('doctrine'),
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+        ])
+        ->tag('rekalogika.analytics.value_serializer');
 
     //
     // refresh agent
@@ -153,5 +181,4 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             'method' => 'run',
         ])
     ;
-
 };
