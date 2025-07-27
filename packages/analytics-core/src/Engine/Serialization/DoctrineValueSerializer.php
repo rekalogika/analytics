@@ -41,7 +41,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): string|UnsupportedValue {
+    ): string {
         // if value is enum, we return the value directly. no type checking is
         // done here.
 
@@ -54,7 +54,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         }
 
         if (!\is_object($value)) {
-            return new UnsupportedValue();
+            throw new UnsupportedValue();
         }
 
         $class = ProxyUtil::normalizeClassName($value::class);
@@ -127,6 +127,6 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             ));
         }
 
-        return new UnsupportedValue();
+        throw new UnsupportedValue();
     }
 }

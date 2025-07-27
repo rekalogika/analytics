@@ -70,14 +70,13 @@ final readonly class ChainValueSerializer implements ValueSerializer
         }
 
         foreach ($this->getNonSpecificServices() as $manager) {
-            $value = $manager->deserialize($class, $dimension, $identifier);
-
-            if (!$value instanceof UnsupportedValue) {
-                return $value;
+            try {
+                return $manager->deserialize($class, $dimension, $identifier);
+            } catch (UnsupportedValue) {
             }
         }
 
-        return new UnsupportedValue();
+        throw new UnsupportedValue();
     }
 
 
@@ -86,7 +85,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): string|UnsupportedValue {
+    ): string {
         $specificManager = $this->getSpecificService($class, $dimension);
 
         if ($specificManager !== null) {
@@ -94,13 +93,12 @@ final readonly class ChainValueSerializer implements ValueSerializer
         }
 
         foreach ($this->getNonSpecificServices() as $manager) {
-            $serialized = $manager->serialize($class, $dimension, $value);
-
-            if (!$serialized instanceof UnsupportedValue) {
-                return $serialized;
+            try {
+                return $manager->serialize($class, $dimension, $value);
+            } catch (UnsupportedValue) {
             }
         }
 
-        return new UnsupportedValue();
+        throw new UnsupportedValue();
     }
 }
