@@ -13,20 +13,24 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
+use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
 use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
+use Rekalogika\Analytics\Tests\App\Serializer\TupleDtoSerializer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -120,6 +124,26 @@ final class AppController extends AbstractController
             'chartError' => $chartError,
             'expressions' => $expressions,
             'hash' => $hash,
+        ]);
+    }
+
+    #[Route('/summary/tuple/{data}', name: 'tuple')]
+    public function tuple(
+        string $data,
+        TupleDtoSerializer $tupleDtoSerializer,
+        TupleSerializer $tupleSerializer,
+        #[Autowire('@rekalogika.analytics.summary_manager')]
+        DefaultSummaryManager $summaryManager,
+    ): Response {
+        $sqlFormatter = new SqlFormatter();
+        $tupleDto = $tupleDtoSerializer->deserialize($data);
+        $row = $tupleSerializer->deserialize($tupleDto);
+        $queryComponents = $summaryManager->getTupleQueryComponents($row);
+
+        return $this->render('app/tuple.html.twig', [
+            'row' => $row,
+            'source_sql' => $sqlFormatter->format($queryComponents->getSqlStatement()),
+            'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
         ]);
     }
 

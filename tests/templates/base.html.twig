@@ -7,13 +7,12 @@
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block stylesheets %}
-            <link href=" https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sandstone/bootstrap.min.css "
+            <link href=" https://cdn.jsdelivr.net/npm/bootswatch@5.3.7/dist/spacelab/bootstrap.min.css "
                   rel="stylesheet">
         {% endblock %}
 
         {% block javascripts %}
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-                    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
                     crossorigin="anonymous"></script>
             {% block importmap %}{{ importmap("app") }}{% endblock %}
         {% endblock %}

@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Tree;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\PivotTable\Model\Property;
 
-abstract readonly class TreeProperty
+abstract readonly class TreeProperty implements Property
 {
     final public function __construct(private TreeNode $node) {}
 

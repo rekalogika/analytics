@@ -19,6 +19,7 @@
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.20 || ^3.2",
         "doctrine/persistence": "^3.1 || ^4.0",
+        "doctrine/sql-formatter": "^1.5",
         "ozdemirburak/iris": "^3.1",
         "phpoffice/phpspreadsheet": "^4.0",
         "psr/cache": "^3.0",
