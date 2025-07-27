@@ -79,7 +79,12 @@ final class NormalBlock extends BranchBlock
     public function getSubtotalDataRows(
         Subtotals $subtotals,
     ): DefaultRows {
-        if ($this->getTreeNode()->getKey() === '@values') {
+        $parentChildCount = \count($this->getParentBlock()?->getBalancedChildBlocks() ?? []);
+
+        if (
+            $this->getTreeNode()->getKey() === '@values'
+            || $parentChildCount === 1
+        ) {
             $cell = new DefaultFooterHeaderCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),

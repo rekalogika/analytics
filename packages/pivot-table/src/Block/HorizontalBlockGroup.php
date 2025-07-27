@@ -117,6 +117,7 @@ final class HorizontalBlockGroup extends BlockGroup
     ): DefaultRows {
         $dataRows = new DefaultRows([], $this);
         $childBlock = $this->getOneBalancedChildBlock();
+        $balancedChildBlocks = $this->getBalancedChildBlocks();
 
         if (!$childBlock instanceof NodeBlock) {
             throw new \RuntimeException(
@@ -125,12 +126,12 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         if ($childBlock->getTreeNode()->getKey() === '@values') {
-            foreach ($this->getBalancedChildBlocks() as $childBlock) {
+            foreach ($balancedChildBlocks as $childBlock) {
                 $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
                 $dataRows = $dataRows->appendRight($childDataRows);
             }
         } else {
-            if ($requirePadding) {
+            if ($requirePadding && \count($balancedChildBlocks) > 1) {
                 foreach ($this->getBalancedChildBlocks() as $childBlock) {
                     $childDataRows = $childBlock->getDataPaddingRows();
                     $dataRows = $dataRows->appendRight($childDataRows);
