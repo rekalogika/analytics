@@ -53,9 +53,12 @@ abstract class BaseVisitor extends ExpressionVisitor
     #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): CompositeExpression
     {
-        /** @psalm-suppress MixedReturnStatement */
+        /**
+         * @psalm-suppress MixedReturnStatement
+         * @var list<Expression>
+         */
         $expressions = array_map(
-            fn(Expression $e): Expression => $e->visit($this),
+            fn(Expression $e): mixed => $e->visit($this),
             $expr->getExpressionList(),
         );
 

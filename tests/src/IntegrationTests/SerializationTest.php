@@ -49,8 +49,8 @@ final class SerializationTest extends KernelTestCase
         $this->assertInstanceOf(Expression::class, $serializedExpression);
 
         $this->assertEquals(
-            expected: Criteria::expr()->in('customerCountry', [$country->getId()]),
-            actual: $serializedExpression,
+            Criteria::expr()->in('customerCountry', [$country->getId()]),
+            $serializedExpression,
         );
 
         $deserializationVisitor = new DeserializationVisitor(
