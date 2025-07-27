@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
+namespace Rekalogika\Analytics\Engine\SummaryManager\Query\Expression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
@@ -131,7 +131,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         $fieldWithAlias = $this->rootAlias . '.' . $field;
 
         /** @psalm-suppress MixedAssignment */
-        $value = $this->walkValue($comparison->getValue());
+        $value = $comparison->getValue()->visit($this);
         $type = $this->getFieldType($field);
 
         if (\is_array($value)) {
@@ -209,7 +209,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
         // ensure value is array
 
         /** @psalm-suppress MixedAssignment */
-        $values = $this->walkValue($comparison->getValue());
+        $values = $comparison->getValue()->visit($this);
 
         if (!\is_array($values)) {
             throw new LogicException('Value must be an array with IN or NOT IN operator');
@@ -292,7 +292,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
 
         if (\is_array($value)) {
             return array_map(
-                fn($v): mixed => $this->walkValue(new Value($v)),
+                fn($v): mixed => (new Value($v))->visit($this),
                 $value,
             );
         }
@@ -307,7 +307,7 @@ final class SummaryExpressionVisitor extends ExpressionVisitor
          * @var list<ORMComparison|Andx|Orx|string>
          */
         $expressions = array_map(
-            fn($expression): mixed => $this->dispatch($expression),
+            fn($expression): mixed => $expression->visit($this),
             $expr->getExpressionList(),
         );
 
