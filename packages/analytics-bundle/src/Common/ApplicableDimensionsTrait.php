@@ -57,6 +57,7 @@ trait ApplicableDimensionsTrait
             throw new InvalidArgumentException(\sprintf('Service "%s" is not a "%s"', $key, $this->getServiceClass()));
         }
 
+        /** @var T */
         return $specificManager;
     }
 }

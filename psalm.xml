@@ -35,6 +35,11 @@
                 <directory name="packages/analytics-core/src/Time/Dimension" />
             </errorLevel>
         </ClassMustBeFinal>
+        <MoreSpecificReturnType>
+            <errorLevel type="suppress">
+                <file name="packages/analytics-bundle/src/Common/ApplicableDimensionsTrait.php" />
+            </errorLevel>
+        </MoreSpecificReturnType>
     </issueHandlers>
 
     <plugins>
