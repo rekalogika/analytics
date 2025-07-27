@@ -37,7 +37,7 @@ use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
-final class SummarizerQuery extends AbstractQuery
+final class SummaryQuery extends AbstractQuery
 {
     /**
      * @var list<string>
@@ -336,8 +336,6 @@ final class SummarizerQuery extends AbstractQuery
     {
         if ($dimension === '@values') {
             $this->addMeasuresToQueryBuilder();
-            // } elseif (str_contains($dimension, '.')) {
-            // $this->addHierarchicalDimensionToQueryBuilder($dimension);
         } else {
             $this->addDimensionToQueryBuilder($dimension);
         }

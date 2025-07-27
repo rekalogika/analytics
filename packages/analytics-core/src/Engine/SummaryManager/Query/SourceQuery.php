@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
+use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\ExpressionUtil;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\SourceExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -28,7 +31,6 @@ final class SourceQuery extends AbstractQuery
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
-        private readonly Tuple $tuple,
     ) {
         $sourceClass = $summaryMetadata->getSourceClass();
 
@@ -39,27 +41,88 @@ final class SourceQuery extends AbstractQuery
         );
 
         parent::__construct($simpleQueryBuilder);
+
+        $this->addQueryBuilderModifier();
+    }
+
+    public function selectRoot(): self
+    {
+        $this->getSimpleQueryBuilder()->select('root');
+        $this->addOrderByIdentifier();
+
+        return $this;
+    }
+
+    public function selectMeasures(): self
+    {
+        $this->addMeasuresToSelect();
+
+        return $this;
+    }
+
+    public function fromTuple(Tuple $tuple): self
+    {
+        $this->addTupleDimensionsToWhere($tuple);
+
+        $expressions = $tuple->getCondition();
+
+        if ($expressions !== null) {
+            $this->addExpressionsToWhere($expressions);
+        }
+
+        return $this;
+    }
+
+    public function fromQuery(Query $query): self
+    {
+        $this->addQueryDimensionsToSelectGroupByOrderBy($query);
+
+        $expressions = $query->getWhere();
+
+        if ($expressions !== null) {
+            $this->addExpressionsToWhere($expressions);
+        }
+
+        return $this;
     }
 
     public function getQueryBuilder(): QueryBuilder
     {
-        $this->initialize();
-        $this->processQueryBuilderModifier();
-        $this->processDimensions();
-        $this->processConditions();
-        $this->processOrderBy();
-
         return $this->getSimpleQueryBuilder()->getQueryBuilder();
     }
 
-    private function initialize(): void
+    //
+    // private methods
+    //
+
+    private function addMeasuresToSelect(): void
     {
-        $this->getSimpleQueryBuilder()->addSelect('root');
+        foreach ($this->summaryMetadata->getMeasures() as $measureMetadata) {
+            if ($measureMetadata->isVirtual()) {
+                continue;
+            }
+
+            $function = $measureMetadata->getFunction();
+
+            if (!$function instanceof SummarizableAggregateFunction) {
+                continue;
+            }
+
+            $expression = $function->getSourceToAggregateExpression(
+                context: new SourceQueryContext(
+                    queryBuilder: $this->getSimpleQueryBuilder(),
+                    summaryMetadata: $this->summaryMetadata,
+                    measureMetadata: $measureMetadata,
+                ),
+            );
+
+            $this->getSimpleQueryBuilder()->addSelect($expression);
+        }
     }
 
-    private function processDimensions(): void
+    private function addTupleDimensionsToWhere(Tuple $tuple): void
     {
-        foreach ($this->tuple as $dimension) {
+        foreach ($tuple as $dimension) {
             $name = $dimension->getName();
 
             if ($name === '@values') {
@@ -70,11 +133,11 @@ final class SourceQuery extends AbstractQuery
             /** @psalm-suppress MixedAssignment */
             $rawMember = $dimension->getRawMember();
 
-            $this->processDimension($name, $rawMember);
+            $this->addDimensionToWhere($name, $rawMember);
         }
     }
 
-    private function processDimension(string $name, mixed $rawMember): void
+    private function addDimensionToWhere(string $name, mixed $rawMember): void
     {
         $dimensionMetadata = $this->summaryMetadata->getDimension($name);
         $valueResolver = $dimensionMetadata->getValueResolver();
@@ -94,7 +157,35 @@ final class SourceQuery extends AbstractQuery
         ));
     }
 
-    private function processQueryBuilderModifier(): void
+    private function addQueryDimensionsToSelectGroupByOrderBy(Query $query): void
+    {
+        $dimensions = $query->getGroupBy();
+
+        foreach ($dimensions as $dimension) {
+            $dimensionMetadata = $this->summaryMetadata->getDimension($dimension);
+            $alias = $dimensionMetadata->getDqlAlias();
+            $valueResolver = $dimensionMetadata->getValueResolver();
+
+            $expression = $valueResolver->getExpression(
+                context: new SourceQueryContext(
+                    queryBuilder: $this->getSimpleQueryBuilder(),
+                    summaryMetadata: $this->summaryMetadata,
+                    dimensionMetadata: $dimensionMetadata,
+                ),
+            );
+
+            $this->getSimpleQueryBuilder()->addSelect(\sprintf(
+                '%s AS %s',
+                $expression,
+                $alias,
+            ));
+
+            $this->getSimpleQueryBuilder()->addGroupBy($alias);
+            $this->getSimpleQueryBuilder()->addOrderBy($alias, 'ASC');
+        }
+    }
+
+    private function addQueryBuilderModifier(): void
     {
         $class = $this->summaryMetadata->getSummaryClass();
 
@@ -105,14 +196,8 @@ final class SourceQuery extends AbstractQuery
         }
     }
 
-    private function processConditions(): void
+    private function addExpressionsToWhere(Expression $expression): void
     {
-        $expression = $this->tuple->getCondition();
-
-        if ($expression === null) {
-            return;
-        }
-
         ExpressionUtil::addExpressionToQueryBuilder(
             metadata: $this->summaryMetadata,
             queryBuilder: $this->getSimpleQueryBuilder(),
@@ -121,7 +206,7 @@ final class SourceQuery extends AbstractQuery
         );
     }
 
-    private function processOrderBy(): void
+    private function addOrderByIdentifier(): void
     {
         $identifier = $this->entityManager
             ->getClassMetadata($this->summaryMetadata->getSourceClass())
