@@ -17,19 +17,19 @@ interface ValueSerializer
 {
     /**
      * @param class-string $class The summary entity class name.
-     * @return string|UnsupportedValue The serialized value. If the value is not
-     * supported, returns UnsupportedValue.
+     * @return string The serialized value.
+     * @throws UnsupportedValue
      */
     public function serialize(
         string $class,
         string $dimension,
         mixed $value,
-    ): string|UnsupportedValue;
+    ): string;
 
     /**
      * @param class-string $class The summary entity class name.
-     * @return mixed The deserialized value. If the value is not supported,
-     * returns UnsupportedValue.
+     * @return mixed The deserialized value.
+     * @throws UnsupportedValue
      */
     public function deserialize(
         string $class,

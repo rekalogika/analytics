@@ -13,4 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Serialization;
 
-final readonly class UnsupportedValue {}
+use Rekalogika\Analytics\Common\Exception\RuntimeException;
+
+final class UnsupportedValue extends RuntimeException
+{
+    public function __construct() {}
+}
