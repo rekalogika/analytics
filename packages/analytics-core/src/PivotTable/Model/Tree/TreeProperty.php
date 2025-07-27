@@ -20,6 +20,7 @@ abstract readonly class TreeProperty implements Property
 {
     final public function __construct(private TreeNode $node) {}
 
+    #[\Override]
     abstract public function getContent(): mixed;
 
     final public function getNode(): TreeNode
