@@ -60,7 +60,7 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
     }
 
     #[\Override]
-    public function deserialize(TupleDto $dto): ?Row
+    public function deserialize(TupleDto $dto): Row
     {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($dto->getSummaryClass());
@@ -78,6 +78,8 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         }
 
         // add group by
+        $dimensionMembers = [];
+
         foreach ($dto->getMembers() as $dimensionName => $serializedValue) {
             /** @psalm-suppress MixedAssignment */
             $rawMember = $this->valueSerializer->deserialize(
@@ -92,6 +94,9 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
                 $dimensionName,
                 $rawMember,
             ));
+
+            /** @psalm-suppress MixedAssignment */
+            $dimensionMembers[$dimensionName] = $rawMember;
         }
 
         // select all measures
@@ -104,6 +109,10 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         $table = $result->getTable();
         $rows = iterator_to_array($table);
 
-        return $rows[0] ?? null;
+        return $rows[0] ?? new NullRow(
+            summaryMetadata: $metadata,
+            dimensionMembers: $dimensionMembers,
+            condition: $condition,
+        );
     }
 }
