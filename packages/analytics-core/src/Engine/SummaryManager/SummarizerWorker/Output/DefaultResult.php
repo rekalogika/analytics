@@ -17,14 +17,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Common\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -33,6 +36,10 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DefaultResult implements Result
 {
+    private SummarizerQuery|EmptyResult|null $summarizerQuery = null;
+
+    private QueryComponents|EmptyResult|null $queryComponents = null;
+
     /**
      * @var list<array<string, mixed>>|null
      */
@@ -62,10 +69,10 @@ final class DefaultResult implements Result
         private readonly string $summaryClass,
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
-        private readonly SummarizerQuery $summarizerQuery,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly EntityManagerInterface $entityManager,
         int $fillingNodesLimit,
+        private int $queryResultLimit,
     ) {
         $this->rowCollection = new RowCollection();
 
@@ -92,7 +99,81 @@ final class DefaultResult implements Result
      */
     private function getQueryResult(): array
     {
-        return $this->queryResult ??= $this->summarizerQuery->getQueryResult();
+        if ($this->queryResult !== null) {
+            return $this->queryResult;
+        }
+
+        $summarizerQuery = $this->getSummarizerQuery();
+
+        if ($summarizerQuery === null) {
+            return $this->queryResult = [];
+        }
+
+        return $this->queryResult = $summarizerQuery->getQueryResult();
+    }
+
+    private function getSummarizerQuery(): ?SummarizerQuery
+    {
+        if ($this->summarizerQuery !== null) {
+            if ($this->summarizerQuery instanceof EmptyResult) {
+                return null;
+            }
+
+            return $this->summarizerQuery;
+        }
+
+        // get max id
+        $lastId = $this->getLowestPartitionLastId();
+
+        // if max id is null, no data exists in the summary table
+        if ($lastId === null) {
+            $this->summarizerQuery = new EmptyResult();
+            return null;
+        }
+
+        return $this->summarizerQuery = new SummarizerQuery(
+            entityManager: $this->entityManager,
+            query: $this->query,
+            metadata: $this->metadata,
+            maxId: $lastId,
+            queryResultLimit: $this->queryResultLimit,
+        );
+    }
+
+    public function getQueryComponents(): ?QueryComponents
+    {
+        if ($this->queryComponents !== null) {
+            if ($this->queryComponents instanceof EmptyResult) {
+                return null;
+            }
+
+            return $this->queryComponents;
+        }
+
+        // if no measure is selected, don't bother running the query
+        if ($this->query->getSelect() === []) {
+            $this->queryComponents = new EmptyResult();
+            return null;
+        }
+
+        $summarizerQuery = $this->getSummarizerQuery();
+
+        if ($summarizerQuery === null) {
+            $this->queryComponents = new EmptyResult();
+            return null;
+        }
+
+        return $this->queryComponents = $summarizerQuery->getQueryComponents();
+    }
+
+    private function getLowestPartitionLastId(): int|string|null
+    {
+        $query = new LowestPartitionLastIdQuery(
+            entityManager: $this->entityManager,
+            metadata: $this->metadata,
+        );
+
+        return $query->getLowestLevelPartitionMaxId();
     }
 
     private function getUnbalancedTable(): DefaultTable

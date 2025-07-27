@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
-final readonly class LowestPartitionMaxIdQuery
+final readonly class LowestPartitionLastIdQuery
 {
     public function __construct(
         private EntityManagerInterface $entityManager,

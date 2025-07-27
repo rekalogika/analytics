@@ -21,7 +21,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\SummarizerQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultResult;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -87,22 +86,15 @@ final class DefaultQuery implements Query
             return $this->result;
         }
 
-        $summarizerQuery = new SummarizerQuery(
-            entityManager: $this->getEntityManager(),
-            query: $this,
-            metadata: $this->getSummaryMetadata(),
-            queryResultLimit: $this->queryResultLimit,
-        );
-
         return $this->result = new DefaultResult(
             label: $this->getSummaryMetadata()->getLabel(),
             summaryClass: $this->getSummaryMetadata()->getSummaryClass(),
             query: $this,
             metadata: $this->getSummaryMetadata(),
-            summarizerQuery: $summarizerQuery,
             propertyAccessor: $this->propertyAccessor,
             entityManager: $this->getEntityManager(),
             fillingNodesLimit: $this->fillingNodesLimit,
+            queryResultLimit: $this->queryResultLimit,
         );
     }
 

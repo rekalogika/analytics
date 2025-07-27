@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 abstract class AbstractQuery
 {
+    private ?QueryComponents $queryComponents = null;
+
     protected function __construct(
         private readonly SimpleQueryBuilder $simpleQueryBuilder,
     ) {}
@@ -29,5 +32,14 @@ abstract class AbstractQuery
     protected function resolve(string $path): string
     {
         return $this->simpleQueryBuilder->resolve($path);
+    }
+
+    public function getQueryComponents(): QueryComponents
+    {
+        if (null === $this->queryComponents) {
+            $this->queryComponents = $this->simpleQueryBuilder->getQueryComponents();
+        }
+
+        return $this->queryComponents;
     }
 }
