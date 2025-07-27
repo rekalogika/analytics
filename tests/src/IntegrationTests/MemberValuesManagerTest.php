@@ -82,7 +82,7 @@ final class MemberValuesManagerTest extends KernelTestCase
         $value = $memberValuesManager->getValueFromIdentifier(
             class: OrderSummary::class,
             dimension: 'customerCountry',
-            id: (string) $id,
+            identifier: (string) $id,
         );
 
         $this->assertInstanceOf(Country::class, $value);
