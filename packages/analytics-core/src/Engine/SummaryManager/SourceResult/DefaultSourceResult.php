@@ -105,7 +105,6 @@ final readonly class DefaultSourceResult implements SourceResult
         return $this->pageable->getTotalItems();
     }
 
-    #[\Override]
     public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;

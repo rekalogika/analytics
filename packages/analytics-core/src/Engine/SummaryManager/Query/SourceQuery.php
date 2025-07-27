@@ -17,8 +17,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
-use Rekalogika\Analytics\Metadata\Summary\DimensionPropertyMetadata;
+use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\ExpressionUtil;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\SourceExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
@@ -43,7 +44,9 @@ final class SourceQuery extends AbstractQuery
     public function getQueryBuilder(): QueryBuilder
     {
         $this->initialize();
+        $this->processQueryBuilderModifier();
         $this->processDimensions();
+        $this->processConditions();
         $this->processOrderBy();
 
         return $this->getSimpleQueryBuilder()->getQueryBuilder();
@@ -91,29 +94,32 @@ final class SourceQuery extends AbstractQuery
         ));
     }
 
-    // private function processDimensionProperty(
-    //     DimensionPropertyMetadata $dimensionProperty,
-    //     mixed $rawMember,
-    // ): void {
-    //     $valueResolver = $dimensionProperty->getValueResolver();
+    private function processQueryBuilderModifier(): void
+    {
+        $class = $this->summaryMetadata->getSummaryClass();
 
-    //     $expression = $valueResolver->getExpression(
-    //         context: new SourceQueryContext(
-    //             queryBuilder: $this->getSimpleQueryBuilder(),
-    //             summaryMetadata: $this->summaryMetadata,
-    //             dimensionMetadata: $dimensionProperty->getDimension(),
-    //             dimensionPropertyMetadata: $dimensionProperty,
-    //         ),
-    //     );
+        if (is_a($class, HasQueryBuilderModifier::class, true)) {
+            $class::modifyQueryBuilder(
+                $this->getSimpleQueryBuilder()->getQueryBuilder(),
+            );
+        }
+    }
 
-    //     // add to query
+    private function processConditions(): void
+    {
+        $expression = $this->tuple->getCondition();
 
-    //     $this->getSimpleQueryBuilder()->andWhere(\sprintf(
-    //         '%s = %s',
-    //         $expression,
-    //         $this->createNamedParameter($rawMember),
-    //     ));
-    // }
+        if ($expression === null) {
+            return;
+        }
+
+        ExpressionUtil::addExpressionToQueryBuilder(
+            metadata: $this->summaryMetadata,
+            queryBuilder: $this->getSimpleQueryBuilder(),
+            expression: $expression,
+            visitorClass: SourceExpressionVisitor::class,
+        );
+    }
 
     private function processOrderBy(): void
     {

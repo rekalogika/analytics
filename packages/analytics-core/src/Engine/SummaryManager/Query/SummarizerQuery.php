@@ -26,6 +26,7 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\ExpressionUtil;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\Expression\SummaryExpressionVisitor;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -296,10 +297,11 @@ final class SummarizerQuery extends AbstractQuery
             return;
         }
 
-        $visitor = ExpressionUtil::addExpressionToSummaryQueryBuilder(
+        $visitor = ExpressionUtil::addExpressionToQueryBuilder(
             metadata: $this->metadata,
             queryBuilder: $this->getSimpleQueryBuilder(),
             expression: $where,
+            visitorClass: SummaryExpressionVisitor::class,
         );
 
         $involvedDimensions = $visitor->getInvolvedDimensions();

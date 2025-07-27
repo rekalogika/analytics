@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 
 /**
@@ -23,7 +22,4 @@ use Rekalogika\Contracts\Rekapager\PageableInterface;
  *
  * @extends PageableInterface<array-key,object>
  */
-interface SourceResult extends PageableInterface
-{
-    public function getQueryBuilder(): QueryBuilder;
-}
+interface SourceResult extends PageableInterface {}

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
@@ -25,11 +24,6 @@ final class TupleSerializerTest extends KernelTestCase
 {
     public function testTupleSerializer(): void
     {
-        // prepare services
-
-        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $this->assertInstanceOf(EntityManagerInterface::class, $entityManager);
-
         $summaryManager = self::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(SummaryManager::class, $summaryManager);
 
