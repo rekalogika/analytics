@@ -434,6 +434,6 @@ final class QueryComponents
          * @psalm-suppress MixedArgument
          * @phpstan-ignore argument.type
          */
-        return strval($result);
+        return \strval($result);
     }
 }
