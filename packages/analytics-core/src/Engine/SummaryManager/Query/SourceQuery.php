@@ -55,7 +55,7 @@ final class SourceQuery extends AbstractQuery
 
     public function selectMeasures(): self
     {
-        $this->addMeasuresToSelect();
+        $this->addAllMeasuresToSelect();
 
         return $this;
     }
@@ -95,13 +95,13 @@ final class SourceQuery extends AbstractQuery
     // private methods
     //
 
-    private function addMeasuresToSelect(): void
+    /**
+     * @todo allow virtual measures
+     * @todo fix hll
+     */
+    private function addAllMeasuresToSelect(): void
     {
         foreach ($this->summaryMetadata->getMeasures() as $measureMetadata) {
-            if ($measureMetadata->isVirtual()) {
-                continue;
-            }
-
             $function = $measureMetadata->getFunction();
 
             if (!$function instanceof SummarizableAggregateFunction) {

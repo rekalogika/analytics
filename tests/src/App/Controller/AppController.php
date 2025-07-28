@@ -158,7 +158,7 @@ final class AppController extends AbstractController
 
         return $this->render('app/tuple.html.twig', [
             'row' => $row,
-            'source_sql' => $sqlFormatter->format($queryComponents->getSqlStatement()),
+            'source_sql' => $sqlFormatter->format($queryComponents->getInterpolatedSqlStatement()),
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
         ]);
     }
