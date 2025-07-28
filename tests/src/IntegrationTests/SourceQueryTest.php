@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\SourceResult\DefaultSourceResult;
-use Rekalogika\Analytics\Tests\App\Entity\Gender;
+use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -116,8 +118,15 @@ final class SourceQueryTest extends KernelTestCase
 
     public function testCount(): void
     {
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $this->assertInstanceOf(EntityManager::class, $entityManager);
+
         $summaryManager = self::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        $oneCountry = $entityManager
+            ->getRepository(Country::class)
+            ->findOneBy([]);
 
         // query
 
@@ -127,8 +136,8 @@ final class SourceQueryTest extends KernelTestCase
             ->select('count', 'price')
             ->groupBy('customerCountry')
             ->addGroupBy('itemCategory')
-            ->addGroupBy('customerType')
-            ->where(Criteria::expr()->neq('customerGender', Gender::Male));
+            ->addGroupBy('customerGender')
+            ->where(Criteria::expr()->neq('customerCountry', $oneCountry));
 
         $result = $query->getResult();
 
