@@ -105,7 +105,7 @@ final class HorizontalBlockGroup extends BlockGroup
         $headerRows = new DefaultRows([], $this);
 
         $headerRows = $headerRows
-            ->appendRight($this->getOneChildBlock()->getSubtotalHeaderRows($subtotals));
+            ->appendRight($this->getOneBalancedChildBlock()->getSubtotalHeaderRows($subtotals));
 
         return $headerRows;
     }
@@ -153,6 +153,15 @@ final class HorizontalBlockGroup extends BlockGroup
         foreach ($this->getBalancedChildBlocks() as $childBlock) {
             $childDataRows = $childBlock->getDataPaddingRows();
             $dataRows = $dataRows->appendRight($childDataRows);
+        }
+
+        if (
+            \count($this->getBalancedChildBlocks()) > 1
+            && $this->getOneChild()->getKey() !== '@values'
+        ) {
+            $subtotals = new Subtotals($this->getParentNode());
+            $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
+            $dataRows = $dataRows->appendRight($subtotalDataRows);
         }
 
         return $dataRows;
