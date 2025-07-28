@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Controller;
 
+use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
@@ -151,14 +152,19 @@ final class AppController extends AbstractController
         #[Autowire('@rekalogika.analytics.summary_manager')]
         DefaultSummaryManager $summaryManager,
     ): Response {
-        $sqlFormatter = new SqlFormatter();
+        $sqlFormatter = new SqlFormatter(new HtmlHighlighter(usePre: false));
+
         $tupleDto = $tupleDtoSerializer->deserialize($data);
         $row = $tupleSerializer->deserialize($tupleDto);
         $queryComponents = $summaryManager->getTupleQueryComponents($row);
 
+        $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
+        $sourceSql = $sqlFormatter->compress($sourceSql);
+        $sourceSql = $sqlFormatter->highlight($sourceSql);
+
         return $this->render('app/tuple.html.twig', [
             'row' => $row,
-            'source_sql' => $sqlFormatter->format($queryComponents->getInterpolatedSqlStatement()),
+            'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
         ]);
     }
