@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Core\Metadata\Dimension;
-use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
+use Rekalogika\Analytics\Metadata\Attribute\Dimension;
+use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;

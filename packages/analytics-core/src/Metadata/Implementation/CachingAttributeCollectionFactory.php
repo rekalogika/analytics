@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollectionFactory;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\CacheInterface;
 

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Core\GroupingStrategy\RootStrategy;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;

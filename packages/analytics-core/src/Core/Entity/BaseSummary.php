@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Core\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
-use Rekalogika\Analytics\Core\Metadata as Analytics;
+use Rekalogika\Analytics\Metadata\Attribute as Analytics;
 
 /**
  * Super class for summary entity. Contains properties that exist in all summary

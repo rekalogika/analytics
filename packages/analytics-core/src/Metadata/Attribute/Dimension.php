@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Metadata;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;

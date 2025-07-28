@@ -53,7 +53,6 @@ final class ArchitectureTest
                 Selector::classname(\ReflectionNamedType::class),
 
                 // misc
-                Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\UnitEnum::class),
 
@@ -350,7 +349,6 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
 
                 // psr/symfony contracts
@@ -369,6 +367,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // php misc
+                Selector::classname(\Attribute::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\Stringable::class),
 

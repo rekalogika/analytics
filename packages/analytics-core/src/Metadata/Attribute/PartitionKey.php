@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\Metadata;
+namespace Rekalogika\Analytics\Metadata\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class Groupings {}
+final readonly class PartitionKey {}
