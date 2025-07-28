@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\PivotTable\Model\Tree\TreeMember;
 use Rekalogika\Analytics\Tests\App\Serializer\TupleDtoSerializer;
+use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
@@ -30,6 +31,7 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
         private TupleSerializer $tupleSerializer,
         private TupleDtoSerializer $tupleDtoSerializer,
         private UrlGeneratorInterface $urlGenerator,
+        private SummaryClassRegistry $summaryClassRegistry,
     ) {}
 
     private function getHtmlifier(): Htmlifier
@@ -66,10 +68,14 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
 
         $tupleDto = $this->tupleSerializer->serialize($tuple);
         $string = $this->tupleDtoSerializer->serialize($tupleDto);
+        $hash = $this->summaryClassRegistry->getHashFromClass($tuple->getSummaryClass());
 
         $url = $this->urlGenerator->generate(
             'tuple',
-            ['data' => $string],
+            [
+                'data' => $string,
+                'hash' => $hash,
+            ],
         );
 
         $content = $this->getHtmlifier()->toHtml($input->getContent());

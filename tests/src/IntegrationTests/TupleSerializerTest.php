@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
@@ -51,11 +50,13 @@ final class TupleSerializerTest extends KernelTestCase
         $tupleSerializer = self::getContainer()->get(TupleSerializer::class);
         $this->assertInstanceOf(TupleSerializer::class, $tupleSerializer);
 
+        $class = $row->getSummaryClass();
+
         $serializedTuple = $tupleSerializer->serialize($row);
 
         // deserialize the tuple
 
-        $deserializedRow = $tupleSerializer->deserialize($serializedTuple);
+        $deserializedRow = $tupleSerializer->deserialize($class, $serializedTuple);
 
         // original measures
 

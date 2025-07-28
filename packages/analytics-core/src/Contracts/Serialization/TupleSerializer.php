@@ -20,5 +20,8 @@ interface TupleSerializer
 {
     public function serialize(Tuple $tuple): TupleDto;
 
-    public function deserialize(TupleDto $dto): Row;
+    /**
+     * @param class-string $summaryClass
+     */
+    public function deserialize(string $summaryClass, TupleDto $dto): Row;
 }

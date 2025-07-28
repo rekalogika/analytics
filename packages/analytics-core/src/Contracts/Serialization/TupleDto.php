@@ -18,23 +18,13 @@ use Doctrine\Common\Collections\Expr\Expression;
 final readonly class TupleDto
 {
     /**
-     * @param class-string $summaryClass
      * @param array<string,string> $members Key is dimension name, value is the
      * serialized raw member value.
      */
     public function __construct(
-        private string $summaryClass,
         private array $members,
         private ?Expression $condition,
     ) {}
-
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
-    }
 
     /**
      * @return array<string,string>
