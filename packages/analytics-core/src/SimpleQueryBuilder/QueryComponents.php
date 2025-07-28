@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SimpleQueryBuilder;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
@@ -54,6 +58,16 @@ final class QueryComponents
      * @var null|array<int<0,max>,int|string|ParameterType|ArrayParameterType>
      */
     private ?array $types = null;
+
+    /**
+     * @var null|array<int<0,max>,int|ParameterType|ArrayParameterType>
+     */
+    private ?array $resolvedTypes = null;
+
+    /**
+     * @var null|array<int<0,max>,mixed>
+     */
+    private ?array $resolvedParameters = null;
 
     public function __construct(private Query $query) {}
 
@@ -165,6 +179,16 @@ final class QueryComponents
         return $this->query;
     }
 
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->getQuery()->getEntityManager();
+    }
+
+    public function getConnection(): Connection
+    {
+        return $this->getEntityManager()->getConnection();
+    }
+
     /**
      * @return list<string>
      */
@@ -265,5 +289,151 @@ final class QueryComponents
         /** @psalm-suppress MixedReturnTypeCoercion */
         /** @psalm-suppress MixedPropertyTypeCoercion */
         return $this->types = $types;
+    }
+
+
+    /**
+     * @return array<int<0,max>,int|ParameterType|ArrayParameterType>
+     */
+    public function getResolvedTypes(): array
+    {
+        if ($this->resolvedTypes !== null) {
+            return $this->resolvedTypes;
+        }
+
+        $types = $this->getTypes();
+        $resolvedTypes = [];
+
+        foreach ($types as $key => $type) {
+            if (\is_string($type)) {
+                $type = Type::getType($type);
+            }
+
+            if ($type instanceof Type) {
+                $resolvedTypes[$key] = $type->getBindingType();
+            } else {
+                $resolvedTypes[$key] = $type;
+            }
+        }
+
+        return $this->resolvedTypes = $resolvedTypes;
+    }
+
+    /**
+     * @return array<int<0,max>,mixed>
+     */
+    public function getResolvedParameters(): array
+    {
+        if ($this->resolvedParameters !== null) {
+            return $this->resolvedParameters;
+        }
+
+        $resolvedParameters = [];
+        $types = $this->getTypes();
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($this->getParameters() as $key => $parameter) {
+            $type = $types[$key] ?? null;
+
+            if ($type === null) {
+                $resolvedParameters[$key] = $parameter;
+                continue;
+            }
+
+            if (\is_string($type)) {
+                $type = Type::getType($type);
+            }
+
+            if ($type instanceof Type) {
+                try {
+                    $resolvedParameters[$key] = $type->convertToDatabaseValue($parameter, $this->getConnection()->getDatabasePlatform());
+                } catch (\TypeError | ConversionException) {
+                    // If conversion fails, keep the original parameter value
+                    $resolvedParameters[$key] = $parameter;
+                }
+            } else {
+                $resolvedParameters[$key] = $parameter;
+            }
+        }
+
+        return $this->resolvedParameters = $resolvedParameters;
+    }
+
+    public function getInterpolatedSqlStatement(): string
+    {
+        $sql = $this->getSqlStatement();
+        $parameters = $this->getResolvedParameters();
+
+        $i = 0;
+
+        if (! \array_key_exists(0, $parameters) && \array_key_exists(1, $parameters)) {
+            $i = 1;
+        }
+
+        return preg_replace_callback(
+            '/\?|((?<!:):[a-z0-9_]+)/i',
+            static function ($matches) use ($parameters, &$i) {
+                $key = substr($matches[0], 1);
+
+                if (! \array_key_exists($i, $parameters) && ! \array_key_exists($key, $parameters)) {
+                    return $matches[0];
+                }
+
+                /** @psalm-suppress MixedAssignment */
+                $value  = \array_key_exists($i, $parameters) ? $parameters[$i] : $parameters[$key];
+                $result = self::escapeFunction($value);
+                $i++;
+
+                return $result;
+            },
+            $sql,
+        ) ?? throw new UnexpectedValueException(
+            'Failed to interpolate SQL statement, preg_replace_callback returned null',
+        );
+    }
+
+    public static function escapeFunction(mixed $parameter): string
+    {
+        /** @psalm-suppress MixedAssignment */
+        $result = $parameter;
+
+        switch (true) {
+            // Check if result is non-unicode string using PCRE_UTF8 modifier
+            case \is_string($result) && ! preg_match('//u', $result):
+                $result = '0x' . strtoupper(bin2hex($result));
+                break;
+
+            case \is_string($result):
+                $result = "'" . addslashes($result) . "'";
+                break;
+
+            case \is_array($result):
+                /** @psalm-suppress MixedAssignment */
+                foreach ($result as &$value) {
+                    $value = static::escapeFunction($value);
+                }
+
+                /** @psalm-suppress MixedArgumentTypeCoercion */
+                $result = implode(', ', $result) ?: 'NULL';
+                break;
+
+            case $result instanceof \Stringable:
+                $result = addslashes((string) $result);
+                break;
+
+            case $result === null:
+                $result = 'NULL';
+                break;
+
+            case \is_bool($result):
+                $result = $result ? '1' : '0';
+                break;
+        }
+
+        /**
+         * @psalm-suppress MixedArgument
+         * @phpstan-ignore argument.type
+         */
+        return \strval($result);
     }
 }
