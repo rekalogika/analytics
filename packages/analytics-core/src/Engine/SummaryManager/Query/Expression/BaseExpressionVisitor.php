@@ -96,12 +96,18 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
 
         // special case for eq null
         if ($operator === Comparison::EQ && $value === null) {
-            return $this->queryBuilder->expr()->isNull($field->getField());
+            return \sprintf(
+                'REKALOGIKA_IS_NULL(%s) = TRUE',
+                $field->getField(),
+            );
         }
 
         // special case for neq null
         if ($operator === Comparison::NEQ && $value === null) {
-            return $this->queryBuilder->expr()->isNotNull($field->getField());
+            return \sprintf(
+                'REKALOGIKA_IS_NOT_NULL(%s) = TRUE',
+                $field->getField(),
+            );
         }
 
         // create named param
@@ -183,9 +189,15 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
                 // condition
 
                 if ($comparisonOperator === Comparison::NIN) {
-                    return $this->queryBuilder->expr()->isNotNull($field->getField());
+                    return \sprintf(
+                        'REKALOGIKA_IS_NOT_NULL(%s) = TRUE',
+                        $field->getField(),
+                    );
                 } else {
-                    return $this->queryBuilder->expr()->isNull($field->getField());
+                    return \sprintf(
+                        'REKALOGIKA_IS_NULL(%s) = TRUE',
+                        $field->getField(),
+                    );
                 }
             } else {
                 // if condition is empty, and no null condition either, return
@@ -225,12 +237,18 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
         if ($comparisonOperator === Comparison::NIN) {
             return $this->queryBuilder->expr()->andX(
                 $valuesWithoutNullExpression,
-                $this->queryBuilder->expr()->isNotNull($field->getField()),
+                \sprintf(
+                    'REKALOGIKA_IS_NOT_NULL(%s) = TRUE',
+                    $field->getField(),
+                ),
             );
         } else {
             return $this->queryBuilder->expr()->orX(
                 $valuesWithoutNullExpression,
-                $this->queryBuilder->expr()->isNull($field->getField()),
+                \sprintf(
+                    'REKALOGIKA_IS_NULL(%s) = TRUE',
+                    $field->getField(),
+                ),
             );
         }
     }

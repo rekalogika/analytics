@@ -20,6 +20,8 @@ use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
+use Rekalogika\Analytics\Core\Doctrine\Function\IsNotNullFunction;
+use Rekalogika\Analytics\Core\Doctrine\Function\IsNullFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
@@ -165,6 +167,8 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             'REKALOGIKA_BUST' => BustFunction::class,
             'REKALOGIKA_TRUNCATE_BIGINT' => TruncateBigIntFunction::class,
             'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
+            'REKALOGIKA_IS_NULL' => IsNullFunction::class,
+            'REKALOGIKA_IS_NOT_NULL' => IsNotNullFunction::class,
         ];
 
         $numericFunctions = [
