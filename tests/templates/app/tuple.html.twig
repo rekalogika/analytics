@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Tuple' }}{% endblock %}
+
+{% block body %}
+    <h2 class="mb-3">Tuple</h2>
+
+    <h3 class="mb-3">Dimensions</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Label</th>
+                <th>Member</th>
+                <th>Raw Member</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, dimension in row %}
+                <tr>
+                    <td>{{ dimension.name }}</td>
+                    <td>{{ dimension.label|trans }}</td>
+                    <td>{{ dimension.member|analytics_to_html }}</td>
+                    <td>{{ dimension.rawMember|analytics_to_html }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="mb-3">Measures</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Label</th>
+                <th>Value</th>
+                <th>Raw Value</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, measure in row.measures %}
+                <tr>
+                    <td>{{ measure.name }}</td>
+                    <td>{{ measure.label|trans }}</td>
+                    <td>{{ measure.value|analytics_to_html }}</td>
+                    <td>{{ measure.rawValue|analytics_to_html }}</td>
+                    <td>{{ measure.unit|analytics_to_html }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="mb-3">Source Table SQL</h3>
+
+    <pre class="p-3">{{ source_sql|raw }}</pre>
+
+
+{% endblock body %}

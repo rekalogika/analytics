@@ -103,7 +103,7 @@ final class DefaultResult implements Result
             return $this->queryResult;
         }
 
-        $summarizerQuery = $this->getSummarizerQuery();
+        $summarizerQuery = $this->getSummaryQuery();
 
         if ($summarizerQuery === null) {
             return $this->queryResult = [];
@@ -112,7 +112,7 @@ final class DefaultResult implements Result
         return $this->queryResult = $summarizerQuery->getQueryResult();
     }
 
-    private function getSummarizerQuery(): ?SummaryQuery
+    private function getSummaryQuery(): ?SummaryQuery
     {
         if ($this->summarizerQuery !== null) {
             if ($this->summarizerQuery instanceof EmptyResult) {
@@ -156,7 +156,7 @@ final class DefaultResult implements Result
             return null;
         }
 
-        $summarizerQuery = $this->getSummarizerQuery();
+        $summarizerQuery = $this->getSummaryQuery();
 
         if ($summarizerQuery === null) {
             $this->queryComponents = new EmptyResult();

@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SourceQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SourceResult\DefaultSourceResult;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final readonly class DefaultSummaryManager implements SummaryManager
@@ -92,5 +93,29 @@ final readonly class DefaultSummaryManager implements SummaryManager
             ->getQueryBuilder();
 
         return new DefaultSourceResult($queryBuilder);
+    }
+
+    public function getTupleQueryComponents(Tuple $tuple): QueryComponents
+    {
+        $summaryClass = $tuple->getSummaryClass();
+        $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
+        $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
+
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new LogicException(\sprintf(
+                'The entity manager for class "%s" is not an instance of "EntityManagerInterface".',
+                $summaryClass,
+            ));
+        }
+
+        $sourceQuery = new SourceQuery(
+            entityManager: $entityManager,
+            summaryMetadata: $metadata,
+        );
+
+        return $sourceQuery
+            ->selectMeasures()
+            ->fromTuple($tuple)
+            ->getQueryComponents();
     }
 }

@@ -37,7 +37,11 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
 
         $members = [];
 
-        foreach ($tuple as $dimension) {
+        foreach ($tuple as $name => $dimension) {
+            if ($name === '@values') {
+                continue;
+            }
+
             $dimensionName = $dimension->getName();
             /** @psalm-suppress MixedAssignment */
             $dimensionMember = $dimension->getRawMember();
