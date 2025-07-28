@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Core\GroupingStrategy;
+namespace Rekalogika\Analytics\Contracts\Internal;
 
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
@@ -19,6 +19,9 @@ use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 
+/**
+ * @internal
+ */
 final readonly class RootStrategy implements GroupingStrategy
 {
     #[\Override]
