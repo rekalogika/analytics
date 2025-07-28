@@ -28,11 +28,16 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
+
+                // internal packages
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
 
-                // doctrine dependencies
+                // rekalogika
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
+
+                // doctrine
                 Selector::inNamespace('Doctrine\DBAL'),
                 Selector::inNamespace('Doctrine\ORM'),
                 Selector::inNamespace('Doctrine\Migrations'),
@@ -40,9 +45,6 @@ final class ArchitectureTest
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
-
-                // rekalogika dependencies
-                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
@@ -69,8 +71,12 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsCommon(),
 
-                // contracts dependencies
+                // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // doctrine
+                Selector::classname(QueryException::class),
+                Selector::classname(ConversionException::class),
 
                 // php misc
                 Selector::classname(\Stringable::class),
@@ -86,10 +92,6 @@ final class ArchitectureTest
                 Selector::classname(\OverflowException::class),
                 Selector::classname(\UnderflowException::class),
                 Selector::classname(\DomainException::class),
-
-                // doctrine
-                Selector::classname(QueryException::class),
-                Selector::classname(ConversionException::class),
             );
     }
 
@@ -100,15 +102,17 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsEngine(),
+
+                // internal packages
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsMetadata(),
 
-                // optional dependencies
+                // internal packages (optional)
                 Selectors::selectAnalyticsUXPanel(),
 
-                // dependencies
+                // rekalogika
                 Selector::inNamespace('Rekalogika\Analytics\SimpleQueryBuilder'),
                 Selector::inNamespace('Rekalogika\Contracts\Rekapager'),
                 Selector::inNamespace('Rekalogika\Rekapager\Keyset'),
@@ -174,16 +178,15 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsBundle(),
 
-                // dependencies
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsEngine(),
-                Selector::inNamespace('OzdemirBurak\Iris\Color'),
                 Selectors::selectPivotTable(),
 
-                // optional dependencies
+                // internal packages (optional)
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsPostgreSQLHll(),
@@ -199,17 +202,14 @@ final class ArchitectureTest
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // symfony
-                Selector::inNamespace('Symfony\Component\AssetMapper'),
                 Selector::inNamespace('Symfony\Component\Config'),
                 Selector::inNamespace('Symfony\Component\Cache'),
                 Selector::inNamespace('Symfony\Component\Console'),
                 Selector::inNamespace('Symfony\Component\DependencyInjection'),
                 Selector::inNamespace('Symfony\Component\EventDispatcher'),
                 Selector::inNamespace('Symfony\Component\HttpKernel'),
-                Selector::inNamespace('Symfony\Component\Lock'),
                 Selector::inNamespace('Symfony\Component\Messenger'),
                 Selector::inNamespace('Symfony\Component\Translation'),
-                Selector::inNamespace('Symfony\UX\Chartjs'),
 
                 // doctrine
                 Selector::inNamespace('Doctrine\Bundle\DoctrineBundle'),
@@ -298,13 +298,12 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsUXPanel(),
 
-                // dependencies
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsBundle(),
                 Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsMetadata(),
-                // Selectors::selectAnalyticsTime(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Psr\Container'),
@@ -348,8 +347,13 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsMetadata(),
+
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
+
+                // rekalogika
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Cache'),
@@ -362,9 +366,6 @@ final class ArchitectureTest
 
                 // symfony components
                 Selector::inNamespace('Symfony\Component\Cache'),
-
-                // other third-party libraries
-                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
 
                 // php misc
                 Selector::classname(\Attribute::class),
@@ -404,6 +405,8 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsTime(),
+
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
@@ -454,6 +457,8 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLHll(),
+
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
 
@@ -482,6 +487,8 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsUuid(),
+
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
                 Selectors::selectAnalyticsCommon(),
@@ -510,14 +517,16 @@ final class ArchitectureTest
             ->canOnlyDependOn()
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
+
+                // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCommon(),
 
-                // psr/symfony contracts
-                Selector::inNamespace('Symfony\Contracts\Translation'),
-
                 // rekalogika dependencies
                 Selectors::selectPivotTable(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
 
                 // php misc
                 Selector::classname(\Override::class),

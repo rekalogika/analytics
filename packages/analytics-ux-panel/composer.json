@@ -25,6 +25,7 @@
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3",
+        "symfony/stimulus-bundle": "^2.9",
         "twig/twig": "^3.15 || ^4.0"
     },
     "autoload": {
