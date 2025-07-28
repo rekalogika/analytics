@@ -18,9 +18,9 @@ use Doctrine\ORM\Mapping\Embedded;
 use Rekalogika\Analytics\Common\Model\TranslatableMessage;
 use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
-use Rekalogika\Analytics\Core\Metadata\Dimension;
-use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
+use Rekalogika\Analytics\Metadata\Attribute\Dimension;
+use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
 use Rekalogika\Analytics\Time\Dimension\Set\HourSet;
 use Rekalogika\Analytics\Time\Dimension\System\Trait\IsoWeekDateTrait;
 

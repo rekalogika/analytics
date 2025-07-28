@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Time\Dimension\System;
 use Doctrine\ORM\Mapping\Embeddable;
 use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
-use Rekalogika\Analytics\Core\Metadata\DimensionGroup;
+use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
 use Rekalogika\Analytics\Time\Dimension\System\Trait\GregorianDateTrait;
 
 #[Embeddable()]

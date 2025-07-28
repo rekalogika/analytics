@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureMetadata extends PropertyMetadata

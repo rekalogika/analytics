@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\Analytics\Metadata\Implementation\DimensionAwareAttributeCollectionDecorator;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Rekalogika\Analytics\Common\Exception\RuntimeException;
-use Rekalogika\Analytics\Metadata\Attribute\AttributeCollection;
+use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 
 final readonly class DimensionAwareAttributeCollectionDecorator implements
