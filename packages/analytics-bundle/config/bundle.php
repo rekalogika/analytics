@@ -18,16 +18,16 @@ use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
 use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
+use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
-use Rekalogika\Analytics\Bundle\MemberValuesManager\ChainMemberValuesManager;
 use Rekalogika\Analytics\Bundle\RefreshAgent\SymfonyRefreshAgentDispatcher;
 use Rekalogika\Analytics\Bundle\Serialization\ChainValueSerializer;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Engine\MemberValuesManager\DoctrineMemberValuesManager;
+use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -120,23 +120,23 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     //
 
     $services->alias(
-        MemberValuesManager::class,
-        'rekalogika.analytics.member_values_manager.chain',
+        DistinctValuesResolver::class,
+        'rekalogika.analytics.distinct_values_resolver.chain',
     );
 
     $services
-        ->set('rekalogika.analytics.member_values_manager.chain')
-        ->class(ChainMemberValuesManager::class);
+        ->set('rekalogika.analytics.distinct_values_resolver.chain')
+        ->class(ChainDistinctValuesResolver::class);
 
     $services
-        ->set('rekalogika.analytics.member_values_manager.doctrine')
-        ->class(DoctrineMemberValuesManager::class)
+        ->set('rekalogika.analytics.distinct_values_resolver.doctrine')
+        ->class(DoctrineDistinctValuesResolver::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
         ])
-        ->tag('rekalogika.analytics.member_values_manager');
+        ->tag('rekalogika.analytics.distinct_values_resolver');
 
     //
     // value serializer

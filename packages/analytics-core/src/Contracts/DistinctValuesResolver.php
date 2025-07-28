@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-interface MemberValuesManager
+interface DistinctValuesResolver
 {
     /**
      * Returns the distinct values for the given dimension of the given class.

@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class MemberValuesManagerTest extends KernelTestCase
+final class DistinctValuesResolverTest extends KernelTestCase
 {
     public function testDoctrineEntity(): void
     {
-        $memberValuesManager = self::getContainer()
-            ->get(MemberValuesManager::class);
+        $distinctValuesResolver = self::getContainer()
+            ->get(DistinctValuesResolver::class);
 
-        $values = $memberValuesManager->getDistinctValues(
+        $values = $distinctValuesResolver->getDistinctValues(
             class: OrderSummary::class,
             dimension: 'customerCountry',
             limit: 100,
@@ -39,10 +39,10 @@ final class MemberValuesManagerTest extends KernelTestCase
 
     public function testEnum(): void
     {
-        $memberValuesManager = self::getContainer()
-            ->get(MemberValuesManager::class);
+        $distinctValuesResolver = self::getContainer()
+            ->get(DistinctValuesResolver::class);
 
-        $values = $memberValuesManager->getDistinctValues(
+        $values = $distinctValuesResolver->getDistinctValues(
             class: OrderSummary::class,
             dimension: 'customerType',
             limit: 100,
