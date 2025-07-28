@@ -144,18 +144,20 @@ final class AppController extends AbstractController
         ]);
     }
 
-    #[Route('/summary/tuple/{data}', name: 'tuple')]
+    #[Route('/summary/tuple/{hash}/{data}', name: 'tuple')]
     public function tuple(
+        string $hash,
         string $data,
         TupleDtoSerializer $tupleDtoSerializer,
         TupleSerializer $tupleSerializer,
         #[Autowire('@rekalogika.analytics.summary_manager')]
         DefaultSummaryManager $summaryManager,
     ): Response {
+        $class = $this->summaryClassRegistry->getClassFromHash($hash);
         $sqlFormatter = new SqlFormatter(new HtmlHighlighter(usePre: false));
 
         $tupleDto = $tupleDtoSerializer->deserialize($data);
-        $row = $tupleSerializer->deserialize($tupleDto);
+        $row = $tupleSerializer->deserialize($class, $tupleDto);
         $queryComponents = $summaryManager->getTupleQueryComponents($row);
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
@@ -166,6 +168,7 @@ final class AppController extends AbstractController
             'row' => $row,
             'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
+            'hash' => $hash,
         ]);
     }
 

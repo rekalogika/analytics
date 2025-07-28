@@ -57,22 +57,21 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         }
 
         return new TupleDto(
-            summaryClass: $tuple->getSummaryClass(),
             members: $members,
             condition: $tuple->getCondition(),
         );
     }
 
     #[\Override]
-    public function deserialize(TupleDto $dto): Row
+    public function deserialize(string $summaryClass, TupleDto $dto): Row
     {
         $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($dto->getSummaryClass());
+            ->getSummaryMetadata($summaryClass);
 
         // create query
         $query = $this->summaryManager
             ->createQuery()
-            ->from($dto->getSummaryClass());
+            ->from($summaryClass);
 
         // add where condition
         $condition = $dto->getCondition();
@@ -87,7 +86,7 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         foreach ($dto->getMembers() as $dimensionName => $serializedValue) {
             /** @psalm-suppress MixedAssignment */
             $rawMember = $this->valueSerializer->deserialize(
-                class: $dto->getSummaryClass(),
+                class: $summaryClass,
                 dimension: $dimensionName,
                 identifier: $serializedValue,
             );

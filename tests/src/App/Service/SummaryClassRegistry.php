@@ -39,6 +39,22 @@ final readonly class SummaryClassRegistry
     }
 
     /**
+     * @param class-string $className
+     */
+    public function getHashFromClass(string $className): string
+    {
+        $classMap = $this->summaryClassMapFactory->getClassMap();
+
+        $hash = hash('xxh128', $className);
+
+        if (!isset($classMap[$hash]) || $classMap[$hash] !== $className) {
+            throw new NotFoundException('Summary class not found');
+        }
+
+        return $hash;
+    }
+
+    /**
      * @return array<string,TranslatableInterface>
      */
     public function getHashToLabel(): array
