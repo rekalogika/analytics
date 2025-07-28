@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Serialization;
 
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+
 interface ValueSerializer
 {
     /**
      * @param class-string $class The summary entity class name.
      * @return string The serialized value.
-     * @throws UnsupportedValue
+     * @throws UnsupportedValue If the serializer does not support the value
+     * type.
+     * @throws InvalidArgumentException If the value cannot be serialized.
      */
     public function serialize(
         string $class,
@@ -29,7 +33,9 @@ interface ValueSerializer
     /**
      * @param class-string $class The summary entity class name.
      * @return mixed The deserialized value.
-     * @throws UnsupportedValue
+     * @throws UnsupportedValue If the serializer does not support the value
+     * type.
+     * @throws InvalidArgumentException If the value cannot be deserialized.
      */
     public function deserialize(
         string $class,

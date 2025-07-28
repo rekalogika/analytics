@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Serialization;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsTrait;
+use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Serialization\UnsupportedValue;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 
@@ -76,7 +77,13 @@ final readonly class ChainValueSerializer implements ValueSerializer
             }
         }
 
-        throw new UnsupportedValue();
+        throw new InvalidArgumentException(\sprintf(
+            'No serializer found for class "%s", dimension "%s", and identifier "%s". You may need to create a custom implementation of "%s" for this class and dimension.',
+            $class,
+            $dimension,
+            $identifier,
+            ValueSerializer::class,
+        ));
     }
 
 
@@ -99,6 +106,12 @@ final readonly class ChainValueSerializer implements ValueSerializer
             }
         }
 
-        throw new UnsupportedValue();
+        throw new InvalidArgumentException(\sprintf(
+            'No serializer found for class "%s", dimension "%s", and value "%s". You may need to create a custom implementation of "%s" for this class and dimension.',
+            $class,
+            $dimension,
+            get_debug_type($value),
+            ValueSerializer::class,
+        ));
     }
 }

@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\MemberValuesManager;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
@@ -43,6 +44,7 @@ final class AppController extends AbstractController
         private readonly SummaryManager $summaryManager,
         private readonly SummaryClassRegistry $summaryClassRegistry,
         private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
     ) {}
 
     #[Route('/', name: 'index')]
@@ -52,7 +54,6 @@ final class AppController extends AbstractController
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
         ]);
     }
-
 
     #[Route('/summary/page/{hash}', name: 'summary')]
     public function summary(
@@ -97,6 +98,15 @@ final class AppController extends AbstractController
         } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
             $pivotTableError = $e->trans($this->translator);
+        } catch (\Throwable $e) {
+            $pivotTable = null;
+            $pivotTableError = 'An error occurred while rendering the pivot table.';
+            $this->logger->error(
+                'An error occurred while rendering the pivot table.',
+                [
+                    'exception' => $e,
+                ],
+            );
         }
 
         // expression rendering
@@ -111,7 +121,13 @@ final class AppController extends AbstractController
             $chartError = null;
         } catch (\Throwable $e) {
             $chart = null;
-            $chartError = 'An error occurred while creating the chart: ' . $e->getMessage();
+            $chartError = 'An error occurred while creating the chart: ';
+            $this->logger->error(
+                'An error occurred while creating the chart.',
+                [
+                    'exception' => $e,
+                ],
+            );
         }
 
         return $this->render('app/summary.html.twig', [
