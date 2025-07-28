@@ -150,11 +150,18 @@ final class SourceQuery extends AbstractQuery
             ),
         );
 
-        $this->getSimpleQueryBuilder()->andWhere(\sprintf(
-            '%s = %s',
-            $expression,
-            $this->createNamedParameter($rawMember),
-        ));
+        if ($rawMember === null) {
+            $this->getSimpleQueryBuilder()->andWhere(\sprintf(
+                'REKALOGIKA_IS_NULL(%s) = TRUE',
+                $expression,
+            ));
+        } else {
+            $this->getSimpleQueryBuilder()->andWhere(\sprintf(
+                '%s = %s',
+                $expression,
+                $this->createNamedParameter($rawMember),
+            ));
+        }
     }
 
     private function addQueryDimensionsToSelectGroupByOrderBy(Query $query): void
