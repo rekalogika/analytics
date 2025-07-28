@@ -196,6 +196,23 @@ final readonly class ClassMetadataWrapper
         return $targetClass;
     }
 
+    public function getScalarType(string $property): ?string
+    {
+        $fieldMapping = $this->classMetadata->getFieldMapping($property);
+
+        if (!isset($fieldMapping['type'])) {
+            return null;
+        }
+
+        $type = $fieldMapping['type'];
+
+        if (!\is_string($type)) {
+            throw new MetadataException(\sprintf('Type for property "%s" is not a string', $property));
+        }
+
+        return $type;
+    }
+
     /**
      * @return class-string<\UnitEnum>|null
      */

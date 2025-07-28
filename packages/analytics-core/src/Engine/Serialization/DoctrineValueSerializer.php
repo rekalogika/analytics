@@ -53,6 +53,10 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             return self::NULL;
         }
 
+        if (\is_string($value) || \is_int($value) || \is_float($value)) {
+            return (string) $value;
+        }
+
         if (!\is_object($value)) {
             throw new UnsupportedValue();
         }
@@ -124,6 +128,31 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             throw new UnexpectedValueException(\sprintf(
                 'The enum type "%s" is not a BackedEnum',
                 $enumType,
+            ));
+        }
+
+        // if scalar
+
+        if (($scalarType = $metadata->getScalarType($dimension)) !== null) {
+            if ($scalarType === 'string') {
+                return $identifier;
+            }
+
+            if ($scalarType === 'integer') {
+                return (int) $identifier;
+            }
+
+            if ($scalarType === 'float') {
+                return (float) $identifier;
+            }
+
+            if ($scalarType === 'boolean') {
+                return (bool) $identifier;
+            }
+
+            throw new UnexpectedValueException(\sprintf(
+                'The scalar type "%s" is not supported',
+                $scalarType,
             ));
         }
 
