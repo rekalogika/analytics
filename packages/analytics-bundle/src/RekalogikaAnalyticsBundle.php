@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
+use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
-use Rekalogika\Analytics\Bundle\DependencyInjection\MemberValuesManagerPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\ValueSerializerPass;
 use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
 use Rekalogika\Analytics\Core\Doctrine\Function\IsNotNullFunction;
@@ -60,7 +60,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         parent::build($container);
 
         $container->addCompilerPass(new DoctrineEntityPass());
-        $container->addCompilerPass(new MemberValuesManagerPass());
+        $container->addCompilerPass(new DistinctValuesResolverPass());
         $container->addCompilerPass(new ValueSerializerPass());
     }
 
@@ -124,8 +124,8 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $builder->registerForAutoconfiguration(ValueSerializer::class)
             ->addTag('rekalogika.analytics.value_serializer');
 
-        $builder->registerForAutoconfiguration(MemberValuesManager::class)
-            ->addTag('rekalogika.analytics.member_values_manager');
+        $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
+            ->addTag('rekalogika.analytics.distinct_values_resolver');
 
         $builder->registerForAutoconfiguration(Stringifier::class)
             ->addTag('rekalogika.analytics.stringifier');

@@ -17,7 +17,7 @@ use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -223,7 +223,7 @@ final class AppController extends AbstractController
      * Dummy controller to prevent services in arguments from being removed
      */
     public function dummy(
-        MemberValuesManager $memberValuesManager,
+        DistinctValuesResolver $distinctValueResolver,
         ValueSerializer $valueSerializer,
         TupleSerializer $tupleSerializer,
     ): Response {

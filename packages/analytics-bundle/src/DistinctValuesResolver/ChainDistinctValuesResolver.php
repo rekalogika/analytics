@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Bundle\MemberValuesManager;
+namespace Rekalogika\Analytics\Bundle\DistinctValuesResolver;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsTrait;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 
-final readonly class ChainMemberValuesManager implements MemberValuesManager
+final readonly class ChainDistinctValuesResolver implements DistinctValuesResolver
 {
     /**
-     * @use ApplicableDimensionsTrait<MemberValuesManager>
+     * @use ApplicableDimensionsTrait<DistinctValuesResolver>
      */
     use ApplicableDimensionsTrait;
 
@@ -28,7 +28,7 @@ final readonly class ChainMemberValuesManager implements MemberValuesManager
      * @param ContainerInterface $specificServiceLocator Services that supplies
      * the information about the classes that they handle. i.e. their
      * `getApplicableDimensions()` method returns an iterable.
-     * @param iterable<MemberValuesManager> $nonSpecificServices Services
+     * @param iterable<DistinctValuesResolver> $nonSpecificServices Services
      * that do not supply the information about the classes that they handle.
      * i.e. their `getApplicableDimensions()` method returns null.
      */
@@ -52,7 +52,7 @@ final readonly class ChainMemberValuesManager implements MemberValuesManager
     #[\Override]
     private function getServiceClass(): string
     {
-        return MemberValuesManager::class;
+        return DistinctValuesResolver::class;
     }
 
     #[\Override]

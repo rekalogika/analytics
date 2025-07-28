@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\Filter;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Contracts\MemberValuesManager;
+use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\DimensionNotSupportedByFilter;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
@@ -26,7 +26,7 @@ final readonly class DoctrineFilterResolver implements FilterResolver
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private MemberValuesManager $memberValuesManager,
+        private DistinctValuesResolver $distinctValuesResolver,
     ) {}
 
     #[\Override]
@@ -39,7 +39,7 @@ final readonly class DoctrineFilterResolver implements FilterResolver
             throw new DimensionNotSupportedByFilter();
         }
 
-        $choices = $this->memberValuesManager
+        $choices = $this->distinctValuesResolver
             ->getDistinctValues($summaryClass, $name, 100);
 
         if ($choices === null) {
