@@ -104,8 +104,6 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         $summaryMetadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($class);
 
-        $dimensionMetadata = $summaryMetadata->getDimension($dimension);
-
         // if it is a relation, we get the unique values from the source entity
 
         if ($metadata->isPropertyEntity($dimension)) {
@@ -133,27 +131,8 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
 
         // if scalar
 
-        if (($scalarType = $metadata->getScalarType($dimension)) !== null) {
-            if ($scalarType === 'string') {
-                return $identifier;
-            }
-
-            if ($scalarType === 'integer') {
-                return (int) $identifier;
-            }
-
-            if ($scalarType === 'float') {
-                return (float) $identifier;
-            }
-
-            if ($scalarType === 'boolean') {
-                return (bool) $identifier;
-            }
-
-            throw new UnexpectedValueException(\sprintf(
-                'The scalar type "%s" is not supported',
-                $scalarType,
-            ));
+        if ($metadata->getScalarType($dimension) !== null) {
+            return $identifier;
         }
 
         throw new UnsupportedValue();
