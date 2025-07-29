@@ -155,15 +155,25 @@ final class SourceQueryTest extends KernelTestCase
 
         /** @psalm-suppress MixedAssignment */
         $precounted = $row->getMeasures()->getByKey('count')?->getValue() ?? 0;
-
         $sourceResult = $summaryManager->getSource($row->getTuple());
 
         $count = 0;
+        $pages = $sourceResult->withItemsPerPage(1000)->getPages();
 
-        foreach ($sourceResult->withItemsPerPage(1000)->getPages() as $page) {
+        foreach ($pages as $page) {
             foreach ($page as $item) {
                 $count++;
             }
+        }
+
+        if ($count !== $precounted) {
+            $this->fail(
+                \sprintf(
+                    'Count from source result (%d) does not match the precounted value (%d).',
+                    $count,
+                    $precounted,
+                ),
+            );
         }
 
         $this->assertEquals($precounted, $count, 'Count from source result should match the precounted value.');
