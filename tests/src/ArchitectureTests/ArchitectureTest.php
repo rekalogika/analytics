@@ -404,6 +404,36 @@ final class ArchitectureTest
             );
     }
 
+    public function testPackageSerialization(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsSerialization(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsSerialization(),
+
+                // internal packages
+                Selectors::selectAnalyticsContracts(),
+                Selectors::selectAnalyticsMetadata(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\Common\Collections'),
+
+                // php misc
+                Selector::classname(\Override::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayIterator::class),
+                Selector::classname(\Traversable::class),
+            );
+    }
+
     public function testPackageTime(): Rule
     {
         return PHPat::rule()
