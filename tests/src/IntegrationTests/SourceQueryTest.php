@@ -154,14 +154,16 @@ final class SourceQueryTest extends KernelTestCase
         $this->assertInstanceOf(SummaryManager::class, $summaryManager);
 
         /** @psalm-suppress MixedAssignment */
-        $precounted = $row->getMeasures()->getByKey('count')?->getValue();
+        $precounted = $row->getMeasures()->getByKey('count')?->getValue() ?? 0;
 
         $sourceResult = $summaryManager->getSource($row->getTuple());
 
         $count = 0;
 
         foreach ($sourceResult->withItemsPerPage(1000)->getPages() as $page) {
-            $count += \count($page);
+            foreach ($page as $item) {
+                $count++;
+            }
         }
 
         $this->assertEquals($precounted, $count, 'Count from source result should match the precounted value.');
