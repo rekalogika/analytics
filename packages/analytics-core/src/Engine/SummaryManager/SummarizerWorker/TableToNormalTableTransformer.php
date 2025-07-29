@@ -128,7 +128,7 @@ final class TableToNormalTableTransformer
      */
     private function unpivotRow(DefaultRow $row): iterable
     {
-        $summaryClass = $row->getSummaryClass();
+        $summaryClass = $row->getTuple()->getSummaryClass();
         $newRow = [];
 
         foreach ($this->dimensions as $dimension) {
@@ -140,7 +140,7 @@ final class TableToNormalTableTransformer
                 continue;
             }
 
-            $d = $row->getByKey($dimension);
+            $d = $row->getTuple()->getByKey($dimension);
 
             if ($d === null) {
                 continue;
@@ -169,7 +169,7 @@ final class TableToNormalTableTransformer
             $tuple = new DefaultTuple(
                 summaryClass: $summaryClass,
                 dimensions: $newRow,
-                condition: $row->getCondition(),
+                condition: $row->getTuple()->getCondition(),
             );
 
             $measure = $row->getMeasures()->getByKey($measure)

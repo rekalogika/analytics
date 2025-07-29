@@ -76,11 +76,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function createAutoChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->first();
+        $row = $result->getTable()->first();
 
-        if ($tuple === null) {
+        if ($row === null) {
             throw new UnsupportedData('Result is empty');
         }
+
+        $tuple = $row->getTuple();
 
         if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
@@ -138,11 +140,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function createLineChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->first();
+        $row = $result->getTable()->first();
 
-        if ($tuple === null) {
+        if ($row === null) {
             throw new UnsupportedData('Result is empty');
         }
+
+        $tuple = $row->getTuple();
 
         if (\count($tuple) === 1) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
@@ -209,11 +213,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate data
 
         foreach ($result->getTable() as $row) {
-            if (\count($row) !== 1) {
+            $tuple = $row->getTuple();
+
+            if (\count($tuple) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $row->getByIndex(0);
+            $dimension = $tuple->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -342,7 +348,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $secondDimensions = [];
 
         foreach ($result->getTable() as $row) {
-            $secondDimension = $row->getByIndex(1);
+            $tuple = $row->getTuple();
+            $secondDimension = $tuple->getByIndex(1);
 
             if ($secondDimension === null) {
                 throw new UnsupportedData('Expected a second dimension');
@@ -540,11 +547,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate data
 
         foreach ($result->getTable() as $row) {
-            if (\count($row) !== 1) {
+            $tuple = $row->getTuple();
+
+            if (\count($tuple) !== 1) {
                 throw new UnsupportedData('Expected only one member');
             }
 
-            $dimension = $row->getByIndex(0);
+            $dimension = $tuple->getByIndex(0);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');

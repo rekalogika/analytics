@@ -103,7 +103,7 @@ final readonly class ResultDebugger
     public static function debugRow(Row $row): array
     {
         return [
-            'tuple' => self::debugTuple($row),
+            'tuple' => self::debugTuple($row->getTuple()),
             'measures' => self::debugMeasures($row->getMeasures()),
         ];
     }
@@ -128,7 +128,7 @@ final readonly class ResultDebugger
     public static function debugNormalRow(NormalRow $row): array
     {
         return [
-            'tuple' => self::debugTuple($row),
+            'tuple' => self::debugTuple($row->getTuple()),
             'measure' => self::debugMeasure($row->getMeasure()),
         ];
     }

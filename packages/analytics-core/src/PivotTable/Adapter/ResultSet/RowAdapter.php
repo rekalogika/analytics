@@ -27,7 +27,7 @@ final readonly class RowAdapter implements ResultRow
     #[\Override]
     public function getTuple(): Tuple
     {
-        return new TupleAdapter($this->row);
+        return new TupleAdapter($this->row->getTuple());
     }
 
     #[\Override]
