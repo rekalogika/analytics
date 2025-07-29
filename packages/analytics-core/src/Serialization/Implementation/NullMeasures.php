@@ -23,7 +23,7 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 final readonly class NullMeasures implements Measures, \IteratorAggregate
 {
     /**
-     * @var array<string,Measure>
+     * @var array<string,NullMeasure>
      */
     private array $measures;
 
@@ -46,13 +46,13 @@ final readonly class NullMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?Measure
+    public function getByKey(mixed $key): ?NullMeasure
     {
-        return $this->measures[$name] ?? null;
+        return $this->measures[$key] ?? null;
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?Measure
+    public function getByIndex(int $index): ?NullMeasure
     {
         $keys = array_keys($this->measures);
 
@@ -60,13 +60,41 @@ final readonly class NullMeasures implements Measures, \IteratorAggregate
             return null;
         }
 
-        return $this->measures[$keys[$index]];
+        $name = $keys[$index];
+
+        return $this->measures[$name] ?? null;
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function hasKey(mixed $key): bool
     {
-        return isset($this->measures[$name]);
+        return isset($this->measures[$key]);
+    }
+
+    #[\Override]
+    public function first(): ?NullMeasure
+    {
+        $keys = array_keys($this->measures);
+        $key = $keys[0] ?? null;
+
+        if ($key === null) {
+            return null;
+        }
+
+        return $this->measures[$key];
+    }
+
+    #[\Override]
+    public function last(): ?NullMeasure
+    {
+        $keys = array_keys($this->measures);
+        $key = end($keys);
+
+        if ($key === false) {
+            return null;
+        }
+
+        return $this->measures[$key] ?? null;
     }
 
     #[\Override]

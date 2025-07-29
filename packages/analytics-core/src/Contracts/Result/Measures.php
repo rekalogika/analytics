@@ -13,18 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+
 /**
  * Collection of measures, in no particular order.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<string,Measure>
+ * @extends OrderedMapCollection<string,Measure>
  */
-interface Measures extends \Traversable, \Countable
-{
-    public function getByName(string $name): ?Measure;
-
-    public function getByIndex(int $index): ?Measure;
-
-    public function has(string $name): bool;
-}
+interface Measures extends OrderedMapCollection {}

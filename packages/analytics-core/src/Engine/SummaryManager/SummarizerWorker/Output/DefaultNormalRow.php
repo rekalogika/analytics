@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
@@ -30,6 +29,7 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
         private DefaultMeasure $measure,
         private ?GroupingField $groupings,
     ) {}
+
 
     #[\Override]
     public function getSummaryClass(): string
@@ -55,7 +55,7 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
     public static function compare(self $row1, self $row2, array $measures): int
     {
         foreach ($row1 as $name => $value1) {
-            $value2 = $row2->getByName($name);
+            $value2 = $row2->getByKey($name);
 
             if ($value2 === null) {
                 return 1;
@@ -94,21 +94,33 @@ final readonly class DefaultNormalRow implements NormalRow, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?Dimension
+    public function getByKey(mixed $key): mixed
     {
-        return $this->tuple->getByName($name);
+        return $this->tuple->getByKey($key);
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?Dimension
+    public function getByIndex(int $index): ?DefaultDimension
     {
         return $this->tuple->getByIndex($index);
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function hasKey(mixed $key): bool
     {
-        return $this->tuple->has($name);
+        return $this->tuple->hasKey($key);
+    }
+
+    #[\Override]
+    public function first(): mixed
+    {
+        return $this->tuple->first();
+    }
+
+    #[\Override]
+    public function last(): mixed
+    {
+        return $this->tuple->last();
     }
 
     #[\Override]

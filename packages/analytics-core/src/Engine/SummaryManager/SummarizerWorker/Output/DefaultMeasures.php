@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 
 /**
@@ -42,13 +41,13 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?DefaultMeasure
+    public function getByKey(mixed $key): ?DefaultMeasure
     {
-        return $this->measures[$name] ?? null;
+        return $this->measures[$key] ?? null;
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?Measure
+    public function getByIndex(int $index): ?DefaultMeasure
     {
         $keys = array_keys($this->measures);
 
@@ -62,9 +61,23 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function hasKey(mixed $key): bool
     {
-        return isset($this->measures[$name]);
+        return isset($this->measures[$key]);
+    }
+
+    #[\Override]
+    public function first(): ?DefaultMeasure
+    {
+        $keys = array_keys($this->measures);
+        return $keys ? $this->measures[$keys[0]] : null;
+    }
+
+    #[\Override]
+    public function last(): ?DefaultMeasure
+    {
+        $keys = array_keys($this->measures);
+        return $keys ? $this->measures[end($keys)] : null;
     }
 
     #[\Override]
