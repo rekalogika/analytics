@@ -196,8 +196,9 @@ final class DefaultResult implements Result
 
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             query: $this->query,
-            metadata: $this->metadata,
             input: $this->getUnbalancedTable(),
+            rowCollection: $this->rowCollection,
+            metadata: $this->metadata,
         );
     }
 
@@ -208,6 +209,7 @@ final class DefaultResult implements Result
             label: $this->label,
             normalTable: $this->getUnbalancedNormalTable(),
             treeNodeFactory: $this->treeNodeFactory,
+            rowCollection: $this->rowCollection,
         );
     }
 

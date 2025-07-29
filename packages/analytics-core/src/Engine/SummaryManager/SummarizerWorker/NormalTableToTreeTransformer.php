@@ -52,6 +52,7 @@ final class NormalTableToTreeTransformer
         TranslatableInterface $label,
         DefaultNormalTable $normalTable,
         DefaultTreeNodeFactory $treeNodeFactory,
+        RowCollection $rowCollection,
     ): DefaultTree {
         $summaryClass = $normalTable->getSummaryClass();
         // check if empty
@@ -66,7 +67,7 @@ final class NormalTableToTreeTransformer
                 children: [],
                 itemCollection: $normalTable->getItemCollection(),
                 treeNodeFactory: $treeNodeFactory,
-                rowCollection: $normalTable->getRowCollection(),
+                rowCollection: $rowCollection,
                 condition: $normalTable->getCondition(),
             );
         }
@@ -83,7 +84,7 @@ final class NormalTableToTreeTransformer
             names: $names,
             itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
-            rowCollection: $normalTable->getRowCollection(),
+            rowCollection: $rowCollection,
         );
 
         return new DefaultTree(
@@ -93,7 +94,7 @@ final class NormalTableToTreeTransformer
             children: $transformer->doTransform($normalTable),
             itemCollection: $normalTable->getItemCollection(),
             treeNodeFactory: $treeNodeFactory,
-            rowCollection: $normalTable->getRowCollection(),
+            rowCollection: $rowCollection,
             condition: $normalTable->first()?->getCondition(),
         );
     }

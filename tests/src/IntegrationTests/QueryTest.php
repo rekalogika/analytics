@@ -624,7 +624,7 @@ final class QueryTest extends KernelTestCase
 
         $this->assertInstanceOf(DefaultTable::class, $result);
 
-        $rows = iterator_to_array($result);
+        $rows = iterator_to_array($result, false);
         $first = array_shift($rows);
 
         $this->assertInstanceOf(DefaultRow::class, $first);

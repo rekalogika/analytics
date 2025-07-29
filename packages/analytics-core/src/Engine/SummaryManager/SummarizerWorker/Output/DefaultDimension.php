@@ -18,14 +18,16 @@ use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class DefaultDimension implements Dimension
+final class DefaultDimension implements Dimension
 {
+    private ?string $signature = null;
+
     public function __construct(
-        private TranslatableInterface $label,
-        private string $name,
-        private mixed $member,
-        private mixed $rawMember,
-        private mixed $displayMember,
+        private readonly TranslatableInterface $label,
+        private readonly string $name,
+        private readonly mixed $member,
+        private readonly mixed $rawMember,
+        private readonly mixed $displayMember,
     ) {}
 
     public static function createMeasureDimension(
@@ -88,10 +90,20 @@ final readonly class DefaultDimension implements Dimension
 
     public function getSignature(): string
     {
-        if (\is_object($this->rawMember)) {
-            return hash('xxh128', $this->name . ':' . spl_object_id($this->rawMember));
+        if ($this->signature !== null) {
+            return $this->signature;
         }
 
-        return hash('xxh128', $this->name . ':' . serialize($this->rawMember));
+        if (\is_object($this->rawMember)) {
+            return $this->signature = hash(
+                'xxh128',
+                $this->name . ':' . spl_object_id($this->rawMember),
+            );
+        }
+
+        return $this->signature = hash(
+            'xxh128',
+            $this->name . ':' . serialize($this->rawMember),
+        );
     }
 }

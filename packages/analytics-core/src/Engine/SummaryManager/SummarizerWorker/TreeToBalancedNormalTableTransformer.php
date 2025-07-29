@@ -42,7 +42,6 @@ final class TreeToBalancedNormalTableTransformer
             summaryClass: $tree->getSummaryClass(),
             rows: $rows,
             itemCollection: $tree->getItemCollection(),
-            rowCollection: $tree->getRowCollection(),
             condition: $tree->getTuple()->getCondition(),
         );
     }
