@@ -33,16 +33,16 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
+use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
-use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 final class SummaryQuery extends AbstractQuery
 {
     /**
      * @var list<string>
      */
-    private array $rollUpFields = [];
+    private array $cubeFields = [];
 
     /**
      * This field is used for subtotal rollups, and is not related to the
@@ -121,15 +121,15 @@ final class SummaryQuery extends AbstractQuery
 
         // create group by
 
-        $rollUp = new RollUp();
+        $cube = new Cube();
 
-        foreach ($this->rollUpFields as $field) {
+        foreach ($this->cubeFields as $field) {
             $this->getSimpleQueryBuilder()->addGroupBy($field);
-            $rollUp->add(new Field($field));
+            $cube->add(new Field($field));
         }
 
         $groupBy = new GroupBy();
-        $groupBy->add($rollUp);
+        $groupBy->add($cube);
 
         // create query & apply group by
 
@@ -451,7 +451,7 @@ final class SummaryQuery extends AbstractQuery
 
             // group by and grouping fields
 
-            $this->rollUpFields[] = $alias;
+            $this->cubeFields[] = $alias;
             $this->groupingFields[] = $fieldExpression;
 
             return;
@@ -477,7 +477,7 @@ final class SummaryQuery extends AbstractQuery
             )
         ;
 
-        $this->rollUpFields[] = $alias;
+        $this->cubeFields[] = $alias;
 
         $this->groupingFields[] =
             $this->resolve($dimensionMetadata->getName());

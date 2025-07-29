@@ -34,45 +34,49 @@ final readonly class GroupingField
         mixed $groupingField,
         array $dimensions,
     ) {
-        if (!\is_string($groupingField)) {
+        if (!\is_string($groupingField) && !\is_int($groupingField)) {
             throw new InvalidArgumentException('Grouping field must be a string or an integer.');
         }
+
+        $groupingField = (string) $groupingField;
+        $isGrouping = array_map(fn($char) => $char === '1', str_split($groupingField));
 
         $dimensions = array_filter(
             $dimensions,
             static fn(string $dimension) => $dimension !== '@values',
         );
 
-        if (\strlen($groupingField) !== \count($dimensions)) {
+        $i = 0;
+
+        $groupingFields = [];
+        $nonGroupingFields = [];
+
+        foreach ($dimensions as $dimension) {
+            $dimensionIsGrouping = $isGrouping[$i]
+                ?? throw new InvalidArgumentException(\sprintf(
+                    'Grouping field "%s" has less dimensions than the group by fields: %s',
+                    $groupingField,
+                    implode(', ', $dimensions),
+                ));
+
+            if ($dimensionIsGrouping) {
+                $groupingFields[] = $dimension;
+            } else {
+                $nonGroupingFields[] = $dimension;
+            }
+
+            ++$i;
+        }
+
+        $this->groupingFields = $groupingFields;
+        $this->nonGroupingFields = $nonGroupingFields;
+
+        if ($i !== \count($isGrouping)) {
             throw new InvalidArgumentException(\sprintf(
-                'Grouping field "%s" must have the same number of dimensions as the group by fields: %s',
+                'Grouping field "%s" has different dimension count than the group by fields: %s',
                 $groupingField,
                 implode(', ', $dimensions),
             ));
-        }
-
-        $groupingsCount = substr_count($groupingField, '1');
-        $nonGroupingCount = substr_count($groupingField, '0');
-
-        if ($groupingsCount + $nonGroupingCount !== \strlen($groupingField)) {
-            throw new InvalidArgumentException('Grouping field must only contain 0 and 1 characters.');
-        }
-
-        // nonGroupingFields are the $nonGroupingCount fields from the start of $dimensions
-        $this->nonGroupingFields = \array_slice(
-            $dimensions,
-            0,
-            $nonGroupingCount,
-        );
-
-        // groupingFields are the $groupingsCount fields from the end of $dimensions
-        if ($groupingsCount === 0) {
-            $this->groupingFields = [];
-        } else {
-            $this->groupingFields = \array_slice(
-                $dimensions,
-                -$groupingsCount,
-            );
         }
     }
 
