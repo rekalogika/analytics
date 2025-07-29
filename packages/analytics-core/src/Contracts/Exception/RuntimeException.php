@@ -11,8 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Common\Exception;
+namespace Rekalogika\Analytics\Contracts\Exception;
 
-use Doctrine\ORM\Query\QueryException as DoctrineQueryException;
-
-class QueryException extends DoctrineQueryException implements AnalyticsException {}
+class RuntimeException extends \RuntimeException implements AnalyticsException {}

@@ -22,31 +22,17 @@ final readonly class Selectors
 
     public static function selectAnalyticsCore(): SelectorInterface
     {
-        return Selector::AllOf(
-            Selector::inNamespace('Rekalogika\Analytics\Core'),
-            Selector::NOT(
-                self::selectAnalyticsCommon(),
-            ),
-        );
-    }
-
-    public static function selectAnalyticsCommon(): SelectorInterface
-    {
-        return Selector::inNamespace('Rekalogika\Analytics\Common');
+        return Selector::inNamespace('Rekalogika\Analytics\Core');
     }
 
     public static function selectAnalyticsContracts(): SelectorInterface
     {
-        return Selector::AnyOf(
-            Selector::inNamespace('Rekalogika\Analytics\Contracts'),
-        );
+        return Selector::inNamespace('Rekalogika\Analytics\Contracts');
     }
 
     public static function selectAnalyticsMetadata(): SelectorInterface
     {
-        return Selector::AnyOf(
-            Selector::inNamespace('Rekalogika\Analytics\Metadata'),
-        );
+        return Selector::inNamespace('Rekalogika\Analytics\Metadata');
     }
 
     public static function selectAnalyticsBundle(): SelectorInterface

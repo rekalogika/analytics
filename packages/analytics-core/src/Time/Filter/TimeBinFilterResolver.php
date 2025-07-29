@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Filter;
 
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfMonth;

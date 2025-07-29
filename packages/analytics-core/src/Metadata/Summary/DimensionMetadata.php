@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Doctrine\Common\Collections\Order;
-use Rekalogika\Analytics\Common\Exception\LogicException;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\DimensionGroup\DimensionGroupAware;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;

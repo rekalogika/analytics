@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\Dimension\System\Trait;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embedded;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Year;

@@ -11,10 +11,10 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Common\Exception;
+namespace Rekalogika\Analytics\Contracts\Exception;
 
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Common\Util\NullTranslator;
+use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

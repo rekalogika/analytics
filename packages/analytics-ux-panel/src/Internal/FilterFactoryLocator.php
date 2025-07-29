@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\UX\PanelBundle\Internal;
 
 use Psr\Container\ContainerInterface;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;

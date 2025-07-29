@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 

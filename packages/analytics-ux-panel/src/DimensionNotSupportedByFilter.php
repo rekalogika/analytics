@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle;
 
-use Rekalogika\Analytics\Common\Exception\RuntimeException;
+use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
 
 final class DimensionNotSupportedByFilter extends RuntimeException
 {

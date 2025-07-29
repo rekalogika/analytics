@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter\Exception;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
 abstract class FormatterFailureException extends InvalidArgumentException {}

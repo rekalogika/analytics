@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\Dimension\Set;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\FieldSetStrategy;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;

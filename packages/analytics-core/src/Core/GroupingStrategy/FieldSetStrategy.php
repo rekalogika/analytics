@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Core\GroupingStrategy;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;

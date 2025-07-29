@@ -17,8 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 
 /**
  * Compatibility layer for Doctrine ClassMetadata. Abstracts the differences

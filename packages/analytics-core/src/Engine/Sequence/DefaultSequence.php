@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Sequence;
 
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Sequence;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 

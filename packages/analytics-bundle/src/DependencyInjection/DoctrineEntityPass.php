@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;

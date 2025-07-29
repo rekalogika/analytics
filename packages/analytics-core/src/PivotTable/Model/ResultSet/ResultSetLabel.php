@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
 
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\PivotTable\Model\Label;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

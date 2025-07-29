@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\SimpleQueryBuilder\Path;
 
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 
 final readonly class PathResolver
 {

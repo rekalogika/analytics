@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;
 use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
 use Rekalogika\Analytics\Metadata\Attribute\Summary;

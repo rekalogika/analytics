@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Exception;
 
-use Rekalogika\Analytics\Common\Exception\RuntimeException;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
-use Rekalogika\Analytics\Common\Util\NullTranslator;
+use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
+use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

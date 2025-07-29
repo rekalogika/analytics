@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Util;
 
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 
 final readonly class ProxyUtil
 {

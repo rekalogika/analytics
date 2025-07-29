@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\Handler;
 
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;

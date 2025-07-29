@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Core\Entity;
 
-use Rekalogika\Analytics\Common\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Context\DimensionGroupContext;
 use Rekalogika\Analytics\Contracts\DimensionGroup\ContextAwareDimensionGroup;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 
 /**
  * @phpstan-require-implements ContextAwareDimensionGroup

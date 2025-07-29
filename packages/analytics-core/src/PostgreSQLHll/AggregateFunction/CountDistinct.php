@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PostgreSQLHll\AggregateFunction;
 
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\UserValueTransformer;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Formatter\Implementation;
 
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Symfony\Contracts\Translation\TranslatableInterface;

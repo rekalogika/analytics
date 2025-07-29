@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Common\Exception\HierarchicalOrderingRequired;
+use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;

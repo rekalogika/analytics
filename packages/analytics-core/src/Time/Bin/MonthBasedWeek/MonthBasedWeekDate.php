@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 
 use Doctrine\DBAL\Types\Types;
-use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Html;
 
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;

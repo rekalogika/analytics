@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Common\Exception\RuntimeException;
+use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 

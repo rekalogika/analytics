@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;

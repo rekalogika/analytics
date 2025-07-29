@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Serialization;
 
 use Psr\Container\ContainerInterface;
 use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsTrait;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Serialization\UnsupportedValue;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 

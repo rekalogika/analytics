@@ -30,7 +30,7 @@
             <errorLevel type="suppress">
                 <directory name="tests/src/App/Entity" />
                 <directory name="packages/analytics-core/src/Core/Entity" />
-                <directory name="packages/analytics-core/src/Common/Exception" />
+                <directory name="packages/analytics-core/src/Contracts/Exception" />
                 <directory name="packages/analytics-core/src/Engine/Entity" />
                 <directory name="packages/analytics-core/src/Time/Dimension" />
             </errorLevel>

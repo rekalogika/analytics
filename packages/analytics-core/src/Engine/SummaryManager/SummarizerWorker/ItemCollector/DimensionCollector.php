@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
 
 use Doctrine\Common\Collections\Order;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
