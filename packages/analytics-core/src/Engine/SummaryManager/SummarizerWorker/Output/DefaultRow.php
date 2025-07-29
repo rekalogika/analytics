@@ -51,7 +51,7 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
         return $this->groupings;
     }
 
-    public function isSubtotal(): bool
+    public function isGrouping(): bool
     {
         return $this->groupings?->isSubtotal() ?? false;
     }

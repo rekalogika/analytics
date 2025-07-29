@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\ListCollection;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
  * A query result in normalized tabular format. Each row in a normal table
@@ -21,9 +21,9 @@ use Rekalogika\Analytics\Contracts\Collection\ListCollection;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends ListCollection<NormalRow>
+ * @extends OrderedMapCollection<Tuple,NormalRow>
  */
-interface NormalTable extends ListCollection
+interface NormalTable extends OrderedMapCollection
 {
     /**
      * @return class-string

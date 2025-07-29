@@ -110,7 +110,7 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         // execute
         $result = $query->getResult();
         $table = $result->getTable();
-        $rows = iterator_to_array($table);
+        $rows = iterator_to_array($table, false);
 
         return $rows[0] ?? new NullRow(
             summaryMetadata: $metadata,

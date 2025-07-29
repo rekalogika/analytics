@@ -19,21 +19,23 @@ use Rekalogika\Analytics\Contracts\Result\Tuple;
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
  */
-final readonly class DefaultTuple implements Tuple, \IteratorAggregate
+final class DefaultTuple implements Tuple, \IteratorAggregate
 {
+    private ?string $signature = null;
+
     /**
      * @var array<string,DefaultDimension>
      */
-    private array $dimensions;
+    private readonly array $dimensions;
 
     /**
      * @param class-string $summaryClass
      * @param iterable<DefaultDimension> $dimensions
      */
     public function __construct(
-        private string $summaryClass,
+        private readonly string $summaryClass,
         iterable $dimensions,
-        private ?Expression $condition,
+        private readonly ?Expression $condition,
     ) {
         $dimensionsArray = [];
 
@@ -158,19 +160,16 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
 
     public function getSignature(): string
     {
+        if ($this->signature !== null) {
+            return $this->signature;
+        }
+
         $signatures = array_map(
             static fn(DefaultDimension $dimension): string => $dimension->getSignature(),
             $this->dimensions,
         );
 
-        return hash('xxh128', serialize($signatures));
-    }
-
-    public function getNamesSignature(): string
-    {
-        $names = array_keys($this->dimensions);
-
-        return hash('xxh128', serialize($names));
+        return $this->signature = hash('xxh128', serialize($signatures));
     }
 
     public function getWithoutValues(): self

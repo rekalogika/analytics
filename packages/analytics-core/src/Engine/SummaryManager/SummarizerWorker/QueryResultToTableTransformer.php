@@ -88,7 +88,6 @@ final readonly class QueryResultToTableTransformer
         return new DefaultTable(
             summaryClass: $metadata->getSummaryClass(),
             rows: $rows,
-            rowCollection: $rowCollection,
             condition: $query->getWhere(),
         );
     }

@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
@@ -49,6 +50,7 @@ final class TableToNormalTableTransformer
     private function __construct(
         DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
+        private readonly RowCollection $rowCollection,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $dimensions = $query->getGroupBy();
@@ -66,11 +68,13 @@ final class TableToNormalTableTransformer
         DefaultQuery $query,
         DefaultTable $input,
         SummaryMetadata $metadata,
+        RowCollection $rowCollection,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
             query: $query,
             metadata: $metadata,
+            rowCollection: $rowCollection,
             measureLabel: $valuesLabel,
         );
 
@@ -79,7 +83,7 @@ final class TableToNormalTableTransformer
 
     private function doTransform(DefaultTable $input): DefaultNormalTable
     {
-        $rowCollection = $input->getRowCollection();
+        $rowCollection = $this->rowCollection;
 
         $rows = [];
         $subtotalRows = [];
@@ -87,7 +91,7 @@ final class TableToNormalTableTransformer
         foreach ($rowCollection->getRows() as $row) {
 
             foreach ($this->unpivotRow($row) as $normalRow) {
-                if ($row->isSubtotal()) {
+                if ($row->isGrouping()) {
                     $subtotalRows[] = $normalRow;
                 } else {
                     $rows[] = $normalRow;
@@ -108,7 +112,6 @@ final class TableToNormalTableTransformer
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
             itemCollection: $itemCollection,
-            rowCollection: $rowCollection,
             condition: $input->getCondition(),
         );
     }
