@@ -90,7 +90,7 @@ final class DimensionCollector
     {
         $earlierDimensions = [];
 
-        foreach ($normalRow as $dimension) {
+        foreach ($normalRow->getTuple() as $dimension) {
             $name = $dimension->getName();
 
             $this->getCollectorForName($name)->addDimension($dimension);

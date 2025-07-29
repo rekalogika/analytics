@@ -158,7 +158,7 @@ final class AppController extends AbstractController
 
         $tupleDto = $tupleDtoSerializer->deserialize($data);
         $row = $tupleSerializer->deserialize($class, $tupleDto);
-        $queryComponents = $summaryManager->getTupleQueryComponents($row);
+        $queryComponents = $summaryManager->getTupleQueryComponents($row->getTuple());
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
         $sourceSql = $sqlFormatter->compress($sourceSql);

@@ -50,9 +50,10 @@ final class TupleSerializerTest extends KernelTestCase
         $tupleSerializer = self::getContainer()->get(TupleSerializer::class);
         $this->assertInstanceOf(TupleSerializer::class, $tupleSerializer);
 
-        $class = $row->getSummaryClass();
+        $tuple = $row->getTuple();
+        $class = $tuple->getSummaryClass();
 
-        $serializedTuple = $tupleSerializer->serialize($row);
+        $serializedTuple = $tupleSerializer->serialize($tuple);
 
         // deserialize the tuple
 

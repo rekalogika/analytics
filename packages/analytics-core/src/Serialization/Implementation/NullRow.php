@@ -14,27 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
-use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
-/**
- * @implements \IteratorAggregate<string,NullDimension>
- */
-final readonly class NullRow implements Row, \IteratorAggregate
+final readonly class NullRow implements Row
 {
-    /**
-     * @var class-string
-     */
-    private string $summaryClass;
     private NullMeasures $measures;
 
-    /**
-     * @var array<string,NullDimension>
-     */
-    private array $dimensions;
+    private NullTuple $tuple;
 
     /**
      * @param array<string,mixed> $dimensionMembers
@@ -44,112 +31,23 @@ final readonly class NullRow implements Row, \IteratorAggregate
         array $dimensionMembers,
         private ?Expression $condition,
     ) {
-        $this->summaryClass = $summaryMetadata->getSummaryClass();
         $this->measures = new NullMeasures($summaryMetadata);
-
-        $dimensions = [];
-
-        /** @psalm-suppress MixedAssignment */
-        foreach ($dimensionMembers as $name => $member) {
-            $dimensions[$name] = new NullDimension(
-                name: $name,
-                member: $member,
-                summaryMetadata: $summaryMetadata,
-            );
-        }
-
-        $this->dimensions = $dimensions;
+        $this->tuple = new NullTuple(
+            summaryMetadata: $summaryMetadata,
+            dimensionMembers: $dimensionMembers,
+            condition: $this->condition,
+        );
     }
 
     #[\Override]
-    public function getIterator(): \Traversable
-    {
-        return new \ArrayIterator($this->dimensions);
-    }
-
-    #[\Override]
-    public function getMeasures(): Measures
+    public function getMeasures(): NullMeasures
     {
         return $this->measures;
     }
 
     #[\Override]
-    public function getSummaryClass(): string
+    public function getTuple(): NullTuple
     {
-        return $this->summaryClass;
-    }
-
-    #[\Override]
-    public function getByKey(mixed $key): ?NullDimension
-    {
-        return $this->dimensions[$key] ?? null;
-    }
-
-    #[\Override]
-    public function getByIndex(int $index): mixed
-    {
-        $keys = array_keys($this->dimensions);
-
-        if (!isset($keys[$index])) {
-            return null;
-        }
-
-        $name = $keys[$index];
-
-        return $this->dimensions[$name] ?? null;
-    }
-
-    #[\Override]
-    public function hasKey(mixed $key): bool
-    {
-        return isset($this->dimensions[$key]);
-    }
-
-    #[\Override]
-    public function first(): ?NullDimension
-    {
-        $keys = array_keys($this->dimensions);
-        return $keys ? $this->dimensions[$keys[0]] : null;
-    }
-
-    #[\Override]
-    public function last(): ?NullDimension
-    {
-        $keys = array_keys($this->dimensions);
-        return $keys ? $this->dimensions[end($keys)] : null;
-    }
-
-    #[\Override]
-    public function getMembers(): array
-    {
-        $members = [];
-
-        foreach ($this->dimensions as $dimension) {
-            /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getName()] = $dimension->getMember();
-        }
-
-        return $members;
-    }
-
-    /**
-     * @todo implement
-     */
-    #[\Override]
-    public function isSame(Tuple $other): bool
-    {
-        throw new BadMethodCallException('Not implemented yet');
-    }
-
-    #[\Override]
-    public function getCondition(): ?Expression
-    {
-        return $this->condition;
-    }
-
-    #[\Override]
-    public function count(): int
-    {
-        return \count($this->dimensions);
+        return $this->tuple;
     }
 }

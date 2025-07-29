@@ -13,14 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 
-/**
- * @implements \IteratorAggregate<string,DefaultDimension>
- */
-final readonly class DefaultRow implements Row, \IteratorAggregate
+final readonly class DefaultRow implements Row
 {
     public function __construct(
         private DefaultTuple $tuple,
@@ -29,21 +24,15 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     ) {}
 
     #[\Override]
-    public function getIterator(): \Traversable
-    {
-        return $this->tuple->getIterator();
-    }
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->tuple->getSummaryClass();
-    }
-
-    #[\Override]
     public function getMeasures(): DefaultMeasures
     {
         return $this->measures;
+    }
+
+    #[\Override]
+    public function getTuple(): DefaultTuple
+    {
+        return $this->tuple;
     }
 
     public function getGroupings(): ?GroupingField
@@ -56,67 +45,8 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
         return $this->groupings?->isSubtotal() ?? false;
     }
 
-    #[\Override]
-    public function getByKey(mixed $key): mixed
-    {
-        return $this->tuple->getByKey($key);
-    }
-
-    #[\Override]
-    public function getByIndex(int $index): ?DefaultDimension
-    {
-        return $this->tuple->getByIndex($index);
-    }
-
-    #[\Override]
-    public function hasKey(mixed $key): bool
-    {
-        return $this->tuple->hasKey($key);
-    }
-
-    #[\Override]
-    public function first(): mixed
-    {
-        return $this->tuple->first();
-    }
-
-    #[\Override]
-    public function last(): mixed
-    {
-        return $this->tuple->last();
-    }
-
-    #[\Override]
-    public function getMembers(): array
-    {
-        return $this->tuple->getMembers();
-    }
-
-    #[\Override]
-    public function isSame(Tuple $other): bool
-    {
-        return $this->tuple->isSame($other);
-    }
-
-    #[\Override]
-    public function count(): int
-    {
-        return $this->tuple->count();
-    }
-
-    #[\Override]
-    public function getCondition(): ?Expression
-    {
-        return $this->tuple->getCondition();
-    }
-
     public function getSignature(): string
     {
         return $this->tuple->getSignature();
-    }
-
-    public function getTuple(): DefaultTuple
-    {
-        return $this->tuple;
     }
 }
