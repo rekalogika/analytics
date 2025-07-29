@@ -155,6 +155,8 @@ final class SourceQueryTest extends KernelTestCase
 
         /** @psalm-suppress MixedAssignment */
         $precounted = $row->getMeasures()->getByKey('count')?->getValue() ?? 0;
+        $this->assertIsInt($precounted);
+
         $sourceResult = $summaryManager->getSource($row->getTuple());
 
         $count = 0;
