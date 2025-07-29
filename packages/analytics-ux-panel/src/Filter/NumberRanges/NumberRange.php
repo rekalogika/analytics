@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 
 /**
  * @template T of object

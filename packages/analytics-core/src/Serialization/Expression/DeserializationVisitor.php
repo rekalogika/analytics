@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Serialization\Expression;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 
 /**
  * Visitor for converting an expression into a form that can be serialized.

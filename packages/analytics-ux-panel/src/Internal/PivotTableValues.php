@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Internal;
 
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class PivotTableValues

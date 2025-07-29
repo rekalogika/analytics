@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;
 use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;

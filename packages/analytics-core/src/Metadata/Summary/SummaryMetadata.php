@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
-use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\Analytics\Metadata\Implementation\RootGroupingStrategy;

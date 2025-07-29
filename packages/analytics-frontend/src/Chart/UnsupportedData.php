@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Chart;
 
-use Rekalogika\Analytics\Common\Exception\RuntimeException;
+use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
 
 final class UnsupportedData extends RuntimeException {}

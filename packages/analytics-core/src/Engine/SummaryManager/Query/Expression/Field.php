@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query\Expression;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
 final readonly class Field implements Expression
 {

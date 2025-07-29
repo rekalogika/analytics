@@ -20,7 +20,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
-use Rekalogika\Analytics\Common\Exception\QueryException;
+use Rekalogika\Analytics\Contracts\Exception\QueryException;
 
 /**
  * REKALOGIKA_TIME_BIN_MBW_WEEK

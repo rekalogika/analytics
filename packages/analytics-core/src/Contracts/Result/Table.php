@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Common\Exception\EmptyResultException;
+use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
 
 /**
  * A query result in tabular format

@@ -13,14 +13,60 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\ArchitectureTests;
 
-use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\ORM\Query\QueryException;
 use PHPat\Selector\Selector;
 use PHPat\Test\Builder\Rule;
 use PHPat\Test\PHPat;
 
 final class ArchitectureTest
 {
+    public function testPackageAnalyticsContracts(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selectors::selectAnalyticsContracts())
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsContracts(),
+
+                // internal packages
+                Selector::inNamespace('Rekalogika\Analytics\SimpleQueryBuilder'),
+                Selector::inNamespace('Rekalogika\Analytics\Metadata'),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // rekalogika
+                Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
+                Selector::inNamespace('Rekalogika\Contracts\Rekapager'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\Common\Collections'),
+
+                // php misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\Override::class),
+
+                // php exception
+                Selector::classname(\Throwable::class),
+                Selector::classname(\RuntimeException::class),
+                Selector::classname(\LogicException::class),
+                Selector::classname(\InvalidArgumentException::class),
+                Selector::classname(\BadMethodCallException::class),
+                Selector::classname(\UnexpectedValueException::class),
+                Selector::classname(\OverflowException::class),
+                Selector::classname(\UnderflowException::class),
+                Selector::classname(\DomainException::class),
+
+                // php reflection
+                Selector::classname(\ReflectionClass::class),
+
+                // php array
+                Selector::classname(\Traversable::class),
+                Selector::classname(\Countable::class),
+            );
+    }
+
     public function testPackageAnalyticsCore(): Rule
     {
         return PHPat::rule()
@@ -31,7 +77,6 @@ final class ArchitectureTest
 
                 // internal packages
                 Selectors::selectAnalyticsMetadata(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
 
                 // rekalogika
@@ -63,38 +108,6 @@ final class ArchitectureTest
             );
     }
 
-    public function testPackageAnalyticsCommon(): Rule
-    {
-        return PHPat::rule()
-            ->classes(Selectors::selectAnalyticsCommon())
-            ->canOnlyDependOn()
-            ->classes(
-                Selectors::selectAnalyticsCommon(),
-
-                // psr/symfony contracts
-                Selector::inNamespace('Symfony\Contracts\Translation'),
-
-                // doctrine
-                Selector::classname(QueryException::class),
-                Selector::classname(ConversionException::class),
-
-                // php misc
-                Selector::classname(\Stringable::class),
-                Selector::classname(\Override::class),
-
-                // php exception
-                Selector::classname(\Throwable::class),
-                Selector::classname(\RuntimeException::class),
-                Selector::classname(\LogicException::class),
-                Selector::classname(\InvalidArgumentException::class),
-                Selector::classname(\BadMethodCallException::class),
-                Selector::classname(\UnexpectedValueException::class),
-                Selector::classname(\OverflowException::class),
-                Selector::classname(\UnderflowException::class),
-                Selector::classname(\DomainException::class),
-            );
-    }
-
     public function testPackageAnalyticsEngine(): Rule
     {
         return PHPat::rule()
@@ -105,7 +118,6 @@ final class ArchitectureTest
 
                 // internal packages
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsMetadata(),
 
@@ -181,7 +193,6 @@ final class ArchitectureTest
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsEngine(),
                 Selectors::selectPivotTable(),
@@ -252,7 +263,6 @@ final class ArchitectureTest
                 // dependencies
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
                 Selectors::selectAnalyticsPivotTable(),
                 Selectors::selectPivotTable(),
@@ -301,7 +311,6 @@ final class ArchitectureTest
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsBundle(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsMetadata(),
 
@@ -350,7 +359,6 @@ final class ArchitectureTest
 
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCommon(),
 
                 // rekalogika
                 Selector::inNamespace('Rekalogika\DoctrineAdvancedGroupBy'),
@@ -409,7 +417,6 @@ final class ArchitectureTest
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCommon(),
                 Selectors::selectAnalyticsMetadata(),
 
                 // optional deps
@@ -460,7 +467,6 @@ final class ArchitectureTest
 
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCommon(),
 
                 // psr/symfony contracts
                 Selector::inNamespace('Symfony\Contracts\Translation'),
@@ -491,7 +497,6 @@ final class ArchitectureTest
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
                 Selectors::selectAnalyticsCore(),
-                Selectors::selectAnalyticsCommon(),
 
                 // symfony
                 Selector::inNamespace('Symfony\Component\Uid'),
@@ -520,7 +525,6 @@ final class ArchitectureTest
 
                 // internal packages
                 Selectors::selectAnalyticsContracts(),
-                Selectors::selectAnalyticsCommon(),
 
                 // rekalogika dependencies
                 Selectors::selectPivotTable(),

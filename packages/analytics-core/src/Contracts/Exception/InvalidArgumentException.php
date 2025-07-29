@@ -11,6 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Common\Exception;
+namespace Rekalogika\Analytics\Contracts\Exception;
 
-class UnexpectedValueException extends \UnexpectedValueException implements AnalyticsException {}
+class InvalidArgumentException extends \InvalidArgumentException implements AnalyticsException {}

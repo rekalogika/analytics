@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Common\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;

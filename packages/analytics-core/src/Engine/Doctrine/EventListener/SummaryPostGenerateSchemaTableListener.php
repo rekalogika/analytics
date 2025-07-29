@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\Doctrine\EventListener;
 
 use Doctrine\ORM\Tools\Event\GenerateSchemaTableEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
+use Rekalogika\Analytics\Contracts\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 

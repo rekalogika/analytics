@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Common\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Row;

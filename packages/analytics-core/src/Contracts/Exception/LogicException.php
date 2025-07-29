@@ -11,6 +11,6 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Common\Exception;
+namespace Rekalogika\Analytics\Contracts\Exception;
 
-class OverflowException extends \OverflowException implements AnalyticsException {}
+class LogicException extends \LogicException implements AnalyticsException {}

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html;
 
-use Rekalogika\Analytics\Common\Exception\HierarchicalOrderingRequired;
+use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;

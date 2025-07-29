@@ -15,10 +15,10 @@ namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
-use Rekalogika\Analytics\Common\Exception\SummaryNotFound;
-use Rekalogika\Analytics\Common\Model\LiteralString;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Contracts\Model\Partition as DoctrineSummaryPartition;
+use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;
 use Rekalogika\Analytics\Metadata\Attribute\Groupings;
 use Rekalogika\Analytics\Metadata\Attribute\Measure;

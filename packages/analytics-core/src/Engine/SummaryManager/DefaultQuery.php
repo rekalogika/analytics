@@ -18,7 +18,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultResult;

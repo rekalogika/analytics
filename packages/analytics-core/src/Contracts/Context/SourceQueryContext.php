@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Contracts\Context;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
-use Rekalogika\Analytics\Common\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;

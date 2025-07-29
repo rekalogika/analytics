@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Common\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;

@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Time\Dimension\System;
 
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Embedded;
-use Rekalogika\Analytics\Common\Model\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Core\Entity\BaseDimensionGroup;
 use Rekalogika\Analytics\Core\GroupingStrategy\RollUpStrategy;
 use Rekalogika\Analytics\Core\ValueResolver\Noop;
