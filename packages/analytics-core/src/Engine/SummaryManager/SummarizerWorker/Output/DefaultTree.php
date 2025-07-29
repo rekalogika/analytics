@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -43,7 +44,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         private readonly ?string $childrenKey,
         private readonly array $children,
         private readonly ItemCollection $itemCollection,
-        private readonly DefaultTreeNodeFactory $treeNodeFactory,
+        private readonly TreeNodeFactory $treeNodeFactory,
         private readonly RowCollection $rowCollection,
         ?Expression $condition,
     ) {

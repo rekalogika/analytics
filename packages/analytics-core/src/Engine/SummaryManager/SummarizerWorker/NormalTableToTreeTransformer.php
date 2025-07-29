@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTreeNodeFactory;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class NormalTableToTreeTransformer
@@ -44,14 +44,14 @@ final class NormalTableToTreeTransformer
         private readonly string $summaryClass,
         private readonly array $names,
         private readonly ItemCollection $itemCollection,
-        private readonly DefaultTreeNodeFactory $treeNodeFactory,
+        private readonly TreeNodeFactory $treeNodeFactory,
         private readonly RowCollection $rowCollection,
     ) {}
 
     public static function transform(
         TranslatableInterface $label,
         DefaultNormalTable $normalTable,
-        DefaultTreeNodeFactory $treeNodeFactory,
+        TreeNodeFactory $treeNodeFactory,
         RowCollection $rowCollection,
     ): DefaultTree {
         $summaryClass = $normalTable->getSummaryClass();

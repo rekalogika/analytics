@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
@@ -57,7 +58,7 @@ final class DefaultResult implements Result
 
     private ?bool $hasHierarchicalOrdering = null;
 
-    private readonly DefaultTreeNodeFactory $treeNodeFactory;
+    private readonly TreeNodeFactory $treeNodeFactory;
 
     private readonly RowCollection $rowCollection;
 
@@ -76,7 +77,7 @@ final class DefaultResult implements Result
     ) {
         $this->rowCollection = new RowCollection();
 
-        $this->treeNodeFactory = new DefaultTreeNodeFactory(
+        $this->treeNodeFactory = new TreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,
             rowCollection: $this->rowCollection,
         );
