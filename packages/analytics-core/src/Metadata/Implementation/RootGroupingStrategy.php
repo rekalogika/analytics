@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Contracts\Internal;
+namespace Rekalogika\Analytics\Metadata\Implementation;
 
 use Rekalogika\Analytics\Contracts\Model\GroupByExpressions;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
@@ -22,7 +22,7 @@ use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 /**
  * @internal
  */
-final readonly class RootStrategy implements GroupingStrategy
+final readonly class RootGroupingStrategy implements GroupingStrategy
 {
     #[\Override]
     public function getGroupByExpression(
