@@ -36,7 +36,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class QueryResultToTableTransformer
 {
-    private DimensionFactory $dimensionFactory;
     private QueryResultToTableHelper $helper;
 
     /**
@@ -49,8 +48,8 @@ final readonly class QueryResultToTableTransformer
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly DimensionFactory $dimensionFactory,
     ) {
-        $this->dimensionFactory = new DimensionFactory();
         $this->helper = new QueryResultToTableHelper();
 
         $this->dimensions = array_values(array_filter(
@@ -68,6 +67,7 @@ final readonly class QueryResultToTableTransformer
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
         RowCollection $rowCollection,
+        DimensionFactory $dimensionFactory,
         array $input,
     ): DefaultTable {
         $transformer = new self(
@@ -75,6 +75,7 @@ final readonly class QueryResultToTableTransformer
             metadata: $metadata,
             entityManager: $entityManager,
             propertyAccessor: $propertyAccessor,
+            dimensionFactory: $dimensionFactory,
         );
 
         /** @psalm-suppress InvalidArgument */

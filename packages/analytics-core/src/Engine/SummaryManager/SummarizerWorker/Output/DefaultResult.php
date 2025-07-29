@@ -20,6 +20,8 @@ use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
@@ -61,6 +63,8 @@ final class DefaultResult implements Result
     private readonly TreeNodeFactory $treeNodeFactory;
 
     private readonly RowCollection $rowCollection;
+    private readonly DimensionCollection $dimensionCollection;
+    private readonly DimensionFactory $dimensionFactory;
 
     /**
      * @param class-string $summaryClass
@@ -76,6 +80,8 @@ final class DefaultResult implements Result
         private int $queryResultLimit,
     ) {
         $this->rowCollection = new RowCollection();
+        $this->dimensionCollection = new DimensionCollection();
+        $this->dimensionFactory = new DimensionFactory($this->dimensionCollection);
 
         $this->treeNodeFactory = new TreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,
@@ -185,6 +191,7 @@ final class DefaultResult implements Result
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
             rowCollection: $this->rowCollection,
+            dimensionFactory: $this->dimensionFactory,
             input: $this->getQueryResult(),
         );
     }
@@ -199,6 +206,7 @@ final class DefaultResult implements Result
             query: $this->query,
             input: $this->getUnbalancedTable(),
             rowCollection: $this->rowCollection,
+            dimensionFactory: $this->dimensionFactory,
             metadata: $this->metadata,
         );
     }

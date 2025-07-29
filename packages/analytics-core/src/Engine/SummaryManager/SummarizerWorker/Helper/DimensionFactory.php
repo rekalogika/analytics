@@ -23,6 +23,10 @@ final class DimensionFactory
      */
     private array $dimensions = [];
 
+    public function __construct(
+        private readonly DimensionCollection $dimensionCollection,
+    ) {}
+
     public function createDimension(
         string $name,
         TranslatableInterface $label,
@@ -42,12 +46,16 @@ final class DimensionFactory
             );
         }
 
-        return $this->dimensions[$signature] ??= new DefaultDimension(
+        $dimension = $this->dimensions[$signature] ??= new DefaultDimension(
             name: $name,
             label: $label,
             member: $member,
             rawMember: $rawMember,
             displayMember: $displayMember,
         );
+
+        $this->dimensionCollection->collectDimension($dimension);
+
+        return $dimension;
     }
 }
