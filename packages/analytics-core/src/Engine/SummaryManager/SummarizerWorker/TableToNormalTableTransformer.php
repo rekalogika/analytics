@@ -137,7 +137,7 @@ final class TableToNormalTableTransformer
                 continue;
             }
 
-            $d = $row->getByName($dimension);
+            $d = $row->getByKey($dimension);
 
             if ($d === null) {
                 continue;
@@ -169,7 +169,7 @@ final class TableToNormalTableTransformer
                 condition: $row->getCondition(),
             );
 
-            $measure = $row->getMeasures()->getByName($measure)
+            $measure = $row->getMeasures()->getByKey($measure)
                 ?? throw new UnexpectedValueException(
                     \sprintf('Measure "%s" not found in row', $measure),
                 );

@@ -13,24 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
+use Rekalogika\Analytics\Contracts\Collection\ListCollection;
 
 /**
  * A query result in tabular format
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<int,Row>
+ * @extends ListCollection<Row>
  */
-interface Table extends \Traversable, \Countable
+interface Table extends ListCollection
 {
     /**
      * @return class-string
      */
     public function getSummaryClass(): string;
-
-    /**
-     * @throws EmptyResultException
-     */
-    public function getRowPrototype(): Row;
 }

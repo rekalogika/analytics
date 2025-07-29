@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
-use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
@@ -81,13 +80,13 @@ final readonly class NullRow implements Row, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?Dimension
+    public function getByKey(mixed $key): ?NullDimension
     {
-        return $this->dimensions[$name] ?? null;
+        return $this->dimensions[$key] ?? null;
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?Dimension
+    public function getByIndex(int $index): mixed
     {
         $keys = array_keys($this->dimensions);
 
@@ -95,13 +94,29 @@ final readonly class NullRow implements Row, \IteratorAggregate
             return null;
         }
 
-        return $this->dimensions[$keys[$index]];
+        $name = $keys[$index];
+
+        return $this->dimensions[$name] ?? null;
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function hasKey(mixed $key): bool
     {
-        return isset($this->dimensions[$name]);
+        return isset($this->dimensions[$key]);
+    }
+
+    #[\Override]
+    public function first(): ?NullDimension
+    {
+        $keys = array_keys($this->dimensions);
+        return $keys ? $this->dimensions[$keys[0]] : null;
+    }
+
+    #[\Override]
+    public function last(): ?NullDimension
+    {
+        $keys = array_keys($this->dimensions);
+        return $keys ? $this->dimensions[end($keys)] : null;
     }
 
     #[\Override]

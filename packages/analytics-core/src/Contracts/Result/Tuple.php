@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
  * A tuple of dimensions. A collection of dimensions that identifies a unique
@@ -23,9 +24,9 @@ use Doctrine\Common\Collections\Expr\Expression;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<string,Dimension>
+ * @extends OrderedMapCollection<string,Dimension>
  */
-interface Tuple extends \Traversable, \Countable
+interface Tuple extends OrderedMapCollection
 {
     /**
      * The summary class that this tuple belongs to.
@@ -33,18 +34,6 @@ interface Tuple extends \Traversable, \Countable
      * @return class-string
      */
     public function getSummaryClass(): string;
-
-    /**
-     * Gets a dimension by its name.
-     */
-    public function getByName(string $name): ?Dimension;
-
-    /**
-     * Gets a dimension by its index. 0 is the first dimension.
-     */
-    public function getByIndex(int $index): ?Dimension;
-
-    public function has(string $name): bool;
 
     /**
      * @return array<string,mixed>

@@ -57,9 +57,9 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?DefaultDimension
+    public function getByKey(mixed $key): mixed
     {
-        return $this->tuple->getByName($name);
+        return $this->tuple->getByKey($key);
     }
 
     #[\Override]
@@ -69,9 +69,21 @@ final readonly class DefaultRow implements Row, \IteratorAggregate
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function hasKey(mixed $key): bool
     {
-        return $this->tuple->has($name);
+        return $this->tuple->hasKey($key);
+    }
+
+    #[\Override]
+    public function first(): mixed
+    {
+        return $this->tuple->first();
+    }
+
+    #[\Override]
+    public function last(): mixed
+    {
+        return $this->tuple->last();
     }
 
     #[\Override]

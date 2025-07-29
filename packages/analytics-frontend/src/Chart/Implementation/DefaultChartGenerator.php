@@ -76,7 +76,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function createAutoChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->getRowPrototype();
+        $tuple = $result->getTable()->first();
+
+        if ($tuple === null) {
+            throw new UnsupportedData('Result is empty');
+        }
 
         if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
@@ -134,7 +138,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function createLineChart(Result $result): Chart
     {
-        $tuple = $result->getTable()->getRowPrototype();
+        $tuple = $result->getTable()->first();
+
+        if ($tuple === null) {
+            throw new UnsupportedData('Result is empty');
+        }
 
         if (\count($tuple) === 1) {
             return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
@@ -151,7 +159,12 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     private function createBarOrLineChart(Result $result, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measures = $result->getTable()->getRowPrototype()->getMeasures();
+        $measures = $result->getTable()->first()?->getMeasures();
+
+        if ($measures === null) {
+            throw new UnsupportedData('Measures not found');
+        }
+
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 
@@ -164,7 +177,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate labels
 
         foreach ($selectedMeasures as $name) {
-            $measure = $measures->getByName($name)
+            $measure = $measures->getByKey($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
                     $name,
@@ -219,7 +232,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             $measures = $row->getMeasures();
 
             foreach ($selectedMeasures as $name) {
-                $measure = $measures->getByName($name);
+                $measure = $measures->getByKey($name);
 
                 /** @psalm-suppress MixedAssignment */
                 $value = $measure?->getValue() ?? 0;
@@ -311,7 +324,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $result->getTable()->getRowPrototype()->getMeasures()->getByIndex(0);
+        $measure = $result->getTable()->first()?->getMeasures()->getByIndex(0);
 
         if ($measure === null) {
             throw new UnsupportedData('Measures not found');
@@ -496,7 +509,12 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     private function createPieChart(Result $result): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measures = $result->getTable()->getRowPrototype()->getMeasures();
+        $measures = $result->getTable()->first()?->getMeasures();
+
+        if ($measures === null) {
+            throw new UnsupportedData('Measures not found');
+        }
+
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
 
@@ -507,7 +525,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate labels
 
         $name = $selectedMeasures[0];
-        $measure = $measures->getByName($name);
+        $measure = $measures->getByKey($name);
 
         $labels = [];
         $dataSet = [];
@@ -543,7 +561,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->getByName($name);
+            $measure = $measures->getByKey($name);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 

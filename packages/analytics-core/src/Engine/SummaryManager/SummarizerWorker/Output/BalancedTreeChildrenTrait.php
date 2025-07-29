@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+
 trait BalancedTreeChildrenTrait
 {
     /**
@@ -80,5 +82,43 @@ trait BalancedTreeChildrenTrait
         }
 
         return null;
+    }
+
+    public function getByKey(mixed $key): ?DefaultTreeNode
+    {
+        return $this->traverse($key);
+    }
+
+    public function getByIndex(int $index): ?DefaultTreeNode
+    {
+        $balancedChildren = $this->getBalancedChildren();
+
+        return $balancedChildren[$index] ?? null;
+    }
+
+    public function hasKey(mixed $key): bool
+    {
+        try {
+            $result = $this->traverse($key);
+
+            return $result instanceof DefaultTreeNode;
+        } catch (UnexpectedValueException) {
+            return false;
+        }
+    }
+
+    public function first(): ?DefaultTreeNode
+    {
+        $balancedChildren = $this->getBalancedChildren();
+
+        return $balancedChildren[0] ?? null;
+    }
+
+    public function last(): ?DefaultTreeNode
+    {
+        $balancedChildren = $this->getBalancedChildren();
+
+        $count = \count($balancedChildren);
+        return $count > 0 ? $balancedChildren[$count - 1] : null;
     }
 }

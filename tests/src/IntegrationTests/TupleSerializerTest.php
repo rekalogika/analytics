@@ -61,14 +61,14 @@ final class TupleSerializerTest extends KernelTestCase
         // original measures
 
         /** @psalm-suppress MixedAssignment */
-        $count = $row->getMeasures()->getByName('count')?->getRawValue();
+        $count = $row->getMeasures()->getByKey('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $price = $row->getMeasures()->getByName('price')?->getRawValue();
+        $price = $row->getMeasures()->getByKey('price')?->getRawValue();
 
         /** @psalm-suppress MixedAssignment */
-        $deserializedCount = $deserializedRow->getMeasures()->getByName('count')?->getRawValue();
+        $deserializedCount = $deserializedRow->getMeasures()->getByKey('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $deserializedPrice = $deserializedRow->getMeasures()->getByName('price')?->getRawValue();
+        $deserializedPrice = $deserializedRow->getMeasures()->getByKey('price')?->getRawValue();
 
         $this->assertEquals($count, $deserializedCount);
         $this->assertEquals($price, $deserializedPrice);

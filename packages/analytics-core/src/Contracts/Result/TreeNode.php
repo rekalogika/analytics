@@ -13,14 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+
 /**
  * Represent a node in a tree.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<mixed,TreeNode>
+ * @extends OrderedMapCollection<mixed,TreeNode>
  */
-interface TreeNode extends \Traversable, \Countable, Dimension
+interface TreeNode extends OrderedMapCollection, Dimension
 {
     /**
      * @return class-string

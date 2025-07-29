@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 
@@ -60,16 +59,33 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function getRowPrototype(): DefaultRow
+    public function get(int $key): ?DefaultRow
+    {
+        return $this->rows[$key] ?? null;
+    }
+
+    #[\Override]
+    public function first(): ?DefaultRow
     {
         $firstKey = array_key_first($this->rows);
 
         if ($firstKey === null) {
-            throw new EmptyResultException('No rows in the table to get prototype from.');
+            return null;
         }
 
-        return $this->rows[$firstKey]
-            ?? throw new EmptyResultException('No rows in the table to get prototype from.');
+        return $this->rows[$firstKey];
+    }
+
+    #[\Override]
+    public function last(): ?DefaultRow
+    {
+        $lastKey = array_key_last($this->rows);
+
+        if ($lastKey === null) {
+            return null;
+        }
+
+        return $this->rows[$lastKey];
     }
 
     #[\Override]

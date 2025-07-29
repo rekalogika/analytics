@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
+use Rekalogika\Analytics\Contracts\Collection\ListCollection;
 
 /**
  * A query result in normalized tabular format. Each row in a normal table
@@ -21,17 +21,12 @@ use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends \Traversable<int,NormalRow>
+ * @extends ListCollection<NormalRow>
  */
-interface NormalTable extends \Traversable, \Countable
+interface NormalTable extends ListCollection
 {
     /**
      * @return class-string
      */
     public function getSummaryClass(): string;
-
-    /**
-     * @throws EmptyResultException
-     */
-    public function getRowPrototype(): NormalRow;
 }

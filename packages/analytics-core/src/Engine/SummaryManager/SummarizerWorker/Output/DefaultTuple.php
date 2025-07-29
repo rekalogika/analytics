@@ -68,12 +68,6 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByName(string $name): ?DefaultDimension
-    {
-        return $this->dimensions[$name] ?? null;
-    }
-
-    #[\Override]
     public function getByIndex(int $index): ?DefaultDimension
     {
         $names = array_keys($this->dimensions);
@@ -86,9 +80,29 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function has(string $name): bool
+    public function getByKey(mixed $key): mixed
     {
-        return isset($this->dimensions[$name]);
+        return $this->dimensions[$key] ?? null;
+    }
+
+    #[\Override]
+    public function hasKey(mixed $key): bool
+    {
+        return isset($this->dimensions[$key]);
+    }
+
+    #[\Override]
+    public function first(): mixed
+    {
+        $keys = array_keys($this->dimensions);
+        return $keys ? $this->dimensions[$keys[0]] : null;
+    }
+
+    #[\Override]
+    public function last(): mixed
+    {
+        $keys = array_keys($this->dimensions);
+        return $keys ? $this->dimensions[end($keys)] : null;
     }
 
     #[\Override]
@@ -111,11 +125,11 @@ final readonly class DefaultTuple implements Tuple, \IteratorAggregate
         }
 
         foreach ($this->dimensions as $name => $dimension) {
-            if (!$other->has($name)) {
+            if (!$other->hasKey($name)) {
                 return false;
             }
 
-            if (!$dimension->isSame($other->getByName($name))) {
+            if (!$dimension->isSame($other->getByKey($name))) {
                 return false;
             }
         }
