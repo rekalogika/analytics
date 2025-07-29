@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
@@ -107,28 +106,6 @@ final readonly class NullTuple implements Tuple, \IteratorAggregate
     {
         $keys = array_keys($this->dimensions);
         return $keys ? $this->dimensions[end($keys)] : null;
-    }
-
-    #[\Override]
-    public function getMembers(): array
-    {
-        $members = [];
-
-        foreach ($this->dimensions as $dimension) {
-            /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getName()] = $dimension->getMember();
-        }
-
-        return $members;
-    }
-
-    /**
-     * @todo implement
-     */
-    #[\Override]
-    public function isSame(Tuple $other): bool
-    {
-        throw new BadMethodCallException('Not implemented yet');
     }
 
     #[\Override]

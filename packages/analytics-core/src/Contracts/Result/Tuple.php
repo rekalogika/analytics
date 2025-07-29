@@ -35,12 +35,5 @@ interface Tuple extends OrderedMapCollection
      */
     public function getSummaryClass(): string;
 
-    /**
-     * @return array<string,mixed>
-     */
-    public function getMembers(): array;
-
-    public function isSame(self $other): bool;
-
     public function getCondition(): ?Expression;
 }
