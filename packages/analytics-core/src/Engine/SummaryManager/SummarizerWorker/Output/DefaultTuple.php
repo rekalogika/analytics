@@ -119,27 +119,9 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         yield from $this->dimensions;
     }
 
-    #[\Override]
-    public function isSame(Tuple $other): bool
-    {
-        if ($this->count() !== $other->count()) {
-            return false;
-        }
-
-        foreach ($this->dimensions as $name => $dimension) {
-            if (!$other->hasKey($name)) {
-                return false;
-            }
-
-            if (!$dimension->isSame($other->getByKey($name))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    #[\Override]
+    /**
+     * @return array<string,mixed>
+     */
     public function getMembers(): array
     {
         $members = [];
