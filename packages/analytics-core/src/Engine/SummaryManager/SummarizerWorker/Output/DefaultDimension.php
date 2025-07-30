@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
-use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DefaultDimension implements Dimension
@@ -29,19 +28,6 @@ final class DefaultDimension implements Dimension
         private readonly mixed $rawMember,
         private readonly mixed $displayMember,
     ) {}
-
-    public static function createMeasureDimension(
-        TranslatableInterface $label,
-        MeasureMember $measureMember,
-    ): self {
-        return new self(
-            label: $label,
-            name: '@values',
-            member: $measureMember,
-            rawMember: $measureMember,
-            displayMember: $measureMember,
-        );
-    }
 
     #[\Override]
     public function getLabel(): TranslatableInterface

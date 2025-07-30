@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -51,6 +52,7 @@ final class TableToNormalTableTransformer
         DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly RowCollection $rowCollection,
+        private readonly DimensionFactory $dimensionFactory,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $dimensions = $query->getGroupBy();
@@ -69,12 +71,14 @@ final class TableToNormalTableTransformer
         DefaultTable $input,
         SummaryMetadata $metadata,
         RowCollection $rowCollection,
+        DimensionFactory $dimensionFactory,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
             query: $query,
             metadata: $metadata,
             rowCollection: $rowCollection,
+            dimensionFactory: $dimensionFactory,
             measureLabel: $valuesLabel,
         );
 
@@ -158,11 +162,14 @@ final class TableToNormalTableTransformer
             // @values represent the place of the value column in the
             // row. the value column is not always at the end of the row
 
-            $measureValue = $this->getMeasureMember($measure);
+            $measureMember = $this->getMeasureMember($measure);
 
-            $newRow['@values'] = DefaultDimension::createMeasureDimension(
+            $newRow['@values'] = $this->dimensionFactory->createDimension(
                 label: $this->measureLabel,
-                measureMember: $measureValue,
+                name: '@values',
+                member: $measureMember,
+                rawMember: $measureMember,
+                displayMember: $measureMember,
             );
 
             /** @var array<string,DefaultDimension> $newRow */
