@@ -170,6 +170,7 @@ final class TableToNormalTableTransformer
                 member: $measureMember,
                 rawMember: $measureMember,
                 displayMember: $measureMember,
+                interpolation: false,
             );
 
             /** @var array<string,DefaultDimension> $newRow */

@@ -21,6 +21,9 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMe
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
+/**
+ * @deprecated
+ */
 final class DimensionCollector
 {
     /**

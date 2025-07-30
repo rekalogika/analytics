@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionF
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\GapFiller;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\GapFiller;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 

@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
- * @internal
+ * @deprecated
  */
 final class DefaultTree implements TreeNode, \IteratorAggregate
 {

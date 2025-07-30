@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDi
 
 /**
  * @implements \IteratorAggregate<DefaultDimension>
+ * @deprecated
  */
 final readonly class DimensionCollection implements \IteratorAggregate, \Countable
 {

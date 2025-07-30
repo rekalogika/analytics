@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
 /**
  * Get unique dimensions while preserving the order of the dimensions.
+ * @deprecated
  */
 final class DimensionByNameCollector
 {

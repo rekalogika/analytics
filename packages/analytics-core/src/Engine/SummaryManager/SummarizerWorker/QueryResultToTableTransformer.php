@@ -250,6 +250,7 @@ final readonly class QueryResultToTableTransformer
                 member: $value,
                 rawMember: $rawValue,
                 displayMember: $displayValue,
+                interpolation: false,
             );
 
             $dimensionValues[$name] = $dimension;

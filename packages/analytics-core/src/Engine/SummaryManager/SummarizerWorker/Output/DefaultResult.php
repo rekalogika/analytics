@@ -54,6 +54,7 @@ final class DefaultResult implements Result
     private ?DefaultNormalTable $unbalancedNormalTable = null;
 
     private ?DefaultTree $tree = null;
+    private ?NewDefaultTree $newTree = null;
 
     private ?DefaultNormalTable $normalTable = null;
 
@@ -64,7 +65,7 @@ final class DefaultResult implements Result
     private readonly TreeNodeFactory $treeNodeFactory;
 
     private readonly RowCollection $rowCollection;
-    // private readonly DimensionCollection $dimensionCollection;
+    private readonly DimensionCollection $dimensionCollection;
     private readonly DimensionFactory $dimensionFactory;
 
     /**
@@ -89,7 +90,7 @@ final class DefaultResult implements Result
             ),
         );
 
-        // $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
+        $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
 
         $this->treeNodeFactory = new TreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,
@@ -220,14 +221,28 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getTree(): DefaultTree
+    public function getTree(): NewDefaultTree
     {
-        return $this->tree ??= NormalTableToTreeTransformer::transform(
-            label: $this->label,
-            normalTable: $this->getUnbalancedNormalTable(),
-            treeNodeFactory: $this->treeNodeFactory,
+        // return $this->tree ??= NormalTableToTreeTransformer::transform(
+        //     label: $this->label,
+        //     normalTable: $this->getUnbalancedNormalTable(),
+        //     treeNodeFactory: $this->treeNodeFactory,
+        //     rowCollection: $this->rowCollection,
+        // );
+
+        $this->getUnbalancedNormalTable();
+
+        $result = $this->newTree ??= NewDefaultTree::createRoot(
+            summaryClass: $this->summaryClass,
+            dimensionNames: $this->query->getGroupBy(),
+            rootLabel: $this->label,
             rowCollection: $this->rowCollection,
+            dimensionCollection: $this->dimensionCollection,
+            condition: $this->query->getWhere(),
+            nodesLimit: $this->queryResultLimit,
         );
+
+        return $result;
     }
 
     #[\Override]

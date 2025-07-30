@@ -33,7 +33,13 @@ final readonly class BlockContext
      */
     public function getDistinctNodesOfLevel(int $level): array
     {
-        return $this->distinct[$level] ?? throw new \LogicException('Unknown level');
+        $result =  $this->distinct[$level] ?? null;
+        
+
+        if ($result !== null) {
+            return $result;
+        }
+        throw new \LogicException('Unknown level');
     }
 
     public function isPivoted(TreeNode $treeNode): bool

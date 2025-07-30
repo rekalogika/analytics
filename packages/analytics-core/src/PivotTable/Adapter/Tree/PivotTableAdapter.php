@@ -55,7 +55,7 @@ final readonly class PivotTableAdapter implements BranchNode
                 continue;
             }
 
-            if ($item->getMeasure() === null) {
+            if ($item->count() > 0) {
                 yield new PivotTableAdapter($item, $this->propertyMap);
             } else {
                 yield new PivotTableAdapterLeaf($item, $this->propertyMap);

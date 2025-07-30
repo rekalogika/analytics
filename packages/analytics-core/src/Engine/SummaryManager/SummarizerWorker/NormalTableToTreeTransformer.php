@@ -24,6 +24,9 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTr
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * @deprecated
+ */
 final class NormalTableToTreeTransformer
 {
     /**

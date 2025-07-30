@@ -82,7 +82,7 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): mixed
+    public function getByKey(mixed $key): ?DefaultDimension
     {
         return $this->dimensions[$key] ?? null;
     }
@@ -94,14 +94,14 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): mixed
+    public function first(): ?DefaultDimension
     {
         $keys = array_keys($this->dimensions);
         return $keys ? $this->dimensions[$keys[0]] : null;
     }
 
     #[\Override]
-    public function last(): mixed
+    public function last(): ?DefaultDimension
     {
         $keys = array_keys($this->dimensions);
         return $keys ? $this->dimensions[end($keys)] : null;

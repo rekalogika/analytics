@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
+namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
@@ -152,6 +152,7 @@ final readonly class GapFiller
             member: $member,
             rawMember: $member,
             displayMember: $member,
+            interpolation: true,
         );
     }
 }
