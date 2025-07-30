@@ -305,6 +305,11 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
         foreach ($dimensions as $dimension) {
             $tuple = $this->tuple->append($dimension);
+
+            // if the member is a measure (i.e. '@values'), narrow the measure
+            // names to the measure name specified in the dimension.
+            
+            /** @psalm-suppress MixedAssignment */
             $member = $dimension->getMember();
 
             if ($member instanceof MeasureMember) {
