@@ -35,6 +35,8 @@ interface TreeNode extends OrderedMapCollection, Dimension
      */
     public function getTuple(): Tuple;
 
+    public function getChildren(): TreeNodes;
+
     public function getMeasure(): ?Measure;
 
     public function getSubtotals(): Measures;

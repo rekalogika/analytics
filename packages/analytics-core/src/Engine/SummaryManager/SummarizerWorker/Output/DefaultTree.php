@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Contracts\Result\TreeNodes;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
@@ -44,6 +45,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
      * @var list<DefaultTree>|null
      */
     private ?array $unbalancedChildren = null;
+
+    private ?DefaultTreeNodes $children = null;
 
     /**
      * @param list<string> $descendantdimensionNames
@@ -276,6 +279,16 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
 
         return $dimension;
+    }
+
+    #[\Override]
+    public function getChildren(): TreeNodes
+    {
+        if ($this->children !== null) {
+            return $this->children;
+        }
+
+        return $this->children = new DefaultTreeNodes($this->getBalancedChildren());
     }
 
     /**
