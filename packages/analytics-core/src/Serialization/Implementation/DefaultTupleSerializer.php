@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Serialization\TupleDto;
@@ -21,6 +23,8 @@ use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Serialization\Expression\DeserializationVisitor;
+use Rekalogika\Analytics\Serialization\Expression\SerializationVisitor;
 
 final readonly class DefaultTupleSerializer implements TupleSerializer
 {
@@ -56,9 +60,29 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
             $members[$dimensionName] = $serializedValue;
         }
 
+        $condition = $tuple->getCondition();
+
+        if ($condition !== null) {
+            $visitor = new SerializationVisitor(
+                summaryClass: $class,
+                valueSerializer: $this->valueSerializer,
+            );
+
+            /** @psalm-suppress MixedAssignment */
+            $condition = $condition->visit($visitor);
+
+            if (!$condition instanceof Expression) {
+                throw new UnexpectedValueException(\sprintf(
+                    'Condition must be an instance of %s, got %s',
+                    Expression::class,
+                    \get_debug_type($condition),
+                ));
+            }
+        }
+
         return new TupleDto(
             members: $members,
-            condition: $tuple->getCondition(),
+            condition: $condition,
         );
     }
 
@@ -77,6 +101,22 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         $condition = $dto->getCondition();
 
         if ($condition !== null) {
+            $visitor = new DeserializationVisitor(
+                summaryClass: $summaryClass,
+                valueSerializer: $this->valueSerializer,
+            );
+
+            /** @psalm-suppress MixedAssignment */
+            $condition = $condition->visit($visitor);
+
+            if (!$condition instanceof Expression) {
+                throw new UnexpectedValueException(\sprintf(
+                    'Condition must be an instance of %s, got %s',
+                    Expression::class,
+                    \get_debug_type($condition),
+                ));
+            }
+
             $query->where($condition);
         }
 
