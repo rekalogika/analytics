@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
@@ -31,6 +32,7 @@ final class DimensionByNameCollector
     public function __construct(
         private readonly string $name,
         private readonly ?Order $order,
+        private readonly DimensionFactory $dimensionFactory,
     ) {}
 
     public function getResult(): DimensionCollection
@@ -77,6 +79,6 @@ final class DimensionByNameCollector
             return $dimensions;
         }
 
-        return GapFiller::process($dimensions);
+        return GapFiller::process($dimensions, $this->dimensionFactory);
     }
 }

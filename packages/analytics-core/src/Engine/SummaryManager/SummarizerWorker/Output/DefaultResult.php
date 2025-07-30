@@ -20,8 +20,9 @@ use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\MetadataOrderByResolver;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
@@ -63,7 +64,7 @@ final class DefaultResult implements Result
     private readonly TreeNodeFactory $treeNodeFactory;
 
     private readonly RowCollection $rowCollection;
-    private readonly DimensionCollection $dimensionCollection;
+    // private readonly DimensionCollection $dimensionCollection;
     private readonly DimensionFactory $dimensionFactory;
 
     /**
@@ -80,8 +81,15 @@ final class DefaultResult implements Result
         private int $queryResultLimit,
     ) {
         $this->rowCollection = new RowCollection();
-        $this->dimensionCollection = new DimensionCollection();
-        $this->dimensionFactory = new DimensionFactory($this->dimensionCollection);
+
+        $this->dimensionFactory = new DimensionFactory(
+            new MetadataOrderByResolver(
+                metadata: $this->metadata,
+                query: $this->query,
+            ),
+        );
+
+        // $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
 
         $this->treeNodeFactory = new TreeNodeFactory(
             fillingNodesLimit: $fillingNodesLimit,

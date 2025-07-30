@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -63,7 +63,7 @@ final class TableToNormalTableTransformer
 
         $this->dimensions = $dimensions;
         $this->measures = $query->getSelect();
-        $this->dimensionCollector = new DimensionCollector($metadata, $query);
+        $this->dimensionCollector = new DimensionCollector($metadata, $query, $dimensionFactory);
     }
 
     public static function transform(

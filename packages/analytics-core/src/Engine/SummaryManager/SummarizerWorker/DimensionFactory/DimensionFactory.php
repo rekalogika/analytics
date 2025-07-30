@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
+namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory;
 
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -23,9 +23,21 @@ final class DimensionFactory
      */
     private array $dimensions = [];
 
+    private readonly DimensionCollection $dimensionCollection;
+
     public function __construct(
-        private readonly DimensionCollection $dimensionCollection,
-    ) {}
+        private readonly OrderByResolver $orderByResolver,
+    ) {
+        $this->dimensionCollection = new DimensionCollection(
+            dimensionFactory: $this,
+            orderByResolver: $this->orderByResolver,
+        );
+    }
+
+    public function getDimensionCollection(): DimensionCollection
+    {
+        return $this->dimensionCollection;
+    }
 
     public function createDimension(
         string $name,
