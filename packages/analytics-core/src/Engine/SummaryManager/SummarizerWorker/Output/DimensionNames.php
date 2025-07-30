@@ -62,6 +62,13 @@ final readonly class DimensionNames implements \Countable, \Stringable
         return $this->dimensionNames[0] ?? null;
     }
 
+    public function last(): ?string
+    {
+        $dimensionNames = $this->dimensionNames;
+
+        return $dimensionNames !== [] ? $dimensionNames[\count($dimensionNames) - 1] : null;
+    }
+
     public function withoutFirst(): static
     {
         if (empty($this->dimensionNames)) {

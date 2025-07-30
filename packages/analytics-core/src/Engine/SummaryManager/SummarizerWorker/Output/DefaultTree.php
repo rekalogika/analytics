@@ -137,18 +137,20 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getSubtotals(): Measures
     {
-        if ($this->descendantdimensionNames->hasMeasureDimension()) {
-            $subtotalChildren = $this->getChildren('@values');
-        } else {
-            $subtotalChildren = $this->getChildren();
-        }
-
-
-        if ($subtotalChildren->count() === 0) {
+        if (!$this->descendantdimensionNames->hasMeasureDimension()) {
             $measure = $this->getMeasure();
+
+            if ($measure === null) {
+                $measure = $this->context
+                    ->getNullMeasureCollection()
+                    ->getNullMeasure($this->measureNames[0]);
+            }
+
+            return new DefaultMeasures([$measure]);
         }
 
         $measures = [];
+        $subtotalChildren = $this->getChildren('@values');
 
         foreach ($subtotalChildren as $subtotalChild) {
             $measure = $subtotalChild->getMeasure();
