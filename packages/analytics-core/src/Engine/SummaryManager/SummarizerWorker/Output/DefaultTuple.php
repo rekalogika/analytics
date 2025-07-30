@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
@@ -59,6 +61,46 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
             dimensions: [...$this->dimensions, $dimension],
             condition: $this->condition,
         );
+    }
+
+    public function withoutMeasure(): static
+    {
+        $dimensionsWithoutMeasure = [];
+
+        foreach ($this->dimensions as $dimension) {
+            if ($dimension->getName() === '@values') {
+                continue;
+            }
+
+            $dimensionsWithoutMeasure[] = $dimension;
+        }
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            dimensions: $dimensionsWithoutMeasure,
+            condition: $this->condition,
+        );
+    }
+
+    public function getMeasureName(): ?string
+    {
+        $measureDimension = $this->dimensions['@values'] ?? null;
+
+        if ($measureDimension === null) {
+            return null;
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $member = $measureDimension->getMember();
+
+        if (!$member instanceof MeasureMember) {
+            throw new UnexpectedValueException(\sprintf(
+                'Expected MeasureMember, got %s',
+                get_debug_type($member),
+            ));
+        }
+
+        return $member->getMeasureProperty();
     }
 
     /**

@@ -35,6 +35,12 @@ interface TreeNode extends OrderedMapCollection, Dimension
      */
     public function getTuple(): Tuple;
 
+    /**
+     * @param ?string $name The children's dimension name, if null, it will be
+     * the next dimension according to the query.
+     */
+    public function getChildren(?string $name = null): TreeNodes;
+
     public function getMeasure(): ?Measure;
 
     public function getSubtotals(): Measures;
