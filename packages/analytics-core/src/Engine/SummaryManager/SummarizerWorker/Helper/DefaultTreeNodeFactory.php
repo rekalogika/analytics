@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Exception\InterpolationOverflowException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
-final class NewDefaultTreeNodeFactory
+final class DefaultTreeNodeFactory
 {
     private int $nodesCount = 0;
 

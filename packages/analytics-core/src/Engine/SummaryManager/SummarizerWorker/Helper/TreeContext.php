@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory
 
 final readonly class TreeContext
 {
-    private NewDefaultTreeNodeFactory $treeNodeFactory;
+    private DefaultTreeNodeFactory $treeNodeFactory;
 
     public function __construct(
         private RowCollection $rowCollection,
@@ -26,13 +26,13 @@ final readonly class TreeContext
         private NullMeasureCollection $nullMeasureCollection,
         int $nodesLimit,
     ) {
-        $this->treeNodeFactory = new NewDefaultTreeNodeFactory(
+        $this->treeNodeFactory = new DefaultTreeNodeFactory(
             nodesLimit: $nodesLimit,
             context: $this,
         );
     }
 
-    public function getTreeNodeFactory(): NewDefaultTreeNodeFactory
+    public function getTreeNodeFactory(): DefaultTreeNodeFactory
     {
         return $this->treeNodeFactory;
     }
