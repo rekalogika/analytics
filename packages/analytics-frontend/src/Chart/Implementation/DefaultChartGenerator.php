@@ -398,10 +398,6 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 $dimension = $children[0];
                 $measure = $dimension->getMeasure();
 
-                if ($measure === null) {
-                    throw new UnsupportedData('Measures not found');
-                }
-
                 $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measure->getValue());
 
                 if ($yTitle === null) {

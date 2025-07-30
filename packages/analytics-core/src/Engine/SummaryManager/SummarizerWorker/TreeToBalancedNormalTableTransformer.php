@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
@@ -65,10 +64,6 @@ final class TreeToBalancedNormalTableTransformer
 
         if (\count($node) === 0) {
             $measure = $node->getMeasure();
-
-            if ($measure === null) {
-                throw new UnexpectedValueException('Measure is null');
-            }
 
             $this->createRow($currentRow, $measure);
         }

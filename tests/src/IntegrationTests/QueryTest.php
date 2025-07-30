@@ -77,7 +77,7 @@ final class QueryTest extends KernelTestCase
         $node = $result->traverse('count');
         $this->assertNotNull($node);
         $this->assertEquals('@values', $node->getName());
-        $this->assertIsInt($node->getMeasure()?->getValue());
+        $this->assertIsInt($node->getMeasure()->getValue());
     }
 
     public function testInvalidDimension(): void
@@ -120,7 +120,7 @@ final class QueryTest extends KernelTestCase
         // single traverse
         $node1 = $result->traverse('2024', $country, 'count');
         $this->assertNotNull($node1);
-        $this->assertIsInt($node1->getMeasure()?->getValue());
+        $this->assertIsInt($node1->getMeasure()->getValue());
 
         // multistep traverse
         $node2 = $result
