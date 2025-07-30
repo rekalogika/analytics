@@ -20,6 +20,6 @@ final readonly class TreeValue extends TreeProperty implements Value
     #[\Override]
     public function getContent(): mixed
     {
-        return $this->getNode()->getMeasure()?->getValue();
+        return $this->getNode()->getMeasure()->getValue();
     }
 }

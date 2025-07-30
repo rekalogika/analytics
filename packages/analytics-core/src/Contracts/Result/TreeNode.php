@@ -41,7 +41,7 @@ interface TreeNode extends OrderedMapCollection, Dimension
      */
     public function getChildren(?string $name = null): TreeNodes;
 
-    public function getMeasure(): ?Measure;
+    public function getMeasure(): Measure;
 
     public function getSubtotals(): Measures;
 

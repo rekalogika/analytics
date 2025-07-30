@@ -111,10 +111,12 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getMeasure(): ?DefaultMeasure
+    public function getMeasure(): DefaultMeasure
     {
         if (\count($this->measureNames) !== 1) {
-            return null;
+            return $this->context
+                ->getNullMeasureCollection()
+                ->getNullMeasure($this->measureNames[0]);
         }
 
         if ($this->measure !== null) {
@@ -140,12 +142,6 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         if (!$this->descendantdimensionNames->hasMeasureDimension()) {
             $measure = $this->getMeasure();
 
-            if ($measure === null) {
-                $measure = $this->context
-                    ->getNullMeasureCollection()
-                    ->getNullMeasure($this->measureNames[0]);
-            }
-
             return new DefaultMeasures([$measure]);
         }
 
@@ -154,12 +150,6 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
         foreach ($subtotalChildren as $subtotalChild) {
             $measure = $subtotalChild->getMeasure();
-
-            if ($measure === null) {
-                throw new UnexpectedValueException(
-                    'Subtotal child does not have a measure.',
-                );
-            }
 
             $measures[] = $measure;
         }
