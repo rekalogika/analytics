@@ -15,8 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRow;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
@@ -26,11 +24,6 @@ final class RowCollection
      * @var array<string,DefaultRow>
      */
     private array $rows = [];
-
-    /**
-     * @var array<string,DefaultNormalRow>
-     */
-    private array $normalRows = [];
 
     public function __construct() {}
 
@@ -47,56 +40,28 @@ final class RowCollection
         $this->rows[$signature] = $row;
     }
 
-    public function collectNormalRow(DefaultNormalRow $row): void
-    {
-        $signature = $row->getSignature();
-
-        if (isset($this->normalRows[$signature])) {
-            throw new LogicException(
-                \sprintf('Normal row with signature "%s" already exists.', $signature),
-            );
-        }
-
-        $this->normalRows[$signature] = $row;
-    }
-
-    public function getByTuple(DefaultTuple $tuple): null|DefaultRow|DefaultNormalRow
+    public function getByTuple(DefaultTuple $tuple): null|DefaultRow
     {
         $signature = $tuple->getSignature();
 
-        return $this->rows[$signature]
-            ?? $this->normalRows[$signature]
-            ?? null;
-    }
-
-    public function getMeasures(DefaultTuple $tuple): DefaultMeasures
-    {
-        $row = $this->getByTuple($tuple);
-
-        if ($row === null) {
-            return new DefaultMeasures([]);
-        }
-
-        if ($row instanceof DefaultRow) {
-            return $row->getMeasures();
-        }
-
-        return new DefaultMeasures([$row->getMeasure()]);
+        return $this->rows[$signature] ?? null;
     }
 
     public function getMeasure(DefaultTuple $tuple): ?DefaultMeasure
     {
-        $row = $this->getByTuple($tuple);
+        $measureName = $tuple->getMeasureName();
+
+        if ($measureName === null) {
+            return null;
+        }
+
+        $row = $this->getByTuple($tuple->withoutMeasure());
 
         if ($row === null) {
             return null;
         }
 
-        if (!$row instanceof DefaultNormalRow) {
-            return null;
-        }
-
-        return $row->getMeasure();
+        return $row->getMeasures()->getByKey($measureName);
     }
 
     /**

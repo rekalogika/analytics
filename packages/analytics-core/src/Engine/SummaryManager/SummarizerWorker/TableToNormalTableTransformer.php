@@ -96,8 +96,6 @@ final class TableToNormalTableTransformer
                 } else {
                     $rows[] = $normalRow;
                 }
-
-                $rowCollection->collectNormalRow($normalRow);
             }
         }
 

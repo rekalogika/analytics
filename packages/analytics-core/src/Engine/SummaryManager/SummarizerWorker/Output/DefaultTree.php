@@ -31,8 +31,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DefaultTree implements TreeNode, \IteratorAggregate
 {
-    private readonly DefaultMeasures $subtotals;
-
     private ?DefaultMeasure $measure = null;
 
     /**
@@ -41,18 +39,15 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     private array $children = [];
 
     /**
-     * @param list<string> $descendantdimensionNames
      * @param list<string> $measureNames
      */
     public function __construct(
         private readonly DefaultTuple $tuple,
-        private readonly array $descendantdimensionNames,
+        private readonly DimensionNames $descendantdimensionNames,
         private readonly array $measureNames,
         private readonly ?TranslatableInterface $rootLabel,
         private readonly TreeContext $context,
-    ) {
-        $this->subtotals = $context->getRowCollection()->getMeasures($this->tuple);
-    }
+    ) {}
 
     /**
      * @param class-string $summaryClass
@@ -87,8 +82,10 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             nodesLimit: $nodesLimit,
         );
 
+        $descendantdimensionNames = new DimensionNames($dimensionNames);
+
         return new self(
-            descendantdimensionNames: $dimensionNames,
+            descendantdimensionNames: $descendantdimensionNames,
             measureNames: $measureNames,
             tuple: $rootTuple,
             rootLabel: $rootLabel,
@@ -98,7 +95,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
     private function getNextDimensionName(): ?string
     {
-        return $this->descendantdimensionNames[0] ?? null;
+        return $this->descendantdimensionNames->first();
     }
 
     #[\Override]
@@ -140,7 +137,32 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getSubtotals(): Measures
     {
-        return $this->subtotals;
+        if ($this->descendantdimensionNames->hasMeasureDimension()) {
+            $subtotalChildren = $this->getChildren('@values');
+        } else {
+            $subtotalChildren = $this->getChildren();
+        }
+
+
+        if ($subtotalChildren->count() === 0) {
+            $measure = $this->getMeasure();
+        }
+
+        $measures = [];
+
+        foreach ($subtotalChildren as $subtotalChild) {
+            $measure = $subtotalChild->getMeasure();
+
+            if ($measure === null) {
+                throw new UnexpectedValueException(
+                    'Subtotal child does not have a measure.',
+                );
+            }
+
+            $measures[] = $measure;
+        }
+
+        return new DefaultMeasures($measures);
     }
 
     #[\Override]
@@ -255,24 +277,30 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             return $this->children[$name];
         }
 
-        return $this->children[$name] = new DefaultTreeNodes($this->getBalancedChildren());
+        return $this->children[$name] =
+            new DefaultTreeNodes($this->getBalancedChildren($name));
     }
 
     /**
      * @return list<DefaultTree>
      */
-    private function getBalancedChildren(): array
+    private function getBalancedChildren(string $name): array
     {
         $descendantdimensionNames = $this->descendantdimensionNames;
-        $dimensionName = array_shift($descendantdimensionNames);
 
-        if ($dimensionName === null) {
-            return [];
+        if (!$descendantdimensionNames->hasName($name)) {
+            throw new InvalidArgumentException(\sprintf(
+                'Dimension "%s" is not in the descendant dimension names: %s.',
+                $name,
+                (string) $descendantdimensionNames,
+            ));
         }
+
+        $descendantdimensionNames = $descendantdimensionNames->removeUpTo($name);
 
         $dimensions = $this->context
             ->getDimensionCollection()
-            ->getDimensionsByName($dimensionName)
+            ->getDimensionsByName($name)
             ->getGapFilled();
 
         $treeNodeFactory = $this->context->getTreeNodeFactory();

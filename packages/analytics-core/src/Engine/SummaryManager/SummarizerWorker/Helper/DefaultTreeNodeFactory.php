@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 use Rekalogika\Analytics\Contracts\Exception\InterpolationOverflowException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTree;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DimensionNames;
 
 final class DefaultTreeNodeFactory
 {
@@ -27,12 +28,11 @@ final class DefaultTreeNodeFactory
     ) {}
 
     /**
-     * @param list<string> $descendantdimensionNames
      * @param list<string> $measureNames
      */
     public function createNode(
         DefaultTuple $tuple,
-        array $descendantdimensionNames,
+        DimensionNames $descendantdimensionNames,
         array $measureNames,
     ): DefaultTree {
         if ($this->nodesCount >= $this->nodesLimit) {
