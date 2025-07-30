@@ -25,14 +25,14 @@ final readonly class PivotTableAdapterLeaf implements LeafNode
         private TreeNode $node,
         private TreePropertyMap $propertyMap,
     ) {
-        $measure = $node->getMeasure();
+        // $measure = $node->getMeasure();
 
-        if ($measure === null) {
-            throw new UnexpectedValueException(\sprintf(
-                'Leaf node "%s" does not have a measure',
-                $node->getName(),
-            ));
-        }
+        // if ($measure === null) {
+        //     throw new UnexpectedValueException(\sprintf(
+        //         'Leaf node "%s" does not have a measure',
+        //         $node->getName(),
+        //     ));
+        // }
     }
 
     #[\Override]

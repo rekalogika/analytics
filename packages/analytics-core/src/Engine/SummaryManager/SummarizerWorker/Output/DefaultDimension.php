@@ -27,6 +27,7 @@ final class DefaultDimension implements Dimension
         private readonly mixed $member,
         private readonly mixed $rawMember,
         private readonly mixed $displayMember,
+        private readonly bool $interpolation,
     ) {}
 
     #[\Override]
@@ -91,5 +92,10 @@ final class DefaultDimension implements Dimension
             'xxh128',
             $this->name . ':' . serialize($this->rawMember),
         );
+    }
+
+    public function isInterpolation(): bool
+    {
+        return $this->interpolation;
     }
 }

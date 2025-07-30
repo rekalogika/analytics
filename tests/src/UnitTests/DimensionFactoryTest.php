@@ -16,58 +16,58 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Symfony\Component\Translation\TranslatableMessage;
 
-final class DimensionCollectorTest extends TestCase
+final class DimensionFactoryTest extends TestCase
 {
     public function testNullLast(): void
     {
         $dimensionFactory = new DimensionFactory(new HardcodedOrderByResolver(Order::Ascending));
 
-        $collector = new DimensionByNameCollector(
-            'gender',
-            Order::Ascending,
-            $dimensionFactory,
-        );
-
-        $collector->addDimension(new DefaultDimension(
+        $dimensionFactory->createDimension(
             label: new TranslatableMessage('Female'),
             name: 'gender',
             rawMember: Gender::Female,
             member: Gender::Female,
             displayMember: Gender::Female,
-        ));
+            interpolation: false,
+        );
 
-        $collector->addDimension(new DefaultDimension(
+        $dimensionFactory->createDimension(
             label: new TranslatableMessage('Male'),
             name: 'gender',
             rawMember: Gender::Male,
             member: Gender::Male,
             displayMember: Gender::Male,
-        ));
+            interpolation: false,
+        );
 
-        $collector->addDimension(new DefaultDimension(
+        $dimensionFactory->createDimension(
             label: new TranslatableMessage('Other'),
             name: 'gender',
             rawMember: Gender::Other,
             member: Gender::Other,
             displayMember: Gender::Other,
-        ));
+            interpolation: false,
+        );
 
-        $collector->addDimension(new DefaultDimension(
+        $dimensionFactory->createDimension(
             label: new TranslatableMessage('Unknown'),
             name: 'gender',
             rawMember: null,
             member: null,
             displayMember: 'Unknown',
-        ));
+            interpolation: false,
+        );
+
+        $dimensionCollection = $dimensionFactory->getDimensionCollection();
+        $dimensionsByName = $dimensionCollection->getDimensionsByName('gender');
 
         $result = array_map(
-            fn($dimension): mixed => $dimension->getRawMember(),
-            iterator_to_array($collector->getResult()),
+            fn(DefaultDimension $dimension): mixed => $dimension->getRawMember(),
+            iterator_to_array($dimensionsByName->getGapFilled()),
         );
 
         // Ensure the null value is last in the result

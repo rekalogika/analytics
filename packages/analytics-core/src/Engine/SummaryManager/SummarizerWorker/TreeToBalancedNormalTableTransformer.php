@@ -19,7 +19,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMe
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTree;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTreeNode;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 
 final class TreeToBalancedNormalTableTransformer
@@ -41,7 +40,6 @@ final class TreeToBalancedNormalTableTransformer
         return new DefaultNormalTable(
             summaryClass: $tree->getSummaryClass(),
             rows: $rows,
-            itemCollection: $tree->getItemCollection(),
             condition: $tree->getTuple()->getCondition(),
         );
     }
@@ -59,9 +57,9 @@ final class TreeToBalancedNormalTableTransformer
     }
 
     /**
-     * @param list<DefaultTreeNode> $currentRow
+     * @param list<DefaultTree> $currentRow
      */
-    private function processNode(DefaultTreeNode $node, array $currentRow): void
+    private function processNode(DefaultTree $node, array $currentRow): void
     {
         $currentRow[] = $node;
 
@@ -81,12 +79,12 @@ final class TreeToBalancedNormalTableTransformer
     }
 
     /**
-     * @param list<DefaultTreeNode> $currentRow
+     * @param list<DefaultTree> $currentRow
      */
     private function createRow(array $currentRow, DefaultMeasure $measure): void
     {
         $dimensions = array_map(
-            static fn(DefaultTreeNode $node): DefaultDimension => $node->getDimension(),
+            static fn(DefaultTree $node): DefaultDimension => $node->getDimension(),
             $currentRow,
         );
 

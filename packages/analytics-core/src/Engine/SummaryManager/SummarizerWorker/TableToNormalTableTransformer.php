@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
@@ -46,8 +45,6 @@ final class TableToNormalTableTransformer
      */
     private array $measureMemberCache = [];
 
-    private readonly DimensionCollector $dimensionCollector;
-
     private function __construct(
         DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
@@ -63,7 +60,6 @@ final class TableToNormalTableTransformer
 
         $this->dimensions = $dimensions;
         $this->measures = $query->getSelect();
-        $this->dimensionCollector = new DimensionCollector($metadata, $query, $dimensionFactory);
     }
 
     public static function transform(
@@ -101,8 +97,6 @@ final class TableToNormalTableTransformer
                     $rows[] = $normalRow;
                 }
 
-                $this->dimensionCollector->processDimensions($normalRow);
-                $this->dimensionCollector->processMeasure($normalRow->getMeasure());
                 $rowCollection->collectNormalRow($normalRow);
             }
         }
@@ -110,12 +104,9 @@ final class TableToNormalTableTransformer
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
-        $itemCollection = $this->dimensionCollector->getItemCollection();
-
         return new DefaultNormalTable(
             summaryClass: $input->getSummaryClass(),
             rows: $rows,
-            itemCollection: $itemCollection,
             condition: $input->getCondition(),
         );
     }
@@ -170,6 +161,7 @@ final class TableToNormalTableTransformer
                 member: $measureMember,
                 rawMember: $measureMember,
                 displayMember: $measureMember,
+                interpolation: false,
             );
 
             /** @var array<string,DefaultDimension> $newRow */

@@ -11,13 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector;
+namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Engine\Sequence\SequenceUtil;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -152,6 +151,7 @@ final readonly class GapFiller
             member: $member,
             rawMember: $member,
             displayMember: $member,
+            interpolation: true,
         );
     }
 }

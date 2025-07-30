@@ -45,6 +45,7 @@ final class DimensionFactory
         mixed $member,
         mixed $rawMember,
         mixed $displayMember,
+        bool $interpolation,
     ): DefaultDimension {
         if (\is_object($rawMember)) {
             $signature = hash(
@@ -64,6 +65,7 @@ final class DimensionFactory
             member: $member,
             rawMember: $rawMember,
             displayMember: $displayMember,
+            interpolation: $interpolation,
         );
 
         $this->dimensionCollection->collectDimension($dimension);

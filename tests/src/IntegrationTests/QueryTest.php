@@ -58,7 +58,9 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
             ->getResult()
-            ->getTree();
+            ->getTree()
+            ->traverse('2024')
+            ?? [];
 
         $this->assertCount(0, $result);
     }

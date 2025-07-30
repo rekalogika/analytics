@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\QueryResultToTableHelper;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
@@ -49,6 +50,7 @@ final readonly class QueryResultToTableTransformer
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly DimensionFactory $dimensionFactory,
+        private readonly NullMeasureCollection $nullMeasureCollection,
     ) {
         $this->helper = new QueryResultToTableHelper();
 
@@ -68,6 +70,7 @@ final readonly class QueryResultToTableTransformer
         PropertyAccessorInterface $propertyAccessor,
         RowCollection $rowCollection,
         DimensionFactory $dimensionFactory,
+        NullMeasureCollection $nullMeasureCollection,
         array $input,
     ): DefaultTable {
         $transformer = new self(
@@ -76,6 +79,7 @@ final readonly class QueryResultToTableTransformer
             entityManager: $entityManager,
             propertyAccessor: $propertyAccessor,
             dimensionFactory: $dimensionFactory,
+            nullMeasureCollection: $nullMeasureCollection,
         );
 
         /** @psalm-suppress InvalidArgument */
@@ -250,6 +254,7 @@ final readonly class QueryResultToTableTransformer
                 member: $value,
                 rawMember: $rawValue,
                 displayMember: $displayValue,
+                interpolation: false,
             );
 
             $dimensionValues[$name] = $dimension;
@@ -300,6 +305,8 @@ final readonly class QueryResultToTableTransformer
             );
 
             $measureValues[$name] = $measure;
+
+            $this->nullMeasureCollection->collectMeasure($measure);
         }
 
         return $measureValues;
