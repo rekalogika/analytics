@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Block\Util\Subtotals;
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class RootBlock extends BranchBlock
 {
     protected function __construct(
-        BranchNode $treeNode,
+        TreeNode $treeNode,
         BlockContext $context,
     ) {
         parent::__construct($treeNode, null, 0, $context);

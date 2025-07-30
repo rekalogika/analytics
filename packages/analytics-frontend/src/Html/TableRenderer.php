@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableTreeNodeAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 use Twig\Environment;
@@ -167,7 +167,7 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $treeResult = $result->getTree();
-        $pivotTable = PivotTableAdapter::adapt($treeResult);
+        $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
 
         $table = PivotTableTransformer::transformTreeToTable(
             treeNode: $pivotTable,

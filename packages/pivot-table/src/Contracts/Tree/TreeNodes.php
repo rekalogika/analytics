@@ -13,15 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Contracts\Tree;
 
-interface BranchNode extends TreeNode
-{
-    /**
-     * @return iterable<TreeNode>
-     */
-    public function getChildren(): iterable;
-
-    /**
-     * @return iterable<SubtotalNode>
-     */
-    public function getSubtotals(): iterable;
-}
+/**
+ * @extends \Traversable<TreeNode>
+ */
+interface TreeNodes extends \Traversable, \Countable {}

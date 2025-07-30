@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Block\Util\Subtotals;
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
@@ -46,15 +44,13 @@ abstract class Block implements \Stringable
         int $level,
         BlockContext $context,
     ): Block {
-        if ($treeNode instanceof BranchNode) {
+        if (!$treeNode->isLeaf()) {
             if ($context->isPivoted($treeNode)) {
                 return new PivotBlock($treeNode, $this, $level, $context);
             } else {
                 return new NormalBlock($treeNode, $this, $level, $context);
             }
-        }
-
-        if ($treeNode instanceof LeafNode) {
+        } else {
             if ($context->isPivoted($treeNode)) {
                 return new PivotLeafBlock($treeNode, $this, $level, $context);
             } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
@@ -63,8 +59,6 @@ abstract class Block implements \Stringable
                 return new NormalLeafBlock($treeNode, $this, $level, $context);
             }
         }
-
-        throw new \LogicException('Unknown node type');
     }
 
     final protected function getLevel(): int
@@ -82,7 +76,7 @@ abstract class Block implements \Stringable
      * @param list<string> $superfluousLegends
      */
     final public static function new(
-        BranchNode $treeNode,
+        TreeNode $treeNode,
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Block {
@@ -103,8 +97,8 @@ abstract class Block implements \Stringable
     }
 
     /**
-     * @param non-empty-list<BranchNode> $branchNodes
-     * @return non-empty-list<BranchNode>
+     * @param non-empty-list<TreeNode> $branchNodes
+     * @return non-empty-list<TreeNode>
      */
     final protected function balanceBranchNodes(array $branchNodes, int $level): array
     {
@@ -129,7 +123,7 @@ abstract class Block implements \Stringable
             }
         }
 
-        /** @var non-empty-list<BranchNode> $result */
+        /** @var non-empty-list<TreeNode> $result */
         return $result;
     }
 

@@ -13,4 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Contracts\Tree;
 
-interface SubtotalNode extends LeafNode {}
+interface SubtotalNode
+{
+    public function getKey(): string;
+
+    public function getLegend(): mixed;
+
+    public function getItem(): mixed;
+
+    public function getValue(): mixed;
+}

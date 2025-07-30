@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Block\Util\Subtotals;
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
@@ -24,7 +24,7 @@ final class VerticalBlockGroup extends BlockGroup
     private ?DefaultRows $dataRows = null;
 
     public function __construct(
-        BranchNode $parentNode,
+        TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {

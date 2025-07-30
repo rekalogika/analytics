@@ -13,18 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
-/**
- * @extends NodeBlock<BranchNode>
- */
 abstract class BranchBlock extends NodeBlock
 {
     private BlockGroup $childrenBlockGroup;
 
     protected function __construct(
-        BranchNode $treeNode,
+        TreeNode $treeNode,
         ?Block $parent,
         int $level,
         BlockContext $context,
@@ -38,7 +34,7 @@ abstract class BranchBlock extends NodeBlock
         return $this->childrenBlockGroup;
     }
 
-    private function createBlockGroup(BranchNode $parentNode, int $level): BlockGroup
+    private function createBlockGroup(TreeNode $parentNode, int $level): BlockGroup
     {
 
         /** @var \Traversable<array-key,TreeNode> */

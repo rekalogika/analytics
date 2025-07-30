@@ -15,17 +15,10 @@ namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
-/**
- * @template T of TreeNode
- */
 abstract class NodeBlock extends Block
 {
     private readonly ?BlockGroup $parent;
 
-    /**
-     *
-     * @param T $treeNode
-     */
     protected function __construct(
         private readonly TreeNode $treeNode,
         ?Block $parent,
@@ -45,9 +38,6 @@ abstract class NodeBlock extends Block
         $this->parent = $parent;
     }
 
-    /**
-     * @return T
-     */
     final public function getTreeNode(): TreeNode
     {
         return $this->treeNode;

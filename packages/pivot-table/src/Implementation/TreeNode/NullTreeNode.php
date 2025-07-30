@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\SubtotalNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
-final readonly class NullBranchNode implements BranchNode
+final readonly class NullTreeNode implements TreeNode
 {
     /**
      * @var iterable<NullSubtotalNode> $subtotals
@@ -31,6 +31,7 @@ final readonly class NullBranchNode implements BranchNode
         private mixed $legend,
         private mixed $item,
         iterable $subtotals,
+        private bool $isLeaf,
     ) {
         $newSubtotals = [];
 
@@ -45,15 +46,23 @@ final readonly class NullBranchNode implements BranchNode
         $this->subtotals = $newSubtotals;
     }
 
-    public static function fromInterface(BranchNode $node): self
+    public static function fromInterface(TreeNode $node): self
     {
         return new self(
             name: $node->getKey(),
             legend: $node->getLegend(),
             item: $node->getItem(),
             subtotals: $node->getSubtotals(),
+            isLeaf: $node->isLeaf(),
         );
     }
+
+    #[\Override]
+    public function isLeaf(): bool
+    {
+        return $this->isLeaf;
+    }
+
 
     #[\Override]
     public function getKey(): string
@@ -74,9 +83,15 @@ final readonly class NullBranchNode implements BranchNode
     }
 
     #[\Override]
-    public function getChildren(): iterable
+    public function getValue(): mixed
     {
-        return [];
+        return null;
+    }
+
+    #[\Override]
+    public function getChildren(): NullTreeNodes
+    {
+        return new NullTreeNodes([]);
     }
 
     #[\Override]

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block\Util;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\SubtotalNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 /**
  * @implements \IteratorAggregate<SubtotalNode>
@@ -31,7 +31,7 @@ final class Subtotals implements \IteratorAggregate, \Countable
      */
     private array $remainingNodes;
 
-    public function __construct(BranchNode $treeNode)
+    public function __construct(TreeNode $treeNode)
     {
         $this->nodes = $this->remainingNodes
             = iterator_to_array($treeNode->getSubtotals(), false);
