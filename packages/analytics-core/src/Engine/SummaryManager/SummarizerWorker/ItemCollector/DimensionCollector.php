@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollec
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -35,6 +36,7 @@ final class DimensionCollector
     public function __construct(
         private SummaryMetadata $metadata,
         private DefaultQuery $query,
+        private readonly DimensionFactory $dimensionFactory,
     ) {}
 
     public function getItemCollection(): ItemCollection
@@ -83,6 +85,7 @@ final class DimensionCollector
         return $this->collectors[$name] ??= new DimensionByNameCollector(
             name: $name,
             order: $this->getOrder($name),
+            dimensionFactory: $this->dimensionFactory,
         );
     }
 

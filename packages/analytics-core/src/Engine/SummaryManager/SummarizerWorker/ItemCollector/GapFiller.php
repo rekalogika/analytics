@@ -17,11 +17,27 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Engine\Sequence\SequenceUtil;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class GapFiller
 {
+    /**
+     * Fills gaps in the provided list of dimensions
+     *
+     * @param list<DefaultDimension> $dimensions
+     * @return list<DefaultDimension>
+     */
+    public static function process(
+        array $dimensions,
+        DimensionFactory $dimensionFactory,
+    ): array {
+        $self = new self($dimensions, $dimensionFactory);
+
+        return $self->getOutput();
+    }
+
     /**
      * @var array<int,DefaultDimension>
      */
@@ -36,6 +52,7 @@ final readonly class GapFiller
      */
     private function __construct(
         array $dimensions,
+        private DimensionFactory $dimensionFactory,
     ) {
         $newDimensions = [];
         $class = null;
@@ -90,27 +107,16 @@ final readonly class GapFiller
     }
 
     /**
-     * @param list<DefaultDimension> $dimensions
      * @return list<DefaultDimension>
      */
-    public static function process(array $dimensions): array
+    private function getOutput(): array
     {
-        $self = new self($dimensions);
+        $firstDimension = $this->dimensions[array_key_first($this->dimensions)
+            ?? throw new InvalidArgumentException('Dimensions is empty')];
 
-        /**
-         * @var list<DefaultDimension>
-         * @psalm-suppress InvalidArgument
-         */
-        return array_values(iterator_to_array($self->getOutput()));
-    }
+        $lastDimension = $this->dimensions[array_key_last($this->dimensions)
+            ?? throw new InvalidArgumentException('Dimensions is empty')];
 
-    /**
-     * @return iterable<DefaultDimension>
-     */
-    private function getOutput(): iterable
-    {
-        $firstDimension = $this->dimensions[array_key_first($this->dimensions) ?? throw new InvalidArgumentException('Dimensions is empty')];
-        $lastDimension = $this->dimensions[array_key_last($this->dimensions) ?? throw new InvalidArgumentException('Dimensions is empty')];
         $firstMember = $firstDimension->getMember();
         $lastMember = $lastDimension->getMember();
 
@@ -126,9 +132,13 @@ final readonly class GapFiller
 
         $sequence = SequenceUtil::getSequenceFromMembers($firstMember, $lastMember);
 
+        $output = [];
+
         foreach ($sequence as $current) {
-            yield $this->getDimensionFromSequenceMember($current);
+            $output[] = $this->getDimensionFromSequenceMember($current);
         }
+
+        return $output;
     }
 
     private function getDimensionFromSequenceMember(
@@ -136,9 +146,9 @@ final readonly class GapFiller
     ): DefaultDimension {
         $objectId = spl_object_id($member);
 
-        return $this->dimensions[$objectId] ?? new DefaultDimension(
-            label: $this->label,
+        return $this->dimensions[$objectId] ?? $this->dimensionFactory->createDimension(
             name: $this->name,
+            label: $this->label,
             member: $member,
             rawMember: $member,
             displayMember: $member,

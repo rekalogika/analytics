@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\DimensionFactory;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\QueryResultToTableHelper;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;

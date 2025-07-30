@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -24,7 +25,13 @@ final class DimensionCollectorTest extends TestCase
 {
     public function testNullLast(): void
     {
-        $collector = new DimensionByNameCollector('gender', Order::Ascending);
+        $dimensionFactory = new DimensionFactory(new HardcodedOrderByResolver(Order::Ascending));
+
+        $collector = new DimensionByNameCollector(
+            'gender',
+            Order::Ascending,
+            $dimensionFactory,
+        );
 
         $collector->addDimension(new DefaultDimension(
             label: new TranslatableMessage('Female'),
