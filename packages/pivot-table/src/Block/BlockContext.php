@@ -34,7 +34,7 @@ final readonly class BlockContext
     public function getDistinctNodesOfLevel(int $level): array
     {
         $result =  $this->distinct[$level] ?? null;
-        
+
 
         if ($result !== null) {
             return $result;

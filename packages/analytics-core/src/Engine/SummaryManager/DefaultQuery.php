@@ -93,7 +93,7 @@ final class DefaultQuery implements Query
             metadata: $this->getSummaryMetadata(),
             propertyAccessor: $this->propertyAccessor,
             entityManager: $this->getEntityManager(),
-            fillingNodesLimit: $this->fillingNodesLimit,
+            nodesLimit: $this->fillingNodesLimit,
             queryResultLimit: $this->queryResultLimit,
         );
     }

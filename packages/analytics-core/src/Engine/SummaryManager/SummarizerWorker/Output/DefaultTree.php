@@ -14,65 +14,97 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\ItemCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeContext;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @implements \IteratorAggregate<mixed,DefaultTreeNode>
- * @deprecated
+ * @implements \IteratorAggregate<mixed,DefaultTree>
+ * @internal
  */
 final class DefaultTree implements TreeNode, \IteratorAggregate
 {
-    use NodeTrait;
-    use BalancedTreeChildrenTrait;
+    private readonly DefaultMeasures $subtotals;
 
-    private DefaultTuple $tuple;
-    private DefaultMeasures $subtotals;
+    private ?DefaultMeasure $measure = null;
+
+    /**
+     * @var list<DefaultTree>|null
+     */
+    private ?array $balancedChildren = null;
+
+    /**
+     * @var list<DefaultTree>|null
+     */
+    private ?array $unbalancedChildren = null;
+
+    /**
+     * @param list<string> $descendantdimensionNames
+     * @param list<string> $measureNames
+     */
+    public function __construct(
+        private readonly DefaultTuple $tuple,
+        private readonly array $descendantdimensionNames,
+        private readonly array $measureNames,
+        private readonly ?TranslatableInterface $rootLabel,
+        private readonly TreeContext $context,
+    ) {
+        $this->subtotals = $context->getRowCollection()->getMeasures($this->tuple);
+    }
 
     /**
      * @param class-string $summaryClass
-     * @param list<DefaultTreeNode> $children
+     * @param list<string> $dimensionNames
+     * @param list<string> $measureNames
      */
-    public function __construct(
-        private readonly string $summaryClass,
-        private readonly TranslatableInterface $label,
-        private readonly ?string $childrenKey,
-        private readonly array $children,
-        private readonly ItemCollection $itemCollection,
-        private readonly TreeNodeFactory $treeNodeFactory,
-        private readonly RowCollection $rowCollection,
+    public static function createRoot(
+        string $summaryClass,
+        array $dimensionNames,
+        array $measureNames,
+        TranslatableInterface $rootLabel,
+        RowCollection $rowCollection,
+        DimensionCollection $dimensionCollection,
+        NullMeasureCollection $nullMeasureCollection,
         ?Expression $condition,
-    ) {
-        if ($childrenKey === null && $children !== []) {
-            throw new UnexpectedValueException('Children key cannot be null if children is not empty');
+        int $nodesLimit,
+    ): self {
+        if (!\in_array('@values', $dimensionNames, true)) {
+            $dimensionNames[] = '@values';
         }
 
-        foreach ($children as $child) {
-            if ($child->getName() !== $childrenKey) {
-                throw new UnexpectedValueException(
-                    \sprintf('Invalid child key "%s", expected "%s"', $child->getName(), (string) $childrenKey),
-                );
-            }
-        }
-
-        $this->tuple = new DefaultTuple(
+        $rootTuple = new DefaultTuple(
             summaryClass: $summaryClass,
             dimensions: [],
             condition: $condition,
         );
 
-        $this->subtotals = $rowCollection->getMeasures($this->tuple);
+        $context = new TreeContext(
+            rowCollection: $rowCollection,
+            dimensionCollection: $dimensionCollection,
+            nullMeasureCollection: $nullMeasureCollection,
+            nodesLimit: $nodesLimit,
+        );
+
+        return new self(
+            descendantdimensionNames: $dimensionNames,
+            measureNames: $measureNames,
+            tuple: $rootTuple,
+            rootLabel: $rootLabel,
+            context: $context,
+        );
     }
 
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->summaryClass;
+        return $this->tuple->getSummaryClass();
     }
 
     #[\Override]
@@ -84,7 +116,25 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getMeasure(): ?DefaultMeasure
     {
-        return null;
+        if (\count($this->measureNames) !== 1) {
+            return null;
+        }
+
+        if ($this->measure !== null) {
+            return $this->measure;
+        }
+
+        $measure = $this->context
+            ->getRowCollection()
+            ->getMeasure($this->tuple);
+
+        if ($measure === null) {
+            $measure = $this->context
+                ->getNullMeasureCollection()
+                ->getNullMeasure($this->measureNames[0]);
+        }
+
+        return $this->measure = $measure;
     }
 
     #[\Override]
@@ -96,43 +146,50 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function isNull(): bool
     {
-        return false;
+        return $this->tuple->last()?->isInterpolation() ?? false;
     }
 
     #[\Override]
     public function getMember(): mixed
     {
-        return null;
+        return $this->tuple->last()?->getMember();
     }
 
     #[\Override]
     public function getRawMember(): mixed
     {
-        return null;
+        return $this->tuple->last()?->getRawMember();
     }
 
     #[\Override]
     public function getDisplayMember(): mixed
     {
-        return null;
+        return $this->tuple->last()?->getDisplayMember();
     }
 
     #[\Override]
     public function getName(): string
     {
-        return '';
+        return $this->tuple->last()?->getName() ?? '';
     }
 
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return $this->label;
+        if ($this->rootLabel !== null) {
+            return $this->rootLabel;
+        }
+
+        return $this->tuple->last()?->getLabel()
+            ?? throw new UnexpectedValueException(
+                'Root label is not set and tuple does not have a label.',
+            );
     }
 
     #[\Override]
     public function count(): int
     {
-        return \count($this->children);
+        return \count($this->getBalancedChildren());
     }
 
     #[\Override]
@@ -143,18 +200,213 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
     }
 
-    public function getItemCollection(): ItemCollection
+    #[\Override]
+    public function getByKey(mixed $key): ?DefaultTree
     {
-        return $this->itemCollection;
+        $balancedChildren = $this->getBalancedChildren();
+
+        foreach ($balancedChildren as $child) {
+            if ($child->getMember() === $key) {
+                return $child;
+            }
+        }
+
+        return null;
     }
 
-    public function getChildrenKey(): ?string
+    #[\Override]
+    public function getByIndex(int $index): ?DefaultTree
     {
-        return $this->childrenKey;
+        $balancedChildren = $this->getBalancedChildren();
+
+        if (!isset($balancedChildren[$index])) {
+            return null;
+        }
+
+        return $balancedChildren[$index];
     }
 
-    public function getRowCollection(): RowCollection
+    #[\Override]
+    public function hasKey(mixed $key): bool
     {
-        return $this->rowCollection;
+        $balancedChildren = $this->getBalancedChildren();
+
+        foreach ($balancedChildren as $child) {
+            if ($child->getMember() === $key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #[\Override]
+    public function first(): ?DefaultTree
+    {
+        $balancedChildren = $this->getBalancedChildren();
+
+        if (empty($balancedChildren)) {
+            return null;
+        }
+
+        return $balancedChildren[0];
+    }
+
+    #[\Override]
+    public function last(): ?DefaultTree
+    {
+        $balancedChildren = $this->getBalancedChildren();
+
+        if (empty($balancedChildren)) {
+            return null;
+        }
+
+        return end($balancedChildren);
+    }
+
+    public function getDimension(): DefaultDimension
+    {
+        $dimension = $this->tuple->last();
+
+        if (!$dimension instanceof DefaultDimension) {
+            throw new UnexpectedValueException(
+                'Expected last tuple item to be an instance of DefaultDimension, '
+                    . 'got: ' . get_debug_type($dimension),
+            );
+        }
+
+        return $dimension;
+    }
+
+    /**
+     * @return list<DefaultTree>
+     */
+    private function getBalancedChildren(): array
+    {
+        if ($this->balancedChildren !== null) {
+            return $this->balancedChildren;
+        }
+
+        $descendantdimensionNames = $this->descendantdimensionNames;
+        $dimensionName = array_shift($descendantdimensionNames);
+
+        if ($dimensionName === null) {
+            return $this->balancedChildren = [];
+        }
+
+        $dimensions = $this->context
+            ->getDimensionCollection()
+            ->getDimensionsByName($dimensionName)
+            ->getGapFilled();
+
+        $treeNodeFactory = $this->context->getTreeNodeFactory();
+
+        $balancedChildren = [];
+
+        foreach ($dimensions as $dimension) {
+            $tuple = $this->tuple->append($dimension);
+            $member = $dimension->getMember();
+
+            if ($member instanceof MeasureMember) {
+                $measureNames = [$member->getMeasureProperty()];
+            } else {
+                $measureNames = $this->measureNames;
+            }
+
+            $child = $treeNodeFactory->createNode(
+                tuple: $tuple,
+                descendantdimensionNames: $descendantdimensionNames,
+                measureNames: $measureNames,
+            );
+
+            $balancedChildren[] = $child;
+        }
+
+        return $this->balancedChildren = $balancedChildren;
+    }
+
+    /**
+     * @return list<DefaultTree>
+     */
+    public function getUnbalancedChildren(): array
+    {
+        if ($this->unbalancedChildren !== null) {
+            return $this->unbalancedChildren;
+        }
+
+        $balancedChildren = $this->getBalancedChildren();
+        $unbalancedChildren = [];
+
+        foreach ($balancedChildren as $child) {
+            if ($child->isNull()) {
+                continue;
+            }
+
+            $unbalancedChildren[] = $child;
+        }
+
+        return $this->unbalancedChildren = $unbalancedChildren;
+    }
+
+    private function canDescribeThisNode(mixed $input): bool
+    {
+        /** @psalm-suppress MixedAssignment */
+        $member = $this->getMember();
+
+        if (
+            $member instanceof MeasureMember
+            && $member->getMeasureProperty() === $input
+        ) {
+            return true;
+        }
+
+        if ($member === $input) {
+            return true;
+        }
+
+        if (
+            $member instanceof \Stringable
+            && $member->__toString() === $input
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function getChildByDescription(mixed $input): ?DefaultTree
+    {
+        foreach ($this as $child) {
+            if ($child->canDescribeThisNode($input)) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
+    #[\Override]
+    public function traverse(mixed ...$members): ?DefaultTree
+    {
+        if ($members === []) {
+            throw new InvalidArgumentException(
+                'Cannot traverse to empty members, expected at least 1 member.',
+            );
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $first = array_shift($members);
+
+        $child = $this->getChildByDescription($first);
+
+        if ($child === null) {
+            return null;
+        }
+
+        if ($members === []) {
+            return $child;
+        }
+
+        return $child->traverse(...$members);
     }
 }

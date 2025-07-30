@@ -23,10 +23,9 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTa
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\MetadataOrderByResolver;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeNodeFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\NormalTableToTreeTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
@@ -53,8 +52,7 @@ final class DefaultResult implements Result
 
     private ?DefaultNormalTable $unbalancedNormalTable = null;
 
-    private ?DefaultTree $tree = null;
-    private ?NewDefaultTree $newTree = null;
+    private ?DefaultTree $newTree = null;
 
     private ?DefaultNormalTable $normalTable = null;
 
@@ -62,11 +60,11 @@ final class DefaultResult implements Result
 
     private ?bool $hasHierarchicalOrdering = null;
 
-    private readonly TreeNodeFactory $treeNodeFactory;
-
     private readonly RowCollection $rowCollection;
     private readonly DimensionCollection $dimensionCollection;
     private readonly DimensionFactory $dimensionFactory;
+
+    private readonly NullMeasureCollection $nullMeasureCollection;
 
     /**
      * @param class-string $summaryClass
@@ -78,7 +76,7 @@ final class DefaultResult implements Result
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly EntityManagerInterface $entityManager,
-        int $fillingNodesLimit,
+        private int $nodesLimit,
         private int $queryResultLimit,
     ) {
         $this->rowCollection = new RowCollection();
@@ -91,11 +89,7 @@ final class DefaultResult implements Result
         );
 
         $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
-
-        $this->treeNodeFactory = new TreeNodeFactory(
-            fillingNodesLimit: $fillingNodesLimit,
-            rowCollection: $this->rowCollection,
-        );
+        $this->nullMeasureCollection = new NullMeasureCollection();
     }
 
     #[\Override]
@@ -202,6 +196,7 @@ final class DefaultResult implements Result
             rowCollection: $this->rowCollection,
             dimensionFactory: $this->dimensionFactory,
             input: $this->getQueryResult(),
+            nullMeasureCollection: $this->nullMeasureCollection,
         );
     }
 
@@ -221,28 +216,25 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getTree(): NewDefaultTree
+    public function getTree(): DefaultTree
     {
-        // return $this->tree ??= NormalTableToTreeTransformer::transform(
-        //     label: $this->label,
-        //     normalTable: $this->getUnbalancedNormalTable(),
-        //     treeNodeFactory: $this->treeNodeFactory,
-        //     rowCollection: $this->rowCollection,
-        // );
+        if ($this->newTree !== null) {
+            return $this->newTree;
+        }
 
         $this->getUnbalancedNormalTable();
 
-        $result = $this->newTree ??= NewDefaultTree::createRoot(
+        return $this->newTree = DefaultTree::createRoot(
             summaryClass: $this->summaryClass,
             dimensionNames: $this->query->getGroupBy(),
+            measureNames: $this->query->getSelect(),
             rootLabel: $this->label,
             rowCollection: $this->rowCollection,
             dimensionCollection: $this->dimensionCollection,
+            nullMeasureCollection: $this->nullMeasureCollection,
             condition: $this->query->getWhere(),
-            nodesLimit: $this->queryResultLimit,
+            nodesLimit: $this->nodesLimit,
         );
-
-        return $result;
     }
 
     #[\Override]

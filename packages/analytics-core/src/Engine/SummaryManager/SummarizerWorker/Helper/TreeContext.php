@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 
 final readonly class TreeContext
 {
@@ -22,6 +23,7 @@ final readonly class TreeContext
     public function __construct(
         private RowCollection $rowCollection,
         private DimensionCollection $dimensionCollection,
+        private NullMeasureCollection $nullMeasureCollection,
         int $nodesLimit,
     ) {
         $this->treeNodeFactory = new NewDefaultTreeNodeFactory(
@@ -43,5 +45,10 @@ final readonly class TreeContext
     public function getDimensionCollection(): DimensionCollection
     {
         return $this->dimensionCollection;
+    }
+
+    public function getNullMeasureCollection(): NullMeasureCollection
+    {
+        return $this->nullMeasureCollection;
     }
 }

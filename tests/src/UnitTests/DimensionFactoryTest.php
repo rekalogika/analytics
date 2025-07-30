@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\ItemCollector\DimensionByNameCollector;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Symfony\Component\Translation\TranslatableMessage;

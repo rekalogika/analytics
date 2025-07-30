@@ -17,7 +17,6 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Engine\Sequence\SequenceUtil;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
