@@ -19,7 +19,6 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Contracts\Result\TreeNodes;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
@@ -37,16 +36,9 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     private ?DefaultMeasure $measure = null;
 
     /**
-     * @var list<DefaultTree>|null
+     * @var array<string,DefaultTreeNodes>
      */
-    private ?array $balancedChildren = null;
-
-    /**
-     * @var list<DefaultTree>|null
-     */
-    private ?array $unbalancedChildren = null;
-
-    private ?DefaultTreeNodes $children = null;
+    private array $children = [];
 
     /**
      * @param list<string> $descendantdimensionNames
@@ -102,6 +94,11 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             rootLabel: $rootLabel,
             context: $context,
         );
+    }
+
+    private function getNextDimensionName(): ?string
+    {
+        return $this->descendantdimensionNames[0] ?? null;
     }
 
     #[\Override]
@@ -192,79 +189,43 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function count(): int
     {
-        return \count($this->getBalancedChildren());
+        return $this->getChildren()->count();
     }
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->getBalancedChildren() as $child) {
-            yield $child->getMember() => $child;
-        }
+        return $this->getChildren()->getIterator();
     }
 
     #[\Override]
     public function getByKey(mixed $key): ?DefaultTree
     {
-        $balancedChildren = $this->getBalancedChildren();
-
-        foreach ($balancedChildren as $child) {
-            if ($child->getMember() === $key) {
-                return $child;
-            }
-        }
-
-        return null;
+        return $this->getChildren()->getByKey($key);
     }
 
     #[\Override]
     public function getByIndex(int $index): ?DefaultTree
     {
-        $balancedChildren = $this->getBalancedChildren();
-
-        if (!isset($balancedChildren[$index])) {
-            return null;
-        }
-
-        return $balancedChildren[$index];
+        return $this->getChildren()->getByIndex($index);
     }
 
     #[\Override]
     public function hasKey(mixed $key): bool
     {
-        $balancedChildren = $this->getBalancedChildren();
-
-        foreach ($balancedChildren as $child) {
-            if ($child->getMember() === $key) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->getChildren()->hasKey($key);
     }
 
     #[\Override]
     public function first(): ?DefaultTree
     {
-        $balancedChildren = $this->getBalancedChildren();
-
-        if (empty($balancedChildren)) {
-            return null;
-        }
-
-        return $balancedChildren[0];
+        return $this->getChildren()->first();
     }
 
     #[\Override]
     public function last(): ?DefaultTree
     {
-        $balancedChildren = $this->getBalancedChildren();
-
-        if (empty($balancedChildren)) {
-            return null;
-        }
-
-        return end($balancedChildren);
+        return $this->getChildren()->last();
     }
 
     public function getDimension(): DefaultDimension
@@ -282,13 +243,19 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getChildren(): TreeNodes
+    public function getChildren(?string $name = null): DefaultTreeNodes
     {
-        if ($this->children !== null) {
-            return $this->children;
+        $name ??= $this->getNextDimensionName();
+
+        if ($name === \null) {
+            return new DefaultTreeNodes([]);
         }
 
-        return $this->children = new DefaultTreeNodes($this->getBalancedChildren());
+        if (isset($this->children[$name])) {
+            return $this->children[$name];
+        }
+
+        return $this->children[$name] = new DefaultTreeNodes($this->getBalancedChildren());
     }
 
     /**
@@ -296,15 +263,11 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
      */
     private function getBalancedChildren(): array
     {
-        if ($this->balancedChildren !== null) {
-            return $this->balancedChildren;
-        }
-
         $descendantdimensionNames = $this->descendantdimensionNames;
         $dimensionName = array_shift($descendantdimensionNames);
 
         if ($dimensionName === null) {
-            return $this->balancedChildren = [];
+            return [];
         }
 
         $dimensions = $this->context
@@ -340,30 +303,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             $balancedChildren[] = $child;
         }
 
-        return $this->balancedChildren = $balancedChildren;
-    }
-
-    /**
-     * @return list<DefaultTree>
-     */
-    public function getUnbalancedChildren(): array
-    {
-        if ($this->unbalancedChildren !== null) {
-            return $this->unbalancedChildren;
-        }
-
-        $balancedChildren = $this->getBalancedChildren();
-        $unbalancedChildren = [];
-
-        foreach ($balancedChildren as $child) {
-            if ($child->isNull()) {
-                continue;
-            }
-
-            $unbalancedChildren[] = $child;
-        }
-
-        return $this->unbalancedChildren = $unbalancedChildren;
+        return $balancedChildren;
     }
 
     private function canDescribeThisNode(mixed $input): bool

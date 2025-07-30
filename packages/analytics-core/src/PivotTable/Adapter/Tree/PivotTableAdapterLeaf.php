@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
 use Rekalogika\Analytics\PivotTable\Util\TreePropertyMap;
@@ -24,16 +23,7 @@ final readonly class PivotTableAdapterLeaf implements LeafNode
     public function __construct(
         private TreeNode $node,
         private TreePropertyMap $propertyMap,
-    ) {
-        // $measure = $node->getMeasure();
-
-        // if ($measure === null) {
-        //     throw new UnexpectedValueException(\sprintf(
-        //         'Leaf node "%s" does not have a measure',
-        //         $node->getName(),
-        //     ));
-        // }
-    }
+    ) {}
 
     #[\Override]
     public function getValue(): mixed
