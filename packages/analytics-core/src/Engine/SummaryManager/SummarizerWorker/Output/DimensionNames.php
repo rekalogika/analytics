@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Exception\DimensionNamesException;
 
 final readonly class DimensionNames implements \Countable, \Stringable
 {
@@ -80,7 +80,7 @@ final readonly class DimensionNames implements \Countable, \Stringable
     public function withoutFirst(): static
     {
         if (empty($this->dimensionNames)) {
-            throw new InvalidArgumentException('Dimension names cannot be empty.');
+            throw new DimensionNamesException('Dimension names cannot be empty.');
         }
 
         $dimensionNames = $this->dimensionNames;
@@ -108,5 +108,50 @@ final readonly class DimensionNames implements \Countable, \Stringable
         array_shift($dimensionNames); // remove the name itself
 
         return new self($dimensionNames);
+    }
+
+    /**
+     * @param int<1,max>|int<min,-1>|string $name
+     */
+    public function resolveName(string|int $name): string
+    {
+        if (\is_string($name)) {
+            if (!$this->hasName($name)) {
+                throw new DimensionNamesException(\sprintf(
+                    'Dimension name "%s" is not found in the dimension names: %s',
+                    $name,
+                    implode(', ', $this->dimensionNames),
+                ));
+            }
+
+            return $name;
+        }
+
+        // if positive, returns the name at the index, start at 1
+        if ($name > 0) {
+            return $this->dimensionNames[$name - 1]
+                ?? throw new DimensionNamesException(\sprintf(
+                    'Dimension name at index %d is not found in the dimension names: %s',
+                    $name,
+                    implode(', ', $this->dimensionNames),
+                ));
+        }
+
+        // if negative, returns the name at the index from the end, start at -1
+        if ($name < 0) {
+            $index = \count($this->dimensionNames) + $name;
+
+            return $this->dimensionNames[$index]
+                ?? throw new DimensionNamesException(\sprintf(
+                    'Dimension name at index %d is not found in the dimension names: %s',
+                    $name,
+                    implode(', ', $this->dimensionNames),
+                ));
+        }
+
+        throw new DimensionNamesException(\sprintf(
+            'Invalid dimension name: %s. Must be a string or an integer.',
+            var_export($name, true),
+        ));
     }
 }

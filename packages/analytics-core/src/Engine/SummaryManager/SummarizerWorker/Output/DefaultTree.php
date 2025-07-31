@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Exception\DimensionNamesException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeContext;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -87,11 +88,6 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             rootLabel: $rootLabel,
             context: $context,
         );
-    }
-
-    private function getNextDimensionName(): ?string
-    {
-        return $this->descendantdimensionNames->first();
     }
 
     #[\Override]
@@ -259,13 +255,21 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getChildren(?string $name = null): DefaultTreeNodes
+    public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
-        $name ??= $this->getNextDimensionName();
-
-        if ($name === \null) {
+        try {
+            return $this->getChildrenOrFail($name);
+        } catch (DimensionNamesException) {
             return new DefaultTreeNodes([]);
         }
+    }
+
+    /**
+     * @param int<1,max>|int<min,-1>|string $name
+     */
+    private function getChildrenOrFail(int|string $name = 1): DefaultTreeNodes
+    {
+        $name = $this->descendantdimensionNames->resolveName($name);
 
         if (isset($this->children[$name])) {
             return $this->children[$name];
