@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
+use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class TupleSerializerTest extends KernelTestCase
+final class TupleMapperTest extends KernelTestCase
 {
-    public function testTupleSerializer(): void
+    public function testTupleMapper(): void
     {
         $summaryManager = self::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(SummaryManager::class, $summaryManager);
@@ -47,17 +47,17 @@ final class TupleSerializerTest extends KernelTestCase
 
     private function testOne(Row $row): void
     {
-        $tupleSerializer = self::getContainer()->get(TupleSerializer::class);
-        $this->assertInstanceOf(TupleSerializer::class, $tupleSerializer);
+        $tupleMapper = self::getContainer()->get(TupleMapper::class);
+        $this->assertInstanceOf(TupleMapper::class, $tupleMapper);
 
         $tuple = $row->getTuple();
         $class = $tuple->getSummaryClass();
 
-        $serializedTuple = $tupleSerializer->serialize($tuple);
+        $tupleDto = $tupleMapper->toDto($tuple);
 
         // deserialize the tuple
 
-        $deserializedRow = $tupleSerializer->deserialize($class, $serializedTuple);
+        $newTuple = $tupleMapper->fromDto($class, $tupleDto);
 
         // original measures
 
@@ -67,9 +67,9 @@ final class TupleSerializerTest extends KernelTestCase
         $price = $row->getMeasures()->getByKey('price')?->getRawValue();
 
         /** @psalm-suppress MixedAssignment */
-        $deserializedCount = $deserializedRow->getMeasures()->getByKey('count')?->getRawValue();
+        $deserializedCount = $newTuple->getMeasures()->getByKey('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $deserializedPrice = $deserializedRow->getMeasures()->getByKey('price')?->getRawValue();
+        $deserializedPrice = $newTuple->getMeasures()->getByKey('price')?->getRawValue();
 
         $this->assertEquals($count, $deserializedCount);
         $this->assertEquals($price, $deserializedPrice);

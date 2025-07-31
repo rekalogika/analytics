@@ -18,7 +18,8 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
+use Rekalogika\Analytics\Contracts\Dto\TupleDto;
+use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
@@ -28,7 +29,6 @@ use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
 use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
-use Rekalogika\Analytics\Tests\App\Serializer\TupleDtoSerializer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -148,16 +148,16 @@ final class AppController extends AbstractController
     public function tuple(
         string $hash,
         string $data,
-        TupleDtoSerializer $tupleDtoSerializer,
-        TupleSerializer $tupleSerializer,
+        TupleMapper $tupleMapper,
         #[Autowire('@rekalogika.analytics.summary_manager')]
         DefaultSummaryManager $summaryManager,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
         $sqlFormatter = new SqlFormatter(new HtmlHighlighter(usePre: false));
 
-        $tupleDto = $tupleDtoSerializer->deserialize($data);
-        $row = $tupleSerializer->deserialize($class, $tupleDto);
+        /** @psalm-suppress MixedArgument */
+        $tupleDto = TupleDto::fromArray(json_decode($data, true));
+        $row = $tupleMapper->fromDto($class, $tupleDto);
         $queryComponents = $summaryManager->getTupleQueryComponents($row->getTuple());
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
@@ -225,7 +225,7 @@ final class AppController extends AbstractController
     public function dummy(
         DistinctValuesResolver $distinctValueResolver,
         ValueSerializer $valueSerializer,
-        TupleSerializer $tupleSerializer,
+        TupleMapper $tupleSerializer,
     ): Response {
         return new Response();
     }

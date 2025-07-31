@@ -11,27 +11,36 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Serialization\Implementation;
+namespace Rekalogika\Analytics\Serialization\Mapper;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Dto\ExpressionDto;
+use Rekalogika\Analytics\Contracts\Dto\TupleDto;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Contracts\Serialization\TupleDto;
-use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
+use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Serialization\Implementation\NullRow;
+use Rekalogika\Analytics\Serialization\Mapper\Implementation\ChainMapper;
 
-final readonly class DefaultTupleSerializer implements TupleSerializer
+final readonly class DefaultTupleMapper implements TupleMapper
 {
+    private Mapper $mapper;
+
     public function __construct(
         private ValueSerializer $valueSerializer,
         private SummaryManager $summaryManager,
         private SummaryMetadataFactory $summaryMetadataFactory,
-    ) {}
+    ) {
+        $this->mapper = new ChainMapper($this->valueSerializer);
+    }
 
     #[\Override]
-    public function serialize(Tuple $tuple): TupleDto
+    public function toDto(Tuple $tuple): TupleDto
     {
         $class = $tuple->getSummaryClass();
 
@@ -46,7 +55,6 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
             /** @psalm-suppress MixedAssignment */
             $dimensionMember = $dimension->getRawMember();
 
-            // Serialize the value to a string representation
             $serializedValue = $this->valueSerializer->serialize(
                 class: $class,
                 dimension: $dimensionName,
@@ -56,14 +64,28 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
             $members[$dimensionName] = $serializedValue;
         }
 
+        $condition = $tuple->getCondition();
+
+        if ($condition !== null) {
+            $mapperContext = new MapperContext(
+                summaryClass: $class,
+            );
+
+            $condition = $this->mapper->toDto($condition, $mapperContext);
+
+            if (!$condition instanceof ExpressionDto) {
+                throw new UnexpectedValueException('Expected ExpressionDto, got ' . \get_class($condition));
+            }
+        }
+
         return new TupleDto(
             members: $members,
-            condition: $tuple->getCondition(),
+            condition: $condition,
         );
     }
 
     #[\Override]
-    public function deserialize(string $summaryClass, TupleDto $dto): Row
+    public function fromDto(string $summaryClass, TupleDto $dto): Row
     {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
@@ -74,9 +96,20 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
             ->from($summaryClass);
 
         // add where condition
-        $condition = $dto->getCondition();
+        $conditionDto = $dto->getCondition();
+        $condition = null;
 
-        if ($condition !== null) {
+        if ($conditionDto !== null) {
+            $mapperContext = new MapperContext(
+                summaryClass: $summaryClass,
+            );
+
+            $condition = $this->mapper->fromDto($conditionDto, $mapperContext);
+
+            if (!$condition instanceof Expression) {
+                throw new UnexpectedValueException('Expected Expression, got ' . \get_class($condition));
+            }
+
             $query->where($condition);
         }
 
@@ -110,9 +143,8 @@ final readonly class DefaultTupleSerializer implements TupleSerializer
         // execute
         $result = $query->getResult();
         $table = $result->getTable();
-        $rows = iterator_to_array($table, false);
 
-        return $rows[0] ?? new NullRow(
+        return $table->first() ?? new NullRow(
             summaryMetadata: $metadata,
             dimensionMembers: $dimensionMembers,
             condition: $condition,

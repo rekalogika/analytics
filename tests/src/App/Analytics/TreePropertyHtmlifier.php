@@ -14,12 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
-use Rekalogika\Analytics\Contracts\Serialization\TupleSerializer;
+use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Rekalogika\Analytics\PivotTable\Model\Tree\TreeMember;
-use Rekalogika\Analytics\Tests\App\Serializer\TupleDtoSerializer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -28,8 +27,7 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
     private ?Htmlifier $htmlifier = null;
 
     public function __construct(
-        private TupleSerializer $tupleSerializer,
-        private TupleDtoSerializer $tupleDtoSerializer,
+        private TupleMapper $tupleMapper,
         private UrlGeneratorInterface $urlGenerator,
         private SummaryClassRegistry $summaryClassRegistry,
     ) {}
@@ -66,8 +64,8 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
         $node = $input->getNode();
         $tuple = $node->getTuple();
 
-        $tupleDto = $this->tupleSerializer->serialize($tuple);
-        $string = $this->tupleDtoSerializer->serialize($tupleDto);
+        $tupleDto = $this->tupleMapper->toDto($tuple);
+        $string = json_encode($tupleDto->toArray());
         $hash = $this->summaryClassRegistry->getHashFromClass($tuple->getSummaryClass());
 
         $url = $this->urlGenerator->generate(
