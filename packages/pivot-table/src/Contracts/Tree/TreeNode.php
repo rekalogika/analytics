@@ -15,9 +15,20 @@ namespace Rekalogika\PivotTable\Contracts\Tree;
 
 interface TreeNode
 {
+    public function isLeaf(): bool;
+
     public function getKey(): string;
 
     public function getLegend(): mixed;
 
     public function getItem(): mixed;
+
+    public function getValue(): mixed;
+
+    public function getChildren(): TreeNodes;
+
+    /**
+     * @return iterable<SubtotalNode>
+     */
+    public function getSubtotals(): iterable;
 }

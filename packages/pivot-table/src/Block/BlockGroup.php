@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 
 abstract class BlockGroup extends Block
@@ -39,7 +38,7 @@ abstract class BlockGroup extends Block
     private ?array $balancedChildBlocks = null;
 
     public function __construct(
-        private readonly BranchNode $parentNode,
+        private readonly TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
@@ -94,7 +93,7 @@ abstract class BlockGroup extends Block
             ?? throw new \RuntimeException('No child blocks found in the parent node.');
     }
 
-    final public function getParentNode(): BranchNode
+    final public function getParentNode(): TreeNode
     {
         return $this->parentNode;
     }
@@ -108,7 +107,6 @@ abstract class BlockGroup extends Block
             return $this->children;
         }
 
-        /** @var \Traversable<array-key,TreeNode> */
         $children = $this->parentNode->getChildren();
 
         return $this->children = array_values(iterator_to_array($children));
@@ -125,7 +123,7 @@ abstract class BlockGroup extends Block
 
         $children = $this->getChildren();
 
-        /** @var non-empty-list<BranchNode> $children */
+        /** @var non-empty-list<TreeNode> $children */
         return $this->balancedChildren = $this->balanceBranchNodes($children, $this->getLevel());
     }
 

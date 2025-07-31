@@ -14,20 +14,35 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
 use Rekalogika\Analytics\PivotTable\Util\TreePropertyMap;
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNode as PivotTableTreeNode;
+use Rekalogika\PivotTable\Contracts\Tree\TreeNodes;
 
-final readonly class PivotTableAdapter implements BranchNode
+final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
 {
     public static function adapt(TreeNode $node): self
     {
-        return new self($node);
+        return new self($node, new TreePropertyMap());
     }
 
-    private function __construct(
+    private PivotTableTreeNodesAdapter $children;
+
+    public function __construct(
         private TreeNode $node,
-        private TreePropertyMap $propertyMap = new TreePropertyMap(),
-    ) {}
+        private TreePropertyMap $propertyMap,
+    ) {
+        $this->children = new PivotTableTreeNodesAdapter(
+            nodes: $node->getChildren(),
+            propertyMap: $propertyMap,
+        );
+    }
+
+    #[\Override]
+    public function isLeaf(): bool
+    {
+        return $this->node->getDimensionNames() === [];
+    }
 
     #[\Override]
     public function getKey(): string
@@ -48,19 +63,15 @@ final readonly class PivotTableAdapter implements BranchNode
     }
 
     #[\Override]
-    public function getChildren(): iterable
+    public function getValue(): mixed
     {
-        foreach ($this->node as $item) {
-            if ($item->isNull()) {
-                continue;
-            }
+        return new TreeValue($this->node);
+    }
 
-            if ($item->count() > 0) {
-                yield new PivotTableAdapter($item, $this->propertyMap);
-            } else {
-                yield new PivotTableAdapterLeaf($item, $this->propertyMap);
-            }
-        }
+    #[\Override]
+    public function getChildren(): TreeNodes
+    {
+        return $this->children;
     }
 
     #[\Override]
@@ -69,7 +80,7 @@ final readonly class PivotTableAdapter implements BranchNode
         $subtotals = $this->node->getSubtotals();
 
         foreach ($subtotals as $subtotal) {
-            yield SubtotalAdapter::adapt($subtotal);
+            yield new SubtotalAdapter($subtotal);
         }
     }
 

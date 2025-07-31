@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableTreeNodeAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 
@@ -64,7 +64,7 @@ final readonly class SpreadsheetRenderer
         array $pivotedDimensions = [],
     ): Spreadsheet {
         $treeResult = $result->getTree();
-        $pivotTable = PivotTableAdapter::adapt($treeResult);
+        $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
 
         $table = PivotTableTransformer::transformTreeToTable(
             treeNode: $pivotTable,

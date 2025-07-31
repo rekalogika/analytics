@@ -568,6 +568,7 @@ final class ArchitectureTest
                 // php array
                 Selector::classname(\Traversable::class),
                 Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\ArrayIterator::class),
                 Selector::classname(\WeakMap::class),
             );
     }

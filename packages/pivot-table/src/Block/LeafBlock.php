@@ -13,9 +13,4 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
-
-/**
- * @extends NodeBlock<LeafNode>
- */
 abstract class LeafBlock extends NodeBlock {}

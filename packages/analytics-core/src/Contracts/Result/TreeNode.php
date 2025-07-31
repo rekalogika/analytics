@@ -36,6 +36,14 @@ interface TreeNode extends OrderedMapCollection, Dimension
     public function getTuple(): Tuple;
 
     /**
+     * The dimension names of the descendant nodes of this node. Empty means
+     * this node is a leaf node.
+     *
+     * @return list<string>
+     */
+    public function getDimensionNames(): array;
+
+    /**
      * @param ?string $name The children's dimension name, if null, it will be
      * the next dimension according to the query.
      */

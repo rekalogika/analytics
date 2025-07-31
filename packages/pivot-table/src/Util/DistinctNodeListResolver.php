@@ -13,49 +13,39 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\PivotTable\Contracts\Tree\BranchNode;
-use Rekalogika\PivotTable\Contracts\Tree\LeafNode;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
-use Rekalogika\PivotTable\Implementation\TreeNode\NullBranchNode;
-use Rekalogika\PivotTable\Implementation\TreeNode\NullLeafNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 
 final readonly class DistinctNodeListResolver
 {
     /**
      * @return list<list<TreeNode>>
      */
-    public static function getDistinctNodes(
-        TreeNode $treeNode,
-    ): array {
-        if ($treeNode instanceof BranchNode) {
-            $grandChildrenDistincts = [];
-            $children = $treeNode->getChildren();
-
-            foreach ($treeNode->getChildren() as $child) {
-                if ($child instanceof BranchNode) {
-                    $grandChildrenDistincts[] = self::getDistinctNodes($child);
-                }
-            }
-
-            $childNulls = [];
-
-            foreach ($children as $child) {
-                if ($child instanceof BranchNode) {
-                    $childNulls[] = NullBranchNode::fromInterface($child);
-                } elseif ($child instanceof LeafNode) {
-                    $childNulls[] = NullLeafNode::fromInterface($child);
-                } else {
-                    throw new \LogicException('Unknown node type');
-                }
-            }
-
-            return [
-                $childNulls,
-                ...self::mergeDistincts($grandChildrenDistincts),
-            ];
+    public static function getDistinctNodes(TreeNode $treeNode): array
+    {
+        if ($treeNode->isLeaf()) {
+            throw new \LogicException('Invalid TreeNode type');
         }
 
-        throw new \LogicException('Invalid TreeNode type');
+        $grandChildrenDistincts = [];
+        $children = $treeNode->getChildren();
+
+        foreach ($treeNode->getChildren() as $child) {
+            if (!$child->isLeaf()) {
+                $grandChildrenDistincts[] = self::getDistinctNodes($child);
+            }
+        }
+
+        $childNulls = [];
+
+        foreach ($children as $child) {
+            $childNulls[] = NullTreeNode::fromInterface($child);
+        }
+
+        return [
+            $childNulls,
+            ...self::mergeDistincts($grandChildrenDistincts),
+        ];
     }
 
     /**
@@ -75,17 +65,11 @@ final readonly class DistinctNodeListResolver
                         $merged[$level] = [];
                     }
 
+
                     if (!\in_array($node->getItem(), $values[$level], true)) {
                         /** @psalm-suppress MixedAssignment */
                         $values[$level][] = $node->getItem();
-
-                        if ($node instanceof BranchNode) {
-                            $merged[$level][] = NullBranchNode::fromInterface($node);
-                        } elseif ($node instanceof LeafNode) {
-                            $merged[$level][] = NullLeafNode::fromInterface($node);
-                        } else {
-                            throw new \LogicException('Unknown node type');
-                        }
+                        $merged[$level][] = NullTreeNode::fromInterface($node);
                     }
                 }
             }

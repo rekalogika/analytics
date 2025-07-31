@@ -21,12 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class SubtotalAdapter implements SubtotalNode, TranslatableInterface
 {
-    public static function adapt(Measure $measure): self
-    {
-        return new self($measure);
-    }
-
-    private function __construct(
+    public function __construct(
         private Measure $measure,
     ) {}
 

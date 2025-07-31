@@ -111,6 +111,12 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
+    public function getDimensionNames(): array
+    {
+        return $this->descendantdimensionNames->toArray();
+    }
+
+    #[\Override]
     public function getMeasure(): DefaultMeasure
     {
         if (\count($this->measureNames) !== 1) {

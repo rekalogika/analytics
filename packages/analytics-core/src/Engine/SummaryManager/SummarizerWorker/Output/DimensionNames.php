@@ -24,6 +24,14 @@ final readonly class DimensionNames implements \Countable, \Stringable
         private array $dimensionNames,
     ) {}
 
+    /**
+     * @return list<string>
+     */
+    public function toArray(): array
+    {
+        return $this->dimensionNames;
+    }
+
     #[\Override]
     public function __toString(): string
     {
