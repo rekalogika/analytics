@@ -18,13 +18,12 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Dto\ExpressionDto;
 use Rekalogika\Analytics\Contracts\Dto\TupleDto;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Serialization\Implementation\NullRow;
 use Rekalogika\Analytics\Serialization\Mapper\Implementation\ChainMapper;
 
 final readonly class DefaultTupleMapper implements TupleMapper
@@ -88,7 +87,7 @@ final readonly class DefaultTupleMapper implements TupleMapper
     }
 
     #[\Override]
-    public function fromDto(string $summaryClass, TupleDto $dto): Row
+    public function fromDto(string $summaryClass, TupleDto $dto): Result
     {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
@@ -144,13 +143,6 @@ final readonly class DefaultTupleMapper implements TupleMapper
         }
 
         // execute
-        $result = $query->getResult();
-        $table = $result->getTable();
-
-        return $table->first() ?? new NullRow(
-            summaryMetadata: $metadata,
-            dimensionMembers: $dimensionMembers,
-            condition: $condition,
-        );
+        return $query->getResult();
     }
 }

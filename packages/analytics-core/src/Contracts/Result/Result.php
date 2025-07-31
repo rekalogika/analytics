@@ -29,6 +29,16 @@ interface Result
      */
     public function getSummaryClass(): string;
 
+    /**
+     * Gets the root tuple of this result.
+     */
+    public function getTuple(): Tuple;
+
+    /**
+     * Gets the root measures of this result.
+     */
+    public function getMeasures(): Measures;
+
     public function getTree(): TreeNode;
 
     public function getNormalTable(): NormalTable;
