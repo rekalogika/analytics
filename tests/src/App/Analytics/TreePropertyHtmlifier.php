@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
-use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
-use Rekalogika\Analytics\PivotTable\Model\Tree\TreeMember;
+use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -57,7 +56,7 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
     #[\Override]
     public function toHtml(mixed $input): string
     {
-        if (!$input instanceof TreeMember) {
+        if (!$input instanceof TreeValue) {
             throw new ValueNotSupportedException();
         }
 
@@ -77,10 +76,6 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
         );
 
         $content = $this->getHtmlifier()->toHtml($input->getContent());
-
-        if ($input->getNode()->getMember() instanceof MeasureMember) {
-            return $content;
-        }
 
         return \sprintf(
             '<a href="%s" target="_blank">%s</a>',

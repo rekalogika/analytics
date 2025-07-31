@@ -17,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for name, dimension in row %}
+            {% for name, dimension in row.tuple %}
                 <tr>
                     <td>{{ dimension.name }}</td>
                     <td>{{ dimension.label|trans }}</td>
