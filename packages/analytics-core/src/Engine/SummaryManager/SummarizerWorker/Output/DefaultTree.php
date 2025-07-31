@@ -19,9 +19,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeContext;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -59,9 +57,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         array $dimensionNames,
         array $measureNames,
         TranslatableInterface $rootLabel,
-        RowCollection $rowCollection,
-        DimensionCollection $dimensionCollection,
-        NullMeasureCollection $nullMeasureCollection,
+        DefaultTable $table,
+        DefaultNormalTable $normalTable,
         ?Expression $condition,
         int $nodesLimit,
     ): self {
@@ -76,9 +73,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         );
 
         $context = new TreeContext(
-            rowCollection: $rowCollection,
-            dimensionCollection: $dimensionCollection,
-            nullMeasureCollection: $nullMeasureCollection,
+            table: $table,
+            resultContext: $normalTable->getContext(),
             nodesLimit: $nodesLimit,
         );
 
@@ -130,8 +126,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
 
         $measure = $this->context
-            ->getRowCollection()
-            ->getMeasure($this->tuple);
+            ->getTable()
+            ->getMeasureByTuple($this->tuple);
 
         if ($measure === null) {
             $measure = $this->context
@@ -392,5 +388,10 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
 
         return $child->traverse(...$members);
+    }
+
+    public function getContext(): ResultContext
+    {
+        return $this->context->getResultContext();
     }
 }

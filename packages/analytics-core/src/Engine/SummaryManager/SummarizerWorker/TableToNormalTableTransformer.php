@@ -16,8 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultNormalRow;
@@ -48,9 +47,8 @@ final class TableToNormalTableTransformer
     private function __construct(
         DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
-        private readonly RowCollection $rowCollection,
-        private readonly DimensionFactory $dimensionFactory,
-        private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
+        private readonly ResultContext $context,
+        private readonly TranslatableInterface $measureLabel,
     ) {
         $dimensions = $query->getGroupBy();
 
@@ -64,48 +62,45 @@ final class TableToNormalTableTransformer
 
     public static function transform(
         DefaultQuery $query,
-        DefaultTable $input,
+        DefaultTable $table,
         SummaryMetadata $metadata,
-        RowCollection $rowCollection,
-        DimensionFactory $dimensionFactory,
         TranslatableInterface $valuesLabel = new TranslatableMessage('Values'),
     ): DefaultNormalTable {
         $transformer = new self(
             query: $query,
             metadata: $metadata,
-            rowCollection: $rowCollection,
-            dimensionFactory: $dimensionFactory,
+            context: $table->getContext(),
             measureLabel: $valuesLabel,
         );
 
-        return $transformer->doTransform($input);
+        return new DefaultNormalTable(
+            summaryClass: $metadata->getSummaryClass(),
+            rows: $transformer->doTransform($table),
+            context: $table->getContext(),
+        );
     }
 
-    private function doTransform(DefaultTable $input): DefaultNormalTable
+    /**
+     * @return iterable<DefaultNormalRow>
+     */
+    private function doTransform(DefaultTable $table): iterable
     {
-        $rowCollection = $this->rowCollection;
-
         $rows = [];
-        $subtotalRows = [];
 
-        foreach ($rowCollection->getRows() as $row) {
+        foreach ($table as $row) {
+            if ($row->isGrouping()) {
+                continue;
+            }
 
             foreach ($this->unpivotRow($row) as $normalRow) {
-                if ($row->isGrouping()) {
-                    $subtotalRows[] = $normalRow;
-                } else {
-                    $rows[] = $normalRow;
-                }
+                $rows[] = $normalRow;
             }
         }
 
         /** @psalm-suppress MixedArgumentTypeCoercion */
         usort($rows, $this->getMeasureSorterCallable());
 
-        return new DefaultNormalTable(
-            summaryClass: $input->getSummaryClass(),
-            rows: $rows,
-        );
+        yield from $rows;
     }
 
     private function getMeasureSorterCallable(): callable
@@ -152,14 +147,16 @@ final class TableToNormalTableTransformer
 
             $measureMember = $this->getMeasureMember($measure);
 
-            $newRow['@values'] = $this->dimensionFactory->createDimension(
-                label: $this->measureLabel,
-                name: '@values',
-                member: $measureMember,
-                rawMember: $measureMember,
-                displayMember: $measureMember,
-                interpolation: false,
-            );
+            $newRow['@values'] = $this->context
+                ->getDimensionFactory()
+                ->createDimension(
+                    label: $this->measureLabel,
+                    name: '@values',
+                    member: $measureMember,
+                    rawMember: $measureMember,
+                    displayMember: $measureMember,
+                    interpolation: false,
+                );
 
             /** @var array<string,DefaultDimension> $newRow */
             $tuple = new DefaultTuple(

@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 
 /**
  * @implements \IteratorAggregate<Tuple,DefaultRow>
@@ -29,11 +30,11 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     private array $rows;
 
     /**
-     * Grouping rows
+     * All rows including grouping rows
      *
      * @var array<string,DefaultRow>
      */
-    private array $groupingRows;
+    private array $allRows;
 
     /**
      * @param class-string $summaryClass
@@ -42,24 +43,25 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         iterable $rows,
+        private ResultContext $context,
     ) {
         $newRows = [];
-        $newGroupingRows = [];
+        $newAllRows = [];
 
         foreach ($rows as $row) {
-            if ($row->isGrouping()) {
-                $newGroupingRows[$row->getSignature()] = $row;
-            } else {
+            $newAllRows[$row->getSignature()] = $row;
+
+            if (!$row->isGrouping()) {
                 $newRows[$row->getSignature()] = $row;
             }
         }
 
         $this->rows = $newRows;
-        $this->groupingRows = $newGroupingRows;
+        $this->allRows = $newAllRows;
     }
 
     /**
-     * Get by tuple returns from the rows or grouping rows
+     * Get row by tuple. Seeks through all rows, including grouping rows.
      */
     #[\Override]
     public function getByKey(mixed $key): ?DefaultRow
@@ -70,7 +72,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
 
         $signature = $key->getSignature();
 
-        return $this->rows[$signature] ?? $this->groupingRows[$signature] ?? null;
+        return $this->allRows[$signature] ?? null;
     }
 
     /**
@@ -91,6 +93,10 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         return $this->rows[$signature] ?? null;
     }
 
+    /**
+     * Checks if the table has a row with the given key. Checks through all
+     * rows, including grouping rows.
+     */
     #[\Override]
     public function hasKey(mixed $key): bool
     {
@@ -100,7 +106,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
 
         $signature = $key->getSignature();
 
-        return isset($this->rows[$signature]) || isset($this->groupingRows[$signature]);
+        return isset($this->allRows[$signature]);
     }
 
     #[\Override]
@@ -145,5 +151,27 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         foreach ($this->rows as $row) {
             yield $row->getTuple() => $row;
         }
+    }
+
+    public function getMeasureByTuple(DefaultTuple $tuple): ?DefaultMeasure
+    {
+        $measureName = $tuple->getMeasureName();
+
+        if ($measureName === null) {
+            return null;
+        }
+
+        $row = $this->getByKey($tuple->withoutMeasure());
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $row->getMeasures()->getByKey($measureName);
+    }
+
+    public function getContext(): ResultContext
+    {
+        return $this->context;
     }
 }

@@ -76,6 +76,7 @@ final class BalancedNormalTableToBalancedTableTransformer
         return new DefaultTable(
             summaryClass: $summaryClass,
             rows: $this->rows,
+            context: $this->normalTable->getContext(),
         );
     }
 }

@@ -22,12 +22,8 @@ use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\BalancedNormalTableToBalancedTableTransformer;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionCollection;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\MetadataOrderByResolver;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\EmptyResult;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\TreeToBalancedNormalTableTransformer;
@@ -62,12 +58,6 @@ final class DefaultResult implements Result
 
     private ?bool $hasHierarchicalOrdering = null;
 
-    private readonly RowCollection $rowCollection;
-    private readonly DimensionCollection $dimensionCollection;
-    private readonly DimensionFactory $dimensionFactory;
-
-    private readonly NullMeasureCollection $nullMeasureCollection;
-
     /**
      * @param class-string $summaryClass
      */
@@ -80,19 +70,7 @@ final class DefaultResult implements Result
         private readonly EntityManagerInterface $entityManager,
         private int $nodesLimit,
         private int $queryResultLimit,
-    ) {
-        $this->rowCollection = new RowCollection();
-
-        $this->dimensionFactory = new DimensionFactory(
-            new MetadataOrderByResolver(
-                metadata: $this->metadata,
-                query: $this->query,
-            ),
-        );
-
-        $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
-        $this->nullMeasureCollection = new NullMeasureCollection();
-    }
+    ) {}
 
     #[\Override]
     public function getLabel(): TranslatableInterface
@@ -202,15 +180,18 @@ final class DefaultResult implements Result
 
     private function getUnbalancedTable(): DefaultTable
     {
+        $resultContext = new ResultContext(
+            metadata: $this->metadata,
+            query: $this->query,
+        );
+
         return $this->unbalancedTable ??= QueryResultToTableTransformer::transform(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
-            rowCollection: $this->rowCollection,
-            dimensionFactory: $this->dimensionFactory,
             input: $this->getQueryResult(),
-            nullMeasureCollection: $this->nullMeasureCollection,
+            context: $resultContext,
         );
     }
 
@@ -222,9 +203,7 @@ final class DefaultResult implements Result
 
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             query: $this->query,
-            input: $this->getUnbalancedTable(),
-            rowCollection: $this->rowCollection,
-            dimensionFactory: $this->dimensionFactory,
+            table: $this->getUnbalancedTable(),
             metadata: $this->metadata,
         );
     }
@@ -236,16 +215,13 @@ final class DefaultResult implements Result
             return $this->newTree;
         }
 
-        $this->getUnbalancedNormalTable();
-
         return $this->newTree = DefaultTree::createRoot(
             summaryClass: $this->summaryClass,
+            table: $this->getUnbalancedTable(),
+            normalTable: $this->getUnbalancedNormalTable(),
             dimensionNames: $this->query->getGroupBy(),
             measureNames: $this->query->getSelect(),
             rootLabel: $this->label,
-            rowCollection: $this->rowCollection,
-            dimensionCollection: $this->dimensionCollection,
-            nullMeasureCollection: $this->nullMeasureCollection,
             condition: $this->query->getWhere(),
             nodesLimit: $this->nodesLimit,
         );
