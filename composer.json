@@ -43,7 +43,6 @@
         "symfony/messenger": "^6.4 || ^7.0",
         "symfony/polyfill-intl-icu": "^1.31",
         "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
         "symfony/service-contracts": "^3",
         "symfony/stimulus-bundle": "^2.9",
         "symfony/translation": "^6.4 || ^7.0",
