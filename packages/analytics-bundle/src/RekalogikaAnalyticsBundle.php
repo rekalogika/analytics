@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Core\Doctrine\Function\BustFunction;
+use Rekalogika\Analytics\Core\Doctrine\Function\InFunction;
 use Rekalogika\Analytics\Core\Doctrine\Function\IsNotNullFunction;
 use Rekalogika\Analytics\Core\Doctrine\Function\IsNullFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
@@ -169,6 +170,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             'REKALOGIKA_GROUPING_CONCAT' => GroupingConcatFunction::class,
             'REKALOGIKA_IS_NULL' => IsNullFunction::class,
             'REKALOGIKA_IS_NOT_NULL' => IsNotNullFunction::class,
+            'REKALOGIKA_IN' => InFunction::class,
         ];
 
         $numericFunctions = [
