@@ -201,43 +201,43 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function count(): int
     {
-        return $this->tryGetChildren()->count();
+        return $this->getChildren()->count();
     }
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        return $this->tryGetChildren()->getIterator();
+        return $this->getChildren()->getIterator();
     }
 
     #[\Override]
     public function getByKey(mixed $key): ?DefaultTree
     {
-        return $this->tryGetChildren()->getByKey($key);
+        return $this->getChildren()->getByKey($key);
     }
 
     #[\Override]
     public function getByIndex(int $index): ?DefaultTree
     {
-        return $this->tryGetChildren()->getByIndex($index);
+        return $this->getChildren()->getByIndex($index);
     }
 
     #[\Override]
     public function hasKey(mixed $key): bool
     {
-        return $this->tryGetChildren()->hasKey($key);
+        return $this->getChildren()->hasKey($key);
     }
 
     #[\Override]
     public function first(): ?DefaultTree
     {
-        return $this->tryGetChildren()->first();
+        return $this->getChildren()->first();
     }
 
     #[\Override]
     public function last(): ?DefaultTree
     {
-        return $this->tryGetChildren()->last();
+        return $this->getChildren()->last();
     }
 
     public function getDimension(): DefaultDimension
@@ -257,6 +257,18 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
+        try {
+            return $this->getChildrenOrFail($name);
+        } catch (DimensionNamesException) {
+            return new DefaultTreeNodes([]);
+        }
+    }
+
+    /**
+     * @param int<1,max>|int<min,-1>|string $name
+     */
+    private function getChildrenOrFail(int|string $name = 1): DefaultTreeNodes
+    {
         $name = $this->descendantdimensionNames->resolveName($name);
 
         if (isset($this->children[$name])) {
@@ -265,18 +277,6 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
         return $this->children[$name] =
             new DefaultTreeNodes($this->getBalancedChildren($name));
-    }
-
-    /**
-     * @param int<1,max>|int<min,-1>|string $name
-     */
-    public function tryGetChildren(int|string $name = 1): DefaultTreeNodes
-    {
-        try {
-            return $this->getChildren($name);
-        } catch (DimensionNamesException) {
-            return new DefaultTreeNodes([]);
-        }
     }
 
     /**
