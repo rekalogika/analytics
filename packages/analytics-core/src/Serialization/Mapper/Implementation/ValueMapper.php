@@ -61,10 +61,15 @@ final readonly class ValueMapper implements Mapper
 
         if (\is_array($value)) {
             $value = array_map(
-                /** @psalm-suppress MixedArgument */
+                /**
+                 * @psalm-suppress MixedArgument
+                 */
                 fn($value): mixed => $this->valueSerializer->deserialize(
                     class: $context->getSummaryClass(),
                     dimension: $context->getCurrentField(),
+                    /**
+                     * @phpstan-ignore argument.type
+                     */
                     identifier: $value,
                 ),
                 $value,

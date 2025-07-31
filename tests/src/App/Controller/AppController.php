@@ -155,7 +155,10 @@ final class AppController extends AbstractController
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
         $sqlFormatter = new SqlFormatter(new HtmlHighlighter(usePre: false));
 
-        /** @psalm-suppress MixedArgument */
+        /**
+         * @psalm-suppress MixedArgument
+         * @phpstan-ignore argument.type
+         */
         $tupleDto = TupleDto::fromArray(json_decode($data, true));
         $row = $tupleMapper->fromDto($class, $tupleDto);
         $queryComponents = $summaryManager->getTupleQueryComponents($row->getTuple());

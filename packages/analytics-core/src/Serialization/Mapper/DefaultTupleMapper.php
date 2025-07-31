@@ -29,6 +29,9 @@ use Rekalogika\Analytics\Serialization\Mapper\Implementation\ChainMapper;
 
 final readonly class DefaultTupleMapper implements TupleMapper
 {
+    /**
+     * @var Mapper<object,object>
+     */
     private Mapper $mapper;
 
     public function __construct(
