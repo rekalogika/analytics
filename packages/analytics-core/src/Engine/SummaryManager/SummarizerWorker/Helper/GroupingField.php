@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
+namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 

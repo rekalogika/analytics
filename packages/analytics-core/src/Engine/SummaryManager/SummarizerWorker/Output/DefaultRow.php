@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\GroupingField;
 
 final readonly class DefaultRow implements Row
 {

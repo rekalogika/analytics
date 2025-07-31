@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\GroupingField;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\GroupingField;
 
 final class GroupingTest extends TestCase
 {

@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\GroupingField;
 use Rekalogika\Analytics\Engine\Util\DimensionUtil;
 
 final readonly class DefaultNormalRow implements NormalRow

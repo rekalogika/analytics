@@ -18,10 +18,9 @@ use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\DimensionFactory;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\NullMeasureCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\GroupingField;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\QueryResultToTableHelper;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\RowCollection;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultMeasures;
@@ -29,7 +28,6 @@ use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultRo
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTable;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultTuple;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\DefaultUnit;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output\GroupingField;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -49,8 +47,7 @@ final readonly class QueryResultToTableTransformer
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly DimensionFactory $dimensionFactory,
-        private readonly NullMeasureCollection $nullMeasureCollection,
+        private readonly ResultContext $context,
     ) {
         $this->helper = new QueryResultToTableHelper();
 
@@ -68,9 +65,7 @@ final readonly class QueryResultToTableTransformer
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
-        RowCollection $rowCollection,
-        DimensionFactory $dimensionFactory,
-        NullMeasureCollection $nullMeasureCollection,
+        ResultContext $context,
         array $input,
     ): DefaultTable {
         $transformer = new self(
@@ -78,21 +73,13 @@ final readonly class QueryResultToTableTransformer
             metadata: $metadata,
             entityManager: $entityManager,
             propertyAccessor: $propertyAccessor,
-            dimensionFactory: $dimensionFactory,
-            nullMeasureCollection: $nullMeasureCollection,
+            context: $context,
         );
-
-        /** @psalm-suppress InvalidArgument */
-        $rows = iterator_to_array($transformer->doTransform($input), false);
-
-        /** @var iterable<int,DefaultRow> $rows */
-        foreach ($rows as $row) {
-            $rowCollection->collectRow($row);
-        }
 
         return new DefaultTable(
             summaryClass: $metadata->getSummaryClass(),
-            rows: $rows,
+            rows: $transformer->doTransform($input),
+            context: $context,
         );
     }
 
@@ -247,7 +234,7 @@ final readonly class QueryResultToTableTransformer
             /** @psalm-suppress MixedAssignment */
             $displayValue = $value ?? $this->getNullValue($name);
 
-            $dimension = $this->dimensionFactory->createDimension(
+            $dimension = $this->context->getDimensionFactory()->createDimension(
                 label: $this->getLabel($name),
                 name: $name,
                 member: $value,
@@ -305,7 +292,7 @@ final readonly class QueryResultToTableTransformer
 
             $measureValues[$name] = $measure;
 
-            $this->nullMeasureCollection->collectMeasure($measure);
+            $this->context->getNullMeasureCollection()->collectMeasure($measure);
         }
 
         return $measureValues;

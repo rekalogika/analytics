@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 
 /**
  * @implements \IteratorAggregate<int,DefaultNormalRow>
@@ -33,6 +34,7 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function __construct(
         private string $summaryClass,
         iterable $rows,
+        private ResultContext $context,
     ) {
         $newRows = [];
 
@@ -123,5 +125,10 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         foreach ($this->rows as $row) {
             yield $row;
         }
+    }
+
+    public function getContext(): ResultContext
+    {
+        return $this->context;
     }
 }
