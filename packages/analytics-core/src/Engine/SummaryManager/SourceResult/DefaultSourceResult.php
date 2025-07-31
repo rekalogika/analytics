@@ -32,7 +32,7 @@ final readonly class DefaultSourceResult implements SourceResult
      */
     public function __construct(
         private QueryBuilder $queryBuilder,
-        int $itemsPerPage = 50,
+        int $itemsPerPage = 1000,
     ) {
         $adapter = new QueryBuilderAdapter(
             queryBuilder: $queryBuilder,
