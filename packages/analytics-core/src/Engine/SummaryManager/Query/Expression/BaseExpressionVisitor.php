@@ -216,12 +216,14 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
             );
 
         if ($comparisonOperator === Comparison::NIN) {
-            $valuesWithoutNullExpression = $this->queryBuilder->expr()->notIn(
+            $valuesWithoutNullExpression = \sprintf(
+                'REKALOGIKA_IN(%s, %s) = FALSE',
                 $field->getField(),
                 $valuesWithoutNullParameters,
             );
         } else {
-            $valuesWithoutNullExpression = $this->queryBuilder->expr()->in(
+            $valuesWithoutNullExpression = \sprintf(
+                'REKALOGIKA_IN(%s, %s) = TRUE',
                 $field->getField(),
                 $valuesWithoutNullParameters,
             );
