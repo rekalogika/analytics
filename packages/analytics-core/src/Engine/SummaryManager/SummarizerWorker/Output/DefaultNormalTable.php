@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
 
@@ -34,7 +33,6 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
     public function __construct(
         private string $summaryClass,
         iterable $rows,
-        private ?Expression $condition,
     ) {
         $newRows = [];
 
@@ -125,10 +123,5 @@ final readonly class DefaultNormalTable implements NormalTable, \IteratorAggrega
         foreach ($this->rows as $row) {
             yield $row;
         }
-    }
-
-    public function getCondition(): ?Expression
-    {
-        return $this->condition;
     }
 }

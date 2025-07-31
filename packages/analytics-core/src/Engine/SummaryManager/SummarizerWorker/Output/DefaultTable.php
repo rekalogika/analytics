@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
-use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
@@ -43,7 +42,6 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     public function __construct(
         private string $summaryClass,
         iterable $rows,
-        private ?Expression $condition,
     ) {
         $newRows = [];
         $newGroupingRows = [];
@@ -147,10 +145,5 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         foreach ($this->rows as $row) {
             yield $row->getTuple() => $row;
         }
-    }
-
-    public function getCondition(): ?Expression
-    {
-        return $this->condition;
     }
 }
