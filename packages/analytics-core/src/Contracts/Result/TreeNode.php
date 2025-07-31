@@ -44,10 +44,17 @@ interface TreeNode extends OrderedMapCollection, Dimension
     public function getDimensionNames(): array;
 
     /**
-     * @param ?string $name The children's dimension name, if null, it will be
-     * the next dimension according to the query.
+     * Gets children of this node, with the specified dimension name. The
+     * dimension name does not have to be the immediate dimension according to
+     * the query. But must be one of the descendant dimension names.
+     *
+     * @param int<1,max>|int<min,-1>|string $name If string, gets the children with that dimension
+     * name. The name must be one of the descendant dimension names. If int,
+     * skips the first $name children and returns the rest. If negative, skips
+     * to the last $name children. The default is 1, which means the next
+     * dimension according to the query.
      */
-    public function getChildren(?string $name = null): TreeNodes;
+    public function getChildren(int|string $name = 1): TreeNodes;
 
     public function getMeasure(): Measure;
 

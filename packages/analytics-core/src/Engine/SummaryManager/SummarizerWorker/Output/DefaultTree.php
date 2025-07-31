@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
+use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Exception\DimensionNamesException;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Helper\TreeContext;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -87,11 +88,6 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             rootLabel: $rootLabel,
             context: $context,
         );
-    }
-
-    private function getNextDimensionName(): ?string
-    {
-        return $this->descendantdimensionNames->first();
     }
 
     #[\Override]
@@ -205,43 +201,43 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function count(): int
     {
-        return $this->getChildren()->count();
+        return $this->tryGetChildren()->count();
     }
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        return $this->getChildren()->getIterator();
+        return $this->tryGetChildren()->getIterator();
     }
 
     #[\Override]
     public function getByKey(mixed $key): ?DefaultTree
     {
-        return $this->getChildren()->getByKey($key);
+        return $this->tryGetChildren()->getByKey($key);
     }
 
     #[\Override]
     public function getByIndex(int $index): ?DefaultTree
     {
-        return $this->getChildren()->getByIndex($index);
+        return $this->tryGetChildren()->getByIndex($index);
     }
 
     #[\Override]
     public function hasKey(mixed $key): bool
     {
-        return $this->getChildren()->hasKey($key);
+        return $this->tryGetChildren()->hasKey($key);
     }
 
     #[\Override]
     public function first(): ?DefaultTree
     {
-        return $this->getChildren()->first();
+        return $this->tryGetChildren()->first();
     }
 
     #[\Override]
     public function last(): ?DefaultTree
     {
-        return $this->getChildren()->last();
+        return $this->tryGetChildren()->last();
     }
 
     public function getDimension(): DefaultDimension
@@ -259,13 +255,9 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getChildren(?string $name = null): DefaultTreeNodes
+    public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
-        $name ??= $this->getNextDimensionName();
-
-        if ($name === \null) {
-            return new DefaultTreeNodes([]);
-        }
+        $name = $this->descendantdimensionNames->resolveName($name);
 
         if (isset($this->children[$name])) {
             return $this->children[$name];
@@ -273,6 +265,18 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
         return $this->children[$name] =
             new DefaultTreeNodes($this->getBalancedChildren($name));
+    }
+
+    /**
+     * @param int<1,max>|int<min,-1>|string $name
+     */
+    public function tryGetChildren(int|string $name = 1): DefaultTreeNodes
+    {
+        try {
+            return $this->getChildren($name);
+        } catch (DimensionNamesException) {
+            return new DefaultTreeNodes([]);
+        }
     }
 
     /**
