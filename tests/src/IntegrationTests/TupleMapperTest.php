@@ -57,7 +57,7 @@ final class TupleMapperTest extends KernelTestCase
 
         // deserialize the tuple
 
-        $newTuple = $tupleMapper->fromDto($class, $tupleDto);
+        $newRow = $tupleMapper->fromDto($class, $tupleDto);
 
         // original measures
 
@@ -67,9 +67,9 @@ final class TupleMapperTest extends KernelTestCase
         $price = $row->getMeasures()->getByKey('price')?->getRawValue();
 
         /** @psalm-suppress MixedAssignment */
-        $deserializedCount = $newTuple->getMeasures()->getByKey('count')?->getRawValue();
+        $deserializedCount = $newRow->getMeasures()->getByKey('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $deserializedPrice = $newTuple->getMeasures()->getByKey('price')?->getRawValue();
+        $deserializedPrice = $newRow->getMeasures()->getByKey('price')?->getRawValue();
 
         $this->assertEquals($count, $deserializedCount);
         $this->assertEquals($price, $deserializedPrice);

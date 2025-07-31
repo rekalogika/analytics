@@ -15,9 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
-use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryQuery;
@@ -82,18 +80,6 @@ final class DefaultResult implements Result
     public function getSummaryClass(): string
     {
         return $this->summaryClass;
-    }
-
-    #[\Override]
-    public function getTuple(): Tuple
-    {
-        return $this->getTree()->getTuple();
-    }
-
-    #[\Override]
-    public function getMeasures(): Measures
-    {
-        return $this->getTree()->getSubtotals();
     }
 
     /**
