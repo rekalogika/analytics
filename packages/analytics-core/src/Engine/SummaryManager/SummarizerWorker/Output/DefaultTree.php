@@ -135,7 +135,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getSubtotals(): Measures
+    public function getMeasures(): Measures
     {
         if (!$this->descendantdimensionNames->hasMeasureDimension()) {
             $measure = $this->getMeasure();
