@@ -84,4 +84,9 @@ final readonly class Selectors
     {
         return Selector::inNamespace('Rekalogika\Analytics\PostgreSQLHll');
     }
+
+    public static function selectAnalyticsPostgreSQLExtra(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\PostgreSQLExtra');
+    }
 }

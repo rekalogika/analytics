@@ -31,6 +31,8 @@ use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
+use Rekalogika\Analytics\PostgreSQLExtra\Doctrine\Function\FirstFunction;
+use Rekalogika\Analytics\PostgreSQLExtra\Doctrine\Function\LastFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllCardinalityFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllHashFunction;
@@ -215,6 +217,18 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         }
 
         //
+        // PostgreSQLExtra
+        //
+
+        if (class_exists(FirstFunction::class)) {
+            $stringFunctions = [
+                ...$stringFunctions,
+                'REKALOGIKA_FIRST' => FirstFunction::class,
+                'REKALOGIKA_LAST' => LastFunction::class,
+            ];
+        }
+
+        //
         // finalize
         //
 
@@ -266,6 +280,22 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
 
             $timeBinPath = \dirname($timeBinPath, 2) . '/Migrations';
             $migrationsPaths['Rekalogika\Analytics\Time\Doctrine\Migrations'] = $timeBinPath;
+        } catch (\ReflectionException) {
+        }
+
+        //
+        // postgresql extra
+        //
+
+        try {
+            $firstPath = (new \ReflectionClass(FirstFunction::class))->getFileName();
+
+            if ($firstPath === false) {
+                throw new \ReflectionException('Could not get file name for FirstFunction');
+            }
+
+            $firstPath = \dirname($firstPath, 2) . '/Migrations';
+            $migrationsPaths['Rekalogika\Analytics\PostgreSQLExtra\Doctrine\Migrations'] = $firstPath;
         } catch (\ReflectionException) {
         }
 
