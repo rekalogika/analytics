@@ -99,7 +99,7 @@ jobs:
       if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
     - name: Composer dump
-      run: composer dump-autoload --optimize
+      run: composer dump-autoload --dry-run --optimize
 
     - name: Validate php-cs-fixer
       run: |
