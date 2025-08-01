@@ -20,13 +20,13 @@ abstract class BranchBlock extends NodeBlock
     private BlockGroup $childrenBlockGroup;
 
     protected function __construct(
-        TreeNode $treeNode,
+        TreeNode $node,
         ?Block $parent,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($treeNode, $parent, $level, $context);
-        $this->childrenBlockGroup = $this->createBlockGroup($treeNode, $level);
+        parent::__construct($node, $parent, $level, $context);
+        $this->childrenBlockGroup = $this->createBlockGroup($node, $level);
     }
 
     final public function getChildrenBlockGroup(): BlockGroup

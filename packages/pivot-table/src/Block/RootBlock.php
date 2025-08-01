@@ -20,10 +20,10 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class RootBlock extends BranchBlock
 {
     protected function __construct(
-        TreeNode $treeNode,
+        TreeNode $node,
         BlockContext $context,
     ) {
-        parent::__construct($treeNode, null, 0, $context);
+        parent::__construct($node, null, 0, $context);
     }
 
     #[\Override]

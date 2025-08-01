@@ -46,13 +46,13 @@ final readonly class BlockContext
         ));
     }
 
-    public function isPivoted(TreeNode $treeNode): bool
+    public function isPivoted(TreeNode $node): bool
     {
-        return \in_array($treeNode->getKey(), $this->pivotedDimensions, true);
+        return \in_array($node->getKey(), $this->pivotedDimensions, true);
     }
 
-    public function hasSuperfluousLegend(TreeNode $treeNode): bool
+    public function hasSuperfluousLegend(TreeNode $node): bool
     {
-        return \in_array($treeNode->getKey(), $this->superfluousLegends, true);
+        return \in_array($node->getKey(), $this->superfluousLegends, true);
     }
 }

@@ -40,23 +40,23 @@ abstract class Block implements \Stringable
     }
 
     private function createByType(
-        TreeNode $treeNode,
+        TreeNode $node,
         int $level,
         BlockContext $context,
     ): Block {
-        if (!$treeNode->isLeaf()) {
-            if ($context->isPivoted($treeNode)) {
-                return new PivotBlock($treeNode, $this, $level, $context);
+        if (!$node->isLeaf()) {
+            if ($context->isPivoted($node)) {
+                return new PivotBlock($node, $this, $level, $context);
             } else {
-                return new NormalBlock($treeNode, $this, $level, $context);
+                return new NormalBlock($node, $this, $level, $context);
             }
         } else {
-            if ($context->isPivoted($treeNode)) {
-                return new PivotLeafBlock($treeNode, $this, $level, $context);
+            if ($context->isPivoted($node)) {
+                return new PivotLeafBlock($node, $this, $level, $context);
             } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
-                return new SingleNodeLeafBlock($treeNode, $this, $level, $context);
+                return new SingleNodeLeafBlock($node, $this, $level, $context);
             } else {
-                return new NormalLeafBlock($treeNode, $this, $level, $context);
+                return new NormalLeafBlock($node, $this, $level, $context);
             }
         }
     }
@@ -66,9 +66,9 @@ abstract class Block implements \Stringable
         return $this->level;
     }
 
-    final protected function createBlock(TreeNode $treeNode, int $level): Block
+    final protected function createBlock(TreeNode $node, int $level): Block
     {
-        return self::createByType($treeNode, $level, $this->getContext());
+        return self::createByType($node, $level, $this->getContext());
     }
 
     /**
@@ -76,11 +76,11 @@ abstract class Block implements \Stringable
      * @param list<string> $superfluousLegends
      */
     final public static function new(
-        TreeNode $treeNode,
+        TreeNode $node,
         array $pivotedNodes = [],
         array $superfluousLegends = [],
     ): Block {
-        $distinct = DistinctNodeListResolver::getDistinctNodes($treeNode);
+        $distinct = DistinctNodeListResolver::getDistinctNodes($node);
 
         $context = new BlockContext(
             distinct: $distinct,
@@ -88,7 +88,7 @@ abstract class Block implements \Stringable
             superfluousLegends: $superfluousLegends,
         );
 
-        return new RootBlock($treeNode, $context);
+        return new RootBlock($node, $context);
     }
 
     final protected function getContext(): BlockContext

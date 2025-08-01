@@ -20,7 +20,7 @@ abstract class NodeBlock extends Block
     private readonly ?BlockGroup $parent;
 
     protected function __construct(
-        private readonly TreeNode $treeNode,
+        private readonly TreeNode $node,
         ?Block $parent,
         int $level,
         BlockContext $context,
@@ -40,7 +40,7 @@ abstract class NodeBlock extends Block
 
     final public function getTreeNode(): TreeNode
     {
-        return $this->treeNode;
+        return $this->node;
     }
 
     final public function getParentBlock(): ?BlockGroup
