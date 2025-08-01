@@ -98,6 +98,9 @@ jobs:
       run: make translation-lint
       if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
 
+    - name: Composer dump
+      run: composer dump-autoload --dry-run --optimize
+
     - name: Validate php-cs-fixer
       run: |
         PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer check --allow-risky=yes

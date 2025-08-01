@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
-final readonly class Last implements SummarizableAggregateFunction
+final readonly class First implements SummarizableAggregateFunction
 {
     private ValueResolver $property;
 
@@ -31,7 +31,7 @@ final readonly class Last implements SummarizableAggregateFunction
     public function getSourceToAggregateExpression(SourceQueryContext $context): string
     {
         return \sprintf(
-            "REKALOGIKA_LAST(%s)",
+            "REKALOGIKA_FIRST(%s)",
             $this->property->getExpression($context),
         );
     }
@@ -39,7 +39,7 @@ final readonly class Last implements SummarizableAggregateFunction
     #[\Override]
     public function getAggregateToAggregateExpression(string $inputExpression): string
     {
-        return \sprintf('REKALOGIKA_LAST(%s)', $inputExpression);
+        return \sprintf('REKALOGIKA_FIRST(%s)', $inputExpression);
     }
 
     #[\Override]
@@ -47,7 +47,7 @@ final readonly class Last implements SummarizableAggregateFunction
         string $inputExpression,
         SummaryQueryContext $context,
     ): string {
-        return \sprintf('REKALOGIKA_LAST(%s)', $inputExpression);
+        return \sprintf('%s', $inputExpression);
     }
 
     #[\Override]
