@@ -250,6 +250,12 @@ final class DefaultResult implements Result
         $orderFields = array_keys($orderBy);
         $groupByFields = $this->query->getGroupBy();
 
+        // remove @values
+        $groupByFields = array_filter(
+            $groupByFields,
+            static fn (string $field): bool => $field !== '@values',
+        );
+
         return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;
     }
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
 
 abstract readonly class DefaultCell implements Cell
@@ -21,15 +20,10 @@ abstract readonly class DefaultCell implements Cell
     final public function __construct(
         private string $name,
         private mixed $content,
-        private ?Block $generatingBlock,
+        private DefaultContext $context,
         private int $columnSpan = 1,
         private int $rowSpan = 1,
     ) {}
-
-    public function getGeneratingBlock(): ?Block
-    {
-        return $this->generatingBlock;
-    }
 
     final public function getKey(): string
     {
@@ -43,6 +37,12 @@ abstract readonly class DefaultCell implements Cell
     }
 
     #[\Override]
+    final public function getContext(): DefaultContext
+    {
+        return $this->context;
+    }
+
+    #[\Override]
     final public function getColumnSpan(): int
     {
         return $this->columnSpan;
@@ -53,9 +53,9 @@ abstract readonly class DefaultCell implements Cell
         return new static(
             name: $this->name,
             content: $this->content,
+            context: $this->context,
             columnSpan: $columnSpan,
             rowSpan: $this->rowSpan,
-            generatingBlock: $this->generatingBlock,
         );
     }
 
@@ -70,9 +70,9 @@ abstract readonly class DefaultCell implements Cell
         return new static(
             name: $this->name,
             content: $this->content,
+            context: $this->context,
             columnSpan: $this->columnSpan,
             rowSpan: $rowSpan,
-            generatingBlock: $this->generatingBlock,
         );
     }
 
@@ -80,20 +80,20 @@ abstract readonly class DefaultCell implements Cell
     {
         $cell = $this->withRowSpan($rows->getHeight());
 
-        $firstRow = (new DefaultRow([$cell], $this->generatingBlock))
+        $firstRow = (new DefaultRow([$cell], $this->context))
             ->appendRow($rows->getFirstRow());
 
         $secondToLastRows = $rows->getSecondToLastRows()->toArray();
 
-        return new DefaultRows([$firstRow, ...$secondToLastRows], $this->generatingBlock);
+        return new DefaultRows([$firstRow, ...$secondToLastRows], $this->context);
     }
 
     final public function appendRowsBelow(DefaultRows $rows): DefaultRows
     {
         $cell = $this->withColumnSpan($rows->getWidth());
         $first = new DefaultRows(
-            [new DefaultRow([$cell], $this->generatingBlock)],
-            $this->generatingBlock,
+            [new DefaultRow([$cell], $this->context)],
+            $this->context,
         );
 
         return $first->appendBelow($rows);
@@ -101,10 +101,10 @@ abstract readonly class DefaultCell implements Cell
 
     final public function appendCellBelow(DefaultCell $cell): DefaultRows
     {
-        $row1 = new DefaultRow([$this], $this->generatingBlock);
-        $row2 = new DefaultRow([$cell], $this->generatingBlock);
+        $row1 = new DefaultRow([$this], $this->context);
+        $row2 = new DefaultRow([$cell], $this->context);
 
-        return new DefaultRows([$row1, $row2], $this->generatingBlock);
+        return new DefaultRows([$row1, $row2], $this->context);
     }
 
     private function getSignature(): string

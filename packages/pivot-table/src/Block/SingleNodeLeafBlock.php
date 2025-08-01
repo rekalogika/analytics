@@ -22,24 +22,28 @@ final class SingleNodeLeafBlock extends LeafBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getValue(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 }

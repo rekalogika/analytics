@@ -20,12 +20,12 @@ final class EmptyBlock extends BranchBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        return new DefaultRows([], $this);
+        return new DefaultRows([], $this->getElementContext());
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
-        return new DefaultRows([], $this);
+        return new DefaultRows([], $this->getElementContext());
     }
 }

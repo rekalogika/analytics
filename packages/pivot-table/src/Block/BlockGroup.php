@@ -42,6 +42,9 @@ abstract class BlockGroup extends Block
      */
     private array $balancedChildBlocks = [];
 
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
         private readonly TreeNode $node,
         private readonly ?TreeNode $parentNode,

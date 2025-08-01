@@ -22,19 +22,21 @@ final class PivotBlock extends BranchBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         if (
             $this->getContext()->isLegendSkipped($this->getTreeNode())
         ) {
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
-                generatingBlock: $this,
+                context: $context,
             );
         } else {
             $valueCell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
-                generatingBlock: $this,
+                context: $context,
             );
         }
 

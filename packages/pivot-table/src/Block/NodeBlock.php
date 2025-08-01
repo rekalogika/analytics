@@ -19,6 +19,9 @@ abstract class NodeBlock extends Block
 {
     private readonly ?BlockGroup $parent;
 
+    /**
+     * @param int<0,max> $level
+     */
     protected function __construct(
         private readonly TreeNode $node,
         ?Block $parent,

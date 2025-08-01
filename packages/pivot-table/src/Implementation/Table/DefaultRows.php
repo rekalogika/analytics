@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Row;
 use Rekalogika\PivotTable\Table\RowGroup;
 
@@ -32,19 +31,14 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
      */
     public function __construct(
         private readonly array $rows,
-        private ?Block $generatingBlock,
+        private readonly DefaultContext $context,
     ) {}
 
     public static function createFromCell(
         DefaultCell $cell,
-        ?Block $generatingBlock = null,
+        DefaultContext $context,
     ): self {
-        return new self([new DefaultRow([$cell], $generatingBlock)], $generatingBlock);
-    }
-
-    public function getGeneratingBlock(): ?Block
-    {
-        return $this->generatingBlock;
+        return new self([new DefaultRow([$cell], $context)], $context);
     }
 
     #[\Override]
@@ -95,22 +89,22 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
 
     public function getFirstRow(): DefaultRow
     {
-        return $this->rows[0] ?? new DefaultRow([], null);
+        return $this->rows[0] ?? new DefaultRow([], $this->context);
     }
 
     public function getSecondToLastRows(): DefaultRows
     {
-        return new self(\array_slice($this->rows, 1), $this->generatingBlock);
+        return new self(\array_slice($this->rows, 1), $this->context);
     }
 
     public function appendRow(DefaultRow $row): DefaultRows
     {
-        return new self([...$this->rows, $row], $this->generatingBlock);
+        return new self([...$this->rows, $row], $this->context);
     }
 
     public function appendBelow(DefaultRows $rows): DefaultRows
     {
-        return new self([...$this->rows, ...$rows->toArray()], $this->generatingBlock);
+        return new self([...$this->rows, ...$rows->toArray()], $this->context);
     }
 
     public function appendRight(DefaultRows $rows): DefaultRows
@@ -121,8 +115,8 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
         $newRows = [];
 
         for ($i = 0; $i < $height; $i++) {
-            $newRows[$i] = $this->rows[$i] ?? new DefaultRow([], null);
-            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([], null));
+            $newRows[$i] = $this->rows[$i] ?? new DefaultRow([], $this->context);
+            $newRows[$i] = $newRows[$i]->appendRow($rowsToAdd[$i] ?? new DefaultRow([], $this->context));
         }
 
         // Calculate the maximum width of the new rows
@@ -143,9 +137,9 @@ final class DefaultRows implements \IteratorAggregate, RowGroup
 
             $cells = iterator_to_array($row, false);
             $cells[0] = $cells[0]->withColumnSpan($width);
-            $newRows[$i] = new DefaultRow($cells, $this->generatingBlock);
+            $newRows[$i] = new DefaultRow($cells, $this->context);
         }
 
-        return new self(array_values($newRows), $this->generatingBlock);
+        return new self(array_values($newRows), $this->context);
     }
 }

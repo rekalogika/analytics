@@ -22,34 +22,38 @@ final class PivotLeafBlock extends LeafBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         if (
             $this->getContext()->isLegendSkipped($this->getTreeNode())
         ) {
             $cell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
-                generatingBlock: $this,
+                context: $context,
             );
         } else {
             $cell = new DefaultDataCell(
                 name: $this->getTreeNode()->getKey(),
                 content: $this->getTreeNode()->getItem(),
-                generatingBlock: $this,
+                context: $context,
             );
         }
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getValue(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 }

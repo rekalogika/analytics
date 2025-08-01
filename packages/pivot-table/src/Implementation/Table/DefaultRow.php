@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
+use Rekalogika\PivotTable\Table\ElementContext;
 use Rekalogika\PivotTable\Table\Row;
 use Rekalogika\PivotTable\Table\TableVisitor;
 
@@ -33,9 +33,15 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
      */
     public function __construct(
         array $cells,
-        private ?Block $generatingBlock,
+        private DefaultContext $context,
     ) {
         $this->cells = $this->mergeCells($cells);
+    }
+
+    #[\Override]
+    public function getContext(): ElementContext
+    {
+        return $this->context;
     }
 
     /**
@@ -90,11 +96,6 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         }
 
         return $mergedCells;
-    }
-
-    public function getGeneratingBlock(): ?Block
-    {
-        return $this->generatingBlock;
     }
 
     #[\Override]
@@ -153,11 +154,11 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
 
     public function appendCell(DefaultCell $cell): static
     {
-        return new self([...$this->cells, $cell], $this->generatingBlock);
+        return new self([...$this->cells, $cell], $this->context);
     }
 
     public function appendRow(DefaultRow $row): static
     {
-        return new self([...$this->cells, ...$row->cells], $this->generatingBlock);
+        return new self([...$this->cells, ...$row->cells], $this->context);
     }
 }

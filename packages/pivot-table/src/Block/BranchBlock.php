@@ -19,6 +19,9 @@ abstract class BranchBlock extends NodeBlock
 {
     private BlockGroup $childrenBlockGroup;
 
+    /**
+     * @param int<0,max> $level
+     */
     protected function __construct(
         TreeNode $node,
         private ?TreeNode $parentNode,
@@ -37,6 +40,8 @@ abstract class BranchBlock extends NodeBlock
 
     /**
      * Blocks that contains blocks, each representing a child node
+     *
+     * @param int<0,max> $level
      */
     private function createBlockGroup(TreeNode $node, int $level): BlockGroup
     {

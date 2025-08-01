@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
+use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
@@ -23,6 +24,11 @@ use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
 abstract class Block implements \Stringable
 {
+    private ?DefaultContext $elementContext = null;
+
+    /**
+     * @param int<0,max> $level
+     */
     protected function __construct(
         private readonly int $level,
         private readonly BlockContext $context,
@@ -38,6 +44,17 @@ abstract class Block implements \Stringable
         );
     }
 
+    protected function getElementContext(): DefaultContext
+    {
+        return $this->elementContext ??= new DefaultContext(
+            depth: $this->level,
+            generatingBlock: $this,
+        );
+    }
+
+    /**
+     * @param int<0,max> $level
+     */
     private function createByType(
         TreeNode $node,
         ?TreeNode $parentNode,
@@ -73,11 +90,17 @@ abstract class Block implements \Stringable
         }
     }
 
+    /**
+     * @return int<0,max>
+     */
     final protected function getLevel(): int
     {
         return $this->level;
     }
 
+    /**
+     * @param int<0,max> $level
+     */
     final protected function createBlock(
         TreeNode $node,
         ?TreeNode $parentNode,
@@ -156,13 +179,15 @@ abstract class Block implements \Stringable
 
     final public function generateTable(): DefaultTable
     {
+        $context = $this->getElementContext();
+
         return new DefaultTable(
             [
-                new DefaultTableHeader($this->getHeaderRows(), $this),
-                new DefaultTableBody($this->getDataRows(), $this),
-                new DefaultTableFooter(new DefaultRows([], $this), $this),
+                new DefaultTableHeader($this->getHeaderRows(), $context),
+                new DefaultTableBody($this->getDataRows(), $context),
+                new DefaultTableFooter(new DefaultRows([], $context), $context),
             ],
-            generatingBlock: $this,
+            context: $context,
         );
     }
 }

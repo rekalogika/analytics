@@ -23,33 +23,37 @@ final class NormalLeafBlock extends LeafBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
             columnSpan: 2,
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $name = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
-            generatingBlock: $this,
+            context: $context,
         );
 
         $value = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getValue(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        $row = new DefaultRow([$name, $value], $this);
+        $row = new DefaultRow([$name, $value], $context);
 
-        return new DefaultRows([$row], $this);
+        return new DefaultRows([$row], $context);
     }
 }

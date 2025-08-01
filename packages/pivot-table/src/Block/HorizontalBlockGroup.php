@@ -23,6 +23,9 @@ final class HorizontalBlockGroup extends BlockGroup
 
     private ?DefaultRows $dataRows = null;
 
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
         TreeNode $node,
         ?TreeNode $parentNode,
@@ -44,7 +47,8 @@ final class HorizontalBlockGroup extends BlockGroup
             return $this->headerRows;
         }
 
-        $headerRows = new DefaultRows([], $this);
+        $context = $this->getElementContext();
+        $headerRows = new DefaultRows([], $context);
 
         // add a header and data column for each of the child blocks
         foreach ($this->getBalancedChildBlocks() as $childBlock) {
@@ -59,7 +63,7 @@ final class HorizontalBlockGroup extends BlockGroup
             $nameCell = new DefaultHeaderCell(
                 name: $child->getKey(),
                 content: $child->getLegend(),
-                generatingBlock: $this,
+                context: $context,
             );
 
             $headerRows = $nameCell->appendRowsBelow($headerRows);
@@ -75,7 +79,8 @@ final class HorizontalBlockGroup extends BlockGroup
             return $this->dataRows;
         }
 
-        $dataRows = new DefaultRows([], $this);
+        $context = $this->getElementContext();
+        $dataRows = new DefaultRows([], $context);
 
         foreach ($this->getBalancedChildBlocks() as $childBlock) {
             $childDataRows = $childBlock->getDataRows();

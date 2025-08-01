@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
-use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Element;
 use Rekalogika\PivotTable\Table\Row;
 
@@ -24,12 +23,13 @@ abstract class DefaultTableSection implements \IteratorAggregate, \Countable, El
 {
     final public function __construct(
         private readonly DefaultRows $rows,
-        private ?Block $generatingBlock,
+        private readonly DefaultContext $context,
     ) {}
 
-    public function getGeneratingBlock(): ?Block
+    #[\Override]
+    final public function getContext(): DefaultContext
     {
-        return $this->generatingBlock;
+        return $this->context;
     }
 
     /**

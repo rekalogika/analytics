@@ -22,6 +22,9 @@ final class VerticalBlockGroup extends BlockGroup
 
     private ?DefaultRows $dataRows = null;
 
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
         TreeNode $node,
         ?TreeNode $parentNode,
@@ -53,7 +56,7 @@ final class VerticalBlockGroup extends BlockGroup
             return $this->dataRows;
         }
 
-        $dataRows = new DefaultRows([], $this);
+        $dataRows = new DefaultRows([], $this->getElementContext());
 
         // add a data row for each of the child blocks
         foreach ($this->getChildBlocks() as $childBlock) {

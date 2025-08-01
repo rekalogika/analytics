@@ -19,40 +19,31 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class NormalBlock extends BranchBlock
 {
-    private ?DefaultRows $headerRows = null;
-    private ?DefaultRows $dataRows = null;
-
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        if ($this->headerRows !== null) {
-            return $this->headerRows;
-        }
+        $context = $this->getElementContext();
 
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return $this->headerRows = $cell
-            ->appendRowsRight($this->getChildrenBlockGroup()->getHeaderRows());
+        return $cell->appendRowsRight($this->getChildrenBlockGroup()->getHeaderRows());
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
-        if ($this->dataRows !== null) {
-            return $this->dataRows;
-        }
+        $context = $this->getElementContext();
 
         $cell = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return $this->dataRows = $cell
-            ->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
+        return $cell->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
     }
 }
