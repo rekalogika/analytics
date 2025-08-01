@@ -94,11 +94,13 @@ abstract class Block implements \Stringable
     /**
      * @param list<string> $pivotedNodes
      * @param list<string> $skipLegends
+     * @param list<string> $createSubtotals
      */
     final public static function new(
         TreeNode $node,
         array $pivotedNodes = [],
-        array $skipLegends = [],
+        array $skipLegends = ['@values'],
+        array $createSubtotals = [],
     ): Block {
         $distinct = DistinctNodeListResolver::getDistinctNodes($node);
 
@@ -106,6 +108,7 @@ abstract class Block implements \Stringable
             distinct: $distinct,
             pivotedDimensions: $pivotedNodes,
             skipLegends: $skipLegends,
+            createSubtotals: $createSubtotals,
         );
 
         return new RootBlock($node, $context);

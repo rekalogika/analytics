@@ -21,11 +21,13 @@ final readonly class BlockContext
      * @param list<list<TreeNode>> $distinct
      * @param list<string> $pivotedDimensions
      * @param list<string> $skipLegends
+     * @param list<string> $createSubtotals
      */
     public function __construct(
         private array $distinct,
         private array $pivotedDimensions = [],
         private array $skipLegends = [],
+        private array $createSubtotals = [],
     ) {}
 
     /**
@@ -54,5 +56,10 @@ final readonly class BlockContext
     public function isLegendSkipped(TreeNode $node): bool
     {
         return \in_array($node->getKey(), $this->skipLegends, true);
+    }
+
+    public function doCreateSubtotals(TreeNode $node): bool
+    {
+        return \in_array($node->getKey(), $this->createSubtotals, true);
     }
 }

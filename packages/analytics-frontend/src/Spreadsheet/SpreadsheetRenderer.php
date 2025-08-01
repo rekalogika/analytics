@@ -70,6 +70,7 @@ final readonly class SpreadsheetRenderer
             node: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
+            createSubtotals: $result->getDimensionNames(),
         );
 
         $html = $this->visitor->visitTable($table);

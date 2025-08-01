@@ -145,7 +145,11 @@ abstract class BlockGroup extends Block
      */
     private function getSubtotalNode(int $level = 1): ?TreeNode
     {
-        return SubtotalTreeNode::create($this->node, $level);
+        return SubtotalTreeNode::create(
+            node: $this->node,
+            level: $level,
+            context: $this->getContext(),
+        );
     }
 
     /**

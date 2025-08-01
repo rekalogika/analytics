@@ -82,6 +82,12 @@ final class DefaultResult implements Result
         return $this->summaryClass;
     }
 
+    #[\Override]
+    public function getDimensionNames(): array
+    {
+        return $this->query->getGroupBy();
+    }
+
     /**
      * @return list<array<string,mixed>>
      */

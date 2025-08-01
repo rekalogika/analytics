@@ -173,6 +173,7 @@ final readonly class TableRenderer
             node: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
+            createSubtotals: $result->getDimensionNames(),
         );
 
         return $this->getVisitor($theme)->visitTable($table);

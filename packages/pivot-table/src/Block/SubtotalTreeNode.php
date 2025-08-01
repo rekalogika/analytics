@@ -21,8 +21,11 @@ final readonly class SubtotalTreeNode implements TreeNode
     /**
      * @param int<1,max> $level
      */
-    public static function create(TreeNode $node, int $level): ?self
-    {
+    public static function create(
+        TreeNode $node,
+        int $level,
+        BlockContext $context,
+    ): ?self {
         $children = iterator_to_array($node->getChildren($level));
 
         if (\count($children) < 2) {
@@ -31,6 +34,11 @@ final readonly class SubtotalTreeNode implements TreeNode
         }
 
         $child = $children[0];
+
+        if ($context->doCreateSubtotals($child) === false) {
+            // If subtotals are not desired for this node, return null.
+            return null;
+        }
 
         if ($child->getKey() === '@values') {
             return null;
