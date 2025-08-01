@@ -21,6 +21,7 @@ abstract class BranchBlock extends NodeBlock
 
     protected function __construct(
         TreeNode $node,
+        private ?TreeNode $parentNode,
         ?Block $parent,
         int $level,
         BlockContext $context,
@@ -49,13 +50,28 @@ abstract class BranchBlock extends NodeBlock
             ?? null;
 
         if ($firstChild === null) {
-            return new EmptyBlockGroup($node, $level, $this->getContext());
+            return new EmptyBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         }
 
         if ($this->getContext()->isPivoted($firstChild)) {
-            return new HorizontalBlockGroup($node, $level, $this->getContext());
+            return new HorizontalBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         } else {
-            return new VerticalBlockGroup($node, $level, $this->getContext());
+            return new VerticalBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         }
     }
 }

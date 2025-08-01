@@ -24,11 +24,17 @@ final class VerticalBlockGroup extends BlockGroup
     private ?DefaultRows $dataRows = null;
 
     public function __construct(
-        TreeNode $parentNode,
+        TreeNode $node,
+        ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($parentNode, $level, $context);
+        parent::__construct(
+            node: $node,
+            parentNode: $parentNode,
+            level: $level,
+            context: $context,
+        );
     }
 
     #[\Override]

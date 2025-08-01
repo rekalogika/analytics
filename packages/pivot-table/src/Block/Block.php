@@ -41,14 +41,27 @@ abstract class Block implements \Stringable
 
     private function createByType(
         TreeNode $node,
+        ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ): Block {
         if (!$node->isLeaf()) {
             if ($context->isPivoted($node)) {
-                return new PivotBlock($node, $this, $level, $context);
+                return new PivotBlock(
+                    node: $node,
+                    parentNode: $parentNode,
+                    parent: $this,
+                    level: $level,
+                    context: $context,
+                );
             } else {
-                return new NormalBlock($node, $this, $level, $context);
+                return new NormalBlock(
+                    node: $node,
+                    parentNode: $parentNode,
+                    parent: $this,
+                    level: $level,
+                    context: $context,
+                );
             }
         } else {
             if ($context->isPivoted($node)) {
@@ -66,9 +79,17 @@ abstract class Block implements \Stringable
         return $this->level;
     }
 
-    final protected function createBlock(TreeNode $node, int $level): Block
-    {
-        return self::createByType($node, $level, $this->getContext());
+    final protected function createBlock(
+        TreeNode $node,
+        ?TreeNode $parentNode,
+        int $level,
+    ): Block {
+        return self::createByType(
+            node: $node,
+            parentNode: $parentNode,
+            level: $level,
+            context: $this->getContext(),
+        );
     }
 
     /**

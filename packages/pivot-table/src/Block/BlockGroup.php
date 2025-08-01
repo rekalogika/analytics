@@ -39,6 +39,7 @@ abstract class BlockGroup extends Block
 
     public function __construct(
         private readonly TreeNode $node,
+        private readonly ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
@@ -58,7 +59,11 @@ abstract class BlockGroup extends Block
         $childBlocks = [];
 
         foreach ($this->getChildNodes($level) as $childNode) {
-            $childBlocks[] = $this->createBlock($childNode, $this->getLevel() + $level);
+            $childBlocks[] = $this->createBlock(
+                node: $childNode,
+                parentNode: $this->node,
+                level: $this->getLevel() + $level,
+            );
         }
 
         return $this->childBlocks[$level] = $childBlocks;
@@ -77,7 +82,11 @@ abstract class BlockGroup extends Block
         $balancedChildBlocks = [];
 
         foreach ($this->getBalancedChildren($level) as $childNode) {
-            $balancedChildBlocks[] = $this->createBlock($childNode, $this->getLevel() + $level);
+            $balancedChildBlocks[] = $this->createBlock(
+                node: $childNode,
+                parentNode: $this->node,
+                level: $this->getLevel() + $level,
+            );
         }
 
         return $this->balancedChildBlocks[$level] = $balancedChildBlocks;
@@ -104,6 +113,11 @@ abstract class BlockGroup extends Block
     final public function getNode(): TreeNode
     {
         return $this->node;
+    }
+
+    final public function getParentNode(): ?TreeNode
+    {
+        return $this->parentNode;
     }
 
     /**

@@ -23,7 +23,13 @@ final class RootBlock extends BranchBlock
         TreeNode $node,
         BlockContext $context,
     ) {
-        parent::__construct($node, null, 0, $context);
+        parent::__construct(
+            node: $node,
+            parentNode: null,
+            parent: null,
+            level: 0,
+            context: $context,
+        );
     }
 
     #[\Override]
