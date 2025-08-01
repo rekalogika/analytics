@@ -201,6 +201,7 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsTime(),
                 Selectors::selectAnalyticsPostgreSQLHll(),
+                Selectors::selectAnalyticsPostgreSQLExtra(),
                 Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsPivotTable(),
 
@@ -511,6 +512,29 @@ final class ArchitectureTest
 
                 // php enum
                 Selector::classname(\BackedEnum::class),
+            );
+    }
+
+    public function testPackagePostgreSQLExtra(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsPostgreSQLExtra(),
+            )
+            ->canOnlyDependOn()
+            ->classes(
+                Selectors::selectAnalyticsPostgreSQLExtra(),
+
+                // internal packages
+                Selectors::selectAnalyticsContracts(),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\ORM'),
+                Selector::inNamespace('Doctrine\Migrations'),
+
+                // php misc
+                Selector::classname(\Override::class),
             );
     }
 
