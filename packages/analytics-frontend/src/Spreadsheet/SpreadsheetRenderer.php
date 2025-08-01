@@ -69,7 +69,7 @@ final readonly class SpreadsheetRenderer
         $table = PivotTableTransformer::transformTreeToTable(
             treeNode: $pivotTable,
             pivotedNodes: $pivotedDimensions,
-            skippedLegends: ['@values'],
+            skipLegends: ['@values'],
         );
 
         $html = $this->visitor->visitTable($table);
