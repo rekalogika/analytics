@@ -89,7 +89,7 @@ abstract class BlockGroup extends Block
     public function getOneChildBlock(int $level = 1): Block
     {
         return $this->getChildBlocks($level)[0]
-            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+            ?? throw new \RuntimeException('No child blocks found in the current node.');
     }
 
     /**
@@ -98,7 +98,7 @@ abstract class BlockGroup extends Block
     public function getOneBalancedChildBlock(int $level = 1): Block
     {
         return $this->getBalancedChildBlocks($level)[0]
-            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+            ?? throw new \RuntimeException('No child blocks found in the current node.');
     }
 
     final public function getNode(): TreeNode
@@ -145,6 +145,6 @@ abstract class BlockGroup extends Block
     {
         return $this->getChildNodes($level)[0]
             ?? $this->getBalancedChildren($level)[0]
-            ?? throw new \RuntimeException('No child nodes found in the parent node.');
+            ?? throw new \RuntimeException('No child nodes found in the current node.');
     }
 }
