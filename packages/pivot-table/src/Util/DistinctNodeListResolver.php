@@ -21,16 +21,16 @@ final readonly class DistinctNodeListResolver
     /**
      * @return list<list<TreeNode>>
      */
-    public static function getDistinctNodes(TreeNode $treeNode): array
+    public static function getDistinctNodes(TreeNode $node): array
     {
-        if ($treeNode->isLeaf()) {
+        if ($node->isLeaf()) {
             throw new \LogicException('Invalid TreeNode type');
         }
 
         $grandChildrenDistincts = [];
-        $children = $treeNode->getChildren();
+        $children = $node->getChildren();
 
-        foreach ($treeNode->getChildren() as $child) {
+        foreach ($node->getChildren() as $child) {
             if (!$child->isLeaf()) {
                 $grandChildrenDistincts[] = self::getDistinctNodes($child);
             }

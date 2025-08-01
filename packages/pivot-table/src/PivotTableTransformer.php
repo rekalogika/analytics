@@ -47,13 +47,13 @@ final readonly class PivotTableTransformer
      * @param list<string> $skipLegends
      */
     public static function transformTreeToTable(
-        TreeNode $treeNode,
+        TreeNode $node,
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
     ): Table {
 
         $block = self::transformTreeToBlock(
-            node: $treeNode,
+            node: $node,
             pivotedNodes: $pivotedNodes,
             skipLegends: $skipLegends,
         );

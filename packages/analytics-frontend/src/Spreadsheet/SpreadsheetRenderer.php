@@ -67,7 +67,7 @@ final readonly class SpreadsheetRenderer
         $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
 
         $table = PivotTableTransformer::transformTreeToTable(
-            treeNode: $pivotTable,
+            node: $pivotTable,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
         );
