@@ -26,17 +26,10 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
         return new self($node, new TreePropertyMap());
     }
 
-    private PivotTableTreeNodesAdapter $children;
-
     public function __construct(
         private TreeNode $node,
         private TreePropertyMap $propertyMap,
-    ) {
-        $this->children = new PivotTableTreeNodesAdapter(
-            nodes: $node->getChildren(),
-            propertyMap: $propertyMap,
-        );
-    }
+    ) {}
 
     #[\Override]
     public function isLeaf(): bool
@@ -69,9 +62,12 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
     }
 
     #[\Override]
-    public function getChildren(): TreeNodes
+    public function getChildren(int $level = 1): TreeNodes
     {
-        return $this->children;
+        return new PivotTableTreeNodesAdapter(
+            nodes: $this->node->getChildren($level),
+            propertyMap: $this->propertyMap,
+        );
     }
 
     #[\Override]

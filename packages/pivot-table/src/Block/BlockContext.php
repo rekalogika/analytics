@@ -35,11 +35,15 @@ final readonly class BlockContext
     {
         $result =  $this->distinct[$level] ?? null;
 
-
         if ($result !== null) {
             return $result;
         }
-        throw new \LogicException('Unknown level');
+
+        throw new \LogicException(\sprintf(
+            'Distinct nodes of level %d not found. Available levels: %s',
+            $level,
+            implode(', ', array_keys($this->distinct)),
+        ));
     }
 
     public function isPivoted(TreeNode $treeNode): bool

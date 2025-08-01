@@ -25,7 +25,10 @@ interface TreeNode
 
     public function getValue(): mixed;
 
-    public function getChildren(): TreeNodes;
+    /**
+     * @param int<1,max> $level
+     */
+    public function getChildren(int $level = 1): TreeNodes;
 
     /**
      * @return iterable<SubtotalNode>

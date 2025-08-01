@@ -89,7 +89,7 @@ final readonly class NullTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(): NullTreeNodes
+    public function getChildren(int $level = 1): NullTreeNodes
     {
         return new NullTreeNodes([]);
     }
