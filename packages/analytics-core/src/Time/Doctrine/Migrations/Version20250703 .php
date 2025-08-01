@@ -37,37 +37,46 @@ final class Version20250703 extends AbstractMigration
                 outputtz text
             ) RETURNS INTEGER
             AS $$
-                SELECT
-                    (EXTRACT(YEAR FROM month_owner_date)::int) * 1000 +
-                    (EXTRACT(MONTH FROM month_owner_date)::int) * 10 +
-                    (FLOOR(
-                        EXTRACT(EPOCH FROM (
-                            week_monday - DATE_TRUNC('week', first_thursday_of_month + INTERVAL '3 days')
-                        )) / 604800
-                    )::int + 1)
-                FROM (
+                WITH
+                -- Step 1: Calculate the ISO week’s Thursday (week owning date)
+                week_thursday AS (
+                    SELECT (input + (4 - EXTRACT(ISODOW FROM input)::INT) * INTERVAL '1 day')::DATE AS thursday
+                ),
+
+                -- Step 2: Determine the year and month from that Thursday
+                year_month AS (
                     SELECT
-                        -- ISO-style week Monday
-                        DATE_TRUNC('week', input + INTERVAL '3 days')::date AS week_monday,
+                        thursday,
+                        EXTRACT(YEAR FROM thursday)::INT AS y,
+                        EXTRACT(MONTH FROM thursday)::INT AS m
+                    FROM week_thursday
+                ),
 
-                        -- The Thursday of that week, to determine ownership
-                        (DATE_TRUNC('week', input + INTERVAL '3 days') + INTERVAL '3 days')::date AS week_thursday,
+                -- Step 3: First Thursday of that month
+                first_thursday AS (
+                    SELECT
+                        y,
+                        m,
+                        thursday,
+                        (MAKE_DATE(y, m, 1) + ((11 - EXTRACT(DOW FROM MAKE_DATE(y, m, 1))::INT) % 7) * INTERVAL '1 day')::DATE AS first_thu
+                    FROM year_month
+                ),
 
-                        -- First Thursday of that month (the anchor for week 1)
-                        (
-                            SELECT d
-                            FROM generate_series(
-                                DATE_TRUNC('month', (DATE_TRUNC('week', input + INTERVAL '3 days') + INTERVAL '3 days'))::date,
-                                DATE_TRUNC('month', (DATE_TRUNC('week', input + INTERVAL '3 days') + INTERVAL '3 days'))::date + INTERVAL '6 days',
-                                INTERVAL '1 day'
-                            ) AS d
-                            WHERE EXTRACT(DOW FROM d) = 4
-                            LIMIT 1
-                        ) AS first_thursday_of_month,
+                -- Step 4: Compute Mondays
+                mondays AS (
+                    SELECT
+                        y,
+                        m,
+                        thursday,
+                        (first_thu - ((EXTRACT(ISODOW FROM first_thu)::INT + 6) % 7) * INTERVAL '1 day')::DATE AS first_week_monday,
+                        (input - ((EXTRACT(ISODOW FROM input)::INT + 6) % 7) * INTERVAL '1 day')::DATE AS current_week_monday
+                    FROM first_thursday
+                )
 
-                        -- Month that owns this ISO-style week
-                        DATE_TRUNC('month', (DATE_TRUNC('week', input + INTERVAL '3 days') + INTERVAL '3 days'))::date AS month_owner_date
-                ) AS data
+                -- Step 5: Calculate final YYYYMMW integer
+                SELECT
+                    y * 1000 + m * 10 + GREATEST(((current_week_monday - first_week_monday) / 7)::INT + 1, 1)
+                FROM mondays;
             $$ LANGUAGE SQL IMMUTABLE;
         SQL);
 
