@@ -253,7 +253,7 @@ final class DefaultResult implements Result
         // remove @values
         $groupByFields = array_filter(
             $groupByFields,
-            static fn (string $field): bool => $field !== '@values',
+            static fn(string $field): bool => $field !== '@values',
         );
 
         return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;

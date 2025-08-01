@@ -48,6 +48,7 @@ abstract class Block implements \Stringable
     {
         return $this->elementContext ??= new DefaultContext(
             depth: $this->level,
+            subtotalDepth: $this->getContext()->getSubtotalDepth(),
             generatingBlock: $this,
         );
     }
@@ -106,11 +107,17 @@ abstract class Block implements \Stringable
         ?TreeNode $parentNode,
         int $level,
     ): Block {
+        $context = $this->getContext();
+
+        if ($node instanceof SubtotalTreeNode) {
+            $context = $this->getContext()->incrementSubtotal();
+        }
+
         return self::createByType(
             node: $node,
             parentNode: $parentNode,
             level: $level,
-            context: $this->getContext(),
+            context: $context,
         );
     }
 

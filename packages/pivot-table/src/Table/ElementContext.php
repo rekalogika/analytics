@@ -26,4 +26,9 @@ interface ElementContext
     public function getDepth(): int;
 
     public function getGeneratingBlock(): ?Block;
+
+    /**
+     * @return int<0,max>
+     */
+    public function getSubtotalDepth(): int;
 }

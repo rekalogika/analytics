@@ -20,15 +20,21 @@ final readonly class DefaultContext implements ElementContext
 {
     public static function createFlat(): self
     {
-        return new self(0, null);
+        return new self(
+            depth: 0,
+            generatingBlock: null,
+            subtotalDepth: 0,
+        );
     }
 
     /**
      * @param int<0,max> $depth
+     * @param int<0,max> $subtotalDepth
      */
     public function __construct(
         private int $depth,
         private ?Block $generatingBlock,
+        private int $subtotalDepth,
     ) {}
 
     #[\Override]
@@ -41,5 +47,11 @@ final readonly class DefaultContext implements ElementContext
     public function getGeneratingBlock(): ?Block
     {
         return $this->generatingBlock;
+    }
+
+    #[\Override]
+    public function getSubtotalDepth(): int
+    {
+        return $this->subtotalDepth;
     }
 }

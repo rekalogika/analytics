@@ -30,6 +30,29 @@
     table-group-divider
 {%- endblock tbody_class -%}
 
+{%- block th_class -%}
+    {{ parent() }}
+{%- endblock th_class -%}
+
+{%- block td_class -%}
+    {{ parent() }}
+    {% if element.context.subtotalDepth > 0 %}
+        bg-secondary
+
+        {% if element.context.subtotalDepth == 1 %}
+            bg-opacity-10
+        {% elseif element.context.subtotalDepth == 2 %}
+            bg-opacity-25
+        {% elseif element.context.subtotalDepth == 3 %}
+            bg-opacity-50
+        {% elseif element.context.subtotalDepth == 4 %}
+            bg-opacity-75 text-white
+        {% elseif element.context.subtotalDepth == 5 %}
+            text-white
+        {% endif %}
+    {% endif %}
+{%- endblock td_class -%}
+
 {%- block tf_class -%}
     {{ parent() }}
     table-secondary
