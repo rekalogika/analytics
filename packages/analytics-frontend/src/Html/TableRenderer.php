@@ -170,9 +170,10 @@ final readonly class TableRenderer
         $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
 
         $table = PivotTableTransformer::transformTreeToTable(
-            treeNode: $pivotTable,
+            node: $pivotTable,
             pivotedNodes: $pivotedDimensions,
-            superfluousLegends: ['@values'],
+            skipLegends: ['@values'],
+            createSubtotals: $result->getDimensionNames(),
         );
 
         return $this->getVisitor($theme)->visitTable($table);

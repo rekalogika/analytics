@@ -29,6 +29,14 @@ interface Result
      */
     public function getSummaryClass(): string;
 
+    /**
+     * The dimension names of this result. It is the same as the groupBy clause
+     * of the query.
+     *
+     * @return list<string>
+     */
+    public function getDimensionNames(): array;
+
     public function getTree(): TreeNode;
 
     public function getNormalTable(): NormalTable;

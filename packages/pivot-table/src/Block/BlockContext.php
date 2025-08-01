@@ -20,13 +20,28 @@ final readonly class BlockContext
     /**
      * @param list<list<TreeNode>> $distinct
      * @param list<string> $pivotedDimensions
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skipLegends
+     * @param list<string> $createSubtotals
+     * @param int<0,max> $subtotalDepth 0 is not in subtotal, 1 is in subtotal of first level, and so on.
      */
     public function __construct(
         private array $distinct,
         private array $pivotedDimensions = [],
-        private array $superfluousLegends = [],
+        private array $skipLegends = [],
+        private array $createSubtotals = [],
+        private int $subtotalDepth = 0,
     ) {}
+
+    public function incrementSubtotal(): self
+    {
+        return new self(
+            distinct: $this->distinct,
+            pivotedDimensions: $this->pivotedDimensions,
+            skipLegends: $this->skipLegends,
+            createSubtotals: $this->createSubtotals,
+            subtotalDepth: $this->subtotalDepth + 1,
+        );
+    }
 
     /**
      * @return list<TreeNode>
@@ -35,20 +50,37 @@ final readonly class BlockContext
     {
         $result =  $this->distinct[$level] ?? null;
 
-
         if ($result !== null) {
             return $result;
         }
-        throw new \LogicException('Unknown level');
+
+        throw new \LogicException(\sprintf(
+            'Distinct nodes of level %d not found. Available levels: %s',
+            $level,
+            implode(', ', array_keys($this->distinct)),
+        ));
     }
 
-    public function isPivoted(TreeNode $treeNode): bool
+    public function isPivoted(TreeNode $node): bool
     {
-        return \in_array($treeNode->getKey(), $this->pivotedDimensions, true);
+        return \in_array($node->getKey(), $this->pivotedDimensions, true);
     }
 
-    public function hasSuperfluousLegend(TreeNode $treeNode): bool
+    public function isLegendSkipped(TreeNode $node): bool
     {
-        return \in_array($treeNode->getKey(), $this->superfluousLegends, true);
+        return \in_array($node->getKey(), $this->skipLegends, true);
+    }
+
+    public function doCreateSubtotals(TreeNode $node): bool
+    {
+        return \in_array($node->getKey(), $this->createSubtotals, true);
+    }
+
+    /**
+     * @return int<0,max>
+     */
+    public function getSubtotalDepth(): int
+    {
+        return $this->subtotalDepth;
     }
 }

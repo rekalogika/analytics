@@ -19,14 +19,18 @@ abstract class BranchBlock extends NodeBlock
 {
     private BlockGroup $childrenBlockGroup;
 
+    /**
+     * @param int<0,max> $level
+     */
     protected function __construct(
-        TreeNode $treeNode,
+        TreeNode $node,
+        private ?TreeNode $parentNode,
         ?Block $parent,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($treeNode, $parent, $level, $context);
-        $this->childrenBlockGroup = $this->createBlockGroup($treeNode, $level);
+        parent::__construct($node, $parent, $level, $context);
+        $this->childrenBlockGroup = $this->createBlockGroup($node, $level);
     }
 
     final public function getChildrenBlockGroup(): BlockGroup
@@ -34,11 +38,16 @@ abstract class BranchBlock extends NodeBlock
         return $this->childrenBlockGroup;
     }
 
-    private function createBlockGroup(TreeNode $parentNode, int $level): BlockGroup
+    /**
+     * Blocks that contains blocks, each representing a child node
+     *
+     * @param int<0,max> $level
+     */
+    private function createBlockGroup(TreeNode $node, int $level): BlockGroup
     {
 
         /** @var \Traversable<array-key,TreeNode> */
-        $children = $parentNode->getChildren();
+        $children = $node->getChildren();
         $children = iterator_to_array($children);
 
         $firstChild = $children[0]
@@ -46,13 +55,28 @@ abstract class BranchBlock extends NodeBlock
             ?? null;
 
         if ($firstChild === null) {
-            return new EmptyBlockGroup($parentNode, $level, $this->getContext());
+            return new EmptyBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         }
 
         if ($this->getContext()->isPivoted($firstChild)) {
-            return new HorizontalBlockGroup($parentNode, $level, $this->getContext());
+            return new HorizontalBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         } else {
-            return new VerticalBlockGroup($parentNode, $level, $this->getContext());
+            return new VerticalBlockGroup(
+                node: $node,
+                parentNode: $this->parentNode,
+                level: $level,
+                context: $this->getContext(),
+            );
         }
     }
 }

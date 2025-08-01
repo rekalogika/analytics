@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class EmptyBlockGroup extends BlockGroup
@@ -21,32 +20,12 @@ final class EmptyBlockGroup extends BlockGroup
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        return new DefaultRows([], $this);
+        return new DefaultRows([], $this->getElementContext());
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
-        return new DefaultRows([], $this);
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        throw new \BadMethodCallException('Not implemented yet');
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        return new DefaultRows([], $this);
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        throw new \BadMethodCallException('Not implemented yet');
+        return new DefaultRows([], $this->getElementContext());
     }
 }

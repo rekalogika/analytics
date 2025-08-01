@@ -226,7 +226,13 @@ final class DefaultQuery implements Query
     #[\Override]
     public function getGroupBy(): array
     {
-        return $this->dimensions;
+        $dimensions = $this->dimensions;
+
+        if (!\in_array('@values', $dimensions, true)) {
+            $dimensions[] = '@values';
+        }
+
+        return $dimensions;
     }
 
     #[\Override]

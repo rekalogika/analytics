@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -23,12 +22,21 @@ final class VerticalBlockGroup extends BlockGroup
 
     private ?DefaultRows $dataRows = null;
 
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
-        TreeNode $parentNode,
+        TreeNode $node,
+        ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($parentNode, $level, $context);
+        parent::__construct(
+            node: $node,
+            parentNode: $parentNode,
+            level: $level,
+            context: $context,
+        );
     }
 
     #[\Override]
@@ -48,61 +56,13 @@ final class VerticalBlockGroup extends BlockGroup
             return $this->dataRows;
         }
 
-        $dataRows = new DefaultRows([], $this);
+        $dataRows = new DefaultRows([], $this->getElementContext());
 
         // add a data row for each of the child blocks
         foreach ($this->getChildBlocks() as $childBlock) {
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        if (
-            \count($this->getChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getParentNode());
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
-            $dataRows = $dataRows->appendBelow($subtotalDataRows);
-        }
-
         return $this->dataRows = $dataRows;
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        throw new \BadMethodCallException('Not implemented yet');
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $dataRows = new DefaultRows([], $this);
-        $childBlock = $this->getOneChildBlock();
-
-        if (!$childBlock instanceof NodeBlock) {
-            throw new \RuntimeException(
-                'The child block must be a NodeBlock to get subtotal rows.',
-            );
-        }
-
-        if ($childBlock->getTreeNode()->getKey() === '@values') {
-            foreach ($this->getChildBlocks() as $childBlock) {
-                $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-                $dataRows = $dataRows->appendBelow($childDataRows);
-            }
-        } else {
-            $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-            $dataRows = $dataRows->appendBelow($childDataRows);
-        }
-
-        return $dataRows;
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        throw new \BadMethodCallException('Not implemented yet');
     }
 }

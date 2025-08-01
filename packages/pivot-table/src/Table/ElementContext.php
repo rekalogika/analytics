@@ -13,19 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Table;
 
+use Rekalogika\PivotTable\Block\Block;
+
 /**
  * Represents a HTML element
  */
-interface Element
+interface ElementContext
 {
-    public function getTagName(): string;
+    /**
+     * @return int<0,max>
+     */
+    public function getDepth(): int;
 
-    public function getContext(): ElementContext;
+    public function getGeneratingBlock(): ?Block;
 
     /**
-     * @template T
-     * @param TableVisitor<T> $visitor
-     * @return T
+     * @return int<0,max>
      */
-    public function accept(TableVisitor $visitor): mixed;
+    public function getSubtotalDepth(): int;
 }

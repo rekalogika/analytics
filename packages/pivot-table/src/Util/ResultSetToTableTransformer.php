@@ -15,6 +15,7 @@ namespace Rekalogika\PivotTable\Util;
 
 use Rekalogika\PivotTable\Contracts\Result\ResultRow;
 use Rekalogika\PivotTable\Contracts\Result\ResultSet;
+use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
@@ -28,6 +29,7 @@ final class ResultSetToTableTransformer
 {
     private DefaultTableHeader $tableHeader;
     private DefaultTableBody $tableBody;
+    private DefaultContext $context;
 
     public static function transform(ResultSet $resultSet): Table
     {
@@ -36,6 +38,8 @@ final class ResultSetToTableTransformer
 
     private function __construct(ResultSet $resultSet)
     {
+        $this->context = DefaultContext::createFlat();
+
         $tupleCount = $this->getMaxTupleCount($resultSet);
 
         $rows = [];
@@ -54,8 +58,8 @@ final class ResultSetToTableTransformer
             throw new \RuntimeException('ResultSet must have at least one row with a tuple.');
         }
 
-        $this->tableBody = new DefaultTableBody(new DefaultRows($rows, null), null);
-        $this->tableHeader = new DefaultTableHeader(new DefaultRows([$thead], null), null);
+        $this->tableBody = new DefaultTableBody(new DefaultRows($rows, $this->context), $this->context);
+        $this->tableHeader = new DefaultTableHeader(new DefaultRows([$thead], $this->context), $this->context);
     }
 
     private function getTable(): DefaultTable
@@ -65,7 +69,7 @@ final class ResultSetToTableTransformer
                 $this->tableHeader,
                 $this->tableBody,
             ],
-            generatingBlock: null,
+            $this->context,
         );
     }
 
@@ -86,7 +90,7 @@ final class ResultSetToTableTransformer
 
     private function getTableHeader(ResultRow $row): DefaultRow
     {
-        $htmlRow = new DefaultRow([], null);
+        $htmlRow = new DefaultRow([], $this->context);
 
         foreach ($row->getTuple() as $field) {
             $cell = new DefaultHeaderCell(
@@ -94,7 +98,7 @@ final class ResultSetToTableTransformer
                 content: $field->getLegend(),
                 columnSpan: 1,
                 rowSpan: 1,
-                generatingBlock: null,
+                context: $this->context,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -106,7 +110,7 @@ final class ResultSetToTableTransformer
                 content: $value->getLegend(),
                 columnSpan: 1,
                 rowSpan: 1,
-                generatingBlock: null,
+                context: $this->context,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -117,7 +121,7 @@ final class ResultSetToTableTransformer
 
     private function resultRowToTableRow(ResultRow $row): DefaultRow
     {
-        $htmlRow = new DefaultRow([], null);
+        $htmlRow = new DefaultRow([], $this->context);
 
         foreach ($row->getTuple() as $field) {
             $cell = new DefaultDataCell(
@@ -125,7 +129,7 @@ final class ResultSetToTableTransformer
                 content: $field->getItem(),
                 columnSpan: 1,
                 rowSpan: 1,
-                generatingBlock: null,
+                context: $this->context,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);
@@ -137,7 +141,7 @@ final class ResultSetToTableTransformer
                 content: $value->getValue(),
                 columnSpan: 1,
                 rowSpan: 1,
-                generatingBlock: null,
+                context: $this->context,
             );
 
             $htmlRow = $htmlRow->appendCell($cell);

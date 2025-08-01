@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -24,12 +23,21 @@ final class HorizontalBlockGroup extends BlockGroup
 
     private ?DefaultRows $dataRows = null;
 
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
-        TreeNode $parentNode,
+        TreeNode $node,
+        ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
-        parent::__construct($parentNode, $level, $context);
+        parent::__construct(
+            node: $node,
+            parentNode: $parentNode,
+            level: $level,
+            context: $context,
+        );
     }
 
     #[\Override]
@@ -39,7 +47,8 @@ final class HorizontalBlockGroup extends BlockGroup
             return $this->headerRows;
         }
 
-        $headerRows = new DefaultRows([], $this);
+        $context = $this->getElementContext();
+        $headerRows = new DefaultRows([], $context);
 
         // add a header and data column for each of the child blocks
         foreach ($this->getBalancedChildBlocks() as $childBlock) {
@@ -47,23 +56,14 @@ final class HorizontalBlockGroup extends BlockGroup
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
-        if (
-            \count($this->getBalancedChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getParentNode());
-            $subtotalHeaderRows = $this->getSubtotalHeaderRows($subtotals);
-            $headerRows = $headerRows->appendRight($subtotalHeaderRows);
-        }
-
-        // add a legend if the dimension is not marked as superfluous
+        // add a legend if the dimension is not marked as skipped
         $child = $this->getOneChild();
 
-        if (!$this->getContext()->hasSuperfluousLegend($child)) {
+        if (!$this->getContext()->isLegendSkipped($child)) {
             $nameCell = new DefaultHeaderCell(
                 name: $child->getKey(),
                 content: $child->getLegend(),
-                generatingBlock: $this,
+                context: $context,
             );
 
             $headerRows = $nameCell->appendRowsBelow($headerRows);
@@ -79,91 +79,14 @@ final class HorizontalBlockGroup extends BlockGroup
             return $this->dataRows;
         }
 
-        $dataRows = new DefaultRows([], $this);
+        $context = $this->getElementContext();
+        $dataRows = new DefaultRows([], $context);
 
         foreach ($this->getBalancedChildBlocks() as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
-        if (
-            \count($this->getBalancedChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getParentNode());
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
-            $dataRows = $dataRows->appendRight($subtotalDataRows);
-        }
-
         return $this->dataRows = $dataRows;
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $headerRows = new DefaultRows([], $this);
-
-        $headerRows = $headerRows
-            ->appendRight($this->getOneBalancedChildBlock()->getSubtotalHeaderRows($subtotals));
-
-        return $headerRows;
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-        bool $requirePadding = true,
-    ): DefaultRows {
-        $dataRows = new DefaultRows([], $this);
-        $childBlock = $this->getOneBalancedChildBlock();
-        $balancedChildBlocks = $this->getBalancedChildBlocks();
-
-        if (!$childBlock instanceof NodeBlock) {
-            throw new \RuntimeException(
-                'The child block must be a NodeBlock to get subtotal rows.',
-            );
-        }
-
-        if ($childBlock->getTreeNode()->getKey() === '@values') {
-            foreach ($balancedChildBlocks as $childBlock) {
-                $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-                $dataRows = $dataRows->appendRight($childDataRows);
-            }
-        } else {
-            if ($requirePadding && \count($balancedChildBlocks) > 1) {
-                foreach ($this->getBalancedChildBlocks() as $childBlock) {
-                    $childDataRows = $childBlock->getDataPaddingRows();
-                    $dataRows = $dataRows->appendRight($childDataRows);
-                }
-            }
-
-            $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-            $dataRows = $dataRows->appendRight($childDataRows);
-        }
-
-        return $dataRows;
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        $dataRows = new DefaultRows([], $this);
-
-        foreach ($this->getBalancedChildBlocks() as $childBlock) {
-            $childDataRows = $childBlock->getDataPaddingRows();
-            $dataRows = $dataRows->appendRight($childDataRows);
-        }
-
-        if (
-            \count($this->getBalancedChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getParentNode());
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
-            $dataRows = $dataRows->appendRight($subtotalDataRows);
-        }
-
-        return $dataRows;
     }
 }

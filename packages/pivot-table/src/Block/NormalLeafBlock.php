@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultFooterCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultFooterHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRow;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
@@ -26,85 +23,37 @@ final class NormalLeafBlock extends LeafBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $cell = new DefaultHeaderCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getLegend(),
             columnSpan: 2,
-            generatingBlock: $this,
+            context: $context,
         );
 
-        return DefaultRows::createFromCell($cell, $this);
+        return DefaultRows::createFromCell($cell, $context);
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
+        $context = $this->getElementContext();
+
         $name = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getItem(),
-            generatingBlock: $this,
+            context: $context,
         );
 
         $value = new DefaultDataCell(
             name: $this->getTreeNode()->getKey(),
             content: $this->getTreeNode()->getValue(),
-            generatingBlock: $this,
+            context: $context,
         );
 
-        $row = new DefaultRow([$name, $value], $this);
+        $row = new DefaultRow([$name, $value], $context);
 
-        return new DefaultRows([$row], $this);
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        throw new \BadMethodCallException('Not implemented yet');
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $leafNode = $subtotals->takeOne();
-
-        if (\count($subtotals) > 1) {
-            if ($this->getTreeNode()->getKey() === '@values') {
-                $name = new DefaultFooterHeaderCell(
-                    name: $leafNode->getKey(),
-                    content: $leafNode->getItem(),
-                    generatingBlock: $this,
-                );
-            } else {
-                $name = new DefaultFooterHeaderCell(
-                    name: '',
-                    content: '',
-                    generatingBlock: $this,
-                );
-            }
-        } else {
-            $name = new DefaultFooterHeaderCell(
-                name: '',
-                content: 'Total',
-                generatingBlock: $this,
-            );
-        }
-
-        $value = new DefaultFooterCell(
-            name: $leafNode->getKey(),
-            content: $leafNode->getValue(),
-            generatingBlock: $this,
-        );
-
-        $row = new DefaultRow([$name, $value], $this);
-
-        return new DefaultRows([$row], $this);
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        throw new \BadMethodCallException('Not implemented yet');
+        return new DefaultRows([$row], $context);
     }
 }

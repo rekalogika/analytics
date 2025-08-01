@@ -23,14 +23,21 @@ final readonly class PivotTableTransformer
 
     /**
      * @param list<string> $pivotedNodes
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skipLegends
+     * @param list<string> $createSubtotals
      */
     public static function transformTreeToBlock(
-        TreeNode $treeNode,
+        TreeNode $node,
         array $pivotedNodes = [],
-        array $superfluousLegends = [],
+        array $skipLegends = ['@values'],
+        array $createSubtotals = [],
     ): Block {
-        return Block::new($treeNode, $pivotedNodes, $superfluousLegends);
+        return Block::new(
+            node: $node,
+            pivotedNodes: $pivotedNodes,
+            skipLegends: $skipLegends,
+            createSubtotals: $createSubtotals,
+        );
     }
 
     public static function transformBlockToTable(Block $block): Table
@@ -40,18 +47,20 @@ final readonly class PivotTableTransformer
 
     /**
      * @param list<string> $pivotedNodes
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skipLegends
+     * @param list<string> $createSubtotals
      */
     public static function transformTreeToTable(
-        TreeNode $treeNode,
+        TreeNode $node,
         array $pivotedNodes = [],
-        array $superfluousLegends = [],
+        array $skipLegends = ['@values'],
+        array $createSubtotals = [],
     ): Table {
-
         $block = self::transformTreeToBlock(
-            treeNode: $treeNode,
+            node: $node,
             pivotedNodes: $pivotedNodes,
-            superfluousLegends: $superfluousLegends,
+            skipLegends: $skipLegends,
+            createSubtotals: $createSubtotals,
         );
 
         return self::transformBlockToTable($block);

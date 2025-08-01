@@ -18,27 +18,36 @@ use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 abstract class BlockGroup extends Block
 {
     /**
-     * @var list<TreeNode>|null
+     * @var array<int,list<TreeNode>>
      */
-    private ?array $children = null;
+    private array $rawChildNodes = [];
 
     /**
-     * @var non-empty-list<TreeNode>|null
+     * @var array<int,list<TreeNode>>
      */
-    private ?array $balancedChildren = null;
+    private array $childNodes = [];
 
     /**
-     * @var list<Block>|null
+     * @var array<int,non-empty-list<TreeNode>>
      */
-    private ?array $childBlocks = null;
+    private array $balancedChildNodes = [];
 
     /**
-     * @var list<Block>|null
+     * @var array<int,list<Block>>
      */
-    private ?array $balancedChildBlocks = null;
+    private array $childBlocks = [];
 
+    /**
+     * @var array<int,list<Block>>
+     */
+    private array $balancedChildBlocks = [];
+
+    /**
+     * @param int<0,max> $level
+     */
     public function __construct(
-        private readonly TreeNode $parentNode,
+        private readonly TreeNode $node,
+        private readonly ?TreeNode $parentNode,
         int $level,
         BlockContext $context,
     ) {
@@ -46,91 +55,156 @@ abstract class BlockGroup extends Block
     }
 
     /**
+     * @param int<1,max> $level
      * @return list<Block>
      */
-    public function getChildBlocks(): array
+    public function getChildBlocks(int $level = 1): array
     {
-        if ($this->childBlocks !== null) {
-            return $this->childBlocks;
+        if (isset($this->childBlocks[$level])) {
+            return $this->childBlocks[$level];
         }
 
         $childBlocks = [];
 
-        foreach ($this->getChildren() as $childNode) {
-            $childBlocks[] = $this->createBlock($childNode, $this->getLevel() + 1);
+        foreach ($this->getChildNodes($level) as $childNode) {
+            $childBlocks[] = $this->createBlock(
+                node: $childNode,
+                parentNode: $this->node,
+                level: $this->getLevel() + $level,
+            );
         }
 
-        return $this->childBlocks = $childBlocks;
+        return $this->childBlocks[$level] = $childBlocks;
     }
 
     /**
+     * @param int<1,max> $level
      * @return list<Block>
      */
-    public function getBalancedChildBlocks(): array
+    public function getBalancedChildBlocks(int $level = 1): array
     {
-        if ($this->balancedChildBlocks !== null) {
-            return $this->balancedChildBlocks;
+        if (isset($this->balancedChildBlocks[$level])) {
+            return $this->balancedChildBlocks[$level];
         }
 
         $balancedChildBlocks = [];
 
-        foreach ($this->getBalancedChildren() as $childNode) {
-            $balancedChildBlocks[] = $this->createBlock($childNode, $this->getLevel() + 1);
+        foreach ($this->getBalancedChildNodes($level) as $childNode) {
+            $balancedChildBlocks[] = $this->createBlock(
+                node: $childNode,
+                parentNode: $this->node,
+                level: $this->getLevel() + $level,
+            );
         }
 
-        return $this->balancedChildBlocks = $balancedChildBlocks;
+        return $this->balancedChildBlocks[$level] = $balancedChildBlocks;
     }
 
-    public function getOneChildBlock(): Block
+    /**
+     * @param int<1,max> $level
+     */
+    public function getOneChildBlock(int $level = 1): Block
     {
-        return $this->getChildBlocks()[0]
-            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+        return $this->getChildBlocks($level)[0]
+            ?? throw new \RuntimeException('No child blocks found in the current node.');
     }
 
-    public function getOneBalancedChildBlock(): Block
+    /**
+     * @param int<1,max> $level
+     */
+    public function getOneBalancedChildBlock(int $level = 1): Block
     {
-        return $this->getBalancedChildBlocks()[0]
-            ?? throw new \RuntimeException('No child blocks found in the parent node.');
+        return $this->getBalancedChildBlocks($level)[0]
+            ?? throw new \RuntimeException('No child blocks found in the current node.');
     }
 
-    final public function getParentNode(): TreeNode
+    final public function getNode(): TreeNode
+    {
+        return $this->node;
+    }
+
+    final public function getParentNode(): ?TreeNode
     {
         return $this->parentNode;
     }
 
     /**
+     * @param int<1,max> $level
      * @return list<TreeNode>
      */
-    final public function getChildren(): array
+    private function getRawChildNodes(int $level = 1): array
     {
-        if ($this->children !== null) {
-            return $this->children;
+        if (isset($this->rawChildNodes[$level])) {
+            return $this->rawChildNodes[$level];
         }
 
-        $children = $this->parentNode->getChildren();
+        $children = array_values(iterator_to_array($this->node->getChildren($level)));
 
-        return $this->children = array_values(iterator_to_array($children));
+        return $this->rawChildNodes[$level] = $children;
     }
 
     /**
-     * @return non-empty-list<TreeNode>
+     * @param int<1,max> $level
      */
-    final public function getBalancedChildren(): array
+    private function getSubtotalNode(int $level = 1): ?TreeNode
     {
-        if ($this->balancedChildren !== null) {
-            return $this->balancedChildren;
-        }
-
-        $children = $this->getChildren();
-
-        /** @var non-empty-list<TreeNode> $children */
-        return $this->balancedChildren = $this->balanceBranchNodes($children, $this->getLevel());
+        return SubtotalTreeNode::create(
+            node: $this->node,
+            level: $level,
+            context: $this->getContext(),
+        );
     }
 
-    final public function getOneChild(): TreeNode
+    /**
+     * @param int<1,max> $level
+     * @return list<TreeNode>
+     */
+    private function getChildNodes(int $level = 1): array
     {
-        return $this->getChildren()[0]
-            ?? $this->getBalancedChildren()[0]
-            ?? throw new \RuntimeException('No child nodes found in the parent node.');
+        if (isset($this->childNodes[$level])) {
+            return $this->childNodes[$level];
+        }
+
+        $children = $this->getRawChildNodes($level);
+        $subtotalNode = $this->getSubtotalNode($level);
+
+        if ($subtotalNode !== null) {
+            $children[] = $subtotalNode;
+        }
+
+        return $this->childNodes[$level] = $children;
+    }
+
+    /**
+     * @param int<1,max> $level
+     * @return non-empty-list<TreeNode>
+     */
+    private function getBalancedChildNodes(int $level = 1): array
+    {
+        if (isset($this->balancedChildNodes[$level])) {
+            return $this->balancedChildNodes[$level];
+        }
+
+        $children = $this->getChildNodes($level);
+        $children = $this->balanceNodes($children, $this->getLevel() + $level - 1);
+
+        $subtotalNode = $this->getSubtotalNode($level);
+
+        if ($subtotalNode !== null) {
+            $children[] = $subtotalNode;
+        }
+
+        /** @var non-empty-list<TreeNode> $children */
+        return $this->balancedChildNodes[$level] = $children;
+    }
+
+    /**
+     * @param int<1,max> $level
+     */
+    final public function getOneChild(int $level = 1): TreeNode
+    {
+        return $this->getChildNodes($level)[0]
+            ?? $this->getBalancedChildNodes($level)[0]
+            ?? throw new \RuntimeException('No child nodes found in the current node.');
     }
 }
