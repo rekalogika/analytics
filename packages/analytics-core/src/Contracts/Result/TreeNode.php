@@ -48,17 +48,17 @@ interface TreeNode extends OrderedMapCollection, Dimension
      * dimension name does not have to be the immediate dimension according to
      * the query. But must be one of the descendant dimension names.
      *
-     * @param int<1,max>|int<min,-1>|string $name If string, gets the children with that dimension
-     * name. The name must be one of the descendant dimension names. If int,
-     * skips the first $name children and returns the rest. If negative, skips
-     * to the last $name children. The default is 1, which means the next
-     * dimension according to the query.
+     * @param int<1,max>|int<min,-1>|string $name If string, gets the children
+     * with that dimension name. The name must be one of the descendant
+     * dimension names. If int, skips the first $name children and returns the
+     * rest. If negative, skips to the last $name children. The default is 1,
+     * which means the next immediate dimension according to the query.
      */
     public function getChildren(int|string $name = 1): TreeNodes;
 
     public function getMeasure(): Measure;
 
-    public function getSubtotals(): Measures;
+    public function getMeasures(): Measures;
 
     public function traverse(mixed ...$members): ?TreeNode;
 
