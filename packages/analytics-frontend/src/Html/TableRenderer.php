@@ -172,7 +172,7 @@ final readonly class TableRenderer
         $table = PivotTableTransformer::transformTreeToTable(
             treeNode: $pivotTable,
             pivotedNodes: $pivotedDimensions,
-            superfluousLegends: ['@values'],
+            skippedLegends: ['@values'],
         );
 
         return $this->getVisitor($theme)->visitTable($table);

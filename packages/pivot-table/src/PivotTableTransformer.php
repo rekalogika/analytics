@@ -23,14 +23,14 @@ final readonly class PivotTableTransformer
 
     /**
      * @param list<string> $pivotedNodes
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skippedLegends
      */
     public static function transformTreeToBlock(
         TreeNode $treeNode,
         array $pivotedNodes = [],
-        array $superfluousLegends = [],
+        array $skippedLegends = ['@values'],
     ): Block {
-        return Block::new($treeNode, $pivotedNodes, $superfluousLegends);
+        return Block::new($treeNode, $pivotedNodes, $skippedLegends);
     }
 
     public static function transformBlockToTable(Block $block): Table
@@ -40,18 +40,18 @@ final readonly class PivotTableTransformer
 
     /**
      * @param list<string> $pivotedNodes
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skippedLegends
      */
     public static function transformTreeToTable(
         TreeNode $treeNode,
         array $pivotedNodes = [],
-        array $superfluousLegends = [],
+        array $skippedLegends = ['@values'],
     ): Table {
 
         $block = self::transformTreeToBlock(
             treeNode: $treeNode,
             pivotedNodes: $pivotedNodes,
-            superfluousLegends: $superfluousLegends,
+            skippedLegends: $skippedLegends,
         );
 
         return self::transformBlockToTable($block);

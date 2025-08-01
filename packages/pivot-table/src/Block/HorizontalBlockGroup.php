@@ -52,10 +52,10 @@ final class HorizontalBlockGroup extends BlockGroup
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
-        // add a legend if the dimension is not marked as superfluous
+        // add a legend if the dimension is not marked as skipped
         $child = $this->getOneChild();
 
-        if (!$this->getContext()->hasSuperfluousLegend($child)) {
+        if (!$this->getContext()->isLegendSkipped($child)) {
             $nameCell = new DefaultHeaderCell(
                 name: $child->getKey(),
                 content: $child->getLegend(),

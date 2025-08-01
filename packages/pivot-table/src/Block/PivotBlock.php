@@ -23,7 +23,7 @@ final class PivotBlock extends BranchBlock
     public function getHeaderRows(): DefaultRows
     {
         if (
-            $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
+            $this->getContext()->isLegendSkipped($this->getTreeNode())
         ) {
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),

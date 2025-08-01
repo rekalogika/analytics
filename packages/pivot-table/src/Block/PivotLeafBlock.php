@@ -23,7 +23,7 @@ final class PivotLeafBlock extends LeafBlock
     public function getHeaderRows(): DefaultRows
     {
         if (
-            $this->getContext()->hasSuperfluousLegend($this->getTreeNode())
+            $this->getContext()->isLegendSkipped($this->getTreeNode())
         ) {
             $cell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),

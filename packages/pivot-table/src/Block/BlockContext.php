@@ -20,12 +20,12 @@ final readonly class BlockContext
     /**
      * @param list<list<TreeNode>> $distinct
      * @param list<string> $pivotedDimensions
-     * @param list<string> $superfluousLegends
+     * @param list<string> $skipLegends
      */
     public function __construct(
         private array $distinct,
         private array $pivotedDimensions = [],
-        private array $superfluousLegends = [],
+        private array $skipLegends = [],
     ) {}
 
     /**
@@ -51,8 +51,8 @@ final readonly class BlockContext
         return \in_array($node->getKey(), $this->pivotedDimensions, true);
     }
 
-    public function hasSuperfluousLegend(TreeNode $node): bool
+    public function isLegendSkipped(TreeNode $node): bool
     {
-        return \in_array($node->getKey(), $this->superfluousLegends, true);
+        return \in_array($node->getKey(), $this->skipLegends, true);
     }
 }
