@@ -29,9 +29,4 @@ interface TreeNode
      * @param int<1,max> $level
      */
     public function getChildren(int $level = 1): TreeNodes;
-
-    /**
-     * @return iterable<SubtotalNode>
-     */
-    public function getSubtotals(): iterable;
 }

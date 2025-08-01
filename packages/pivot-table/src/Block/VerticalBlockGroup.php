@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -61,54 +60,6 @@ final class VerticalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        // if (
-        //     \count($this->getChildBlocks()) > 1
-        //     && $this->getOneChild()->getKey() !== '@values'
-        // ) {
-        //     $subtotals = new Subtotals($this->getNode());
-        //     $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
-        //     $dataRows = $dataRows->appendBelow($subtotalDataRows);
-        // }
-
         return $this->dataRows = $dataRows;
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        throw new \BadMethodCallException('Not implemented yet');
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $dataRows = new DefaultRows([], $this);
-        $childBlock = $this->getOneChildBlock();
-
-        if (!$childBlock instanceof NodeBlock) {
-            throw new \RuntimeException(
-                'The child block must be a NodeBlock to get subtotal rows.',
-            );
-        }
-
-        if ($childBlock->getTreeNode()->getKey() === '@values') {
-            foreach ($this->getChildBlocks() as $childBlock) {
-                $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-                $dataRows = $dataRows->appendBelow($childDataRows);
-            }
-        } else {
-            $childDataRows = $childBlock->getSubtotalDataRows($subtotals);
-            $dataRows = $dataRows->appendBelow($childDataRows);
-        }
-
-        return $dataRows;
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        throw new \BadMethodCallException('Not implemented yet');
     }
 }

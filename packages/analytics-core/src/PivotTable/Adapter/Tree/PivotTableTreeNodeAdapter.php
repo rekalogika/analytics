@@ -70,16 +70,6 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
         );
     }
 
-    #[\Override]
-    public function getSubtotals(): iterable
-    {
-        $subtotals = $this->node->getSubtotals();
-
-        foreach ($subtotals as $subtotal) {
-            yield new SubtotalAdapter($subtotal);
-        }
-    }
-
     public function getTreeNode(): TreeNode
     {
         return $this->node;

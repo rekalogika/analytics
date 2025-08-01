@@ -90,10 +90,4 @@ final readonly class SubtotalTreeNode implements TreeNode
     {
         return $this->node->getChildren($this->level + $level);
     }
-
-    #[\Override]
-    public function getSubtotals(): iterable
-    {
-        return $this->node->getSubtotals();
-    }
 }

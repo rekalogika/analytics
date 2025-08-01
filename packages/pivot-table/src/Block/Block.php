@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
@@ -118,29 +117,29 @@ abstract class Block implements \Stringable
     }
 
     /**
-     * @param list<TreeNode> $branchNodes
+     * @param list<TreeNode> $nodes
      * @return non-empty-list<TreeNode>
      */
-    final protected function balanceBranchNodes(array $branchNodes, int $level): array
+    final protected function balanceNodes(array $nodes, int $level): array
     {
-        $distinctBranchNodes = $this->getContext()->getDistinctNodesOfLevel($level);
+        $distinctNodes = $this->getContext()->getDistinctNodesOfLevel($level);
 
         $result = [];
 
-        foreach ($distinctBranchNodes as $distinctBranchNode) {
+        foreach ($distinctNodes as $distinctNode) {
             $found = false;
 
-            foreach ($branchNodes as $branchNode) {
+            foreach ($nodes as $node) {
                 // @todo fix identity comparison
-                if ($branchNode->getItem() === $distinctBranchNode->getItem()) {
-                    $result[] = $branchNode;
+                if ($node->getItem() === $distinctNode->getItem()) {
+                    $result[] = $node;
                     $found = true;
                     break;
                 }
             }
 
             if (!$found) {
-                $result[] = $distinctBranchNode;
+                $result[] = $distinctNode;
             }
         }
 
@@ -151,16 +150,6 @@ abstract class Block implements \Stringable
     abstract public function getHeaderRows(): DefaultRows;
 
     abstract public function getDataRows(): DefaultRows;
-
-    abstract public function getDataPaddingRows(): DefaultRows;
-
-    abstract public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows;
-
-    abstract public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows;
 
     final public function generateTable(): DefaultTable
     {

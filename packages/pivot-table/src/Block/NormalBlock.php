@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Util\Subtotals;
 use Rekalogika\PivotTable\Implementation\Table\DefaultDataCell;
-use Rekalogika\PivotTable\Implementation\Table\DefaultFooterHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -56,57 +54,5 @@ final class NormalBlock extends BranchBlock
 
         return $this->dataRows = $cell
             ->appendRowsRight($this->getChildrenBlockGroup()->getDataRows());
-    }
-
-    #[\Override]
-    public function getSubtotalHeaderRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $cell = new DefaultHeaderCell(
-            name: 'Total',
-            content: 'Total',
-            generatingBlock: $this,
-            columnSpan: $this->getHeaderRows()->getHeight(),
-        );
-
-        $subtotalHeaderRows = $this->getChildrenBlockGroup()
-            ->getSubtotalHeaderRows($subtotals);
-
-        return $cell->appendRowsRight($subtotalHeaderRows);
-    }
-
-    #[\Override]
-    public function getSubtotalDataRows(
-        Subtotals $subtotals,
-    ): DefaultRows {
-        $parentChildCount = \count($this->getParentBlock()?->getBalancedChildBlocks() ?? []);
-
-        if (
-            $this->getTreeNode()->getKey() === '@values'
-            || $parentChildCount === 1
-        ) {
-            $cell = new DefaultFooterHeaderCell(
-                name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
-                generatingBlock: $this,
-            );
-        } else {
-            $cell = new DefaultFooterHeaderCell(
-                name: '',
-                content: 'Total',
-                generatingBlock: $this,
-            );
-        }
-
-        $childredSubtotalRows = $this->getChildrenBlockGroup()
-            ->getSubtotalDataRows($subtotals);
-
-        return $cell->appendRowsRight($childredSubtotalRows);
-    }
-
-    #[\Override]
-    public function getDataPaddingRows(): DefaultRows
-    {
-        throw new \BadMethodCallException('Not implemented yet');
     }
 }

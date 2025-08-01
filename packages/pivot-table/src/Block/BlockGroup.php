@@ -180,7 +180,7 @@ abstract class BlockGroup extends Block
         }
 
         $children = $this->getChildNodes($level);
-        $children = $this->balanceBranchNodes($children, $this->getLevel() + $level - 1);
+        $children = $this->balanceNodes($children, $this->getLevel() + $level - 1);
 
         $subtotalNode = $this->getSubtotalNode($level);
 
