@@ -361,11 +361,5 @@
         <target>An error occurred</target>
       </segment>
     </unit>
-    <unit id="tHdA52O" name="All">
-      <segment>
-        <source>All</source>
-        <target>All</target>
-      </segment>
-    </unit>
   </file>
 </xliff>
