@@ -20,7 +20,7 @@ abstract class BlockGroup extends Block
     /**
      * @var array<int,list<TreeNode>>
      */
-    private array $children = [];
+    private array $childNodes = [];
 
     /**
      * @var array<int,non-empty-list<TreeNode>>
@@ -38,7 +38,7 @@ abstract class BlockGroup extends Block
     private array $balancedChildBlocks = [];
 
     public function __construct(
-        private readonly TreeNode $parentNode,
+        private readonly TreeNode $node,
         int $level,
         BlockContext $context,
     ) {
@@ -57,7 +57,7 @@ abstract class BlockGroup extends Block
 
         $childBlocks = [];
 
-        foreach ($this->getChildren($level) as $childNode) {
+        foreach ($this->getChildNodes($level) as $childNode) {
             $childBlocks[] = $this->createBlock($childNode, $this->getLevel() + $level);
         }
 
@@ -101,24 +101,24 @@ abstract class BlockGroup extends Block
             ?? throw new \RuntimeException('No child blocks found in the parent node.');
     }
 
-    final public function getParentNode(): TreeNode
+    final public function getNode(): TreeNode
     {
-        return $this->parentNode;
+        return $this->node;
     }
 
     /**
      * @param int<1,max> $level
      * @return list<TreeNode>
      */
-    final public function getChildren(int $level = 1): array
+    private function getChildNodes(int $level = 1): array
     {
-        if (isset($this->children[$level])) {
-            return $this->children[$level];
+        if (isset($this->childNodes[$level])) {
+            return $this->childNodes[$level];
         }
 
-        $children = $this->parentNode->getChildren($level);
+        $children = $this->node->getChildren($level);
 
-        return $this->children[$level] = array_values(iterator_to_array($children));
+        return $this->childNodes[$level] = array_values(iterator_to_array($children));
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class BlockGroup extends Block
             return $this->balancedChildren[$level];
         }
 
-        $children = $this->getChildren($level);
+        $children = $this->getChildNodes($level);
 
         /** @var non-empty-list<TreeNode> $children */
         return $this->balancedChildren[$level] =
@@ -143,7 +143,7 @@ abstract class BlockGroup extends Block
      */
     final public function getOneChild(int $level = 1): TreeNode
     {
-        return $this->getChildren($level)[0]
+        return $this->getChildNodes($level)[0]
             ?? $this->getBalancedChildren($level)[0]
             ?? throw new \RuntimeException('No child nodes found in the parent node.');
     }

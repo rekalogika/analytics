@@ -59,7 +59,7 @@ final class VerticalBlockGroup extends BlockGroup
             \count($this->getChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            $subtotals = new Subtotals($this->getParentNode());
+            $subtotals = new Subtotals($this->getNode());
             $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
             $dataRows = $dataRows->appendBelow($subtotalDataRows);
         }

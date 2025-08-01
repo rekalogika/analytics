@@ -51,7 +51,7 @@ final class HorizontalBlockGroup extends BlockGroup
             \count($this->getBalancedChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            $subtotals = new Subtotals($this->getParentNode());
+            $subtotals = new Subtotals($this->getNode());
             $subtotalHeaderRows = $this->getSubtotalHeaderRows($subtotals);
             $headerRows = $headerRows->appendRight($subtotalHeaderRows);
         }
@@ -90,7 +90,7 @@ final class HorizontalBlockGroup extends BlockGroup
             \count($this->getBalancedChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            $subtotals = new Subtotals($this->getParentNode());
+            $subtotals = new Subtotals($this->getNode());
             $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
             $dataRows = $dataRows->appendRight($subtotalDataRows);
         }
@@ -159,7 +159,7 @@ final class HorizontalBlockGroup extends BlockGroup
             \count($this->getBalancedChildBlocks()) > 1
             && $this->getOneChild()->getKey() !== '@values'
         ) {
-            $subtotals = new Subtotals($this->getParentNode());
+            $subtotals = new Subtotals($this->getNode());
             $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
             $dataRows = $dataRows->appendRight($subtotalDataRows);
         }
