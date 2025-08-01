@@ -34,11 +34,14 @@ abstract class BranchBlock extends NodeBlock
         return $this->childrenBlockGroup;
     }
 
-    private function createBlockGroup(TreeNode $parentNode, int $level): BlockGroup
+    /**
+     * Blocks that contains blocks, each representing a child node
+     */
+    private function createBlockGroup(TreeNode $node, int $level): BlockGroup
     {
 
         /** @var \Traversable<array-key,TreeNode> */
-        $children = $parentNode->getChildren();
+        $children = $node->getChildren();
         $children = iterator_to_array($children);
 
         $firstChild = $children[0]
@@ -46,13 +49,13 @@ abstract class BranchBlock extends NodeBlock
             ?? null;
 
         if ($firstChild === null) {
-            return new EmptyBlockGroup($parentNode, $level, $this->getContext());
+            return new EmptyBlockGroup($node, $level, $this->getContext());
         }
 
         if ($this->getContext()->isPivoted($firstChild)) {
-            return new HorizontalBlockGroup($parentNode, $level, $this->getContext());
+            return new HorizontalBlockGroup($node, $level, $this->getContext());
         } else {
-            return new VerticalBlockGroup($parentNode, $level, $this->getContext());
+            return new VerticalBlockGroup($node, $level, $this->getContext());
         }
     }
 }
