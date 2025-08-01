@@ -38,7 +38,7 @@ final class Version20250801 extends AbstractMigration
         // Then wrap an aggregate around it:
         $this->addSql(<<<'SQL'
             CREATE OR REPLACE AGGREGATE public.rekalogika_first (anyelement) (
-                SFUNC    = public.first_agg
+                SFUNC    = public.rekalogika_first_agg
                 , STYPE    = anyelement
                 , PARALLEL = safe
             );
@@ -55,7 +55,7 @@ final class Version20250801 extends AbstractMigration
         // Then wrap an aggregate around it:
         $this->addSql(<<<'SQL'
             CREATE OR REPLACE AGGREGATE public.rekalogika_last (anyelement) (
-                SFUNC    = public.last_agg
+                SFUNC    = public.rekalogika_last_agg
                 , STYPE    = anyelement
                 , PARALLEL = safe
             );
