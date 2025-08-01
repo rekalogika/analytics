@@ -53,14 +53,14 @@ final class HorizontalBlockGroup extends BlockGroup
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
-        if (
-            \count($this->getBalancedChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getNode());
-            $subtotalHeaderRows = $this->getSubtotalHeaderRows($subtotals);
-            $headerRows = $headerRows->appendRight($subtotalHeaderRows);
-        }
+        // if (
+        //     \count($this->getBalancedChildBlocks()) > 1
+        //     && $this->getOneChild()->getKey() !== '@values'
+        // ) {
+        //     $subtotals = new Subtotals($this->getNode());
+        //     $subtotalHeaderRows = $this->getSubtotalHeaderRows($subtotals);
+        //     $headerRows = $headerRows->appendRight($subtotalHeaderRows);
+        // }
 
         // add a legend if the dimension is not marked as superfluous
         $child = $this->getOneChild();
@@ -92,14 +92,14 @@ final class HorizontalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
-        if (
-            \count($this->getBalancedChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getNode());
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
-            $dataRows = $dataRows->appendRight($subtotalDataRows);
-        }
+        // if (
+        //     \count($this->getBalancedChildBlocks()) > 1
+        //     && $this->getOneChild()->getKey() !== '@values'
+        // ) {
+        //     $subtotals = new Subtotals($this->getNode());
+        //     $subtotalDataRows = $this->getSubtotalDataRows($subtotals, false);
+        //     $dataRows = $dataRows->appendRight($subtotalDataRows);
+        // }
 
         return $this->dataRows = $dataRows;
     }

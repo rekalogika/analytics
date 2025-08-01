@@ -118,7 +118,7 @@ abstract class Block implements \Stringable
     }
 
     /**
-     * @param non-empty-list<TreeNode> $branchNodes
+     * @param list<TreeNode> $branchNodes
      * @return non-empty-list<TreeNode>
      */
     final protected function balanceBranchNodes(array $branchNodes, int $level): array

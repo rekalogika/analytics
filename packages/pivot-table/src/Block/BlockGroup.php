@@ -14,9 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 
 abstract class BlockGroup extends Block
 {
+    /**
+     * @var array<int,list<TreeNode>>
+     */
+    private array $rawChildNodes = [];
+
     /**
      * @var array<int,list<TreeNode>>
      */
@@ -25,7 +31,7 @@ abstract class BlockGroup extends Block
     /**
      * @var array<int,non-empty-list<TreeNode>>
      */
-    private array $balancedChildren = [];
+    private array $balancedChildNodes = [];
 
     /**
      * @var array<int,list<Block>>
@@ -81,7 +87,7 @@ abstract class BlockGroup extends Block
 
         $balancedChildBlocks = [];
 
-        foreach ($this->getBalancedChildren($level) as $childNode) {
+        foreach ($this->getBalancedChildNodes($level) as $childNode) {
             $balancedChildBlocks[] = $this->createBlock(
                 node: $childNode,
                 parentNode: $this->node,
@@ -124,32 +130,66 @@ abstract class BlockGroup extends Block
      * @param int<1,max> $level
      * @return list<TreeNode>
      */
+    private function getRawChildNodes(int $level = 1): array
+    {
+        if (isset($this->rawChildNodes[$level])) {
+            return $this->rawChildNodes[$level];
+        }
+
+        $children = array_values(iterator_to_array($this->node->getChildren($level)));
+
+        return $this->rawChildNodes[$level] = $children;
+    }
+
+    /**
+     * @param int<1,max> $level
+     */
+    private function getSubtotalNode(int $level = 1): ?TreeNode
+    {
+        return SubtotalTreeNode::create($this->node, $level);
+    }
+
+    /**
+     * @param int<1,max> $level
+     * @return list<TreeNode>
+     */
     private function getChildNodes(int $level = 1): array
     {
         if (isset($this->childNodes[$level])) {
             return $this->childNodes[$level];
         }
 
-        $children = $this->node->getChildren($level);
+        $children = $this->getRawChildNodes($level);
+        $subtotalNode = $this->getSubtotalNode($level);
 
-        return $this->childNodes[$level] = array_values(iterator_to_array($children));
+        if ($subtotalNode !== null) {
+            $children[] = $subtotalNode;
+        }
+
+        return $this->childNodes[$level] = $children;
     }
 
     /**
      * @param int<1,max> $level
      * @return non-empty-list<TreeNode>
      */
-    final public function getBalancedChildren(int $level = 1): array
+    private function getBalancedChildNodes(int $level = 1): array
     {
-        if (isset($this->balancedChildren[$level])) {
-            return $this->balancedChildren[$level];
+        if (isset($this->balancedChildNodes[$level])) {
+            return $this->balancedChildNodes[$level];
         }
 
         $children = $this->getChildNodes($level);
+        $children = $this->balanceBranchNodes($children, $this->getLevel() + $level - 1);
+
+        $subtotalNode = $this->getSubtotalNode($level);
+
+        if ($subtotalNode !== null) {
+            $children[] = $subtotalNode;
+        }
 
         /** @var non-empty-list<TreeNode> $children */
-        return $this->balancedChildren[$level] =
-            $this->balanceBranchNodes($children, $this->getLevel() + $level - 1); // @todo may be an error
+        return $this->balancedChildNodes[$level] = $children;
     }
 
     /**
@@ -158,7 +198,7 @@ abstract class BlockGroup extends Block
     final public function getOneChild(int $level = 1): TreeNode
     {
         return $this->getChildNodes($level)[0]
-            ?? $this->getBalancedChildren($level)[0]
+            ?? $this->getBalancedChildNodes($level)[0]
             ?? throw new \RuntimeException('No child nodes found in the current node.');
     }
 }

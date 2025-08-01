@@ -61,14 +61,14 @@ final class VerticalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        if (
-            \count($this->getChildBlocks()) > 1
-            && $this->getOneChild()->getKey() !== '@values'
-        ) {
-            $subtotals = new Subtotals($this->getNode());
-            $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
-            $dataRows = $dataRows->appendBelow($subtotalDataRows);
-        }
+        // if (
+        //     \count($this->getChildBlocks()) > 1
+        //     && $this->getOneChild()->getKey() !== '@values'
+        // ) {
+        //     $subtotals = new Subtotals($this->getNode());
+        //     $subtotalDataRows = $this->getSubtotalDataRows($subtotals);
+        //     $dataRows = $dataRows->appendBelow($subtotalDataRows);
+        // }
 
         return $this->dataRows = $dataRows;
     }
