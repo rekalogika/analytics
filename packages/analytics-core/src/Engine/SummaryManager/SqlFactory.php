@@ -58,7 +58,11 @@ final class SqlFactory
         yield from $query->getSQL();
     }
 
-    private function createInsertIntoSummaryQuery(): string
+    //
+    // insert into summary
+    //
+
+    private function getInsertIntoSummaryQuery(): string
     {
         if ($this->insertInto !== null) {
             return $this->insertInto;
@@ -85,55 +89,21 @@ final class SqlFactory
                 entityManager: $this->entityManager,
                 partitionManager: $this->partitionManager,
                 summaryMetadata: $this->summaryMetadata,
+                insertSql: $this->getInsertIntoSummaryQuery(),
             );
     }
 
     /**
      * @return iterable<DecomposedQuery>
      */
-    private function createSelectForRollingUpSingleSourceToSummaryQuery(
+    public function createRollUpSourceToSummaryQueries(
         Partition $start,
         Partition $end,
     ): iterable {
-        return $this
+        yield from $this
             ->getRollUpSourceToSummaryQuery()
             ->withBoundary($start, $end)
             ->getQueries();
-    }
-
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    private function createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
-        Partition $start,
-        Partition $end,
-    ): iterable {
-        $selects = $this->createSelectForRollingUpSingleSourceToSummaryQuery(
-            start: $start,
-            end: $end,
-        );
-
-        $insertInto = $this->createInsertIntoSummaryQuery();
-
-        foreach ($selects as $select) {
-            yield $select->prependSql($insertInto);
-        }
-    }
-
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    public function createInsertIntoSelectForRollingUpSourceToSummaryQuery(
-        Partition $start,
-        Partition $end,
-    ): iterable {
-        $insertIntoSelects = $this
-            ->createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
-                start: $start,
-                end: $end,
-            );
-
-        yield from $insertIntoSelects;
     }
 
     //
@@ -142,7 +112,7 @@ final class SqlFactory
 
     private ?RollUpSummaryToSummaryGroupAllStrategyQuery $rollUpSummaryToSummaryQuery = null;
 
-    public function getRollupSummaryToSummaryQuery(): RollUpSummaryToSummaryGroupAllStrategyQuery
+    public function getRollUpSummaryToSummaryQuery(): RollUpSummaryToSummaryGroupAllStrategyQuery
     {
         return $this->rollUpSummaryToSummaryQuery ??=
             new RollUpSummaryToSummaryGroupAllStrategyQuery(
@@ -159,7 +129,7 @@ final class SqlFactory
         Partition $end,
     ): iterable {
         return $this
-            ->getRollupSummaryToSummaryQuery()
+            ->getRollUpSummaryToSummaryQuery()
             ->withBoundary($start, $end)
             ->getQueries();
     }
@@ -176,7 +146,7 @@ final class SqlFactory
             end: $end,
         );
 
-        $insertInto = $this->createInsertIntoSummaryQuery();
+        $insertInto = $this->getInsertIntoSummaryQuery();
 
         foreach ($selects as $select) {
             yield $select->prependSql($insertInto);

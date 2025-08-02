@@ -205,6 +205,9 @@ final class ArchitectureTest
                 Selectors::selectAnalyticsFrontend(),
                 Selectors::selectAnalyticsPivotTable(),
 
+                // rekalogika
+                Selector::inNamespace('Rekalogika\Analytics\SimpleQueryBuilder'),
+
                 // psr/symfony contracts
                 Selector::inNamespace('Psr\Cache'),
                 Selector::inNamespace('Psr\Log'),

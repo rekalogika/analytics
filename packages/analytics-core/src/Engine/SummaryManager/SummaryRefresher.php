@@ -427,7 +427,7 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->createInsertIntoSelectForRollingUpSourceToSummaryQuery(
+            ->createRollUpSourceToSummaryQueries(
                 start: $range->getStart(),
                 end: $range->getEnd(),
             );

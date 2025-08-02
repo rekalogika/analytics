@@ -29,7 +29,7 @@ use Rekalogika\DoctrineAdvancedGroupBy\Field;
 
 final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 {
-    private ?Groupings $groupings = null;
+    private Groupings $groupings;
     private ?Partition $start = null;
     private ?Partition $end = null;
 
@@ -37,6 +37,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         EntityManagerInterface $entityManager,
         private readonly PartitionHandler $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
+        private readonly string $insertSql,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -44,12 +45,14 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             alias: 'root',
         );
 
+        $this->groupings = Groupings::create($this->summaryMetadata);
+
         parent::__construct($simpleQueryBuilder);
     }
 
     private function getGroupings(): Groupings
     {
-        return $this->groupings ??= Groupings::create($this->summaryMetadata);
+        return $this->groupings;
     }
 
     public function withBoundary(Partition $start, Partition $end): self
@@ -245,6 +248,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $groupBy->add(new Field('par_level'));
         $groupBy->apply($query);
 
-        return DecomposedQuery::createFromQuery($query);
+        return DecomposedQuery::createFromQuery($query)
+            ->prependSql($this->insertSql);
     }
 }
