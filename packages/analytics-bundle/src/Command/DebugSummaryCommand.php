@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
+use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryEntityQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresher;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -234,11 +235,12 @@ final class DebugSummaryCommand extends Command
         SummaryRefresher $refresher,
     ): void {
         $sqlFactory = $refresher->getSqlFactory();
-        $deleteQuery = $sqlFactory->getDeleteExistingSummaryQuery();
 
-        $io->title('SQL for Deleting Existing Summary Partitions');
-
-        $this->printDecomposedQuery($io, $deleteQuery->getQuery());
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getDeleteExistingSummaryQuery(),
+            title: 'SQL for Deleting Existing Summary Partitions'
+        );
     }
 
     private function printSourceToSummaryRollupSql(
@@ -246,13 +248,12 @@ final class DebugSummaryCommand extends Command
         SummaryRefresher $refresher,
     ): void {
         $sqlFactory = $refresher->getSqlFactory();
-        $rollUpQueries = $sqlFactory->getRollUpSourceToSummaryQuery();
 
-        $io->title('SQL for Rolling Up Source to Summary');
-
-        foreach ($rollUpQueries->getQueries() as $rollupQuery) {
-            $this->printDecomposedQuery($io, $rollupQuery);
-        }
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getRollUpSourceToSummaryQuery(),
+            title: 'SQL for Rolling Up Source to Summary'
+        );
     }
 
     private function printSummaryToSummaryRollupSql(
@@ -260,12 +261,23 @@ final class DebugSummaryCommand extends Command
         SummaryRefresher $refresher,
     ): void {
         $sqlFactory = $refresher->getSqlFactory();
-        $rollUpQueries = $sqlFactory->getRollUpSummaryToSummaryQuery();
 
-        $io->title('SQL for Rolling Up Summary to Summary');
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getRollUpSummaryToSummaryQuery(),
+            title: 'SQL for Rolling Up Summary to Summary'
+        );
+    }
 
-        foreach ($rollUpQueries->getQueries() as $rollupQuery) {
-            $this->printDecomposedQuery($io, $rollupQuery);
+    private function printSummaryEntityQuery(
+        SymfonyStyle $io,
+        SummaryEntityQuery $query,
+        string $title,
+    ): void {
+        $io->title($title);
+
+        foreach ($query->getQueries() as $decomposedQuery) {
+            $this->printDecomposedQuery($io, $decomposedQuery);
         }
     }
 

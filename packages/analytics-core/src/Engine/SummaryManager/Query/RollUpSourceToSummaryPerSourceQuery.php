@@ -27,7 +27,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 
-final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
+final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements SummaryEntityQuery
 {
     private Groupings $groupings;
     private ?Partition $start = null;
@@ -55,7 +55,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         return $this->groupings;
     }
 
-    public function withBoundary(Partition $start, Partition $end): self
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
     {
         if ($this->start !== null || $this->end !== null) {
             throw new UnexpectedValueException('Boundary has already been set.');
@@ -71,6 +72,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     /**
      * @return iterable<DecomposedQuery>
      */
+    #[\Override]
     public function getQueries(): iterable
     {
         $this->initialize();

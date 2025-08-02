@@ -404,12 +404,12 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $query = $this->getSqlFactory()->createDeleteSummaryQuery(
-            start: $range->getStart(),
-            end: $range->getEnd(),
-        );
+        $queries = $this->getSqlFactory()
+            ->getDeleteExistingSummaryQuery()
+            ->withBoundary($range->getStart(), $range->getEnd())
+            ->getQueries();
 
-        $this->executeQueries([$query]);
+        $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 
@@ -423,10 +423,12 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->createRollUpSourceToSummaryQueries(
+            ->getRollUpSourceToSummaryQuery()
+            ->withBoundary(
                 start: $range->getStart(),
                 end: $range->getEnd(),
-            );
+            )
+            ->getQueries();
 
         $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
@@ -442,10 +444,12 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->createRollUpSummaryToSummaryQueries(
+            ->getRollUpSummaryToSummaryQuery()
+            ->withBoundary(
                 start: $range->getStart(),
                 end: $range->getEnd(),
-            );
+            )
+            ->getQueries();
 
         $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());

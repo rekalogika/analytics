@@ -26,7 +26,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 /**
  * Roll up lower level summary to higher level by grouping by the entire row set
  */
-final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
+final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery implements SummaryEntityQuery
 {
     private ?Partition $start = null;
     private ?Partition $end = null;
@@ -45,7 +45,8 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
     }
 
-    public function withBoundary(Partition $start, Partition $end): self
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
     {
         if ($this->start !== null || $this->end !== null) {
             throw new UnexpectedValueException('Boundary has already been set.');
@@ -58,9 +59,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         return $clone;
     }
 
-    /**
-     * @return iterable<DecomposedQuery>
-     */
+    #[\Override]
     public function getQueries(): iterable
     {
         $this->initialize();

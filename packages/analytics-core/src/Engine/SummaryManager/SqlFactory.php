@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\PartitionHandler;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\InsertIntoSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSourceToSummaryPerSourceQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSummaryToSummaryGroupAllStrategyQuery;
+use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryEntityQuery;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 
 final class SqlFactory
 {
@@ -37,31 +36,6 @@ final class SqlFactory
             manager: $this->entityManager,
             class: $this->summaryMetadata->getSummaryClass(),
         );
-    }
-
-    //
-    // delete
-    //
-
-    private ?DeleteExistingSummaryQuery $deleteExistingSummaryQuery = null;
-
-    public function getDeleteExistingSummaryQuery(): DeleteExistingSummaryQuery
-    {
-        return $this->deleteExistingSummaryQuery ??=
-            new DeleteExistingSummaryQuery(
-                entityManager: $this->entityManager,
-                summaryMetadata: $this->summaryMetadata,
-            );
-    }
-
-    public function createDeleteSummaryQuery(
-        Partition $start,
-        Partition $end,
-    ): DecomposedQuery {
-        return $this
-            ->getDeleteExistingSummaryQuery()
-            ->withBoundary($start, $end)
-            ->getQuery();
     }
 
     //
@@ -85,12 +59,27 @@ final class SqlFactory
     }
 
     //
+    // delete
+    //
+
+    private ?SummaryEntityQuery $deleteExistingSummaryQuery = null;
+
+    public function getDeleteExistingSummaryQuery(): SummaryEntityQuery
+    {
+        return $this->deleteExistingSummaryQuery ??=
+            new DeleteExistingSummaryQuery(
+                entityManager: $this->entityManager,
+                summaryMetadata: $this->summaryMetadata,
+            );
+    }
+
+    //
     // rollup source to summary
     //
 
-    private ?RollUpSourceToSummaryPerSourceQuery $rollUpSourceToSummaryQuery = null;
+    private ?SummaryEntityQuery $rollUpSourceToSummaryQuery = null;
 
-    public function getRollUpSourceToSummaryQuery(): RollUpSourceToSummaryPerSourceQuery
+    public function getRollUpSourceToSummaryQuery(): SummaryEntityQuery
     {
         return $this->rollUpSourceToSummaryQuery ??=
             new RollUpSourceToSummaryPerSourceQuery(
@@ -101,26 +90,13 @@ final class SqlFactory
             );
     }
 
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    public function createRollUpSourceToSummaryQueries(
-        Partition $start,
-        Partition $end,
-    ): iterable {
-        yield from $this
-            ->getRollUpSourceToSummaryQuery()
-            ->withBoundary($start, $end)
-            ->getQueries();
-    }
-
     //
     // rollup summary to summary
     //
 
-    private ?RollUpSummaryToSummaryGroupAllStrategyQuery $rollUpSummaryToSummaryQuery = null;
+    private ?SummaryEntityQuery $rollUpSummaryToSummaryQuery = null;
 
-    public function getRollUpSummaryToSummaryQuery(): RollUpSummaryToSummaryGroupAllStrategyQuery
+    public function getRollUpSummaryToSummaryQuery(): SummaryEntityQuery
     {
         return $this->rollUpSummaryToSummaryQuery ??=
             new RollUpSummaryToSummaryGroupAllStrategyQuery(
@@ -128,18 +104,5 @@ final class SqlFactory
                 metadata: $this->summaryMetadata,
                 insertSql: $this->getInsertIntoSummaryQuery(),
             );
-    }
-
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    public function createRollUpSummaryToSummaryQueries(
-        Partition $start,
-        Partition $end,
-    ): iterable {
-        return $this
-            ->getRollUpSummaryToSummaryQuery()
-            ->withBoundary($start, $end)
-            ->getQueries();
     }
 }

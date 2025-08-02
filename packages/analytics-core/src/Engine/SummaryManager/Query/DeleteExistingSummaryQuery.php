@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final class DeleteExistingSummaryQuery extends AbstractQuery
+final class DeleteExistingSummaryQuery extends AbstractQuery implements SummaryEntityQuery
 {
     private ?Partition $start = null;
     private ?Partition $end = null;
@@ -39,7 +39,8 @@ final class DeleteExistingSummaryQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
     }
 
-    public function withBoundary(Partition $start, Partition $end): self
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
     {
         if ($this->start !== null || $this->end !== null) {
             throw new UnexpectedValueException('Boundary has already been set.');
@@ -52,12 +53,13 @@ final class DeleteExistingSummaryQuery extends AbstractQuery
         return $clone;
     }
 
-    public function getQuery(): DecomposedQuery
+    #[\Override]
+    public function getQueries(): iterable
     {
         $this->prepare();
         $query = $this->getSimpleQueryBuilder()->getQuery();
 
-        return DecomposedQuery::createFromQuery($query);
+        yield DecomposedQuery::createFromQuery($query);
     }
 
     private function prepare(): void
