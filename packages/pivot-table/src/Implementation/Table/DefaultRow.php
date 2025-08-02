@@ -55,14 +55,8 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
 
         foreach ($cells as $cell) {
             if (
-                (
-                    $lastCell instanceof DefaultFooterCell
-                    || $lastCell instanceof DefaultFooterHeaderCell
-                )
-                && (
-                    $cell instanceof DefaultFooterCell
-                    || $cell instanceof DefaultFooterHeaderCell
-                )
+                $lastCell !== null
+                && $lastCell::class === $cell::class
                 && $lastCell->getContent() === $cell->getContent()
                 && $lastCell->getRowSpan() === $cell->getRowSpan()
             ) {
@@ -70,31 +64,14 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
                     ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
                 array_pop($mergedCells);
                 $mergedCells[] = $lastCell;
-
-                continue;
+            } else {
+                $mergedCells[] = $cell;
             }
 
-            if (
-                $lastCell instanceof DefaultFooterHeaderCell
-                && (
-                    $cell instanceof DefaultFooterHeaderCell
-                    || $cell instanceof DefaultFooterCell
-                )
-                && $cell->getContent() === ''
-                && $lastCell->getRowSpan() === $cell->getRowSpan()
-            ) {
-                $lastCell = $lastCell
-                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
-                array_pop($mergedCells);
-                $mergedCells[] = $lastCell;
-
-                continue;
-            }
-
-            $mergedCells[] = $cell;
             $lastCell = $cell;
         }
 
+        /** @var list<DefaultCell> */
         return $mergedCells;
     }
 

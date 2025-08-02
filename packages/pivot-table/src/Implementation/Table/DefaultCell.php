@@ -48,7 +48,7 @@ abstract readonly class DefaultCell implements Cell
         return $this->columnSpan;
     }
 
-    final public function withColumnSpan(int $columnSpan): static
+    final public function withColumnSpan(int $columnSpan): self
     {
         return new static(
             name: $this->name,
