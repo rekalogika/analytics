@@ -30,11 +30,14 @@ use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 
+/**
+ * @internal
+ */
 final class SummaryRefresher
 {
     private readonly SummaryHandler $summaryHandler;
 
-    private readonly SqlFactory $sqlFactory;
+    private ?SqlFactory $sqlFactory = null;
 
     public function __construct(
         HandlerFactory $handlerFactory,
@@ -45,17 +48,20 @@ final class SummaryRefresher
         $this->summaryHandler = $handlerFactory->getSummary(
             summaryClass: $this->metadata->getSummaryClass(),
         );
-
-        $this->sqlFactory = new SqlFactory(
-            entityManager: $this->entityManager,
-            summaryMetadata: $this->metadata,
-            partitionManager: $this->summaryHandler->getPartition(),
-        );
     }
 
     private function getConnection(): Connection
     {
         return $this->entityManager->getConnection();
+    }
+
+    public function getSqlFactory(): SqlFactory
+    {
+        return $this->sqlFactory ??= new SqlFactory(
+            entityManager: $this->entityManager,
+            summaryMetadata: $this->metadata,
+            partitionManager: $this->summaryHandler->getPartition(),
+        );
     }
 
     /**
@@ -402,7 +408,7 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $queries = $this->sqlFactory->createDeleteSummaryQuery(
+        $queries = $this->getSqlFactory()->createDeleteSummaryQuery(
             start: $range->getStart(),
             end: $range->getEnd(),
         );
@@ -420,7 +426,7 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $queries = $this->sqlFactory
+        $queries = $this->getSqlFactory()
             ->createInsertIntoSelectForRollingUpSourceToSummaryQuery(
                 start: $range->getStart(),
                 end: $range->getEnd(),
@@ -439,7 +445,7 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $queries = $this->sqlFactory
+        $queries = $this->getSqlFactory()
             ->createInsertIntoSelectForRollingUpSummaryToSummaryQuery(
                 start: $range->getStart(),
                 end: $range->getEnd(),

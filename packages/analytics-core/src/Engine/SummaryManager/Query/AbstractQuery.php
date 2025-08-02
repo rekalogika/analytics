@@ -21,8 +21,14 @@ abstract class AbstractQuery
     private ?QueryComponents $queryComponents = null;
 
     protected function __construct(
-        private readonly SimpleQueryBuilder $simpleQueryBuilder,
+        private SimpleQueryBuilder $simpleQueryBuilder,
     ) {}
+
+    public function __clone()
+    {
+        $this->simpleQueryBuilder = clone $this->simpleQueryBuilder;
+        $this->queryComponents = null; // Reset query components to ensure fresh state
+    }
 
     protected function getSimpleQueryBuilder(): SimpleQueryBuilder
     {

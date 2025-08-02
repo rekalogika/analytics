@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
+use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresher;
+use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -21,6 +23,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,6 +38,7 @@ final class DebugSummaryCommand extends Command
 
     public function __construct(
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
+        private readonly SummaryRefresherFactory $summaryRefresherFactory,
         private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
@@ -47,6 +51,13 @@ final class DebugSummaryCommand extends Command
             name: 'summaryClass',
             mode: InputArgument::OPTIONAL,
             description: 'Summary class name',
+        );
+
+        // add optional --query option
+        $this->addOption(
+            name: 'query',
+            mode: InputOption::VALUE_NONE,
+            description: 'If set, the command will show the SQL query various operations.',
         );
     }
 
@@ -61,20 +72,49 @@ final class DebugSummaryCommand extends Command
             default: null,
         );
 
+        $showQueries = $input->getOption('query');
+
         if (!\is_string($class) || !class_exists($class)) {
             $this->io = new SymfonyStyle($input, $output);
             $this->io->error('Class does not exist.');
             return Command::FAILURE;
         }
 
+        if ($showQueries) {
+            $this->printQueries($io, $class);
+        } else {
+            $this->printGeneralInformation($io, $class);
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param class-string $summaryClass
+     */
+    private function printGeneralInformation(
+        SymfonyStyle $io,
+        string $summaryClass,
+    ): void {
         $summaryMetadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($class);
+            ->getSummaryMetadata($summaryClass);
 
         $this->printHeaders(io: $io, summaryMetadata: $summaryMetadata);
         $this->printDimensions(io: $io, summaryMetadata: $summaryMetadata);
         $this->printMeasures(io: $io, summaryMetadata: $summaryMetadata);
+    }
 
-        return Command::SUCCESS;
+    /**
+     * @param class-string $summaryClass
+     */
+    private function printQueries(
+        SymfonyStyle $io,
+        string $summaryClass,
+    ): void {
+        $refresher = $this->summaryRefresherFactory
+            ->createSummaryRefresher($summaryClass);
+
+        $this->printSourceRollupSql($io, $refresher);
     }
 
     private function printHeaders(
@@ -184,5 +224,19 @@ final class DebugSummaryCommand extends Command
         $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_RIGHT, '');
 
         return iterator_to_array($iterator, false);
+    }
+
+    private function printSourceRollupSql(
+        SymfonyStyle $io,
+        SummaryRefresher $refresher,
+    ): void {
+        $sqlFactory = $refresher->getSqlFactory();
+        $rollUpQueries = $sqlFactory->getRollUpSourceToSummaryQuery();
+
+        $io->section('SQL for Rolling Up Source to Summary (without boundary conditions)');
+
+        foreach ($rollUpQueries->getQueries() as $rollupQuery) {
+            $io->writeln($rollupQuery->getSql() . ';');
+        }
     }
 }

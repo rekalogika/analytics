@@ -29,14 +29,14 @@ use Rekalogika\DoctrineAdvancedGroupBy\Field;
 
 final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 {
-    private Groupings $groupings;
+    private ?Groupings $groupings = null;
+    private ?Partition $start = null;
+    private ?Partition $end = null;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly PartitionHandler $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
-        private readonly Partition $start,
-        private readonly Partition $end,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -45,20 +45,36 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         );
 
         parent::__construct($simpleQueryBuilder);
+    }
 
-        $this->groupings = Groupings::create($summaryMetadata);
+    private function getGroupings(): Groupings
+    {
+        return $this->groupings ??= Groupings::create($this->summaryMetadata);
+    }
+
+    public function withBoundary(Partition $start, Partition $end): self
+    {
+        if ($this->start !== null || $this->end !== null) {
+            throw new UnexpectedValueException('Boundary has already been set.');
+        }
+
+        $clone = clone $this;
+        $clone->start = $start;
+        $clone->end = $end;
+
+        return $clone;
     }
 
     /**
      * @return iterable<DecomposedQuery>
      */
-    public function getQuery(): iterable
+    public function getQueries(): iterable
     {
         $this->initialize();
         $this->processPartition();
         $this->processDimensions();
         $this->processMeasures();
-        $this->processConstraints();
+        $this->processBoundary();
         $this->processGroupings();
         $this->processQueryBuilderModifier();
 
@@ -125,7 +141,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             $this->getSimpleQueryBuilder()
                 ->addSelect(\sprintf('%s AS %s', $expression, $alias));
 
-            $this->groupings->registerExpression(
+            $this->getGroupings()->registerExpression(
                 name: $dimensionMetadata->getName(),
                 expression: $expression,
             );
@@ -157,8 +173,12 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         }
     }
 
-    private function processConstraints(): void
+    private function processBoundary(): void
     {
+        if ($this->start === null || $this->end === null) {
+            return;
+        }
+
         $partitionMetadata = $this->summaryMetadata->getPartition();
         $valueResolver = $partitionMetadata->getSource();
 
@@ -210,7 +230,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     private function processGroupings(): void
     {
         $this->getSimpleQueryBuilder()
-            ->addSelect($this->groupings->getExpression());
+            ->addSelect($this->getGroupings()->getExpression());
     }
 
     private function createSqlStatement(): DecomposedQuery

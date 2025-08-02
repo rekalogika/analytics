@@ -27,35 +27,43 @@ use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
  */
 final class SimpleQueryBuilder
 {
-    private readonly PathResolver $pathResolver;
+    private ?PathResolver $pathResolver = null;
 
-    private readonly QueryBuilder $queryBuilder;
+    private ?QueryBuilder $queryBuilder = null;
 
     private int $boundCounter = 0;
-
 
     /**
      * @param class-string $from
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
-        string $from,
-        string $alias = 'root',
-        ?string $indexBy = null,
-    ) {
-        if (!class_exists($from)) {
-            throw new BadMethodCallException(\sprintf('Class "%s" does not exist', $from));
-        }
+        private EntityManagerInterface $entityManager,
+        private string $from,
+        private string $alias = 'root',
+        private ?string $indexBy = null,
+    ) {}
 
-        $this->queryBuilder = $entityManager
-            ->createQueryBuilder()
-            ->from($from, $alias, $indexBy);
+    public function __clone()
+    {
+        $this->queryBuilder = null;
+        $this->pathResolver = null;
+        $this->boundCounter = 0;
+    }
 
-        $this->pathResolver = new PathResolver(
-            baseClass: $from,
-            baseAlias: $alias,
-            queryBuilder: $this->queryBuilder,
+    private function getPathResolver(): PathResolver
+    {
+        return $this->pathResolver ??= new PathResolver(
+            baseClass: $this->from,
+            baseAlias: $this->alias,
+            queryBuilder: $this->getQueryBuilder(),
         );
+    }
+
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder ??= $this->entityManager
+            ->createQueryBuilder()
+            ->from($this->from, $this->alias, $this->indexBy);
     }
 
     public static function createFromRegistry(
@@ -91,21 +99,16 @@ final class SimpleQueryBuilder
             throw new BadMethodCallException(\sprintf('Method name must be a string, %s given', \gettype($name)));
         }
 
-        if (!method_exists($this->queryBuilder, $name)) {
+        if (!method_exists($this->getQueryBuilder(), $name)) {
             throw new BadMethodCallException(\sprintf('Method %s does not exist on QueryBuilder', $name));
         }
 
         return $this->queryBuilder->{$name}(...$arguments);
     }
 
-    public function getQueryBuilder(): QueryBuilder
-    {
-        return $this->queryBuilder;
-    }
-
     public function getQueryComponents(): QueryComponents
     {
-        return new QueryComponents($this->queryBuilder->getQuery());
+        return new QueryComponents($this->getQueryBuilder()->getQuery());
     }
 
     public function from(): self
@@ -121,7 +124,7 @@ final class SimpleQueryBuilder
      */
     public function resolve(string $path): string
     {
-        return $this->pathResolver->resolve($path);
+        return $this->getPathResolver()->resolve($path);
     }
 
     /**
@@ -139,7 +142,7 @@ final class SimpleQueryBuilder
             $type = null;
         }
 
-        $this->queryBuilder->setParameter($name, $value, $type);
+        $this->getQueryBuilder()->setParameter($name, $value, $type);
 
         return ':' . $name;
     }
