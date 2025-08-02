@@ -15,10 +15,12 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 /**
@@ -26,11 +28,12 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
  */
 final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
 {
+    private ?Partition $start = null;
+    private ?Partition $end = null;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
-        private readonly Partition $start,
-        private readonly Partition $end,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -41,10 +44,23 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         parent::__construct($simpleQueryBuilder);
     }
 
+    public function withBoundary(Partition $start, Partition $end): self
+    {
+        if ($this->start !== null || $this->end !== null) {
+            throw new UnexpectedValueException('Boundary has already been set.');
+        }
+
+        $clone = clone $this;
+        $clone->start = $start;
+        $clone->end = $end;
+
+        return $clone;
+    }
+
     /**
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
-    public function getSQL(): iterable
+    public function getQueries(): iterable
     {
         $this->initialize();
         $this->processPartition();
@@ -53,7 +69,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $this->processConstraints();
         $this->processGroupings();
 
-        return $this->createSQL();
+        yield $this->createQuery();
     }
 
     private function initialize(): void
@@ -73,14 +89,12 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             ->resolve($partitionMetadata->getFullyQualifiedPartitionKeyProperty());
 
         $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf(
-                'MIN(%s) AS p_key',
-                $partitionKeyProperty,
-            ))
-            ->addSelect(\sprintf(
-                '%s AS p_level',
-                $this->start->getLevel(),
-            ))
+            ->addSelect(\sprintf('MIN(%s) AS p_key', $partitionKeyProperty))
+            ->addSelect('0 + :partitionLevel AS p_level')
+            ->setParameter(
+                'partitionLevel',
+                $this->start?->getLevel() ?? '(placeholder) partition level',
+            )
             ->addGroupBy('p_level')
         ;
     }
@@ -149,9 +163,35 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
+        $this->getSimpleQueryBuilder()
+            ->andWhere(\sprintf(
+                'root.%s.%s >= :lowerBound',
+                $partitionProperty,
+                $partitionKeyProperty,
+            ))
+            ->andWhere(\sprintf(
+                'root.%s.%s < :upperBound',
+                $partitionProperty,
+                $partitionKeyProperty,
+            ))
+            ->andWhere(\sprintf(
+                'root.%s.%s = :lowerLevel',
+                $partitionProperty,
+                $partitionLevelProperty,
+            ))
+        ;
+
+        if ($this->start === null || $this->end === null) {
+            $this->getSimpleQueryBuilder()
+                ->setParameter('lowerBound', '(placeholder) the lower bound')
+                ->setParameter('upperBound', '(placeholder) the upper bound')
+                ->setParameter('lowerLevel', '(placeholder) the lower level');
+
+            return;
+        }
+
         $lowerBound = $this->start->getLowerBound();
         $upperBound = $this->end->getUpperBound();
-
         $lowerLevel = PartitionUtil::getLowerLevel($this->start);
 
         if ($lowerLevel === null) {
@@ -159,25 +199,9 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         }
 
         $this->getSimpleQueryBuilder()
-            ->andWhere(\sprintf(
-                'root.%s.%s >= %d',
-                $partitionProperty,
-                $partitionKeyProperty,
-                $lowerBound,
-            ))
-            ->andWhere(\sprintf(
-                'root.%s.%s < %d',
-                $partitionProperty,
-                $partitionKeyProperty,
-                $upperBound,
-            ))
-            ->andWhere(\sprintf(
-                'root.%s.%s = %d',
-                $partitionProperty,
-                $partitionLevelProperty,
-                $lowerLevel,
-            ))
-        ;
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->setParameter('lowerLevel', $lowerLevel);
     }
 
     private function processGroupings(): void
@@ -196,18 +220,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         ;
     }
 
-    /**
-     * @return iterable<string>
-     */
-    private function createSQL(): iterable
+    private function createQuery(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
-        $result = $query->getSQL();
 
-        if (\is_array($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        return DecomposedQuery::createFromQuery($query);
     }
 }

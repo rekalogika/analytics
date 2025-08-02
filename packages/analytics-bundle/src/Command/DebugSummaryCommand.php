@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\DimensionMetadataIterator;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -114,7 +115,8 @@ final class DebugSummaryCommand extends Command
         $refresher = $this->summaryRefresherFactory
             ->createSummaryRefresher($summaryClass);
 
-        $this->printSourceRollupSql($io, $refresher);
+        $this->printSourceToSummaryRollupSql($io, $refresher);
+        $this->printSummaryToSummaryRollupSql($io, $refresher);
     }
 
     private function printHeaders(
@@ -226,7 +228,7 @@ final class DebugSummaryCommand extends Command
         return iterator_to_array($iterator, false);
     }
 
-    private function printSourceRollupSql(
+    private function printSourceToSummaryRollupSql(
         SymfonyStyle $io,
         SummaryRefresher $refresher,
     ): void {
@@ -236,29 +238,59 @@ final class DebugSummaryCommand extends Command
         $io->title('SQL for Rolling Up Source to Summary');
 
         foreach ($rollUpQueries->getQueries() as $rollupQuery) {
-            $io->section('SQL Query');
+            $this->printDecomposedQuery($io, $rollupQuery);
+        }
+    }
 
-            $io->writeln(sprintf(
-                '<info>%s;</info>',
-                $rollupQuery->getSql(),
-            ));
+    private function printSummaryToSummaryRollupSql(
+        SymfonyStyle $io,
+        SummaryRefresher $refresher,
+    ): void {
+        $sqlFactory = $refresher->getSqlFactory();
+        $rollUpQueries = $sqlFactory->getRollUpSummaryToSummaryQuery();
 
-            $parameters = [];
-            $types = $rollupQuery->getTypes();
+        $io->title('SQL for Rolling Up Summary to Summary');
 
-            /** @psalm-suppress MixedAssignment */
-            foreach ($rollupQuery->getParameters() as $key => $value) {
-                $type = $types[$key] ?? '(none)';
+        foreach ($rollUpQueries->getQueries() as $rollupQuery) {
+            $this->printDecomposedQuery($io, $rollupQuery);
+        }
+    }
 
-                $parameters[] = [
-                    $key,
-                    var_export($value, true),
-                    var_export($type, true),
-                ];
+    private function printDecomposedQuery(
+        SymfonyStyle $io,
+        DecomposedQuery $query,
+    ): void {
+        $io->section('SQL Query');
+
+        $io->writeln(\sprintf(
+            '<info>%s;</info>',
+            $query->getSql(),
+        ));
+
+        $parameters = [];
+        $types = $query->getTypes();
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($query->getParameters() as $key => $value) {
+            $type = $types[$key] ?? '(none)';
+
+            // if value starts with "(placeholder)", remove it
+            if (\is_string($value) && str_starts_with($value, '(placeholder) ')) {
+                $value = substr($value, \strlen('(placeholder) '));
+                $type = 'description of the value';
+            } else {
+                $value = var_export($value, true);
+                $type = var_export($type, true);
             }
 
-            $io->section('Parameters');
-            $io->table(['Key', 'Value', 'Type'], $parameters);
+            $parameters[] = [
+                $key,
+                $value,
+                $type,
+            ];
         }
+
+        $io->section('Parameters');
+        $io->table(['Key', 'Value', 'Type'], $parameters);
     }
 }

@@ -78,7 +78,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $this->processGroupings();
         $this->processQueryBuilderModifier();
 
-        yield $this->createSqlStatement();
+        yield $this->createQuery();
     }
 
     private function initialize(): void
@@ -236,7 +236,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             ->addSelect($this->getGroupings()->getExpression());
     }
 
-    private function createSqlStatement(): DecomposedQuery
+    private function createQuery(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
 

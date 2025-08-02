@@ -14,13 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\SummaryManager\Handler\PartitionHandler;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\DeleteExistingSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\InsertIntoSummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSourceToSummaryPerSourceQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSummaryToSummaryCubingStrategyQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\Query\RollUpSummaryToSummaryGroupAllStrategyQuery;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -28,27 +26,15 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 
 final class SqlFactory
 {
-    /**
-     * @param RollUpSummaryToSummaryCubingStrategyQuery::class|RollUpSummaryToSummaryGroupAllStrategyQuery::class $summaryToSummaryRollUpClass
-     */
-    private string $summaryToSummaryRollUpClass = RollUpSummaryToSummaryCubingStrategyQuery::class;
-
     private readonly ClassMetadataWrapper $doctrineClassMetadata;
 
     private ?string $insertInto = null;
 
-    /**
-     * @param class-string<RollUpSummaryToSummaryCubingStrategyQuery>|class-string<RollUpSummaryToSummaryGroupAllStrategyQuery> $summaryToSummaryRollUpClass
-     */
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
         private readonly PartitionHandler $partitionManager,
-        ?string $summaryToSummaryRollUpClass = null,
     ) {
-        $this->summaryToSummaryRollUpClass = $summaryToSummaryRollUpClass
-            ?? RollUpSummaryToSummaryGroupAllStrategyQuery::class;
-
         $this->doctrineClassMetadata = new ClassMetadataWrapper(
             manager: $this->entityManager,
             class: $this->summaryMetadata->getSummaryClass(),
@@ -85,6 +71,10 @@ final class SqlFactory
 
         return $this->insertInto = $query->getSQL();
     }
+
+    //
+    // rollup source to summary
+    //
 
     private ?RollUpSourceToSummaryPerSourceQuery $rollUpSourceToSummaryQuery = null;
 
@@ -137,8 +127,6 @@ final class SqlFactory
         Partition $start,
         Partition $end,
     ): iterable {
-        $source = $this->summaryMetadata->getSourceClass();
-
         $insertIntoSelects = $this
             ->createInsertIntoSelectForRollingUpSingleSourceToSummaryQuery(
                 start: $start,
@@ -148,40 +136,36 @@ final class SqlFactory
         yield from $insertIntoSelects;
     }
 
+    //
+    // rollup summary to summary
+    //
+
+    private ?RollUpSummaryToSummaryGroupAllStrategyQuery $rollUpSummaryToSummaryQuery = null;
+
+    public function getRollupSummaryToSummaryQuery(): RollUpSummaryToSummaryGroupAllStrategyQuery
+    {
+        return $this->rollUpSummaryToSummaryQuery ??=
+            new RollUpSummaryToSummaryGroupAllStrategyQuery(
+                entityManager: $this->entityManager,
+                metadata: $this->summaryMetadata,
+            );
+    }
+
     /**
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
     private function createSelectForRollingUpSummaryToSummaryQuery(
         Partition $start,
         Partition $end,
     ): iterable {
-        $class = $this->summaryToSummaryRollUpClass;
-
-        if (
-            !is_a($class, RollUpSummaryToSummaryCubingStrategyQuery::class, true)
-            && !is_a($class, RollUpSummaryToSummaryGroupAllStrategyQuery::class, true)
-        ) {
-            throw new LogicException(\sprintf(
-                'Class "%s" must be an instance of "%s" or "%s"',
-                $class,
-                RollUpSummaryToSummaryCubingStrategyQuery::class,
-                RollUpSummaryToSummaryGroupAllStrategyQuery::class,
-            ));
-        }
-
-        $query = new $class(
-            entityManager: $this->entityManager,
-            metadata: $this->summaryMetadata,
-            start: $start,
-            end: $end,
-        );
-
-        // @phpstan-ignore method.notFound
-        yield from $query->getSQL();
+        return $this
+            ->getRollupSummaryToSummaryQuery()
+            ->withBoundary($start, $end)
+            ->getQueries();
     }
 
     /**
-     * @return iterable<string>
+     * @return iterable<DecomposedQuery>
      */
     public function createInsertIntoSelectForRollingUpSummaryToSummaryQuery(
         Partition $start,
@@ -195,7 +179,7 @@ final class SqlFactory
         $insertInto = $this->createInsertIntoSummaryQuery();
 
         foreach ($selects as $select) {
-            yield $insertInto . ' ' . $select;
+            yield $select->prependSql($insertInto);
         }
     }
 }
