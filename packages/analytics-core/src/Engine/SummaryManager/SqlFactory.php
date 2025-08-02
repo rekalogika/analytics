@@ -28,8 +28,6 @@ final class SqlFactory
 {
     private readonly ClassMetadataWrapper $doctrineClassMetadata;
 
-    private ?string $insertInto = null;
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
@@ -40,6 +38,10 @@ final class SqlFactory
             class: $this->summaryMetadata->getSummaryClass(),
         );
     }
+
+    //
+    // delete
+    //
 
     private ?DeleteExistingSummaryQuery $deleteExistingSummaryQuery = null;
 
@@ -65,6 +67,8 @@ final class SqlFactory
     //
     // insert into summary
     //
+
+    private ?string $insertInto = null;
 
     private function getInsertIntoSummaryQuery(): string
     {
