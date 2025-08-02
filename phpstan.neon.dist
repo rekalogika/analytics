@@ -13,7 +13,7 @@ parameters:
     excludePaths:
         - tests/var
         - tests/src/App/Factory
-        - packages/analytics-core/src/Engine/SummaryManager/Query/RollUpSummaryToSummaryCubingStrategyQuery.php
+        - packages/analytics-core/src/Engine/SummaryRefresher/Query/RollUpSummaryToSummaryCubingStrategyQuery.php
     doctrine:
         objectManagerLoader: tests/object-manager.php
     ignoreErrors:

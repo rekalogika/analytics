@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\RefreshAgent;
 
-use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
+use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 
 final readonly class RefreshAgent
 {

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
-use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryEntityQuery;
-use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresher;
-use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
+use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresher;
+use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
+use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -271,7 +271,7 @@ final class DebugSummaryCommand extends Command
 
     private function printSummaryEntityQuery(
         SymfonyStyle $io,
-        SummaryEntityQuery $query,
+        SummaryRefresherQuery $query,
         string $title,
     ): void {
         $io->title($title);

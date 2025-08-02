@@ -18,9 +18,9 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\DirtySummaryEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\NewDirtyFlagEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DirtySummaryEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SourceEntityListener implements ResetInterface
