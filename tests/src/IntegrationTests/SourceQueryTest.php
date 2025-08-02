@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryManager\SourceResult\DefaultSourceResult;
+use Rekalogika\Analytics\Engine\SummaryQuery\DefaultSourceResult;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

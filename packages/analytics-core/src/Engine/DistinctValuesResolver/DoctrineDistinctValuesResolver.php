@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
-use Rekalogika\Analytics\Engine\SummaryManager\Query\GetDistinctValuesFromSourceQuery;
+use Rekalogika\Analytics\Engine\DistinctValuesResolver\Query\GetDistinctValuesFromSourceQuery;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;

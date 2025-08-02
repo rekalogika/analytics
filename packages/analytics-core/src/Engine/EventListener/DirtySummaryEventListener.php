@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\EventListener;
 
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\DirtySummaryEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DirtySummaryEvent;
 
 final readonly class DirtySummaryEventListener
 {

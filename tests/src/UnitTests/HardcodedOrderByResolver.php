@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use Doctrine\Common\Collections\Order;
-use Rekalogika\Analytics\Engine\SummaryManager\SummarizerWorker\DimensionFactory\OrderByResolver;
+use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\OrderByResolver;
 
 final readonly class HardcodedOrderByResolver implements OrderByResolver
 {

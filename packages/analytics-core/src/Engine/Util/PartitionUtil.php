@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\Util;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Engine\SummaryManager\PartitionRange;
+use Rekalogika\Analytics\Engine\Entity\PartitionRange;
 
 final readonly class PartitionUtil
 {

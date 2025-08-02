@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\EventListener;
 
-use Rekalogika\Analytics\Engine\SummaryManager\Event\AbstractEndEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\AbstractStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeEndEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\DeleteRangeStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshEndEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeEndEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshRangeStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RefreshStartEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeEndEvent;
-use Rekalogika\Analytics\Engine\SummaryManager\Event\RollUpRangeStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\AbstractEndEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\AbstractStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeEndEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RefreshEndEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RefreshRangeEndEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RefreshRangeStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RefreshStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RollUpRangeEndEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RollUpRangeStartEvent;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

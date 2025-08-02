@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Engine\SummaryManager\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
