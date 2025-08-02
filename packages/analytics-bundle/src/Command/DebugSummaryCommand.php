@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
+use Rekalogika\Analytics\Engine\SummaryManager\Query\SummaryEntityQuery;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresher;
 use Rekalogika\Analytics\Engine\SummaryManager\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\DimensionMetadataIterator;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -114,7 +116,9 @@ final class DebugSummaryCommand extends Command
         $refresher = $this->summaryRefresherFactory
             ->createSummaryRefresher($summaryClass);
 
-        $this->printSourceRollupSql($io, $refresher);
+        $this->printSourceToSummaryRollupSql($io, $refresher);
+        $this->printSummaryToSummaryRollupSql($io, $refresher);
+        $this->printDeleteSummarySql($io, $refresher);
     }
 
     private function printHeaders(
@@ -226,17 +230,92 @@ final class DebugSummaryCommand extends Command
         return iterator_to_array($iterator, false);
     }
 
-    private function printSourceRollupSql(
+    private function printDeleteSummarySql(
         SymfonyStyle $io,
         SummaryRefresher $refresher,
     ): void {
         $sqlFactory = $refresher->getSqlFactory();
-        $rollUpQueries = $sqlFactory->getRollUpSourceToSummaryQuery();
 
-        $io->section('SQL for Rolling Up Source to Summary (without boundary conditions)');
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getDeleteExistingSummaryQuery(),
+            title: 'SQL for Deleting Existing Summary Partitions',
+        );
+    }
 
-        foreach ($rollUpQueries->getQueries() as $rollupQuery) {
-            $io->writeln($rollupQuery->getSql() . ';');
+    private function printSourceToSummaryRollupSql(
+        SymfonyStyle $io,
+        SummaryRefresher $refresher,
+    ): void {
+        $sqlFactory = $refresher->getSqlFactory();
+
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getRollUpSourceToSummaryQuery(),
+            title: 'SQL for Rolling Up Source to Summary',
+        );
+    }
+
+    private function printSummaryToSummaryRollupSql(
+        SymfonyStyle $io,
+        SummaryRefresher $refresher,
+    ): void {
+        $sqlFactory = $refresher->getSqlFactory();
+
+        $this->printSummaryEntityQuery(
+            io: $io,
+            query: $sqlFactory->getRollUpSummaryToSummaryQuery(),
+            title: 'SQL for Rolling Up Summary to Summary',
+        );
+    }
+
+    private function printSummaryEntityQuery(
+        SymfonyStyle $io,
+        SummaryEntityQuery $query,
+        string $title,
+    ): void {
+        $io->title($title);
+
+        foreach ($query->getQueries() as $decomposedQuery) {
+            $this->printDecomposedQuery($io, $decomposedQuery);
         }
+    }
+
+    private function printDecomposedQuery(
+        SymfonyStyle $io,
+        DecomposedQuery $query,
+    ): void {
+        $io->section('SQL Query');
+
+        $io->writeln(\sprintf(
+            '<info>%s;</info>',
+            $query->getSql(),
+        ));
+
+        $parameters = [];
+        $types = $query->getTypes();
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($query->getParameters() as $key => $value) {
+            $type = $types[$key] ?? '(none)';
+
+            // if value starts with "(placeholder)", remove it
+            if (\is_string($value) && str_starts_with($value, '(placeholder) ')) {
+                $value = substr($value, \strlen('(placeholder) '));
+                $type = 'description of the value';
+            } else {
+                $value = var_export($value, true);
+                $type = var_export($type, true);
+            }
+
+            $parameters[] = [
+                $key,
+                $value,
+                $type,
+            ];
+        }
+
+        $io->section('Parameters');
+        $io->table(['Key', 'Value', 'Type'], $parameters);
     }
 }

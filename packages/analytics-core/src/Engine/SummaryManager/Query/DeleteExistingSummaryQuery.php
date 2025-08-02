@@ -17,20 +17,60 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final readonly class DeleteExistingSummaryQuery
+final class DeleteExistingSummaryQuery extends AbstractQuery implements SummaryEntityQuery
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SummaryMetadata $summaryMetadata,
-        private Partition $start,
-        private Partition $end,
-    ) {}
+        EntityManagerInterface $entityManager,
+        private readonly SummaryMetadata $summaryMetadata,
+    ) {
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $summaryMetadata->getSummaryClass(),
+            alias: 'root',
+        );
 
-    /**
-     * @return iterable<string>
-     */
-    public function getSQL(): iterable
+        parent::__construct($simpleQueryBuilder);
+
+        $this->prepare();
+    }
+
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
+    {
+        $clone = clone $this;
+
+        $lowerBound = $start->getLowerBound();
+        $upperBound = $end->getUpperBound();
+        $level = $start->getLevel();
+
+        if ($level !== $end->getLevel()) {
+            throw new InvalidArgumentException(\sprintf(
+                'The start and end partitions must be on the same level, but got "%d" and "%d"',
+                $start->getLevel(),
+                $end->getLevel(),
+            ));
+        }
+
+        $clone->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->setParameter('lowerLevel', $level);
+
+        return $clone;
+    }
+
+    #[\Override]
+    public function getQueries(): iterable
+    {
+        $query = $this->getSimpleQueryBuilder()->getQuery();
+
+        yield DecomposedQuery::createFromQuery($query);
+    }
+
+    private function prepare(): void
     {
         $summaryClassName = $this->summaryMetadata->getSummaryClass();
         $partitionMetadata = $this->summaryMetadata->getPartition();
@@ -38,52 +78,32 @@ final readonly class DeleteExistingSummaryQuery
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
-        $level = $this->start->getLevel();
-
-        if ($level !== $this->end->getLevel()) {
-            throw new InvalidArgumentException(\sprintf(
-                'The start and end partitions must be on the same level, but got "%d" and "%d"',
-                $this->start->getLevel(),
-                $this->end->getLevel(),
-            ));
-        }
-
-        $start = $this->start->getLowerBound();
-        $end = $this->end->getUpperBound();
-
-        $queryBuilder = $this->entityManager
-            ->createQueryBuilder()
+        $this->getSimpleQueryBuilder()
             ->delete($summaryClassName, 'root');
 
-        $queryBuilder
+        $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                'root.%s.%s >= %s',
+                'root.%s.%s >= :lowerBound',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $start,
             ))
 
             ->andWhere(\sprintf(
-                'root.%s.%s < %s',
+                'root.%s.%s < :upperBound',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $end,
             ))
 
             ->andWhere(\sprintf(
-                'root.%s.%s = %s',
+                'root.%s.%s = :lowerLevel',
                 $partitionProperty,
                 $partitionLevelProperty,
-                $level,
             ))
         ;
 
-        $result = $queryBuilder->getQuery()->getSQL();
-
-        if (\is_array($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        $this->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', '(placeholder) the lower bound')
+            ->setParameter('upperBound', '(placeholder) the upper bound')
+            ->setParameter('lowerLevel', '(placeholder) the lower level');
     }
 }

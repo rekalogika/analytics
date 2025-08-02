@@ -65,16 +65,12 @@ final class SummaryRefresher
     }
 
     /**
-     * @param iterable<string|DecomposedQuery> $queries
+     * @param iterable<DecomposedQuery> $queries
      */
     private function executeQueries(iterable $queries): void
     {
         foreach ($queries as $query) {
-            if (\is_string($query)) {
-                $this->getConnection()->executeStatement($query);
-            } else {
-                $query->execute($this->getConnection());
-            }
+            $query->execute($this->getConnection());
         }
     }
 
@@ -408,10 +404,10 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $queries = $this->getSqlFactory()->createDeleteSummaryQuery(
-            start: $range->getStart(),
-            end: $range->getEnd(),
-        );
+        $queries = $this->getSqlFactory()
+            ->getDeleteExistingSummaryQuery()
+            ->withBoundary($range->getStart(), $range->getEnd())
+            ->getQueries();
 
         $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
@@ -427,10 +423,12 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->createInsertIntoSelectForRollingUpSourceToSummaryQuery(
+            ->getRollUpSourceToSummaryQuery()
+            ->withBoundary(
                 start: $range->getStart(),
                 end: $range->getEnd(),
-            );
+            )
+            ->getQueries();
 
         $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
@@ -446,10 +444,12 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->createInsertIntoSelectForRollingUpSummaryToSummaryQuery(
+            ->getRollUpSummaryToSummaryQuery()
+            ->withBoundary(
                 start: $range->getStart(),
                 end: $range->getEnd(),
-            );
+            )
+            ->getQueries();
 
         $this->executeQueries($queries);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());

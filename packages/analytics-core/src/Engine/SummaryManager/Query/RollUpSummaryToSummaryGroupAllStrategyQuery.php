@@ -19,18 +19,18 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 /**
  * Roll up lower level summary to higher level by grouping by the entire row set
  */
-final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
+final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery implements SummaryEntityQuery
 {
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
-        private readonly Partition $start,
-        private readonly Partition $end,
+        private readonly string $insertSql,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -39,21 +39,42 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         );
 
         parent::__construct($simpleQueryBuilder);
-    }
 
-    /**
-     * @return iterable<string>
-     */
-    public function getSQL(): iterable
-    {
         $this->initialize();
         $this->processPartition();
         $this->processDimensions();
         $this->processMeasures();
         $this->processConstraints();
         $this->processGroupings();
+    }
 
-        return $this->createSQL();
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
+    {
+        $clone = clone $this;
+
+        $lowerBound = $start->getLowerBound();
+        $upperBound = $end->getUpperBound();
+        $lowerLevel = PartitionUtil::getLowerLevel($start);
+        $currentLevel = $start->getLevel();
+
+        if ($lowerLevel === null) {
+            throw new LogicException('The lowest level must be rolled up from the source');
+        }
+
+        $clone->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->setParameter('lowerLevel', $lowerLevel)
+            ->setParameter('currentLevel', $currentLevel);
+
+        return $clone;
+    }
+
+    #[\Override]
+    public function getQueries(): iterable
+    {
+        yield $this->createQuery();
     }
 
     private function initialize(): void
@@ -73,14 +94,9 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
             ->resolve($partitionMetadata->getFullyQualifiedPartitionKeyProperty());
 
         $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf(
-                'MIN(%s) AS p_key',
-                $partitionKeyProperty,
-            ))
-            ->addSelect(\sprintf(
-                '%s AS p_level',
-                $this->start->getLevel(),
-            ))
+            ->addSelect(\sprintf('MIN(%s) AS p_key', $partitionKeyProperty))
+            ->addSelect('0 + :currentLevel AS p_level')
+            ->setParameter('currentLevel', '(placeholder) partition level')
             ->addGroupBy('p_level')
         ;
     }
@@ -149,35 +165,28 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
-        $lowerBound = $this->start->getLowerBound();
-        $upperBound = $this->end->getUpperBound();
-
-        $lowerLevel = PartitionUtil::getLowerLevel($this->start);
-
-        if ($lowerLevel === null) {
-            throw new LogicException('The lowest level must be rolled up from the source');
-        }
-
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                'root.%s.%s >= %d',
+                'root.%s.%s >= :lowerBound',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $lowerBound,
             ))
             ->andWhere(\sprintf(
-                'root.%s.%s < %d',
+                'root.%s.%s < :upperBound',
                 $partitionProperty,
                 $partitionKeyProperty,
-                $upperBound,
             ))
             ->andWhere(\sprintf(
-                'root.%s.%s = %d',
+                'root.%s.%s = :lowerLevel',
                 $partitionProperty,
                 $partitionLevelProperty,
-                $lowerLevel,
             ))
         ;
+
+        $this->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', '(placeholder) the lower bound')
+            ->setParameter('upperBound', '(placeholder) the upper bound')
+            ->setParameter('lowerLevel', '(placeholder) the lower level');
     }
 
     private function processGroupings(): void
@@ -196,18 +205,11 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
         ;
     }
 
-    /**
-     * @return iterable<string>
-     */
-    private function createSQL(): iterable
+    private function createQuery(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
-        $result = $query->getSQL();
 
-        if (\is_array($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        return DecomposedQuery::createFromQuery($query)
+            ->prependSql($this->insertSql);
     }
 }

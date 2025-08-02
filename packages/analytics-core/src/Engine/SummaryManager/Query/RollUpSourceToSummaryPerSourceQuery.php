@@ -27,16 +27,15 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 
-final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
+final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements SummaryEntityQuery
 {
-    private ?Groupings $groupings = null;
-    private ?Partition $start = null;
-    private ?Partition $end = null;
+    private Groupings $groupings;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly PartitionHandler $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
+        private readonly string $insertSql,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -44,32 +43,10 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             alias: 'root',
         );
 
+        $this->groupings = Groupings::create($this->summaryMetadata);
+
         parent::__construct($simpleQueryBuilder);
-    }
 
-    private function getGroupings(): Groupings
-    {
-        return $this->groupings ??= Groupings::create($this->summaryMetadata);
-    }
-
-    public function withBoundary(Partition $start, Partition $end): self
-    {
-        if ($this->start !== null || $this->end !== null) {
-            throw new UnexpectedValueException('Boundary has already been set.');
-        }
-
-        $clone = clone $this;
-        $clone->start = $start;
-        $clone->end = $end;
-
-        return $clone;
-    }
-
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    public function getQueries(): iterable
-    {
         $this->initialize();
         $this->processPartition();
         $this->processDimensions();
@@ -77,8 +54,40 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $this->processBoundary();
         $this->processGroupings();
         $this->processQueryBuilderModifier();
+    }
 
-        yield $this->createSqlStatement();
+    private function getGroupings(): Groupings
+    {
+        return $this->groupings;
+    }
+
+    #[\Override]
+    public function withBoundary(Partition $start, Partition $end): static
+    {
+        $clone = clone $this;
+
+        /** @psalm-suppress MixedAssignment */
+        $start = $clone->partitionManager
+            ->getLowerBoundSourceValueFromPartition($start);
+
+        /** @psalm-suppress MixedAssignment */
+        $end = $clone->partitionManager
+            ->getUpperBoundSourceValueFromPartition($end);
+
+        $clone->getSimpleQueryBuilder()
+            ->setParameter('startBoundary', $start)
+            ->setParameter('endBoundary', $end);
+
+        return $clone;
+    }
+
+    /**
+     * @return iterable<DecomposedQuery>
+     */
+    #[\Override]
+    public function getQueries(): iterable
+    {
+        yield $this->createQuery();
     }
 
     private function initialize(): void
@@ -126,6 +135,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
     {
         foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
             $valueResolver = $dimensionMetadata->getValueResolver();
+            /** @psalm-suppress ImpureMethodCall */
             $valueResolver = Bust::create($valueResolver);
 
             $expression = $valueResolver->getExpression(
@@ -175,23 +185,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processBoundary(): void
     {
-        if ($this->start === null || $this->end === null) {
-            return;
-        }
-
         $partitionMetadata = $this->summaryMetadata->getPartition();
         $valueResolver = $partitionMetadata->getSource();
-
-        /** @psalm-suppress MixedAssignment */
-        $start = $this->partitionManager
-            ->getLowerBoundSourceValueFromPartition($this->start);
-
-        /** @psalm-suppress MixedAssignment */
-        $end = $this->partitionManager
-            ->getUpperBoundSourceValueFromPartition($this->end);
-
-        // add constraints
-
         $properties = $valueResolver->getInvolvedProperties();
 
         if (\count($properties) !== 1) {
@@ -205,15 +200,17 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                "%s >= %s",
+                "%s >= :startBoundary",
                 $this->resolve($property),
-                $this->getSimpleQueryBuilder()->createNamedParameter($start),
             ))
             ->andWhere(\sprintf(
-                "%s < %s",
+                "%s < :endBoundary",
                 $this->resolve($property),
-                $this->getSimpleQueryBuilder()->createNamedParameter($end),
             ));
+
+        $this->getSimpleQueryBuilder()
+            ->setParameter('startBoundary', '(placeholder) the start boundary')
+            ->setParameter('endBoundary', '(placeholder) the end boundary');
     }
 
     private function processQueryBuilderModifier(): void
@@ -221,6 +218,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $class = $this->summaryMetadata->getSummaryClass();
 
         if (is_a($class, HasQueryBuilderModifier::class, true)) {
+            /** @psalm-suppress ImpureMethodCall */
             $class::modifyQueryBuilder(
                 $this->getSimpleQueryBuilder()->getQueryBuilder(),
             );
@@ -233,7 +231,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
             ->addSelect($this->getGroupings()->getExpression());
     }
 
-    private function createSqlStatement(): DecomposedQuery
+    private function createQuery(): DecomposedQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
 
@@ -242,6 +240,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
         $groupBy->add(new Field('par_level'));
         $groupBy->apply($query);
 
-        return DecomposedQuery::createFromQuery($query);
+        return DecomposedQuery::createFromQuery($query)
+            ->prependSql($this->insertSql);
     }
 }

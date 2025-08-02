@@ -45,9 +45,13 @@ final class SimpleQueryBuilder
 
     public function __clone()
     {
-        $this->queryBuilder = null;
-        $this->pathResolver = null;
-        $this->boundCounter = 0;
+        if ($this->queryBuilder !== null) {
+            $this->queryBuilder = clone $this->queryBuilder;
+        }
+
+        if ($this->pathResolver !== null) {
+            $this->pathResolver = clone $this->pathResolver;
+        }
     }
 
     private function getPathResolver(): PathResolver
