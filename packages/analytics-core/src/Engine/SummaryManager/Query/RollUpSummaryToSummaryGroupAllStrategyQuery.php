@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
@@ -28,9 +27,6 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
  */
 final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery implements SummaryEntityQuery
 {
-    private ?Partition $start = null;
-    private ?Partition $end = null;
-
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
@@ -43,18 +39,34 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
         );
 
         parent::__construct($simpleQueryBuilder);
+
+        $this->initialize();
+        $this->processPartition();
+        $this->processDimensions();
+        $this->processMeasures();
+        $this->processConstraints();
+        $this->processGroupings();
     }
 
     #[\Override]
     public function withBoundary(Partition $start, Partition $end): static
     {
-        if ($this->start !== null || $this->end !== null) {
-            throw new UnexpectedValueException('Boundary has already been set.');
+        $clone = clone $this;
+
+        $lowerBound = $start->getLowerBound();
+        $upperBound = $end->getUpperBound();
+        $lowerLevel = PartitionUtil::getLowerLevel($start);
+        $currentLevel = $start->getLevel();
+
+        if ($lowerLevel === null) {
+            throw new LogicException('The lowest level must be rolled up from the source');
         }
 
-        $clone = clone $this;
-        $clone->start = $start;
-        $clone->end = $end;
+        $clone->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->setParameter('lowerLevel', $lowerLevel)
+            ->setParameter('currentLevel', $currentLevel);
 
         return $clone;
     }
@@ -62,13 +74,6 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
     #[\Override]
     public function getQueries(): iterable
     {
-        $this->initialize();
-        $this->processPartition();
-        $this->processDimensions();
-        $this->processMeasures();
-        $this->processConstraints();
-        $this->processGroupings();
-
         yield $this->createQuery();
     }
 
@@ -90,11 +95,8 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
 
         $this->getSimpleQueryBuilder()
             ->addSelect(\sprintf('MIN(%s) AS p_key', $partitionKeyProperty))
-            ->addSelect('0 + :partitionLevel AS p_level')
-            ->setParameter(
-                'partitionLevel',
-                $this->start?->getLevel() ?? '(placeholder) partition level',
-            )
+            ->addSelect('0 + :currentLevel AS p_level')
+            ->setParameter('currentLevel', '(placeholder) partition level')
             ->addGroupBy('p_level')
         ;
     }
@@ -181,27 +183,10 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
             ))
         ;
 
-        if ($this->start === null || $this->end === null) {
-            $this->getSimpleQueryBuilder()
-                ->setParameter('lowerBound', '(placeholder) the lower bound')
-                ->setParameter('upperBound', '(placeholder) the upper bound')
-                ->setParameter('lowerLevel', '(placeholder) the lower level');
-
-            return;
-        }
-
-        $lowerBound = $this->start->getLowerBound();
-        $upperBound = $this->end->getUpperBound();
-        $lowerLevel = PartitionUtil::getLowerLevel($this->start);
-
-        if ($lowerLevel === null) {
-            throw new LogicException('The lowest level must be rolled up from the source');
-        }
-
         $this->getSimpleQueryBuilder()
-            ->setParameter('lowerBound', $lowerBound)
-            ->setParameter('upperBound', $upperBound)
-            ->setParameter('lowerLevel', $lowerLevel);
+            ->setParameter('lowerBound', '(placeholder) the lower bound')
+            ->setParameter('upperBound', '(placeholder) the upper bound')
+            ->setParameter('lowerLevel', '(placeholder) the lower level');
     }
 
     private function processGroupings(): void

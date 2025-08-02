@@ -27,7 +27,10 @@ abstract class AbstractQuery
     public function __clone()
     {
         $this->simpleQueryBuilder = clone $this->simpleQueryBuilder;
-        $this->queryComponents = null; // Reset query components to ensure fresh state
+
+        if (null !== $this->queryComponents) {
+            $this->queryComponents = clone $this->queryComponents;
+        }
     }
 
     protected function getSimpleQueryBuilder(): SimpleQueryBuilder

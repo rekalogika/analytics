@@ -30,8 +30,6 @@ use Rekalogika\DoctrineAdvancedGroupBy\Field;
 final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements SummaryEntityQuery
 {
     private Groupings $groupings;
-    private ?Partition $start = null;
-    private ?Partition $end = null;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -48,6 +46,14 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
         $this->groupings = Groupings::create($this->summaryMetadata);
 
         parent::__construct($simpleQueryBuilder);
+
+        $this->initialize();
+        $this->processPartition();
+        $this->processDimensions();
+        $this->processMeasures();
+        $this->processBoundary();
+        $this->processGroupings();
+        $this->processQueryBuilderModifier();
     }
 
     private function getGroupings(): Groupings
@@ -58,13 +64,19 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
     #[\Override]
     public function withBoundary(Partition $start, Partition $end): static
     {
-        if ($this->start !== null || $this->end !== null) {
-            throw new UnexpectedValueException('Boundary has already been set.');
-        }
-
         $clone = clone $this;
-        $clone->start = $start;
-        $clone->end = $end;
+
+        /** @psalm-suppress MixedAssignment */
+        $start = $clone->partitionManager
+            ->getLowerBoundSourceValueFromPartition($start);
+
+        /** @psalm-suppress MixedAssignment */
+        $end = $clone->partitionManager
+            ->getUpperBoundSourceValueFromPartition($end);
+
+        $clone->getSimpleQueryBuilder()
+            ->setParameter('startBoundary', $start)
+            ->setParameter('endBoundary', $end);
 
         return $clone;
     }
@@ -75,14 +87,6 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
     #[\Override]
     public function getQueries(): iterable
     {
-        $this->initialize();
-        $this->processPartition();
-        $this->processDimensions();
-        $this->processMeasures();
-        $this->processBoundary();
-        $this->processGroupings();
-        $this->processQueryBuilderModifier();
-
         yield $this->createQuery();
     }
 
@@ -131,6 +135,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
     {
         foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
             $valueResolver = $dimensionMetadata->getValueResolver();
+            /** @psalm-suppress ImpureMethodCall */
             $valueResolver = Bust::create($valueResolver);
 
             $expression = $valueResolver->getExpression(
@@ -203,25 +208,9 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
                 $this->resolve($property),
             ));
 
-        if ($this->start === null || $this->end === null) {
-            $this->getSimpleQueryBuilder()
-                ->setParameter('startBoundary', '(placeholder) the start boundary')
-                ->setParameter('endBoundary', '(placeholder) the end boundary');
-
-            return;
-        }
-
-        /** @psalm-suppress MixedAssignment */
-        $start = $this->partitionManager
-            ->getLowerBoundSourceValueFromPartition($this->start);
-
-        /** @psalm-suppress MixedAssignment */
-        $end = $this->partitionManager
-            ->getUpperBoundSourceValueFromPartition($this->end);
-
         $this->getSimpleQueryBuilder()
-            ->setParameter('startBoundary', $start)
-            ->setParameter('endBoundary', $end);
+            ->setParameter('startBoundary', '(placeholder) the start boundary')
+            ->setParameter('endBoundary', '(placeholder) the end boundary');
     }
 
     private function processQueryBuilderModifier(): void
@@ -229,6 +218,7 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery implements
         $class = $this->summaryMetadata->getSummaryClass();
 
         if (is_a($class, HasQueryBuilderModifier::class, true)) {
+            /** @psalm-suppress ImpureMethodCall */
             $class::modifyQueryBuilder(
                 $this->getSimpleQueryBuilder()->getQueryBuilder(),
             );
