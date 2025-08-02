@@ -16,8 +16,6 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Query;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr\Andx;
-use Doctrine\ORM\Query\Expr\Comparison;
 use Rekalogika\Analytics\Contracts\Context\SummaryQueryContext;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Exception\QueryResultOverflowException;
@@ -28,7 +26,7 @@ use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Expression\ExpressionUtil;
 use Rekalogika\Analytics\Engine\SummaryQuery\Expression\SummaryExpressionVisitor;
-use Rekalogika\Analytics\Engine\Util\PartitionUtil;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\PartitionExpressionResolver;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
@@ -70,6 +68,8 @@ final class SummaryQuery extends AbstractQuery
      */
     private Query $doctrineQuery;
 
+    private PartitionExpressionResolver $partitionExpressionResolver;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly DefaultQuery $query,
@@ -94,6 +94,9 @@ final class SummaryQuery extends AbstractQuery
         }
 
         $this->groupings = Groupings::create($metadata);
+
+        // initialize range conditions resolver
+        $this->initializeRangeConditionsResolver();
 
         // add query builder parameters that are always used
         $this->initializeQueryBuilder();
@@ -191,10 +194,7 @@ final class SummaryQuery extends AbstractQuery
         ;
     }
 
-    /**
-     * @return iterable<Comparison|Andx>
-     */
-    private function getRangeConditions(Partition $partition): iterable
+    private function initializeRangeConditionsResolver(): void
     {
         $partitionLevelProperty = $this->metadata
             ->getPartition()
@@ -204,73 +204,22 @@ final class SummaryQuery extends AbstractQuery
             ->getPartition()
             ->getFullyQualifiedPartitionKeyProperty();
 
-        $higherPartition = $partition->getContaining();
-
         $levelProperty = $this->resolve($partitionLevelProperty);
         $keyProperty = $this->resolve($partitionKeyProperty);
 
-        if ($higherPartition === null) {
-            // if the partition is at the top level, return all top partitions
-            // up to the partition
-            yield $this->getSimpleQueryBuilder()->expr()->andX(
-                $this->getSimpleQueryBuilder()->expr()->eq(
-                    $levelProperty,
-                    $partition->getLevel(),
-                ),
-                $this->getSimpleQueryBuilder()->expr()->lt(
-                    $keyProperty,
-                    $partition->getUpperBound(),
-                ),
-            );
-        } elseif ($partition->getUpperBound() === $higherPartition->getUpperBound()) {
-            // if the partition is at the end of the containing parent partition,
-            // return the containing parent partition
-            foreach ($this->getRangeConditions($higherPartition) as $condition) {
-                yield $condition;
-            }
-        } else {
-            // else return the range of the current level from the start of the
-            // containing parent partition up to the end of the current
-            // partition
-
-            yield $this->getSimpleQueryBuilder()->expr()->andX(
-                $this->getSimpleQueryBuilder()->expr()->eq(
-                    $levelProperty,
-                    $partition->getLevel(),
-                ),
-                $this->getSimpleQueryBuilder()->expr()->gte(
-                    $keyProperty,
-                    $higherPartition->getLowerBound(),
-                ),
-                $this->getSimpleQueryBuilder()->expr()->lt(
-                    $keyProperty,
-                    $partition->getUpperBound(),
-                ),
-            );
-
-            // and then return the range of the previous of the parent partition
-
-            $higherPrevious = $higherPartition->getPrevious();
-
-            if ($higherPrevious !== null) {
-                foreach ($this->getRangeConditions($higherPrevious) as $condition) {
-                    yield $condition;
-                }
-            }
-        }
+        $this->partitionExpressionResolver = new PartitionExpressionResolver(
+            levelProperty: $levelProperty,
+            keyProperty: $keyProperty,
+            partitionClass: $this->metadata->getPartition()->getPartitionClass(),
+        );
     }
 
     private function addPartitionWhere(): void
     {
-        $partitionClass = $this->metadata->getPartition()->getPartitionClass();
-        $lowestLevel = PartitionUtil::getLowestLevel($partitionClass);
-        $pointPartition = $partitionClass::createFromSourceValue($this->maxId, $lowestLevel);
-        $conditions = $this->getRangeConditions($pointPartition);
+        $conditions = $this->partitionExpressionResolver
+            ->resolvePartitionExpression($this->maxId);
 
-        /** @psalm-suppress InvalidArgument */
-        $orX = $this->getSimpleQueryBuilder()->expr()->orX(...$conditions);
-
-        $this->getSimpleQueryBuilder()->andWhere($orX);
+        $this->getSimpleQueryBuilder()->addCriteria($conditions);
     }
 
     private function addGroupingWhere(): void
