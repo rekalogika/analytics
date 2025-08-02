@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\Expression;
+namespace Rekalogika\Analytics\Engine\SummaryQuery\Expression;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
