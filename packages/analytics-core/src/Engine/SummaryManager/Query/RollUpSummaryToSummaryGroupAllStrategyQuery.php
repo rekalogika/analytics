@@ -34,6 +34,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     public function __construct(
         EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
+        private readonly string $insertSql,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -224,6 +225,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
 
-        return DecomposedQuery::createFromQuery($query);
+        return DecomposedQuery::createFromQuery($query)
+            ->prependSql($this->insertSql);
     }
 }

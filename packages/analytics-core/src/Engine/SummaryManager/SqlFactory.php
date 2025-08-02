@@ -118,13 +118,14 @@ final class SqlFactory
             new RollUpSummaryToSummaryGroupAllStrategyQuery(
                 entityManager: $this->entityManager,
                 metadata: $this->summaryMetadata,
+                insertSql: $this->getInsertIntoSummaryQuery(),
             );
     }
 
     /**
      * @return iterable<DecomposedQuery>
      */
-    private function createSelectForRollingUpSummaryToSummaryQuery(
+    public function createRollUpSummaryToSummaryQueries(
         Partition $start,
         Partition $end,
     ): iterable {
@@ -132,24 +133,5 @@ final class SqlFactory
             ->getRollUpSummaryToSummaryQuery()
             ->withBoundary($start, $end)
             ->getQueries();
-    }
-
-    /**
-     * @return iterable<DecomposedQuery>
-     */
-    public function createInsertIntoSelectForRollingUpSummaryToSummaryQuery(
-        Partition $start,
-        Partition $end,
-    ): iterable {
-        $selects = $this->createSelectForRollingUpSummaryToSummaryQuery(
-            start: $start,
-            end: $end,
-        );
-
-        $insertInto = $this->getInsertIntoSummaryQuery();
-
-        foreach ($selects as $select) {
-            yield $select->prependSql($insertInto);
-        }
     }
 }
