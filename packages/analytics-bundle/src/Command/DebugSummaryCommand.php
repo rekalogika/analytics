@@ -117,6 +117,7 @@ final class DebugSummaryCommand extends Command
 
         $this->printSourceToSummaryRollupSql($io, $refresher);
         $this->printSummaryToSummaryRollupSql($io, $refresher);
+        $this->printDeleteSummarySql($io, $refresher);
     }
 
     private function printHeaders(
@@ -226,6 +227,18 @@ final class DebugSummaryCommand extends Command
         $iterator->setPrefixPart(\RecursiveTreeIterator::PREFIX_RIGHT, '');
 
         return iterator_to_array($iterator, false);
+    }
+
+    private function printDeleteSummarySql(
+        SymfonyStyle $io,
+        SummaryRefresher $refresher,
+    ): void {
+        $sqlFactory = $refresher->getSqlFactory();
+        $deleteQuery = $sqlFactory->getDeleteExistingSummaryQuery();
+
+        $io->title('SQL for Deleting Existing Summary Partitions');
+
+        $this->printDecomposedQuery($io, $deleteQuery->getQuery());
     }
 
     private function printSourceToSummaryRollupSql(

@@ -15,22 +15,52 @@ namespace Rekalogika\Analytics\Engine\SummaryManager\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
+use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
-final readonly class DeleteExistingSummaryQuery
+final class DeleteExistingSummaryQuery extends AbstractQuery
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SummaryMetadata $summaryMetadata,
-        private Partition $start,
-        private Partition $end,
-    ) {}
+    private ?Partition $start = null;
+    private ?Partition $end = null;
 
-    /**
-     * @return iterable<string>
-     */
-    public function getSQL(): iterable
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        private readonly SummaryMetadata $summaryMetadata,
+    ) {
+        $simpleQueryBuilder = new SimpleQueryBuilder(
+            entityManager: $entityManager,
+            from: $summaryMetadata->getSummaryClass(),
+            alias: 'root',
+        );
+
+        parent::__construct($simpleQueryBuilder);
+    }
+
+    public function withBoundary(Partition $start, Partition $end): self
+    {
+        if ($this->start !== null || $this->end !== null) {
+            throw new UnexpectedValueException('Boundary has already been set.');
+        }
+
+        $clone = clone $this;
+        $clone->start = $start;
+        $clone->end = $end;
+
+        return $clone;
+    }
+
+    public function getQuery(): DecomposedQuery
+    {
+        $this->prepare();
+        $query = $this->getSimpleQueryBuilder()->getQuery();
+
+        return DecomposedQuery::createFromQuery($query);
+    }
+
+    private function prepare(): void
     {
         $summaryClassName = $this->summaryMetadata->getSummaryClass();
         $partitionMetadata = $this->summaryMetadata->getPartition();
@@ -38,6 +68,40 @@ final readonly class DeleteExistingSummaryQuery
         $partitionKeyProperty = $partitionMetadata->getPartitionKeyProperty();
         $partitionLevelProperty = $partitionMetadata->getPartitionLevelProperty();
 
+        $this->getSimpleQueryBuilder()
+            ->delete($summaryClassName, 'root');
+
+        $this->getSimpleQueryBuilder()
+            ->andWhere(\sprintf(
+                'root.%s.%s >= :lowerBound',
+                $partitionProperty,
+                $partitionKeyProperty,
+            ))
+
+            ->andWhere(\sprintf(
+                'root.%s.%s < :upperBound',
+                $partitionProperty,
+                $partitionKeyProperty,
+            ))
+
+            ->andWhere(\sprintf(
+                'root.%s.%s = :lowerLevel',
+                $partitionProperty,
+                $partitionLevelProperty,
+            ))
+        ;
+
+        if ($this->start === null || $this->end === null) {
+            $this->getSimpleQueryBuilder()
+                ->setParameter('lowerBound', '(placeholder) the lower bound')
+                ->setParameter('upperBound', '(placeholder) the upper bound')
+                ->setParameter('lowerLevel', '(placeholder) the lower level');
+
+            return;
+        }
+
+        $lowerBound = $this->start->getLowerBound();
+        $upperBound = $this->end->getUpperBound();
         $level = $this->start->getLevel();
 
         if ($level !== $this->end->getLevel()) {
@@ -48,42 +112,9 @@ final readonly class DeleteExistingSummaryQuery
             ));
         }
 
-        $start = $this->start->getLowerBound();
-        $end = $this->end->getUpperBound();
-
-        $queryBuilder = $this->entityManager
-            ->createQueryBuilder()
-            ->delete($summaryClassName, 'root');
-
-        $queryBuilder
-            ->andWhere(\sprintf(
-                'root.%s.%s >= %s',
-                $partitionProperty,
-                $partitionKeyProperty,
-                $start,
-            ))
-
-            ->andWhere(\sprintf(
-                'root.%s.%s < %s',
-                $partitionProperty,
-                $partitionKeyProperty,
-                $end,
-            ))
-
-            ->andWhere(\sprintf(
-                'root.%s.%s = %s',
-                $partitionProperty,
-                $partitionLevelProperty,
-                $level,
-            ))
-        ;
-
-        $result = $queryBuilder->getQuery()->getSQL();
-
-        if (\is_array($result)) {
-            yield from $result;
-        } else {
-            yield $result;
-        }
+        $this->getSimpleQueryBuilder()
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->setParameter('lowerLevel', $level);
     }
 }

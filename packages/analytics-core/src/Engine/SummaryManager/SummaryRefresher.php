@@ -65,16 +65,12 @@ final class SummaryRefresher
     }
 
     /**
-     * @param iterable<string|DecomposedQuery> $queries
+     * @param iterable<DecomposedQuery> $queries
      */
     private function executeQueries(iterable $queries): void
     {
         foreach ($queries as $query) {
-            if (\is_string($query)) {
-                $this->getConnection()->executeStatement($query);
-            } else {
-                $query->execute($this->getConnection());
-            }
+            $query->execute($this->getConnection());
         }
     }
 
@@ -408,12 +404,12 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        $queries = $this->getSqlFactory()->createDeleteSummaryQuery(
+        $query = $this->getSqlFactory()->createDeleteSummaryQuery(
             start: $range->getStart(),
             end: $range->getEnd(),
         );
 
-        $this->executeQueries($queries);
+        $this->executeQueries([$query]);
         $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
     }
 

@@ -41,21 +41,25 @@ final class SqlFactory
         );
     }
 
-    /**
-     * @return iterable<string>
-     */
+    private ?DeleteExistingSummaryQuery $deleteExistingSummaryQuery = null;
+
+    public function getDeleteExistingSummaryQuery(): DeleteExistingSummaryQuery
+    {
+        return $this->deleteExistingSummaryQuery ??=
+            new DeleteExistingSummaryQuery(
+                entityManager: $this->entityManager,
+                summaryMetadata: $this->summaryMetadata,
+            );
+    }
+
     public function createDeleteSummaryQuery(
         Partition $start,
         Partition $end,
-    ): iterable {
-        $query = new DeleteExistingSummaryQuery(
-            entityManager: $this->entityManager,
-            summaryMetadata: $this->summaryMetadata,
-            start: $start,
-            end: $end,
-        );
-
-        yield from $query->getSQL();
+    ): DecomposedQuery {
+        return $this
+            ->getDeleteExistingSummaryQuery()
+            ->withBoundary($start, $end)
+            ->getQuery();
     }
 
     //
