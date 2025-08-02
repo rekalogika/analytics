@@ -86,6 +86,18 @@ final class SqlFactory
         return $this->insertInto = $query->getSQL();
     }
 
+    private ?RollUpSourceToSummaryPerSourceQuery $rollUpSourceToSummaryQuery = null;
+
+    public function getRollUpSourceToSummaryQuery(): RollUpSourceToSummaryPerSourceQuery
+    {
+        return $this->rollUpSourceToSummaryQuery ??=
+            new RollUpSourceToSummaryPerSourceQuery(
+                entityManager: $this->entityManager,
+                partitionManager: $this->partitionManager,
+                summaryMetadata: $this->summaryMetadata,
+            );
+    }
+
     /**
      * @return iterable<DecomposedQuery>
      */
@@ -93,15 +105,10 @@ final class SqlFactory
         Partition $start,
         Partition $end,
     ): iterable {
-        $query = new RollUpSourceToSummaryPerSourceQuery(
-            entityManager: $this->entityManager,
-            partitionManager: $this->partitionManager,
-            summaryMetadata: $this->summaryMetadata,
-            start: $start,
-            end: $end,
-        );
-
-        yield from $query->getQuery();
+        return $this
+            ->getRollUpSourceToSummaryQuery()
+            ->withBoundary($start, $end)
+            ->getQueries();
     }
 
     /**

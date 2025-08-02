@@ -97,6 +97,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->class(DebugSummaryCommand::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$translator' => service('translator'),
         ])
         ->tag('console.command')
