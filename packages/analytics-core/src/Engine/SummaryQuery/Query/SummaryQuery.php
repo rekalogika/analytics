@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryQuery;
+namespace Rekalogika\Analytics\Engine\SummaryQuery\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException;
@@ -23,10 +23,11 @@ use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Exception\QueryResultOverflowException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Engine\Expression\ExpressionUtil;
-use Rekalogika\Analytics\Engine\Expression\SummaryExpressionVisitor;
 use Rekalogika\Analytics\Engine\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Expression\ExpressionUtil;
+use Rekalogika\Analytics\Engine\SummaryQuery\Expression\SummaryExpressionVisitor;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;

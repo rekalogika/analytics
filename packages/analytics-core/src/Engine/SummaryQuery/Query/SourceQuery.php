@@ -21,9 +21,9 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Engine\Expression\ExpressionUtil;
-use Rekalogika\Analytics\Engine\Expression\SourceExpressionVisitor;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Expression\ExpressionUtil;
+use Rekalogika\Analytics\Engine\SummaryQuery\Expression\SourceExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 

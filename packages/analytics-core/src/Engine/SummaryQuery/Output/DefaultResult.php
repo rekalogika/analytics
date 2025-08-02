@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\SummaryQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Worker\BalancedNormalTableToBalancedTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryQuery\Worker\QueryResultToTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryQuery\Worker\TableToNormalTableTransformer;
