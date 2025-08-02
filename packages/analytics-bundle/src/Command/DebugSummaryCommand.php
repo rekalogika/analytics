@@ -239,7 +239,7 @@ final class DebugSummaryCommand extends Command
         $this->printSummaryEntityQuery(
             io: $io,
             query: $sqlFactory->getDeleteExistingSummaryQuery(),
-            title: 'SQL for Deleting Existing Summary Partitions'
+            title: 'SQL for Deleting Existing Summary Partitions',
         );
     }
 
@@ -252,7 +252,7 @@ final class DebugSummaryCommand extends Command
         $this->printSummaryEntityQuery(
             io: $io,
             query: $sqlFactory->getRollUpSourceToSummaryQuery(),
-            title: 'SQL for Rolling Up Source to Summary'
+            title: 'SQL for Rolling Up Source to Summary',
         );
     }
 
@@ -265,7 +265,7 @@ final class DebugSummaryCommand extends Command
         $this->printSummaryEntityQuery(
             io: $io,
             query: $sqlFactory->getRollUpSummaryToSummaryQuery(),
-            title: 'SQL for Rolling Up Summary to Summary'
+            title: 'SQL for Rolling Up Summary to Summary',
         );
     }
 
