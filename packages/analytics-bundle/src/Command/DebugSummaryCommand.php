@@ -233,10 +233,32 @@ final class DebugSummaryCommand extends Command
         $sqlFactory = $refresher->getSqlFactory();
         $rollUpQueries = $sqlFactory->getRollUpSourceToSummaryQuery();
 
-        $io->section('SQL for Rolling Up Source to Summary (without boundary conditions)');
+        $io->title('SQL for Rolling Up Source to Summary');
 
         foreach ($rollUpQueries->getQueries() as $rollupQuery) {
-            $io->writeln($rollupQuery->getSql() . ';');
+            $io->section('SQL Query');
+
+            $io->writeln(sprintf(
+                '<info>%s;</info>',
+                $rollupQuery->getSql(),
+            ));
+
+            $parameters = [];
+            $types = $rollupQuery->getTypes();
+
+            /** @psalm-suppress MixedAssignment */
+            foreach ($rollupQuery->getParameters() as $key => $value) {
+                $type = $types[$key] ?? '(none)';
+
+                $parameters[] = [
+                    $key,
+                    var_export($value, true),
+                    var_export($type, true),
+                ];
+            }
+
+            $io->section('Parameters');
+            $io->table(['Key', 'Value', 'Type'], $parameters);
         }
     }
 }

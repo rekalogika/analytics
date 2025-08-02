@@ -175,23 +175,8 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
     private function processBoundary(): void
     {
-        if ($this->start === null || $this->end === null) {
-            return;
-        }
-
         $partitionMetadata = $this->summaryMetadata->getPartition();
         $valueResolver = $partitionMetadata->getSource();
-
-        /** @psalm-suppress MixedAssignment */
-        $start = $this->partitionManager
-            ->getLowerBoundSourceValueFromPartition($this->start);
-
-        /** @psalm-suppress MixedAssignment */
-        $end = $this->partitionManager
-            ->getUpperBoundSourceValueFromPartition($this->end);
-
-        // add constraints
-
         $properties = $valueResolver->getInvolvedProperties();
 
         if (\count($properties) !== 1) {
@@ -205,15 +190,33 @@ final class RollUpSourceToSummaryPerSourceQuery extends AbstractQuery
 
         $this->getSimpleQueryBuilder()
             ->andWhere(\sprintf(
-                "%s >= %s",
+                "%s >= :startBoundary",
                 $this->resolve($property),
-                $this->getSimpleQueryBuilder()->createNamedParameter($start),
             ))
             ->andWhere(\sprintf(
-                "%s < %s",
+                "%s < :endBoundary",
                 $this->resolve($property),
-                $this->getSimpleQueryBuilder()->createNamedParameter($end),
             ));
+
+        if ($this->start === null || $this->end === null) {
+            $this->getSimpleQueryBuilder()
+                ->setParameter('startBoundary', '(placeholder) the start boundary')
+                ->setParameter('endBoundary', '(placeholder) the end boundary');
+
+            return;
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $start = $this->partitionManager
+            ->getLowerBoundSourceValueFromPartition($this->start);
+
+        /** @psalm-suppress MixedAssignment */
+        $end = $this->partitionManager
+            ->getUpperBoundSourceValueFromPartition($this->end);
+
+        $this->getSimpleQueryBuilder()
+            ->setParameter('startBoundary', $start)
+            ->setParameter('endBoundary', $end);
     }
 
     private function processQueryBuilderModifier(): void
