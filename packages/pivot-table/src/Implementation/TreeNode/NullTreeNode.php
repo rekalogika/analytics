@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
-use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 
 final readonly class NullTreeNode implements TreeNode
 {
@@ -66,8 +66,8 @@ final readonly class NullTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): NullTreeNodes
+    public function getChildren(int $level = 1): \Traversable
     {
-        return new NullTreeNodes([]);
+        yield from [];
     }
 }

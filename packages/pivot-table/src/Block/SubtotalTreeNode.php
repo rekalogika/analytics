@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\Tree\TreeNode;
-use Rekalogika\PivotTable\Contracts\Tree\TreeNodes;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 
 final readonly class SubtotalTreeNode implements TreeNode
 {
@@ -94,7 +93,7 @@ final readonly class SubtotalTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): TreeNodes
+    public function getChildren(int $level = 1): \Traversable
     {
         return $this->node->getChildren($this->level + $level);
     }
