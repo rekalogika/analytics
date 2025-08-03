@@ -135,7 +135,7 @@ abstract class Block implements \Stringable
         array $createSubtotals = [],
     ): Block {
         $repository = new TreeNodeDecoratorRepository();
-        $rootNode = $repository->decorate($node, null);
+        $rootNode = $repository->decorate($node);
         $distinct = DistinctNodeListResolver::getDistinctNodes($node);
 
         $context = new BlockContext(
@@ -181,7 +181,8 @@ abstract class Block implements \Stringable
 
             if (!$found) {
                 $result[] = $this->context->getRepository()
-                    ->decorate($distinctNode, $parent);
+                    ->decorate($distinctNode)
+                    ->withParent($parent);
             }
         }
 

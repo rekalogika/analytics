@@ -17,42 +17,42 @@ use Rekalogika\PivotTable\Block\SubtotalTreeNode;
 use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Decorator\Internal\ItemToTreeNodeDecoratorMap;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
+use Rekalogika\PivotTable\Util\TreeNodeDebugger;
 
 final class TreeNodeDecorator extends BaseTreeNodeDecorator
 {
+    public static bool $debug = false;
+
+    /**
+     * @var array<string,mixed>
+     */
+    public array $debugData;
+
     /**
      * @var array<int,list<self>>
      */
     private array $children = [];
 
-    private readonly self $root;
-
     public static function decorate(TreeNode $node): self
     {
         $repository = new TreeNodeDecoratorRepository();
 
-        return $repository->decorate($node, null);
+        return $repository->decorate($node);
     }
 
     public function __construct(
         private readonly TreeNode $node,
-        private readonly null|self $parent,
         private readonly TreeNodeDecoratorRepository $repository,
+        private readonly null|self $parent = null,
     ) {
         if ($node instanceof self) {
             throw new \InvalidArgumentException('Cannot redecorate a TreeNodeDecorator instance.');
         }
 
-        if ($parent === null) {
-            $this->root = $this;
+        if (self::$debug) {
+            $this->debugData = TreeNodeDebugger::debug($node);
         } else {
-            $current = $this;
-
-            while ($current->parent !== null) {
-                $current = $current->parent;
-            }
-
-            $this->root = $current;
+            $this->debugData = [];
         }
 
         parent::__construct($node);
@@ -60,12 +60,11 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
 
     public function withParent(self $parent): self
     {
-        return new self($this->node, $parent, $this->repository);
-    }
-
-    public function getRoot(): self
-    {
-        return $this->root;
+        return new self(
+            node: $this->node,
+            repository: $this->repository,
+            parent: $parent,
+        );
     }
 
     public function isSubtotal(): bool
@@ -87,7 +86,9 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         $result = [];
 
         foreach ($this->node->getChildren($level) as $child) {
-            $result[] = $this->repository->decorate($child, $this);
+            $result[] = $this->repository
+                ->decorate($child)
+                ->withParent($this);
         }
 
         return $this->children[$level] = $result;
@@ -137,7 +138,11 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
                     ->withParent($this);
             } else {
                 $null = NullTreeNode::fromInterface($child);
-                $decorated = $this->repository->decorate($null, $this);
+
+                $decorated = $this->repository
+                    ->decorate($null)
+                    ->withParent($this);
+
                 $result[] = $decorated;
             }
         }

@@ -28,10 +28,8 @@ final class TreeNodeDecoratorRepository
         $this->treeNodeDecorators = new \WeakMap();
     }
 
-    public function decorate(
-        TreeNode $node,
-        ?TreeNodeDecorator $parent,
-    ): TreeNodeDecorator {
+    public function decorate(TreeNode $node): TreeNodeDecorator
+    {
         if ($node instanceof TreeNodeDecorator) {
             return $node;
         }
@@ -44,7 +42,6 @@ final class TreeNodeDecoratorRepository
         return  $this->treeNodeDecorators[$node] =
             new TreeNodeDecorator(
                 node: $node,
-                parent: $parent,
                 repository: $this,
             );
     }
