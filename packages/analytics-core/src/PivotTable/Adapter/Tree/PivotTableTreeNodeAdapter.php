@@ -61,7 +61,7 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): \Traversable
+    public function getChildren(int $level = 1): iterable
     {
         foreach ($this->node->getChildren($level) as $child) {
             if ($child->isNull()) {

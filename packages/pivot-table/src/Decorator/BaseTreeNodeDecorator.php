@@ -11,63 +11,50 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Implementation\TreeNode;
+namespace Rekalogika\PivotTable\Decorator;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
 
-final readonly class NullTreeNode implements TreeNode
+abstract class BaseTreeNodeDecorator implements TreeNode
 {
     public function __construct(
-        private string $name,
-        private mixed $legend,
-        private mixed $item,
-        private bool $isLeaf,
+        private readonly TreeNode $node,
     ) {}
-
-    public static function fromInterface(TreeNode $node): self
-    {
-        return new self(
-            name: $node->getKey(),
-            legend: $node->getLegend(),
-            item: $node->getItem(),
-            isLeaf: $node->isLeaf(),
-        );
-    }
 
     #[\Override]
     public function isLeaf(): bool
     {
-        return $this->isLeaf;
+        return $this->node->isLeaf();
     }
-
 
     #[\Override]
     public function getKey(): string
     {
-        return $this->name;
+        return $this->node->getKey();
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
-        return $this->legend;
+        return $this->node->getLegend();
     }
 
     #[\Override]
     public function getItem(): mixed
     {
-        return $this->item;
+        return $this->node->getItem();
     }
 
     #[\Override]
     public function getValue(): mixed
     {
-        return null;
+        return $this->node->getValue();
     }
 
+    /**
+     * @param int<1,max> $level
+     * @return iterable<TreeNodeDecorator>
+     */
     #[\Override]
-    public function getChildren(int $level = 1): iterable
-    {
-        yield from [];
-    }
+    abstract public function getChildren(int $level = 1): iterable;
 }
