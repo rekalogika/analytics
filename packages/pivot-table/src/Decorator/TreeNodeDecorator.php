@@ -23,24 +23,14 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
     /**
      * @var array<int,list<self>>
      */
-    private array $grandChildrenItems = [];
-
-    /**
-     * @var array<int,list<self>>
-     */
     private array $children = [];
 
     private readonly self $root;
 
-    /**
-     * @var int<0,max>
-     */
-    private int $depth;
-
     public static function decorate(TreeNode $node): self
     {
         $repository = new TreeNodeDecoratorRepository();
-        
+
         return $repository->decorate($node, null);
     }
 
@@ -55,18 +45,14 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
 
         if ($parent === null) {
             $this->root = $this;
-            $this->depth = 0;
         } else {
             $current = $this;
-            $depth = 0;
 
             while ($current->parent !== null) {
                 $current = $current->parent;
-                $depth++;
             }
 
             $this->root = $current;
-            $this->depth = $depth + 1;
         }
 
         parent::__construct($node);
@@ -102,47 +88,33 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         return $this->children[$level] = $result;
     }
 
-    public function getParent(): ?self
-    {
-        return $this->parent;
-    }
-
     /**
-     * @todo implement manual traversal for databases that don't have rollups or
-     * cubes
+     * Gets the unique child items from the perspective of the parent node.
      *
-     * @param int<1,max> $level
+     * @param int<1,max> $childLevel 1 means the immediate children, 2 means
+     * grandchildren, etc.
+     * @param int<0,max> $parentLevel 0 means the current node, 1 means the parent node,
+     * etc.
      * @return list<self>
      */
-    private function getGrandchildren(int $level = 1): array
+    private function getChildrenSeenByParent(int $childLevel, int $parentLevel): array
     {
-        if (isset($this->grandChildrenItems[$level])) {
-            return $this->grandChildrenItems[$level];
-        }
+        $parent = $this->getParentByLevel($parentLevel);
 
-        return $this->grandChildrenItems[$level] = $this->getChildren($level + 1);
+        return $parent->getChildren($childLevel + $parentLevel);
     }
 
     /**
-     * @param int<1,max> $level
-     * @return non-empty-list<self>
+     * @param int<1,max> $childLevel 1 means the immediate children, 2 means
+     * grandchildren, etc.
+     * @param int<0,max> $parentLevel 0 means the current node, 1 means the parent node,
+     * etc.
+     * @return list<self>
      */
-    public function getBalancedChildren(int $level = 1): array
+    public function getBalancedChildren(int $childLevel, int $parentLevel): array
     {
-        if ($this->parent === null) {
-            // If this is the root node, return the children directly
-            $result = $this->getChildren($level);
-
-            if ($result === []) {
-                throw new \LogicException('Root node must have at least one child.');
-            }
-
-            return $result;
-        }
-
-        $children = $this->getChildren($level);
-        // $parentGrandChildren = $this->parent->getGrandchildren($level);
-        $parentGrandChildren = $this->root->getGrandchildren($this->depth + $level);
+        $children = $this->getChildren($childLevel);
+        $childrenSeenByParent = $this->getChildrenSeenByParent($childLevel, $parentLevel);
 
         // create a map of children items to nodes
         $childrenItemsToNodes = ItemToTreeNodeDecoratorMap::create($children);
@@ -151,13 +123,13 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         $result = [];
 
         /** @psalm-suppress MixedAssignment */
-        foreach ($parentGrandChildren as $node) {
-            $item = $node->getItem();
+        foreach ($childrenSeenByParent as $child) {
+            $currentItem = $child->getItem();
 
-            if ($childrenItemsToNodes->exists($item)) {
-                $result[] = $childrenItemsToNodes->get($item);
+            if ($childrenItemsToNodes->exists($currentItem)) {
+                $result[] = $childrenItemsToNodes->get($currentItem);
             } else {
-                $null = NullTreeNode::fromInterface($node);
+                $null = NullTreeNode::fromInterface($child);
                 $decorated = $this->repository->decorate($null, $this);
                 $result[] = $decorated;
             }
@@ -165,5 +137,31 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
 
         /** @var non-empty-list<self> */
         return $result;
+    }
+
+    /**
+     * Gets the parent node at the specified level.
+     *
+     * @param int<0,max> $level The level of the parent node to retrieve. 0
+     * means the current node, 1 means the immediate parent, 2 means the
+     * grandparent, etc.
+     */
+    private function getParentByLevel(int $level): self
+    {
+        $current = $this;
+
+        for ($i = 1; $i <= $level; $i++) {
+            if ($current->parent === null) {
+                throw new \LogicException('Cannot get parent by level: no parent found at level ' . $level);
+            }
+            $current = $current->parent;
+        }
+
+        return $current;
+    }
+
+    public function getParent(): ?self
+    {
+        return $this->parent;
     }
 }

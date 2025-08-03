@@ -101,7 +101,7 @@ final readonly class TreeNodeDebugger
             return $item->trans(new NullTranslator());
         }
 
-        return sprintf(
+        return \sprintf(
             '%s(%s)',
             get_debug_type($item),
             spl_object_id($item),

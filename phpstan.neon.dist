@@ -24,6 +24,9 @@ parameters:
             identifier: property.onlyWritten
             path: packages/analytics-core/src/Time/Dimension/*        
         -
+            identifier: method.nonObject
+            path: tests/src/IntegrationTests/TreeNodeDecoratorTest.php        
+        -
             identifier: property.onlyRead
             path: tests/src/App/Entity/*
         -
