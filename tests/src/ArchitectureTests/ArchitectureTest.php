@@ -621,6 +621,7 @@ final class ArchitectureTest
                 Selector::classname(\IteratorAggregate::class),
                 Selector::classname(\Traversable::class),
                 Selector::classname(\ArrayIterator::class),
+                Selector::classname(\WeakMap::class),
 
                 // misc
                 Selector::classname(\UnitEnum::class),
