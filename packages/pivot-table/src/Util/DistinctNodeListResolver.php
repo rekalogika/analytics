@@ -13,18 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 
 final readonly class DistinctNodeListResolver
 {
     /**
-     * @return list<list<TreeNode>>
+     * @return list<list<TreeNodeDecorator>>
      */
-    public static function getDistinctNodes(TreeNode $node): array
-    {
+    public static function getDistinctNodes(
+        TreeNodeDecorator $node,
+        TreeNodeDecoratorRepository $repository,
+    ): array {
         if ($node->isLeaf()) {
-            throw new \LogicException('Invalid TreeNode type');
+            throw new \LogicException('Invalid TreeNodeDecorator type');
         }
 
         $grandChildrenDistincts = [];
@@ -32,28 +35,31 @@ final readonly class DistinctNodeListResolver
 
         foreach ($node->getChildren() as $child) {
             if (!$child->isLeaf()) {
-                $grandChildrenDistincts[] = self::getDistinctNodes($child);
+                $grandChildrenDistincts[] = self::getDistinctNodes($child, $repository);
             }
         }
 
         $childNulls = [];
 
         foreach ($children as $child) {
-            $childNulls[] = NullTreeNode::fromInterface($child);
+            $nullNode = NullTreeNode::fromInterface($child);
+            $childNulls[] = $repository->decorate($nullNode, $node);
         }
 
         return [
             $childNulls,
-            ...self::mergeDistincts($grandChildrenDistincts),
+            ...self::mergeDistincts($grandChildrenDistincts, $repository),
         ];
     }
 
     /**
-     * @param list<list<list<TreeNode>>> $distincts
-     * @return list<list<TreeNode>>
+     * @param list<list<list<TreeNodeDecorator>>> $distincts
+     * @return list<list<TreeNodeDecorator>>
      */
-    private static function mergeDistincts(array $distincts): array
-    {
+    private static function mergeDistincts(
+        array $distincts,
+        TreeNodeDecoratorRepository $repository,
+    ): array {
         $values = [];
         $merged = [];
 
@@ -69,7 +75,11 @@ final readonly class DistinctNodeListResolver
                     if (!\in_array($node->getItem(), $values[$level], true)) {
                         /** @psalm-suppress MixedAssignment */
                         $values[$level][] = $node->getItem();
-                        $merged[$level][] = NullTreeNode::fromInterface($node);
+
+                        $nullNode = NullTreeNode::fromInterface($node);
+                        $decorated = $repository->decorate($nullNode, null);
+
+                        $merged[$level][] = $decorated;
                     }
                 }
             }

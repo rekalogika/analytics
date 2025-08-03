@@ -13,24 +13,31 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 
 final readonly class BlockContext
 {
     /**
-     * @param list<list<TreeNode>> $distinct
+     * @param list<list<TreeNodeDecorator>> $distinct
      * @param list<string> $pivotedDimensions
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
      * @param int<0,max> $subtotalDepth 0 is not in subtotal, 1 is in subtotal of first level, and so on.
      */
     public function __construct(
+        private TreeNodeDecoratorRepository $repository,
         private array $distinct,
         private array $pivotedDimensions = [],
         private array $skipLegends = [],
         private array $createSubtotals = [],
         private int $subtotalDepth = 0,
     ) {}
+
+    public function getRepository(): TreeNodeDecoratorRepository
+    {
+        return $this->repository;
+    }
 
     public function incrementSubtotal(): self
     {
@@ -40,11 +47,12 @@ final readonly class BlockContext
             skipLegends: $this->skipLegends,
             createSubtotals: $this->createSubtotals,
             subtotalDepth: $this->subtotalDepth + 1,
+            repository: $this->repository,
         );
     }
 
     /**
-     * @return list<TreeNode>
+     * @return list<TreeNodeDecorator>
      */
     public function getDistinctNodesOfLevel(int $level): array
     {
@@ -61,17 +69,17 @@ final readonly class BlockContext
         ));
     }
 
-    public function isPivoted(TreeNode $node): bool
+    public function isPivoted(TreeNodeDecorator $node): bool
     {
         return \in_array($node->getKey(), $this->pivotedDimensions, true);
     }
 
-    public function isLegendSkipped(TreeNode $node): bool
+    public function isLegendSkipped(TreeNodeDecorator $node): bool
     {
         return \in_array($node->getKey(), $this->skipLegends, true);
     }
 
-    public function doCreateSubtotals(TreeNode $node): bool
+    public function doCreateSubtotals(TreeNodeDecorator $node): bool
     {
         return \in_array($node->getKey(), $this->createSubtotals, true);
     }

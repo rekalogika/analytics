@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 
 abstract class NodeBlock extends Block
 {
@@ -23,7 +23,7 @@ abstract class NodeBlock extends Block
      * @param int<0,max> $level
      */
     protected function __construct(
-        private readonly TreeNode $node,
+        private readonly TreeNodeDecorator $node,
         ?Block $parent,
         int $level,
         BlockContext $context,
@@ -41,7 +41,7 @@ abstract class NodeBlock extends Block
         $this->parent = $parent;
     }
 
-    final public function getTreeNode(): TreeNode
+    final public function getTreeNode(): TreeNodeDecorator
     {
         return $this->node;
     }
