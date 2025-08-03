@@ -26,15 +26,9 @@ final readonly class SubtotalTreeNode implements TreeNode
         BlockContext $context,
     ): ?self {
         $children = iterator_to_array($node->getChildren($level));
+        $child = $children[0] ?? null;
 
-        if (\count($children) < 2) {
-            // If the node has less than 2 children, subtotal is not required.
-            return null;
-        }
-
-        $child = $children[0];
-
-        if ($context->doCreateSubtotals($child) === false) {
+        if ($child === null || $context->doCreateSubtotals($child) === false) {
             // If subtotals are not desired for this node, return null.
             return null;
         }
