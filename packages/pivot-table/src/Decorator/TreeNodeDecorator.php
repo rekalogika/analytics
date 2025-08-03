@@ -58,6 +58,11 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         parent::__construct($node);
     }
 
+    public function withParent(self $parent): self
+    {
+        return new self($this->node, $parent, $this->repository);
+    }
+
     public function getRoot(): self
     {
         return $this->root;
@@ -127,7 +132,9 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
             $currentItem = $child->getItem();
 
             if ($childrenItemsToNodes->exists($currentItem)) {
-                $result[] = $childrenItemsToNodes->get($currentItem);
+                $result[] = $childrenItemsToNodes
+                    ->get($currentItem)
+                    ->withParent($this);
             } else {
                 $null = NullTreeNode::fromInterface($child);
                 $decorated = $this->repository->decorate($null, $this);
