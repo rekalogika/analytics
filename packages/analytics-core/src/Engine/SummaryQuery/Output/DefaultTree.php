@@ -32,6 +32,8 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 {
     private ?DefaultMeasure $measure = null;
 
+    private ?bool $isNull = null;
+
     /**
      * @var array<string,DefaultTreeNodes>
      */
@@ -158,7 +160,10 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function isNull(): bool
     {
-        return $this->tuple->last()?->isInterpolation() ?? false;
+        return $this->isNull ??= (
+            ($this->tuple->last()?->isInterpolation() ?? false)
+            || !$this->context->getTable()->hasKey($this->tuple->withoutMeasure())
+        );
     }
 
     #[\Override]
