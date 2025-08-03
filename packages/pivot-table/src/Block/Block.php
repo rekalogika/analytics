@@ -14,16 +14,19 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
-use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
 abstract class Block implements \Stringable
 {
+    public static bool $debug = true;
+
     private ?DefaultContext $elementContext = null;
 
     /**
@@ -57,8 +60,8 @@ abstract class Block implements \Stringable
      * @param int<0,max> $level
      */
     private function createByType(
-        TreeNode $node,
-        ?TreeNode $parentNode,
+        TreeNodeDecorator $node,
+        ?TreeNodeDecorator $parentNode,
         int $level,
         BlockContext $context,
     ): Block {
@@ -83,7 +86,12 @@ abstract class Block implements \Stringable
         } else {
             if ($context->isPivoted($node)) {
                 return new PivotLeafBlock($node, $this, $level, $context);
-            } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
+            } elseif (
+                // ($context->getDistinctNodesOfLevel($level - 1)) === 1) {
+                // $parentNode !== null &&
+                // \count($node->getRoot()->getChildren($level+2)) === 1
+                $parentNode !== null && count($parentNode->getBalancedChildren()) === 1
+            ) {
                 return new SingleNodeLeafBlock($node, $this, $level, $context);
             } else {
                 return new NormalLeafBlock($node, $this, $level, $context);
@@ -103,13 +111,13 @@ abstract class Block implements \Stringable
      * @param int<0,max> $level
      */
     final protected function createBlock(
-        TreeNode $node,
-        ?TreeNode $parentNode,
+        TreeNodeDecorator $node,
+        ?TreeNodeDecorator $parentNode,
         int $level,
     ): Block {
         $context = $this->getContext();
 
-        if ($node instanceof SubtotalTreeNode) {
+        if ($node->isSubtotal()) {
             $context = $this->getContext()->incrementSubtotal();
         }
 
@@ -132,10 +140,16 @@ abstract class Block implements \Stringable
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
-        $distinct = DistinctNodeListResolver::getDistinctNodes($node);
+        // dump(TreeNodeDebugger::debug($node));
+        $decoratorRepository = new TreeNodeDecoratorRepository($node);
+
+        $node = $decoratorRepository->decorate(
+            node: $node,
+            parent: null,
+        );
 
         $context = new BlockContext(
-            distinct: $distinct,
+            decoratorRepository: $decoratorRepository,
             pivotedDimensions: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
@@ -147,37 +161,6 @@ abstract class Block implements \Stringable
     final protected function getContext(): BlockContext
     {
         return $this->context;
-    }
-
-    /**
-     * @param list<TreeNode> $nodes
-     * @return non-empty-list<TreeNode>
-     */
-    final protected function balanceNodes(array $nodes, int $level): array
-    {
-        $distinctNodes = $this->getContext()->getDistinctNodesOfLevel($level);
-
-        $result = [];
-
-        foreach ($distinctNodes as $distinctNode) {
-            $found = false;
-
-            foreach ($nodes as $node) {
-                // @todo fix identity comparison
-                if ($node->getItem() === $distinctNode->getItem()) {
-                    $result[] = $node;
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                $result[] = $distinctNode;
-            }
-        }
-
-        /** @var non-empty-list<TreeNode> $result */
-        return $result;
     }
 
     abstract public function getHeaderRows(): DefaultRows;

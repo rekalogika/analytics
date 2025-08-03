@@ -22,7 +22,7 @@ final class TreeNodeDecoratorRepository
      */
     private \WeakMap $treeNodeDecorators;
 
-    public function __construct()
+    public function __construct(TreeNode $rootNode)
     {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->treeNodeDecorators = new \WeakMap();
@@ -33,9 +33,7 @@ final class TreeNodeDecoratorRepository
         ?TreeNodeDecorator $parent,
     ): TreeNodeDecorator {
         if ($node instanceof TreeNodeDecorator) {
-            throw new \LogicException(
-                'Cannot decorate a node that is already decorated.',
-            );
+            return $node;
         }
 
         if (isset($this->treeNodeDecorators[$node])) {
