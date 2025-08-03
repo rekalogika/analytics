@@ -150,6 +150,7 @@ abstract class BlockGroup extends Block
     {
         return SubtotalTreeNode::create(
             node: $this->node,
+            blockLevel: $this->getLevel(),
             level: $level,
             context: $this->getContext(),
         );
