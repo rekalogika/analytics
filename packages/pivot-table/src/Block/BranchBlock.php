@@ -46,9 +46,7 @@ abstract class BranchBlock extends NodeBlock
     private function createBlockGroup(TreeNodeDecorator $node, int $level): BlockGroup
     {
 
-        /** @var \Traversable<array-key,TreeNodeDecorator> */
         $children = $node->getChildren();
-        $children = iterator_to_array($children);
 
         $firstChild = $children[0]
             ?? $this->getContext()->getDistinctNodesOfLevel($level)[0]
