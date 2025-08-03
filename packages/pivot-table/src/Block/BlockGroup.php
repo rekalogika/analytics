@@ -167,10 +167,13 @@ abstract class BlockGroup extends Block
         }
 
         $children = $this->getRawChildNodes($level);
-        $subtotalNode = $this->getSubtotalNode($level);
 
-        if ($subtotalNode !== null) {
-            $children[] = $subtotalNode;
+        if (\count($children) > 1) {
+            $subtotalNode = $this->getSubtotalNode($level);
+
+            if ($subtotalNode !== null) {
+                $children[] = $subtotalNode;
+            }
         }
 
         return $this->childNodes[$level] = $children;
