@@ -16,8 +16,7 @@ namespace Rekalogika\Analytics\PivotTable\Adapter\Tree;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
 use Rekalogika\Analytics\PivotTable\Util\TreePropertyMap;
-use Rekalogika\PivotTable\Contracts\Tree\TreeNode as PivotTableTreeNode;
-use Rekalogika\PivotTable\Contracts\Tree\TreeNodes;
+use Rekalogika\PivotTable\Contracts\TreeNode as PivotTableTreeNode;
 
 final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
 {
@@ -62,12 +61,20 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): TreeNodes
+    public function getChildren(int $level = 1): \Traversable
     {
-        return new PivotTableTreeNodesAdapter(
-            nodes: $this->node->getChildren($level),
-            propertyMap: $this->propertyMap,
-        );
+        foreach ($this->node->getChildren($level) as $child) {
+            if ($child->isNull()) {
+                continue;
+            }
+
+            yield new self($child, $this->propertyMap);
+        }
+
+        // return new PivotTableTreeNodesAdapter(
+        //     nodes: $this->node->getChildren($level),
+        //     propertyMap: $this->propertyMap,
+        // );
     }
 
     public function getTreeNode(): TreeNode
