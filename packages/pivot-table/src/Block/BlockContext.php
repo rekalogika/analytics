@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 
 final readonly class BlockContext
 {
     /**
-     * @param list<list<TreeNodeDecorator>> $distinct
+     * @param list<list<TreeNode>> $distinct
      * @param list<string> $pivotedDimensions
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
@@ -52,7 +53,7 @@ final readonly class BlockContext
     }
 
     /**
-     * @return list<TreeNodeDecorator>
+     * @return list<TreeNode>
      */
     public function getDistinctNodesOfLevel(int $level): array
     {
@@ -79,7 +80,7 @@ final readonly class BlockContext
         return \in_array($node->getKey(), $this->skipLegends, true);
     }
 
-    public function doCreateSubtotals(TreeNodeDecorator $node): bool
+    public function doCreateSubtotals(TreeNode $node): bool
     {
         return \in_array($node->getKey(), $this->createSubtotals, true);
     }

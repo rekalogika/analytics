@@ -136,8 +136,7 @@ abstract class Block implements \Stringable
     ): Block {
         $repository = new TreeNodeDecoratorRepository();
         $rootNode = $repository->decorate($node, null);
-
-        $distinct = DistinctNodeListResolver::getDistinctNodes($rootNode, $repository);
+        $distinct = DistinctNodeListResolver::getDistinctNodes($node);
 
         $context = new BlockContext(
             distinct: $distinct,
@@ -159,8 +158,11 @@ abstract class Block implements \Stringable
      * @param list<TreeNodeDecorator> $nodes
      * @return non-empty-list<TreeNodeDecorator>
      */
-    final protected function balanceNodes(array $nodes, int $level): array
-    {
+    final protected function balanceNodes(
+        TreeNodeDecorator $parent,
+        array $nodes,
+        int $level,
+    ): array {
         $distinctNodes = $this->getContext()->getDistinctNodesOfLevel($level);
 
         $result = [];
@@ -178,11 +180,15 @@ abstract class Block implements \Stringable
             }
 
             if (!$found) {
-                $result[] = $distinctNode;
+                $result[] = $this->context->getRepository()
+                    ->decorate($distinctNode, $parent);
             }
         }
 
-        /** @var non-empty-list<TreeNodeDecorator> $result */
+        if (\count($result) === 0) {
+            throw new \LogicException('Should not be empty, but got %s');
+        }
+
         return $result;
     }
 

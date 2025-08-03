@@ -45,12 +45,17 @@ abstract class BranchBlock extends NodeBlock
      */
     private function createBlockGroup(TreeNodeDecorator $node, int $level): BlockGroup
     {
-
         $children = $node->getChildren();
 
         $firstChild = $children[0]
             ?? $this->getContext()->getDistinctNodesOfLevel($level)[0]
             ?? null;
+
+        if (!$firstChild instanceof TreeNodeDecorator && $firstChild !== null) {
+            $firstChild = $this->getContext()
+                ->getRepository()
+                ->decorate($firstChild, $node);
+        }
 
         if ($firstChild === null) {
             return new EmptyBlockGroup(
