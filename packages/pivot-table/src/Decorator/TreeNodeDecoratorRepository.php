@@ -28,7 +28,7 @@ final class TreeNodeDecoratorRepository
         $this->treeNodeDecorators = new \WeakMap();
     }
 
-    public function getDecorator(
+    public function decorate(
         TreeNode $node,
         ?TreeNodeDecorator $parent,
     ): TreeNodeDecorator {

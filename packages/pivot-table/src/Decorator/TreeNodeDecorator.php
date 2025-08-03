@@ -50,7 +50,7 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         $result = [];
 
         foreach ($this->node->getChildren($level) as $child) {
-            $result[] = $this->repository->getDecorator($child, $this);
+            $result[] = $this->repository->decorate($child, $this);
         }
 
         return $this->children[$level] = $result;
@@ -105,7 +105,7 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
                 $result[] = $childrenItemsToNodes->get($item);
             } else {
                 $null = NullTreeNode::fromInterface($node);
-                $decorated = $this->repository->getDecorator($null, $this);
+                $decorated = $this->repository->decorate($null, $this);
                 $result[] = $decorated;
             }
         }
