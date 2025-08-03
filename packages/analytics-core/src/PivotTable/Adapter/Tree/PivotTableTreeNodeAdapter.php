@@ -70,11 +70,6 @@ final readonly class PivotTableTreeNodeAdapter implements PivotTableTreeNode
 
             yield new self($child, $this->propertyMap);
         }
-
-        // return new PivotTableTreeNodesAdapter(
-        //     nodes: $this->node->getChildren($level),
-        //     propertyMap: $this->propertyMap,
-        // );
     }
 
     public function getTreeNode(): TreeNode
