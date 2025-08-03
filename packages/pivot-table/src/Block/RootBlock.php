@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class RootBlock extends BranchBlock
 {
     protected function __construct(
-        TreeNode $node,
+        TreeNodeDecorator $node,
         BlockContext $context,
     ) {
         parent::__construct(

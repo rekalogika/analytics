@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
@@ -26,8 +26,8 @@ final class VerticalBlockGroup extends BlockGroup
      * @param int<0,max> $level
      */
     public function __construct(
-        TreeNode $node,
-        ?TreeNode $parentNode,
+        TreeNodeDecorator $node,
+        ?TreeNodeDecorator $parentNode,
         int $level,
         BlockContext $context,
     ) {

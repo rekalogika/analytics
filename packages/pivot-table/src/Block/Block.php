@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
@@ -57,8 +59,8 @@ abstract class Block implements \Stringable
      * @param int<0,max> $level
      */
     private function createByType(
-        TreeNode $node,
-        ?TreeNode $parentNode,
+        TreeNodeDecorator $node,
+        ?TreeNodeDecorator $parentNode,
         int $level,
         BlockContext $context,
     ): Block {
@@ -103,13 +105,13 @@ abstract class Block implements \Stringable
      * @param int<0,max> $level
      */
     final protected function createBlock(
-        TreeNode $node,
-        ?TreeNode $parentNode,
+        TreeNodeDecorator $node,
+        ?TreeNodeDecorator $parentNode,
         int $level,
     ): Block {
         $context = $this->getContext();
 
-        if ($node instanceof SubtotalTreeNode) {
+        if ($node->isSubtotal()) {
             $context = $this->getContext()->incrementSubtotal();
         }
 
@@ -132,16 +134,20 @@ abstract class Block implements \Stringable
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
-        $distinct = DistinctNodeListResolver::getDistinctNodes($node);
+        $repository = new TreeNodeDecoratorRepository();
+        $rootNode = $repository->decorate($node, null);
+
+        $distinct = DistinctNodeListResolver::getDistinctNodes($rootNode, $repository);
 
         $context = new BlockContext(
             distinct: $distinct,
             pivotedDimensions: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
+            repository: $repository,
         );
 
-        return new RootBlock($node, $context);
+        return new RootBlock($rootNode, $context);
     }
 
     final protected function getContext(): BlockContext
@@ -150,8 +156,8 @@ abstract class Block implements \Stringable
     }
 
     /**
-     * @param list<TreeNode> $nodes
-     * @return non-empty-list<TreeNode>
+     * @param list<TreeNodeDecorator> $nodes
+     * @return non-empty-list<TreeNodeDecorator>
      */
     final protected function balanceNodes(array $nodes, int $level): array
     {
@@ -176,7 +182,7 @@ abstract class Block implements \Stringable
             }
         }
 
-        /** @var non-empty-list<TreeNode> $result */
+        /** @var non-empty-list<TreeNodeDecorator> $result */
         return $result;
     }
 
