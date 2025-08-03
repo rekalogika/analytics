@@ -88,7 +88,7 @@ final readonly class SubtotalTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): \Traversable
+    public function getChildren(int $level = 1): iterable
     {
         return $this->node->getChildren($this->level + $level);
     }

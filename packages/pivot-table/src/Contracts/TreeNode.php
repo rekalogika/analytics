@@ -52,7 +52,7 @@ interface TreeNode
      * will return the grandchildren.
      *
      * @param int<1,max> $level
-     * @return \Traversable<TreeNode>
+     * @return iterable<TreeNode>
      */
-    public function getChildren(int $level = 1): \Traversable;
+    public function getChildren(int $level = 1): iterable;
 }
