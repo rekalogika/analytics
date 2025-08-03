@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
+use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
 use Rekalogika\PivotTable\Contracts\TreeNode;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class TreeNodeDebugger
 {
@@ -69,14 +71,40 @@ final readonly class TreeNodeDebugger
             return var_export($item, true);
         }
 
-        if (\is_object($item)) {
-            return \get_class($item) . ':' . spl_object_id($item);
-        }
-
         if (\is_null($item)) {
             return 'null';
         }
 
-        return get_debug_type($item);
+        if ($item instanceof \UnitEnum) {
+            if ($item instanceof \BackedEnum) {
+                return $item->value;
+            }
+
+            return $item->name;
+        }
+
+        if (!\is_object($item)) {
+            return get_debug_type($item);
+        }
+
+        if ($item instanceof \Stringable) {
+            return (string) $item;
+        }
+
+        if (method_exists($item, 'getContent')) {
+            return $this->normalizeItem($item->getContent());
+        }
+
+        // @phpstan-ignore phpat.testPackageRekalogikaPivotTable
+        if ($item instanceof TranslatableInterface) {
+            // @phpstan-ignore phpat.testPackageRekalogikaPivotTable
+            return $item->trans(new NullTranslator());
+        }
+
+        return sprintf(
+            '%s(%s)',
+            get_debug_type($item),
+            spl_object_id($item),
+        );
     }
 }

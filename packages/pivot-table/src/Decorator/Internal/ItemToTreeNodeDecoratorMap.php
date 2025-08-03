@@ -11,7 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Decorator;
+namespace Rekalogika\PivotTable\Decorator\Internal;
+
+use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 
 final class ItemToTreeNodeDecoratorMap
 {

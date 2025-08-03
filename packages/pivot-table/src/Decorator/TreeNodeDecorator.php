@@ -15,6 +15,7 @@ namespace Rekalogika\PivotTable\Decorator;
 
 use Rekalogika\PivotTable\Block\SubtotalTreeNode;
 use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Decorator\Internal\ItemToTreeNodeDecoratorMap;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 
 final class TreeNodeDecorator extends BaseTreeNodeDecorator
@@ -35,6 +36,13 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
      * @var int<0,max>
      */
     private int $depth;
+
+    public static function decorate(TreeNode $node): self
+    {
+        $repository = new TreeNodeDecoratorRepository();
+        
+        return $repository->decorate($node, null);
+    }
 
     public function __construct(
         private readonly TreeNode $node,
