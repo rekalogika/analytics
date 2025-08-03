@@ -35,7 +35,8 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         array $cells,
         private DefaultContext $context,
     ) {
-        $this->cells = $this->mergeCells($cells);
+        // $this->cells = $this->mergeCells($cells);
+        $this->cells = $cells;
     }
 
     #[\Override]
@@ -44,36 +45,36 @@ final readonly class DefaultRow implements \IteratorAggregate, Row
         return $this->context;
     }
 
-    /**
-     * @param list<DefaultCell> $cells
-     * @return list<DefaultCell>
-     */
-    private function mergeCells(array $cells): array
-    {
-        $mergedCells = [];
-        $lastCell = null;
+    // /**
+    //  * @param list<DefaultCell> $cells
+    //  * @return list<DefaultCell>
+    //  */
+    // private function mergeCells(array $cells): array
+    // {
+    //     $mergedCells = [];
+    //     $lastCell = null;
 
-        foreach ($cells as $cell) {
-            if (
-                $lastCell !== null
-                && $lastCell::class === $cell::class
-                && $lastCell->getContent() === $cell->getContent()
-                && $lastCell->getRowSpan() === $cell->getRowSpan()
-            ) {
-                $lastCell = $lastCell
-                    ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
-                array_pop($mergedCells);
-                $mergedCells[] = $lastCell;
-            } else {
-                $mergedCells[] = $cell;
-            }
+    //     foreach ($cells as $cell) {
+    //         if (
+    //             $lastCell !== null
+    //             && $lastCell::class === $cell::class
+    //             && $lastCell->getContent() === $cell->getContent()
+    //             && $lastCell->getRowSpan() === $cell->getRowSpan()
+    //         ) {
+    //             $lastCell = $lastCell
+    //                 ->withColumnSpan($lastCell->getColumnSpan() + $cell->getColumnSpan());
+    //             array_pop($mergedCells);
+    //             $mergedCells[] = $lastCell;
+    //         } else {
+    //             $mergedCells[] = $cell;
+    //         }
 
-            $lastCell = $cell;
-        }
+    //         $lastCell = $cell;
+    //     }
 
-        /** @var list<DefaultCell> */
-        return $mergedCells;
-    }
+    //     /** @var list<DefaultCell> */
+    //     return $mergedCells;
+    // }
 
     #[\Override]
     public function accept(TableVisitor $visitor): mixed
