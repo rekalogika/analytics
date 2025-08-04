@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 
 final readonly class BlockContext
 {
     /**
-     * @param list<list<TreeNodeDecorator>> $distinct
      * @param list<string> $pivotedDimensions
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
@@ -27,7 +27,6 @@ final readonly class BlockContext
      */
     public function __construct(
         private TreeNodeDecoratorRepository $repository,
-        private array $distinct,
         private array $pivotedDimensions = [],
         private array $skipLegends = [],
         private array $createSubtotals = [],
@@ -42,31 +41,12 @@ final readonly class BlockContext
     public function incrementSubtotal(): self
     {
         return new self(
-            distinct: $this->distinct,
             pivotedDimensions: $this->pivotedDimensions,
             skipLegends: $this->skipLegends,
             createSubtotals: $this->createSubtotals,
             subtotalDepth: $this->subtotalDepth + 1,
             repository: $this->repository,
         );
-    }
-
-    /**
-     * @return list<TreeNodeDecorator>
-     */
-    public function getDistinctNodesOfLevel(int $level): array
-    {
-        $result =  $this->distinct[$level] ?? null;
-
-        if ($result !== null) {
-            return $result;
-        }
-
-        throw new \LogicException(\sprintf(
-            'Distinct nodes of level %d not found. Available levels: %s',
-            $level,
-            implode(', ', array_keys($this->distinct)),
-        ));
     }
 
     public function isPivoted(TreeNodeDecorator $node): bool
@@ -79,7 +59,7 @@ final readonly class BlockContext
         return \in_array($node->getKey(), $this->skipLegends, true);
     }
 
-    public function doCreateSubtotals(TreeNodeDecorator $node): bool
+    public function doCreateSubtotals(TreeNode $node): bool
     {
         return \in_array($node->getKey(), $this->createSubtotals, true);
     }

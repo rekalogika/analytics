@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Block;
+namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
 
@@ -20,36 +20,7 @@ final readonly class SubtotalTreeNode implements TreeNode
     /**
      * @param int<1,max> $level
      */
-    public static function create(
-        TreeNode $node,
-        int $level,
-        int $blockLevel,
-        BlockContext $context,
-    ): ?self {
-        $distinctNodes = $context->getDistinctNodesOfLevel($blockLevel);
-        $child = $distinctNodes[0] ?? null;
-
-        if ($child === null || $context->doCreateSubtotals($child) === false) {
-            // If subtotals are not desired for this node, return null.
-            return null;
-        }
-
-        if ($child->getKey() === '@values') {
-            return null;
-        }
-
-        return new self(
-            node: $node,
-            childrenKey: $child->getKey(),
-            isLeaf: $child->isLeaf(),
-            level: $level,
-        );
-    }
-
-    /**
-     * @param int<1,max> $level
-     */
-    private function __construct(
+    public function __construct(
         private TreeNode $node,
         private string $childrenKey,
         private bool $isLeaf,

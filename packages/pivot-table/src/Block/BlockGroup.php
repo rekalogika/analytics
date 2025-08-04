@@ -14,14 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 
 abstract class BlockGroup extends Block
 {
-    /**
-     * @var array<int,list<TreeNodeDecorator>>
-     */
-    private array $rawChildNodes = [];
-
     /**
      * @var array<int,list<TreeNodeDecorator>>
      */
@@ -130,37 +126,34 @@ abstract class BlockGroup extends Block
 
     /**
      * @param int<1,max> $level
-     * @return list<TreeNodeDecorator>
-     */
-    private function getRawChildNodes(int $level = 1): array
-    {
-        if (isset($this->rawChildNodes[$level])) {
-            return $this->rawChildNodes[$level];
-        }
-
-        /** @var list<TreeNodeDecorator> */
-        $children = array_values(iterator_to_array($this->node->getChildren($level), false));
-
-        return $this->rawChildNodes[$level] = $children;
-    }
-
-    /**
-     * @param int<1,max> $level
      */
     private function getSubtotalNode(int $level = 1): ?TreeNodeDecorator
     {
-        $node = SubtotalTreeNode::create(
-            node: $this->node,
-            blockLevel: $this->getLevel(),
-            level: $level,
-            context: $this->getContext(),
-        );
+        $balancedChildren = $this->node->getBalancedChildren($level, $this->getLevel());
+        $child = $balancedChildren[0] ?? null;
 
-        if ($node === null) {
+        // If subtotals are not desired for this node, return null.
+        if ($child === null || $this->getContext()->doCreateSubtotals($child) === false) {
             return null;
         }
 
-        return $this->getContext()->getRepository()->decorate($node, $this->node);
+        // different values cannot be aggregated
+        if ($child->getKey() === '@values') {
+            return null;
+        }
+
+        $subtotalNode = new SubtotalTreeNode(
+            node: $this->node,
+            childrenKey: $child->getKey(),
+            isLeaf: $child->isLeaf(),
+            level: $level,
+        );
+
+        return $this
+            ->getContext()
+            ->getRepository()
+            ->decorate($subtotalNode)
+            ->withParent($this->node);
     }
 
     /**
@@ -173,7 +166,7 @@ abstract class BlockGroup extends Block
             return $this->childNodes[$level];
         }
 
-        $children = $this->getRawChildNodes($level);
+        $children = $this->node->getChildren($level);
 
         if (\count($children) >= 2) {
             $subtotalNode = $this->getSubtotalNode($level);
@@ -196,8 +189,7 @@ abstract class BlockGroup extends Block
             return $this->balancedChildNodes[$level];
         }
 
-        $children = $this->getChildNodes($level);
-        $children = $this->balanceNodes($children, $this->getLevel() + $level - 1);
+        $children = $this->node->getBalancedChildren($level, $this->getLevel());
 
         $subtotalNode = $this->getSubtotalNode($level);
 
