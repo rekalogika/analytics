@@ -147,7 +147,15 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
             }
         }
 
-        /** @var non-empty-list<self> */
+        if ($result === []) {
+            throw new \LogicException(sprintf(
+                'No children found for child level %d and parent level %d in node %s.',
+                $childLevel,
+                $parentLevel,
+                $this->getKey()
+            ));
+        }
+
         return $result;
     }
 
