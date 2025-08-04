@@ -48,16 +48,8 @@ abstract class BranchBlock extends NodeBlock
         $children = $node->getChildren();
 
         $firstChild = $children[0]
-            // ?? $this->getContext()->getDistinctNodesOfLevel($level)[0]
             ?? $node->getBalancedChildren(1, $level)[0]
             ?? null;
-
-        if (!$firstChild instanceof TreeNodeDecorator && $firstChild !== null) {
-            $firstChild = $this->getContext()
-                ->getRepository()
-                ->decorate($firstChild)
-                ->withParent($node);
-        }
 
         if ($firstChild === null) {
             return new EmptyBlockGroup(
