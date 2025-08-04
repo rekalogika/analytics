@@ -23,19 +23,14 @@ final class HorizontalBlockGroup extends BlockGroup
 
     private ?DefaultRows $dataRows = null;
 
-    /**
-     * @param int<0,max> $level
-     */
     public function __construct(
         TreeNodeDecorator $node,
         ?TreeNodeDecorator $parentNode,
-        int $level,
         BlockContext $context,
     ) {
         parent::__construct(
             node: $node,
             parentNode: $parentNode,
-            level: $level,
             context: $context,
         );
     }

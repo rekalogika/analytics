@@ -19,16 +19,12 @@ abstract class NodeBlock extends Block
 {
     private readonly ?BlockGroup $parent;
 
-    /**
-     * @param int<0,max> $level
-     */
     protected function __construct(
         private readonly TreeNodeDecorator $node,
         ?Block $parent,
-        int $level,
         BlockContext $context,
     ) {
-        parent::__construct($level, $context);
+        parent::__construct($context);
 
         if ($parent !== null && !$parent instanceof BlockGroup) {
             throw new \InvalidArgumentException(\sprintf(

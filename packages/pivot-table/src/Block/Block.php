@@ -27,11 +27,7 @@ abstract class Block implements \Stringable
 {
     private ?DefaultContext $elementContext = null;
 
-    /**
-     * @param int<0,max> $level
-     */
     protected function __construct(
-        private readonly int $level,
         private readonly BlockContext $context,
     ) {}
 
@@ -41,59 +37,17 @@ abstract class Block implements \Stringable
         return \sprintf(
             '%s(level: %d)',
             static::class,
-            $this->level,
+            $this->getLevel(),
         );
     }
 
     protected function getElementContext(): DefaultContext
     {
         return $this->elementContext ??= new DefaultContext(
-            depth: $this->level,
+            depth: $this->getLevel(),
             subtotalDepth: $this->getContext()->getSubtotalDepth(),
             generatingBlock: $this,
         );
-    }
-
-    /**
-     * @param int<0,max> $level
-     */
-    private function createByType(
-        TreeNodeDecorator $node,
-        ?TreeNodeDecorator $parentNode,
-        int $level,
-        BlockContext $context,
-    ): Block {
-        if (!$node->isLeaf()) {
-            if ($context->isPivoted($node)) {
-                return new PivotBlock(
-                    node: $node,
-                    parentNode: $parentNode,
-                    parent: $this,
-                    level: $level,
-                    context: $context,
-                );
-            } else {
-                return new NormalBlock(
-                    node: $node,
-                    parentNode: $parentNode,
-                    parent: $this,
-                    level: $level,
-                    context: $context,
-                );
-            }
-        } else {
-            if ($context->isPivoted($node)) {
-                return new PivotLeafBlock($node, $this, $level, $context);
-            } elseif (
-                $parentNode !== null
-                && $level > 0
-                && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
-            ) {
-                return new SingleNodeLeafBlock($node, $this, $level, $context);
-            } else {
-                return new NormalLeafBlock($node, $this, $level, $context);
-            }
-        }
     }
 
     /**
@@ -101,29 +55,66 @@ abstract class Block implements \Stringable
      */
     final protected function getLevel(): int
     {
-        return $this->level;
+        return $this->context->getBlockDepth();
     }
 
     /**
-     * @param int<0,max> $level
+     * @param int<1,max> $levelIncrement
      */
     final protected function createBlock(
         TreeNodeDecorator $node,
         ?TreeNodeDecorator $parentNode,
-        int $level,
+        int $levelIncrement,
     ): Block {
         $context = $this->getContext();
+        $level = $context->getBlockDepth();
+        $context = $context->incrementBlockDepth($levelIncrement);
 
         if ($node->isSubtotal()) {
-            $context = $this->getContext()->incrementSubtotal();
+            $context = $context->incrementSubtotal();
         }
 
-        return self::createByType(
-            node: $node,
-            parentNode: $parentNode,
-            level: $level,
-            context: $context,
-        );
+        if (!$node->isLeaf()) {
+            if ($context->isPivoted($node)) {
+                return new PivotBlock(
+                    node: $node,
+                    parentNode: $parentNode,
+                    parent: $this,
+                    context: $context,
+                );
+            } else {
+                return new NormalBlock(
+                    node: $node,
+                    parentNode: $parentNode,
+                    parent: $this,
+                    context: $context,
+                );
+            }
+        } else {
+            if ($context->isPivoted($node)) {
+                return new PivotLeafBlock(
+                    node: $node,
+                    parent: $this,
+                    context: $context,
+                );
+            } elseif (
+                $parentNode !== null
+                && $level > 0
+                && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
+            ) {
+                return new SingleNodeLeafBlock(
+                    node: $node,
+                    parent: $this,
+                    context: $context,
+                );
+            } else {
+                return new NormalLeafBlock(
+                    node: $node,
+                    parent: $this,
+                    context: $context,
+                );
+            }
+        }
     }
 
     /**
