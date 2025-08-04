@@ -123,7 +123,7 @@ abstract class BlockGroup extends Block
     /**
      * @param int<1,max> $level
      */
-    private function getSubtotalNode(int $level = 1): ?TreeNodeDecorator
+    protected function getSubtotalNode(int $level = 1): ?TreeNodeDecorator
     {
         $balancedChildren = $this->node->getBalancedChildren($level, $this->getLevel());
         $child = $balancedChildren[0] ?? null;

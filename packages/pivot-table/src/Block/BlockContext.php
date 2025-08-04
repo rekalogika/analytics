@@ -72,6 +72,14 @@ final readonly class BlockContext
         return \in_array($node->getKey(), $this->pivotedDimensions, true);
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getPivotedDimensions(): array
+    {
+        return $this->pivotedDimensions;
+    }
+
     public function isLegendSkipped(TreeNodeDecorator $node): bool
     {
         return \in_array($node->getKey(), $this->skipLegends, true);
