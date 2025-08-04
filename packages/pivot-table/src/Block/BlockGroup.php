@@ -38,16 +38,12 @@ abstract class BlockGroup extends Block
      */
     private array $balancedChildBlocks = [];
 
-    /**
-     * @param int<0,max> $level
-     */
     public function __construct(
         private readonly TreeNodeDecorator $node,
         private readonly ?TreeNodeDecorator $parentNode,
-        int $level,
         BlockContext $context,
     ) {
-        parent::__construct($level, $context);
+        parent::__construct($context);
     }
 
     /**
@@ -66,7 +62,7 @@ abstract class BlockGroup extends Block
             $childBlocks[] = $this->createBlock(
                 node: $childNode,
                 parentNode: $this->node,
-                level: $this->getLevel() + $level,
+                levelIncrement: $level,
             );
         }
 
@@ -89,7 +85,7 @@ abstract class BlockGroup extends Block
             $balancedChildBlocks[] = $this->createBlock(
                 node: $childNode,
                 parentNode: $this->node,
-                level: $this->getLevel() + $level,
+                levelIncrement: $level,
             );
         }
 

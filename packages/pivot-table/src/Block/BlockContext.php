@@ -24,6 +24,7 @@ final readonly class BlockContext
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
      * @param int<0,max> $subtotalDepth 0 is not in subtotal, 1 is in subtotal of first level, and so on.
+     * @param int<0,max> $blockDepth 0 is the root block, 1 is the child of the root block, and so on.
      */
     public function __construct(
         private TreeNodeDecoratorRepository $repository,
@@ -31,6 +32,7 @@ final readonly class BlockContext
         private array $skipLegends = [],
         private array $createSubtotals = [],
         private int $subtotalDepth = 0,
+        private int $blockDepth = 0,
     ) {}
 
     public function getRepository(): TreeNodeDecoratorRepository
@@ -41,11 +43,27 @@ final readonly class BlockContext
     public function incrementSubtotal(): self
     {
         return new self(
+            repository: $this->repository,
             pivotedDimensions: $this->pivotedDimensions,
             skipLegends: $this->skipLegends,
             createSubtotals: $this->createSubtotals,
             subtotalDepth: $this->subtotalDepth + 1,
+            blockDepth: $this->blockDepth,
+        );
+    }
+
+    /**
+     * @param int<1,max> $amount
+     */
+    public function incrementBlockDepth(int $amount): self
+    {
+        return new self(
             repository: $this->repository,
+            pivotedDimensions: $this->pivotedDimensions,
+            skipLegends: $this->skipLegends,
+            createSubtotals: $this->createSubtotals,
+            subtotalDepth: $this->subtotalDepth,
+            blockDepth: $this->blockDepth + $amount,
         );
     }
 
@@ -70,5 +88,13 @@ final readonly class BlockContext
     public function getSubtotalDepth(): int
     {
         return $this->subtotalDepth;
+    }
+
+    /**
+     * @return int<0,max>
+     */
+    public function getBlockDepth(): int
+    {
+        return $this->blockDepth;
     }
 }

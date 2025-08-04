@@ -26,7 +26,6 @@ final class RootBlock extends BranchBlock
             node: $node,
             parentNode: null,
             parent: null,
-            level: 0,
             context: $context,
         );
     }
