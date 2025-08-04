@@ -13,6 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
+/**
+ * Represents a property of a element in a pivot table. It can be a label,
+ * value, or dimension member. It wraps the element so that the final renderer
+ * can know if the element is a label, value, or member.
+ */
 interface Property
 {
     public function getContent(): mixed;

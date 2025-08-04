@@ -170,7 +170,8 @@ final class DefaultResult implements Result
         return $query->getLowestLevelPartitionMaxId();
     }
 
-    private function getUnbalancedTable(): DefaultTable
+    #[\Override]
+    public function getCube(): DefaultTable
     {
         $resultContext = new ResultContext(
             metadata: $this->metadata,
@@ -195,7 +196,7 @@ final class DefaultResult implements Result
 
         return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
             query: $this->query,
-            table: $this->getUnbalancedTable(),
+            table: $this->getCube(),
             metadata: $this->metadata,
         );
     }
@@ -209,7 +210,7 @@ final class DefaultResult implements Result
 
         return $this->newTree = DefaultTree::createRoot(
             summaryClass: $this->summaryClass,
-            table: $this->getUnbalancedTable(),
+            table: $this->getCube(),
             normalTable: $this->getUnbalancedNormalTable(),
             dimensionNames: $this->query->getGroupBy(),
             measureNames: $this->query->getSelect(),
@@ -229,7 +230,7 @@ final class DefaultResult implements Result
     public function getTable(): DefaultTable
     {
         if (!$this->hasHierarchicalOrdering()) {
-            return $this->getUnbalancedTable();
+            return $this->getCube()->withoutGroupingRows();
         }
 
         return $this->table ??= BalancedNormalTableToBalancedTableTransformer::transform(normalTable: $this->getNormalTable());

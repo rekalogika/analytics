@@ -30,13 +30,6 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
     private array $rows;
 
     /**
-     * All rows including grouping rows
-     *
-     * @var array<string,DefaultRow>
-     */
-    private array $allRows;
-
-    /**
      * @param class-string $summaryClass
      * @param iterable<DefaultRow> $rows
      */
@@ -46,23 +39,31 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         private ResultContext $context,
     ) {
         $newRows = [];
-        $newAllRows = [];
 
         foreach ($rows as $row) {
-            $newAllRows[$row->getSignature()] = $row;
-
-            if (!$row->isGrouping()) {
-                $newRows[$row->getSignature()] = $row;
-            }
+            $newRows[$row->getSignature()] = $row;
         }
 
         $this->rows = $newRows;
-        $this->allRows = $newAllRows;
     }
 
-    /**
-     * Get row by tuple. Seeks through all rows, including grouping rows.
-     */
+    public function withoutGroupingRows(): self
+    {
+        $rows = (function (): \Traversable {
+            foreach ($this->rows as $row) {
+                if (!$row->isGrouping()) {
+                    yield $row;
+                }
+            }
+        })();
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            rows: $rows,
+            context: $this->context,
+        );
+    }
+
     #[\Override]
     public function getByKey(mixed $key): ?DefaultRow
     {
@@ -72,13 +73,9 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
 
         $signature = $key->getSignature();
 
-        return $this->allRows[$signature] ?? null;
+        return $this->rows[$signature] ?? null;
     }
 
-    /**
-     * Get by index returns the row at the given index. Only seeks through the
-     * rows, not grouping rows.
-     */
     #[\Override]
     public function getByIndex(int $index): ?DefaultRow
     {
@@ -93,10 +90,6 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
         return $this->rows[$signature] ?? null;
     }
 
-    /**
-     * Checks if the table has a row with the given key. Checks through all
-     * rows, including grouping rows.
-     */
     #[\Override]
     public function hasKey(mixed $key): bool
     {
@@ -106,7 +99,7 @@ final readonly class DefaultTable implements Table, \IteratorAggregate
 
         $signature = $key->getSignature();
 
-        return isset($this->allRows[$signature]);
+        return isset($this->rows[$signature]);
     }
 
     #[\Override]

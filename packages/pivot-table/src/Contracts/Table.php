@@ -11,9 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\PivotTable\Contracts;
 
-/**
- * Represents a value of a measure in a pivot table.
- */
-interface Value extends Property {}
+interface Table
+{
+    /**
+     * @return iterable<Row>
+     */
+    public function getRows(): iterable;
+
+    public function getLegend(string $key): mixed;
+}

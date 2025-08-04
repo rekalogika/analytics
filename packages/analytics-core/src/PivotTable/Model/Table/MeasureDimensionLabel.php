@@ -11,16 +11,18 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\Tree;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\PivotTable\Model\Label;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class TreeLabel extends TreeProperty implements Label
+final readonly class MeasureDimensionLabel implements Label
 {
+    public function __construct(private TranslatableInterface $label) {}
+
     #[\Override]
     public function getContent(): TranslatableInterface
     {
-        return $this->getNode()->getLabel();
+        return $this->label;
     }
 }

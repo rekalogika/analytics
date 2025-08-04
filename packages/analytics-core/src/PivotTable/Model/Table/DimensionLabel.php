@@ -11,15 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
+use Rekalogika\Analytics\PivotTable\Model\Label;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * Represents a label of a dimension or measure in a pivot table.
- */
-interface Label extends Property
+final readonly class DimensionLabel extends DimensionProperty implements Label
 {
     #[\Override]
-    public function getContent(): TranslatableInterface;
+    public function getContent(): TranslatableInterface
+    {
+        return $this->getDimension()->getLabel();
+    }
 }
