@@ -98,6 +98,12 @@ final readonly class DefaultTreeNode implements TreeNode
     #[\Override]
     public function getLegend(): mixed
     {
+        $key = $this->getKey();
+
+        if ($key === '@values') {
+            return $this->manager->getMeasureLabel();
+        }
+
         return $this->manager->getLegend($this->getKey());
     }
 
@@ -115,6 +121,18 @@ final readonly class DefaultTreeNode implements TreeNode
                 'Item for key "%s" not found in tuple.',
                 $key,
             ));
+        }
+
+        if ($key === '@values') {
+            if (!\is_string($this->tuple[$key])) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Expected string for key "%s", "%s" given.',
+                    $key,
+                    \gettype($this->tuple[$key]),
+                ));
+            }
+
+            return $this->manager->getLegend($this->tuple[$key]);
         }
 
         return $this->tuple[$key];

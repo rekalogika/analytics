@@ -24,6 +24,7 @@ final class Manager
 
     public function __construct(
         private readonly Table $table,
+        private readonly mixed $measureLabel = 'Values',
         ?IdentityStrategy $identityStrategy = null,
     ) {
         $identityStrategy ??= new DefaultIdentityStrategy();
@@ -31,6 +32,11 @@ final class Manager
         $this->rowRepository = new RowRepository($table, $identityStrategy);
         $this->dimensionRepository = $this->rowRepository
             ->getDimensionRepository();
+    }
+
+    public function getMeasureLabel(): mixed
+    {
+        return $this->measureLabel;
     }
 
     public function getRowRepository(): RowRepository
