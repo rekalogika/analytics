@@ -46,7 +46,7 @@ final class HorizontalBlockGroup extends BlockGroup
         $headerRows = new DefaultRows([], $context);
 
         // add a header and data column for each of the child blocks
-        foreach ($this->getBalancedChildBlocks() as $childBlock) {
+        foreach ($this->getBalancedChildBlocksForHorizontalLayout() as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
@@ -77,11 +77,42 @@ final class HorizontalBlockGroup extends BlockGroup
         $context = $this->getElementContext();
         $dataRows = new DefaultRows([], $context);
 
-        foreach ($this->getBalancedChildBlocks() as $childBlock) {
+        foreach ($this->getBalancedChildBlocksForHorizontalLayout() as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
         return $this->dataRows = $dataRows;
+    }
+
+    /**
+     * @param int<1,max> $level
+     * @return list<Block>
+     */
+    private function getBalancedChildBlocksForHorizontalLayout(int $level = 1): array
+    {
+        $pivotedDimensions = $this->getContext()->getPivotedDimensions();
+        $blocks = [];
+
+        $children = $this->getNode()
+            ->getBalancedChildrenFromNonPivotedParent($level, $pivotedDimensions);
+
+        if (\count($children) > 1) {
+            $subtotalNode = $this->getSubtotalNode($level);
+
+            if ($subtotalNode !== null) {
+                $children[] = $subtotalNode;
+            }
+        }
+
+        foreach ($children as $childNode) {
+            $blocks[] = $this->createBlock(
+                node: $childNode,
+                parentNode: $this->getNode(),
+                levelIncrement: $level,
+            );
+        }
+
+        return $blocks;
     }
 }

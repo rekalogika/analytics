@@ -110,18 +110,99 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         return $parent->getChildren($childLevel + $parentLevel);
     }
 
+    // /**
+    //  * @param int<1,max> $childLevel 1 means the immediate children, 2 means
+    //  * grandchildren, etc.
+    //  * @return list<self>
+    //  */
+    // private function getBalancedChildrenFromParentKey(
+    //     int $childLevel,
+    //     string $parentKey
+    // ): array {
+    //     $parentLevel = $this->getParentLevelByKey($parentKey);
+
+    //     if ($parentLevel === null) {
+    //         return $this->getChildren($childLevel);
+    //     }
+
+    //     if ($parentLevel < 0) {
+    //         throw new \LogicException(\sprintf(
+    //             'Parent level %d is invalid for parent key %s in node %s.',
+    //             $parentLevel,
+    //             $parentKey,
+    //             $this->getKey(),
+    //         ));
+    //     }
+
+    //     return $this->getBalancedChildren($childLevel, $parentLevel);
+    // }
+
+    // /**
+    //  * Gets the first parent node that is not pivoted, or null if all parents
+    //  * are pivoted or if the parent is in the list of pivoted dimensions.
+    //  *
+    //  * @param list<string> $pivotedDimensions
+    //  */
+    // private function getFirstNonPivotedParent(array $pivotedDimensions): self
+    // {
+    //     if (!\in_array($this->getKey(), $pivotedDimensions, true)) {
+    //         return $this;
+    //     }
+
+    //     if ($this->parent === null) {
+    //         return $this;
+    //     }
+
+    //     return $this->parent->getFirstNonPivotedParent($pivotedDimensions);
+    // }
+
+    // private function getFirstNonPivotedParentLevel(array $pivotedDimensions): ?int
+    // {
+    //     if (!\in_array($this->getKey(), $pivotedDimensions, true)) {
+    //         return 0;
+    //     }
+
+    //     if ($this->parent === null) {
+    //         return null;
+    //     }
+
+    //     $parentLevel = $this->parent->getFirstNonPivotedParentLevel($pivotedDimensions);
+
+    //     if ($parentLevel === null) {
+    //         return null;
+    //     }
+
+    //     return $parentLevel + 1;
+    // }
+
+    // private function getParentLevelByKey(string $parentKey): ?int
+    // {
+    //     $parent = $this->parent;
+
+    //     if ($parent === null) {
+    //         return null;
+    //     }
+
+    //     if ($parent->getKey() === $parentKey) {
+    //         return 0;
+    //     }
+
+    //     $parentResult = $parent->getParentLevelByKey($parentKey);
+
+    //     if ($parentResult === null) {
+    //         return null;
+    //     }
+
+    //     return $parentResult + 1;
+    // }
+
     /**
-     * @param int<1,max> $childLevel 1 means the immediate children, 2 means
-     * grandchildren, etc.
-     * @param int<0,max> $parentLevel 0 means the current node, 1 means the parent node,
-     * etc.
+     * @param list<self> $children
+     * @param non-empty-list<self> $childrenPrototype
      * @return list<self>
      */
-    public function getBalancedChildren(int $childLevel, int $parentLevel): array
+    private function doBalanceChildren(array $children, array $childrenPrototype): array
     {
-        $children = $this->getChildren($childLevel);
-        $childrenSeenByParent = $this->getChildrenSeenByParent($childLevel, $parentLevel);
-
         // create a map of children items to nodes
         $childrenItemsToNodes = ItemToTreeNodeDecoratorMap::create($children);
 
@@ -129,7 +210,7 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         $result = [];
 
         /** @psalm-suppress MixedAssignment */
-        foreach ($childrenSeenByParent as $child) {
+        foreach ($childrenPrototype as $child) {
             $currentItem = $child->getItem();
 
             if ($childrenItemsToNodes->exists($currentItem)) {
@@ -147,6 +228,33 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
             }
         }
 
+        return $result;
+    }
+
+    /**
+     *
+     * @param int<1,max> $childLevel 1 means the immediate children, 2 means
+     * grandchildren, etc.
+     * @param int<0,max> $parentLevel 0 means the current node, 1 means the parent node,
+     * etc.
+     * @return list<self>
+     */
+    public function getBalancedChildren(int $childLevel, int $parentLevel): array
+    {
+        $children = $this->getChildren($childLevel);
+        $childrenSeenByParent = $this->getChildrenSeenByParent($childLevel, $parentLevel);
+
+        if (\count($childrenSeenByParent) === 0) {
+            throw new \LogicException(\sprintf(
+                'No children found for child level %d and parent level %d in node %s.',
+                $childLevel,
+                $parentLevel,
+                $this->getKey(),
+            ));
+        }
+
+        $result = $this->doBalanceChildren($children, $childrenSeenByParent);
+
         if ($result === []) {
             throw new \LogicException(\sprintf(
                 'No children found for child level %d and parent level %d in node %s.',
@@ -157,6 +265,75 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         }
 
         return $result;
+    }
+
+    /**
+     * Gets the balanced children from a non-pivoted parent node.
+     *
+     * @param int<1,max> $childLevel 1 means the immediate children, 2 means
+     * grandchildren, etc.
+     * @param list<string> $pivotedDimensions The list of pivoted dimensions.
+     * @return list<self>
+     */
+    public function getBalancedChildrenFromNonPivotedParent(
+        int $childLevel,
+        array $pivotedDimensions,
+    ): array {
+        $children = $this->getChildren($childLevel);
+
+        // determine the suitable parent for getting the prototypes
+
+        $parent = $this;
+        $parentLevel = 0;
+
+        // @todo fix this logic
+
+        while (true) {
+            if ($parent->parent === null) {
+                // if the parent is null, we are at the root node
+                break;
+            }
+
+            $parent = $parent->parent;
+            $parentLevel++;
+        }
+
+        // while (true) {
+        //     if ($parent->parent === null) {
+        //         // if the parent is null, we are at the root node
+        //         break;
+        //     }
+
+        //     if (!\in_array($parent->parent->getKey(), $pivotedDimensions, true)) {
+        //         break;
+        //     }
+
+        //     // if ($parent->parent === null) {
+        //     //     break;
+        //     // }
+
+        //     $parent = $parent->parent;
+        //     $parentLevel++;
+        // }
+
+        // if ($parent->getKey() === '@values' && $parent->parent !== null) {
+        //     $parent = $parent->parent;
+        //     $parentLevel++;
+        // }
+
+        // end
+
+        $childrenPrototype = $parent->getChildren($childLevel + $parentLevel);
+
+        if (\count($childrenPrototype) === 0) {
+            throw new \LogicException(\sprintf(
+                'No children found for child level %d in non-pivoted parent node %s.',
+                $childLevel,
+                $parent->getKey(),
+            ));
+        }
+
+        return $this->doBalanceChildren($children, $childrenPrototype);
     }
 
     /**
