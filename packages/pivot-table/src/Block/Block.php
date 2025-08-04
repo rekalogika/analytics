@@ -22,7 +22,6 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
-use Rekalogika\PivotTable\Util\DistinctNodeListResolver;
 
 abstract class Block implements \Stringable
 {
@@ -85,7 +84,11 @@ abstract class Block implements \Stringable
         } else {
             if ($context->isPivoted($node)) {
                 return new PivotLeafBlock($node, $this, $level, $context);
-            } elseif (\count($context->getDistinctNodesOfLevel($level - 1)) === 1) {
+            } elseif (
+                $parentNode !== null
+                && $level > 0
+                && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
+            ) {
                 return new SingleNodeLeafBlock($node, $this, $level, $context);
             } else {
                 return new NormalLeafBlock($node, $this, $level, $context);
@@ -136,10 +139,8 @@ abstract class Block implements \Stringable
     ): Block {
         $repository = new TreeNodeDecoratorRepository();
         $rootNode = $repository->decorate($node);
-        $distinct = DistinctNodeListResolver::getDistinctNodes($node);
 
         $context = new BlockContext(
-            distinct: $distinct,
             pivotedDimensions: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
@@ -152,45 +153,6 @@ abstract class Block implements \Stringable
     final protected function getContext(): BlockContext
     {
         return $this->context;
-    }
-
-    /**
-     * @param list<TreeNodeDecorator> $nodes
-     * @return non-empty-list<TreeNodeDecorator>
-     */
-    final protected function balanceNodes(
-        TreeNodeDecorator $parent,
-        array $nodes,
-        int $level,
-    ): array {
-        $distinctNodes = $this->getContext()->getDistinctNodesOfLevel($level);
-
-        $result = [];
-
-        foreach ($distinctNodes as $distinctNode) {
-            $found = false;
-
-            foreach ($nodes as $node) {
-                // @todo fix identity comparison
-                if ($node->getItem() === $distinctNode->getItem()) {
-                    $result[] = $node;
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                $result[] = $this->context->getRepository()
-                    ->decorate($distinctNode)
-                    ->withParent($parent);
-            }
-        }
-
-        if (\count($result) === 0) {
-            throw new \LogicException('Should not be empty, but got %s');
-        }
-
-        return $result;
     }
 
     abstract public function getHeaderRows(): DefaultRows;

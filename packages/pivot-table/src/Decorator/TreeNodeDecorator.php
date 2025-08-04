@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Decorator;
 
-use Rekalogika\PivotTable\Block\SubtotalTreeNode;
 use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Decorator\Internal\ItemToTreeNodeDecoratorMap;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 use Rekalogika\PivotTable\Util\TreeNodeDebugger;
 
 final class TreeNodeDecorator extends BaseTreeNodeDecorator

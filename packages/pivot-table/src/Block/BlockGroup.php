@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 
 abstract class BlockGroup extends Block
 {
@@ -128,21 +129,30 @@ abstract class BlockGroup extends Block
      */
     private function getSubtotalNode(int $level = 1): ?TreeNodeDecorator
     {
-        $node = SubtotalTreeNode::create(
-            node: $this->node,
-            blockLevel: $this->getLevel(),
-            level: $level,
-            context: $this->getContext(),
-        );
+        $balancedChildren = $this->node->getBalancedChildren($level, $this->getLevel());
+        $child = $balancedChildren[0] ?? null;
 
-        if ($node === null) {
+        // If subtotals are not desired for this node, return null.
+        if ($child === null || $this->getContext()->doCreateSubtotals($child) === false) {
             return null;
         }
+
+        // different values cannot be aggregated
+        if ($child->getKey() === '@values') {
+            return null;
+        }
+
+        $subtotalNode = new SubtotalTreeNode(
+            node: $this->node,
+            childrenKey: $child->getKey(),
+            isLeaf: $child->isLeaf(),
+            level: $level,
+        );
 
         return $this
             ->getContext()
             ->getRepository()
-            ->decorate($node)
+            ->decorate($subtotalNode)
             ->withParent($this->node);
     }
 
