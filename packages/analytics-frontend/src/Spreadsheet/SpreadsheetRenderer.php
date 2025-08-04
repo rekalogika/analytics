@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableTreeNodeAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter as TableTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 
@@ -63,11 +63,13 @@ final readonly class SpreadsheetRenderer
         Result $result,
         array $pivotedDimensions = [],
     ): Spreadsheet {
-        $treeResult = $result->getTree();
-        $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
+        $dimensions = $result->getDimensionNames();
+        $cube = $result->getCube();
+        $pivotTable = TableTableAdapter::adapt($cube);
 
-        $table = PivotTableTransformer::transformTreeToTable(
-            node: $pivotTable,
+        $table = PivotTableTransformer::transformTableToTable(
+            table: $pivotTable,
+            unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
             createSubtotals: $result->getDimensionNames(),

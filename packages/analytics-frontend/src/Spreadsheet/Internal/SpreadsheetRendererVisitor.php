@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Spreadsheet\Internal;
 
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
-use Rekalogika\Analytics\PivotTable\Model\Tree\TreeProperty;
+use Rekalogika\Analytics\PivotTable\Model\Table\DimensionProperty;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\FooterCell;
@@ -48,7 +48,7 @@ final readonly class SpreadsheetRendererVisitor implements TableVisitor
         $columnSpan = $cell->getColumnSpan();
         $rowSpan = $cell->getRowSpan();
 
-        if ($content instanceof TreeProperty) {
+        if ($content instanceof DimensionProperty) {
             /** @psalm-suppress MixedAssignment */
             $content = $content->getContent();
         }

@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\Tree;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\PivotTable\Model\Member;
 
-final readonly class TreeMember extends TreeProperty implements Member
+final readonly class DimensionMember extends DimensionProperty implements Member
 {
     #[\Override]
     public function getContent(): mixed
     {
-        return $this->getNode()->getDisplayMember();
+        return $this->getDimension()->getDisplayMember();
     }
 }

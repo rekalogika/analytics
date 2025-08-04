@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableTreeNodeAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\TableFramework\Manager;
 use Rekalogika\PivotTable\Util\TreeNodeDebugger;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -38,7 +39,9 @@ final class TreeNodeDecoratorTest extends KernelTestCase
 
         $result = $query->getResult();
 
-        $treeNode = PivotTableTreeNodeAdapter::adapt($result->getTree());
+        $tableAdapter = TableAdapter::adapt($result->getCube());
+        $manager = new Manager($tableAdapter);
+        $treeNode = $manager->createTree(['customerCountry', 'customerType', 'customerGender', '@values']);
         $node = TreeNodeDecorator::decorate($treeNode);
 
         $canada = $this->find(

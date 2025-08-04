@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
+/**
+ * Represents a value of a measure in a pivot table.
+ */
 interface Value extends Property {}

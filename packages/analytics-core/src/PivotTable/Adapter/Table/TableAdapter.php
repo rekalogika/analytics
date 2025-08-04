@@ -14,10 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
 use Rekalogika\Analytics\Contracts\Result\Table;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
+use Rekalogika\Analytics\PivotTable\Model\Table\MeasureDimensionLabel;
+use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
 use Rekalogika\PivotTable\Contracts\Table as PivotTableTable;
 
 final readonly class TableAdapter implements PivotTableTable
 {
+    public static function adapt(Table $table): self
+    {
+        return new self($table);
+    }
+
     /**
      * @var array<string,mixed>
      */
@@ -28,17 +36,23 @@ final readonly class TableAdapter implements PivotTableTable
      */
     private array $rows;
 
-    public function __construct(
+    private TablePropertyMap $propertyMap;
+
+    private function __construct(
         private readonly Table $table,
     ) {
+        $this->propertyMap = new TablePropertyMap();
+
         $rows = [];
         $legends = [];
 
         foreach ($this->table as $row) {
-            $rowAdapter = new RowAdapter($row);
+            $rowAdapter = new RowAdapter($row, $this->propertyMap);
             $rows[] = $rowAdapter;
             $legends = array_merge($legends, $rowAdapter->getLegends());
         }
+
+        $legends['@values'] = new MeasureDimensionLabel(new TranslatableMessage('Values'));
 
         $this->rows = $rows;
         $this->legends = $legends;

@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Model;
 
+/**
+ * Represents a member of a dimension in a pivot table.
+ */
 interface Member extends Property {}

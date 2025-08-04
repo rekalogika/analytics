@@ -98,12 +98,6 @@ final readonly class DefaultTreeNode implements TreeNode
     #[\Override]
     public function getLegend(): mixed
     {
-        $key = $this->getKey();
-
-        if ($key === '@values') {
-            return $this->manager->getMeasureLabel();
-        }
-
         return $this->manager->getLegend($this->getKey());
     }
 

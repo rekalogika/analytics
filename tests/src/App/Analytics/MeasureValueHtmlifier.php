@@ -17,11 +17,11 @@ use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
-use Rekalogika\Analytics\PivotTable\Model\Tree\TreeValue;
+use Rekalogika\Analytics\PivotTable\Model\Table\MeasureValue;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
+final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
 {
     private ?Htmlifier $htmlifier = null;
 
@@ -56,12 +56,12 @@ final class TreePropertyHtmlifier implements Htmlifier, HtmlifierAware
     #[\Override]
     public function toHtml(mixed $input): string
     {
-        if (!$input instanceof TreeValue) {
+        if (!$input instanceof MeasureValue) {
             throw new ValueNotSupportedException();
         }
 
-        $node = $input->getNode();
-        $tuple = $node->getTuple();
+        $row = $input->getRow();
+        $tuple = $row->getTuple();
 
         $tupleDto = $this->tupleMapper->toDto($tuple);
         $string = json_encode($tupleDto->toArray());
