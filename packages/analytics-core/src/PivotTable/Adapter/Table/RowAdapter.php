@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
 use Rekalogika\PivotTable\Contracts\Row as PivotTableRow;
 
 final readonly class RowAdapter implements PivotTableRow
 {
     public function __construct(
-        private Row $row,
+        private Cell $cell,
         private TablePropertyMap $propertyMap,
     ) {}
 
     #[\Override]
     public function getDimensions(): iterable
     {
-        foreach ($this->row->getTuple() as $key => $dimension) {
+        foreach ($this->cell->getTuple() as $key => $dimension) {
             yield $key => $this->propertyMap->getDimensionMember($dimension);
         }
     }
@@ -35,10 +35,10 @@ final readonly class RowAdapter implements PivotTableRow
     #[\Override]
     public function getMeasures(): iterable
     {
-        foreach ($this->row->getMeasures() as $key => $_) {
+        foreach ($this->cell->getMeasures() as $key => $_) {
             yield $key =>
                 $this->propertyMap
-                ->getMeasureValue($this->row)
+                ->getMeasureValue($this->cell)
                 ->withMeasureName($key);
         }
     }
@@ -50,14 +50,14 @@ final readonly class RowAdapter implements PivotTableRow
     {
         $legends = [];
 
-        foreach ($this->row->getTuple() as $key => $dimension) {
+        foreach ($this->cell->getTuple() as $key => $dimension) {
             $legends[$key] = $this->propertyMap->getDimensionLabel($dimension);
         }
 
-        foreach ($this->row->getMeasures() as $key => $_) {
+        foreach ($this->cell->getMeasures() as $key => $_) {
             $legends[$key] =
                 $this->propertyMap
-                ->getMeasureLabel($this->row)
+                ->getMeasureLabel($this->cell)
                 ->withMeasureName($key);
         }
 

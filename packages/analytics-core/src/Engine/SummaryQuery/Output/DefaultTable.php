@@ -103,6 +103,9 @@ final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
         return isset($this->rows[$signature]);
     }
 
+    /**
+     * @return class-string
+     */
     #[\Override]
     public function getSummaryClass(): string
     {

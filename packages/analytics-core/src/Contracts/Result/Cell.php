@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
-
 /**
- * A query result in cube format.
+ * Represent a cell in a cube. A cell has a tuple and one or more measures
+ * associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.
- *
- * @extends OrderedMapCollection<Tuple,Cell>
  */
-interface Cube extends OrderedMapCollection
+interface Cell
 {
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
+    public function getTuple(): Tuple;
+
+    public function getMeasures(): Measures;
 }

@@ -14,19 +14,19 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\PivotTable\Model\Value;
 
 final readonly class MeasureValue implements Value
 {
     public function __construct(
-        private Row $row,
+        private Cell $cell,
         private ?string $measureName = null,
     ) {}
 
     public function withMeasureName(string $measureName): self
     {
-        return new self($this->row, $measureName);
+        return new self($this->cell, $measureName);
     }
 
     #[\Override]
@@ -36,7 +36,7 @@ final readonly class MeasureValue implements Value
             throw new InvalidArgumentException('Measure name must be set before getting content.');
         }
 
-        return $this->row
+        return $this->cell
             ->getMeasures()
             ->getByKey($this->measureName)
             ?->getValue()
@@ -45,8 +45,8 @@ final readonly class MeasureValue implements Value
             );
     }
 
-    public function getRow(): Row
+    public function getCell(): Cell
     {
-        return $this->row;
+        return $this->cell;
     }
 }
