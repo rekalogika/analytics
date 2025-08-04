@@ -43,5 +43,5 @@ interface Result
 
     public function getTable(): Table;
 
-    public function getCube(): Table;
+    public function getCube(): Cube;
 }

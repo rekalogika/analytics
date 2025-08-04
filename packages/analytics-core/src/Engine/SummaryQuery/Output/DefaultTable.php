@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Rekalogika\Analytics\Contracts\Result\Cube;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -20,7 +21,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 /**
  * @implements \IteratorAggregate<Tuple,DefaultRow>
  */
-final readonly class DefaultTable implements Table, \IteratorAggregate
+final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
 {
     /**
      * Non-grouping rows
