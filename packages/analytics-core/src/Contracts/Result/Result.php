@@ -42,4 +42,6 @@ interface Result
     public function getNormalTable(): NormalTable;
 
     public function getTable(): Table;
+
+    public function getCube(): Table;
 }

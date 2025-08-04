@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\Tree\PivotTableTreeNodeAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter as TableTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 use Twig\Environment;
@@ -166,11 +166,13 @@ final readonly class TableRenderer
         array $pivotedDimensions = ['@values'],
         ?string $theme = null,
     ): string {
-        $treeResult = $result->getTree();
-        $pivotTable = PivotTableTreeNodeAdapter::adapt($treeResult);
+        $dimensions = $result->getDimensionNames();
+        $tableResult = $result->getCube();
+        $pivotTable = new TableTableAdapter($tableResult);
 
-        $table = PivotTableTransformer::transformTreeToTable(
-            node: $pivotTable,
+        $table = PivotTableTransformer::transformTableToTable(
+            table: $pivotTable,
+            unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
             createSubtotals: $result->getDimensionNames(),
