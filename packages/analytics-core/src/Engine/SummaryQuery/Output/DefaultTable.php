@@ -31,13 +31,11 @@ final class DefaultTable implements Table, \IteratorAggregate
     private readonly array $dimensionality;
 
     /**
-     * @var \ArrayObject<int<0,max>,DefaultCell>
+     * @var \ArrayObject<int<0,max>,DefaultCell>|null
+     * @phpstan-ignore property.unusedType
      */
     private ?\ArrayObject $rows = null;
 
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(private readonly ResultContext $context)
     {
         $this->cellRepository = $context->getCellRepository();
@@ -46,7 +44,7 @@ final class DefaultTable implements Table, \IteratorAggregate
         // remove @values from dimensionality
         $this->dimensionality = array_values(array_filter(
             $dimensionality,
-            static fn (string $dimension) => $dimension !== '@values',
+            static fn(string $dimension) => $dimension !== '@values',
         ));
     }
 
@@ -73,8 +71,10 @@ final class DefaultTable implements Table, \IteratorAggregate
             ->getCellsByDimensionality($this->dimensionality);
 
         $rows = array_values(iterator_to_array($rows));
+        /** @var \ArrayObject<int<0,max>,DefaultCell> */
+        $array = new \ArrayObject($rows);
 
-        return $this->rows = new \ArrayObject($rows);
+        return $this->rows = $array;
     }
 
     #[\Override]

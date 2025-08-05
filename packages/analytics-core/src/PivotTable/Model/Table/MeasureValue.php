@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\PivotTable\Model\Value;
 
 final readonly class MeasureValue implements Value
 {
     public function __construct(
-        private Cell $cell,
+        private CubeCell $cell,
         private ?string $measureName = null,
     ) {}
 
@@ -45,7 +45,7 @@ final readonly class MeasureValue implements Value
             );
     }
 
-    public function getCell(): Cell
+    public function getCell(): CubeCell
     {
         return $this->cell;
     }

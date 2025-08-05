@@ -177,6 +177,7 @@ final class ArchitectureTest
                 Selector::classname(\Countable::class),
                 Selector::classname(\ArrayIterator::class),
                 Selector::classname(\WeakMap::class),
+                Selector::classname(\ArrayObject::class),
             );
     }
 

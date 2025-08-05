@@ -69,6 +69,12 @@ final readonly class NullTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
+    public function getDimensionality(): array
+    {
+        return array_keys($this->dimensions);
+    }
+
+    #[\Override]
     public function getByKey(mixed $key): ?NullDimension
     {
         return $this->dimensions[$key] ?? null;

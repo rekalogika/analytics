@@ -26,6 +26,11 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     private ?string $signature = null;
 
     /**
+     * @var list<string>|null
+     */
+    private ?array $dimensionality = null;
+
+    /**
      * @var array<string,DefaultDimension>
      */
     private readonly array $dimensions;
@@ -59,6 +64,25 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: [...$this->dimensions, $dimension],
+            condition: $this->condition,
+        );
+    }
+
+    public function without(string $dimensionName): static
+    {
+        if (!isset($this->dimensions[$dimensionName])) {
+            throw new UnexpectedValueException(\sprintf(
+                'Dimension "%s" not found in tuple',
+                $dimensionName,
+            ));
+        }
+
+        $dimensionsWithout = $this->dimensions;
+        unset($dimensionsWithout[$dimensionName]);
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            dimensions: $dimensionsWithout,
             condition: $this->condition,
         );
     }
@@ -197,6 +221,32 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         );
 
         return $this->signature = hash('xxh128', serialize($signatures));
+    }
+
+    /**
+     * @return list<string>
+     */
+    #[\Override]
+    public function getDimensionality(): array
+    {
+        if ($this->dimensionality !== null) {
+            return $this->dimensionality;
+        }
+
+        $dimensionality = array_keys($this->dimensions);
+        sort($dimensionality);
+
+        return $this->dimensionality = $dimensionality;
+    }
+
+    /**
+     * @param list<string> $dimensionality
+     */
+    public function hasDimensionality(array $dimensionality): bool
+    {
+        sort($dimensionality);
+
+        return $this->getDimensionality() === $dimensionality;
     }
 
     public function getWithoutValues(): self

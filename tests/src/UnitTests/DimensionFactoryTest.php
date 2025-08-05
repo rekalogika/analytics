@@ -24,7 +24,10 @@ final class DimensionFactoryTest extends TestCase
 {
     public function testNullLast(): void
     {
-        $dimensionFactory = new DimensionFactory(new HardcodedOrderByResolver(Order::Ascending));
+        $dimensionFactory = new DimensionFactory(
+            orderByResolver: new HardcodedOrderByResolver(Order::Ascending),
+            nodesLimit: 1000,
+        );
 
         $dimensionFactory->createDimension(
             label: new TranslatableMessage('Female'),

@@ -122,28 +122,28 @@ final readonly class ResultDebugger
         return $result;
     }
 
-    /**
-     * @return array<string,list<string>|string>
-     */
-    public static function debugNormalRow(NormalRow $row): array
-    {
-        return [
-            'tuple' => self::debugTuple($row->getTuple()),
-            'measure' => self::debugMeasure($row->getMeasure()),
-        ];
-    }
+    // /**
+    //  * @return array<string,list<string>|string>
+    //  */
+    // public static function debugNormalRow(NormalRow $row): array
+    // {
+    //     return [
+    //         'tuple' => self::debugTuple($row->getTuple()),
+    //         'measure' => self::debugMeasure($row->getMeasure()),
+    //     ];
+    // }
 
-    /**
-     * @return list<array<string,list<string>|string>>
-     */
-    public static function debugNormalTable(NormalTable $table): array
-    {
-        $result = [];
+    // /**
+    //  * @return list<array<string,list<string>|string>>
+    //  */
+    // public static function debugNormalTable(NormalTable $table): array
+    // {
+    //     $result = [];
 
-        foreach ($table as $row) {
-            $result[] = self::debugNormalRow($row);
-        }
+    //     foreach ($table as $row) {
+    //         $result[] = self::debugNormalRow($row);
+    //     }
 
-        return $result;
-    }
+    //     return $result;
+    // }
 }

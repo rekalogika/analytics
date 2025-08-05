@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\PivotTable\Model\Label;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class MeasureLabel implements Label
 {
     public function __construct(
-        private Cell $cell,
+        private CubeCell $cell,
         private ?string $measureName = null,
     ) {}
 
@@ -46,7 +46,7 @@ final readonly class MeasureLabel implements Label
             );
     }
 
-    public function getRow(): Cell
+    public function getRow(): CubeCell
     {
         return $this->cell;
     }

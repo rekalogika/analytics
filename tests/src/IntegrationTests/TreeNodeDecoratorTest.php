@@ -39,7 +39,7 @@ final class TreeNodeDecoratorTest extends KernelTestCase
 
         $result = $query->getResult();
 
-        $tableAdapter = TableAdapter::adapt($result->getCube());
+        $tableAdapter = TableAdapter::adapt($result);
         $manager = new Manager($tableAdapter);
         $treeNode = $manager->createTree(['customerCountry', 'customerType', 'customerGender', '@values']);
         $node = TreeNodeDecorator::decorate($treeNode);

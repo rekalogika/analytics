@@ -13,14 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
-use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
 use Rekalogika\PivotTable\Contracts\Row as PivotTableRow;
 
 final readonly class RowAdapter implements PivotTableRow
 {
     public function __construct(
-        private Cell $cell,
+        private CubeCell $cell,
         private TablePropertyMap $propertyMap,
     ) {}
 
@@ -28,7 +30,19 @@ final readonly class RowAdapter implements PivotTableRow
     public function getDimensions(): iterable
     {
         foreach ($this->cell->getTuple() as $key => $dimension) {
-            yield $key => $this->propertyMap->getDimensionMember($dimension);
+            if ($key === '@values') {
+                $member = $dimension->getMember();
+
+                if (!$member instanceof MeasureMember) {
+                    throw new LogicException(
+                        'Expected a MeasureMember for the "@values" dimension, but got: ' . get_debug_type($member),
+                    );
+                }
+
+                yield $key => $member->getMeasureProperty();
+            } else {
+                yield $key => $this->propertyMap->getDimensionMember($dimension);
+            }
         }
     }
 

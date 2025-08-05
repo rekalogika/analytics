@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionCollection;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\MetadataOrderByResolver;
@@ -23,27 +24,48 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 /**
  * @internal
  */
-final class ResultContext
+final readonly class ResultContext
 {
-    private readonly DimensionCollection $dimensionCollection;
+    private DimensionCollection $dimensionCollection;
 
-    private readonly DimensionFactory $dimensionFactory;
+    private DimensionFactory $dimensionFactory;
 
-    private readonly NullMeasureCollection $nullMeasureCollection;
+    private NullMeasureCollection $nullMeasureCollection;
+
+    private CellRepository $cellRepository;
 
     public function __construct(
-        SummaryMetadata $metadata,
-        DefaultQuery $query,
+        private SummaryMetadata $metadata,
+        private DefaultQuery $query,
+        int $nodesLimit,
     ) {
+        $orderByResolver = new MetadataOrderByResolver(
+            metadata: $metadata,
+            query: $query,
+        );
+
         $this->dimensionFactory = new DimensionFactory(
-            new MetadataOrderByResolver(
-                metadata: $metadata,
-                query: $query,
-            ),
+            orderByResolver: $orderByResolver,
+            nodesLimit: $nodesLimit,
         );
 
         $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
         $this->nullMeasureCollection = new NullMeasureCollection();
+
+        $this->cellRepository = new CellRepository(
+            dimensionCollection: $this->dimensionCollection,
+            nullMeasureCollection: $this->nullMeasureCollection,
+        );
+    }
+
+    public function getQuery(): DefaultQuery
+    {
+        return $this->query;
+    }
+
+    public function getMetadata(): SummaryMetadata
+    {
+        return $this->metadata;
     }
 
     public function getDimensionCollection(): DimensionCollection
@@ -59,5 +81,10 @@ final class ResultContext
     public function getNullMeasureCollection(): NullMeasureCollection
     {
         return $this->nullMeasureCollection;
+    }
+
+    public function getCellRepository(): CellRepository
+    {
+        return $this->cellRepository;
     }
 }

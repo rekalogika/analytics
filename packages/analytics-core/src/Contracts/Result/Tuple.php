@@ -36,4 +36,9 @@ interface Tuple extends OrderedMapCollection
     public function getSummaryClass(): string;
 
     public function getCondition(): ?Expression;
+
+    /**
+     * @return list<string>
+     */
+    public function getDimensionality(): array;
 }

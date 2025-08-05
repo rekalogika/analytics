@@ -16,17 +16,10 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
- * A query result in normalized tabular format. Each row in a normal table
- * contains one measure.
+ * Represent a list of tree nodes.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<Tuple,NormalRow>
+ * @extends OrderedMapCollection<Tuple,CubeCell>
  */
-interface NormalTable extends OrderedMapCollection
-{
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-}
+interface CubeCells extends OrderedMapCollection {}

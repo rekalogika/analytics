@@ -11,21 +11,23 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryQuery\Worker;
+namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\GroupingField;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\QueryResultToTableHelper;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasure;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasures;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTable;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTuple;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultUnit;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
@@ -33,71 +35,96 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class QueryResultToTableTransformer
+final class ResultContextBuilder
 {
-    private QueryResultToTableHelper $helper;
+    private readonly QueryResultToTableHelper $helper;
 
     /**
      * @var list<string>
      */
-    private array $dimensions;
+    private readonly array $dimensions;
+
+    /**
+     * @var list<string>
+     */
+    private readonly array $measures;
+
+    /**
+     * @var array<string,DefaultMeasureMember>
+     */
+    private array $measureMemberCache = [];
+
+    private readonly ResultContext $context;
 
     private function __construct(
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly ResultContext $context,
+        int $nodesLimit,
+        private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $this->helper = new QueryResultToTableHelper();
+
+        $this->context = new ResultContext(
+            metadata: $metadata,
+            query: $query,
+            nodesLimit: $nodesLimit,
+        );
 
         $this->dimensions = array_values(array_filter(
             $this->query->getGroupBy(),
             static fn(string $dimension): bool => $dimension !== '@values',
         ));
+
+        $this->measures = $this->query->getSelect();
     }
 
     /**
      * @param list<array<string,mixed>> $input
      */
-    public static function transform(
+    public static function createContext(
         DefaultQuery $query,
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
-        ResultContext $context,
+        int $nodesLimit,
         array $input,
-    ): DefaultTable {
+    ): ResultContext {
         $transformer = new self(
             query: $query,
             metadata: $metadata,
             entityManager: $entityManager,
             propertyAccessor: $propertyAccessor,
-            context: $context,
+            nodesLimit: $nodesLimit,
         );
 
-        return new DefaultTable(
-            summaryClass: $metadata->getSummaryClass(),
-            rows: $transformer->doTransform($input),
-            context: $context,
-        );
+        return $transformer->process($input);
     }
 
     /**
      * @param list<array<string,mixed>> $input
-     * @return iterable<int,DefaultRow>
      */
-    private function doTransform(array $input): iterable
+    private function process(array $input): ResultContext
     {
+        $cellRepository = $this->context->getCellRepository();
+
         foreach ($input as $item) {
-            yield $this->transformOne($item);
+            $cell = $this->transformOne($item);
+            $cellRepository->collectCell($cell);
+
+            foreach ($this->unpivotRow($cell) as $row) {
+                $cellRepository->collectCell($row);
+            }
         }
+
+        return $this->context;
     }
 
     /**
      * @param array<string,mixed> $input
      */
-    public function transformOne(array $input): DefaultRow
+    private function transformOne(array $input): DefaultCell
     {
         // create the object
         $summaryClass = $this->metadata->getSummaryClass();
@@ -147,10 +174,12 @@ final readonly class QueryResultToTableTransformer
 
         $measures = new DefaultMeasures($measureValues);
 
-        return new DefaultRow(
+        return new DefaultCell(
             tuple: $tuple,
             measures: $measures,
-            groupings: $groupings,
+            measureNames: $this->measures,
+            isNull: false,
+            context: $this->context,
         );
     }
 
@@ -349,5 +378,53 @@ final readonly class QueryResultToTableTransformer
         return $this->metadata
             ->getDimension($dimension)
             ->getNullLabel();
+    }
+
+    /**
+     * @return iterable<DefaultCell>
+     */
+    private function unpivotRow(DefaultCell $cell): iterable
+    {
+        foreach ($this->measures as $measure) {
+            $measureMember = $this->getMeasureMember($measure);
+
+            $measureDimension = $this->context
+                ->getDimensionFactory()
+                ->createDimension(
+                    label: $this->measureLabel,
+                    name: '@values',
+                    member: $measureMember,
+                    rawMember: $measureMember,
+                    displayMember: $measureMember,
+                    interpolation: false,
+                );
+
+            $measure = $cell->getMeasures()->getByKey($measure)
+                ?? throw new UnexpectedValueException(
+                    \sprintf('Measure "%s" not found in row', $measure),
+                );
+
+            $tuple = $cell->getTuple()->append($measureDimension);
+
+            $measures = new DefaultMeasures([
+                $measure->getName() => $measure,
+            ]);
+
+            yield new DefaultCell(
+                tuple: $tuple,
+                measures: $measures,
+                measureNames: $this->measures,
+                isNull: false,
+                context: $this->context,
+            );
+        }
+    }
+
+    private function getMeasureMember(string $measure): DefaultMeasureMember
+    {
+        return $this->measureMemberCache[$measure] ??= new DefaultMeasureMember(
+            label: $this->metadata->getMeasure($measure)->getLabel(),
+            property: $measure,
+        );
     }
 }

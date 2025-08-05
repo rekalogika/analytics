@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
-use Rekalogika\Analytics\Contracts\Result\Cube;
+use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\PivotTable\Model\Table\MeasureDimensionLabel;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
@@ -21,9 +21,9 @@ use Rekalogika\PivotTable\Contracts\Table as PivotTableTable;
 
 final readonly class TableAdapter implements PivotTableTable
 {
-    public static function adapt(Cube $cube): self
+    public static function adapt(Result $result): self
     {
-        return new self($cube);
+        return new self($result);
     }
 
     /**
@@ -38,16 +38,15 @@ final readonly class TableAdapter implements PivotTableTable
 
     private TablePropertyMap $propertyMap;
 
-    private function __construct(
-        private readonly Cube $cube,
-    ) {
+    private function __construct(Result $result)
+    {
         $this->propertyMap = new TablePropertyMap();
 
         $rows = [];
         $legends = [];
 
-        foreach ($this->cube as $row) {
-            $rowAdapter = new RowAdapter($row, $this->propertyMap);
+        foreach ($result->getAllCubes() as $cube) {
+            $rowAdapter = new RowAdapter($cube, $this->propertyMap);
             $rows[] = $rowAdapter;
             $legends = array_merge($legends, $rowAdapter->getLegends());
         }

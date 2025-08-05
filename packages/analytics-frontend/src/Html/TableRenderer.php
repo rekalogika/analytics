@@ -167,8 +167,7 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionNames();
-        $cube = $result->getCube();
-        $pivotTable = TableTableAdapter::adapt($cube);
+        $pivotTable = TableTableAdapter::adapt($result);
 
         $table = PivotTableTransformer::transformTableToTable(
             table: $pivotTable,

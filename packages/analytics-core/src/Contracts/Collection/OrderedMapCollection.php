@@ -27,6 +27,7 @@ interface OrderedMapCollection extends \Traversable, \Countable
     public function getByKey(mixed $key): mixed;
 
     /**
+     * @param int<0,max> $index
      * @return TValue|null
      */
     public function getByIndex(int $index): mixed;

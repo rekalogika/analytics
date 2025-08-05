@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
+use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -23,10 +24,13 @@ final class DimensionFactory
      */
     private array $dimensions = [];
 
+    private int $currentNodesCount = 0;
+
     private readonly DimensionCollection $dimensionCollection;
 
     public function __construct(
         private readonly OrderByResolver $orderByResolver,
+        private int $nodesLimit,
     ) {
         $this->dimensionCollection = new DimensionCollection(
             dimensionFactory: $this,
@@ -67,6 +71,15 @@ final class DimensionFactory
             displayMember: $displayMember,
             interpolation: $interpolation,
         );
+
+        if ($interpolation) {
+            $this->currentNodesCount++;
+            if ($this->currentNodesCount > $this->nodesLimit) {
+                throw new OverflowException(
+                    'The number of interpolation nodes exceeds the limit of ' . $this->nodesLimit,
+                );
+            }
+        }
 
         $this->dimensionCollection->collectDimension($dimension);
 

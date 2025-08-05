@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Measure;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class DefaultMeasure implements Measure
@@ -25,6 +26,17 @@ final readonly class DefaultMeasure implements Measure
         private mixed $rawValue,
         private ?DefaultUnit $unit,
     ) {}
+
+    public static function createMultiple(): self
+    {
+        return new self(
+            label: new TranslatableMessage('Multiple measures'),
+            name: '',
+            value: null,
+            rawValue: null,
+            unit: null,
+        );
+    }
 
     public static function createNull(
         TranslatableInterface $label,
