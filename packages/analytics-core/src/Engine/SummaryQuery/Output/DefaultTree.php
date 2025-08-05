@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
@@ -21,7 +20,6 @@ use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Engine\SummaryQuery\Exception\DimensionNamesException;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\TreeContext;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -30,8 +28,6 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DefaultTree implements TreeNode, \IteratorAggregate
 {
-    private ?DefaultMeasure $measure = null;
-
     private ?bool $isNull = null;
 
     /**
@@ -43,11 +39,11 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
      * @param list<string> $measureNames
      */
     public function __construct(
-        private readonly DefaultTuple $tuple,
+        private readonly DefaultCell $cell,
         private readonly DimensionNames $descendantdimensionNames,
         private readonly array $measureNames,
         private readonly ?TranslatableInterface $rootLabel,
-        private readonly TreeContext $context,
+        private readonly ResultContext $context,
     ) {}
 
     /**
@@ -56,37 +52,22 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
      * @param list<string> $measureNames
      */
     public static function createRoot(
-        string $summaryClass,
+        DefaultCell $apexCell,
         array $dimensionNames,
         array $measureNames,
         TranslatableInterface $rootLabel,
-        DefaultTable $table,
-        DefaultNormalTable $normalTable,
-        ?Expression $condition,
-        int $nodesLimit,
+        ResultContext $context,
     ): self {
         if (!\in_array('@values', $dimensionNames, true)) {
             $dimensionNames[] = '@values';
         }
 
-        $rootTuple = new DefaultTuple(
-            summaryClass: $summaryClass,
-            dimensions: [],
-            condition: $condition,
-        );
-
-        $context = new TreeContext(
-            table: $table,
-            resultContext: $normalTable->getContext(),
-            nodesLimit: $nodesLimit,
-        );
-
         $descendantdimensionNames = new DimensionNames($dimensionNames);
 
         return new self(
+            cell: $apexCell,
             descendantdimensionNames: $descendantdimensionNames,
             measureNames: $measureNames,
-            tuple: $rootTuple,
             rootLabel: $rootLabel,
             context: $context,
         );
@@ -95,13 +76,13 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->tuple->getSummaryClass();
+        return $this->cell->getSummaryClass();
     }
 
     #[\Override]
     public function getTuple(): DefaultTuple
     {
-        return $this->tuple;
+        return $this->cell->getTuple();
     }
 
     #[\Override]
@@ -113,81 +94,46 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getMeasure(): DefaultMeasure
     {
-        if (\count($this->measureNames) !== 1) {
-            return $this->context
-                ->getNullMeasureCollection()
-                ->getNullMeasure($this->measureNames[0]);
-        }
-
-        if ($this->measure !== null) {
-            return $this->measure;
-        }
-
-        $measure = $this->context
-            ->getTable()
-            ->getMeasureByTuple($this->tuple);
-
-        if ($measure === null) {
-            $measure = $this->context
-                ->getNullMeasureCollection()
-                ->getNullMeasure($this->measureNames[0]);
-        }
-
-        return $this->measure = $measure;
+        return $this->cell->getMeasure();
     }
 
     #[\Override]
     public function getMeasures(): Measures
     {
-        if (!$this->descendantdimensionNames->hasMeasureDimension()) {
-            $measure = $this->getMeasure();
-
-            return new DefaultMeasures([$measure]);
-        }
-
-        $measures = [];
-        $subtotalChildren = $this->getChildren('@values');
-
-        foreach ($subtotalChildren as $subtotalChild) {
-            $measure = $subtotalChild->getMeasure();
-
-            $measures[] = $measure;
-        }
-
-        return new DefaultMeasures($measures);
+        return $this->cell->getMeasures();
     }
 
     #[\Override]
     public function isNull(): bool
     {
         return $this->isNull ??= (
-            ($this->tuple->last()?->isInterpolation() ?? false)
-            || !$this->context->getTable()->hasKey($this->tuple->withoutMeasure())
+            ($this->getTuple()->last()?->isInterpolation() ?? false)
+            || !$this->context->getCellRepository()->hasCellWithTuple($this->getTuple()->withoutMeasure())
         );
     }
 
     #[\Override]
     public function getMember(): mixed
     {
-        return $this->tuple->last()?->getMember();
+        return $this->getTuple()->last()?->getMember();
     }
 
     #[\Override]
     public function getRawMember(): mixed
     {
-        return $this->tuple->last()?->getRawMember();
+        return $this->getTuple()->last()?->getRawMember();
     }
 
     #[\Override]
     public function getDisplayMember(): mixed
     {
-        return $this->tuple->last()?->getDisplayMember();
+        return $this->getTuple()->last()?->getDisplayMember();
     }
 
     #[\Override]
     public function getName(): string
     {
-        return $this->tuple->last()?->getName() ?? '';
+        return $this->getTuple()->last()?->getName() ?? '';
     }
 
     #[\Override]
@@ -197,7 +143,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
             return $this->rootLabel;
         }
 
-        return $this->tuple->last()?->getLabel()
+        return $this->getTuple()->last()?->getLabel()
             ?? throw new UnexpectedValueException(
                 'Root label is not set and tuple does not have a label.',
             );
@@ -247,7 +193,7 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
     public function getDimension(): DefaultDimension
     {
-        $dimension = $this->tuple->last();
+        $dimension = $this->getTuple()->last();
 
         if (!$dimension instanceof DefaultDimension) {
             throw new UnexpectedValueException(
@@ -262,33 +208,12 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
-        try {
-            return $this->getChildrenOrFail($name);
-        } catch (DimensionNamesException) {
-            return new DefaultTreeNodes([]);
-        }
-    }
-
-    /**
-     * @param int<1,max>|int<min,-1>|string $name
-     */
-    private function getChildrenOrFail(int|string $name = 1): DefaultTreeNodes
-    {
         $name = $this->descendantdimensionNames->resolveName($name);
 
         if (isset($this->children[$name])) {
             return $this->children[$name];
         }
 
-        return $this->children[$name] =
-            new DefaultTreeNodes($this->getBalancedChildren($name));
-    }
-
-    /**
-     * @return list<DefaultTree>
-     */
-    private function getBalancedChildren(string $name): array
-    {
         $descendantdimensionNames = $this->descendantdimensionNames;
 
         if (!$descendantdimensionNames->hasName($name)) {
@@ -301,41 +226,85 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
 
         $descendantdimensionNames = $descendantdimensionNames->removeUpTo($name);
 
-        $dimensions = $this->context
-            ->getDimensionCollection()
-            ->getDimensionsByName($name)
-            ->getGapFilled();
+        $cells = $this->context
+            ->getCellRepository()
+            ->getCellsByBaseAndDimension($this->cell, $name);
 
-        $treeNodeFactory = $this->context->getTreeNodeFactory();
-
-        $balancedChildren = [];
-
-        foreach ($dimensions as $dimension) {
-            $tuple = $this->tuple->append($dimension);
-
-            // if the member is a measure (i.e. '@values'), narrow the measure
-            // names to the measure name specified in the dimension.
-
-            /** @psalm-suppress MixedAssignment */
-            $member = $dimension->getMember();
-
-            if ($member instanceof MeasureMember) {
-                $measureNames = [$member->getMeasureProperty()];
-            } else {
-                $measureNames = $this->measureNames;
-            }
-
-            $child = $treeNodeFactory->createNode(
-                tuple: $tuple,
-                descendantdimensionNames: $descendantdimensionNames,
-                measureNames: $measureNames,
-            );
-
-            $balancedChildren[] = $child;
-        }
-
-        return $balancedChildren;
+        return $this->children[$name] = new DefaultTreeNodes(
+            cells: $cells,
+            context: $this->context,
+            descendantdimensionNames: $descendantdimensionNames,
+            measureNames: $this->measureNames,
+        );
     }
+
+    // /**
+    //  * @param int<1,max>|int<min,-1>|string $name
+    //  */
+    // private function getChildrenOrFail(int|string $name = 1): DefaultTreeNodes
+    // {
+    //     $name = $this->descendantdimensionNames->resolveName($name);
+
+    //     if (isset($this->children[$name])) {
+    //         return $this->children[$name];
+    //     }
+
+    //     return $this->children[$name] =
+    //         new DefaultTreeNodes($this->getBalancedChildren($name));
+    // }
+
+    // /**
+    //  * @return list<DefaultTree>
+    //  */
+    // private function getBalancedChildren(string $name): array
+    // {
+    //     $descendantdimensionNames = $this->descendantdimensionNames;
+
+    //     if (!$descendantdimensionNames->hasName($name)) {
+    //         throw new InvalidArgumentException(\sprintf(
+    //             'Dimension "%s" is not in the descendant dimension names: %s.',
+    //             $name,
+    //             (string) $descendantdimensionNames,
+    //         ));
+    //     }
+
+    //     $descendantdimensionNames = $descendantdimensionNames->removeUpTo($name);
+
+    //     $dimensions = $this->context
+    //         ->getDimensionCollection()
+    //         ->getDimensionsByName($name)
+    //         ->getGapFilled();
+
+    //     $treeNodeFactory = $this->context->getTreeNodeFactory();
+
+    //     $balancedChildren = [];
+
+    //     foreach ($dimensions as $dimension) {
+    //         $tuple = $this->tuple->append($dimension);
+
+    //         // if the member is a measure (i.e. '@values'), narrow the measure
+    //         // names to the measure name specified in the dimension.
+
+    //         /** @psalm-suppress MixedAssignment */
+    //         $member = $dimension->getMember();
+
+    //         if ($member instanceof MeasureMember) {
+    //             $measureNames = [$member->getMeasureProperty()];
+    //         } else {
+    //             $measureNames = $this->measureNames;
+    //         }
+
+    //         $child = $treeNodeFactory->createNode(
+    //             tuple: $tuple,
+    //             descendantdimensionNames: $descendantdimensionNames,
+    //             measureNames: $measureNames,
+    //         );
+
+    //         $balancedChildren[] = $child;
+    //     }
+
+    //     return $balancedChildren;
+    // }
 
     private function canDescribeThisNode(mixed $input): bool
     {
@@ -397,10 +366,5 @@ final class DefaultTree implements TreeNode, \IteratorAggregate
         }
 
         return $child->traverse(...$members);
-    }
-
-    public function getContext(): ResultContext
-    {
-        return $this->context->getResultContext();
     }
 }
