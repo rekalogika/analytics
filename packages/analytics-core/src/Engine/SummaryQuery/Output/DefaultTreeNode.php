@@ -65,7 +65,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     {
         $name = $this->dimensionNames->resolveName($name);
         $dimensionNames = $this->dimensionNames->removeUpTo($name);
-        $cells = $this->cell->drillDown('name');
+        $cells = $this->cell->drillDown($name);
 
         return new DefaultTreeNodes(
             cells: $cells,
