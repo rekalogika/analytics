@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\GroupingField;
 
-final readonly class DefaultRow implements Row
+final readonly class DefaultRow implements Row, Cell
 {
     public function __construct(
         private DefaultTuple $tuple,

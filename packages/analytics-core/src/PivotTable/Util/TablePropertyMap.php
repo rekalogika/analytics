@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\PivotTable\Model\Table\DimensionLabel;
 use Rekalogika\Analytics\PivotTable\Model\Table\DimensionMember;
 use Rekalogika\Analytics\PivotTable\Model\Table\MeasureLabel;
@@ -37,14 +37,14 @@ final class TablePropertyMap
     private \WeakMap $dimensionToMember;
 
     /**
-     * @var \WeakMap<Row,MeasureValue>
+     * @var \WeakMap<Cell,MeasureValue>
      */
-    private \WeakMap $rowToMeasureValue;
+    private \WeakMap $cellToMeasureValue;
 
     /**
-     * @var \WeakMap<Row,MeasureLabel>
+     * @var \WeakMap<Cell,MeasureLabel>
      */
-    private \WeakMap $rowToMeasureLabel;
+    private \WeakMap $cellToMeasureLabel;
 
     public function __construct()
     {
@@ -53,9 +53,9 @@ final class TablePropertyMap
         /** @psalm-suppress PropertyTypeCoercion */
         $this->dimensionToMember = new \WeakMap();
         /** @psalm-suppress PropertyTypeCoercion */
-        $this->rowToMeasureValue = new \WeakMap();
+        $this->cellToMeasureValue = new \WeakMap();
         /** @psalm-suppress PropertyTypeCoercion */
-        $this->rowToMeasureLabel = new \WeakMap();
+        $this->cellToMeasureLabel = new \WeakMap();
     }
 
     public function getDimensionLabel(Dimension $dimension): DimensionLabel
@@ -76,21 +76,21 @@ final class TablePropertyMap
         return $this->dimensionToMember->offsetGet($dimension) ?? throw new LogicException('Dimension member not found in the map.');
     }
 
-    public function getMeasureValue(Row $row): MeasureValue
+    public function getMeasureValue(Cell $cell): MeasureValue
     {
-        if (!$this->rowToMeasureValue->offsetExists($row)) {
-            $this->rowToMeasureValue->offsetSet($row, new MeasureValue($row));
+        if (!$this->cellToMeasureValue->offsetExists($cell)) {
+            $this->cellToMeasureValue->offsetSet($cell, new MeasureValue($cell));
         }
 
-        return $this->rowToMeasureValue->offsetGet($row) ?? throw new LogicException('Measure value not found in the map.');
+        return $this->cellToMeasureValue->offsetGet($cell) ?? throw new LogicException('Measure value not found in the map.');
     }
 
-    public function getMeasureLabel(Row $row): MeasureLabel
+    public function getMeasureLabel(Cell $cell): MeasureLabel
     {
-        if (!$this->rowToMeasureLabel->offsetExists($row)) {
-            $this->rowToMeasureLabel->offsetSet($row, new MeasureLabel($row));
+        if (!$this->cellToMeasureLabel->offsetExists($cell)) {
+            $this->cellToMeasureLabel->offsetSet($cell, new MeasureLabel($cell));
         }
 
-        return $this->rowToMeasureLabel->offsetGet($row) ?? throw new LogicException('Measure label not found in the map.');
+        return $this->cellToMeasureLabel->offsetGet($cell) ?? throw new LogicException('Measure label not found in the map.');
     }
 }

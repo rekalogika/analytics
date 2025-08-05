@@ -60,7 +60,7 @@ final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
             throw new ValueNotSupportedException();
         }
 
-        $row = $input->getRow();
+        $row = $input->getCell();
         $tuple = $row->getTuple();
 
         $tupleDto = $this->tupleMapper->toDto($tuple);
