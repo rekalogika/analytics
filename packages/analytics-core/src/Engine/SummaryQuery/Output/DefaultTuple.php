@@ -188,9 +188,12 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
             return $this->signature;
         }
 
+        $dimensions = $this->dimensions;
+        ksort($dimensions);
+
         $signatures = array_map(
             static fn(DefaultDimension $dimension): string => $dimension->getSignature(),
-            $this->dimensions,
+            $dimensions,
         );
 
         return $this->signature = hash('xxh128', serialize($signatures));
