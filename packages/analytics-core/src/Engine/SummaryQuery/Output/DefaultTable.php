@@ -13,82 +13,74 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Cube;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
 /**
- * @implements \IteratorAggregate<Tuple,DefaultRow>
+ * @implements \IteratorAggregate<Tuple,DefaultCell>
  */
-final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
+final class DefaultTable implements Table, \IteratorAggregate
 {
+    private readonly CellRepository $cellRepository;
+
     /**
-     * Non-grouping rows
-     *
-     * @var array<string,DefaultRow>
+     * @var list<string>
      */
-    private array $rows;
+    private readonly array $dimensionality;
+
+    /**
+     * @var \ArrayObject<int<0,max>,DefaultCell>
+     */
+    private ?\ArrayObject $rows = null;
 
     /**
      * @param class-string $summaryClass
-     * @param iterable<DefaultRow> $rows
      */
-    public function __construct(
-        private string $summaryClass,
-        iterable $rows,
-        private ResultContext $context,
-    ) {
-        $newRows = [];
-
-        foreach ($rows as $row) {
-            $newRows[$row->getSignature()] = $row;
-        }
-
-        $this->rows = $newRows;
-    }
-
-    public function withoutGroupingRows(): self
+    public function __construct(private readonly ResultContext $context)
     {
-        $rows = (function (): \Traversable {
-            foreach ($this->rows as $row) {
-                if (!$row->isGrouping()) {
-                    yield $row;
-                }
-            }
-        })();
+        $this->cellRepository = $context->getCellRepository();
+        $dimensionality = $context->getQuery()->getGroupBy();
 
-        return new self(
-            summaryClass: $this->summaryClass,
-            rows: $rows,
-            context: $this->context,
-        );
+        // remove @values from dimensionality
+        $this->dimensionality = array_values(array_filter(
+            $dimensionality,
+            static fn (string $dimension) => $dimension !== '@values',
+        ));
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultRow
+    public function getByKey(mixed $key): ?DefaultCell
     {
         if (!$key instanceof DefaultTuple) {
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
         }
 
-        $signature = $key->getSignature();
+        return $this->cellRepository->getCellByTuple($key);
+    }
 
-        return $this->rows[$signature] ?? null;
+    /**
+     * @return \ArrayObject<int<0,max>,DefaultCell>
+     */
+    private function getRows(): \ArrayObject
+    {
+        if ($this->rows !== null) {
+            return $this->rows;
+        }
+
+        $rows = $this->cellRepository
+            ->getCellsByDimensionality($this->dimensionality);
+
+        $rows = array_values(iterator_to_array($rows));
+
+        return $this->rows = new \ArrayObject($rows);
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?DefaultRow
+    public function getByIndex(int $index): ?DefaultCell
     {
-        $keys = array_keys($this->rows);
-
-        if (!isset($keys[$index])) {
-            return null;
-        }
-
-        $signature = $keys[$index];
-
-        return $this->rows[$signature] ?? null;
+        return $this->getRows()[$index] ?? null;
     }
 
     #[\Override]
@@ -98,9 +90,7 @@ final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
         }
 
-        $signature = $key->getSignature();
-
-        return isset($this->rows[$signature]);
+        return $this->cellRepository->hasCellWithTuple($key);
     }
 
     /**
@@ -109,43 +99,39 @@ final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->summaryClass;
+        return $this->context->getMetadata()->getSummaryClass();
     }
 
     #[\Override]
-    public function first(): ?DefaultRow
+    public function first(): ?DefaultCell
     {
-        $firstKey = array_key_first($this->rows);
+        $rows = $this->getRows();
 
-        if ($firstKey === null) {
-            return null;
-        }
-
-        return $this->rows[$firstKey];
+        return $rows[0] ?? null;
     }
 
     #[\Override]
-    public function last(): ?DefaultRow
+    public function last(): ?DefaultCell
     {
-        $lastKey = array_key_last($this->rows);
+        $rows = $this->getRows();
 
-        if ($lastKey === null) {
+        if (($count = $rows->count()) < 1) {
             return null;
         }
 
-        return $this->rows[$lastKey];
+        return $rows[$count - 1];
     }
 
     #[\Override]
     public function count(): int
     {
-        return \count($this->rows);
+        return \count($this->getRows());
     }
 
     #[\Override]
     public function getIterator(): \Traversable
     {
-        foreach ($this->rows as $row) {
+        foreach ($this->getRows() as $row) {
             yield $row->getTuple() => $row;
         }
     }
@@ -165,10 +151,5 @@ final readonly class DefaultTable implements Table, Cube, \IteratorAggregate
         }
 
         return $row->getMeasures()->getByKey($measureName);
-    }
-
-    public function getContext(): ResultContext
-    {
-        return $this->context;
     }
 }
