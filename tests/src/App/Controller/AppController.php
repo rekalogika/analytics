@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
+use OverflowException;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
@@ -99,15 +100,15 @@ final class AppController extends AbstractController
         } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
             $pivotTableError = $e->trans($this->translator);
-            // } catch (\Throwable $e) {
-            //     $pivotTable = null;
-            //     $pivotTableError = 'An error occurred while rendering the pivot table.';
-            //     $this->logger->error(
-            //         'An error occurred while rendering the pivot table.',
-            //         [
-            //             'exception' => $e,
-            //         ],
-            //     );
+        } catch (\Throwable $e) {
+            $pivotTable = null;
+            $pivotTableError = 'An error occurred while rendering the pivot table.';
+            $this->logger->error(
+                'An error occurred while rendering the pivot table.',
+                [
+                    'exception' => $e,
+                ],
+            );
         }
 
         // expression rendering
@@ -120,6 +121,9 @@ final class AppController extends AbstractController
         } catch (UnsupportedData) {
             $chart = null;
             $chartError = null;
+        } catch (OverflowException $e) {
+            $chart = null;
+            $chartError = $e->getMessage();
         } catch (\Throwable $e) {
             $chart = null;
             $chartError = 'An error occurred while creating the chart: ';
