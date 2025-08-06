@@ -90,6 +90,12 @@ final readonly class DefaultTreeNode implements TreeNode
     }
 
     #[\Override]
+    public function getPath(): array
+    {
+        return array_keys($this->tuple);
+    }
+
+    #[\Override]
     public function getKey(): string
     {
         return array_key_last($this->tuple) ?? '';

@@ -28,6 +28,12 @@ abstract class BaseTreeNodeDecorator implements TreeNode
     }
 
     #[\Override]
+    public function getPath(): array
+    {
+        return $this->node->getPath();
+    }
+
+    #[\Override]
     public function getKey(): string
     {
         return $this->node->getKey();

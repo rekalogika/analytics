@@ -17,7 +17,11 @@ use Rekalogika\PivotTable\Contracts\TreeNode;
 
 final readonly class NullTreeNode implements TreeNode
 {
+    /**
+     * @param list<string> $path
+     */
     public function __construct(
+        private array $path,
         private string $name,
         private mixed $legend,
         private mixed $item,
@@ -27,6 +31,7 @@ final readonly class NullTreeNode implements TreeNode
     public static function fromInterface(TreeNode $node): self
     {
         return new self(
+            path: $node->getPath(),
             name: $node->getKey(),
             legend: $node->getLegend(),
             item: $node->getItem(),
@@ -40,6 +45,11 @@ final readonly class NullTreeNode implements TreeNode
         return $this->isLeaf;
     }
 
+    #[\Override]
+    public function getPath(): array
+    {
+        return $this->path;
+    }
 
     #[\Override]
     public function getKey(): string
