@@ -37,7 +37,7 @@ final class TreeNodeRegistry
 
         return $this->nodes[$signature] ??= new DefaultTreeNode(
             cell: $cell,
-            dimensionNames: $dimensionality,
+            dimensionality: $dimensionality,
             registry: $this,
         );
     }

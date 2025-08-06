@@ -26,24 +26,24 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 {
     /**
-     * @param list<string> $dimensionNames
+     * @param list<string> $dimensionality
      */
     public static function createRoot(
         DefaultCell $cell,
-        array $dimensionNames,
+        array $dimensionality,
     ): self {
         $registry = new TreeNodeRegistry();
 
         return new self(
             cell: $cell,
-            dimensionNames: Dimensionality::create($dimensionNames),
+            dimensionality: Dimensionality::create($dimensionality),
             registry: $registry,
         );
     }
 
     public function __construct(
         private readonly DefaultCell $cell,
-        private readonly Dimensionality $dimensionNames,
+        private readonly Dimensionality $dimensionality,
         private readonly TreeNodeRegistry $registry,
     ) {}
 
@@ -60,21 +60,15 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getDimensionNames(): array
-    {
-        return $this->dimensionNames->getDescendants();
-    }
-
-    #[\Override]
     public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
-        $name = $this->dimensionNames->resolveName($name);
-        $dimensionNames = $this->dimensionNames->descend($name);
+        $name = $this->dimensionality->resolveName($name);
+        $dimensionality = $this->dimensionality->descend($name);
         $cells = $this->cell->drillDown($name);
 
         return new DefaultTreeNodes(
             cells: $cells,
-            dimensionality: $dimensionNames,
+            dimensionality: $dimensionality,
             registry: $this->registry,
         );
     }
@@ -93,7 +87,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
     private function getDimension(): ?DefaultDimension
     {
-        $dimensionName = $this->dimensionNames->getCurrent();
+        $dimensionName = $this->dimensionality->getCurrent();
 
         if ($dimensionName === null) {
             return null;

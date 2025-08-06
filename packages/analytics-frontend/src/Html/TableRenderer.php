@@ -152,7 +152,7 @@ final readonly class TableRenderer
         array $pivotedDimensions = ['@values'],
         ?string $theme = null,
     ): string {
-        $dimensions = $result->getDimensionNames();
+        $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
 
         $table = PivotTableTransformer::transformTableToTable(
@@ -160,7 +160,7 @@ final readonly class TableRenderer
             unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
-            createSubtotals: $result->getDimensionNames(),
+            createSubtotals: $result->getDimensionality(),
         );
 
         return $this->getVisitor($theme)->visitTable($table);

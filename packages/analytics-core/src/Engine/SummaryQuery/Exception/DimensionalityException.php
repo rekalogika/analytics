@@ -15,4 +15,4 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Exception;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
-final class DimensionNamesException extends InvalidArgumentException {}
+final class DimensionalityException extends InvalidArgumentException {}

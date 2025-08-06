@@ -21,7 +21,6 @@ use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\Worker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -41,13 +40,7 @@ final class DefaultResult implements Result
      */
     private ?array $queryResult = null;
 
-    // private ?DefaultTable $unbalancedTable = null;
-
-    // private ?DefaultNormalTable $unbalancedNormalTable = null;
-
     private ?DefaultTreeNode $tree = null;
-
-    // private ?DefaultNormalTable $normalTable = null;
 
     private ?DefaultTable $table = null;
 
@@ -82,7 +75,7 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getDimensionNames(): array
+    public function getDimensionality(): array
     {
         return $this->query->getGroupBy();
     }
@@ -202,15 +195,9 @@ final class DefaultResult implements Result
     {
         return $this->tree ??= DefaultTreeNode::createRoot(
             cell: $this->getCube(),
-            dimensionNames: $this->query->getGroupBy(),
+            dimensionality: $this->query->getGroupBy(),
         );
     }
-
-    // #[\Override]
-    // public function getNormalTable(): DefaultNormalTable
-    // {
-    //     return $this->normalTable ??= TreeToBalancedNormalTableTransformer::transform(tree: $this->getTree());
-    // }
 
     #[\Override]
     public function getTable(): DefaultTable
