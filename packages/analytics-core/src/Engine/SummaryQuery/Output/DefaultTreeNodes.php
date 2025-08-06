@@ -29,7 +29,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     ) {}
 
     #[\Override]
-    public function getByKey(mixed $key): mixed
+    public function get(mixed $key): mixed
     {
         $current = $this->dimensionality->getCurrent();
 
@@ -38,7 +38,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
         }
 
         foreach ($this as $node) {
-            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
+            if ($node->getTuple()->get($current)?->getRawMember() === $key) {
                 return $node;
             }
         }
@@ -62,7 +62,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         $current = $this->dimensionality->getCurrent();
 
@@ -71,7 +71,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
         }
 
         foreach ($this as $node) {
-            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
+            if ($node->getTuple()->get($current)?->getRawMember() === $key) {
                 return true;
             }
         }

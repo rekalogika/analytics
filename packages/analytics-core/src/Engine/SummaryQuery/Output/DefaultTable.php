@@ -60,7 +60,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultRow
+    public function get(mixed $key): ?DefaultRow
     {
         if (!$key instanceof DefaultTuple) {
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
@@ -106,7 +106,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         if (!$key instanceof DefaultTuple) {
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');

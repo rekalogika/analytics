@@ -130,13 +130,13 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultDimension
+    public function get(mixed $key): ?DefaultDimension
     {
         return $this->dimensions[$key] ?? null;
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         return isset($this->dimensions[$key]);
     }

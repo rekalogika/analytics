@@ -99,7 +99,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             return null;
         }
 
-        return $this->cell->getTuple()->getByKey($dimensionName);
+        return $this->cell->getTuple()->get($dimensionName);
     }
 
     #[\Override]
@@ -109,7 +109,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): mixed
+    public function get(mixed $key): mixed
     {
         /** @psalm-suppress MixedAssignment */
         foreach ($this->getChildren() as $childKey => $child) {
@@ -138,7 +138,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         /** @psalm-suppress MixedAssignment */
         foreach ($this->getChildren() as $childKey => $child) {

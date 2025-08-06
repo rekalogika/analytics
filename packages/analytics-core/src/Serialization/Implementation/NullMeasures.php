@@ -46,7 +46,7 @@ final readonly class NullMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?NullMeasure
+    public function get(mixed $key): ?NullMeasure
     {
         return $this->measures[$key] ?? null;
     }
@@ -66,7 +66,7 @@ final readonly class NullMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         return isset($this->measures[$key]);
     }

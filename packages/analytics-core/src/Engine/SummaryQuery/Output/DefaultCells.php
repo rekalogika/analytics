@@ -68,7 +68,7 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultCell
+    public function get(mixed $key): ?DefaultCell
     {
         if (!$key instanceof DefaultTuple) {
             throw new InvalidArgumentException('This class only accepts DefaultTuple as key.');
@@ -95,7 +95,7 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         if (!$key instanceof DefaultTuple) {
             throw new InvalidArgumentException('This class only accepts DefaultTuple as key.');
