@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
@@ -32,11 +34,18 @@ final readonly class NullRow implements Row
         private ?Expression $condition,
     ) {
         $this->measures = new NullMeasures($summaryMetadata);
+
         $this->tuple = new NullTuple(
             summaryMetadata: $summaryMetadata,
             dimensionMembers: $dimensionMembers,
             condition: $this->condition,
         );
+    }
+
+    #[\Override]
+    public function getMeasure(): Measure
+    {
+        throw new BadMethodCallException('Not yet implemented');
     }
 
     #[\Override]

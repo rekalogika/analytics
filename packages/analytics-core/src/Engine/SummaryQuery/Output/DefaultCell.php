@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
 final class DefaultCell implements CubeCell
 {
-    private ?DefaultMeasure $measure = null;
+    use MeasuresTrait;
 
     /**
      * @var array<string,DefaultCells>
@@ -68,28 +68,6 @@ final class DefaultCell implements CubeCell
     public function getMeasures(): DefaultMeasures
     {
         return $this->measures;
-    }
-
-    #[\Override]
-    public function getMeasure(): DefaultMeasure
-    {
-        if ($this->measure !== null) {
-            return $this->measure;
-        }
-
-        $measureName = $this->tuple->getMeasureName();
-
-        // does not have @values in the tuple
-        if ($measureName === null) {
-            $measure = DefaultMeasure::createMultiple();
-        } else {
-            $measure = $this->measures->get($measureName)
-                ?? throw new InvalidArgumentException(
-                    \sprintf('Measure with name "%s" does not exist.', $measureName),
-                );
-        }
-
-        return $this->measure = $measure;
     }
 
     #[\Override]

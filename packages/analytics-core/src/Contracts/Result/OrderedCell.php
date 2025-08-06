@@ -14,9 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a row in a table. A row has a tuple and one or more measures
- * associated with it.
+ * Represent an ordered cell. An ordered cell is a cell that contains an ordered
+ * tuple. In an ordered tuple, the order of dimensions is significant.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Row extends OrderedCell {}
+interface OrderedCell extends Cell
+{
+    #[\Override]
+    public function getTuple(): OrderedTuple;
+}

@@ -49,6 +49,21 @@ final readonly class Dimensionality
         return $this->ancestors;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getAncestorsToCurrent(): array
+    {
+        if ($this->current === null) {
+            return [];
+        }
+
+        $ancestors = $this->ancestors;
+        $ancestors[] = $this->current;
+
+        return $ancestors;
+    }
+
     public function getCurrent(): ?string
     {
         return $this->current;

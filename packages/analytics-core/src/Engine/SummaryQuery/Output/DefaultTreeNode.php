@@ -25,6 +25,8 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 {
+    use MeasuresTrait;
+
     /**
      * @param list<string> $dimensionality
      */
@@ -54,9 +56,10 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     }
 
     #[\Override]
-    public function getTuple(): DefaultTuple
+    public function getTuple(): DefaultOrderedTuple
     {
-        return $this->cell->getTuple();
+        return $this->cell->getTuple()
+            ->withOrder($this->dimensionality->getAncestorsToCurrent());
     }
 
     #[\Override]
@@ -71,12 +74,6 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
             dimensionality: $dimensionality,
             registry: $this->registry,
         );
-    }
-
-    #[\Override]
-    public function getMeasure(): DefaultMeasure
-    {
-        return $this->cell->getMeasure();
     }
 
     #[\Override]
