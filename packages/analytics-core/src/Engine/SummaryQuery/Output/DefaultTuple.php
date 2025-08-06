@@ -55,6 +55,17 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         $this->dimensions = $dimensionsArray;
     }
 
+    /**
+     * @param list<string> $order
+     */
+    public function withOrder(array $order): DefaultOrderedTuple
+    {
+        return new DefaultOrderedTuple(
+            tuple: $this,
+            order: $order,
+        );
+    }
+
     #[\Override]
     public function getSummaryClass(): string
     {

@@ -125,4 +125,9 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
             yield $key => $dimension;
         }
     }
+
+    public function getMeasureName(): ?string
+    {
+        return $this->tuple->getMeasureName();
+    }
 }

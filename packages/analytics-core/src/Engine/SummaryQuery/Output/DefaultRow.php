@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
 use Rekalogika\Analytics\Contracts\Result\Row;
 
 final class DefaultRow implements Row
 {
+    use MeasuresTrait;
+
     /**
      * @param list<string> $dimensionality
      */
@@ -28,16 +28,13 @@ final class DefaultRow implements Row
     ) {}
 
     #[\Override]
-    public function getTuple(): OrderedTuple
+    public function getTuple(): DefaultOrderedTuple
     {
-        return new DefaultOrderedTuple(
-            tuple: $this->cell->getTuple(),
-            order: $this->dimensionality,
-        );
+        return $this->cell->getTuple()->withOrder($this->dimensionality);
     }
 
     #[\Override]
-    public function getMeasures(): Measures
+    public function getMeasures(): DefaultMeasures
     {
         return $this->cell->getMeasures();
     }

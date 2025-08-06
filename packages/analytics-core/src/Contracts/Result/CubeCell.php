@@ -19,7 +19,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface CubeCell
+interface CubeCell extends Cell
 {
     /**
      * The input summary class for this cube.
@@ -28,15 +28,16 @@ interface CubeCell
      */
     public function getSummaryClass(): string;
 
+    /**
+     * The apex CubeCell, or the CubeCell without any dimensions.
+     */
     public function getApex(): self;
 
+    /**
+     * Determine if this TreeNode was created for interpolation, or to balance
+     * the tree, and does not result from the query.
+     */
     public function isNull(): bool;
-
-    public function getTuple(): Tuple;
-
-    public function getMeasures(): Measures;
-
-    public function getMeasure(): Measure;
 
     public function rollUp(string $dimensionName): self;
 

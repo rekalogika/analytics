@@ -22,18 +22,12 @@ use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
  *
  * @extends OrderedMapCollection<mixed,TreeNode>
  */
-interface TreeNode extends OrderedMapCollection, Dimension
+interface TreeNode extends OrderedMapCollection, Dimension, OrderedCell
 {
     /**
      * @return class-string
      */
     public function getSummaryClass(): string;
-
-    /**
-     * Get the tuple of this node, which is a collection of dimensions from the
-     * root to this node.
-     */
-    public function getTuple(): Tuple;
 
     /**
      * Gets children of this node, with the specified dimension name. The
@@ -48,16 +42,11 @@ interface TreeNode extends OrderedMapCollection, Dimension
      */
     public function getChildren(int|string $name = 1): TreeNodes;
 
-    public function getMeasure(): Measure;
-
-    public function getMeasures(): Measures;
-
     public function traverse(mixed ...$members): ?TreeNode;
 
     /**
-     * Determine if this TreeNode was created to balance the tree, and does not
-     * result from the query. If true, this node always leads to a dead end, and
-     * won't have any measure on its leaves
+     * Determine if this TreeNode was created for interpolation, or to balance
+     * the tree, and does not result from the query.
      */
     public function isNull(): bool;
 }
