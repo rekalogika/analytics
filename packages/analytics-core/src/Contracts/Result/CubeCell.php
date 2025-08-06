@@ -41,13 +41,4 @@ interface CubeCell
     public function rollUp(string $dimensionName): self;
 
     public function drillDown(string $dimensionName): CubeCells;
-
-    // public function traverse(mixed ...$members): ?CubeCell;
-
-    // /**
-    //  * Determine if this cell was created to balance the tree, and does not
-    //  * result from the query. If true, this node always leads to a dead end, and
-    //  * won't have any measure on its leaves
-    //  */
-    // public function isNull(): bool;
 }

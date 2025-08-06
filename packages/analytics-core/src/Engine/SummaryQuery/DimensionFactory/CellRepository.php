@@ -57,9 +57,15 @@ final class CellRepository
         string $dimensionName,
         bool $fillGaps,
     ): iterable {
-        $dimensions = $this->dimensionCollection
-            ->getDimensionsByName($dimensionName)
-            ->getGapFilled();
+        if ($fillGaps) {
+            $dimensions = $this->dimensionCollection
+                ->getDimensionsByName($dimensionName)
+                ->getGapFilled();
+        } else {
+            $dimensions = $this->dimensionCollection
+                ->getDimensionsByName($dimensionName)
+                ->getUnprocessed();
+        }
 
         foreach ($dimensions as $dimension) {
             $tuple = $baseCell->getTuple()->append($dimension);
@@ -108,7 +114,8 @@ final class CellRepository
                 context: $baseCell->getContext(),
             );
 
-            yield $this->signatureToCell[$tuple->getSignature()] = $cell;
+            $this->collectCell($cell);
+            yield $cell;
         }
     }
 

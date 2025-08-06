@@ -163,15 +163,15 @@ final class AppController extends AbstractController
          * @phpstan-ignore argument.type
          */
         $tupleDto = TupleDto::fromArray(json_decode($data, true));
-        $row = $tupleMapper->fromDto($class, $tupleDto);
-        $queryComponents = $summaryManager->getTupleQueryComponents($row->getTuple());
+        $cell = $tupleMapper->fromDto($class, $tupleDto);
+        $queryComponents = $summaryManager->getTupleQueryComponents($cell->getTuple());
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
         $sourceSql = $sqlFormatter->compress($sourceSql);
         $sourceSql = $sqlFormatter->highlight($sourceSql);
 
         return $this->render('app/tuple.html.twig', [
-            'row' => $row,
+            'row' => $cell,
             'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'hash' => $hash,
