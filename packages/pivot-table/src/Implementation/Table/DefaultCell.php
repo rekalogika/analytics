@@ -106,9 +106,4 @@ abstract readonly class DefaultCell implements Cell
 
         return new DefaultRows([$row1, $row2], $this->context);
     }
-
-    private function getSignature(): string
-    {
-        return hash('xxh128', serialize($this));
-    }
 }
