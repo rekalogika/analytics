@@ -61,4 +61,9 @@ interface TreeNode
      * @return iterable<TreeNode>
      */
     public function drillDown(string $dimensionName): iterable;
+
+    /**
+     * @param list<string> $keys
+     */
+    public function rollUp(array $keys): TreeNode;
 }

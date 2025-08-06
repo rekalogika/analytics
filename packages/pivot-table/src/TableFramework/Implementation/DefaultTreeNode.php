@@ -186,4 +186,28 @@ final readonly class DefaultTreeNode implements TreeNode
             );
         }
     }
+
+    #[\Override]
+    public function rollUp(array $keys): TreeNode
+    {
+        $tuple = $this->tuple;
+
+        foreach ($keys as $key) {
+            if (!\array_key_exists($key, $tuple)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Key "%s" not found in tuple.',
+                    $key,
+                ));
+            }
+
+            unset($tuple[$key]);
+        }
+
+        return new self(
+            manager: $this->manager,
+            tuple: $tuple,
+            descendantPath: [],
+            row: $this->manager->getRowRepository()->getRowOrFail($tuple),
+        );
+    }
 }

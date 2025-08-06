@@ -80,4 +80,10 @@ final readonly class NullTreeNode implements TreeNode
     {
         yield from [];
     }
+
+    #[\Override]
+    public function rollUp(array $keys): TreeNode
+    {
+        return $this;
+    }
 }

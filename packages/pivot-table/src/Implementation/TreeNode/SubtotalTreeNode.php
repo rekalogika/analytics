@@ -68,4 +68,10 @@ final readonly class SubtotalTreeNode implements TreeNode
     {
         return $this->node->drillDown($dimensionName);
     }
+
+    #[\Override]
+    public function rollUp(array $keys): TreeNode
+    {
+        return $this->node->rollUp($keys);
+    }
 }
