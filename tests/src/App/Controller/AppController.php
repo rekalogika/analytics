@@ -120,9 +120,9 @@ final class AppController extends AbstractController
         } catch (UnsupportedData) {
             $chart = null;
             $chartError = null;
-        } catch (\OverflowException $e) {
+        } catch (AnalyticsFrontendException $e) {
             $chart = null;
-            $chartError = $e->getMessage();
+            $chartError = $e->trans($this->translator);
         } catch (\Throwable $e) {
             $chart = null;
             $chartError = 'An error occurred while creating the chart: ';

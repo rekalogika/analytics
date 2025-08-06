@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
-use Rekalogika\Analytics\Contracts\Exception\OverflowException;
+use Rekalogika\Analytics\Contracts\Exception\InterpolationOverflowException;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultDimension;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -75,9 +75,7 @@ final class DimensionFactory
         if ($interpolation) {
             $this->currentNodesCount++;
             if ($this->currentNodesCount > $this->nodesLimit) {
-                throw new OverflowException(
-                    'The number of interpolation nodes exceeds the limit of ' . $this->nodesLimit,
-                );
+                throw new InterpolationOverflowException($this->nodesLimit);
             }
         }
 
