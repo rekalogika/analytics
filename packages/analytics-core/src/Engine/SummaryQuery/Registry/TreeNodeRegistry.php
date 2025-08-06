@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Registry;
 
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTreeNode;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DimensionNames;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\Dimensionality;
 
 final class TreeNodeRegistry
 {
@@ -28,28 +28,28 @@ final class TreeNodeRegistry
 
     public function get(
         DefaultCell $cell,
-        DimensionNames $dimensionNames,
+        Dimensionality $dimensionality,
     ): DefaultTreeNode {
         $signature = $this->getSignature(
             cell: $cell,
-            dimensionNames: $dimensionNames,
+            dimensionality: $dimensionality,
         );
 
         return $this->nodes[$signature] ??= new DefaultTreeNode(
             cell: $cell,
-            dimensionNames: $dimensionNames,
+            dimensionNames: $dimensionality,
             registry: $this,
         );
     }
 
     private function getSignature(
         DefaultCell $cell,
-        DimensionNames $dimensionNames,
+        Dimensionality $dimensionality,
     ): string {
         return \sprintf(
             '%s:%s',
             spl_object_id($cell),
-            $dimensionNames->getSignature(),
+            $dimensionality->getSignature(),
         );
     }
 }

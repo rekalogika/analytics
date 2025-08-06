@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Engine\SummaryQuery\Exception\DimensionNamesException;
 
-final readonly class DimensionNames
+final readonly class Dimensionality
 {
     /**
      * @param list<string> $dimensionNames

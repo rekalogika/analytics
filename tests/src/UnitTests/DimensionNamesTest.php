@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DimensionNames;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\Dimensionality;
 
 final class DimensionNamesTest extends TestCase
 {
     public function testBasic(): void
     {
-        $dimensionNames = DimensionNames::create(['a', 'b', 'c']);
+        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
 
         $this->assertEquals(['a', 'b', 'c'], $dimensionNames->getDescendants());
         $this->assertEquals([], $dimensionNames->getAncestors());
@@ -29,7 +29,7 @@ final class DimensionNamesTest extends TestCase
 
     public function testDescendImmediate(): void
     {
-        $dimensionNames = DimensionNames::create(['a', 'b', 'c']);
+        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
         $descended = $dimensionNames->descend('a');
 
         $this->assertEquals([], $descended->getAncestors());
@@ -39,7 +39,7 @@ final class DimensionNamesTest extends TestCase
 
     public function testSingleDimensionDescend(): void
     {
-        $dimensionNames = DimensionNames::create(['a']);
+        $dimensionNames = Dimensionality::create(['a']);
         $this->assertEquals(['a'], $dimensionNames->getDescendants());
         $this->assertEquals([], $dimensionNames->getAncestors());
         $this->assertNull($dimensionNames->getCurrent());
@@ -52,7 +52,7 @@ final class DimensionNamesTest extends TestCase
 
     public function testDescendNonImmediate(): void
     {
-        $dimensionNames = DimensionNames::create(['a', 'b', 'c']);
+        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
         $descended = $dimensionNames->descend('b');
 
         $this->assertEquals([], $descended->getAncestors());
@@ -62,7 +62,7 @@ final class DimensionNamesTest extends TestCase
 
     public function testResolveName(): void
     {
-        $dimensionNames = DimensionNames::create(['a', 'b', 'c']);
+        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
 
         $this->assertEquals('a', $dimensionNames->resolveName('a'));
         $this->assertEquals('b', $dimensionNames->resolveName('b'));

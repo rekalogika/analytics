@@ -24,14 +24,14 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 {
     public function __construct(
         private DefaultCells $cells,
-        private DimensionNames $dimensionNames,
+        private Dimensionality $dimensionality,
         private TreeNodeRegistry $registry,
     ) {}
 
     #[\Override]
     public function getByKey(mixed $key): mixed
     {
-        $current = $this->dimensionNames->getCurrent();
+        $current = $this->dimensionality->getCurrent();
 
         if ($current === null) {
             throw new LogicException('Cannot get by key when current dimension is null.');
@@ -57,14 +57,14 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 
         return $this->registry->get(
             cell: $result,
-            dimensionNames: $this->dimensionNames,
+            dimensionality: $this->dimensionality,
         );
     }
 
     #[\Override]
     public function hasKey(mixed $key): bool
     {
-        $current = $this->dimensionNames->getCurrent();
+        $current = $this->dimensionality->getCurrent();
 
         if ($current === null) {
             throw new LogicException('Cannot get by key when current dimension is null.');
@@ -90,7 +90,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 
         return $this->registry->get(
             cell: $result,
-            dimensionNames: $this->dimensionNames,
+            dimensionality: $this->dimensionality,
         );
     }
 
@@ -105,7 +105,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 
         return $this->registry->get(
             cell: $result,
-            dimensionNames: $this->dimensionNames,
+            dimensionality: $this->dimensionality,
         );
     }
 
@@ -122,7 +122,7 @@ final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
         foreach ($this->cells as $cell) {
             yield $this->registry->get(
                 cell: $cell,
-                dimensionNames: $this->dimensionNames,
+                dimensionality: $this->dimensionality,
             );
         }
     }

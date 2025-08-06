@@ -36,14 +36,14 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         return new self(
             cell: $cell,
-            dimensionNames: DimensionNames::create($dimensionNames),
+            dimensionNames: Dimensionality::create($dimensionNames),
             registry: $registry,
         );
     }
 
     public function __construct(
         private readonly DefaultCell $cell,
-        private readonly DimensionNames $dimensionNames,
+        private readonly Dimensionality $dimensionNames,
         private readonly TreeNodeRegistry $registry,
     ) {}
 
@@ -74,7 +74,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
 
         return new DefaultTreeNodes(
             cells: $cells,
-            dimensionNames: $dimensionNames,
+            dimensionality: $dimensionNames,
             registry: $this->registry,
         );
     }
