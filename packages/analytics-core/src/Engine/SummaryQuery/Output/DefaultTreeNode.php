@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
-use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Engine\SummaryQuery\Registry\TreeNodeRegistry;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -208,7 +208,7 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getLabel(): TranslatableInterface
     {
         return $this->getDimension()?->getLabel()
-            ?? new TranslatableMessage('Unknown');
+            ?? new LiteralString('-');
     }
 
     #[\Override]

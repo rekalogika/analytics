@@ -361,5 +361,11 @@
         <target>An error occurred</target>
       </segment>
     </unit>
+    <unit id="g5KBtuL" name="Multiple measures">
+      <segment>
+        <source>Multiple measures</source>
+        <target>Multiple measures</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
