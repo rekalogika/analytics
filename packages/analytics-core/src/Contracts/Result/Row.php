@@ -21,7 +21,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
  */
 interface Row
 {
-    public function getTuple(): Tuple;
+    public function getTuple(): OrderedTuple;
 
     public function getMeasures(): Measures;
 }

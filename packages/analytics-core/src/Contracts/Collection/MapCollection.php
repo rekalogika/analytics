@@ -18,7 +18,7 @@ namespace Rekalogika\Analytics\Contracts\Collection;
  * @template-covariant TValue
  * @extends \Traversable<TKey,TValue>
  */
-interface SetCollection extends \Traversable, \Countable
+interface MapCollection extends \Traversable, \Countable
 {
     /**
      * @param TKey $key

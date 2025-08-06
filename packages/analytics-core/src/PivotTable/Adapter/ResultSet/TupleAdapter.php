@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\ResultSet;
 
-use Rekalogika\Analytics\Contracts\Result\Tuple as AnalyticsTuple;
+use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
 use Rekalogika\PivotTable\Contracts\Result\Tuple;
 
 /**
@@ -22,7 +22,7 @@ use Rekalogika\PivotTable\Contracts\Result\Tuple;
 final readonly class TupleAdapter implements Tuple, \IteratorAggregate
 {
     public function __construct(
-        private AnalyticsTuple $tuple,
+        private OrderedTuple $tuple,
     ) {}
 
     #[\Override]

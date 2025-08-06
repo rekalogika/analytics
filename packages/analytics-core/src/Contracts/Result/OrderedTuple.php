@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
@@ -26,19 +25,4 @@ use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
  *
  * @extends OrderedMapCollection<string,Dimension>
  */
-interface OrderedTuple extends OrderedMapCollection
-{
-    /**
-     * The summary class that this tuple belongs to.
-     *
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-
-    public function getCondition(): ?Expression;
-
-    /**
-     * @return list<string>
-     */
-    public function getDimensionality(): array;
-}
+interface OrderedTuple extends Tuple, OrderedMapCollection {}

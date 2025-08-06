@@ -16,10 +16,9 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
-final class DefaultCell implements CubeCell, Row
+final class DefaultCell implements CubeCell
 {
     private ?DefaultMeasure $measure = null;
 

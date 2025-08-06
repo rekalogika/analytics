@@ -215,8 +215,14 @@ final class DefaultResult implements Result
     #[\Override]
     public function getTable(): DefaultTable
     {
-        return $this->table ??= new DefaultTable(
+        $dimensionality = array_values(array_filter(
+            $this->query->getGroupBy(),
+            static fn(string $field): bool => $field !== '@values',
+        ));
+
+        return $this->table ??= DefaultTable::create(
             context: $this->getResultContext(),
+            dimensionality: $dimensionality,
         );
     }
 

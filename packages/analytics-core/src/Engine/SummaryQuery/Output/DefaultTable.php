@@ -17,49 +17,66 @@ use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Analytics\Engine\SummaryQuery\Registry\RowRegistry;
 
 /**
- * @implements \IteratorAggregate<Tuple,DefaultCell>
+ * @implements \IteratorAggregate<Tuple,DefaultRow>
  */
 final class DefaultTable implements Table, \IteratorAggregate
 {
     private readonly CellRepository $cellRepository;
 
     /**
-     * @var list<string>
-     */
-    private readonly array $dimensionality;
-
-    /**
-     * @var \ArrayObject<int<0,max>,DefaultCell>|null
+     * @var \ArrayObject<int<0,max>,DefaultRow>|null
      * @phpstan-ignore property.unusedType
      */
     private ?\ArrayObject $rows = null;
 
-    public function __construct(private readonly ResultContext $context)
-    {
-        $this->cellRepository = $context->getCellRepository();
-        $dimensionality = $context->getQuery()->getGroupBy();
+    /**
+     * @param list<string> $dimensionality
+     */
+    public static function create(
+        ResultContext $context,
+        array $dimensionality,
+    ): self {
+        $registry = new RowRegistry($dimensionality);
 
-        // remove @values from dimensionality
-        $this->dimensionality = array_values(array_filter(
-            $dimensionality,
-            static fn(string $dimension) => $dimension !== '@values',
-        ));
+        return new self(
+            context: $context,
+            dimensionality: $dimensionality,
+            registry: $registry,
+        );
+    }
+
+    /**
+     * @param list<string> $dimensionality
+     */
+    public function __construct(
+        private readonly ResultContext $context,
+        private readonly array $dimensionality,
+        private readonly RowRegistry $registry,
+    ) {
+        $this->cellRepository = $context->getCellRepository();
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultCell
+    public function getByKey(mixed $key): ?DefaultRow
     {
         if (!$key instanceof DefaultTuple) {
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
         }
 
-        return $this->cellRepository->getCellByTuple($key);
+        $cell = $this->cellRepository->getCellByTuple($key);
+
+        if ($cell === null) {
+            return null;
+        }
+
+        return $this->registry->getRowByCell($cell);
     }
 
     /**
-     * @return \ArrayObject<int<0,max>,DefaultCell>
+     * @return \ArrayObject<int<0,max>,DefaultRow>
      */
     private function getRows(): \ArrayObject
     {
@@ -67,18 +84,23 @@ final class DefaultTable implements Table, \IteratorAggregate
             return $this->rows;
         }
 
-        $rows = $this->cellRepository
+        $cells = $this->cellRepository
             ->getCellsByDimensionality($this->dimensionality);
 
-        $rows = array_values(iterator_to_array($rows));
-        /** @var \ArrayObject<int<0,max>,DefaultCell> */
-        $array = new \ArrayObject($rows);
+        $rows = [];
 
-        return $this->rows = $array;
+        foreach ($cells as $cell) {
+            $rows[] = $this->registry->getRowByCell($cell);
+        }
+
+        /**
+         * @var \ArrayObject<int<0,max>,DefaultRow>
+         */
+        return $this->rows = new \ArrayObject($rows, \ArrayObject::ARRAY_AS_PROPS); // @phpstan-ignore-line
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?DefaultCell
+    public function getByIndex(int $index): ?DefaultRow
     {
         return $this->getRows()[$index] ?? null;
     }
@@ -103,7 +125,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultCell
+    public function first(): ?DefaultRow
     {
         $rows = $this->getRows();
 
@@ -111,7 +133,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function last(): ?DefaultCell
+    public function last(): ?DefaultRow
     {
         $rows = $this->getRows();
 
@@ -134,22 +156,5 @@ final class DefaultTable implements Table, \IteratorAggregate
         foreach ($this->getRows() as $row) {
             yield $row->getTuple() => $row;
         }
-    }
-
-    public function getMeasureByTuple(DefaultTuple $tuple): ?DefaultMeasure
-    {
-        $measureName = $tuple->getMeasureName();
-
-        if ($measureName === null) {
-            return null;
-        }
-
-        $row = $this->getByKey($tuple->withoutMeasure());
-
-        if ($row === null) {
-            return null;
-        }
-
-        return $row->getMeasures()->getByKey($measureName);
     }
 }

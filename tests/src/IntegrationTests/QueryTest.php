@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTable;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
@@ -629,7 +629,7 @@ final class QueryTest extends KernelTestCase
         $rows = iterator_to_array($result, false);
         $first = array_shift($rows);
 
-        $this->assertInstanceOf(DefaultCell::class, $first);
+        $this->assertInstanceOf(DefaultRow::class, $first);
 
         // $tuple = $first->getTuple();
         // $this->assertInstanceOf(DefaultTuple::class, $tuple);

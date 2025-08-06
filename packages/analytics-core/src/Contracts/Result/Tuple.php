@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Collection\SetCollection;
+use Rekalogika\Analytics\Contracts\Collection\MapCollection;
 
 /**
  * A tuple of dimensions. A collection of dimensions that identifies a unique
@@ -24,9 +24,9 @@ use Rekalogika\Analytics\Contracts\Collection\SetCollection;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends SetCollection<string,Dimension>
+ * @extends MapCollection<string,Dimension>
  */
-interface Tuple extends SetCollection
+interface Tuple extends MapCollection
 {
     /**
      * The summary class that this tuple belongs to.

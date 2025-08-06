@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\NormalRow;
 use Rekalogika\Analytics\Contracts\Result\NormalTable;
+use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
@@ -67,7 +68,7 @@ final readonly class ResultDebugger
     /**
      * @return list<string>
      */
-    public static function debugTuple(Tuple $tuple): array
+    public static function debugTuple(Tuple|OrderedTuple $tuple): array
     {
         $result = [];
 
