@@ -65,6 +65,7 @@ abstract class BlockGroup extends Block
                 node: $childNode,
                 parentNode: $this->node,
                 levelIncrement: $level,
+                key: $childNode->getKey(),
             );
         }
 
@@ -88,6 +89,7 @@ abstract class BlockGroup extends Block
                 node: $childNode,
                 parentNode: $this->node,
                 levelIncrement: $level,
+                key: $childNode->getKey(),
             );
         }
 
@@ -175,7 +177,16 @@ abstract class BlockGroup extends Block
         }
 
         return $this->childNodes[$level] = $children;
+
+        // $key = $this->getContext()->getNextKey($level);
+
+        // if ($key === null) {
+        //     return [];
+        // }
+
+        // return $this->getChildNodesByKey($key);
     }
+
 
     /**
      * @param int<1,max> $level
@@ -244,5 +255,32 @@ abstract class BlockGroup extends Block
         }
 
         return $result;
+    }
+
+
+    /**
+     * @param null|non-empty-list<TreeNodeDecorator> $prototypeNodes
+     * @return list<TreeNodeDecorator>
+     */
+    private function getChildNodesByKey(string $key, ?array $prototypeNodes = null): array
+    {
+        $children = $this->node->drillDown($key);
+
+        if ($prototypeNodes !== null) {
+            $children = $this->balanceNodesWithPrototype(
+                nodes: $children,
+                prototypeNodes: $prototypeNodes,
+            );
+        }
+
+        // if (\count($children) >= 2) {
+        //     $subtotalNode = $this->getSubtotalNode($level);
+
+        //     if ($subtotalNode !== null) {
+        //         $children[] = $subtotalNode;
+        //     }
+        // }
+
+        return $children;
     }
 }

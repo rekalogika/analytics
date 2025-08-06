@@ -19,6 +19,8 @@ use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 
 final readonly class BlockContext
 {
+    private Keys $keys;
+
     /**
      * @param list<string> $pivotedKeys
      * @param list<string> $unpivotedKeys
@@ -31,22 +33,19 @@ final readonly class BlockContext
     public function __construct(
         private TreeNodeDecorator $rootNode,
         private TreeNodeDecoratorRepository $repository,
-        private array $unpivotedKeys,
-        private array $pivotedKeys,
+        array $unpivotedKeys,
+        array $pivotedKeys,
         private array $skipLegends,
         private array $createSubtotals,
         private int $subtotalDepth = 0,
         private int $blockDepth = 0,
-        private array $currentKeyPath = [],
+        array $currentKeyPath = [],
     ) {
-        if (
-            array_diff($this->pivotedKeys, $this->unpivotedKeys) !== $this->pivotedKeys
-            || array_diff($this->unpivotedKeys, $this->pivotedKeys) !== $this->unpivotedKeys
-        ) {
-            throw new \InvalidArgumentException(
-                'Pivoted nodes and unpivoted nodes must not overlap.',
-            );
-        }
+        $this->keys = new Keys(
+            pivotedKeys: $pivotedKeys,
+            unpivotedKeys: $unpivotedKeys,
+            currentKeyPath: $currentKeyPath,
+        );
     }
 
     public function getRepository(): TreeNodeDecoratorRepository
@@ -63,9 +62,9 @@ final readonly class BlockContext
         return new self(
             rootNode: $this->rootNode,
             repository: $this->repository,
-            pivotedKeys: $this->pivotedKeys,
-            unpivotedKeys: $this->unpivotedKeys,
-            currentKeyPath: $this->currentKeyPath,
+            pivotedKeys: $this->keys->getPivotedKeys(),
+            unpivotedKeys: $this->keys->getUnpivotedKeys(),
+            currentKeyPath: $this->keys->getCurrentKeyPath(),
             skipLegends: $this->skipLegends,
             createSubtotals: $this->createSubtotals,
             subtotalDepth: $this->subtotalDepth + 1,
@@ -81,13 +80,31 @@ final readonly class BlockContext
         return new self(
             rootNode: $this->rootNode,
             repository: $this->repository,
-            pivotedKeys: $this->pivotedKeys,
-            unpivotedKeys: $this->unpivotedKeys,
-            currentKeyPath: $this->currentKeyPath,
+            pivotedKeys: $this->keys->getPivotedKeys(),
+            unpivotedKeys: $this->keys->getUnpivotedKeys(),
+            currentKeyPath: $this->keys->getCurrentKeyPath(),
             skipLegends: $this->skipLegends,
             createSubtotals: $this->createSubtotals,
             subtotalDepth: $this->subtotalDepth,
             blockDepth: $this->blockDepth + $amount,
+        );
+    }
+
+    public function appendKey(string $key): self
+    {
+        $newPath = $this->keys->getCurrentKeyPath();
+        $newPath[] = $key;
+
+        return new self(
+            rootNode: $this->rootNode,
+            repository: $this->repository,
+            pivotedKeys: $this->keys->getPivotedKeys(),
+            unpivotedKeys: $this->keys->getUnpivotedKeys(),
+            currentKeyPath: $newPath,
+            skipLegends: $this->skipLegends,
+            createSubtotals: $this->createSubtotals,
+            subtotalDepth: $this->subtotalDepth,
+            blockDepth: $this->blockDepth,
         );
     }
 
@@ -100,7 +117,7 @@ final readonly class BlockContext
      */
     public function getUnpivotedKeys(): array
     {
-        return $this->unpivotedKeys;
+        return $this->keys->getUnpivotedKeys();
     }
 
     /**
@@ -108,7 +125,7 @@ final readonly class BlockContext
      */
     public function getPivotedKeys(): array
     {
-        return $this->pivotedKeys;
+        return $this->keys->getPivotedKeys();
     }
 
     /**
@@ -116,22 +133,22 @@ final readonly class BlockContext
      */
     public function getKeys(): array
     {
-        return array_merge($this->unpivotedKeys, $this->pivotedKeys);
+        return $this->keys->getKeys();
     }
 
     public function isKeyPivoted(string $key): bool
     {
-        return \in_array($key, $this->pivotedKeys, true);
+        return $this->keys->isKeyPivoted($key);
     }
 
     public function isKeyUnpivoted(string $key): bool
     {
-        return \in_array($key, $this->unpivotedKeys, true);
+        return $this->keys->isKeyUnpivoted($key);
     }
 
     public function getFirstPivotedKey(): ?string
     {
-        return $this->pivotedKeys[0] ?? null;
+        return $this->keys->getFirstPivotedKey();
     }
 
     /**
@@ -139,34 +156,22 @@ final readonly class BlockContext
      */
     public function getCurrentKeyPath(): array
     {
-        return $this->currentKeyPath;
+        return $this->keys->getCurrentKeyPath();
     }
 
     public function getCurrentKey(): ?string
     {
-        if (\count($this->currentKeyPath) === 0) {
-            return null;
-        }
-
-        return $this->currentKeyPath[\count($this->currentKeyPath) - 1] ?? null;
+        return $this->keys->getCurrentKey();
     }
 
-    public function getNextKey(): ?string
+    /**
+     * @param int<1,max> $level 1 means gets the next key, 2 means get the next
+     * after the next key, and so on.
+     * @return string|null
+     */
+    public function getNextKey(int $level = 1): ?string
     {
-        $keys = $this->getKeys();
-        $currentKey = $this->getCurrentKey();
-
-        if ($currentKey === null) {
-            return $keys[0] ?? null;
-        }
-
-        $currentIndex = array_search($currentKey, $keys, true);
-
-        if ($currentIndex === false || $currentIndex + 1 >= \count($keys)) {
-            return null;
-        }
-
-        return $keys[$currentIndex + 1];
+        return $this->keys->getNextKey($level);
     }
 
     //

@@ -65,10 +65,14 @@ abstract class Block implements \Stringable
         TreeNodeDecorator $node,
         ?TreeNodeDecorator $parentNode,
         int $levelIncrement,
+        string $key,
     ): Block {
         $context = $this->getContext();
         $level = $context->getBlockDepth();
-        $context = $context->incrementBlockDepth($levelIncrement);
+
+        $context = $context
+            ->incrementBlockDepth($levelIncrement)
+            ->appendKey($key);
 
         if ($node->isSubtotal()) {
             $context = $context->incrementSubtotal();

@@ -110,6 +110,7 @@ final class HorizontalBlockGroup extends BlockGroup
                 node: $childNode,
                 parentNode: $this->getNode(),
                 levelIncrement: $level,
+                key: $childNode->getKey(),
             );
         }
 
