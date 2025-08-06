@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
-use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 
 final readonly class BlockContext
 {
@@ -31,8 +29,7 @@ final readonly class BlockContext
      * @param int<0,max> $blockDepth 0 is the root block, 1 is the child of the root block, and so on.
      */
     public function __construct(
-        private TreeNodeDecorator $rootNode,
-        private TreeNodeDecoratorRepository $repository,
+        private TreeNode $rootNode,
         array $unpivotedKeys,
         array $pivotedKeys,
         private array $skipLegends,
@@ -48,11 +45,6 @@ final readonly class BlockContext
         );
     }
 
-    public function getRepository(): TreeNodeDecoratorRepository
-    {
-        return $this->repository;
-    }
-
     //
     // withers
     //
@@ -61,7 +53,6 @@ final readonly class BlockContext
     {
         return new self(
             rootNode: $this->rootNode,
-            repository: $this->repository,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -79,7 +70,6 @@ final readonly class BlockContext
     {
         return new self(
             rootNode: $this->rootNode,
-            repository: $this->repository,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -97,7 +87,6 @@ final readonly class BlockContext
 
         return new self(
             rootNode: $this->rootNode,
-            repository: $this->repository,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $newPath,
@@ -174,18 +163,23 @@ final readonly class BlockContext
         return $this->keys->getNextKey($level);
     }
 
+    public function isLeaf(string $key): bool
+    {
+        return $this->keys->isLeaf($key);
+    }
+
     //
     // misc
     //
 
-    public function isLegendSkipped(TreeNodeDecorator $node): bool
+    public function isLegendSkipped(string $key): bool
     {
-        return \in_array($node->getKey(), $this->skipLegends, true);
+        return \in_array($key, $this->skipLegends, true);
     }
 
-    public function doCreateSubtotals(TreeNode $node): bool
+    public function doCreateSubtotals(string $key): bool
     {
-        return \in_array($node->getKey(), $this->createSubtotals, true);
+        return \in_array($key, $this->createSubtotals, true);
     }
 
     /**
@@ -204,7 +198,7 @@ final readonly class BlockContext
         return $this->blockDepth;
     }
 
-    public function getRootTreeNode(): TreeNodeDecorator
+    public function getRootTreeNode(): TreeNode
     {
         return $this->rootNode;
     }

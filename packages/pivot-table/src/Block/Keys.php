@@ -119,4 +119,16 @@ final readonly class Keys
 
         return $keys[$nextIndex] ?? null;
     }
+
+    public function isLeaf(string $key): bool
+    {
+        $keys = $this->getKeys();
+
+        // it's a leaf if it's the last key in the list
+        if ($keys === []) {
+            return true;
+        }
+
+        return $key === $keys[\count($keys) - 1];
+    }
 }

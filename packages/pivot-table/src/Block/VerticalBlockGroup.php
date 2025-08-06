@@ -13,44 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class VerticalBlockGroup extends BlockGroup
 {
-    private ?DefaultRows $headerRows = null;
-
-    private ?DefaultRows $dataRows = null;
-
-    public function __construct(
-        TreeNodeDecorator $node,
-        ?TreeNodeDecorator $parentNode,
-        BlockContext $context,
-    ) {
-        parent::__construct(
-            node: $node,
-            parentNode: $parentNode,
-            context: $context,
-        );
-    }
-
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        if ($this->headerRows !== null) {
-            return $this->headerRows;
-        }
-
-        return $this->headerRows = $this->getOneChildBlock()->getHeaderRows();
+        return $this->getOneChildBlock()->getHeaderRows();
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
-        if ($this->dataRows !== null) {
-            return $this->dataRows;
-        }
-
         $dataRows = new DefaultRows([], $this->getElementContext());
 
         // add a data row for each of the child blocks
@@ -58,6 +33,6 @@ final class VerticalBlockGroup extends BlockGroup
             $dataRows = $dataRows->appendBelow($childBlock->getDataRows());
         }
 
-        return $this->dataRows = $dataRows;
+        return $dataRows;
     }
 }

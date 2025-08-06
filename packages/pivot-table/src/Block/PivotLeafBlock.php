@@ -25,7 +25,7 @@ final class PivotLeafBlock extends LeafBlock
         $context = $this->getElementContext();
 
         if (
-            $this->getContext()->isLegendSkipped($this->getTreeNode())
+            $this->getContext()->isLegendSkipped($this->getTreeNode()->getKey())
         ) {
             $cell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),

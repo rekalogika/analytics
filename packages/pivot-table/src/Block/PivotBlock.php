@@ -25,7 +25,7 @@ final class PivotBlock extends BranchBlock
         $context = $this->getElementContext();
 
         if (
-            $this->getContext()->isLegendSkipped($this->getTreeNode())
+            $this->getContext()->isLegendSkipped($this->getTreeNode()->getKey())
         ) {
             $valueCell = new DefaultHeaderCell(
                 name: $this->getTreeNode()->getKey(),

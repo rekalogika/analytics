@@ -99,15 +99,15 @@ final class AppController extends AbstractController
         } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
             $pivotTableError = $e->trans($this->translator);
-        // } catch (\Throwable $e) {
-        //     $pivotTable = null;
-        //     $pivotTableError = 'An error occurred while rendering the pivot table.';
-        //     $this->logger->error(
-        //         'An error occurred while rendering the pivot table.',
-        //         [
-        //             'exception' => $e,
-        //         ],
-        //     );
+            // } catch (\Throwable $e) {
+            //     $pivotTable = null;
+            //     $pivotTableError = 'An error occurred while rendering the pivot table.';
+            //     $this->logger->error(
+            //         'An error occurred while rendering the pivot table.',
+            //         [
+            //             'exception' => $e,
+            //         ],
+            //     );
         }
 
         // expression rendering

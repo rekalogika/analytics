@@ -14,14 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\Contracts\TreeNode;
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
-use Rekalogika\PivotTable\Decorator\TreeNodeDecoratorRepository;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
+use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 
 abstract class Block implements \Stringable
 {
@@ -58,23 +57,12 @@ abstract class Block implements \Stringable
         return $this->context->getBlockDepth();
     }
 
-    /**
-     * @param int<1,max> $levelIncrement
-     */
-    final protected function createBlock(
-        TreeNodeDecorator $node,
-        ?TreeNodeDecorator $parentNode,
-        int $levelIncrement,
-        string $key,
-    ): Block {
+    final protected function createBlock(TreeNode $node): Block
+    {
         $context = $this->getContext();
-        $level = $context->getBlockDepth();
+        $context = $context->appendKey($node->getKey());
 
-        $context = $context
-            ->incrementBlockDepth($levelIncrement)
-            ->appendKey($key);
-
-        if ($node->isSubtotal()) {
+        if ($node instanceof SubtotalTreeNode) {
             $context = $context->incrementSubtotal();
         }
 
@@ -82,14 +70,12 @@ abstract class Block implements \Stringable
             if ($context->isKeyPivoted($node->getKey())) {
                 return new PivotBlock(
                     node: $node,
-                    parentNode: $parentNode,
                     parent: $this,
                     context: $context,
                 );
             } else {
                 return new NormalBlock(
                     node: $node,
-                    parentNode: $parentNode,
                     parent: $this,
                     context: $context,
                 );
@@ -101,16 +87,16 @@ abstract class Block implements \Stringable
                     parent: $this,
                     context: $context,
                 );
-            } elseif (
-                $parentNode !== null
-                && $level > 0
-                && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
-            ) {
-                return new SingleNodeLeafBlock(
-                    node: $node,
-                    parent: $this,
-                    context: $context,
-                );
+                // } elseif (
+                //     $parentNode !== null
+                //     && $level > 0
+                //     && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
+                // ) {
+                //     return new SingleNodeLeafBlock(
+                //         node: $node,
+                //         parent: $this,
+                //         context: $context,
+                //     );
             } else {
                 return new NormalLeafBlock(
                     node: $node,
@@ -134,19 +120,15 @@ abstract class Block implements \Stringable
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
-        $repository = new TreeNodeDecoratorRepository();
-        $rootNode = $repository->decorate($node);
-
         $context = new BlockContext(
-            rootNode: $rootNode,
-            repository: $repository,
+            rootNode: $node,
             unpivotedKeys: $unpivotedNodes,
             pivotedKeys: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
         );
 
-        return new RootBlock($rootNode, $context);
+        return new RootBlock($node, $context);
     }
 
     final protected function getContext(): BlockContext
