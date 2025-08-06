@@ -145,46 +145,6 @@ final readonly class DefaultTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): iterable
-    {
-        $dimensionName = $this->descendantPath[$level - 1] ?? null;
-
-        if ($dimensionName === null) {
-            yield from [];
-            return;
-            // throw new \InvalidArgumentException(\sprintf(
-            //     'Dimension name for level %d not found in descendant path.',
-            //     $level,
-            // ));
-        }
-
-        $members = $this->manager
-            ->getDimensionRepository()
-            ->getMembers($dimensionName);
-
-        /** @psalm-suppress MixedAssignment */
-        foreach ($members as $member) {
-            $tuple = $this->tuple;
-            $tuple[$dimensionName] = $member;
-
-            $row = $this->manager
-                ->getRowRepository()
-                ->getRow($tuple);
-
-            if ($row === null) {
-                continue;
-            }
-
-            yield new self(
-                manager: $this->manager,
-                tuple: $tuple,
-                descendantPath: \array_slice($this->descendantPath, $level),
-                row: $row,
-            );
-        }
-    }
-
-    #[\Override]
     public function drillDown(string $dimensionName): iterable
     {
         $members = $this->manager

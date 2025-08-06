@@ -64,14 +64,6 @@ final readonly class SubtotalTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): iterable
-    {
-        throw new \RuntimeException(
-            'SubtotalTreeNode does not support getChildren(). Use drillDown() instead.',
-        );
-    }
-
-    #[\Override]
     public function drillDown(string $dimensionName): iterable
     {
         return $this->node->drillDown($dimensionName);

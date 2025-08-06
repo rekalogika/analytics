@@ -76,12 +76,6 @@ final readonly class NullTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): iterable
-    {
-        yield from [];
-    }
-
-    #[\Override]
     public function drillDown(string $dimensionName): iterable
     {
         yield from [];

@@ -15,7 +15,6 @@ namespace Rekalogika\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
 use Rekalogika\PivotTable\Contracts\TreeNode;
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class TreeNodeDebugger
@@ -41,29 +40,7 @@ final readonly class TreeNodeDebugger
             'item' => $this->normalizeItem($this->node->getItem()),
             'value' => $this->normalizeItem($this->node->getValue()),
             'isLeaf' => $this->node->isLeaf(),
-            'children' => $this->normalizeChildren($this->node->getChildren()),
         ];
-
-        // if ($this->node instanceof TreeNodeDecorator) {
-        //     $result['parent'] = $this->node->getParent()
-        //         ? (new self($this->node->getParent()))->toArray()
-        //         : null;
-        // }
-
-        return $result;
-    }
-
-    /**
-     * @param iterable<TreeNode> $children
-     * @return list<array<string,mixed>>
-     */
-    private function normalizeChildren(iterable $children): array
-    {
-        $result = [];
-
-        foreach ($children as $child) {
-            $result[] = (new self($child))->toArray();
-        }
 
         return $result;
     }

@@ -58,17 +58,6 @@ interface TreeNode
     public function getValue(): mixed;
 
     /**
-     * The children of this node. The level parameter indicates how many levels
-     * down the tree to retrieve the children. For example, if the level is 1,
-     * it will return the immediate children of this node. If the level is 2, it
-     * will return the grandchildren.
-     *
-     * @param int<1,max> $level
-     * @return iterable<TreeNode>
-     */
-    public function getChildren(int $level = 1): iterable;
-
-    /**
      * @return iterable<TreeNode>
      */
     public function drillDown(string $dimensionName): iterable;
