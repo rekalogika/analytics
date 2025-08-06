@@ -80,4 +80,10 @@ final readonly class NullTreeNode implements TreeNode
     {
         yield from [];
     }
+
+    #[\Override]
+    public function drillDown(string $dimensionName): iterable
+    {
+        yield from [];
+    }
 }

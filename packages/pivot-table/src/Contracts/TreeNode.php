@@ -67,4 +67,9 @@ interface TreeNode
      * @return iterable<TreeNode>
      */
     public function getChildren(int $level = 1): iterable;
+
+    /**
+     * @return iterable<TreeNode>
+     */
+    public function drillDown(string $dimensionName): iterable;
 }

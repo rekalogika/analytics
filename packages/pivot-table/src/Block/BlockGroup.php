@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Decorator\Internal\ItemToTreeNodeDecoratorMap;
 use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
 
 abstract class BlockGroup extends Block
@@ -205,5 +207,42 @@ abstract class BlockGroup extends Block
         return $this->getChildNodes($level)[0]
             ?? $this->getBalancedChildNodes($level)[0]
             ?? throw new \RuntimeException('No child nodes found in the current node.');
+    }
+
+    /**
+     * @param list<TreeNodeDecorator> $nodes
+     * @param non-empty-list<TreeNodeDecorator> $prototypeNodes
+     * @return list<TreeNodeDecorator>
+     */
+    protected function balanceNodesWithPrototype(
+        array $nodes,
+        array $prototypeNodes,
+    ): array {
+        // create a map of children items to nodes
+        $itemToNodes = ItemToTreeNodeDecoratorMap::create($nodes);
+
+        // create result
+        $result = [];
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($prototypeNodes as $prototype) {
+            $currentItem = $prototype->getItem();
+
+            if ($itemToNodes->exists($currentItem)) {
+                $result[] = $itemToNodes
+                    ->get($currentItem)
+                    ->withParent($this->getNode());
+            } else {
+                $null = NullTreeNode::fromInterface($prototype);
+
+                $decorated = $this->getContext()->getRepository()
+                    ->decorate($null)
+                    ->withParent($this->getNode());
+
+                $result[] = $decorated;
+            }
+        }
+
+        return $result;
     }
 }

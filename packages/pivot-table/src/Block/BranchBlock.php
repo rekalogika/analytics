@@ -56,7 +56,7 @@ abstract class BranchBlock extends NodeBlock
             );
         }
 
-        if ($context->isPivoted($firstChild)) {
+        if ($context->isKeyPivoted($firstChild->getKey())) {
             return new HorizontalBlockGroup(
                 node: $node,
                 parentNode: $this->parentNode,

@@ -27,6 +27,7 @@ final readonly class SubtotalTreeNode implements TreeNode
         private int $level,
     ) {}
 
+
     #[\Override]
     public function isLeaf(): bool
     {
@@ -70,5 +71,11 @@ final readonly class SubtotalTreeNode implements TreeNode
     public function getChildren(int $level = 1): iterable
     {
         return $this->node->getChildren($this->level + $level);
+    }
+
+    #[\Override]
+    public function drillDown(string $dimensionName): iterable
+    {
+        return $this->node->drillDown($dimensionName);
     }
 }

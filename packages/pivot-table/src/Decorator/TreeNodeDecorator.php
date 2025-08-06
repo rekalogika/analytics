@@ -33,6 +33,11 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
      */
     private array $children = [];
 
+    /**
+     * @var array<string,list<self>>
+     */
+    private array $drillDown = [];
+
     public static function decorate(TreeNode $node): self
     {
         $repository = new TreeNodeDecoratorRepository();
@@ -92,6 +97,29 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         }
 
         return $this->children[$level] = $result;
+    }
+
+    /**
+     * @return iterable<self>
+     */
+    #[\Override]
+    public function drillDown(string $dimensionName): iterable
+    {
+        if (isset($this->drillDown[$dimensionName])) {
+            return $this->drillDown[$dimensionName];
+        }
+
+        $children = $this->node->drillDown($dimensionName);
+
+        $result = [];
+
+        foreach ($children as $child) {
+            $result[] = $this->repository
+                ->decorate($child)
+                ->withParent($this);
+        }
+
+        return $this->drillDown[$dimensionName] = $result;
     }
 
     /**

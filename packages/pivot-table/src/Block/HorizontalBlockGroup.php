@@ -91,11 +91,11 @@ final class HorizontalBlockGroup extends BlockGroup
      */
     private function getBalancedChildBlocksForHorizontalLayout(int $level = 1): array
     {
-        $pivotedDimensions = $this->getContext()->getPivotedDimensions();
+        $pivotedNodes = $this->getContext()->getPivotedKeys();
         $blocks = [];
 
         $children = $this->getNode()
-            ->getBalancedChildrenFromNonPivotedParent($level, $pivotedDimensions);
+            ->getBalancedChildrenFromNonPivotedParent($level, $pivotedNodes);
 
         if (\count($children) > 1) {
             $subtotalNode = $this->getSubtotalNode($level);

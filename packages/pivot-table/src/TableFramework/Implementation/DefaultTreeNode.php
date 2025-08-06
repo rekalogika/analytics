@@ -183,4 +183,47 @@ final readonly class DefaultTreeNode implements TreeNode
             );
         }
     }
+
+    #[\Override]
+    public function drillDown(string $dimensionName): iterable
+    {
+        $members = $this->manager
+            ->getDimensionRepository()
+            ->getMembers($dimensionName);
+
+        $descendantPath = $this->descendantPath;
+
+        // remove from $descendantPath until $dimensionName
+        $level = array_search($dimensionName, $descendantPath, true);
+
+        if ($level === false) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Dimension name "%s" not found in descendant path.',
+                $dimensionName,
+            ));
+        }
+        $level += 1; // level is 1-based, not 0-based
+        $descendantPath = \array_slice($descendantPath, $level);
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($members as $member) {
+            $tuple = $this->tuple;
+            $tuple[$dimensionName] = $member;
+
+            $row = $this->manager
+                ->getRowRepository()
+                ->getRow($tuple);
+
+            if ($row === null) {
+                continue;
+            }
+
+            yield new self(
+                manager: $this->manager,
+                tuple: $tuple,
+                descendantPath: $descendantPath,
+                row: $row,
+            );
+        }
+    }
 }

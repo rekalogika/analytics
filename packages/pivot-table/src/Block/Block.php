@@ -75,7 +75,7 @@ abstract class Block implements \Stringable
         }
 
         if (!$node->isLeaf()) {
-            if ($context->isPivoted($node)) {
+            if ($context->isKeyPivoted($node->getKey())) {
                 return new PivotBlock(
                     node: $node,
                     parentNode: $parentNode,
@@ -91,7 +91,7 @@ abstract class Block implements \Stringable
                 );
             }
         } else {
-            if ($context->isPivoted($node)) {
+            if ($context->isKeyPivoted($node->getKey())) {
                 return new PivotLeafBlock(
                     node: $node,
                     parent: $this,
@@ -118,12 +118,14 @@ abstract class Block implements \Stringable
     }
 
     /**
+     * @param list<string> $unpivotedNodes
      * @param list<string> $pivotedNodes
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
      */
     final public static function new(
         TreeNode $node,
+        array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
@@ -132,10 +134,12 @@ abstract class Block implements \Stringable
         $rootNode = $repository->decorate($node);
 
         $context = new BlockContext(
-            pivotedDimensions: $pivotedNodes,
+            rootNode: $rootNode,
+            repository: $repository,
+            unpivotedKeys: $unpivotedNodes,
+            pivotedKeys: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
-            repository: $repository,
         );
 
         return new RootBlock($rootNode, $context);
