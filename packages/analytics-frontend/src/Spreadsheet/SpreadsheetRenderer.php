@@ -63,7 +63,7 @@ final readonly class SpreadsheetRenderer
         Result $result,
         array $pivotedDimensions = [],
     ): Spreadsheet {
-        $dimensions = $result->getDimensionNames();
+        $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
 
         $table = PivotTableTransformer::transformTableToTable(
@@ -71,7 +71,7 @@ final readonly class SpreadsheetRenderer
             unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
-            createSubtotals: $result->getDimensionNames(),
+            createSubtotals: $result->getDimensionality(),
         );
 
         $html = $this->visitor->visitTable($table);

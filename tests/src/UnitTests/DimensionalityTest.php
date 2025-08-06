@@ -16,21 +16,21 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\Dimensionality;
 
-final class DimensionNamesTest extends TestCase
+final class DimensionalityTest extends TestCase
 {
     public function testBasic(): void
     {
-        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
+        $dimensionality = Dimensionality::create(['a', 'b', 'c']);
 
-        $this->assertEquals(['a', 'b', 'c'], $dimensionNames->getDescendants());
-        $this->assertEquals([], $dimensionNames->getAncestors());
-        $this->assertNull($dimensionNames->getCurrent());
+        $this->assertEquals(['a', 'b', 'c'], $dimensionality->getDescendants());
+        $this->assertEquals([], $dimensionality->getAncestors());
+        $this->assertNull($dimensionality->getCurrent());
     }
 
     public function testDescendImmediate(): void
     {
-        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
-        $descended = $dimensionNames->descend('a');
+        $dimensionality = Dimensionality::create(['a', 'b', 'c']);
+        $descended = $dimensionality->descend('a');
 
         $this->assertEquals([], $descended->getAncestors());
         $this->assertEquals('a', $descended->getCurrent());
@@ -39,12 +39,12 @@ final class DimensionNamesTest extends TestCase
 
     public function testSingleDimensionDescend(): void
     {
-        $dimensionNames = Dimensionality::create(['a']);
-        $this->assertEquals(['a'], $dimensionNames->getDescendants());
-        $this->assertEquals([], $dimensionNames->getAncestors());
-        $this->assertNull($dimensionNames->getCurrent());
+        $dimensionality = Dimensionality::create(['a']);
+        $this->assertEquals(['a'], $dimensionality->getDescendants());
+        $this->assertEquals([], $dimensionality->getAncestors());
+        $this->assertNull($dimensionality->getCurrent());
 
-        $descended = $dimensionNames->descend('a');
+        $descended = $dimensionality->descend('a');
         $this->assertEquals([], $descended->getAncestors());
         $this->assertEquals('a', $descended->getCurrent());
         $this->assertEquals([], $descended->getDescendants());
@@ -52,8 +52,8 @@ final class DimensionNamesTest extends TestCase
 
     public function testDescendNonImmediate(): void
     {
-        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
-        $descended = $dimensionNames->descend('b');
+        $dimensionality = Dimensionality::create(['a', 'b', 'c']);
+        $descended = $dimensionality->descend('b');
 
         $this->assertEquals([], $descended->getAncestors());
         $this->assertEquals('b', $descended->getCurrent());
@@ -62,12 +62,12 @@ final class DimensionNamesTest extends TestCase
 
     public function testResolveName(): void
     {
-        $dimensionNames = Dimensionality::create(['a', 'b', 'c']);
+        $dimensionality = Dimensionality::create(['a', 'b', 'c']);
 
-        $this->assertEquals('a', $dimensionNames->resolveName('a'));
-        $this->assertEquals('b', $dimensionNames->resolveName('b'));
-        $this->assertEquals('c', $dimensionNames->resolveName('c'));
-        $this->assertEquals('a', $dimensionNames->resolveName(1));
-        $this->assertEquals('b', $dimensionNames->resolveName(2));
+        $this->assertEquals('a', $dimensionality->resolveName('a'));
+        $this->assertEquals('b', $dimensionality->resolveName('b'));
+        $this->assertEquals('c', $dimensionality->resolveName('c'));
+        $this->assertEquals('a', $dimensionality->resolveName(1));
+        $this->assertEquals('b', $dimensionality->resolveName(2));
     }
 }

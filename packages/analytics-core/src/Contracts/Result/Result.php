@@ -35,7 +35,7 @@ interface Result
      *
      * @return list<string>
      */
-    public function getDimensionNames(): array;
+    public function getDimensionality(): array;
 
     public function getTree(): TreeNode;
 
