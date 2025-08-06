@@ -44,11 +44,7 @@ final class DimensionRepository
      */
     public function getMembers(string $key): array
     {
-        $dimensions = $this->dimensions[$key]
-            ?? throw new \InvalidArgumentException(\sprintf(
-                'Dimensions for key "%s" not found.',
-                $key,
-            ));
+        $dimensions = $this->dimensions[$key] ?? [];
 
         return array_values($dimensions);
     }

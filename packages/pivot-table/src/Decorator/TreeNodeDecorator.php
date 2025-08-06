@@ -21,7 +21,7 @@ use Rekalogika\PivotTable\Util\TreeNodeDebugger;
 
 final class TreeNodeDecorator extends BaseTreeNodeDecorator
 {
-    public static bool $debug = true;
+    public static bool $debug = false;
 
     /**
      * @var array<string,mixed>
@@ -245,12 +245,7 @@ final class TreeNodeDecorator extends BaseTreeNodeDecorator
         $childrenSeenByParent = $this->getChildrenSeenByParent($childLevel, $parentLevel);
 
         if (\count($childrenSeenByParent) === 0) {
-            throw new \LogicException(\sprintf(
-                'No children found for child level %d and parent level %d in node %s.',
-                $childLevel,
-                $parentLevel,
-                $this->getKey(),
-            ));
+            return [];
         }
 
         $result = $this->doBalanceChildren($children, $childrenSeenByParent);
