@@ -44,7 +44,11 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
 
         $cells = $this->context
             ->getCellRepository()
-            ->getCellsByBaseAndDimension($this->baseCell, $this->childDimensionName);
+            ->getCellsByBaseAndDimension(
+                baseCell: $this->baseCell,
+                dimensionName: $this->childDimensionName,
+                fillGaps: true,
+            );
 
         $newCells = [];
 

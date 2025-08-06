@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTable;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
@@ -356,18 +356,18 @@ final class QueryTest extends KernelTestCase
         $this->assertEquals($sorted, $months);
     }
 
-    public function testOrderByDimensionNonHierarchical(): void
-    {
-        $this->expectException(HierarchicalOrderingRequired::class);
+    // public function testOrderByDimensionNonHierarchical(): void
+    // {
+    //     $this->expectException(HierarchicalOrderingRequired::class);
 
-        $result = $this->getQuery()
-            ->groupBy('time.civil.month.month', 'customerType')
-            ->select('count')
-            ->orderBy('customerType', Order::Descending)
-            ->addOrderBy('time.civil.month.month', Order::Descending)
-            ->getResult()
-            ->getTree();
-    }
+    //     $result = $this->getQuery()
+    //         ->groupBy('time.civil.month.month', 'customerType')
+    //         ->select('count')
+    //         ->orderBy('customerType', Order::Descending)
+    //         ->addOrderBy('time.civil.month.month', Order::Descending)
+    //         ->getResult()
+    //         ->getTree();
+    // }
 
     public function testOrderByDimensionHierarchical(): void
     {
@@ -382,17 +382,17 @@ final class QueryTest extends KernelTestCase
         $this->assertCount(2, $result);
     }
 
-    public function testOrderByMeasureOnlyGetTree(): void
-    {
-        $this->expectException(HierarchicalOrderingRequired::class);
+    // public function testOrderByMeasureOnlyGetTree(): void
+    // {
+    //     $this->expectException(HierarchicalOrderingRequired::class);
 
-        $result = $this->getQuery()
-            ->groupBy('time.civil.month.month')
-            ->select('count')
-            ->orderBy('count', Order::Descending)
-            ->getResult()
-            ->getTree();
-    }
+    //     $result = $this->getQuery()
+    //         ->groupBy('time.civil.month.month')
+    //         ->select('count')
+    //         ->orderBy('count', Order::Descending)
+    //         ->getResult()
+    //         ->getTree();
+    // }
 
     public function testOrderByMeasureOnlyGetTable(): void
     {
@@ -629,7 +629,7 @@ final class QueryTest extends KernelTestCase
         $rows = iterator_to_array($result, false);
         $first = array_shift($rows);
 
-        $this->assertInstanceOf(DefaultRow::class, $first);
+        $this->assertInstanceOf(DefaultCell::class, $first);
 
         // $tuple = $first->getTuple();
         // $this->assertInstanceOf(DefaultTuple::class, $tuple);

@@ -51,7 +51,7 @@ final class SourceQueryTest extends KernelTestCase
             ->from(OrderSummary::class)
             ->select('count')
             ->getResult()
-            ->getCube();
+            ->getTree();
 
         $node = $result->traverse('count');
         $this->assertNotNull($node);

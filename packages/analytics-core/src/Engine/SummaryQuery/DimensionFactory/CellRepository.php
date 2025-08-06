@@ -55,6 +55,7 @@ final class CellRepository
     public function getCellsByBaseAndDimension(
         DefaultCell $baseCell,
         string $dimensionName,
+        bool $fillGaps,
     ): iterable {
         $dimensions = $this->dimensionCollection
             ->getDimensionsByName($dimensionName)
@@ -62,15 +63,28 @@ final class CellRepository
 
         foreach ($dimensions as $dimension) {
             $tuple = $baseCell->getTuple()->append($dimension);
+            $cell = $this->signatureToCell[$tuple->getSignature()] ?? null;
 
-            // non interpolated cells
+            // if the cell already exists and it is not the result of a gap fill,
+            // we return it directly.
+            if ($cell !== null) {
+                // if fillGaps is false, we don't return cells previously
+                // created due to gap filling
+                if (!$fillGaps && $cell->isNull()) {
+                    continue;
+                }
 
-            if (isset($this->signatureToCell[$tuple->getSignature()])) {
-                yield $this->signatureToCell[$tuple->getSignature()];
+                yield $cell;
                 continue;
             }
 
-            // interpolated cells
+            // if cell is null and we are not filling gaps, we skip it
+            if (!$fillGaps) {
+                continue;
+            }
+
+            // if cell is null and gap-filling is requestied, we create a new
+            // cell
 
             // if the member is a measure (i.e. '@values'), narrow the measure
             // names to the measure name specified in the dimension.

@@ -13,23 +13,32 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\TreeNodes;
+use Rekalogika\Analytics\Engine\SummaryQuery\Registry\TreeNodeRegistry;
 
 /**
  * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  */
-final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
+final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 {
     public function __construct(
         private DefaultCells $cells,
-        private readonly DimensionNames $dimensionNames,
+        private DimensionNames $dimensionNames,
+        private TreeNodeRegistry $registry,
     ) {}
 
     #[\Override]
     public function getByKey(mixed $key): mixed
     {
+        $current = $this->dimensionNames->getCurrent();
+
+        if ($current === null) {
+            throw new LogicException('Cannot get by key when current dimension is null.');
+        }
+
         foreach ($this as $node) {
-            if ($node->getTuple()->last()?->getRawMember() === $key) {
+            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
                 return $node;
             }
         }
@@ -46,7 +55,7 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
             return null;
         }
 
-        return new DefaultTreeNode(
+        return $this->registry->get(
             cell: $result,
             dimensionNames: $this->dimensionNames,
         );
@@ -55,8 +64,14 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     #[\Override]
     public function hasKey(mixed $key): bool
     {
+        $current = $this->dimensionNames->getCurrent();
+
+        if ($current === null) {
+            throw new LogicException('Cannot get by key when current dimension is null.');
+        }
+
         foreach ($this as $node) {
-            if ($node->getTuple()->last()?->getRawMember() === $key) {
+            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
                 return true;
             }
         }
@@ -73,7 +88,7 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
             return null;
         }
 
-        return new DefaultTreeNode(
+        return $this->registry->get(
             cell: $result,
             dimensionNames: $this->dimensionNames,
         );
@@ -88,7 +103,7 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
             return null;
         }
 
-        return new DefaultTreeNode(
+        return $this->registry->get(
             cell: $result,
             dimensionNames: $this->dimensionNames,
         );
@@ -105,7 +120,7 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     {
         /** @psalm-suppress MixedArgument */
         foreach ($this->cells as $cell) {
-            yield new DefaultTreeNode(
+            yield $this->registry->get(
                 cell: $cell,
                 dimensionNames: $this->dimensionNames,
             );

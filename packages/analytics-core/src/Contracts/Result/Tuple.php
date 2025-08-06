@@ -14,19 +14,19 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+use Rekalogika\Analytics\Contracts\Collection\SetCollection;
 
 /**
  * A tuple of dimensions. A collection of dimensions that identifies a unique
- * intersection of members from different dimensions in the cube. A tuple is
- * ordered, the order of dimensions is significant. The members of a tuple must
- * be from unique dimensions from the same summary class.
+ * intersection of members from different dimensions in the cube. A tuple is in
+ * no particular order. The members of a tuple must be from unique dimensions
+ * from the same summary class.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<string,Dimension>
+ * @extends SetCollection<string,Dimension>
  */
-interface Tuple extends OrderedMapCollection
+interface Tuple extends SetCollection
 {
     /**
      * The summary class that this tuple belongs to.

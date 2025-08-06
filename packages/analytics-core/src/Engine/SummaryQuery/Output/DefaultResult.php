@@ -18,9 +18,9 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
 use Rekalogika\Analytics\Engine\SummaryQuery\Worker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
@@ -200,9 +200,9 @@ final class DefaultResult implements Result
     #[\Override]
     public function getTree(): DefaultTreeNode
     {
-        return $this->tree ??= new DefaultTreeNode(
+        return $this->tree ??= DefaultTreeNode::createRoot(
             cell: $this->getCube(),
-            dimensionNames: new DimensionNames($this->query->getGroupBy()),
+            dimensionNames: $this->query->getGroupBy(),
         );
     }
 

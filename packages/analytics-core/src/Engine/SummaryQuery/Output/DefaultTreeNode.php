@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\Result\TreeNode;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Engine\SummaryQuery\Registry\TreeNodeRegistry;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -31,15 +32,19 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
         DefaultCell $cell,
         array $dimensionNames,
     ): self {
+        $registry = new TreeNodeRegistry();
+
         return new self(
             cell: $cell,
-            dimensionNames: new DimensionNames($dimensionNames),
+            dimensionNames: DimensionNames::create($dimensionNames),
+            registry: $registry,
         );
     }
 
     public function __construct(
         private readonly DefaultCell $cell,
         private readonly DimensionNames $dimensionNames,
+        private readonly TreeNodeRegistry $registry,
     ) {}
 
     #[\Override]
@@ -57,19 +62,20 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getDimensionNames(): array
     {
-        return $this->dimensionNames->toArray();
+        return $this->dimensionNames->getDescendants();
     }
 
     #[\Override]
     public function getChildren(int|string $name = 1): DefaultTreeNodes
     {
         $name = $this->dimensionNames->resolveName($name);
-        $dimensionNames = $this->dimensionNames->removeUpTo($name);
+        $dimensionNames = $this->dimensionNames->descend($name);
         $cells = $this->cell->drillDown($name);
 
         return new DefaultTreeNodes(
             cells: $cells,
             dimensionNames: $dimensionNames,
+            registry: $this->registry,
         );
     }
 
@@ -83,6 +89,17 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     public function getMeasures(): DefaultMeasures
     {
         return $this->cell->getMeasures();
+    }
+
+    private function getDimension(): ?DefaultDimension
+    {
+        $dimensionName = $this->dimensionNames->getCurrent();
+
+        if ($dimensionName === null) {
+            return null;
+        }
+
+        return $this->cell->getTuple()->getByKey($dimensionName);
     }
 
     #[\Override]
@@ -166,31 +183,31 @@ final class DefaultTreeNode implements TreeNode, \IteratorAggregate
     #[\Override]
     public function getMember(): mixed
     {
-        return $this->cell->getTuple()->last()?->getMember();
+        return $this->getDimension()?->getMember();
     }
 
     #[\Override]
     public function getRawMember(): mixed
     {
-        return $this->cell->getTuple()->last()?->getRawMember();
+        return $this->getDimension()?->getRawMember();
     }
 
     #[\Override]
     public function getDisplayMember(): mixed
     {
-        return $this->cell->getTuple()->last()?->getDisplayMember();
+        return $this->getDimension()?->getDisplayMember();
     }
 
     #[\Override]
     public function getName(): string
     {
-        return $this->cell->getTuple()->last()?->getName() ?? '';
+        return $this->getDimension()?->getName() ?? '';
     }
 
     #[\Override]
     public function getLabel(): TranslatableInterface
     {
-        return $this->cell->getTuple()->last()?->getLabel()
+        return $this->getDimension()?->getLabel()
             ?? new TranslatableMessage('Unknown');
     }
 
