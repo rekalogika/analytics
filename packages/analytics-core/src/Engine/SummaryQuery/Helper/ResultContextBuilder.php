@@ -396,7 +396,7 @@ final class ResultContextBuilder
                     interpolation: false,
                 );
 
-            $measure = $cell->getMeasures()->getByKey($measure)
+            $measure = $cell->getMeasures()->get($measure)
                 ?? throw new UnexpectedValueException(
                     \sprintf('Measure "%s" not found in row', $measure),
                 );

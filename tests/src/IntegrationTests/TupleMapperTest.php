@@ -62,14 +62,14 @@ final class TupleMapperTest extends KernelTestCase
         // original measures
 
         /** @psalm-suppress MixedAssignment */
-        $count = $row->getMeasures()->getByKey('count')?->getRawValue();
+        $count = $row->getMeasures()->get('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $price = $row->getMeasures()->getByKey('price')?->getRawValue();
+        $price = $row->getMeasures()->get('price')?->getRawValue();
 
         /** @psalm-suppress MixedAssignment */
-        $deserializedCount = $newRow->getMeasures()->getByKey('count')?->getRawValue();
+        $deserializedCount = $newRow->getMeasures()->get('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $deserializedPrice = $newRow->getMeasures()->getByKey('price')?->getRawValue();
+        $deserializedPrice = $newRow->getMeasures()->get('price')?->getRawValue();
 
         $this->assertEquals($count, $deserializedCount);
         $this->assertEquals($price, $deserializedPrice);

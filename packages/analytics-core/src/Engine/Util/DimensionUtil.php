@@ -77,11 +77,11 @@ final readonly class DimensionUtil
         }
 
         foreach ($a as $name => $dimension) {
-            if (! $b->hasKey($name)) {
+            if (! $b->has($name)) {
                 return false;
             }
 
-            if (! self::isDimensionSame($dimension, $b->getByKey($name))) {
+            if (! self::isDimensionSame($dimension, $b->get($name))) {
                 return false;
             }
         }

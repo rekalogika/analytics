@@ -41,7 +41,7 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): ?DefaultMeasure
+    public function get(mixed $key): ?DefaultMeasure
     {
         return $this->measures[$key] ?? null;
     }
@@ -61,7 +61,7 @@ final readonly class DefaultMeasures implements Measures, \IteratorAggregate
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
         return isset($this->measures[$key]);
     }

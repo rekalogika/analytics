@@ -83,7 +83,7 @@ final class DefaultCell implements CubeCell
         if ($measureName === null) {
             $measure = DefaultMeasure::createMultiple();
         } else {
-            $measure = $this->measures->getByKey($measureName)
+            $measure = $this->measures->get($measureName)
                 ?? throw new InvalidArgumentException(
                     \sprintf('Measure with name "%s" does not exist.', $measureName),
                 );

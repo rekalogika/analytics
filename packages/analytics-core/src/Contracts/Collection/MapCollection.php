@@ -24,10 +24,10 @@ interface MapCollection extends \Traversable, \Countable
      * @param TKey $key
      * @return TValue|null
      */
-    public function getByKey(mixed $key): mixed;
+    public function get(mixed $key): mixed;
 
     /**
      * @param TKey $key
      */
-    public function hasKey(mixed $key): bool;
+    public function has(mixed $key): bool;
 }

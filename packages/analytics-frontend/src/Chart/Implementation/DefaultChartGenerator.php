@@ -184,7 +184,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate labels
 
         foreach ($selectedMeasures as $name) {
-            $measure = $measures->getByKey($name)
+            $measure = $measures->get($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
                     $name,
@@ -241,7 +241,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             $measures = $row->getMeasures();
 
             foreach ($selectedMeasures as $name) {
-                $measure = $measures->getByKey($name);
+                $measure = $measures->get($name);
 
                 /** @psalm-suppress MixedAssignment */
                 $value = $measure?->getValue() ?? 0;
@@ -531,7 +531,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // populate labels
 
         $name = $selectedMeasures[0];
-        $measure = $measures->getByKey($name);
+        $measure = $measures->get($name);
 
         $labels = [];
         $dataSet = [];
@@ -569,7 +569,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->getByKey($name);
+            $measure = $measures->get($name);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 

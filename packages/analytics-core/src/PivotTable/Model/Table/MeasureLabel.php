@@ -39,7 +39,7 @@ final readonly class MeasureLabel implements Label
 
         return $this->cell
             ->getMeasures()
-            ->getByKey($this->measureName)
+            ->get($this->measureName)
             ?->getLabel()
             ?? throw new InvalidArgumentException(
                 \sprintf('Measure "%s" not found in the row.', $this->measureName),

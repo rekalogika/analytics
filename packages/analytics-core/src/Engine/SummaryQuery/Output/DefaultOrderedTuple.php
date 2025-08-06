@@ -59,9 +59,9 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByKey(mixed $key): mixed
+    public function get(mixed $key): mixed
     {
-        return $this->tuple->getByKey($key);
+        return $this->tuple->get($key);
     }
 
     #[\Override]
@@ -70,13 +70,13 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
         $key = $this->order[$index]
             ?? throw new OutOfBoundsException("Index {$index} is out of bounds for the ordered tuple.");
 
-        return $this->tuple->getByKey($key);
+        return $this->tuple->get($key);
     }
 
     #[\Override]
-    public function hasKey(mixed $key): bool
+    public function has(mixed $key): bool
     {
-        return $this->tuple->hasKey($key);
+        return $this->tuple->has($key);
     }
 
     #[\Override]
@@ -88,7 +88,7 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
             return null;
         }
 
-        return $this->tuple->getByKey($key);
+        return $this->tuple->get($key);
     }
 
     #[\Override]
@@ -101,7 +101,7 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
             return null;
         }
 
-        return $this->tuple->getByKey($key);
+        return $this->tuple->get($key);
     }
 
     #[\Override]
@@ -114,7 +114,7 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->order as $key) {
-            $dimension = $this->tuple->getByKey($key);
+            $dimension = $this->tuple->get($key);
 
             if ($dimension === null) {
                 throw new InvalidArgumentException(
