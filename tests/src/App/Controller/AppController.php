@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Tests\App\Controller;
 
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
-use OverflowException;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
@@ -121,7 +120,7 @@ final class AppController extends AbstractController
         } catch (UnsupportedData) {
             $chart = null;
             $chartError = null;
-        } catch (OverflowException $e) {
+        } catch (\OverflowException $e) {
             $chart = null;
             $chartError = $e->getMessage();
         } catch (\Throwable $e) {
