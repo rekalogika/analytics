@@ -111,9 +111,4 @@ abstract readonly class DefaultCell implements Cell
     {
         return hash('xxh128', serialize($this));
     }
-
-    final public function isSameAs(DefaultCell $cell): bool
-    {
-        return $this->getSignature() === $cell->getSignature();
-    }
 }

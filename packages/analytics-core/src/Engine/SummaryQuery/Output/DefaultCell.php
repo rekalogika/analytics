@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -114,66 +113,4 @@ final class DefaultCell implements CubeCell
     {
         return $this->context;
     }
-
-    // private function canDescribeThisNode(mixed $input): bool
-    // {
-    //     /** @psalm-suppress MixedAssignment */
-    //     $member = $this->getMember();
-
-    //     if (
-    //         $member instanceof MeasureMember
-    //         && $member->getMeasureProperty() === $input
-    //     ) {
-    //         return true;
-    //     }
-
-    //     if ($member === $input) {
-    //         return true;
-    //     }
-
-    //     if (
-    //         $member instanceof \Stringable
-    //         && $member->__toString() === $input
-    //     ) {
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
-
-    // private function getChildByDescription(mixed $input): ?DefaultTree
-    // {
-    //     foreach ($this as $child) {
-    //         if ($child->canDescribeThisNode($input)) {
-    //             return $child;
-    //         }
-    //     }
-
-    //     return null;
-    // }
-
-    // #[\Override]
-    // public function traverse(mixed ...$members): ?DefaultTree
-    // {
-    //     if ($members === []) {
-    //         throw new InvalidArgumentException(
-    //             'Cannot traverse to empty members, expected at least 1 member.',
-    //         );
-    //     }
-
-    //     /** @psalm-suppress MixedAssignment */
-    //     $first = array_shift($members);
-
-    //     $child = $this->getChildByDescription($first);
-
-    //     if ($child === null) {
-    //         return null;
-    //     }
-
-    //     if ($members === []) {
-    //         return $child;
-    //     }
-
-    //     return $child->traverse(...$members);
-    // }
 }
