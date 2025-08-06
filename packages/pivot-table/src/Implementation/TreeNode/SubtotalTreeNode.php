@@ -33,6 +33,14 @@ final readonly class SubtotalTreeNode implements TreeNode
         return $this->isLeaf;
     }
 
+    #[\Override]
+    public function getPath(): array
+    {
+        $path = $this->node->getPath();
+        $path[] = $this->childrenKey;
+
+        return $path;
+    }
 
     #[\Override]
     public function getKey(): string

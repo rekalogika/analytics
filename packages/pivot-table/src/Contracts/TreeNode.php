@@ -25,6 +25,15 @@ interface TreeNode
     public function isLeaf(): bool;
 
     /**
+     * The path of this node in the tree. The path is a list of dimension names
+     * that lead to this node. The last item in the path is the same as
+     * `getKey()`
+     *
+     * @return list<string>
+     */
+    public function getPath(): array;
+
+    /**
      * The key to identify a column. All nodes in the same column must have the
      * same key.
      */
