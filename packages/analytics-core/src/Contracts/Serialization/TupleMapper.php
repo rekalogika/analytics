@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Serialization;
 
 use Rekalogika\Analytics\Contracts\Dto\TupleDto;
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 interface TupleMapper
@@ -24,5 +24,5 @@ interface TupleMapper
     /**
      * @param class-string $summaryClass
      */
-    public function fromDto(string $summaryClass, TupleDto $dto): Row;
+    public function fromDto(string $summaryClass, TupleDto $dto): Cell;
 }
