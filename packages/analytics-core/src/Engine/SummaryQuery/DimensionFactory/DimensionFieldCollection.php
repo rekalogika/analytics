@@ -110,7 +110,7 @@ final class DimensionFieldCollection
     /**
      * @return list<DefaultDimension>
      */
-    public function getResult(): array
+    public function getUnprocessed(): array
     {
         $dimensions = $this->collected;
 
