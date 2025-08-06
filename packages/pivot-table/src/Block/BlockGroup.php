@@ -148,7 +148,17 @@ abstract class BlockGroup extends Block
      */
     protected function getChildBlocks(?array $prototypeNodes = null): iterable
     {
-        foreach ($this->getChildTreeNodes($prototypeNodes) as $childNode) {
+        $children = $this->getChildTreeNodes($prototypeNodes);
+
+        if ($children === []) {
+            yield new EmptyBlockGroup(
+                node: $this->getNode(),
+                childKey: null,
+                context: $this->getContext(),
+            );
+        }
+
+        foreach ($children as $childNode) {
             yield $this->createBlock($childNode);
         }
     }
