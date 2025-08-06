@@ -64,8 +64,7 @@ final readonly class SpreadsheetRenderer
         array $pivotedDimensions = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionNames();
-        $cube = $result->getCube();
-        $pivotTable = TableTableAdapter::adapt($cube);
+        $pivotTable = TableTableAdapter::adapt($result);
 
         $table = PivotTableTransformer::transformTableToTable(
             table: $pivotTable,

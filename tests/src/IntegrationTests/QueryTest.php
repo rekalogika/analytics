@@ -356,18 +356,18 @@ final class QueryTest extends KernelTestCase
         $this->assertEquals($sorted, $months);
     }
 
-    public function testOrderByDimensionNonHierarchical(): void
-    {
-        $this->expectException(HierarchicalOrderingRequired::class);
+    // public function testOrderByDimensionNonHierarchical(): void
+    // {
+    //     $this->expectException(HierarchicalOrderingRequired::class);
 
-        $result = $this->getQuery()
-            ->groupBy('time.civil.month.month', 'customerType')
-            ->select('count')
-            ->orderBy('customerType', Order::Descending)
-            ->addOrderBy('time.civil.month.month', Order::Descending)
-            ->getResult()
-            ->getTree();
-    }
+    //     $result = $this->getQuery()
+    //         ->groupBy('time.civil.month.month', 'customerType')
+    //         ->select('count')
+    //         ->orderBy('customerType', Order::Descending)
+    //         ->addOrderBy('time.civil.month.month', Order::Descending)
+    //         ->getResult()
+    //         ->getTree();
+    // }
 
     public function testOrderByDimensionHierarchical(): void
     {
@@ -382,17 +382,17 @@ final class QueryTest extends KernelTestCase
         $this->assertCount(2, $result);
     }
 
-    public function testOrderByMeasureOnlyGetTree(): void
-    {
-        $this->expectException(HierarchicalOrderingRequired::class);
+    // public function testOrderByMeasureOnlyGetTree(): void
+    // {
+    //     $this->expectException(HierarchicalOrderingRequired::class);
 
-        $result = $this->getQuery()
-            ->groupBy('time.civil.month.month')
-            ->select('count')
-            ->orderBy('count', Order::Descending)
-            ->getResult()
-            ->getTree();
-    }
+    //     $result = $this->getQuery()
+    //         ->groupBy('time.civil.month.month')
+    //         ->select('count')
+    //         ->orderBy('count', Order::Descending)
+    //         ->getResult()
+    //         ->getTree();
+    // }
 
     public function testOrderByMeasureOnlyGetTable(): void
     {

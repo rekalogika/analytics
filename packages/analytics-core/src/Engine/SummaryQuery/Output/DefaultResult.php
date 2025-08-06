@@ -14,16 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\Worker\BalancedNormalTableToBalancedTableTransformer;
-use Rekalogika\Analytics\Engine\SummaryQuery\Worker\QueryResultToTableTransformer;
-use Rekalogika\Analytics\Engine\SummaryQuery\Worker\TableToNormalTableTransformer;
 use Rekalogika\Analytics\Engine\SummaryQuery\Worker\TreeToBalancedNormalTableTransformer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
@@ -44,17 +41,19 @@ final class DefaultResult implements Result
      */
     private ?array $queryResult = null;
 
-    private ?DefaultTable $unbalancedTable = null;
+    // private ?DefaultTable $unbalancedTable = null;
 
-    private ?DefaultNormalTable $unbalancedNormalTable = null;
+    // private ?DefaultNormalTable $unbalancedNormalTable = null;
 
-    private ?DefaultTree $newTree = null;
+    private ?DefaultTreeNode $tree = null;
 
-    private ?DefaultNormalTable $normalTable = null;
+    // private ?DefaultNormalTable $normalTable = null;
 
     private ?DefaultTable $table = null;
 
-    private ?bool $hasHierarchicalOrdering = null;
+    // private ?bool $hasHierarchicalOrdering = null;
+
+    private ?ResultContext $resultContext = null;
 
     /**
      * @param class-string $summaryClass
@@ -170,93 +169,84 @@ final class DefaultResult implements Result
         return $query->getLowestLevelPartitionMaxId();
     }
 
-    #[\Override]
-    public function getCube(): DefaultTable
+    private function getResultContext(): ResultContext
     {
-        $resultContext = new ResultContext(
-            metadata: $this->metadata,
-            query: $this->query,
-        );
-
-        return $this->unbalancedTable ??= QueryResultToTableTransformer::transform(
+        return $this->resultContext ??= ResultContextBuilder::createContext(
             query: $this->query,
             metadata: $this->metadata,
             entityManager: $this->entityManager,
             propertyAccessor: $this->propertyAccessor,
             input: $this->getQueryResult(),
-            context: $resultContext,
-        );
-    }
-
-    private function getUnbalancedNormalTable(): DefaultNormalTable
-    {
-        if (!$this->hasHierarchicalOrdering()) {
-            throw new HierarchicalOrderingRequired();
-        }
-
-        return $this->unbalancedNormalTable ??= TableToNormalTableTransformer::transform(
-            query: $this->query,
-            table: $this->getCube(),
-            metadata: $this->metadata,
-        );
-    }
-
-    #[\Override]
-    public function getTree(): DefaultTree
-    {
-        if ($this->newTree !== null) {
-            return $this->newTree;
-        }
-
-        return $this->newTree = DefaultTree::createRoot(
-            summaryClass: $this->summaryClass,
-            table: $this->getCube(),
-            normalTable: $this->getUnbalancedNormalTable(),
-            dimensionNames: $this->query->getGroupBy(),
-            measureNames: $this->query->getSelect(),
-            rootLabel: $this->label,
-            condition: $this->query->getWhere(),
             nodesLimit: $this->nodesLimit,
         );
     }
 
     #[\Override]
-    public function getNormalTable(): DefaultNormalTable
+    public function getCube(): DefaultCell
     {
-        return $this->normalTable ??= TreeToBalancedNormalTableTransformer::transform(tree: $this->getTree());
+        return $this->getResultContext()
+            ->getCellRepository()
+            ->getApexCell();
     }
+
+    #[\Override]
+    public function getAllCubes(): iterable
+    {
+        return $this->getResultContext()
+            ->getCellRepository()
+            ->getAllCubes();
+    }
+
+    #[\Override]
+    public function getTree(): DefaultTreeNode
+    {
+        return $this->tree ??= DefaultTreeNode::createRoot(
+            cell: $this->getCube(),
+            dimensionNames: $this->query->getGroupBy(),
+        );
+    }
+
+    // #[\Override]
+    // public function getNormalTable(): DefaultNormalTable
+    // {
+    //     return $this->normalTable ??= TreeToBalancedNormalTableTransformer::transform(tree: $this->getTree());
+    // }
 
     #[\Override]
     public function getTable(): DefaultTable
     {
-        if (!$this->hasHierarchicalOrdering()) {
-            return $this->getCube()->withoutGroupingRows();
-        }
-
-        return $this->table ??= BalancedNormalTableToBalancedTableTransformer::transform(normalTable: $this->getNormalTable());
-    }
-
-    private function hasHierarchicalOrdering(): bool
-    {
-        if ($this->hasHierarchicalOrdering !== null) {
-            return $this->hasHierarchicalOrdering;
-        }
-
-        $orderBy = $this->query->getOrderBy();
-
-        if ($orderBy === []) {
-            return $this->hasHierarchicalOrdering = true;
-        }
-
-        $orderFields = array_keys($orderBy);
-        $groupByFields = $this->query->getGroupBy();
-
-        // remove @values
-        $groupByFields = array_filter(
-            $groupByFields,
+        $dimensionality = array_values(array_filter(
+            $this->query->getGroupBy(),
             static fn(string $field): bool => $field !== '@values',
-        );
+        ));
 
-        return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;
+        return $this->table ??= DefaultTable::create(
+            context: $this->getResultContext(),
+            dimensionality: $dimensionality,
+        );
     }
+
+    // private function hasHierarchicalOrdering(): bool
+    // {
+    //     if ($this->hasHierarchicalOrdering !== null) {
+    //         return $this->hasHierarchicalOrdering;
+    //     }
+
+    //     $orderBy = $this->query->getOrderBy();
+
+    //     if ($orderBy === []) {
+    //         return $this->hasHierarchicalOrdering = true;
+    //     }
+
+    //     $orderFields = array_keys($orderBy);
+    //     $groupByFields = $this->query->getGroupBy();
+
+    //     // remove @values
+    //     $groupByFields = array_filter(
+    //         $groupByFields,
+    //         static fn(string $field): bool => $field !== '@values',
+    //     );
+
+    //     return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;
+    // }
 }

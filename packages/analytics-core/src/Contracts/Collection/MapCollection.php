@@ -16,23 +16,18 @@ namespace Rekalogika\Analytics\Contracts\Collection;
 /**
  * @template TKey
  * @template-covariant TValue
- * @extends MapCollection<TKey,TValue>
+ * @extends \Traversable<TKey,TValue>
  */
-interface OrderedMapCollection extends MapCollection
+interface MapCollection extends \Traversable, \Countable
 {
     /**
-     * @param int<0,max> $index
+     * @param TKey $key
      * @return TValue|null
      */
-    public function getByIndex(int $index): mixed;
+    public function getByKey(mixed $key): mixed;
 
     /**
-     * @return TValue|null
+     * @param TKey $key
      */
-    public function first(): mixed;
-
-    /**
-     * @return TValue|null
-     */
-    public function last(): mixed;
+    public function hasKey(mixed $key): bool;
 }

@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
 use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
+use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Symfony\Component\Translation\LocaleSwitcher;
@@ -69,6 +70,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
         } catch (EmptyResultException $e) {
             throw new UnsupportedData('Result is empty', previous: $e);
+        } catch (\Throwable $e) {
+            throw FrontendWrapperException::selectiveWrap($e);
         }
 
         throw new UnsupportedData('Unsupported chart type');

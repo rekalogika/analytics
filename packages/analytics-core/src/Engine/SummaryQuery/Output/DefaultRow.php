@@ -13,42 +13,32 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\Measures;
+use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\GroupingField;
 
-final readonly class DefaultRow implements Row, Cell
+final class DefaultRow implements Row
 {
+    /**
+     * @param list<string> $dimensionality
+     */
     public function __construct(
-        private DefaultTuple $tuple,
-        private DefaultMeasures $measures,
-        private ?GroupingField $groupings,
+        private readonly DefaultCell $cell,
+        private readonly array $dimensionality,
     ) {}
 
     #[\Override]
-    public function getMeasures(): DefaultMeasures
+    public function getTuple(): OrderedTuple
     {
-        return $this->measures;
+        return new DefaultOrderedTuple(
+            tuple: $this->cell->getTuple(),
+            order: $this->dimensionality,
+        );
     }
 
     #[\Override]
-    public function getTuple(): DefaultTuple
+    public function getMeasures(): Measures
     {
-        return $this->tuple;
-    }
-
-    public function getGroupings(): ?GroupingField
-    {
-        return $this->groupings;
-    }
-
-    public function isGrouping(): bool
-    {
-        return $this->groupings?->isSubtotal() ?? false;
-    }
-
-    public function getSignature(): string
-    {
-        return $this->tuple->getSignature();
+        return $this->cell->getMeasures();
     }
 }

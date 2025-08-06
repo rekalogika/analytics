@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasure;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasures;
 
 /**
  * Creates a null measure for each of the measures
@@ -36,5 +37,10 @@ final class NullMeasureCollection
         return $this->nullMeasures[$name] ?? throw new \InvalidArgumentException(
             \sprintf('Measure with name "%s" does not exist.', $name),
         );
+    }
+
+    public function getNullMeasures(): DefaultMeasures
+    {
+        return new DefaultMeasures($this->nullMeasures);
     }
 }

@@ -233,15 +233,4 @@ final readonly class ClassMetadataWrapper
         /** @var class-string<\UnitEnum> */
         return $enumType;
     }
-
-    public function getIdReflectionProperty(): \ReflectionProperty
-    {
-        $reflection = $this->classMetadata->getSingleIdReflectionProperty();
-
-        if (!$reflection instanceof \ReflectionProperty) {
-            throw new MetadataException('Reflection property not found');
-        }
-
-        return $reflection;
-    }
 }

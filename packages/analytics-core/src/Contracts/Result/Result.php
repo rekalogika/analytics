@@ -39,9 +39,17 @@ interface Result
 
     public function getTree(): TreeNode;
 
-    public function getNormalTable(): NormalTable;
+    // public function getNormalTable(): NormalTable;
 
     public function getTable(): Table;
 
-    public function getCube(): Cube;
+    /**
+     * Gets the root cube cell.
+     */
+    public function getCube(): CubeCell;
+
+    /**
+     * @return iterable<CubeCell>
+     */
+    public function getAllCubes(): iterable;
 }

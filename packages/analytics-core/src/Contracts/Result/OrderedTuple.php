@@ -16,16 +16,13 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
- * A query result in cube format.
+ * An ordered tuple of dimensions. A collection of dimensions that identifies a
+ * unique intersection of members from different dimensions in the cube. An
+ * ordered tuple is ordered. The members of an ordered tuple must be from unique
+ * dimensions from the same summary class.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<Tuple,Cell>
+ * @extends OrderedMapCollection<string,Dimension>
  */
-interface Cube extends OrderedMapCollection
-{
-    /**
-     * @return class-string
-     */
-    public function getSummaryClass(): string;
-}
+interface OrderedTuple extends Tuple, OrderedMapCollection {}

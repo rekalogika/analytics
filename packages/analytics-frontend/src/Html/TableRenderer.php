@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html;
 
-use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
@@ -57,18 +56,11 @@ final readonly class TableRenderer
         bool $throwException = false,
     ): string {
         try {
-            try {
-                return $this->doRenderPivotTable(
-                    result: $result,
-                    pivotedDimensions: $pivotedDimensions,
-                    theme: $theme,
-                );
-            } catch (HierarchicalOrderingRequired) {
-                return $this->doRenderTable(
-                    result: $result,
-                    theme: $theme,
-                );
-            }
+            return $this->doRenderPivotTable(
+                result: $result,
+                pivotedDimensions: $pivotedDimensions,
+                theme: $theme,
+            );
         } catch (\Throwable $e) {
             $e = FrontendWrapperException::selectiveWrap($e);
 
@@ -92,10 +84,6 @@ final readonly class TableRenderer
      * @param bool $throwException If true, the method will throw an exception
      * if an error occurs during rendering. If false, it will return an HTML
      * string with the error message.
-     *
-     * @throws HierarchicalOrderingRequired Thrown if the result does not have a
-     * hierarchical ordering because a pivot table requires hierarchical
-     * ordering.
      */
     public function renderPivotTable(
         Result $result,
@@ -109,8 +97,6 @@ final readonly class TableRenderer
                 pivotedDimensions: $pivotedDimensions,
                 theme: $theme,
             );
-        } catch (HierarchicalOrderingRequired $e) {
-            throw $e;
         } catch (\Throwable $e) {
             $e = FrontendWrapperException::selectiveWrap($e);
 
@@ -167,8 +153,7 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionNames();
-        $cube = $result->getCube();
-        $pivotTable = TableTableAdapter::adapt($cube);
+        $pivotTable = TableTableAdapter::adapt($result);
 
         $table = PivotTableTransformer::transformTableToTable(
             table: $pivotTable,

@@ -13,34 +13,33 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\TreeNodes;
+use Rekalogika\Analytics\Engine\SummaryQuery\Registry\TreeNodeRegistry;
 
 /**
- * @implements \IteratorAggregate<mixed,DefaultTree>
+ * @implements \IteratorAggregate<mixed,DefaultTreeNode>
  */
-final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
+final readonly class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
 {
-    /**
-     * @param list<DefaultTree> $treeNodes
-     */
     public function __construct(
-        private array $treeNodes = [],
+        private DefaultCells $cells,
+        private Dimensionality $dimensionality,
+        private TreeNodeRegistry $registry,
     ) {}
 
     #[\Override]
-    public function getIterator(): \Traversable
+    public function getByKey(mixed $key): mixed
     {
-        foreach ($this->treeNodes as $key => $treeNode) {
-            yield $treeNode->getMember() => $treeNode;
-        }
-    }
+        $current = $this->dimensionality->getCurrent();
 
-    #[\Override]
-    public function getByKey(mixed $key): ?DefaultTree
-    {
-        foreach ($this->treeNodes as $treeNode) {
-            if ($treeNode->getMember() === $key) {
-                return $treeNode;
+        if ($current === null) {
+            throw new LogicException('Cannot get by key when current dimension is null.');
+        }
+
+        foreach ($this as $node) {
+            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
+                return $node;
             }
         }
 
@@ -48,16 +47,31 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?DefaultTree
+    public function getByIndex(int $index): mixed
     {
-        return $this->treeNodes[$index] ?? null;
+        $result = $this->cells->getByIndex($index);
+
+        if ($result === null) {
+            return null;
+        }
+
+        return $this->registry->get(
+            cell: $result,
+            dimensionality: $this->dimensionality,
+        );
     }
 
     #[\Override]
     public function hasKey(mixed $key): bool
     {
-        foreach ($this->treeNodes as $treeNode) {
-            if ($treeNode->getMember() === $key) {
+        $current = $this->dimensionality->getCurrent();
+
+        if ($current === null) {
+            throw new LogicException('Cannot get by key when current dimension is null.');
+        }
+
+        foreach ($this as $node) {
+            if ($node->getTuple()->getByKey($current)?->getRawMember() === $key) {
                 return true;
             }
         }
@@ -66,22 +80,50 @@ final class DefaultTreeNodes implements TreeNodes, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultTree
+    public function first(): mixed
     {
-        return $this->treeNodes[0] ?? null;
+        $result = $this->cells->first();
+
+        if ($result === null) {
+            return null;
+        }
+
+        return $this->registry->get(
+            cell: $result,
+            dimensionality: $this->dimensionality,
+        );
     }
 
     #[\Override]
-    public function last(): ?DefaultTree
+    public function last(): mixed
     {
-        $count = \count($this->treeNodes);
+        $result = $this->cells->last();
 
-        return $count > 0 ? $this->treeNodes[$count - 1] : null;
+        if ($result === null) {
+            return null;
+        }
+
+        return $this->registry->get(
+            cell: $result,
+            dimensionality: $this->dimensionality,
+        );
     }
 
     #[\Override]
     public function count(): int
     {
-        return \count($this->treeNodes);
+        return $this->cells->count();
+    }
+
+    #[\Override]
+    public function getIterator(): \Traversable
+    {
+        /** @psalm-suppress MixedArgument */
+        foreach ($this->cells as $cell) {
+            yield $this->registry->get(
+                cell: $cell,
+                dimensionality: $this->dimensionality,
+            );
+        }
     }
 }

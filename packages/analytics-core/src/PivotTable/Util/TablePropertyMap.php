@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\PivotTable\Model\Table\DimensionLabel;
 use Rekalogika\Analytics\PivotTable\Model\Table\DimensionMember;
@@ -37,12 +37,12 @@ final class TablePropertyMap
     private \WeakMap $dimensionToMember;
 
     /**
-     * @var \WeakMap<Cell,MeasureValue>
+     * @var \WeakMap<CubeCell,MeasureValue>
      */
     private \WeakMap $cellToMeasureValue;
 
     /**
-     * @var \WeakMap<Cell,MeasureLabel>
+     * @var \WeakMap<CubeCell,MeasureLabel>
      */
     private \WeakMap $cellToMeasureLabel;
 
@@ -76,7 +76,7 @@ final class TablePropertyMap
         return $this->dimensionToMember->offsetGet($dimension) ?? throw new LogicException('Dimension member not found in the map.');
     }
 
-    public function getMeasureValue(Cell $cell): MeasureValue
+    public function getMeasureValue(CubeCell $cell): MeasureValue
     {
         if (!$this->cellToMeasureValue->offsetExists($cell)) {
             $this->cellToMeasureValue->offsetSet($cell, new MeasureValue($cell));
@@ -85,7 +85,7 @@ final class TablePropertyMap
         return $this->cellToMeasureValue->offsetGet($cell) ?? throw new LogicException('Measure value not found in the map.');
     }
 
-    public function getMeasureLabel(Cell $cell): MeasureLabel
+    public function getMeasureLabel(CubeCell $cell): MeasureLabel
     {
         if (!$this->cellToMeasureLabel->offsetExists($cell)) {
             $this->cellToMeasureLabel->offsetSet($cell, new MeasureLabel($cell));

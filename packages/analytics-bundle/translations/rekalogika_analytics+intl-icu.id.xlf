@@ -361,5 +361,11 @@
         <target>Telah terjadi kesalahan</target>
       </segment>
     </unit>
+    <unit id="g5KBtuL" name="Multiple measures">
+      <segment>
+        <source>Multiple measures</source>
+        <target>Lebih dari satu pengukuran</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

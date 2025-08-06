@@ -26,6 +26,11 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     private ?string $signature = null;
 
     /**
+     * @var list<string>|null
+     */
+    private ?array $dimensionality = null;
+
+    /**
      * @var array<string,DefaultDimension>
      */
     private readonly array $dimensions;
@@ -45,6 +50,8 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
             $dimensionsArray[$dimension->getName()] = $dimension;
         }
 
+        ksort($dimensionsArray);
+
         $this->dimensions = $dimensionsArray;
     }
 
@@ -59,6 +66,25 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         return new self(
             summaryClass: $this->summaryClass,
             dimensions: [...$this->dimensions, $dimension],
+            condition: $this->condition,
+        );
+    }
+
+    public function without(string $dimensionName): static
+    {
+        if (!isset($this->dimensions[$dimensionName])) {
+            throw new UnexpectedValueException(\sprintf(
+                'Dimension "%s" not found in tuple',
+                $dimensionName,
+            ));
+        }
+
+        $dimensionsWithout = $this->dimensions;
+        unset($dimensionsWithout[$dimensionName]);
+
+        return new self(
+            summaryClass: $this->summaryClass,
+            dimensions: $dimensionsWithout,
             condition: $this->condition,
         );
     }
@@ -103,26 +129,6 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         return $member->getMeasureProperty();
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getNames(): array
-    {
-        return array_keys($this->dimensions);
-    }
-
-    #[\Override]
-    public function getByIndex(int $index): ?DefaultDimension
-    {
-        $names = array_keys($this->dimensions);
-
-        if (!isset($names[$index])) {
-            return null;
-        }
-
-        return $this->dimensions[$names[$index]];
-    }
-
     #[\Override]
     public function getByKey(mixed $key): ?DefaultDimension
     {
@@ -136,20 +142,6 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultDimension
-    {
-        $keys = array_keys($this->dimensions);
-        return $keys ? $this->dimensions[$keys[0]] : null;
-    }
-
-    #[\Override]
-    public function last(): ?DefaultDimension
-    {
-        $keys = array_keys($this->dimensions);
-        return $keys ? $this->dimensions[end($keys)] : null;
-    }
-
-    #[\Override]
     public function count(): int
     {
         return \count($this->dimensions);
@@ -159,21 +151,6 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         yield from $this->dimensions;
-    }
-
-    /**
-     * @return array<string,mixed>
-     */
-    public function getMembers(): array
-    {
-        $members = [];
-
-        foreach ($this->dimensions as $dimension) {
-            /** @psalm-suppress MixedAssignment */
-            $members[$dimension->getName()] = $dimension->getMember();
-        }
-
-        return $members;
     }
 
     #[\Override]
@@ -189,7 +166,6 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         }
 
         $dimensions = $this->dimensions;
-        ksort($dimensions);
 
         $signatures = array_map(
             static fn(DefaultDimension $dimension): string => $dimension->getSignature(),
@@ -199,50 +175,18 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         return $this->signature = hash('xxh128', serialize($signatures));
     }
 
-    public function getWithoutValues(): self
+    /**
+     * @return list<string>
+     */
+    #[\Override]
+    public function getDimensionality(): array
     {
-        $dimensionsWithoutValues = [];
-
-        foreach ($this->dimensions as $dimension) {
-            if ($dimension->getName() === '@values') {
-                continue;
-            }
-
-            $dimensionsWithoutValues[] = $dimension;
+        if ($this->dimensionality !== null) {
+            return $this->dimensionality;
         }
 
-        return new self(
-            summaryClass: $this->summaryClass,
-            dimensions: $dimensionsWithoutValues,
-            condition: $this->condition,
-        );
-    }
+        $dimensionality = array_keys($this->dimensions);
 
-    /**
-     * @param int<0,max> $n
-     */
-    public function withFirstNDimensions(int $n): self
-    {
-        $dimensions = \array_slice($this->dimensions, 0, $n);
-
-        return new self(
-            summaryClass: $this->summaryClass,
-            dimensions: $dimensions,
-            condition: $this->condition,
-        );
-    }
-
-    /**
-     * @param int<0,max> $n
-     */
-    public function withUntilLastNthDimension(int $n): self
-    {
-        $dimensions = \array_slice($this->dimensions, 0, -$n);
-
-        return new self(
-            summaryClass: $this->summaryClass,
-            dimensions: $dimensions,
-            condition: $this->condition,
-        );
+        return $this->dimensionality = $dimensionality;
     }
 }
