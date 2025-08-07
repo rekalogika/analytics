@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\TableFramework;
 
 use Rekalogika\PivotTable\Contracts\Table;
+use Rekalogika\PivotTable\Implementation\TreeNode\DefaultTreeNode;
 use Rekalogika\PivotTable\TableFramework\Implementation\DefaultIdentityStrategy;
-use Rekalogika\PivotTable\TableFramework\Implementation\DefaultTreeNode;
 
 final class Manager
 {

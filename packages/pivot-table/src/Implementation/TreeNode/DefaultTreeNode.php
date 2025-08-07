@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableFramework\Implementation;
+namespace Rekalogika\PivotTable\Implementation\TreeNode;
 
 use Rekalogika\PivotTable\Contracts\Row;
 use Rekalogika\PivotTable\Contracts\TreeNode;
@@ -19,8 +19,6 @@ use Rekalogika\PivotTable\TableFramework\Manager;
 
 final readonly class DefaultTreeNode implements TreeNode
 {
-    private mixed $value;
-
     /**
      * @param list<string> $path Dimension name path
      */
@@ -40,29 +38,34 @@ final readonly class DefaultTreeNode implements TreeNode
             manager: $manager,
             tuple: [],
             descendantPath: $path,
-            row: $row,
+            value: self::resolveValueFromRow($row),
         );
     }
 
+
+    private static function resolveValueFromRow(Row $row): mixed
+    {
+        $tuple = iterator_to_array($row->getDimensions(), true);
+        $measures = iterator_to_array($row->getMeasures(), true);
+
+        return self::resolveValueFromTupleAndMeasures($tuple, $measures);
+    }
+
     /**
-     * @param Manager $manager
      * @param array<string,mixed> $tuple
-     * @param list<string> $descendantPath
+     * @param array<string,mixed> $measures
+     * @return mixed
      */
-    private function __construct(
-        private Manager $manager,
-        private array $tuple,
-        private array $descendantPath,
-        Row $row,
-    ) {
+    private static function resolveValueFromTupleAndMeasures(
+        array $tuple,
+        array $measures,
+    ): mixed {
         // get measure name
 
         $measureName = $tuple['@values'] ?? null;
 
         if ($measureName === null) {
-            $this->value = null;
-
-            return;
+            return null;
         }
 
         if (!\is_string($measureName)) {
@@ -74,13 +77,37 @@ final readonly class DefaultTreeNode implements TreeNode
 
         // get value
 
-        $measures = iterator_to_array($row->getMeasures(), true);
-
-        $this->value = $measures[$measureName]
+        return $measures[$measureName]
             ?? throw new \InvalidArgumentException(\sprintf(
                 'Value for measure "%s" not found in row.',
                 $measureName,
             ));
+    }
+
+    /**
+     * @param Manager $manager
+     * @param array<string,mixed> $tuple
+     * @param list<string> $descendantPath
+     */
+    private function __construct(
+        private Manager $manager,
+        private array $tuple,
+        private array $descendantPath,
+        private mixed $value,
+    ) {}
+
+    public function createNullChild(string $childKey, mixed $childItem): TreeNode
+    {
+        $tuple = $this->tuple;
+        /** @psalm-suppress MixedAssignment */
+        $tuple[$childKey] = $childItem;
+
+        return new self(
+            manager: $this->manager,
+            tuple: $tuple,
+            descendantPath: $this->descendantPath,
+            value: null,
+        );
     }
 
     #[\Override]
@@ -178,11 +205,14 @@ final readonly class DefaultTreeNode implements TreeNode
                 continue;
             }
 
+            $measures = iterator_to_array($row->getMeasures(), true);
+            $value = self::resolveValueFromTupleAndMeasures($tuple, $measures);
+
             yield new self(
                 manager: $this->manager,
                 tuple: $tuple,
                 descendantPath: $descendantPath,
-                row: $row,
+                value: $value,
             );
         }
     }
@@ -191,6 +221,7 @@ final readonly class DefaultTreeNode implements TreeNode
     public function rollUp(array $keys): TreeNode
     {
         $tuple = $this->tuple;
+        $descendantPath = $this->descendantPath;
 
         foreach ($keys as $key) {
             if (!\array_key_exists($key, $tuple)) {
@@ -201,13 +232,30 @@ final readonly class DefaultTreeNode implements TreeNode
             }
 
             unset($tuple[$key]);
+            $descendantPath[] = $key;
         }
+
+        $row = $this->manager
+            ->getRowRepository()
+            ->getRow($tuple);
+
+        if ($row === null) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Row with tuple "%s" not found.',
+                json_encode($tuple, JSON_THROW_ON_ERROR),
+            ));
+        }
+
+        $measures = iterator_to_array($row->getMeasures(), true);
+
+        /** @psalm-suppress MixedAssignment */
+        $value = self::resolveValueFromTupleAndMeasures($tuple, $measures);
 
         return new self(
             manager: $this->manager,
             tuple: $tuple,
-            descendantPath: [],
-            row: $this->manager->getRowRepository()->getRowOrFail($tuple),
+            descendantPath: $descendantPath,
+            value: $value,
         );
     }
 }
