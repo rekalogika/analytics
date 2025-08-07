@@ -154,10 +154,11 @@ final readonly class TableRenderer
     ): string {
         $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
+        $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
         $table = PivotTableTransformer::transformTableToTable(
             table: $pivotTable,
-            unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
+            unpivotedNodes: $unpivotedDimensions,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
             createSubtotals: $result->getDimensionality(),

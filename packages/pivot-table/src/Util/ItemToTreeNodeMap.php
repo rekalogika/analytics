@@ -11,19 +11,19 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Decorator\Internal;
+namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 
-final class ItemToTreeNodeDecoratorMap
+final class ItemToTreeNodeMap
 {
     /**
-     * @var array<string,TreeNodeDecorator>
+     * @var array<string,TreeNode>
      */
     private array $map = [];
 
     /**
-     * @param iterable<TreeNodeDecorator> $nodes
+     * @param iterable<TreeNode> $nodes
      */
     public static function create(iterable $nodes): self
     {
@@ -36,7 +36,7 @@ final class ItemToTreeNodeDecoratorMap
         return $instance;
     }
 
-    public function add(TreeNodeDecorator $node): void
+    public function add(TreeNode $node): void
     {
         /** @psalm-suppress MixedAssignment */
         $item = $node->getItem();
@@ -58,7 +58,7 @@ final class ItemToTreeNodeDecoratorMap
         return isset($this->map[$key]);
     }
 
-    public function get(mixed $item): TreeNodeDecorator
+    public function get(mixed $item): TreeNode
     {
         $key = $this->getKey($item);
 

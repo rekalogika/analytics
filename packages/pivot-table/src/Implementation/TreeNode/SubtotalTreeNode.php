@@ -17,15 +17,12 @@ use Rekalogika\PivotTable\Contracts\TreeNode;
 
 final readonly class SubtotalTreeNode implements TreeNode
 {
-    /**
-     * @param int<1,max> $level
-     */
     public function __construct(
         private TreeNode $node,
         private string $childrenKey,
         private bool $isLeaf,
-        private int $level,
     ) {}
+
 
     #[\Override]
     public function isLeaf(): bool
@@ -67,8 +64,14 @@ final readonly class SubtotalTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): iterable
+    public function drillDown(string $dimensionName): iterable
     {
-        return $this->node->getChildren($this->level + $level);
+        return $this->node->drillDown($dimensionName);
+    }
+
+    #[\Override]
+    public function rollUp(array $keys): TreeNode
+    {
+        return $this->node->rollUp($keys);
     }
 }

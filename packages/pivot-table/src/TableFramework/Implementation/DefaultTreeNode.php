@@ -145,22 +145,25 @@ final readonly class DefaultTreeNode implements TreeNode
     }
 
     #[\Override]
-    public function getChildren(int $level = 1): iterable
+    public function drillDown(string $dimensionName): iterable
     {
-        $dimensionName = $this->descendantPath[$level - 1] ?? null;
-
-        if ($dimensionName === null) {
-            yield from [];
-            return;
-            // throw new \InvalidArgumentException(\sprintf(
-            //     'Dimension name for level %d not found in descendant path.',
-            //     $level,
-            // ));
-        }
-
         $members = $this->manager
             ->getDimensionRepository()
             ->getMembers($dimensionName);
+
+        $descendantPath = $this->descendantPath;
+
+        // remove from $descendantPath until $dimensionName
+        $level = array_search($dimensionName, $descendantPath, true);
+
+        if ($level === false) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Dimension name "%s" not found in descendant path.',
+                $dimensionName,
+            ));
+        }
+        $level += 1; // level is 1-based, not 0-based
+        $descendantPath = \array_slice($descendantPath, $level);
 
         /** @psalm-suppress MixedAssignment */
         foreach ($members as $member) {
@@ -178,9 +181,33 @@ final readonly class DefaultTreeNode implements TreeNode
             yield new self(
                 manager: $this->manager,
                 tuple: $tuple,
-                descendantPath: \array_slice($this->descendantPath, $level),
+                descendantPath: $descendantPath,
                 row: $row,
             );
         }
+    }
+
+    #[\Override]
+    public function rollUp(array $keys): TreeNode
+    {
+        $tuple = $this->tuple;
+
+        foreach ($keys as $key) {
+            if (!\array_key_exists($key, $tuple)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Key "%s" not found in tuple.',
+                    $key,
+                ));
+            }
+
+            unset($tuple[$key]);
+        }
+
+        return new self(
+            manager: $this->manager,
+            tuple: $tuple,
+            descendantPath: [],
+            row: $this->manager->getRowRepository()->getRowOrFail($tuple),
+        );
     }
 }

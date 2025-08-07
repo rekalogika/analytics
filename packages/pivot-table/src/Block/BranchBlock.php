@@ -13,59 +13,31 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
-
 abstract class BranchBlock extends NodeBlock
 {
-    private BlockGroup $childrenBlockGroup;
-
-    protected function __construct(
-        TreeNodeDecorator $node,
-        private ?TreeNodeDecorator $parentNode,
-        ?Block $parent,
-        BlockContext $context,
-    ) {
-        parent::__construct($node, $parent, $context);
-
-        $this->childrenBlockGroup = $this->createBlockGroup($node);
-    }
-
     final public function getChildrenBlockGroup(): BlockGroup
     {
-        return $this->childrenBlockGroup;
-    }
-
-    /**
-     * Blocks that contains blocks, each representing a child node
-     */
-    private function createBlockGroup(TreeNodeDecorator $node): BlockGroup
-    {
-        $children = $node->getChildren();
         $context = $this->getContext();
+        $nextKey = $context->getNextKey();
 
-        $firstChild = $children[0]
-            ?? $node->getBalancedChildren(1, $context->getBlockDepth())[0]
-            ?? null;
-
-
-        if ($firstChild === null) {
+        if ($nextKey === null) {
             return new EmptyBlockGroup(
-                node: $node,
-                parentNode: $this->parentNode,
+                node: $this->getTreeNode(),
+                childKey: null,
                 context: $context,
             );
         }
 
-        if ($context->isPivoted($firstChild)) {
+        if ($context->isKeyPivoted($nextKey)) {
             return new HorizontalBlockGroup(
-                node: $node,
-                parentNode: $this->parentNode,
+                node: $this->getTreeNode(),
+                childKey: $nextKey,
                 context: $context,
             );
         } else {
             return new VerticalBlockGroup(
-                node: $node,
-                parentNode: $this->parentNode,
+                node: $this->getTreeNode(),
+                childKey: $nextKey,
                 context: $context,
             );
         }

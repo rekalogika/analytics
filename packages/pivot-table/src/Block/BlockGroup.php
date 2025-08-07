@@ -13,197 +13,165 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
+use Rekalogika\PivotTable\Util\ItemToTreeNodeMap;
 
 abstract class BlockGroup extends Block
 {
-    /**
-     * @var array<int,list<TreeNodeDecorator>>
-     */
-    private array $childNodes = [];
-
-    /**
-     * @var array<int,non-empty-list<TreeNodeDecorator>>
-     */
-    private array $balancedChildNodes = [];
-
-    /**
-     * @var array<int,list<Block>>
-     */
-    private array $childBlocks = [];
-
-    /**
-     * @var array<int,list<Block>>
-     */
-    private array $balancedChildBlocks = [];
-
     public function __construct(
-        private readonly TreeNodeDecorator $node,
-        private readonly ?TreeNodeDecorator $parentNode,
+        private readonly TreeNode $node,
+        private readonly ?string $childKey,
         BlockContext $context,
     ) {
         parent::__construct($context);
     }
 
-    /**
-     * @param int<1,max> $level
-     * @return list<Block>
-     */
-    public function getChildBlocks(int $level = 1): array
-    {
-        if (isset($this->childBlocks[$level])) {
-            return $this->childBlocks[$level];
-        }
-
-        $childBlocks = [];
-
-        foreach ($this->getChildNodes($level) as $childNode) {
-            $childBlocks[] = $this->createBlock(
-                node: $childNode,
-                parentNode: $this->node,
-                levelIncrement: $level,
-            );
-        }
-
-        return $this->childBlocks[$level] = $childBlocks;
-    }
-
-    /**
-     * @param int<1,max> $level
-     * @return list<Block>
-     */
-    public function getBalancedChildBlocks(int $level = 1): array
-    {
-        if (isset($this->balancedChildBlocks[$level])) {
-            return $this->balancedChildBlocks[$level];
-        }
-
-        $balancedChildBlocks = [];
-
-        foreach ($this->getBalancedChildNodes($level) as $childNode) {
-            $balancedChildBlocks[] = $this->createBlock(
-                node: $childNode,
-                parentNode: $this->node,
-                levelIncrement: $level,
-            );
-        }
-
-        return $this->balancedChildBlocks[$level] = $balancedChildBlocks;
-    }
-
-    /**
-     * @param int<1,max> $level
-     */
-    public function getOneChildBlock(int $level = 1): Block
-    {
-        return $this->getChildBlocks($level)[0]
-            ?? throw new \RuntimeException('No child blocks found in the current node.');
-    }
-
-    /**
-     * @param int<1,max> $level
-     */
-    public function getOneBalancedChildBlock(int $level = 1): Block
-    {
-        return $this->getBalancedChildBlocks($level)[0]
-            ?? throw new \RuntimeException('No child blocks found in the current node.');
-    }
-
-    final public function getNode(): TreeNodeDecorator
+    protected function getNode(): TreeNode
     {
         return $this->node;
     }
 
-    final public function getParentNode(): ?TreeNodeDecorator
+    protected function getChildKey(): string
     {
-        return $this->parentNode;
+        if ($this->childKey === null) {
+            throw new \RuntimeException('Child key is not set.');
+        }
+
+        return $this->childKey;
+    }
+
+    protected function tryGetChildKey(): ?string
+    {
+        return $this->childKey;
     }
 
     /**
-     * @param int<1,max> $level
+     * @param list<TreeNode> $nodes
+     * @param non-empty-list<TreeNode> $prototypeNodes
+     * @return non-empty-list<TreeNode>
      */
-    protected function getSubtotalNode(int $level = 1): ?TreeNodeDecorator
-    {
-        $balancedChildren = $this->node->getBalancedChildren($level, $this->getLevel());
-        $child = $balancedChildren[0] ?? null;
+    protected function balanceTreeNodesWithPrototype(
+        array $nodes,
+        array $prototypeNodes,
+    ): array {
+        // create a map of children items to nodes
+        $itemToNodes = ItemToTreeNodeMap::create($nodes);
 
-        // If subtotals are not desired for this node, return null.
-        if ($child === null || $this->getContext()->doCreateSubtotals($child) === false) {
-            return null;
+        // create result
+        $result = [];
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($prototypeNodes as $prototype) {
+            $currentItem = $prototype->getItem();
+
+            if ($itemToNodes->exists($currentItem)) {
+                $result[] = $itemToNodes->get($currentItem);
+            } else {
+                $null = NullTreeNode::fromInterface($prototype);
+                $result[] = $null;
+            }
         }
+
+        return $result;
+    }
+
+    protected function getSubtotalNode(): ?TreeNode
+    {
+        $childKey = $this->getChildKey();
 
         // different values cannot be aggregated
-        if ($child->getKey() === '@values') {
+        if ($childKey === '@values') {
             return null;
         }
 
-        $subtotalNode = new SubtotalTreeNode(
-            node: $this->node,
-            childrenKey: $child->getKey(),
-            isLeaf: $child->isLeaf(),
-            level: $level,
-        );
-
-        return $this
-            ->getContext()
-            ->getRepository()
-            ->decorate($subtotalNode)
-            ->withParent($this->node);
-    }
-
-    /**
-     * @param int<1,max> $level
-     * @return list<TreeNodeDecorator>
-     */
-    private function getChildNodes(int $level = 1): array
-    {
-        if (isset($this->childNodes[$level])) {
-            return $this->childNodes[$level];
+        // If subtotals are not desired for this node, return null.
+        if ($this->getContext()->doCreateSubtotals($childKey) === false) {
+            return null;
         }
 
-        $children = $this->node->getChildren($level);
+        return new SubtotalTreeNode(
+            node: $this->node,
+            childrenKey: $childKey,
+            isLeaf: $this->getContext()->isLeaf($childKey),
+        );
+    }
+
+
+    /**
+     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     * @return iterable<TreeNode>
+     */
+    protected function getChildTreeNodes(?array $prototypeNodes = null): iterable
+    {
+        if ($this->childKey === null) {
+            return [];
+        }
+
+        $children = $this->node->drillDown($this->childKey);
+        $children = iterator_to_array($children, false);
+
+        if ($prototypeNodes !== null) {
+            $children = $this->balanceTreeNodesWithPrototype(
+                nodes: $children,
+                prototypeNodes: $prototypeNodes,
+            );
+        }
 
         if (\count($children) >= 2) {
-            $subtotalNode = $this->getSubtotalNode($level);
+            $subtotalNode = $this->getSubtotalNode();
 
             if ($subtotalNode !== null) {
                 $children[] = $subtotalNode;
             }
         }
 
-        return $this->childNodes[$level] = $children;
+        return $children;
     }
 
     /**
-     * @param int<1,max> $level
-     * @return non-empty-list<TreeNodeDecorator>
+     * @param null|non-empty-list<TreeNode> $prototypeNodes
      */
-    private function getBalancedChildNodes(int $level = 1): array
+    protected function getOneChildTreeNode(?array $prototypeNodes = null): TreeNode
     {
-        if (isset($this->balancedChildNodes[$level])) {
-            return $this->balancedChildNodes[$level];
+        foreach ($this->getChildTreeNodes($prototypeNodes) as $childNode) {
+            return $childNode;
         }
 
-        $children = $this->node->getBalancedChildren($level, $this->getLevel());
-
-        $subtotalNode = $this->getSubtotalNode($level);
-
-        if ($subtotalNode !== null) {
-            $children[] = $subtotalNode;
-        }
-
-        /** @var non-empty-list<TreeNodeDecorator> $children */
-        return $this->balancedChildNodes[$level] = $children;
+        throw new \RuntimeException('No child nodes found in the current node.');
     }
 
     /**
-     * @param int<1,max> $level
+     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     * @return iterable<Block>
      */
-    final public function getOneChild(int $level = 1): TreeNodeDecorator
+    protected function getChildBlocks(?array $prototypeNodes = null): iterable
     {
-        return $this->getChildNodes($level)[0]
-            ?? $this->getBalancedChildNodes($level)[0]
-            ?? throw new \RuntimeException('No child nodes found in the current node.');
+        $children = $this->getChildTreeNodes($prototypeNodes);
+
+        if ($children === []) {
+            yield new EmptyBlockGroup(
+                node: $this->getNode(),
+                childKey: null,
+                context: $this->getContext(),
+            );
+        }
+
+        foreach ($children as $childNode) {
+            yield $this->createBlock($childNode);
+        }
+    }
+
+    /**
+     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     */
+    protected function getOneChildBlock(?array $prototypeNodes = null): Block
+    {
+        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
+            return $childBlock;
+        }
+
+        throw new \RuntimeException('No child blocks found in the current node.');
     }
 }

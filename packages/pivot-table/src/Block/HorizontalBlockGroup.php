@@ -13,48 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
-    private ?DefaultRows $headerRows = null;
-
-    private ?DefaultRows $dataRows = null;
-
-    public function __construct(
-        TreeNodeDecorator $node,
-        ?TreeNodeDecorator $parentNode,
-        BlockContext $context,
-    ) {
-        parent::__construct(
-            node: $node,
-            parentNode: $parentNode,
-            context: $context,
-        );
-    }
-
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        if ($this->headerRows !== null) {
-            return $this->headerRows;
-        }
-
         $context = $this->getElementContext();
         $headerRows = new DefaultRows([], $context);
+        $prototypeNodes = $this->getPrototypeNodes();
 
         // add a header and data column for each of the child blocks
-        foreach ($this->getBalancedChildBlocksForHorizontalLayout() as $childBlock) {
+        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
         // add a legend if the dimension is not marked as skipped
-        $child = $this->getOneChild();
+        $child = $this->getOneChildTreeNode($prototypeNodes);
 
-        if (!$this->getContext()->isLegendSkipped($child)) {
+        if (!$this->getContext()->isLegendSkipped($child->getKey())) {
             $nameCell = new DefaultHeaderCell(
                 name: $child->getKey(),
                 content: $child->getLegend(),
@@ -64,55 +45,73 @@ final class HorizontalBlockGroup extends BlockGroup
             $headerRows = $nameCell->appendRowsBelow($headerRows);
         }
 
-        return $this->headerRows = $headerRows;
+        return $headerRows;
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
-        if ($this->dataRows !== null) {
-            return $this->dataRows;
-        }
-
         $context = $this->getElementContext();
         $dataRows = new DefaultRows([], $context);
+        $prototypeNodes = $this->getPrototypeNodes();
 
-        foreach ($this->getBalancedChildBlocksForHorizontalLayout() as $childBlock) {
+        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
             $dataRows = $dataRows->appendRight($childDataRows);
         }
 
-        return $this->dataRows = $dataRows;
+        return $dataRows;
     }
 
     /**
-     * @param int<1,max> $level
-     * @return list<Block>
+     * @return non-empty-list<TreeNode>
      */
-    private function getBalancedChildBlocksForHorizontalLayout(int $level = 1): array
+    private function getPrototypeNodes(): array
     {
-        $pivotedDimensions = $this->getContext()->getPivotedDimensions();
-        $blocks = [];
+        $result = $this->getContext()
+            ->getRootTreeNode()
+            ->drillDown($this->getChildKey());
 
-        $children = $this->getNode()
-            ->getBalancedChildrenFromNonPivotedParent($level, $pivotedDimensions);
+        $result = iterator_to_array($result, false);
 
-        if (\count($children) > 1) {
-            $subtotalNode = $this->getSubtotalNode($level);
-
-            if ($subtotalNode !== null) {
-                $children[] = $subtotalNode;
-            }
+        if ($result === []) {
+            throw new \RuntimeException(\sprintf(
+                'No prototype nodes found for child key "%s".',
+                $this->getChildKey(),
+            ));
         }
 
-        foreach ($children as $childNode) {
-            $blocks[] = $this->createBlock(
-                node: $childNode,
-                parentNode: $this->getNode(),
-                levelIncrement: $level,
-            );
-        }
-
-        return $blocks;
+        return $result;
     }
+
+    // /**
+    //  * @param int<1,max> $level
+    //  * @return list<Block>
+    //  */
+    // private function getBalancedChildBlocksForHorizontalLayout(int $level = 1): array
+    // {
+    //     $pivotedNodes = $this->getContext()->getPivotedKeys();
+    //     $blocks = [];
+
+    //     $children = $this->getNode()
+    //         ->getBalancedChildrenFromNonPivotedParent($level, $pivotedNodes);
+
+    //     if (\count($children) > 1) {
+    //         $subtotalNode = $this->getSubtotalNode($level);
+
+    //         if ($subtotalNode !== null) {
+    //             $children[] = $subtotalNode;
+    //         }
+    //     }
+
+    //     foreach ($children as $childNode) {
+    //         $blocks[] = $this->createBlock(
+    //             node: $childNode,
+    //             levelIncrement: $level,
+    //             key: $childNode->getKey(),
+    //         );
+    //     }
+
+    //     return $blocks;
+    // }
 }

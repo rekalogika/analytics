@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Decorator\TreeNodeDecorator;
+use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class RootBlock extends BranchBlock
 {
     protected function __construct(
-        TreeNodeDecorator $node,
+        TreeNode $node,
         BlockContext $context,
     ) {
         parent::__construct(
             node: $node,
-            parentNode: null,
             parent: null,
             context: $context,
         );
@@ -33,9 +32,7 @@ final class RootBlock extends BranchBlock
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
-        return $this
-            ->getChildrenBlockGroup()
-            ->getHeaderRows();
+        return $this->getChildrenBlockGroup()->getHeaderRows();
     }
 
     #[\Override]
