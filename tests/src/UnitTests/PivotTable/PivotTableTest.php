@@ -14,10 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\UnitTests\PivotTable;
 
 use PHPUnit\Framework\TestCase;
-use Rekalogika\Analytics\Tests\UnitTests\PivotTable\Model\MockTable;
 use Rekalogika\PivotTable\ArrayTable\ArrayTable;
 use Rekalogika\PivotTable\ArrayTable\ArrayTableFactory;
-use Rekalogika\PivotTable\Block\Keys;
 use Rekalogika\PivotTable\TableFramework\Manager;
 
 final class PivotTableTest extends TestCase
@@ -49,7 +47,7 @@ final class PivotTableTest extends TestCase
                 'month' => 'Month',
                 'count' => 'Count',
                 'sum' => 'Sum',
-            ]
+            ],
         );
 
         /**

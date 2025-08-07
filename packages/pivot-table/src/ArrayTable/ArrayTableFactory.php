@@ -21,7 +21,7 @@ final class ArrayTableFactory
      * @param array<string,mixed> $legends Key is any dimension and measure
      * field, value is the legend value. Key can also be `@values` to indicate
      * the legend of the measure dimension.
-     * 
+     *
      */
     public function __construct(
         private readonly array $dimensionFields,
@@ -52,7 +52,7 @@ final class ArrayTableFactory
             throw new \InvalidArgumentException("Dimension field not found: $dimensionName");
         }
 
-        $count = count($this->dimensionFields);
+        $count = \count($this->dimensionFields);
 
         if ($pos >= $count) {
             throw new \InvalidArgumentException("Position out of range for dimension field: $dimensionName");
@@ -101,7 +101,7 @@ final class ArrayTableFactory
                 continue; // Skip grouping fields
             }
 
-            if (!array_key_exists($field, $input)) {
+            if (!\array_key_exists($field, $input)) {
                 throw new \InvalidArgumentException("Missing dimension field: $field");
             }
 
