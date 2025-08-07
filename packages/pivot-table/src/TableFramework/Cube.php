@@ -29,7 +29,8 @@ final readonly class Cube
     public function __construct(
         private CubeManager $manager,
         array $tuple,
-        private bool $isSubtotal = false,
+        private ?string $subtotalMember = null,
+        private mixed $subtotalLegend = null,
     ) {
         if (\array_key_exists('@values', $tuple) && !\is_string($tuple['@values'])) {
             throw new \InvalidArgumentException(
@@ -42,12 +43,12 @@ final readonly class Cube
         $this->tuple = $tuple;
     }
 
-    public function asSubtotal(): self
+    public function asSubtotal(string $key): self
     {
         return new self(
             manager: $this->manager,
             tuple: $this->tuple,
-            isSubtotal: true,
+            subtotalMember: $key,
         );
     }
 
@@ -61,6 +62,10 @@ final readonly class Cube
 
     public function getMember(string $dimensionName): mixed
     {
+        if ($dimensionName === $this->subtotalMember) {
+            return $this->manager->getSubtotalLegend($dimensionName);
+        }
+
         if (!\array_key_exists($dimensionName, $this->tuple)) {
             throw new \InvalidArgumentException(
                 "Dimension '$dimensionName' does not exist in the tuple.",
@@ -105,7 +110,7 @@ final readonly class Cube
 
     public function isSubtotal(): bool
     {
-        return $this->isSubtotal;
+        return $this->subtotalMember !== null;
     }
 
     //
@@ -115,9 +120,9 @@ final readonly class Cube
     /**
      * @return list<self>
      */
-    public function drillDown(string $dimensionName): array
+    public function drillDown(string $dimensionName, bool $balancing): array
     {
-        return $this->manager->drillDown($this->tuple, $dimensionName);
+        return $this->manager->drillDown($this->tuple, $dimensionName, $balancing);
     }
 
     public function slice(string $dimensionName, mixed $member): self
@@ -131,6 +136,17 @@ final readonly class Cube
     public function rollUp(array $keys): self
     {
         return $this->manager->rollUp($this->tuple, $keys);
+    }
+
+    public function rollUpAllExcept(array $keys): self
+    {
+        $allKeys = array_keys($this->tuple);
+        $newKeys = array_values(array_filter(
+            $allKeys,
+            static fn(string $key): bool => !\in_array($key, $keys, true),
+        ));
+
+        return $this->rollUp($newKeys);
     }
 
     /**

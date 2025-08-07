@@ -49,7 +49,7 @@ abstract class BlockGroup extends Block
             return null;
         }
 
-        return $this->cube->asSubtotal();
+        return $this->cube->asSubtotal($childKey);
     }
 
 
@@ -60,7 +60,7 @@ abstract class BlockGroup extends Block
     protected function getChildCubes(?array $prototypeCubes = null): iterable
     {
         if ($prototypeCubes === null) {
-            $children = $this->cube->drillDown($this->getChildKey());
+            $children = $this->cube->drillDown($this->getChildKey(), false);
         } else {
             $children = $this->cube->multipleSlicesFromCubes(
                 dimensionName: $this->getChildKey(),
@@ -68,13 +68,13 @@ abstract class BlockGroup extends Block
             );
         }
 
-        // if (\count($children) >= 2) {
-        //     $subtotalNode = $this->getSubtotalNode();
+        if (\count($children) >= 2) {
+            $subtotalNode = $this->getSubtotalNode();
 
-        //     if ($subtotalNode !== null) {
-        //         $children[] = $subtotalNode;
-        //     }
-        // }
+            if ($subtotalNode !== null) {
+                $children[] = $subtotalNode;
+            }
+        }
 
         return $children;
     }

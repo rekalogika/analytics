@@ -30,7 +30,7 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         $headerRows = new DefaultRows([], $context);
-        $prototypeCubes = $this->getPrototypeNodes();
+        $prototypeCubes = $this->getPrototypeCubes();
 
         // add a header and data column for each of the child blocks
         foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
@@ -59,7 +59,7 @@ final class HorizontalBlockGroup extends BlockGroup
     {
         $context = $this->getElementContext();
         $dataRows = new DefaultRows([], $context);
-        $prototypeCubes = $this->getPrototypeNodes();
+        $prototypeCubes = $this->getPrototypeCubes();
 
         foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
@@ -72,11 +72,21 @@ final class HorizontalBlockGroup extends BlockGroup
     /**
      * @return non-empty-list<Cube>
      */
-    private function getPrototypeNodes(): array
+    private function getPrototypeCubes(): array
     {
-        $result = $this->getContext()
-            ->getApexCube()
-            ->drillDown($this->getChildKey());
+        $firstPivoted = $this->getContext()->getFirstPivotedKey();
+        $currentKeys = array_keys($this->getCube()->getTuple());
+        $existsInTuple = \in_array($firstPivoted, $currentKeys, true);
+
+        if ($firstPivoted === null || !$existsInTuple) {
+            $result = $this->getContext()
+                ->getApexCube()
+                ->drillDown($this->getChildKey(), false);
+        } else {
+            $result = $this->getCube()
+                ->rollUpAllExcept([$firstPivoted])
+                ->drillDown($this->getChildKey(), false);
+        }
 
         if ($result === []) {
             throw new \RuntimeException(\sprintf(

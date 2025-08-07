@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\TableFramework;
 
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\PivotTable\Contracts\Table;
 use Rekalogika\PivotTable\TableFramework\Implementation\DefaultIdentityStrategy;
 
@@ -47,6 +48,11 @@ final class CubeManager
         return $this->table->getLegend($dimension);
     }
 
+    public function getSubtotalLegend(string $dimension): mixed
+    {
+        return new TranslatableMessage('Total');
+    }
+
     public function createApexCube(): Cube
     {
         return new Cube($this, []);
@@ -56,8 +62,11 @@ final class CubeManager
      * @param array<string,mixed> $tuple
      * @return list<Cube>
      */
-    public function drillDown(array $tuple, string $dimension): array
-    {
+    public function drillDown(
+        array $tuple,
+        string $dimension,
+        bool $balancing,
+    ): array {
         $members = $this->dimensionRepository->getMembers($dimension);
 
         $result = [];
@@ -66,6 +75,10 @@ final class CubeManager
         foreach ($members as $member) {
             $newTuple = $tuple;
             $newTuple[$dimension] = $member;
+
+            if (!$balancing && $this->rowRepository->getRow($newTuple) === null) {
+                continue; // skip if no row found
+            }
 
             $result[] = new Cube($this, $newTuple);
         }
