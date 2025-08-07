@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 final readonly class BlockContext
 {
@@ -29,7 +30,8 @@ final readonly class BlockContext
      * @param int<0,max> $blockDepth 0 is the root block, 1 is the child of the root block, and so on.
      */
     public function __construct(
-        private TreeNode $rootNode,
+        private Cube $apexCube,
+        private CubeManager $cubeManager,
         array $unpivotedKeys,
         array $pivotedKeys,
         private array $skipLegends,
@@ -52,7 +54,8 @@ final readonly class BlockContext
     public function incrementSubtotal(): self
     {
         return new self(
-            rootNode: $this->rootNode,
+            apexCube: $this->apexCube,
+            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -69,7 +72,8 @@ final readonly class BlockContext
     public function incrementBlockDepth(int $amount): self
     {
         return new self(
-            rootNode: $this->rootNode,
+            apexCube: $this->apexCube,
+            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -80,13 +84,16 @@ final readonly class BlockContext
         );
     }
 
-    public function appendKey(string $key): self
+    public function pushKey(): self
     {
         $newPath = $this->keys->getCurrentKeyPath();
-        $newPath[] = $key;
+        $newPath[] = $this->keys->getNextKey() ?? throw new \LogicException(
+            'Cannot push key when there is no next key.',
+        );
 
         return new self(
-            rootNode: $this->rootNode,
+            apexCube: $this->apexCube,
+            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $newPath,
@@ -125,14 +132,25 @@ final readonly class BlockContext
         return $this->keys->getKeys();
     }
 
-    public function isKeyPivoted(string $key): bool
+    public function isKeyPivoted(): bool
     {
-        return $this->keys->isKeyPivoted($key);
+        return $this->keys->isKeyPivoted($this->getCurrentKey());
     }
 
-    public function isKeyUnpivoted(string $key): bool
+    public function isNextKeyPivoted(): bool
     {
-        return $this->keys->isKeyUnpivoted($key);
+        $next = $this->getNextKey();
+
+        if ($next === null) {
+            return false; // No next key, so cannot be pivoted.
+        }
+
+        return $this->keys->isKeyPivoted($next);
+    }
+
+    public function isKeyUnpivoted(): bool
+    {
+        return $this->keys->isKeyUnpivoted($this->getCurrentKey());
     }
 
     public function getFirstPivotedKey(): ?string
@@ -148,9 +166,11 @@ final readonly class BlockContext
         return $this->keys->getCurrentKeyPath();
     }
 
-    public function getCurrentKey(): ?string
+    public function getCurrentKey(): string
     {
-        return $this->keys->getCurrentKey();
+        return $this->keys->getCurrentKey() ?? throw new \LogicException(
+            'Cannot get current key when there is no current key.',
+        );
     }
 
     /**
@@ -163,23 +183,28 @@ final readonly class BlockContext
         return $this->keys->getNextKey($level);
     }
 
-    public function isLeaf(string $key): bool
+    public function isLeaf(): bool
     {
-        return $this->keys->isLeaf($key);
+        return $this->keys->isLeaf($this->getCurrentKey());
     }
 
     //
     // misc
     //
 
+    public function getCubeManager(): CubeManager
+    {
+        return $this->cubeManager;
+    }
+
     public function isLegendSkipped(string $key): bool
     {
         return \in_array($key, $this->skipLegends, true);
     }
 
-    public function doCreateSubtotals(string $key): bool
+    public function doCreateSubtotalOnChildren(): bool
     {
-        return \in_array($key, $this->createSubtotals, true);
+        return \in_array($this->getNextKey(), $this->createSubtotals, true);
     }
 
     /**
@@ -198,8 +223,8 @@ final readonly class BlockContext
         return $this->blockDepth;
     }
 
-    public function getRootTreeNode(): TreeNode
+    public function getApexCube(): Cube
     {
-        return $this->rootNode;
+        return $this->apexCube;
     }
 }

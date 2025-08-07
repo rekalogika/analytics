@@ -66,7 +66,7 @@ final readonly class SpreadsheetRenderer
         $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
 
-        $table = PivotTableTransformer::transformTableToTable(
+        $table = PivotTableTransformer::transform(
             table: $pivotTable,
             unpivotedNodes: array_values(array_diff($dimensions, $pivotedDimensions)),
             pivotedNodes: $pivotedDimensions,

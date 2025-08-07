@@ -23,19 +23,20 @@ final class PivotLeafBlock extends LeafBlock
     public function getHeaderRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         if (
-            $this->getContext()->isLegendSkipped($this->getTreeNode()->getKey())
+            $this->getContext()->isLegendSkipped($currentKey)
         ) {
             $cell = new DefaultHeaderCell(
-                name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                name: $currentKey,
+                content: $this->getCube()->getMember($currentKey),
                 context: $context,
             );
         } else {
             $cell = new DefaultDataCell(
-                name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                name: $currentKey,
+                content: $this->getCube()->getMember($currentKey),
                 context: $context,
             );
         }
@@ -47,10 +48,11 @@ final class PivotLeafBlock extends LeafBlock
     public function getDataRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         $cell = new DefaultDataCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getValue(),
+            name: $currentKey,
+            content: $this->getCube()->getValue(),
             context: $context,
         );
 

@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
-use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
+use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 abstract class Block implements \Stringable
 {
@@ -57,33 +57,33 @@ abstract class Block implements \Stringable
         return $this->context->getBlockDepth();
     }
 
-    final protected function createBlock(TreeNode $node): Block
+    final protected function createBlock(Cube $cube): Block
     {
         $context = $this->getContext();
-        $context = $context->appendKey($node->getKey());
+        $context = $context->pushKey();
 
-        if ($node instanceof SubtotalTreeNode) {
+        if ($cube->isSubtotal()) {
             $context = $context->incrementSubtotal();
         }
 
-        if (!$node->isLeaf()) {
-            if ($context->isKeyPivoted($node->getKey())) {
+        if (!$context->isLeaf()) {
+            if ($context->isKeyPivoted()) {
                 return new PivotBlock(
-                    node: $node,
+                    cube: $cube,
                     parent: $this,
                     context: $context,
                 );
             } else {
                 return new NormalBlock(
-                    node: $node,
+                    cube: $cube,
                     parent: $this,
                     context: $context,
                 );
             }
         } else {
-            if ($context->isKeyPivoted($node->getKey())) {
+            if ($context->isKeyPivoted()) {
                 return new PivotLeafBlock(
-                    node: $node,
+                    cube: $cube,
                     parent: $this,
                     context: $context,
                 );
@@ -93,13 +93,13 @@ abstract class Block implements \Stringable
                 //     && \count($parentNode->getBalancedChildren(1, $level - 1)) === 1
                 // ) {
                 //     return new SingleNodeLeafBlock(
-                //         node: $node,
+                //         cube: $cube,
                 //         parent: $this,
                 //         context: $context,
                 //     );
             } else {
                 return new NormalLeafBlock(
-                    node: $node,
+                    cube: $cube,
                     parent: $this,
                     context: $context,
                 );
@@ -114,21 +114,24 @@ abstract class Block implements \Stringable
      * @param list<string> $createSubtotals
      */
     final public static function new(
-        TreeNode $node,
+        CubeManager $cubeManager,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
+        $cube = $cubeManager->createApexCube();
+
         $context = new BlockContext(
-            rootNode: $node,
+            apexCube: $cube,
+            cubeManager: $cubeManager,
             unpivotedKeys: $unpivotedNodes,
             pivotedKeys: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
         );
 
-        return new RootBlock($node, $context);
+        return new RootBlock($cube, $context);
     }
 
     final protected function getContext(): BlockContext

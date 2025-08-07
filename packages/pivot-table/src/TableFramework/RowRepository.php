@@ -47,14 +47,14 @@ final class RowRepository
 
     private function recordRow(Row $row): void
     {
-        $dimensions = iterator_to_array($row->getDimensions());
+        $tuple = iterator_to_array($row->getDimensions(), true);
 
         $signature = $this->identityStrategy
-            ->getMembersSignature($dimensions);
+            ->getMembersSignature($tuple);
 
         if (isset($this->row[$signature])) {
             throw new \InvalidArgumentException(\sprintf(
-                'Row with signature "%s" already exists.',
+                'Signature collission. Row with signature "%s" already exists.',
                 $signature,
             ));
         }
@@ -77,29 +77,29 @@ final class RowRepository
     }
 
     /**
-     * @param array<string,mixed> $members
+     * @param array<string,mixed> $tuple
      */
-    public function getRow(array $members): ?Row
+    public function getRow(array $tuple): ?Row
     {
         // remove @values
-        unset($members['@values']);
-        $signature = $this->identityStrategy->getMembersSignature($members);
+        unset($tuple['@values']);
+        $signature = $this->identityStrategy->getMembersSignature($tuple);
 
         return $this->row[$signature] ?? null;
     }
 
     /**
-     * @param array<string,mixed> $members
+     * @param array<string,mixed> $tuple
      * @throws \InvalidArgumentException
      */
-    public function getRowOrFail(array $members): Row
+    public function getRowOrFail(array $tuple): Row
     {
-        $row = $this->getRow($members);
+        $row = $this->getRow($tuple);
 
         if ($row === null) {
             throw new \InvalidArgumentException(\sprintf(
                 'Row with members "%s" not found.',
-                json_encode($members, JSON_THROW_ON_ERROR),
+                json_encode($tuple, JSON_THROW_ON_ERROR),
             ));
         }
 

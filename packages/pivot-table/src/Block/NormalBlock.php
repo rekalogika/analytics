@@ -23,10 +23,11 @@ final class NormalBlock extends BranchBlock
     public function getHeaderRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         $cell = new DefaultHeaderCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getLegend(),
+            name: $currentKey,
+            content: $this->getCube()->getLegend($currentKey),
             context: $context,
         );
 
@@ -37,10 +38,11 @@ final class NormalBlock extends BranchBlock
     public function getDataRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         $cell = new DefaultDataCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getItem(),
+            name: $currentKey,
+            content: $this->getCube()->getMember($currentKey),
             context: $context,
         );
 

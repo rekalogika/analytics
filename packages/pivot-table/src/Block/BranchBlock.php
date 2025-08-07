@@ -21,23 +21,26 @@ abstract class BranchBlock extends NodeBlock
         $nextKey = $context->getNextKey();
 
         if ($nextKey === null) {
-            return new EmptyBlockGroup(
-                node: $this->getTreeNode(),
-                childKey: null,
-                context: $context,
-            );
+            throw new \LogicException(\sprintf(
+                'Cannot create children block group for %s without next key.',
+                get_debug_type($this),
+            ));
+
+            // return new EmptyBlockGroup(
+            //     node: $this->getCube(),
+            //     childKey: null,
+            //     context: $context,
+            // );
         }
 
-        if ($context->isKeyPivoted($nextKey)) {
+        if ($context->isNextKeyPivoted()) {
             return new HorizontalBlockGroup(
-                node: $this->getTreeNode(),
-                childKey: $nextKey,
+                cube: $this->getCube(),
                 context: $context,
             );
         } else {
             return new VerticalBlockGroup(
-                node: $this->getTreeNode(),
-                childKey: $nextKey,
+                cube: $this->getCube(),
                 context: $context,
             );
         }

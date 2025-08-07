@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\TableFramework\Cube;
 
 abstract class NodeBlock extends Block
 {
     private readonly ?BlockGroup $parent;
 
     protected function __construct(
-        private readonly TreeNode $node,
+        private readonly Cube $cube,
         ?Block $parent,
         BlockContext $context,
     ) {
@@ -37,9 +37,9 @@ abstract class NodeBlock extends Block
         $this->parent = $parent;
     }
 
-    final public function getTreeNode(): TreeNode
+    final public function getCube(): Cube
     {
-        return $this->node;
+        return $this->cube;
     }
 
     final public function getParentBlock(): ?BlockGroup

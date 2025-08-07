@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
+use Rekalogika\PivotTable\TableFramework\Cube;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
@@ -23,22 +23,28 @@ final class HorizontalBlockGroup extends BlockGroup
     public function getHeaderRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $nextKey = $this->getContext()->getNextKey();
+
+        if ($nextKey === null) {
+            throw new \RuntimeException('Next key is not set in the context.');
+        }
+
         $headerRows = new DefaultRows([], $context);
-        $prototypeNodes = $this->getPrototypeNodes();
+        $prototypeCubes = $this->getPrototypeNodes();
 
         // add a header and data column for each of the child blocks
-        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
+        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
         // add a legend if the dimension is not marked as skipped
-        $child = $this->getOneChildTreeNode($prototypeNodes);
+        $child = $this->getOneChildCube($prototypeCubes);
 
-        if (!$this->getContext()->isLegendSkipped($child->getKey())) {
+        if (!$this->getContext()->isLegendSkipped($nextKey)) {
             $nameCell = new DefaultHeaderCell(
-                name: $child->getKey(),
-                content: $child->getLegend(),
+                name: $nextKey,
+                content: $child->getLegend($nextKey),
                 context: $context,
             );
 
@@ -53,9 +59,9 @@ final class HorizontalBlockGroup extends BlockGroup
     {
         $context = $this->getElementContext();
         $dataRows = new DefaultRows([], $context);
-        $prototypeNodes = $this->getPrototypeNodes();
+        $prototypeCubes = $this->getPrototypeNodes();
 
-        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
+        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
             $dataRows = $dataRows->appendRight($childDataRows);
         }
@@ -64,15 +70,13 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     /**
-     * @return non-empty-list<TreeNode>
+     * @return non-empty-list<Cube>
      */
     private function getPrototypeNodes(): array
     {
         $result = $this->getContext()
-            ->getRootTreeNode()
+            ->getApexCube()
             ->drillDown($this->getChildKey());
-
-        $result = iterator_to_array($result, false);
 
         if ($result === []) {
             throw new \RuntimeException(\sprintf(
@@ -83,35 +87,4 @@ final class HorizontalBlockGroup extends BlockGroup
 
         return $result;
     }
-
-    // /**
-    //  * @param int<1,max> $level
-    //  * @return list<Block>
-    //  */
-    // private function getBalancedChildBlocksForHorizontalLayout(int $level = 1): array
-    // {
-    //     $pivotedNodes = $this->getContext()->getPivotedKeys();
-    //     $blocks = [];
-
-    //     $children = $this->getNode()
-    //         ->getBalancedChildrenFromNonPivotedParent($level, $pivotedNodes);
-
-    //     if (\count($children) > 1) {
-    //         $subtotalNode = $this->getSubtotalNode($level);
-
-    //         if ($subtotalNode !== null) {
-    //             $children[] = $subtotalNode;
-    //         }
-    //     }
-
-    //     foreach ($children as $childNode) {
-    //         $blocks[] = $this->createBlock(
-    //             node: $childNode,
-    //             levelIncrement: $level,
-    //             key: $childNode->getKey(),
-    //         );
-    //     }
-
-    //     return $blocks;
-    // }
 }

@@ -24,10 +24,11 @@ final class NormalLeafBlock extends LeafBlock
     public function getHeaderRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         $cell = new DefaultHeaderCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getLegend(),
+            name: $currentKey,
+            content: $this->getCube()->getLegend($currentKey),
             columnSpan: 2,
             context: $context,
         );
@@ -39,16 +40,17 @@ final class NormalLeafBlock extends LeafBlock
     public function getDataRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         $name = new DefaultDataCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getItem(),
+            name: $currentKey,
+            content: $this->getCube()->getMember($currentKey),
             context: $context,
         );
 
         $value = new DefaultDataCell(
-            name: $this->getTreeNode()->getKey(),
-            content: $this->getTreeNode()->getValue(),
+            name: $currentKey,
+            content: $this->getCube()->getValue(),
             context: $context,
         );
 

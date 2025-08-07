@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
+use Rekalogika\PivotTable\TableFramework\Cube;
 
 final class RootBlock extends BranchBlock
 {
     protected function __construct(
-        TreeNode $node,
+        Cube $cube,
         BlockContext $context,
     ) {
         parent::__construct(
-            node: $node,
+            cube: $cube,
             parent: null,
             context: $context,
         );
