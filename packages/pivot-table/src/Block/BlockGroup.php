@@ -16,6 +16,7 @@ namespace Rekalogika\PivotTable\Block;
 use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
 use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
+use Rekalogika\PivotTable\TableFramework\Implementation\DefaultTreeNode;
 use Rekalogika\PivotTable\Util\ItemToTreeNodeMap;
 
 abstract class BlockGroup extends Block
@@ -56,6 +57,9 @@ abstract class BlockGroup extends Block
         array $nodes,
         array $prototypeNodes,
     ): array {
+        $childKey = $this->getChildKey();
+        $node = $this->getNode();
+
         // create a map of children items to nodes
         $itemToNodes = ItemToTreeNodeMap::create($nodes);
 
@@ -64,12 +68,17 @@ abstract class BlockGroup extends Block
 
         /** @psalm-suppress MixedAssignment */
         foreach ($prototypeNodes as $prototype) {
-            $currentItem = $prototype->getItem();
+            $currentItem = $prototype->getItemByKey($childKey);
 
             if ($itemToNodes->exists($currentItem)) {
                 $result[] = $itemToNodes->get($currentItem);
             } else {
-                $null = NullTreeNode::fromInterface($prototype);
+                // $null = NullTreeNode::fromInterface($prototype);
+                $null = $node->createNullChild(
+                    childKey: $childKey,
+                    childItem: $currentItem,
+                );
+
                 $result[] = $null;
             }
         }
@@ -91,11 +100,13 @@ abstract class BlockGroup extends Block
             return null;
         }
 
-        return new SubtotalTreeNode(
-            node: $this->node,
-            childrenKey: $childKey,
-            isLeaf: $this->getContext()->isLeaf($childKey),
-        );
+        // return new SubtotalTreeNode(
+        //     node: $this->node,
+        //     childrenKey: $childKey,
+        //     isLeaf: $this->getContext()->isLeaf($childKey),
+        // );
+
+        return $this->node->createSubtotal($childKey);
     }
 
 

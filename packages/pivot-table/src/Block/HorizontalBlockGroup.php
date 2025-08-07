@@ -73,15 +73,42 @@ final class HorizontalBlockGroup extends BlockGroup
             ->drillDown($this->getChildKey());
 
         $result = iterator_to_array($result, false);
-
-        if ($result === []) {
-            throw new \RuntimeException(\sprintf(
-                'No prototype nodes found for child key "%s".',
-                $this->getChildKey(),
-            ));
-        }
-
+        
         return $result;
+
+        // $currentKey = $this->getNode()->getKey();
+        // $path = $this->getNode()->getPath();
+        // $tuple = $this->getNode()->getTuple();
+        // $firstPivotedKey = $this->getContext()->getFirstPivotedKey();
+
+        // // path without $firstPivotedKey
+        // if ($firstPivotedKey !== null) {
+        //     $newPath = array_values(\array_filter($path, static fn (string $key) => $key !== $firstPivotedKey));
+
+        //     if ($newPath === []) {
+        //         throw new \RuntimeException(\sprintf(
+        //             'Cannot drill down to child key "%s" because the path is empty after removing "%s".',
+        //             $this->getChildKey(),
+        //             $firstPivotedKey,
+        //         ));
+        //     }
+        // } else {
+        //     $newPath = $path;
+        // }
+
+        // // rollup and drilldown
+        // $rolledUp = $this->getNode()->rollUp($newPath);
+        // $drilledDown = $rolledUp->drillDown($currentKey);
+        // $result = iterator_to_array($drilledDown, false);
+
+        // if ($result === []) {
+        //     throw new \RuntimeException(\sprintf(
+        //         'No prototype nodes found for child key "%s".',
+        //         $this->getChildKey(),
+        //     ));
+        // }
+
+        // return $result;
     }
 
     // /**

@@ -54,7 +54,7 @@ final class Manager
      */
     public function createTree(array $path): DefaultTreeNode
     {
-        return DefaultTreeNode::create(
+        return DefaultTreeNode::createRoot(
             manager: $this,
             path: $path,
         );

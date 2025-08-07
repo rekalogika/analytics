@@ -19,12 +19,10 @@ use Rekalogika\PivotTable\TableFramework\Manager;
 
 final readonly class DefaultTreeNode implements TreeNode
 {
-    private mixed $value;
-
     /**
      * @param list<string> $path Dimension name path
      */
-    public static function create(
+    public static function createRoot(
         Manager $manager,
         array $path,
     ): self {
@@ -40,29 +38,33 @@ final readonly class DefaultTreeNode implements TreeNode
             manager: $manager,
             tuple: [],
             descendantPath: $path,
-            row: $row,
+            value: self::resolveValueFromRow($row),
         );
     }
 
+    private static function resolveValueFromRow(Row $row): mixed
+    {
+        $tuple = iterator_to_array($row->getDimensions(), true);
+        $measures = iterator_to_array($row->getMeasures(), true);
+
+        return self::resolveValueFromTupleAndMeasures($tuple, $measures);
+    }
+
     /**
-     * @param Manager $manager
      * @param array<string,mixed> $tuple
-     * @param list<string> $descendantPath
+     * @param array<string,mixed> $measures
+     * @return mixed
      */
-    private function __construct(
-        private Manager $manager,
-        private array $tuple,
-        private array $descendantPath,
-        Row $row,
-    ) {
+    private static function resolveValueFromTupleAndMeasures(
+        array $tuple,
+        array $measures,
+    ): mixed {
         // get measure name
 
         $measureName = $tuple['@values'] ?? null;
 
         if ($measureName === null) {
-            $this->value = null;
-
-            return;
+            return null;
         }
 
         if (!\is_string($measureName)) {
@@ -74,13 +76,58 @@ final readonly class DefaultTreeNode implements TreeNode
 
         // get value
 
-        $measures = iterator_to_array($row->getMeasures(), true);
-
-        $this->value = $measures[$measureName]
+        return $measures[$measureName]
             ?? throw new \InvalidArgumentException(\sprintf(
                 'Value for measure "%s" not found in row.',
                 $measureName,
             ));
+    }
+
+    /**
+     * @param Manager $manager
+     * @param array<string,mixed> $tuple
+     * @param list<string> $descendantPath
+     */
+    private function __construct(
+        private Manager $manager,
+        private array $tuple,
+        private array $descendantPath,
+        private mixed $value,
+        private \Exception $exception = new \Exception(),
+    ) {}
+
+    public function createNullChild(string $childKey, mixed $childItem): TreeNode
+    {
+        $tuple = $this->tuple;
+        /** @psalm-suppress MixedAssignment */
+        $tuple[$childKey] = $childItem;
+
+        return new self(
+            manager: $this->manager,
+            tuple: $tuple,
+            descendantPath: $this->descendantPath,
+            value: null,
+        );
+    }
+
+    public function createSubtotal(string $childKey): TreeNode
+    {
+        $tuple = $this->tuple;
+        /** @psalm-suppress MixedAssignment */
+        $tuple[$childKey] = '@subtotal';
+        $descendantPath = $this->descendantPath;
+        // remove childKey from descendantPath
+        $descendantPath = array_values(\array_filter(
+            $descendantPath,
+            static fn (string $key) => $key !== $childKey,
+        ));
+
+        return new self(
+            manager: $this->manager,
+            tuple: $tuple,
+            descendantPath: $descendantPath,
+            value: null,
+        );
     }
 
     #[\Override]
@@ -95,6 +142,14 @@ final readonly class DefaultTreeNode implements TreeNode
         return array_keys($this->tuple);
     }
 
+    /**
+     * @return array<string,mixed>
+     */
+    public function getTuple(): array
+    {
+        return $this->tuple;
+    }
+
     #[\Override]
     public function getKey(): string
     {
@@ -107,6 +162,30 @@ final readonly class DefaultTreeNode implements TreeNode
         return $this->manager->getLegend($this->getKey());
     }
 
+    public function getItemByKey(string $key): mixed
+    {
+        if (!\array_key_exists($key, $this->tuple)) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Item for key "%s" not found in tuple.',
+                $key,
+            ));
+        }
+
+        // if ($key === '@values') {
+        //     if (!\is_string($this->tuple[$key])) {
+        //         throw new \InvalidArgumentException(\sprintf(
+        //             'Expected string for key "%s", "%s" given.',
+        //             $key,
+        //             \gettype($this->tuple[$key]),
+        //         ));
+        //     }
+
+        //     return $this->manager->getLegend($this->tuple[$key]);
+        // }
+
+        return $this->tuple[$key];
+    }
+
     #[\Override]
     public function getItem(): mixed
     {
@@ -116,26 +195,7 @@ final readonly class DefaultTreeNode implements TreeNode
             return null;
         }
 
-        if (!\array_key_exists($key, $this->tuple)) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Item for key "%s" not found in tuple.',
-                $key,
-            ));
-        }
-
-        if ($key === '@values') {
-            if (!\is_string($this->tuple[$key])) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Expected string for key "%s", "%s" given.',
-                    $key,
-                    \gettype($this->tuple[$key]),
-                ));
-            }
-
-            return $this->manager->getLegend($this->tuple[$key]);
-        }
-
-        return $this->tuple[$key];
+        return $this->getItemByKey($key);
     }
 
     #[\Override]
@@ -178,11 +238,14 @@ final readonly class DefaultTreeNode implements TreeNode
                 continue;
             }
 
+            $measures = iterator_to_array($row->getMeasures(), true);
+            $value = self::resolveValueFromTupleAndMeasures($tuple, $measures);
+
             yield new self(
                 manager: $this->manager,
                 tuple: $tuple,
                 descendantPath: $descendantPath,
-                row: $row,
+                value: $value,
             );
         }
     }
@@ -191,6 +254,7 @@ final readonly class DefaultTreeNode implements TreeNode
     public function rollUp(array $keys): TreeNode
     {
         $tuple = $this->tuple;
+        $descendantPath = $this->descendantPath;
 
         foreach ($keys as $key) {
             if (!\array_key_exists($key, $tuple)) {
@@ -201,13 +265,30 @@ final readonly class DefaultTreeNode implements TreeNode
             }
 
             unset($tuple[$key]);
+            $descendantPath[] = $key;
         }
+
+        $row = $this->manager
+            ->getRowRepository()
+            ->getRow($tuple);
+
+        if ($row === null) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Row with tuple "%s" not found.',
+                json_encode($tuple, JSON_THROW_ON_ERROR),
+            ));
+        }
+
+        $measures = iterator_to_array($row->getMeasures(), true);
+
+        /** @psalm-suppress MixedAssignment */
+        $value = self::resolveValueFromTupleAndMeasures($tuple, $measures);
 
         return new self(
             manager: $this->manager,
             tuple: $tuple,
-            descendantPath: [],
-            row: $this->manager->getRowRepository()->getRowOrFail($tuple),
+            descendantPath: $descendantPath,
+            value: $value,
         );
     }
 }
