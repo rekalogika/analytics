@@ -116,10 +116,10 @@
         }
     },
     "replace": {
-        "rekalogika/analytics-bundle": "0.26.0",
-        "rekalogika/analytics-core": "0.26.0",
-        "rekalogika/analytics-frontend": "0.26.0",
-        "rekalogika/analytics-ux-panel": "0.26.0",
-        "rekalogika/pivot-table": "0.26.0"
+        "rekalogika/analytics-bundle": "0.26.1",
+        "rekalogika/analytics-core": "0.26.1",
+        "rekalogika/analytics-frontend": "0.26.1",
+        "rekalogika/analytics-ux-panel": "0.26.1",
+        "rekalogika/pivot-table": "0.26.1"
     }
 }
