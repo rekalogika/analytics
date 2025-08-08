@@ -55,6 +55,8 @@ final readonly class ResultContext
         $this->cellRepository = new CellRepository(
             dimensionCollection: $this->dimensionCollection,
             nullMeasureCollection: $this->nullMeasureCollection,
+            query: $this->query,
+            context: $this,
         );
     }
 

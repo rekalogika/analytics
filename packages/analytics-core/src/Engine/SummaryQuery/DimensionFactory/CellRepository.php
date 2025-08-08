@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
-use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
+use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTuple;
 
@@ -30,9 +31,14 @@ final class CellRepository
      */
     private array $signatureToCell = [];
 
+    /**
+     * @param class-string $summaryClass
+     */
     public function __construct(
-        private DimensionCollection $dimensionCollection,
-        private NullMeasureCollection $nullMeasureCollection,
+        private readonly DimensionCollection $dimensionCollection,
+        private readonly NullMeasureCollection $nullMeasureCollection,
+        private readonly DefaultQuery $query,
+        private readonly ResultContext $context,
     ) {}
 
     public function collectCell(DefaultCell $cell): void
@@ -141,8 +147,27 @@ final class CellRepository
 
     public function getApexCell(): DefaultCell
     {
-        return $this->apexCell
-            ?? throw new LogicException('Apex cell is not set.');
+        if ($this->apexCell !== null) {
+            return $this->apexCell;
+        }
+
+        // no apex cell was produced, we have to create one here ourselves
+        $apexTuple = new DefaultTuple(
+            summaryClass: $this->query->getFrom(),
+            dimensions: [],
+            condition: $this->query->getWhere(),
+        );
+
+        $apexMeasures = $this->nullMeasureCollection->getNullMeasures();
+        $measures = iterator_to_array($apexMeasures, true);
+
+        return $this->apexCell = new DefaultCell(
+            tuple: $apexTuple,
+            measures: $apexMeasures,
+            measureNames: array_keys($measures),
+            isNull: true,
+            context: $this->context,
+        );
     }
 
     /**
