@@ -17,7 +17,7 @@ interface Table
 {
     /**
      * Returns the rows of the table.
-     * 
+     *
      * @return iterable<Row>
      */
     public function getRows(): iterable;
