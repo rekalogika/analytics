@@ -68,4 +68,10 @@ final readonly class TableAdapter implements PivotTableTable
     {
         return $this->legends[$key] ?? null;
     }
+
+    #[\Override]
+    public function getSubtotalLegend(string $key): mixed
+    {
+        return new TranslatableMessage('Total');
+    }
 }

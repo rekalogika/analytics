@@ -13,71 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Contracts\TreeNode;
-use Rekalogika\PivotTable\Implementation\TreeNode\NullTreeNode;
-use Rekalogika\PivotTable\Implementation\TreeNode\SubtotalTreeNode;
-use Rekalogika\PivotTable\Util\ItemToTreeNodeMap;
+use Rekalogika\PivotTable\TableFramework\Cube;
 
 abstract class BlockGroup extends Block
 {
     public function __construct(
-        private readonly TreeNode $node,
-        private readonly ?string $childKey,
+        private readonly Cube $cube,
         BlockContext $context,
     ) {
         parent::__construct($context);
     }
 
-    protected function getNode(): TreeNode
+    protected function getCube(): Cube
     {
-        return $this->node;
+        return $this->cube;
     }
 
     protected function getChildKey(): string
     {
-        if ($this->childKey === null) {
-            throw new \RuntimeException('Child key is not set.');
-        }
-
-        return $this->childKey;
+        return $this->getContext()->getNextKey()
+            ?? throw new \RuntimeException('Next key is not set.');
     }
 
-    protected function tryGetChildKey(): ?string
-    {
-        return $this->childKey;
-    }
-
-    /**
-     * @param list<TreeNode> $nodes
-     * @param non-empty-list<TreeNode> $prototypeNodes
-     * @return non-empty-list<TreeNode>
-     */
-    protected function balanceTreeNodesWithPrototype(
-        array $nodes,
-        array $prototypeNodes,
-    ): array {
-        // create a map of children items to nodes
-        $itemToNodes = ItemToTreeNodeMap::create($nodes);
-
-        // create result
-        $result = [];
-
-        /** @psalm-suppress MixedAssignment */
-        foreach ($prototypeNodes as $prototype) {
-            $currentItem = $prototype->getItem();
-
-            if ($itemToNodes->exists($currentItem)) {
-                $result[] = $itemToNodes->get($currentItem);
-            } else {
-                $null = NullTreeNode::fromInterface($prototype);
-                $result[] = $null;
-            }
-        }
-
-        return $result;
-    }
-
-    protected function getSubtotalNode(): ?TreeNode
+    protected function getSubtotalNode(): ?Cube
     {
         $childKey = $this->getChildKey();
 
@@ -87,35 +45,26 @@ abstract class BlockGroup extends Block
         }
 
         // If subtotals are not desired for this node, return null.
-        if ($this->getContext()->doCreateSubtotals($childKey) === false) {
+        if ($this->getContext()->doCreateSubtotalOnChildren() === false) {
             return null;
         }
 
-        return new SubtotalTreeNode(
-            node: $this->node,
-            childrenKey: $childKey,
-            isLeaf: $this->getContext()->isLeaf($childKey),
-        );
+        return $this->cube->asSubtotal($childKey);
     }
 
 
     /**
-     * @param null|non-empty-list<TreeNode> $prototypeNodes
-     * @return iterable<TreeNode>
+     * @param null|non-empty-list<Cube> $prototypeCubes
+     * @return iterable<Cube>
      */
-    protected function getChildTreeNodes(?array $prototypeNodes = null): iterable
+    protected function getChildCubes(?array $prototypeCubes = null): iterable
     {
-        if ($this->childKey === null) {
-            return [];
-        }
-
-        $children = $this->node->drillDown($this->childKey);
-        $children = iterator_to_array($children, false);
-
-        if ($prototypeNodes !== null) {
-            $children = $this->balanceTreeNodesWithPrototype(
-                nodes: $children,
-                prototypeNodes: $prototypeNodes,
+        if ($prototypeCubes === null) {
+            $children = $this->cube->drillDown($this->getChildKey(), false);
+        } else {
+            $children = $this->cube->multipleSlicesFromCubes(
+                dimensionName: $this->getChildKey(),
+                cubes: $prototypeCubes,
             );
         }
 
@@ -131,11 +80,11 @@ abstract class BlockGroup extends Block
     }
 
     /**
-     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     * @param null|non-empty-list<Cube> $prototypeCubes
      */
-    protected function getOneChildTreeNode(?array $prototypeNodes = null): TreeNode
+    protected function getOneChildCube(?array $prototypeCubes = null): Cube
     {
-        foreach ($this->getChildTreeNodes($prototypeNodes) as $childNode) {
+        foreach ($this->getChildCubes($prototypeCubes) as $childNode) {
             return $childNode;
         }
 
@@ -143,32 +92,31 @@ abstract class BlockGroup extends Block
     }
 
     /**
-     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     * @param null|non-empty-list<Cube> $prototypeCubes
      * @return iterable<Block>
      */
-    protected function getChildBlocks(?array $prototypeNodes = null): iterable
+    protected function getChildBlocks(?array $prototypeCubes = null): iterable
     {
-        $children = $this->getChildTreeNodes($prototypeNodes);
+        $children = $this->getChildCubes($prototypeCubes);
 
         if ($children === []) {
             yield new EmptyBlockGroup(
-                node: $this->getNode(),
-                childKey: null,
+                cube: $this->getCube(),
                 context: $this->getContext(),
             );
         }
 
-        foreach ($children as $childNode) {
-            yield $this->createBlock($childNode);
+        foreach ($children as $childCube) {
+            yield $this->createBlock($childCube);
         }
     }
 
     /**
-     * @param null|non-empty-list<TreeNode> $prototypeNodes
+     * @param null|non-empty-list<Cube> $prototypeCubes
      */
-    protected function getOneChildBlock(?array $prototypeNodes = null): Block
+    protected function getOneChildBlock(?array $prototypeCubes = null): Block
     {
-        foreach ($this->getChildBlocks($prototypeNodes) as $childBlock) {
+        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
             return $childBlock;
         }
 

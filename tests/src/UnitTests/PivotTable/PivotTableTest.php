@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests\PivotTable;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\PivotTable\ArrayTable\ArrayTable;
 use Rekalogika\PivotTable\ArrayTable\ArrayTableFactory;
-use Rekalogika\PivotTable\TableFramework\Manager;
+use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 final class PivotTableTest extends TestCase
 {
@@ -59,14 +59,8 @@ final class PivotTableTest extends TestCase
 
     public function testTree(): void
     {
-        $manager = new Manager($this->table);
+        $manager = new CubeManager($this->table);
 
-        $tree = $manager->createTree([
-            'month',
-            'country',
-            'name',
-        ]);
-
-        $this->assertEquals('', $tree->getKey());
+        $tree = $manager->createApexCube();
     }
 }

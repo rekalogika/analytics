@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
-use Rekalogika\PivotTable\Contracts\TreeNode;
+use Rekalogika\PivotTable\TableFramework\Cube;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class TreeNodeDebugger
+final readonly class CubeDebugger
 {
     /**
      * @return array<string,mixed>
      */
-    public static function debug(TreeNode $node): array
+    public static function debug(Cube $cube): array
     {
-        return (new self($node))->toArray();
+        return (new self($cube))->toArray();
     }
 
-    public function __construct(private TreeNode $node) {}
+    public function __construct(private Cube $cube) {}
 
     /**
      * @return array<string,mixed>
@@ -35,11 +35,8 @@ final readonly class TreeNodeDebugger
     public function toArray(): array
     {
         $result = [
-            'key' => $this->node->getKey(),
-            'legend' => $this->normalizeItem($this->node->getLegend()),
-            'item' => $this->normalizeItem($this->node->getItem()),
-            'value' => $this->normalizeItem($this->node->getValue()),
-            'isLeaf' => $this->node->isLeaf(),
+            'tuple' => $this->normalizeItem($this->cube->getTuple()),
+            'value' => $this->normalizeItem($this->cube->getValue()),
         ];
 
         return $result;

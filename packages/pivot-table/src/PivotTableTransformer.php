@@ -15,128 +15,36 @@ namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Contracts\Table as ContractsTable;
-use Rekalogika\PivotTable\Contracts\TreeNode;
 use Rekalogika\PivotTable\Table\Table;
-use Rekalogika\PivotTable\TableFramework\Manager;
+use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 final readonly class PivotTableTransformer
 {
     private function __construct() {}
 
     /**
-     * @param list<string> $nodes
-     */
-    public static function transformTableToTree(
-        ContractsTable $table,
-        array $nodes = [],
-    ): TreeNode {
-        return (new Manager($table))->createTree($nodes);
-    }
-
-    /**
      * @param list<string> $unpivotedNodes
      * @param list<string> $pivotedNodes
      * @param list<string> $skipLegends
      * @param list<string> $createSubtotals
      */
-    public static function transformTableToBlock(
+    public static function transform(
         ContractsTable $table,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
-    ): Block {
-        $nodes = [
-            ...$unpivotedNodes,
-            ...$pivotedNodes,
-        ];
+    ): Table {
+        $cubeManager = new CubeManager($table);
 
-        $treeNode = self::transformTableToTree(
-            table: $table,
-            nodes: $nodes,
-        );
-
-        return self::transformTreeToBlock(
-            node: $treeNode,
+        $block = Block::new(
+            cubeManager: $cubeManager,
             unpivotedNodes: $unpivotedNodes,
             pivotedNodes: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
         );
-    }
 
-    /**
-     * @param list<string> $unpivotedNodes
-     * @param list<string> $pivotedNodes
-     * @param list<string> $skipLegends
-     * @param list<string> $createSubtotals
-     */
-    public static function transformTreeToBlock(
-        TreeNode $node,
-        array $unpivotedNodes = [],
-        array $pivotedNodes = [],
-        array $skipLegends = ['@values'],
-        array $createSubtotals = [],
-    ): Block {
-        return Block::new(
-            node: $node,
-            unpivotedNodes: $unpivotedNodes,
-            pivotedNodes: $pivotedNodes,
-            skipLegends: $skipLegends,
-            createSubtotals: $createSubtotals,
-        );
-    }
-
-    public static function transformBlockToTable(Block $block): Table
-    {
         return $block->generateTable();
-    }
-
-    /**
-     * @param list<string> $unpivotedNodes
-     * @param list<string> $pivotedNodes
-     * @param list<string> $skipLegends
-     * @param list<string> $createSubtotals
-     */
-    public static function transformTreeToTable(
-        TreeNode $node,
-        array $unpivotedNodes = [],
-        array $pivotedNodes = [],
-        array $skipLegends = ['@values'],
-        array $createSubtotals = [],
-    ): Table {
-        $block = self::transformTreeToBlock(
-            node: $node,
-            unpivotedNodes: $unpivotedNodes,
-            pivotedNodes: $pivotedNodes,
-            skipLegends: $skipLegends,
-            createSubtotals: $createSubtotals,
-        );
-
-        return self::transformBlockToTable($block);
-    }
-
-    /**
-     * @param list<string> $unpivotedNodes
-     * @param list<string> $pivotedNodes
-     * @param list<string> $skipLegends
-     * @param list<string> $createSubtotals
-     */
-    public static function transformTableToTable(
-        ContractsTable $table,
-        array $unpivotedNodes = [],
-        array $pivotedNodes = [],
-        array $skipLegends = ['@values'],
-        array $createSubtotals = [],
-    ): Table {
-        $block = self::transformTableToBlock(
-            table: $table,
-            unpivotedNodes: $unpivotedNodes,
-            pivotedNodes: $pivotedNodes,
-            skipLegends: $skipLegends,
-            createSubtotals: $createSubtotals,
-        );
-
-        return self::transformBlockToTable($block);
     }
 }

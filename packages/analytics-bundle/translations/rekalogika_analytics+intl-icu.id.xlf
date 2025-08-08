@@ -367,5 +367,11 @@
         <target>Lebih dari satu pengukuran</target>
       </segment>
     </unit>
+    <unit id="x2_GNId" name="Total">
+      <segment>
+        <source>Total</source>
+        <target>Jumlah</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

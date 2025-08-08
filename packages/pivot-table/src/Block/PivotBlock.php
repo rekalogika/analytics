@@ -23,19 +23,20 @@ final class PivotBlock extends BranchBlock
     public function getHeaderRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $currentKey = $this->getContext()->getCurrentKey();
 
         if (
-            $this->getContext()->isLegendSkipped($this->getTreeNode()->getKey())
+            $this->getContext()->isLegendSkipped($currentKey)
         ) {
             $valueCell = new DefaultHeaderCell(
-                name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                name: $currentKey,
+                content: $this->getCube()->getMember($currentKey),
                 context: $context,
             );
         } else {
             $valueCell = new DefaultDataCell(
-                name: $this->getTreeNode()->getKey(),
-                content: $this->getTreeNode()->getItem(),
+                name: $currentKey,
+                content: $this->getCube()->getMember($currentKey),
                 context: $context,
             );
         }

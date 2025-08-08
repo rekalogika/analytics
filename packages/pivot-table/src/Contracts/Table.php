@@ -16,9 +16,16 @@ namespace Rekalogika\PivotTable\Contracts;
 interface Table
 {
     /**
+     * Returns the rows of the table.
+     *
      * @return iterable<Row>
      */
     public function getRows(): iterable;
 
+    /**
+     * Gets the legend of a dimension or a measure.
+     */
     public function getLegend(string $key): mixed;
+
+    public function getSubtotalLegend(string $key): mixed;
 }

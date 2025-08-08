@@ -156,7 +156,7 @@ final readonly class TableRenderer
         $pivotTable = TableTableAdapter::adapt($result);
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
-        $table = PivotTableTransformer::transformTableToTable(
+        $table = PivotTableTransformer::transform(
             table: $pivotTable,
             unpivotedNodes: $unpivotedDimensions,
             pivotedNodes: $pivotedDimensions,
