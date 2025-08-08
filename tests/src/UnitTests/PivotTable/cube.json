@@ -3,24 +3,24 @@
         "name": null,
         "country": null,
         "month": null,
-        "count": 113,
-        "sum": 55560.29,
+        "count": 84,
+        "sum": 41057.73,
         "grouping": 7
     },
     {
         "name": "itemC",
         "country": "KR",
         "month": "202504",
-        "count": 5,
-        "sum": 3397.40,
+        "count": 4,
+        "sum": 2436.65,
         "grouping": 0
     },
     {
         "name": "itemA",
         "country": "KR",
         "month": "202503",
-        "count": 2,
-        "sum": 726.28,
+        "count": 1,
+        "sum": 315.04,
         "grouping": 0
     },
     {
@@ -28,7 +28,7 @@
         "country": "JP",
         "month": "202505",
         "count": 1,
-        "sum": 166.07,
+        "sum": 458.48,
         "grouping": 0
     },
     {
@@ -36,183 +36,159 @@
         "country": "CN",
         "month": "202501",
         "count": 3,
-        "sum": 1301.33,
+        "sum": 1555.11,
         "grouping": 0
     },
     {
-        "name": "itemC",
+        "name": "itemB",
         "country": "CN",
-        "month": "202504",
-        "count": 1,
-        "sum": 754.33,
+        "month": "202503",
+        "count": 2,
+        "sum": 1236.73,
         "grouping": 0
     },
     {
         "name": "itemB",
         "country": "KR",
-        "month": "202504",
-        "count": 4,
-        "sum": 1389.72,
-        "grouping": 0
-    },
-    {
-        "name": "itemC",
-        "country": "JP",
-        "month": "202505",
-        "count": 4,
-        "sum": 2217.15,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "JP",
-        "month": "202505",
-        "count": 2,
-        "sum": 271.04,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "JP",
         "month": "202504",
         "count": 3,
-        "sum": 1301.44,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "JP",
-        "month": "202502",
-        "count": 1,
-        "sum": 249.71,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "KR",
-        "month": "202501",
-        "count": 5,
-        "sum": 1889.44,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "JP",
-        "month": "202501",
-        "count": 5,
-        "sum": 2741.64,
+        "sum": 372.67,
         "grouping": 0
     },
     {
         "name": "itemC",
-        "country": "KR",
-        "month": "202501",
-        "count": 2,
-        "sum": 661.86,
-        "grouping": 0
-    },
-    {
-        "name": "itemA",
         "country": "JP",
-        "month": "202501",
-        "count": 2,
-        "sum": 685.05,
-        "grouping": 0
-    },
-    {
-        "name": "itemC",
-        "country": "KR",
-        "month": "202503",
-        "count": 1,
-        "sum": 450.52,
-        "grouping": 0
-    },
-    {
-        "name": "itemC",
-        "country": "KR",
-        "month": "202505",
-        "count": 5,
-        "sum": 3681.54,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "KR",
-        "month": "202503",
-        "count": 2,
-        "sum": 1286.55,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "KR",
-        "month": "202502",
-        "count": 1,
-        "sum": 682.05,
-        "grouping": 0
-    },
-    {
-        "name": "itemA",
-        "country": "CN",
         "month": "202505",
         "count": 4,
-        "sum": 1742.71,
+        "sum": 1568.16,
         "grouping": 0
     },
     {
         "name": "itemB",
-        "country": "CN",
-        "month": "202501",
+        "country": "JP",
+        "month": "202504",
         "count": 1,
-        "sum": 29.87,
+        "sum": 950.78,
         "grouping": 0
     },
     {
-        "name": "itemA",
+        "name": "itemB",
+        "country": "JP",
+        "month": "202502",
+        "count": 5,
+        "sum": 2201.55,
+        "grouping": 0
+    },
+    {
+        "name": "itemB",
         "country": "KR",
         "month": "202501",
         "count": 3,
-        "sum": 1650.99,
+        "sum": 2002.12,
+        "grouping": 0
+    },
+    {
+        "name": "itemC",
+        "country": "KR",
+        "month": "202501",
+        "count": 1,
+        "sum": 565.39,
+        "grouping": 0
+    },
+    {
+        "name": "itemA",
+        "country": "JP",
+        "month": "202501",
+        "count": 1,
+        "sum": 490.32,
+        "grouping": 0
+    },
+    {
+        "name": "itemC",
+        "country": "KR",
+        "month": "202503",
+        "count": 3,
+        "sum": 2120.91,
         "grouping": 0
     },
     {
         "name": "itemB",
         "country": "CN",
+        "month": "202504",
+        "count": 2,
+        "sum": 725.38,
+        "grouping": 0
+    },
+    {
+        "name": "itemA",
+        "country": "JP",
+        "month": "202502",
+        "count": 3,
+        "sum": 1594.33,
+        "grouping": 0
+    },
+    {
+        "name": "itemB",
+        "country": "KR",
+        "month": "202503",
+        "count": 1,
+        "sum": 675.17,
+        "grouping": 0
+    },
+    {
+        "name": "itemB",
+        "country": "KR",
+        "month": "202502",
+        "count": 1,
+        "sum": 392.07,
+        "grouping": 0
+    },
+    {
+        "name": "itemA",
+        "country": "CN",
         "month": "202505",
+        "count": 2,
+        "sum": 1125.11,
+        "grouping": 0
+    },
+    {
+        "name": "itemB",
+        "country": "CN",
+        "month": "202501",
         "count": 4,
-        "sum": 1937.17,
+        "sum": 1801.82,
+        "grouping": 0
+    },
+    {
+        "name": "itemA",
+        "country": "KR",
+        "month": "202501",
+        "count": 2,
+        "sum": 911.51,
         "grouping": 0
     },
     {
         "name": "itemC",
         "country": "JP",
         "month": "202501",
-        "count": 4,
-        "sum": 2176.62,
+        "count": 1,
+        "sum": 563.16,
         "grouping": 0
     },
     {
         "name": "itemA",
         "country": "CN",
         "month": "202504",
-        "count": 3,
-        "sum": 1111.51,
+        "count": 2,
+        "sum": 1069.04,
         "grouping": 0
     },
     {
         "name": "itemC",
         "country": "CN",
         "month": "202503",
-        "count": 2,
-        "sum": 441.40,
-        "grouping": 0
-    },
-    {
-        "name": "itemB",
-        "country": "KR",
-        "month": "202505",
-        "count": 5,
-        "sum": 3492.09,
+        "count": 4,
+        "sum": 1276.66,
         "grouping": 0
     },
     {
@@ -220,23 +196,31 @@
         "country": "JP",
         "month": "202503",
         "count": 1,
-        "sum": 478.05,
+        "sum": 667.94,
         "grouping": 0
     },
     {
         "name": "itemC",
         "country": "CN",
         "month": "202505",
-        "count": 4,
-        "sum": 3218.69,
+        "count": 3,
+        "sum": 2028.28,
         "grouping": 0
     },
     {
         "name": "itemB",
         "country": "CN",
         "month": "202502",
+        "count": 5,
+        "sum": 1855.90,
+        "grouping": 0
+    },
+    {
+        "name": "itemC",
+        "country": "KR",
+        "month": "202502",
         "count": 1,
-        "sum": 86.83,
+        "sum": 151.80,
         "grouping": 0
     },
     {
@@ -244,167 +228,135 @@
         "country": "CN",
         "month": "202502",
         "count": 5,
-        "sum": 2703.94,
-        "grouping": 0
-    },
-    {
-        "name": "itemC",
-        "country": "JP",
-        "month": "202504",
-        "count": 4,
-        "sum": 976.14,
+        "sum": 2549.00,
         "grouping": 0
     },
     {
         "name": "itemA",
         "country": "CN",
         "month": "202503",
-        "count": 5,
-        "sum": 2880.88,
+        "count": 4,
+        "sum": 1415.94,
         "grouping": 0
     },
     {
         "name": "itemA",
         "country": "JP",
         "month": "202504",
-        "count": 2,
-        "sum": 988.96,
-        "grouping": 0
-    },
-    {
-        "name": "itemA",
-        "country": "KR",
-        "month": "202505",
         "count": 5,
-        "sum": 2335.35,
+        "sum": 3527.79,
         "grouping": 0
     },
     {
         "name": "itemC",
         "country": "CN",
         "month": "202502",
-        "count": 3,
-        "sum": 2433.86,
-        "grouping": 0
-    },
-    {
-        "name": "itemC",
-        "country": "JP",
-        "month": "202502",
-        "count": 2,
-        "sum": 560.87,
-        "grouping": 0
-    },
-    {
-        "name": "itemA",
-        "country": "KR",
-        "month": "202504",
-        "count": 2,
-        "sum": 1644.98,
+        "count": 5,
+        "sum": 1798.12,
         "grouping": 0
     },
     {
         "name": "itemA",
         "country": "CN",
         "month": "202501",
-        "count": 4,
-        "sum": 816.26,
+        "count": 1,
+        "sum": 654.80,
         "grouping": 0
     },
     {
         "name": "itemB",
         "country": "KR",
         "month": null,
-        "count": 17,
-        "sum": 8739.85,
+        "count": 8,
+        "sum": 3442.03,
         "grouping": 1
     },
     {
         "name": "itemA",
         "country": "KR",
         "month": null,
-        "count": 12,
-        "sum": 6357.60,
+        "count": 3,
+        "sum": 1226.55,
         "grouping": 1
     },
     {
         "name": "itemC",
+        "country": "CN",
+        "month": null,
+        "count": 15,
+        "sum": 6658.17,
+        "grouping": 1
+    },
+    {
+        "name": "itemC",
+        "country": "KR",
+        "month": null,
+        "count": 9,
+        "sum": 5274.75,
+        "grouping": 1
+    },
+    {
+        "name": "itemB",
+        "country": "JP",
+        "month": null,
+        "count": 7,
+        "sum": 3820.27,
+        "grouping": 1
+    },
+    {
+        "name": "itemC",
+        "country": "JP",
+        "month": null,
+        "count": 5,
+        "sum": 2131.32,
+        "grouping": 1
+    },
+    {
+        "name": "itemA",
+        "country": "JP",
+        "month": null,
+        "count": 10,
+        "sum": 6070.92,
+        "grouping": 1
+    },
+    {
+        "name": "itemB",
         "country": "CN",
         "month": null,
         "count": 13,
-        "sum": 8149.61,
+        "sum": 5619.83,
         "grouping": 1
     },
     {
-        "name": "itemC",
-        "country": "KR",
-        "month": null,
-        "count": 13,
-        "sum": 8191.32,
-        "grouping": 1
-    },
-    {
-        "name": "itemB",
-        "country": "JP",
-        "month": null,
-        "count": 12,
-        "sum": 5041.88,
-        "grouping": 1
-    },
-    {
-        "name": "itemC",
-        "country": "JP",
+        "name": "itemA",
+        "country": "CN",
         "month": null,
         "count": 14,
-        "sum": 5930.78,
-        "grouping": 1
-    },
-    {
-        "name": "itemA",
-        "country": "JP",
-        "month": null,
-        "count": 5,
-        "sum": 1840.08,
-        "grouping": 1
-    },
-    {
-        "name": "itemB",
-        "country": "CN",
-        "month": null,
-        "count": 6,
-        "sum": 2053.87,
-        "grouping": 1
-    },
-    {
-        "name": "itemA",
-        "country": "CN",
-        "month": null,
-        "count": 21,
-        "sum": 9255.30,
+        "sum": 6813.89,
         "grouping": 1
     },
     {
         "name": "itemA",
         "country": null,
         "month": null,
-        "count": 38,
-        "sum": 17452.98,
+        "count": 27,
+        "sum": 14111.36,
         "grouping": 3
     },
     {
         "name": "itemC",
         "country": null,
         "month": null,
-        "count": 40,
-        "sum": 22271.71,
+        "count": 29,
+        "sum": 14064.24,
         "grouping": 3
     },
     {
         "name": "itemB",
         "country": null,
         "month": null,
-        "count": 35,
-        "sum": 15835.60,
+        "count": 28,
+        "sum": 12882.13,
         "grouping": 3
     },
     {
@@ -412,31 +364,23 @@
         "country": "KR",
         "month": "202503",
         "count": 5,
-        "sum": 2463.35,
-        "grouping": 4
-    },
-    {
-        "name": null,
-        "country": "KR",
-        "month": "202505",
-        "count": 15,
-        "sum": 9508.98,
+        "sum": 3111.12,
         "grouping": 4
     },
     {
         "name": null,
         "country": "KR",
         "month": "202504",
-        "count": 11,
-        "sum": 6432.10,
+        "count": 7,
+        "sum": 2809.32,
         "grouping": 4
     },
     {
         "name": null,
         "country": "JP",
         "month": "202505",
-        "count": 7,
-        "sum": 2654.26,
+        "count": 5,
+        "sum": 2026.64,
         "grouping": 4
     },
     {
@@ -444,47 +388,47 @@
         "country": "CN",
         "month": "202504",
         "count": 4,
-        "sum": 1865.84,
+        "sum": 1794.42,
         "grouping": 4
     },
     {
         "name": null,
         "country": "JP",
         "month": "202502",
-        "count": 3,
-        "sum": 810.58,
+        "count": 8,
+        "sum": 3795.88,
         "grouping": 4
     },
     {
         "name": null,
         "country": "JP",
         "month": "202501",
-        "count": 11,
-        "sum": 5603.31,
+        "count": 2,
+        "sum": 1053.48,
         "grouping": 4
     },
     {
         "name": null,
         "country": "KR",
         "month": "202502",
-        "count": 1,
-        "sum": 682.05,
+        "count": 2,
+        "sum": 543.87,
         "grouping": 4
     },
     {
         "name": null,
         "country": "CN",
         "month": "202505",
-        "count": 12,
-        "sum": 6898.57,
+        "count": 5,
+        "sum": 3153.39,
         "grouping": 4
     },
     {
         "name": null,
         "country": "CN",
         "month": "202503",
-        "count": 7,
-        "sum": 3322.28,
+        "count": 10,
+        "sum": 3929.33,
         "grouping": 4
     },
     {
@@ -492,23 +436,23 @@
         "country": "JP",
         "month": "202503",
         "count": 1,
-        "sum": 478.05,
+        "sum": 667.94,
         "grouping": 4
     },
     {
         "name": null,
         "country": "KR",
         "month": "202501",
-        "count": 10,
-        "sum": 4202.29,
+        "count": 6,
+        "sum": 3479.02,
         "grouping": 4
     },
     {
         "name": null,
         "country": "CN",
         "month": "202502",
-        "count": 9,
-        "sum": 5224.63,
+        "count": 15,
+        "sum": 6203.02,
         "grouping": 4
     },
     {
@@ -516,199 +460,191 @@
         "country": "CN",
         "month": "202501",
         "count": 8,
-        "sum": 2147.46,
+        "sum": 4011.73,
         "grouping": 4
     },
     {
         "name": null,
         "country": "JP",
         "month": "202504",
-        "count": 9,
-        "sum": 3266.54,
+        "count": 6,
+        "sum": 4478.57,
         "grouping": 4
     },
     {
         "name": null,
         "country": "KR",
         "month": null,
-        "count": 42,
-        "sum": 23288.77,
+        "count": 20,
+        "sum": 9943.33,
         "grouping": 5
     },
     {
         "name": null,
         "country": "JP",
         "month": null,
-        "count": 31,
-        "sum": 12812.74,
+        "count": 22,
+        "sum": 12022.51,
         "grouping": 5
     },
     {
         "name": null,
         "country": "CN",
         "month": null,
-        "count": 40,
-        "sum": 19458.78,
+        "count": 42,
+        "sum": 19091.89,
         "grouping": 5
     },
     {
         "name": "itemC",
         "country": null,
         "month": "202503",
-        "count": 3,
-        "sum": 891.92,
+        "count": 7,
+        "sum": 3397.57,
         "grouping": 2
     },
     {
         "name": "itemA",
+        "country": null,
+        "month": "202505",
+        "count": 3,
+        "sum": 1583.59,
+        "grouping": 2
+    },
+    {
+        "name": "itemB",
+        "country": null,
+        "month": "202504",
+        "count": 6,
+        "sum": 2048.83,
+        "grouping": 2
+    },
+    {
+        "name": "itemA",
+        "country": null,
+        "month": "202502",
+        "count": 8,
+        "sum": 4143.33,
+        "grouping": 2
+    },
+    {
+        "name": "itemC",
+        "country": null,
+        "month": "202504",
+        "count": 4,
+        "sum": 2436.65,
+        "grouping": 2
+    },
+    {
+        "name": "itemC",
+        "country": null,
+        "month": "202505",
+        "count": 7,
+        "sum": 3596.44,
+        "grouping": 2
+    },
+    {
+        "name": "itemA",
+        "country": null,
+        "month": "202504",
+        "count": 7,
+        "sum": 4596.83,
+        "grouping": 2
+    },
+    {
+        "name": "itemA",
+        "country": null,
+        "month": "202501",
+        "count": 4,
+        "sum": 2056.63,
+        "grouping": 2
+    },
+    {
+        "name": "itemC",
+        "country": null,
+        "month": "202501",
+        "count": 5,
+        "sum": 2683.66,
+        "grouping": 2
+    },
+    {
+        "name": "itemB",
+        "country": null,
+        "month": "202502",
+        "count": 11,
+        "sum": 4449.52,
+        "grouping": 2
+    },
+    {
+        "name": "itemB",
+        "country": null,
+        "month": "202501",
+        "count": 7,
+        "sum": 3803.94,
+        "grouping": 2
+    },
+    {
+        "name": "itemB",
+        "country": null,
+        "month": "202503",
+        "count": 4,
+        "sum": 2579.84,
+        "grouping": 2
+    },
+    {
+        "name": "itemA",
+        "country": null,
+        "month": "202503",
+        "count": 5,
+        "sum": 1730.98,
+        "grouping": 2
+    },
+    {
+        "name": "itemC",
+        "country": null,
+        "month": "202502",
+        "count": 6,
+        "sum": 1949.92,
+        "grouping": 2
+    },
+    {
+        "name": null,
+        "country": null,
+        "month": "202504",
+        "count": 17,
+        "sum": 9082.31,
+        "grouping": 6
+    },
+    {
+        "name": null,
+        "country": null,
+        "month": "202501",
+        "count": 16,
+        "sum": 8544.23,
+        "grouping": 6
+    },
+    {
+        "name": null,
+        "country": null,
+        "month": "202502",
+        "count": 25,
+        "sum": 10542.77,
+        "grouping": 6
+    },
+    {
+        "name": null,
         "country": null,
         "month": "202505",
         "count": 10,
-        "sum": 4244.13,
-        "grouping": 2
-    },
-    {
-        "name": "itemB",
-        "country": null,
-        "month": "202504",
-        "count": 7,
-        "sum": 2691.16,
-        "grouping": 2
-    },
-    {
-        "name": "itemA",
-        "country": null,
-        "month": "202502",
-        "count": 5,
-        "sum": 2703.94,
-        "grouping": 2
-    },
-    {
-        "name": "itemC",
-        "country": null,
-        "month": "202504",
-        "count": 10,
-        "sum": 5127.87,
-        "grouping": 2
-    },
-    {
-        "name": "itemC",
-        "country": null,
-        "month": "202505",
-        "count": 13,
-        "sum": 9117.38,
-        "grouping": 2
-    },
-    {
-        "name": "itemA",
-        "country": null,
-        "month": "202504",
-        "count": 7,
-        "sum": 3745.45,
-        "grouping": 2
-    },
-    {
-        "name": "itemA",
-        "country": null,
-        "month": "202501",
-        "count": 9,
-        "sum": 3152.30,
-        "grouping": 2
-    },
-    {
-        "name": "itemB",
-        "country": null,
-        "month": "202505",
-        "count": 11,
-        "sum": 5700.30,
-        "grouping": 2
-    },
-    {
-        "name": "itemC",
-        "country": null,
-        "month": "202501",
-        "count": 9,
-        "sum": 4139.81,
-        "grouping": 2
-    },
-    {
-        "name": "itemB",
-        "country": null,
-        "month": "202502",
-        "count": 3,
-        "sum": 1018.59,
-        "grouping": 2
-    },
-    {
-        "name": "itemB",
-        "country": null,
-        "month": "202501",
-        "count": 11,
-        "sum": 4660.95,
-        "grouping": 2
-    },
-    {
-        "name": "itemB",
-        "country": null,
-        "month": "202503",
-        "count": 3,
-        "sum": 1764.60,
-        "grouping": 2
-    },
-    {
-        "name": "itemA",
-        "country": null,
-        "month": "202503",
-        "count": 7,
-        "sum": 3607.16,
-        "grouping": 2
-    },
-    {
-        "name": "itemC",
-        "country": null,
-        "month": "202502",
-        "count": 5,
-        "sum": 2994.73,
-        "grouping": 2
-    },
-    {
-        "name": null,
-        "country": null,
-        "month": "202504",
-        "count": 24,
-        "sum": 11564.48,
-        "grouping": 6
-    },
-    {
-        "name": null,
-        "country": null,
-        "month": "202501",
-        "count": 29,
-        "sum": 11953.06,
-        "grouping": 6
-    },
-    {
-        "name": null,
-        "country": null,
-        "month": "202502",
-        "count": 13,
-        "sum": 6717.26,
-        "grouping": 6
-    },
-    {
-        "name": null,
-        "country": null,
-        "month": "202505",
-        "count": 34,
-        "sum": 19061.81,
+        "sum": 5180.03,
         "grouping": 6
     },
     {
         "name": null,
         "country": null,
         "month": "202503",
-        "count": 13,
-        "sum": 6263.68,
+        "count": 16,
+        "sum": 7708.39,
         "grouping": 6
     }
 ]
