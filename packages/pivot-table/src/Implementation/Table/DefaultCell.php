@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Implementation\Table;
 
+use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Table\Cell;
 
 abstract readonly class DefaultCell implements Cell
@@ -40,6 +41,11 @@ abstract readonly class DefaultCell implements Cell
     final public function getContext(): DefaultContext
     {
         return $this->context;
+    }
+
+    final public function getGeneratingBlock(): ?Block
+    {
+        return $this->context->getGeneratingBlock();
     }
 
     #[\Override]
