@@ -27,7 +27,7 @@ final class PivotTableTest extends TestCase
     {
         parent::setUp();
 
-        $inputFile = __DIR__ . '/items.json';
+        $inputFile = __DIR__ . '/cube.json';
         $this->assertFileExists($inputFile);
 
         $fileContent = file_get_contents($inputFile);
