@@ -46,7 +46,7 @@ final readonly class MeasureLabel implements Label
             );
     }
 
-    public function getRow(): CubeCell
+    public function getCell(): CubeCell
     {
         return $this->cell;
     }
