@@ -367,5 +367,11 @@
         <target>Multiple measures</target>
       </segment>
     </unit>
+    <unit id="x2_GNId" name="Total">
+      <segment>
+        <source>Total</source>
+        <target>Total</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
