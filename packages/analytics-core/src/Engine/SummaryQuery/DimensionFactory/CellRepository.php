@@ -31,9 +31,6 @@ final class CellRepository
      */
     private array $signatureToCell = [];
 
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
         private readonly DimensionCollection $dimensionCollection,
         private readonly NullMeasureCollection $nullMeasureCollection,
