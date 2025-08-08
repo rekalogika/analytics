@@ -87,6 +87,7 @@ abstract class Block implements \Stringable
                     parent: $this,
                     context: $context,
                 );
+                // @todo restore functionality
                 // } elseif (
                 //     $parentNode !== null
                 //     && $level > 0
