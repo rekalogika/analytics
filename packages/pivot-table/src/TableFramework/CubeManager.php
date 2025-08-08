@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\TableFramework;
 
-use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\PivotTable\Contracts\Table;
 use Rekalogika\PivotTable\TableFramework\Implementation\DefaultIdentityStrategy;
 
@@ -50,7 +49,7 @@ final class CubeManager
 
     public function getSubtotalLegend(string $dimension): mixed
     {
-        return new TranslatableMessage('Total');
+        return $this->table->getSubtotalLegend($dimension);
     }
 
     public function createApexCube(): Cube

@@ -26,4 +26,6 @@ interface Table
      * Gets the legend of a dimension or a measure.
      */
     public function getLegend(string $key): mixed;
+
+    public function getSubtotalLegend(string $key): mixed;
 }

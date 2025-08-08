@@ -30,7 +30,6 @@ final readonly class Cube
         private CubeManager $manager,
         array $tuple,
         private ?string $subtotalMember = null,
-        private mixed $subtotalLegend = null,
     ) {
         if (\array_key_exists('@values', $tuple) && !\is_string($tuple['@values'])) {
             throw new \InvalidArgumentException(
@@ -138,6 +137,9 @@ final readonly class Cube
         return $this->manager->rollUp($this->tuple, $keys);
     }
 
+    /**
+     * @param list<string> $keys
+     */
     public function rollUpAllExcept(array $keys): self
     {
         $allKeys = array_keys($this->tuple);
