@@ -52,10 +52,29 @@ final class CellRepository
         return $this->signatureToCell[$tuple->getSignature()] ?? null;
     }
 
+    public function getCellsByBaseAndDimension(
+        DefaultCell $baseCell,
+        string $dimensionName,
+        mixed $dimensionMember,
+    ): ?DefaultCell {
+        $dimension = $this->dimensionCollection
+            ->getDimensionsByName($dimensionName)
+            ->getDimensionByMember($dimensionMember);
+
+        if ($dimension === null) {
+            // if the dimension is not found, we return null
+            return null;
+        }
+
+        $tuple = $baseCell->getTuple()->append($dimension);
+
+        return $this->signatureToCell[$tuple->getSignature()] ?? null;
+    }
+
     /**
      * @return iterable<DefaultCell>
      */
-    public function getCellsByBaseAndDimension(
+    public function getCellsByBaseAndDimensionName(
         DefaultCell $baseCell,
         string $dimensionName,
         bool $fillGaps,
