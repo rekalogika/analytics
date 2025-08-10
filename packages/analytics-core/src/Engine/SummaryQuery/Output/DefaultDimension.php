@@ -75,22 +75,26 @@ final class DefaultDimension implements Dimension
         return $this->member instanceof SequenceMember;
     }
 
+    public static function getMemberSignature(mixed $member): string
+    {
+        if (\is_object($member)) {
+            return (string) spl_object_id($member);
+        }
+
+        return hash('xxh128', serialize($member));
+    }
+
     public function getSignature(): string
     {
         if ($this->signature !== null) {
             return $this->signature;
         }
 
-        if (\is_object($this->rawMember)) {
-            return $this->signature = hash(
-                'xxh128',
-                $this->name . ':' . spl_object_id($this->rawMember),
-            );
-        }
+        $memberSignature = self::getMemberSignature($this->rawMember);
 
         return $this->signature = hash(
             'xxh128',
-            $this->name . ':' . serialize($this->rawMember),
+            $this->name . ':' . $memberSignature,
         );
     }
 

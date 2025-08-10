@@ -109,6 +109,18 @@ final class DefaultCell implements CubeCell
         );
     }
 
+    #[\Override]
+    public function slice(string $dimensionName, mixed $member): ?CubeCell
+    {
+        return $this->context
+            ->getCellRepository()
+            ->getCellsByBaseAndDimension(
+                baseCell: $this,
+                dimensionName: $dimensionName,
+                dimensionMember: $member,
+            );
+    }
+
     public function getContext(): ResultContext
     {
         return $this->context;

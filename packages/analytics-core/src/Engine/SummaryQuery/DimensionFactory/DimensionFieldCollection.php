@@ -29,6 +29,12 @@ final class DimensionFieldCollection
     private array $collected = [];
 
     /**
+     * @var array<string,array<string,DefaultDimension>>
+     */
+    private array $byMember = [];
+
+
+    /**
      * @var list<DefaultDimension>|null
      */
     private ?array $sorted = null;
@@ -37,6 +43,7 @@ final class DimensionFieldCollection
      * @var list<DefaultDimension>|null
      */
     private ?array $gapFilled = null;
+
 
     public function __construct(
         private readonly string $name,
@@ -64,8 +71,22 @@ final class DimensionFieldCollection
             return;
         }
 
+        $memberSignature = DefaultDimension::getMemberSignature($dimension->getRawMember());
+
         $this->collected[$signature] = $dimension;
+        $this->byMember[$dimension->getName()][$memberSignature] = $dimension;
         $this->reset();
+    }
+
+    public function getDimensionByMember(mixed $member): ?DefaultDimension
+    {
+        $memberSignature = DefaultDimension::getMemberSignature($member);
+
+        if (!isset($this->byMember[$this->name][$memberSignature])) {
+            return null;
+        }
+
+        return $this->byMember[$this->name][$memberSignature];
     }
 
     /**

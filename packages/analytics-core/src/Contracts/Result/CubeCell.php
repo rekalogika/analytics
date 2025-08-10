@@ -42,4 +42,6 @@ interface CubeCell extends Cell
     public function rollUp(string $dimensionName): self;
 
     public function drillDown(string $dimensionName): CubeCells;
+
+    public function slice(string $dimensionName, mixed $member): ?self;
 }
