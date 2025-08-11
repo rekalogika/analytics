@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Block;
 
 use Rekalogika\PivotTable\TableFramework\Cube;
-use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 final readonly class BlockContext
 {
@@ -31,7 +30,6 @@ final readonly class BlockContext
      */
     public function __construct(
         private Cube $apexCube,
-        private CubeManager $cubeManager,
         array $unpivotedKeys,
         array $pivotedKeys,
         private array $skipLegends,
@@ -55,7 +53,6 @@ final readonly class BlockContext
     {
         return new self(
             apexCube: $this->apexCube,
-            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -73,7 +70,6 @@ final readonly class BlockContext
     {
         return new self(
             apexCube: $this->apexCube,
-            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -93,7 +89,6 @@ final readonly class BlockContext
 
         return new self(
             apexCube: $this->apexCube,
-            cubeManager: $this->cubeManager,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $newPath,
@@ -191,11 +186,6 @@ final readonly class BlockContext
     //
     // misc
     //
-
-    public function getCubeManager(): CubeManager
-    {
-        return $this->cubeManager;
-    }
 
     public function isLegendSkipped(string $key): bool
     {

@@ -38,7 +38,7 @@ final readonly class PivotTableTransformer
         $cubeManager = new CubeManager($table);
 
         $block = Block::new(
-            cubeManager: $cubeManager,
+            cube: $cubeManager->createApexCube(),
             unpivotedNodes: $unpivotedNodes,
             pivotedNodes: $pivotedNodes,
             skipLegends: $skipLegends,
