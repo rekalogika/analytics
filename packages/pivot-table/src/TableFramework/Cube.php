@@ -21,7 +21,6 @@ final readonly class Cube
     private array $tuple;
 
     private mixed $value;
-    private bool $isNull;
 
     /**
      * @param array<string,mixed> $tuple
@@ -38,7 +37,6 @@ final readonly class Cube
         }
 
         $this->value = $this->manager->getValue($tuple);
-        $this->isNull = $this->manager->isNull($tuple);
         $this->tuple = $tuple;
     }
 
@@ -100,11 +98,6 @@ final readonly class Cube
     public function getValue(): mixed
     {
         return $this->value;
-    }
-
-    public function isNull(): bool
-    {
-        return $this->isNull;
     }
 
     public function isSubtotal(): bool

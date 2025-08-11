@@ -20,7 +20,6 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
 use Rekalogika\PivotTable\TableFramework\Cube;
-use Rekalogika\PivotTable\TableFramework\CubeManager;
 
 abstract class Block implements \Stringable
 {
@@ -115,17 +114,14 @@ abstract class Block implements \Stringable
      * @param list<string> $createSubtotals
      */
     final public static function new(
-        CubeManager $cubeManager,
+        Cube $cube,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
-        $cube = $cubeManager->createApexCube();
-
         $context = new BlockContext(
             apexCube: $cube,
-            cubeManager: $cubeManager,
             unpivotedKeys: $unpivotedNodes,
             pivotedKeys: $pivotedNodes,
             skipLegends: $skipLegends,
