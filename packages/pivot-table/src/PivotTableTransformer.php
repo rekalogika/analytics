@@ -15,8 +15,7 @@ namespace Rekalogika\PivotTable;
 
 use Rekalogika\PivotTable\Block\Block;
 use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
-use Rekalogika\PivotTable\Contracts\Cube\CubeCell;
-use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
 use Rekalogika\PivotTable\Table\Table;
 
 final readonly class PivotTableTransformer
@@ -30,17 +29,13 @@ final readonly class PivotTableTransformer
      * @param list<string> $createSubtotals
      */
     public static function transform(
-        CubeCell $cubeCell,
-        SubtotalDescriptionResolver $subtotalDescriptionResolver,
+        Cube $cube,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Table {
-        $cubeCell = new CubeCellDecorator(
-            cubeCell: $cubeCell,
-            subtotalDescriptionResolver: $subtotalDescriptionResolver,
-        );
+        $cubeCell = CubeCellDecorator::new($cube);
 
         $block = Block::new(
             cubeCell: $cubeCell,

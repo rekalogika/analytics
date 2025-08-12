@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
+use Rekalogika\PivotTable\Contracts\Cube\CubeCell;
 use Rekalogika\PivotTable\Contracts\Table\Table;
 use Rekalogika\PivotTable\TableToCubeAdapter\Helper\TableToCubeAdapterManager;
 use Rekalogika\PivotTable\TableToCubeAdapter\Implementation\DefaultIdentityStrategy;
-use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
-use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterSubtotalDescriptionResolver;
 
-final readonly class TableToCubeAdapter
+final readonly class TableToCubeAdapter implements Cube
 {
     private TableToCubeAdapterManager $manager;
-    private TableToCubeAdapterSubtotalDescriptionResolver $subtotalDescriptionResolver;
 
     public function __construct(
         private Table $table,
@@ -32,19 +31,17 @@ final readonly class TableToCubeAdapter
             table: $this->table,
             identityStrategy: $this->identityStrategy,
         );
-
-        $this->subtotalDescriptionResolver = new TableToCubeAdapterSubtotalDescriptionResolver(
-            table: $this->table,
-        );
     }
 
-    public function getApexCube(): TableToCubeAdapterCube
+    #[\Override]
+    public function getApexCell(): CubeCell
     {
         return $this->manager->getApexCube();
     }
 
-    public function getSubtotalDescriptionResolver(): TableToCubeAdapterSubtotalDescriptionResolver
+    #[\Override]
+    public function getSubtotalDescription(string $dimensionName): mixed
     {
-        return $this->subtotalDescriptionResolver;
+        return $this->table->getSubtotalLegend($dimensionName);
     }
 }

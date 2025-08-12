@@ -13,16 +13,24 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block\Model;
 
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
 use Rekalogika\PivotTable\Contracts\Cube\CubeCell;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension;
 use Rekalogika\PivotTable\Contracts\Cube\MeasureMember;
-use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
 
 final readonly class CubeCellDecorator implements CubeCell
 {
-    public function __construct(
+    public static function new(Cube $cube): self
+    {
+        return new self(
+            cubeCell: $cube->getApexCell(),
+            cube: $cube,
+        );
+    }
+
+    private function __construct(
         private CubeCell $cubeCell,
-        private SubtotalDescriptionResolver $subtotalDescriptionResolver,
+        private Cube $cube,
         private ?string $subtotalKey = null,
     ) {}
 
@@ -30,7 +38,7 @@ final readonly class CubeCellDecorator implements CubeCell
     {
         return new self(
             cubeCell: $this->cubeCell,
-            subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+            cube: $this->cube,
             subtotalKey: $key,
         );
     }
@@ -82,8 +90,7 @@ final readonly class CubeCellDecorator implements CubeCell
     public function getMember(string $dimensionName): mixed
     {
         if ($this->subtotalKey === $dimensionName) {
-            return $this->subtotalDescriptionResolver
-                ->getSubtotalDescription($this->subtotalKey);
+            return $this->cube->getSubtotalDescription($this->subtotalKey);
         }
 
         $dimension = $this->getDimension($dimensionName);
@@ -111,7 +118,7 @@ final readonly class CubeCellDecorator implements CubeCell
 
         return new self(
             cubeCell: $result,
-            subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+            cube: $this->cube,
         );
     }
 
@@ -123,7 +130,7 @@ final readonly class CubeCellDecorator implements CubeCell
         foreach ($cubes as $cube) {
             yield new self(
                 cubeCell: $cube,
-                subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+                cube: $this->cube,
             );
         }
     }
@@ -135,7 +142,7 @@ final readonly class CubeCellDecorator implements CubeCell
 
         return new self(
             cubeCell: $result,
-            subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+            cube: $this->cube,
         );
     }
 
@@ -154,7 +161,7 @@ final readonly class CubeCellDecorator implements CubeCell
 
         return new self(
             cubeCell: $result,
-            subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+            cube: $this->cube,
         );
     }
 
@@ -172,7 +179,7 @@ final readonly class CubeCellDecorator implements CubeCell
 
             yield new self(
                 cubeCell: $cube,
-                subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
+                cube: $this->cube,
             );
         }
     }

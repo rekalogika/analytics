@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block\Model;
 
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension;
-use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
 
 final readonly class SubtotalDimensionDecorator implements Dimension
 {
     public function __construct(
         private Dimension $dimension,
-        private SubtotalDescriptionResolver $subtotalDescriptionResolver,
+        private Cube $cube,
     ) {}
 
     #[\Override]
@@ -38,7 +38,6 @@ final readonly class SubtotalDimensionDecorator implements Dimension
     #[\Override]
     public function getMember(): mixed
     {
-        return $this->subtotalDescriptionResolver
-            ->getSubtotalDescription($this->dimension->getName());
+        return $this->cube->getSubtotalDescription($this->dimension->getName());
     }
 }

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Contracts\Cube;
 
-interface SubtotalDescriptionResolver
+interface Cube
 {
+    public function getApexCell(): CubeCell;
+
     public function getSubtotalDescription(string $dimensionName): mixed;
 }
