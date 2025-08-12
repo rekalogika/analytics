@@ -30,16 +30,15 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         $headerRows = new DefaultRows([], $context);
-        $prototypeCubes = $this->getPrototypeCubes();
 
         // add a header and data column for each of the child blocks
-        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
+        foreach ($this->getChildBlocks() as $childBlock) {
             $childHeaderRows = $childBlock->getHeaderRows();
             $headerRows = $headerRows->appendRight($childHeaderRows);
         }
 
         // add a legend if the dimension is not marked as skipped
-        $child = $this->getOneChildCube($prototypeCubes);
+        $child = $this->getOneChildCube();
 
         if (!$this->getContext()->isLegendSkipped($nextKey)) {
             $nameCell = new DefaultHeaderCell(
@@ -65,9 +64,8 @@ final class HorizontalBlockGroup extends BlockGroup
         }
 
         $dataRows = new DefaultRows([], $context);
-        $prototypeCubes = $this->getPrototypeCubes();
 
-        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
+        foreach ($this->getChildBlocks() as $childBlock) {
             $childDataRows = $childBlock->getDataRows();
             $dataRows = $dataRows->appendRight($childDataRows);
         }
@@ -78,7 +76,8 @@ final class HorizontalBlockGroup extends BlockGroup
     /**
      * @return non-empty-list<CubeDecorator>
      */
-    private function getPrototypeCubes(): array
+    #[\Override]
+    protected function createPrototypeCubes(): array
     {
         $firstPivoted = $this->getContext()->getFirstPivotedKey();
         $currentKeys = array_keys($this->getCube()->getTuple());

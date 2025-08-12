@@ -18,6 +18,12 @@ use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 final class VerticalBlockGroup extends BlockGroup
 {
     #[\Override]
+    protected function createPrototypeCubes(): array
+    {
+        return [];
+    }
+
+    #[\Override]
     public function getHeaderRows(): DefaultRows
     {
         return $this->getOneChildBlock()->getHeaderRows();

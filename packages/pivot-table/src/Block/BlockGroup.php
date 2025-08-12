@@ -35,7 +35,7 @@ abstract class BlockGroup extends Block
             ?? throw new \RuntimeException('Next key is not set.');
     }
 
-    protected function getSubtotalNode(): ?CubeDecorator
+    protected function getSubtotalCube(): ?CubeDecorator
     {
         $childKey = $this->getChildKey();
 
@@ -52,14 +52,27 @@ abstract class BlockGroup extends Block
         return $this->cube->asSubtotal($childKey);
     }
 
+    //
+    // cubes
+    //
 
     /**
-     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
-     * @return iterable<CubeDecorator>
+     * @var null|list<CubeDecorator>
      */
-    protected function getChildCubes(?array $prototypeCubes = null): iterable
+    private ?array $childCubes = null;
+
+    /**
+     * @return list<CubeDecorator>
+     */
+    protected function getChildCubes(): array
     {
-        if ($prototypeCubes === null) {
+        if ($this->childCubes !== null) {
+            return $this->childCubes;
+        }
+
+        $prototypeCubes = $this->getPrototypeCubes();
+
+        if ($prototypeCubes === []) {
             $children = $this->cube->drillDownWithoutBalancing($this->getChildKey());
         } else {
             $children = $this->cube->drillDownWithPrototypes(
@@ -71,57 +84,95 @@ abstract class BlockGroup extends Block
         $children = iterator_to_array($children, preserve_keys: true);
 
         if (\count($children) >= 2) {
-            $subtotalNode = $this->getSubtotalNode();
+            $subtotalNode = $this->getSubtotalCube();
 
             if ($subtotalNode !== null) {
                 $children[] = $subtotalNode;
             }
         }
 
-        return $children;
+        return $this->childCubes = array_values($children);
     }
 
-    /**
-     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
-     */
-    protected function getOneChildCube(?array $prototypeCubes = null): CubeDecorator
+    protected function getOneChildCube(): CubeDecorator
     {
-        foreach ($this->getChildCubes($prototypeCubes) as $childNode) {
+        foreach ($this->getChildCubes() as $childNode) {
             return $childNode;
         }
 
         throw new \RuntimeException('No child nodes found in the current node.');
     }
 
+    //
+    // blocks
+    //
+
     /**
-     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
-     * @return iterable<Block>
+     * @var null|non-empty-list<Block>
      */
-    protected function getChildBlocks(?array $prototypeCubes = null): iterable
+    private ?array $childBlocks = null;
+
+    /**
+     * @return non-empty-list<Block>
+     */
+    protected function getChildBlocks(): array
     {
-        $children = $this->getChildCubes($prototypeCubes);
+        if ($this->childBlocks !== null) {
+            return $this->childBlocks;
+        }
+
+        $children = $this->getChildCubes();
 
         if ($children === []) {
-            yield new EmptyBlockGroup(
-                cube: $this->getCube(),
-                context: $this->getContext(),
-            );
+            return [
+                new EmptyBlockGroup(
+                    cube: $this->getCube(),
+                    context: $this->getContext(),
+                ),
+            ];
         }
+
+        $blocks = [];
 
         foreach ($children as $childCube) {
-            yield $this->createBlock($childCube);
+            $blocks[] = $this->createBlock($childCube);
         }
+
+        /** @var non-empty-list<Block> $blocks */
+        return $this->childBlocks = $blocks;
     }
 
-    /**
-     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
-     */
-    protected function getOneChildBlock(?array $prototypeCubes = null): Block
+    protected function getOneChildBlock(): Block
     {
-        foreach ($this->getChildBlocks($prototypeCubes) as $childBlock) {
+        foreach ($this->getChildBlocks() as $childBlock) {
             return $childBlock;
         }
 
+        // @phpstan-ignore-next-line
         throw new \RuntimeException('No child blocks found in the current node.');
     }
+
+    //
+    // prototype cubes
+    //
+
+    /**
+     * @var null|list<CubeDecorator>
+     */
+    private ?array $prototypeCubes = null;
+
+    /**
+     * @return list<CubeDecorator>
+     */
+    final protected function getPrototypeCubes(): array
+    {
+        return $this->prototypeCubes ??= $this->createPrototypeCubes();
+    }
+
+    /**
+     * Returns empty if no prototype cubes are defined.
+     *
+     * @return list<CubeDecorator>
+     */
+    abstract protected function createPrototypeCubes(): array;
 }
