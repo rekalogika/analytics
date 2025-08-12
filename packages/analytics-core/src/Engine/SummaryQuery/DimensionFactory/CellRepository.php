@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -47,28 +48,45 @@ final class CellRepository
         }
     }
 
-    public function getCellByTuple(DefaultTuple $tuple): ?DefaultCell
+    public function getCellByTuple(DefaultTuple $tuple): DefaultCell
     {
-        return $this->signatureToCell[$tuple->getSignature()] ?? null;
+        return $this->signatureToCell[$tuple->getSignature()]
+            ??= new DefaultCell(
+                tuple: $tuple,
+                measures: $this->nullMeasureCollection->getNullMeasures(),
+                measureNames: [],
+                isNull: true,
+                context: $this->context,
+            );
     }
 
     public function getCellsByBaseAndDimension(
         DefaultCell $baseCell,
         string $dimensionName,
         mixed $dimensionMember,
-    ): ?DefaultCell {
+    ): DefaultCell {
         $dimension = $this->dimensionCollection
             ->getDimensionsByName($dimensionName)
             ->getDimensionByMember($dimensionMember);
 
         if ($dimension === null) {
-            // if the dimension is not found, we return null
-            return null;
+            throw new UnexpectedValueException(\sprintf(
+                'Dimension "%s" with member "%s" not found in the dimension collection.',
+                $dimensionName,
+                get_debug_type($dimensionMember),
+            ));
         }
 
         $tuple = $baseCell->getTuple()->append($dimension);
 
-        return $this->signatureToCell[$tuple->getSignature()] ?? null;
+        return $this->signatureToCell[$tuple->getSignature()]
+            ??= new DefaultCell(
+                tuple: $tuple,
+                measures: $this->nullMeasureCollection->getNullMeasures(),
+                measureNames: $baseCell->getMeasureNames(),
+                isNull: true,
+                context: $baseCell->getContext(),
+            );
     }
 
     /**

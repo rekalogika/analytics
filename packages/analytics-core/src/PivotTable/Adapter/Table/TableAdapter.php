@@ -19,6 +19,9 @@ use Rekalogika\Analytics\PivotTable\Model\Table\MeasureDimensionLabel;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
 use Rekalogika\PivotTable\Contracts\Table\Table as PivotTableTable;
 
+/**
+ * @deprecated
+ */
 final readonly class TableAdapter implements PivotTableTable
 {
     public static function adapt(Result $result): self

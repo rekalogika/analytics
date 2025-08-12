@@ -177,13 +177,17 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         }
 
         $dimensions = $this->dimensions;
+        ksort($dimensions);
 
         $signatures = array_map(
             static fn(DefaultDimension $dimension): string => $dimension->getSignature(),
             $dimensions,
         );
 
-        return $this->signature = hash('xxh128', serialize($signatures));
+        return $this->signature = hash(
+            'xxh128',
+            implode('|', $signatures),
+        );
     }
 
     /**
@@ -197,6 +201,7 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
         }
 
         $dimensionality = array_keys($this->dimensions);
+        sort($dimensionality);
 
         return $this->dimensionality = $dimensionality;
     }

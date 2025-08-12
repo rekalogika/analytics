@@ -29,7 +29,7 @@ final class DimensionFieldCollection
     private array $collected = [];
 
     /**
-     * @var array<string,array<string,DefaultDimension>>
+     * @var array<string,DefaultDimension>
      */
     private array $byMember = [];
 
@@ -74,7 +74,7 @@ final class DimensionFieldCollection
         $memberSignature = DefaultDimension::getMemberSignature($dimension->getRawMember());
 
         $this->collected[$signature] = $dimension;
-        $this->byMember[$dimension->getName()][$memberSignature] = $dimension;
+        $this->byMember[$memberSignature] = $dimension;
         $this->reset();
     }
 
@@ -82,11 +82,11 @@ final class DimensionFieldCollection
     {
         $memberSignature = DefaultDimension::getMemberSignature($member);
 
-        if (!isset($this->byMember[$this->name][$memberSignature])) {
+        if (!isset($this->byMember[$memberSignature])) {
             return null;
         }
 
-        return $this->byMember[$this->name][$memberSignature];
+        return $this->byMember[$memberSignature];
     }
 
     /**

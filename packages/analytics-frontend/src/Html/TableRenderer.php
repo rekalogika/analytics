@@ -16,10 +16,10 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
+use Rekalogika\Analytics\Frontend\Util\HardcodedSubtotalDescriptionResolver;
+use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter as TableTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\PivotTable\TableToCubeAdapter\TableToCubeAdapter;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 use Twig\Environment;
 
@@ -154,17 +154,16 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionality();
-        $pivotTable = TableTableAdapter::adapt($result);
+        $cube = CubeAdapter::adapt($result->getCube());
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
-        $tableToCubeAdapter = new TableToCubeAdapter($pivotTable);
 
         $table = PivotTableTransformer::transform(
-            cube: $tableToCubeAdapter->getApexCube(),
-            subtotalDescriptionResolver: $tableToCubeAdapter->getSubtotalDescriptionResolver(),
+            cube: $cube,
+            subtotalDescriptionResolver: new HardcodedSubtotalDescriptionResolver(),
             unpivotedNodes: $unpivotedDimensions,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
-            createSubtotals: $result->getDimensionality(),
+            createSubtotals: $dimensions,
         );
 
         return $this->getVisitor($theme)->visitTable($table);

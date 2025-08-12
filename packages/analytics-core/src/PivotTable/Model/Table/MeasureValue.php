@@ -39,10 +39,7 @@ final readonly class MeasureValue implements Value
         return $this->cell
             ->getMeasures()
             ->get($this->measureName)
-            ?->getValue()
-            ?? throw new InvalidArgumentException(
-                \sprintf('Measure "%s" not found in the row.', $this->measureName),
-            );
+            ?->getValue();
     }
 
     public function getCell(): CubeCell

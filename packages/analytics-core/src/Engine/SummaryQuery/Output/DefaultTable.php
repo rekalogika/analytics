@@ -60,17 +60,13 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function get(mixed $key): ?DefaultRow
+    public function get(mixed $key): DefaultRow
     {
         if (!$key instanceof DefaultTuple) {
             throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
         }
 
         $cell = $this->cellRepository->getCellByTuple($key);
-
-        if ($cell === null) {
-            return null;
-        }
 
         return $this->registry->getRowByCell($cell);
     }

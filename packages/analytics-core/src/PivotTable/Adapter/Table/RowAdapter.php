@@ -19,6 +19,9 @@ use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
 use Rekalogika\PivotTable\Contracts\Table\Row as PivotTableRow;
 
+/**
+ * @deprecated
+ */
 final readonly class RowAdapter implements PivotTableRow
 {
     public function __construct(
