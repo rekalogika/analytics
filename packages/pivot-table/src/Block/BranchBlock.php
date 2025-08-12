@@ -21,16 +21,10 @@ abstract class BranchBlock extends NodeBlock
         $nextKey = $context->getNextKey();
 
         if ($nextKey === null) {
-            throw new \LogicException(\sprintf(
-                'Cannot create children block group for %s without next key.',
-                get_debug_type($this),
-            ));
-
-            // return new EmptyBlockGroup(
-            //     node: $this->getCube(),
-            //     childKey: null,
-            //     context: $context,
-            // );
+            return new EmptyBlockGroup(
+                cube: $this->getCube(),
+                context: $context,
+            );
         }
 
         if ($context->isNextKeyPivoted()) {

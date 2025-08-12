@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
 
 abstract class NodeBlock extends Block
 {
     private readonly ?BlockGroup $parent;
 
     protected function __construct(
-        private readonly Cube $cube,
+        private readonly CubeDecorator $cube,
         ?Block $parent,
         BlockContext $context,
     ) {
@@ -37,7 +37,7 @@ abstract class NodeBlock extends Block
         $this->parent = $parent;
     }
 
-    final public function getCube(): Cube
+    final public function getCube(): CubeDecorator
     {
         return $this->cube;
     }

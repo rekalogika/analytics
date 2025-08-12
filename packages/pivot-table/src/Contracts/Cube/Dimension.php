@@ -11,15 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableFramework;
+namespace Rekalogika\PivotTable\Contracts\Cube;
 
-interface IdentityStrategy
+interface Dimension
 {
-    public function getMemberSignature(mixed $member): string;
+    public function getName(): string;
 
-    /**
-     * @param array<string,mixed> $members
-     * @return string
-     */
-    public function getMembersSignature(array $members): string;
+    public function getLegend(): mixed;
+
+    public function getMember(): mixed;
 }

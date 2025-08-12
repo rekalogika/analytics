@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableBody;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableFooter;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTableHeader;
-use Rekalogika\PivotTable\TableFramework\Cube;
 
 abstract class Block implements \Stringable
 {
@@ -56,7 +57,7 @@ abstract class Block implements \Stringable
         return $this->context->getBlockDepth();
     }
 
-    final protected function createBlock(Cube $cube): Block
+    final protected function createBlock(CubeDecorator $cube): Block
     {
         $context = $this->getContext();
         $context = $context->pushKey();
@@ -114,7 +115,7 @@ abstract class Block implements \Stringable
      * @param list<string> $createSubtotals
      */
     final public static function new(
-        Cube $cube,
+        CubeDecorator $cube,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],

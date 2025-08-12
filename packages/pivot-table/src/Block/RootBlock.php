@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\TableFramework\Cube;
 
 final class RootBlock extends BranchBlock
 {
+    private bool $isEmpty;
+
     protected function __construct(
-        Cube $cube,
+        CubeDecorator $cube,
         BlockContext $context,
     ) {
         parent::__construct(
@@ -27,17 +29,39 @@ final class RootBlock extends BranchBlock
             parent: null,
             context: $context,
         );
+
+        $nextKey = $context->getNextKey();
+
+        if ($nextKey === null) {
+            $this->isEmpty = true;
+        } else {
+            $children = iterator_to_array($cube->drillDown($nextKey));
+
+            if ($children === []) {
+                $this->isEmpty = true;
+            } else {
+                $this->isEmpty = false;
+            }
+        }
     }
 
     #[\Override]
     public function getHeaderRows(): DefaultRows
     {
+        if ($this->isEmpty) {
+            return new DefaultRows([], $this->getElementContext());
+        }
+
         return $this->getChildrenBlockGroup()->getHeaderRows();
     }
 
     #[\Override]
     public function getDataRows(): DefaultRows
     {
+        if ($this->isEmpty) {
+            return new DefaultRows([], $this->getElementContext());
+        }
+
         return $this->getChildrenBlockGroup()->getDataRows();
     }
 }

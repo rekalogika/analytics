@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\PivotTable\Model\Table\MeasureDimensionLabel;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
-use Rekalogika\PivotTable\Contracts\Table as PivotTableTable;
+use Rekalogika\PivotTable\Contracts\Table\Table as PivotTableTable;
 
 final readonly class TableAdapter implements PivotTableTable
 {
@@ -46,6 +46,10 @@ final readonly class TableAdapter implements PivotTableTable
         $legends = [];
 
         foreach ($result->getAllCubes() as $cube) {
+            if ($cube->getTuple()->has('@values')) {
+                continue;
+            }
+
             $rowAdapter = new RowAdapter($cube, $this->propertyMap);
             $rows[] = $rowAdapter;
             $legends = array_merge($legends, $rowAdapter->getLegends());

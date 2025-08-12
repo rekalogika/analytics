@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
-use Rekalogika\PivotTable\Contracts\Row as PivotTableRow;
+use Rekalogika\PivotTable\Contracts\Table\Row as PivotTableRow;
 
 final readonly class RowAdapter implements PivotTableRow
 {

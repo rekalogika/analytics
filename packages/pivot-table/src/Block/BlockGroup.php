@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
 
 abstract class BlockGroup extends Block
 {
     public function __construct(
-        private readonly Cube $cube,
+        private readonly CubeDecorator $cube,
         BlockContext $context,
     ) {
         parent::__construct($context);
     }
 
-    protected function getCube(): Cube
+    protected function getCube(): CubeDecorator
     {
         return $this->cube;
     }
@@ -35,7 +35,7 @@ abstract class BlockGroup extends Block
             ?? throw new \RuntimeException('Next key is not set.');
     }
 
-    protected function getSubtotalNode(): ?Cube
+    protected function getSubtotalNode(): ?CubeDecorator
     {
         $childKey = $this->getChildKey();
 
@@ -54,19 +54,21 @@ abstract class BlockGroup extends Block
 
 
     /**
-     * @param null|non-empty-list<Cube> $prototypeCubes
-     * @return iterable<Cube>
+     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
+     * @return iterable<CubeDecorator>
      */
     protected function getChildCubes(?array $prototypeCubes = null): iterable
     {
         if ($prototypeCubes === null) {
-            $children = $this->cube->drillDown($this->getChildKey(), false);
+            $children = $this->cube->drillDownWithoutBalancing($this->getChildKey());
         } else {
-            $children = $this->cube->multipleSlicesFromCubes(
+            $children = $this->cube->drillDownWithPrototypes(
                 dimensionName: $this->getChildKey(),
-                cubes: $prototypeCubes,
+                prototypeCubes: $prototypeCubes,
             );
         }
+
+        $children = iterator_to_array($children, preserve_keys: true);
 
         if (\count($children) >= 2) {
             $subtotalNode = $this->getSubtotalNode();
@@ -80,9 +82,9 @@ abstract class BlockGroup extends Block
     }
 
     /**
-     * @param null|non-empty-list<Cube> $prototypeCubes
+     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
      */
-    protected function getOneChildCube(?array $prototypeCubes = null): Cube
+    protected function getOneChildCube(?array $prototypeCubes = null): CubeDecorator
     {
         foreach ($this->getChildCubes($prototypeCubes) as $childNode) {
             return $childNode;
@@ -92,7 +94,7 @@ abstract class BlockGroup extends Block
     }
 
     /**
-     * @param null|non-empty-list<Cube> $prototypeCubes
+     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
      * @return iterable<Block>
      */
     protected function getChildBlocks(?array $prototypeCubes = null): iterable
@@ -112,7 +114,7 @@ abstract class BlockGroup extends Block
     }
 
     /**
-     * @param null|non-empty-list<Cube> $prototypeCubes
+     * @param null|non-empty-list<CubeDecorator> $prototypeCubes
      */
     protected function getOneChildBlock(?array $prototypeCubes = null): Block
     {
