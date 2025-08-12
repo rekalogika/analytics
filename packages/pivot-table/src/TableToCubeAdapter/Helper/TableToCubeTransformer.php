@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableToCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter\Helper;
 
 use Rekalogika\PivotTable\Contracts\Table\Row;
 use Rekalogika\PivotTable\Contracts\Table\Table;

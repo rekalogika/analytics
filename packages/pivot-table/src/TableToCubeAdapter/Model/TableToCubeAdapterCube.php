@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\TableToCubeAdapter\Model;
 
 use Rekalogika\PivotTable\Contracts\Cube\Cube;
-use Rekalogika\PivotTable\TableToCubeAdapter\TableToCubeAdapterManager;
+use Rekalogika\PivotTable\TableToCubeAdapter\Helper\TableToCubeAdapterManager;
 
 final readonly class TableToCubeAdapterCube implements Cube
 {

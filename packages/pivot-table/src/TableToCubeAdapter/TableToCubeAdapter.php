@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
 use Rekalogika\PivotTable\Contracts\Table\Table;
+use Rekalogika\PivotTable\TableToCubeAdapter\Helper\TableToCubeAdapterManager;
 use Rekalogika\PivotTable\TableToCubeAdapter\Implementation\DefaultIdentityStrategy;
 use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
 use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterSubtotalDescriptionResolver;
