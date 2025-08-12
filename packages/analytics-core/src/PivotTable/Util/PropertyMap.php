@@ -18,16 +18,16 @@ use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\DimensionAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\MeasureDimensionAdapter;
-use Rekalogika\Analytics\PivotTable\Model\Table\DimensionLabel;
-use Rekalogika\Analytics\PivotTable\Model\Table\DimensionMember;
-use Rekalogika\Analytics\PivotTable\Model\Table\MeasureLabel;
-use Rekalogika\Analytics\PivotTable\Model\Table\MeasureValue;
+use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionLabel;
+use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionMember;
+use Rekalogika\Analytics\PivotTable\Model\Cube\MeasureLabel;
+use Rekalogika\Analytics\PivotTable\Model\Cube\MeasureValue;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension as PivotTableDimension;
 
 /**
  * Identity map for objects that represent properties of a pivot table.
  */
-final class TablePropertyMap
+final class PropertyMap
 {
     /**
      * @var \WeakMap<Dimension,DimensionLabel>

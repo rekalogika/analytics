@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\PivotTable\Adapter\Cube;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
-use Rekalogika\Analytics\PivotTable\Model\Table\DimensionMember;
-use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
+use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionMember;
+use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
 use Rekalogika\PivotTable\Contracts\Cube\Cube;
 
 final readonly class CubeAdapter implements Cube
@@ -26,13 +26,13 @@ final readonly class CubeAdapter implements Cube
     {
         return new self(
             cell: $cell,
-            propertyMap: new TablePropertyMap(),
+            propertyMap: new PropertyMap(),
         );
     }
 
     private function __construct(
         private CubeCell $cell,
-        private TablePropertyMap $propertyMap,
+        private PropertyMap $propertyMap,
     ) {}
 
     #[\Override]

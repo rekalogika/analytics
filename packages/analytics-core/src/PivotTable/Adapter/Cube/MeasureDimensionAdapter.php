@@ -16,14 +16,14 @@ namespace Rekalogika\Analytics\PivotTable\Adapter\Cube;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
-use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
+use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension as PivotTableDimension;
 
 final readonly class MeasureDimensionAdapter implements PivotTableDimension
 {
     public function __construct(
         private Dimension $dimension,
-        private TablePropertyMap $propertyMap,
+        private PropertyMap $propertyMap,
     ) {
         if ($dimension->getName() !== '@values') {
             throw new LogicException(

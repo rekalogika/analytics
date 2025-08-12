@@ -11,14 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\Table;
+namespace Rekalogika\Analytics\PivotTable\Model\Cube;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\PivotTable\Model\Label;
-use Symfony\Contracts\Translation\TranslatableInterface;
+use Rekalogika\Analytics\PivotTable\Model\Value;
 
-final readonly class MeasureLabel implements Label
+final readonly class MeasureValue implements Value
 {
     public function __construct(
         private CubeCell $cell,
@@ -31,7 +30,7 @@ final readonly class MeasureLabel implements Label
     }
 
     #[\Override]
-    public function getContent(): TranslatableInterface
+    public function getContent(): mixed
     {
         if ($this->measureName === null) {
             throw new InvalidArgumentException('Measure name must be set before getting content.');
@@ -40,10 +39,7 @@ final readonly class MeasureLabel implements Label
         return $this->cell
             ->getMeasures()
             ->get($this->measureName)
-            ?->getLabel()
-            ?? throw new InvalidArgumentException(
-                \sprintf('Measure "%s" not found in the row.', $this->measureName),
-            );
+            ?->getValue();
     }
 
     public function getCell(): CubeCell

@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Adapter\Cube;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
-use Rekalogika\Analytics\PivotTable\Util\TablePropertyMap;
+use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension as PivotTableDimension;
 
 final readonly class DimensionAdapter implements PivotTableDimension
 {
     public function __construct(
         private Dimension $dimension,
-        private TablePropertyMap $propertyMap,
+        private PropertyMap $propertyMap,
     ) {}
 
     #[\Override]

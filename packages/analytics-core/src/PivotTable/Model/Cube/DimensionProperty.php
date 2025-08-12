@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\Table;
+namespace Rekalogika\Analytics\PivotTable\Model\Cube;
 
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\PivotTable\Model\Property;
