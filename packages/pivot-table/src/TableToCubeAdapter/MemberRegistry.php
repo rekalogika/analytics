@@ -11,9 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterCube;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
 
 final class MemberRegistry
 {
@@ -40,7 +40,7 @@ final class MemberRegistry
         $this->members[$dimensionName][$signature] = $member;
     }
 
-    public function registerCubeMembers(TableCubeAdapterCube $cube): void
+    public function registerCubeMembers(TableToCubeAdapterCube $cube): void
     {
         foreach ($cube->getTuple() as $dimension) {
             $dimensionName = $dimension->getName();

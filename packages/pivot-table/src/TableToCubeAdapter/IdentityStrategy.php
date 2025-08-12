@@ -11,14 +11,14 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterDimension;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterDimension;
 
 interface IdentityStrategy
 {
     /**
-     * @param array<string,TableCubeAdapterDimension> $tuple
+     * @param array<string,TableToCubeAdapterDimension> $tuple
      * @return string
      */
     public function getTupleSignature(array $tuple): string;

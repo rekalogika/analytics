@@ -11,23 +11,23 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
 use Rekalogika\PivotTable\Contracts\Row;
 use Rekalogika\PivotTable\Contracts\Table;
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterCube;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
 
 final readonly class TableToCubeTransformer
 {
     public function __construct(
         private Table $table,
         private MeasureMemberRepository $measureMemberRepository,
-        private TableCubeAdapterManager $manager,
+        private TableToCubeAdapterManager $manager,
         private DimensionRepository $dimensionRepository,
     ) {}
 
     /**
-     * @return iterable<TableCubeAdapterCube>
+     * @return iterable<TableToCubeAdapterCube>
      */
     public function transform(): iterable
     {
@@ -46,7 +46,7 @@ final readonly class TableToCubeTransformer
     }
 
     /**
-     * @return iterable<TableCubeAdapterCube>
+     * @return iterable<TableToCubeAdapterCube>
      */
     private function transformRowToCubes(Row $row): iterable
     {
@@ -62,7 +62,7 @@ final readonly class TableToCubeTransformer
             $tuple[$dimensionName] = $dimension;
         }
 
-        yield new TableCubeAdapterCube(
+        yield new TableToCubeAdapterCube(
             manager: $this->manager,
             tuple: $tuple,
             value: null,
@@ -81,7 +81,7 @@ final readonly class TableToCubeTransformer
 
             $tuple['@values'] = $dimension;
 
-            $a = new TableCubeAdapterCube(
+            $a = new TableToCubeAdapterCube(
                 manager: $this->manager,
                 tuple: $tuple,
                 value: $value,

@@ -11,26 +11,33 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter\Model;
+namespace Rekalogika\PivotTable\TableToCubeAdapter\Model;
 
-use Rekalogika\PivotTable\Contracts\Cube\MeasureMember;
+use Rekalogika\PivotTable\Contracts\Cube\Dimension;
 
-final readonly class TableCubeAdapterMeasureMember implements MeasureMember
+final readonly class TableToCubeAdapterDimension implements Dimension
 {
     public function __construct(
-        private string $measureName,
+        private string $name,
         private mixed $legend,
+        private mixed $member,
     ) {}
 
     #[\Override]
-    public function getMeasureName(): string
+    public function getName(): string
     {
-        return $this->measureName;
+        return $this->name;
     }
 
     #[\Override]
     public function getLegend(): mixed
     {
         return $this->legend;
+    }
+
+    #[\Override]
+    public function getMember(): mixed
+    {
+        return $this->member;
     }
 }

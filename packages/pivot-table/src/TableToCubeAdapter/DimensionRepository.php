@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
 use Rekalogika\PivotTable\Contracts\Table;
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterDimension;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterDimension;
 
 final class DimensionRepository
 {
     /**
-     * @var array<string,array<string,TableCubeAdapterDimension>> $dimensions
+     * @var array<string,array<string,TableToCubeAdapterDimension>> $dimensions
      */
     private array $dimensions = [];
 
@@ -31,11 +31,11 @@ final class DimensionRepository
     public function getDimension(
         string $dimensionName,
         mixed $dimensionMember,
-    ): TableCubeAdapterDimension {
+    ): TableToCubeAdapterDimension {
         $signature = $this->identityStrategy
             ->getMemberSignature($dimensionMember);
 
-        return $this->dimensions[$dimensionName][$signature] ??= new TableCubeAdapterDimension(
+        return $this->dimensions[$dimensionName][$signature] ??= new TableToCubeAdapterDimension(
             name: $dimensionName,
             legend: $this->table->getLegend($dimensionName),
             member: $dimensionMember,

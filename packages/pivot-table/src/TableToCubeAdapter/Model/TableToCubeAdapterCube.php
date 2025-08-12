@@ -11,25 +11,25 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter\Model;
+namespace Rekalogika\PivotTable\TableToCubeAdapter\Model;
 
 use Rekalogika\PivotTable\Contracts\Cube\Cube;
-use Rekalogika\PivotTable\TableCubeAdapter\TableCubeAdapterManager;
+use Rekalogika\PivotTable\TableToCubeAdapter\TableToCubeAdapterManager;
 
-final readonly class TableCubeAdapterCube implements Cube
+final readonly class TableToCubeAdapterCube implements Cube
 {
     /**
-     * @param array<string,TableCubeAdapterDimension> $tuple
+     * @param array<string,TableToCubeAdapterDimension> $tuple
      */
     public function __construct(
-        private TableCubeAdapterManager $manager,
+        private TableToCubeAdapterManager $manager,
         private array $tuple,
         private mixed $value,
         private bool $null,
     ) {}
 
     /**
-     * @return array<string,TableCubeAdapterDimension>
+     * @return array<string,TableToCubeAdapterDimension>
      */
     #[\Override]
     public function getTuple(): array
@@ -53,7 +53,7 @@ final readonly class TableCubeAdapterCube implements Cube
     public function slice(
         string $dimensionName,
         mixed $member,
-    ): TableCubeAdapterCube {
+    ): TableToCubeAdapterCube {
         return $this->manager->slice(
             base: $this,
             dimensionName: $dimensionName,
@@ -71,7 +71,7 @@ final readonly class TableCubeAdapterCube implements Cube
     }
 
     #[\Override]
-    public function rollUp(string $dimensionName): TableCubeAdapterCube
+    public function rollUp(string $dimensionName): TableToCubeAdapterCube
     {
         return $this->manager->rollUp(
             base: $this,

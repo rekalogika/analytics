@@ -11,9 +11,9 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter\Implementation;
+namespace Rekalogika\PivotTable\TableToCubeAdapter\Implementation;
 
-use Rekalogika\PivotTable\TableCubeAdapter\IdentityStrategy;
+use Rekalogika\PivotTable\TableToCubeAdapter\IdentityStrategy;
 
 final readonly class DefaultIdentityStrategy implements IdentityStrategy
 {

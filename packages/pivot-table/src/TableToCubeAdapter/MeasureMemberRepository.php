@@ -11,15 +11,15 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
 use Rekalogika\PivotTable\Contracts\Table;
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterMeasureMember;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterMeasureMember;
 
 final class MeasureMemberRepository
 {
     /**
-     * @var array<string,TableCubeAdapterMeasureMember> $measureMembers
+     * @var array<string,TableToCubeAdapterMeasureMember> $measureMembers
      */
     private array $measureMembers = [];
 
@@ -27,9 +27,9 @@ final class MeasureMemberRepository
         private readonly Table $table,
     ) {}
 
-    public function getMeasureMember(string $measureName): TableCubeAdapterMeasureMember
+    public function getMeasureMember(string $measureName): TableToCubeAdapterMeasureMember
     {
-        return $this->measureMembers[$measureName] ??= new TableCubeAdapterMeasureMember(
+        return $this->measureMembers[$measureName] ??= new TableToCubeAdapterMeasureMember(
             measureName: $measureName,
             legend: $this->table->getLegend($measureName),
         );

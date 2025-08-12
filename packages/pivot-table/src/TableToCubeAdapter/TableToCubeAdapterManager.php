@@ -11,13 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
 use Rekalogika\PivotTable\Contracts\Table;
-use Rekalogika\PivotTable\TableCubeAdapter\Implementation\DefaultIdentityStrategy;
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterCube;
+use Rekalogika\PivotTable\TableToCubeAdapter\Implementation\DefaultIdentityStrategy;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
 
-final readonly class TableCubeAdapterManager
+final readonly class TableToCubeAdapterManager
 {
     private CubeRegistry $cubeRegistry;
     private MeasureMemberRepository $measureMemberRepository;
@@ -60,16 +60,16 @@ final readonly class TableCubeAdapterManager
         }
     }
 
-    public function getApexCube(): TableCubeAdapterCube
+    public function getApexCube(): TableToCubeAdapterCube
     {
         return $this->cubeRegistry->getCubeByTuple([]);
     }
 
     public function slice(
-        TableCubeAdapterCube $base,
+        TableToCubeAdapterCube $base,
         string $dimensionName,
         mixed $dimensionMember,
-    ): TableCubeAdapterCube {
+    ): TableToCubeAdapterCube {
         $tuple = $base->getTuple();
 
         $tuple[$dimensionName] = $this->dimensionRepository
@@ -79,10 +79,10 @@ final readonly class TableCubeAdapterManager
     }
 
     /**
-     * @return iterable<TableCubeAdapterCube>
+     * @return iterable<TableToCubeAdapterCube>
      */
     public function drillDown(
-        TableCubeAdapterCube $base,
+        TableToCubeAdapterCube $base,
         string $dimensionName,
     ): iterable {
         $members = $this->memberRegistry->getMembers($dimensionName);
@@ -94,9 +94,9 @@ final readonly class TableCubeAdapterManager
     }
 
     public function rollUp(
-        TableCubeAdapterCube $base,
+        TableToCubeAdapterCube $base,
         string $dimensionName,
-    ): TableCubeAdapterCube {
+    ): TableToCubeAdapterCube {
         $tuple = $base->getTuple();
 
         unset($tuple[$dimensionName]);

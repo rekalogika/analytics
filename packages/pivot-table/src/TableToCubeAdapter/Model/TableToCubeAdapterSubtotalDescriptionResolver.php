@@ -11,12 +11,12 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter\Model;
+namespace Rekalogika\PivotTable\TableToCubeAdapter\Model;
 
 use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
 use Rekalogika\PivotTable\Contracts\Table;
 
-final readonly class TableCubeAdapterSubtotalDescriptionResolver implements SubtotalDescriptionResolver
+final readonly class TableToCubeAdapterSubtotalDescriptionResolver implements SubtotalDescriptionResolver
 {
     public function __construct(private Table $table) {}
 

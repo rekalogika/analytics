@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter as TableTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\PivotTable\TableCubeAdapter\TableCubeAdapter;
+use Rekalogika\PivotTable\TableToCubeAdapter\TableToCubeAdapter;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 use Twig\Environment;
 
@@ -156,7 +156,7 @@ final readonly class TableRenderer
         $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
-        $tableToCubeAdapter = new TableCubeAdapter($pivotTable);
+        $tableToCubeAdapter = new TableToCubeAdapter($pivotTable);
 
         $table = PivotTableTransformer::transform(
             cube: $tableToCubeAdapter->getApexCube(),

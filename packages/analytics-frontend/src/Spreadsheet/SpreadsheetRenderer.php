@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisito
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter as TableTableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\PivotTable\TableCubeAdapter\TableCubeAdapter;
+use Rekalogika\PivotTable\TableToCubeAdapter\TableToCubeAdapter;
 use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
 
 final readonly class SpreadsheetRenderer
@@ -66,7 +66,7 @@ final readonly class SpreadsheetRenderer
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
         $pivotTable = TableTableAdapter::adapt($result);
-        $tableToCubeAdapter = new TableCubeAdapter($pivotTable);
+        $tableToCubeAdapter = new TableToCubeAdapter($pivotTable);
 
         $table = PivotTableTransformer::transform(
             cube: $tableToCubeAdapter->getApexCube(),

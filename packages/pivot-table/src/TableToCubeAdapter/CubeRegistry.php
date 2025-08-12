@@ -11,24 +11,24 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableCubeAdapter;
+namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterCube;
-use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterDimension;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterCube;
+use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterDimension;
 
 final class CubeRegistry
 {
     /**
-     * @var array<string,TableCubeAdapterCube>
+     * @var array<string,TableToCubeAdapterCube>
      */
     private array $cubes = [];
 
     public function __construct(
         private IdentityStrategy $identityStrategy,
-        private TableCubeAdapterManager $manager,
+        private TableToCubeAdapterManager $manager,
     ) {}
 
-    public function registerCube(TableCubeAdapterCube $cube): void
+    public function registerCube(TableToCubeAdapterCube $cube): void
     {
         $signature = $this->identityStrategy->getTupleSignature($cube->getTuple());
 
@@ -43,13 +43,13 @@ final class CubeRegistry
     }
 
     /**
-     * @param array<string,TableCubeAdapterDimension> $tuple
+     * @param array<string,TableToCubeAdapterDimension> $tuple
      */
-    public function getCubeByTuple(array $tuple): TableCubeAdapterCube
+    public function getCubeByTuple(array $tuple): TableToCubeAdapterCube
     {
         $signature = $this->identityStrategy->getTupleSignature($tuple);
 
-        return $this->cubes[$signature] ??= new TableCubeAdapterCube(
+        return $this->cubes[$signature] ??= new TableToCubeAdapterCube(
             manager: $this->manager,
             tuple: $tuple,
             value: null,
