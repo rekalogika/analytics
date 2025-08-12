@@ -140,13 +140,15 @@ final readonly class CubeDecorator implements Cube
     }
 
     /**
-     * @param list<string> $dimensionNames
+     * @param list<string> $exceptions
      */
-    public function rollUpAllExcept(array $dimensionNames): self
+    public function rollUpAllExcept(array $exceptions): self
     {
         $result = $this;
+        $allDimensions = array_keys($this->getTuple());
+        $dimensionsToRollUp = array_diff($allDimensions, $exceptions);
 
-        foreach ($dimensionNames as $dimensionName) {
+        foreach ($dimensionsToRollUp as $dimensionName) {
             $result = $result->rollUp($dimensionName);
         }
 

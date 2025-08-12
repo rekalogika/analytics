@@ -2,6 +2,10 @@ In the current absence of unit tests, these are the URL used for testing purpose
 
 http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07
 
+http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22columns%22%3A%5B%22%40values%22%5D%2C%22filterExpressions%22%3A%7B%7D%7D
+
+http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22columns%22%3A%5B%22%40values%22%5D%2C%22values%22%3A%5B%22price%22%5D%2C%22filterExpressions%22%3A%7B%7D%7D
+
 http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22columns%22%3A%5B%22customerType%22%2C%22customerGender%22%2C%22%40values%22%5D%2C%22values%22%3A%5B%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%22individual%22%2C%22organizational%22%5D%7D%2C%22customerGender%22%3A%7B%22dimension%22%3A%22customerGender%22%2C%22values%22%3A%5B%5D%7D%7D%7D
 
 http://127.0.0.1:8001/summary/page/d7aedf8d8f2812b74b5f0c02f35e3f07?parameters=%7B%22rows%22%3A%5B%22customerType%22%2C%22customerGender%22%5D%2C%22columns%22%3A%5B%22%40values%22%5D%2C%22values%22%3A%5B%22count%22%5D%2C%22filterExpressions%22%3A%7B%22customerType%22%3A%7B%22dimension%22%3A%22customerType%22%2C%22values%22%3A%5B%22individual%22%2C%22organizational%22%5D%7D%2C%22customerGender%22%3A%7B%22dimension%22%3A%22customerGender%22%2C%22values%22%3A%5B%5D%7D%7D%7D
