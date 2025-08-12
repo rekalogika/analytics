@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
-use Rekalogika\Analytics\Frontend\Util\HardcodedSubtotalDescriptionResolver;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -154,12 +153,11 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionality();
-        $cube = CubeAdapter::adapt($result->getCube());
+        $cubeAdapter = CubeAdapter::adapt($result->getCube());
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
         $table = PivotTableTransformer::transform(
-            cubeCell: $cube,
-            subtotalDescriptionResolver: new HardcodedSubtotalDescriptionResolver(),
+            cube: $cubeAdapter,
             unpivotedNodes: $unpivotedDimensions,
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
