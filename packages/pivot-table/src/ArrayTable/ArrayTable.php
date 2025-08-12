@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\ArrayTable;
 
-use Rekalogika\PivotTable\Contracts\Table;
+use Rekalogika\PivotTable\Contracts\Table\Table;
 
 final class ArrayTable implements Table
 {

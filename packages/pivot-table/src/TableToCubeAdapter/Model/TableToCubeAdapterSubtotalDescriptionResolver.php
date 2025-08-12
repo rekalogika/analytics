@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\TableToCubeAdapter\Model;
 
 use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
-use Rekalogika\PivotTable\Contracts\Table;
+use Rekalogika\PivotTable\Contracts\Table\Table;
 
 final readonly class TableToCubeAdapterSubtotalDescriptionResolver implements SubtotalDescriptionResolver
 {

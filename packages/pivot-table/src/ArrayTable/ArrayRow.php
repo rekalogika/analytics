@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\ArrayTable;
 
-use Rekalogika\PivotTable\Contracts\Row;
+use Rekalogika\PivotTable\Contracts\Table\Row;
 
 final class ArrayRow implements Row
 {

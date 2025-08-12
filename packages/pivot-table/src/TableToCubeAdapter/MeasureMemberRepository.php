@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\TableToCubeAdapter;
 
-use Rekalogika\PivotTable\Contracts\Table;
+use Rekalogika\PivotTable\Contracts\Table\Table;
 use Rekalogika\PivotTable\TableToCubeAdapter\Model\TableToCubeAdapterMeasureMember;
 
 final class MeasureMemberRepository

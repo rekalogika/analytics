@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\Contracts;
+namespace Rekalogika\PivotTable\Contracts\Table;
 
 /**
  * Represents a row in a result set, containing dimensions and measures. The
