@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
-use Rekalogika\PivotTable\TableFramework\Cube;
 
 final class HorizontalBlockGroup extends BlockGroup
 {
@@ -58,6 +58,12 @@ final class HorizontalBlockGroup extends BlockGroup
     public function getDataRows(): DefaultRows
     {
         $context = $this->getElementContext();
+        $nextKey = $this->getContext()->getNextKey();
+
+        if ($nextKey === null) {
+            throw new \RuntimeException('Next key is not set in the context.');
+        }
+
         $dataRows = new DefaultRows([], $context);
         $prototypeCubes = $this->getPrototypeCubes();
 
@@ -70,7 +76,7 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     /**
-     * @return non-empty-list<Cube>
+     * @return non-empty-list<CubeDecorator>
      */
     private function getPrototypeCubes(): array
     {
@@ -81,12 +87,14 @@ final class HorizontalBlockGroup extends BlockGroup
         if ($firstPivoted === null || !$existsInTuple) {
             $result = $this->getContext()
                 ->getApexCube()
-                ->drillDown($this->getChildKey(), false);
+                ->drillDownWithoutBalancing($this->getChildKey());
         } else {
             $result = $this->getCube()
                 ->rollUpAllExcept([$firstPivoted])
-                ->drillDown($this->getChildKey(), false);
+                ->drillDownWithoutBalancing($this->getChildKey());
         }
+
+        $result = array_values(iterator_to_array($result));
 
         if ($result === []) {
             throw new \RuntimeException(\sprintf(

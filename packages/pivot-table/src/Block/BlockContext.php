@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\Block\Model\CubeDecorator;
 
 final readonly class BlockContext
 {
@@ -29,7 +29,7 @@ final readonly class BlockContext
      * @param int<0,max> $blockDepth 0 is the root block, 1 is the child of the root block, and so on.
      */
     public function __construct(
-        private Cube $apexCube,
+        private CubeDecorator $apexCube,
         array $unpivotedKeys,
         array $pivotedKeys,
         private array $skipLegends,
@@ -213,7 +213,7 @@ final readonly class BlockContext
         return $this->blockDepth;
     }
 
-    public function getApexCube(): Cube
+    public function getApexCube(): CubeDecorator
     {
         return $this->apexCube;
     }

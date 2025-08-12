@@ -46,6 +46,10 @@ final readonly class TableAdapter implements PivotTableTable
         $legends = [];
 
         foreach ($result->getAllCubes() as $cube) {
+            if ($cube->getTuple()->has('@values')) {
+                continue;
+            }
+
             $rowAdapter = new RowAdapter($cube, $this->propertyMap);
             $rows[] = $rowAdapter;
             $legends = array_merge($legends, $rowAdapter->getLegends());

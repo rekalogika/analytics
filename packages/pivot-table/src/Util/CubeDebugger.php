@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\PivotTable\Util;
 
 use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
-use Rekalogika\PivotTable\TableFramework\Cube;
+use Rekalogika\PivotTable\Contracts\Cube\Cube;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final readonly class CubeDebugger

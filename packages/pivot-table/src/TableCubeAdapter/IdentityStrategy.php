@@ -11,15 +11,17 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\PivotTable\TableFramework;
+namespace Rekalogika\PivotTable\TableCubeAdapter;
+
+use Rekalogika\PivotTable\TableCubeAdapter\Model\TableCubeAdapterDimension;
 
 interface IdentityStrategy
 {
-    public function getMemberSignature(mixed $member): string;
-
     /**
-     * @param array<string,mixed> $members
+     * @param array<string,TableCubeAdapterDimension> $tuple
      * @return string
      */
-    public function getMembersSignature(array $members): string;
+    public function getTupleSignature(array $tuple): string;
+
+    public function getMemberSignature(mixed $member): string;
 }
