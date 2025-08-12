@@ -24,6 +24,6 @@ final readonly class HardcodedSubtotalDescriptionResolver implements SubtotalDes
     #[\Override]
     public function getSubtotalDescription(string $dimensionName): mixed
     {
-        return new TranslatableMessage('Subtotal');
+        return new TranslatableMessage('Total');
     }
 }

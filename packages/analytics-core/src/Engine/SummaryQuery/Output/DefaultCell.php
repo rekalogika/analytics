@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
@@ -95,8 +94,7 @@ final class DefaultCell implements CubeCell
 
         return $this->context
             ->getCellRepository()
-            ->getCellByTuple($rolledUpTuple)
-            ?? throw new UnexpectedValueException('Roll-up cell must always exists.');
+            ->getCellByTuple($rolledUpTuple);
     }
 
     #[\Override]
@@ -110,7 +108,7 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
-    public function slice(string $dimensionName, mixed $member): ?CubeCell
+    public function slice(string $dimensionName, mixed $member): CubeCell
     {
         return $this->context
             ->getCellRepository()

@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
-use Rekalogika\Analytics\PivotTable\Model\Table\MeasureValue;
+use Rekalogika\Analytics\PivotTable\Model\Cube\MeasureValue;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

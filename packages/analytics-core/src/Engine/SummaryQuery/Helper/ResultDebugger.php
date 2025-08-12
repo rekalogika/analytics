@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
@@ -121,6 +122,23 @@ final readonly class ResultDebugger
         }
 
         return $result;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public static function debugCubeCell(CubeCell $cubeCell): array
+    {
+        $tuple = $cubeCell->getTuple();
+        $measures = $cubeCell->getMeasures();
+
+        $tupleDebug = self::debugTuple($tuple);
+        $measuresDebug = self::debugMeasures($measures);
+
+        return [
+            'tuple' => $tupleDebug,
+            'measures' => $measuresDebug,
+        ];
     }
 
     // /**

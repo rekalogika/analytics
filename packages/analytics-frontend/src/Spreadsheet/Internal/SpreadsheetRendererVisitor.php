@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Spreadsheet\Internal;
 
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
-use Rekalogika\Analytics\PivotTable\Model\Table\DimensionProperty;
+use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionProperty;
 use Rekalogika\PivotTable\Table\Cell;
 use Rekalogika\PivotTable\Table\DataCell;
 use Rekalogika\PivotTable\Table\FooterCell;

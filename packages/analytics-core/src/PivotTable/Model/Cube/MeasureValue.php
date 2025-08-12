@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\Table;
+namespace Rekalogika\Analytics\PivotTable\Model\Cube;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
@@ -39,10 +39,7 @@ final readonly class MeasureValue implements Value
         return $this->cell
             ->getMeasures()
             ->get($this->measureName)
-            ?->getValue()
-            ?? throw new InvalidArgumentException(
-                \sprintf('Measure "%s" not found in the row.', $this->measureName),
-            );
+            ?->getValue();
     }
 
     public function getCell(): CubeCell

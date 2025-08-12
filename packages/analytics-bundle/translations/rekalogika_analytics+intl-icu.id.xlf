@@ -373,5 +373,29 @@
         <target>Jumlah</target>
       </segment>
     </unit>
+    <unit id="USWuCoK" name="AND">
+      <segment>
+        <source>AND</source>
+        <target>DAN</target>
+      </segment>
+    </unit>
+    <unit id="ZnsTOYp" name="OR">
+      <segment>
+        <source>OR</source>
+        <target>ATAU</target>
+      </segment>
+    </unit>
+    <unit id="rfZ00.K" name="NOT">
+      <segment>
+        <source>NOT</source>
+        <target>BUKAN</target>
+      </segment>
+    </unit>
+    <unit id="LnABqct">
+      <segment>
+        <source>An error occurred. Please try again later and contact technical support if the problem persists.</source>
+        <target>Telah terjadi kesalahan. Coba kembali beberapa saat lagi dan hubungi dukungan teknis apabila masalah masih terjadi.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>
