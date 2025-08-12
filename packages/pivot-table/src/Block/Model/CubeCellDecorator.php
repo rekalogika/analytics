@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block\Model;
 
-use Rekalogika\PivotTable\Contracts\Cube\Cube;
+use Rekalogika\PivotTable\Contracts\Cube\CubeCell;
 use Rekalogika\PivotTable\Contracts\Cube\Dimension;
 use Rekalogika\PivotTable\Contracts\Cube\MeasureMember;
 use Rekalogika\PivotTable\Contracts\Cube\SubtotalDescriptionResolver;
 
-final readonly class CubeDecorator implements Cube
+final readonly class CubeCellDecorator implements CubeCell
 {
     public function __construct(
-        private Cube $cube,
+        private CubeCell $cubeCell,
         private SubtotalDescriptionResolver $subtotalDescriptionResolver,
         private ?string $subtotalKey = null,
     ) {}
@@ -29,7 +29,7 @@ final readonly class CubeDecorator implements Cube
     public function asSubtotal(string $key): self
     {
         return new self(
-            cube: $this->cube,
+            cubeCell: $this->cubeCell,
             subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
             subtotalKey: $key,
         );
@@ -43,19 +43,19 @@ final readonly class CubeDecorator implements Cube
     #[\Override]
     public function isNull(): bool
     {
-        return $this->cube->isNull();
+        return $this->cubeCell->isNull();
     }
 
     #[\Override]
     public function getTuple(): array
     {
         if ($this->subtotalKey === null) {
-            return $this->cube->getTuple();
+            return $this->cubeCell->getTuple();
         }
 
         $tuple = [];
 
-        foreach ($this->cube->getTuple() as $key => $value) {
+        foreach ($this->cubeCell->getTuple() as $key => $value) {
             $tuple[$key] = $value;
         }
 
@@ -65,7 +65,7 @@ final readonly class CubeDecorator implements Cube
     #[\Override]
     public function getValue(): mixed
     {
-        return $this->cube->getValue();
+        return $this->cubeCell->getValue();
     }
 
     private function getDimension(string $name): Dimension
@@ -107,10 +107,10 @@ final readonly class CubeDecorator implements Cube
     #[\Override]
     public function slice(string $dimensionName, mixed $member): self
     {
-        $result = $this->cube->slice($dimensionName, $member);
+        $result = $this->cubeCell->slice($dimensionName, $member);
 
         return new self(
-            cube: $result,
+            cubeCell: $result,
             subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
         );
     }
@@ -118,11 +118,11 @@ final readonly class CubeDecorator implements Cube
     #[\Override]
     public function drillDown(string $dimensionName): iterable
     {
-        $cubes = $this->cube->drillDown($dimensionName);
+        $cubes = $this->cubeCell->drillDown($dimensionName);
 
         foreach ($cubes as $cube) {
             yield new self(
-                cube: $cube,
+                cubeCell: $cube,
                 subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
             );
         }
@@ -131,10 +131,10 @@ final readonly class CubeDecorator implements Cube
     #[\Override]
     public function rollUp(string $dimensionName): self
     {
-        $result = $this->cube->rollUp($dimensionName);
+        $result = $this->cubeCell->rollUp($dimensionName);
 
         return new self(
-            cube: $result,
+            cubeCell: $result,
             subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
         );
     }
@@ -153,7 +153,7 @@ final readonly class CubeDecorator implements Cube
         }
 
         return new self(
-            cube: $result,
+            cubeCell: $result,
             subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
         );
     }
@@ -163,7 +163,7 @@ final readonly class CubeDecorator implements Cube
      */
     public function drillDownWithoutBalancing(string $dimensionName): iterable
     {
-        $cubes = $this->cube->drillDown($dimensionName);
+        $cubes = $this->cubeCell->drillDown($dimensionName);
 
         foreach ($cubes as $cube) {
             if ($cube->isNull()) {
@@ -171,22 +171,22 @@ final readonly class CubeDecorator implements Cube
             }
 
             yield new self(
-                cube: $cube,
+                cubeCell: $cube,
                 subtotalDescriptionResolver: $this->subtotalDescriptionResolver,
             );
         }
     }
 
     /**
-     * @param list<Cube> $prototypeCubes
+     * @param list<CubeCell> $prototypeCubeCells
      * @return iterable<self>
      */
     public function drillDownWithPrototypes(
         string $dimensionName,
-        array $prototypeCubes,
+        array $prototypeCubeCells,
     ): iterable {
-        foreach ($prototypeCubes as $prototypeCube) {
-            $tuple = $prototypeCube->getTuple();
+        foreach ($prototypeCubeCells as $prototypeCubeCell) {
+            $tuple = $prototypeCubeCell->getTuple();
             $dimension = $tuple[$dimensionName]
                 ?? throw new \InvalidArgumentException("Dimension '$dimensionName' not found in prototype cube.");
 

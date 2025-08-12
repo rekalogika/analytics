@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Model\CubeDecorator;
-use Rekalogika\PivotTable\Contracts\Cube\Cube;
+use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultContext;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 use Rekalogika\PivotTable\Implementation\Table\DefaultTable;
@@ -57,7 +56,7 @@ abstract class Block implements \Stringable
         return $this->context->getBlockDepth();
     }
 
-    final protected function createBlock(CubeDecorator $cube): Block
+    final protected function createBlock(CubeCellDecorator $cube): Block
     {
         $context = $this->getContext();
         $context = $context->pushKey();
@@ -115,21 +114,21 @@ abstract class Block implements \Stringable
      * @param list<string> $createSubtotals
      */
     final public static function new(
-        CubeDecorator $cube,
+        CubeCellDecorator $cubeCell,
         array $unpivotedNodes = [],
         array $pivotedNodes = [],
         array $skipLegends = ['@values'],
         array $createSubtotals = [],
     ): Block {
         $context = new BlockContext(
-            apexCube: $cube,
+            apexCubeCell: $cubeCell,
             unpivotedKeys: $unpivotedNodes,
             pivotedKeys: $pivotedNodes,
             skipLegends: $skipLegends,
             createSubtotals: $createSubtotals,
         );
 
-        return new RootBlock($cube, $context);
+        return new RootBlock($cubeCell, $context);
     }
 
     final protected function getContext(): BlockContext

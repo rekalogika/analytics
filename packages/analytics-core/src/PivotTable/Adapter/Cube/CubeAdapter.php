@@ -18,20 +18,20 @@ use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionMember;
 use Rekalogika\Analytics\PivotTable\Util\PropertyMap;
-use Rekalogika\PivotTable\Contracts\Cube\Cube;
+use Rekalogika\PivotTable\Contracts\Cube\CubeCell as PivotTableCubeCell;
 
-final readonly class CubeAdapter implements Cube
+final readonly class CubeAdapter implements PivotTableCubeCell
 {
-    public static function adapt(CubeCell $cell): self
+    public static function adapt(CubeCell $cubeCell): self
     {
         return new self(
-            cell: $cell,
+            cubeCell: $cubeCell,
             propertyMap: new PropertyMap(),
         );
     }
 
     private function __construct(
-        private CubeCell $cell,
+        private CubeCell $cubeCell,
         private PropertyMap $propertyMap,
     ) {}
 
@@ -40,7 +40,7 @@ final readonly class CubeAdapter implements Cube
     {
         $tuple = [];
 
-        foreach ($this->cell->getTuple() as $key => $dimension) {
+        foreach ($this->cubeCell->getTuple() as $key => $dimension) {
             $tuple[$key] = $this->propertyMap->getDimension($dimension);
         }
 
@@ -49,7 +49,7 @@ final readonly class CubeAdapter implements Cube
 
     private function getMeasureName(): ?string
     {
-        $measureMember = $this->cell
+        $measureMember = $this->cubeCell
             ->getTuple()
             ->get('@values')
             ?->getRawMember();
@@ -77,18 +77,18 @@ final readonly class CubeAdapter implements Cube
         }
 
         return $this->propertyMap
-            ->getMeasureValue($this->cell)
+            ->getMeasureValue($this->cubeCell)
             ->withMeasureName($measureName);
     }
 
     #[\Override]
     public function isNull(): bool
     {
-        return $this->cell->isNull();
+        return $this->cubeCell->isNull();
     }
 
     #[\Override]
-    public function slice(string $dimensionName, mixed $member): Cube
+    public function slice(string $dimensionName, mixed $member): self
     {
         if ($member instanceof DimensionMember) {
             /** @psalm-suppress MixedAssignment */
@@ -101,10 +101,10 @@ final readonly class CubeAdapter implements Cube
             );
         }
 
-        $result = $this->cell->slice($dimensionName, $member);
+        $result = $this->cubeCell->slice($dimensionName, $member);
 
         return new self(
-            cell: $result,
+            cubeCell: $result,
             propertyMap: $this->propertyMap,
         );
     }
@@ -112,23 +112,23 @@ final readonly class CubeAdapter implements Cube
     #[\Override]
     public function drillDown(string $dimensionName): iterable
     {
-        $result = $this->cell->drillDown($dimensionName);
+        $result = $this->cubeCell->drillDown($dimensionName);
 
         foreach ($result as $cube) {
             yield new self(
-                cell: $cube,
+                cubeCell: $cube,
                 propertyMap: $this->propertyMap,
             );
         }
     }
 
     #[\Override]
-    public function rollUp(string $dimensionName): Cube
+    public function rollUp(string $dimensionName): self
     {
-        $result = $this->cell->rollUp($dimensionName);
+        $result = $this->cubeCell->rollUp($dimensionName);
 
         return new self(
-            cell: $result,
+            cubeCell: $result,
             propertyMap: $this->propertyMap,
         );
     }

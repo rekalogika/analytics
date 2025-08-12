@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Model\CubeDecorator;
+use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultHeaderCell;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
@@ -74,7 +74,7 @@ final class HorizontalBlockGroup extends BlockGroup
     }
 
     /**
-     * @return non-empty-list<CubeDecorator>
+     * @return non-empty-list<CubeCellDecorator>
      */
     #[\Override]
     protected function createPrototypeCubes(): array
@@ -85,7 +85,7 @@ final class HorizontalBlockGroup extends BlockGroup
 
         if ($firstPivoted === null || !$existsInTuple) {
             $result = $this->getContext()
-                ->getApexCube()
+                ->getApexCubeCell()
                 ->drillDownWithoutBalancing($this->getChildKey());
         } else {
             $result = $this->getCube()

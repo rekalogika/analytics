@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Contracts\Cube;
 
-interface Cube
+interface CubeCell
 {
     /**
      * @return array<string,Dimension>
@@ -24,12 +24,12 @@ interface Cube
 
     public function isNull(): bool;
 
-    public function slice(string $dimensionName, mixed $member): Cube;
+    public function slice(string $dimensionName, mixed $member): CubeCell;
 
     /**
-     * @return iterable<Cube>
+     * @return iterable<CubeCell>
      */
     public function drillDown(string $dimensionName): iterable;
 
-    public function rollUp(string $dimensionName): Cube;
+    public function rollUp(string $dimensionName): CubeCell;
 }

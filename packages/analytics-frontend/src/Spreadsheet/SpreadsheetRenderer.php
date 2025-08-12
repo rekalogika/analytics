@@ -68,7 +68,7 @@ final readonly class SpreadsheetRenderer
         $cube = CubeAdapter::adapt($result->getCube());
 
         $table = PivotTableTransformer::transform(
-            cube: $cube,
+            cubeCell: $cube,
             subtotalDescriptionResolver: new HardcodedSubtotalDescriptionResolver(),
             pivotedNodes: $pivotedDimensions,
             skipLegends: ['@values'],
