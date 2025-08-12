@@ -50,6 +50,6 @@ final readonly class CubeAdapter implements PivotTableCube
     #[\Override]
     public function getSubtotalDescription(string $dimensionName): mixed
     {
-        return new TranslatableMessage('Subtotal');
+        return new TranslatableMessage('Total');
     }
 }
