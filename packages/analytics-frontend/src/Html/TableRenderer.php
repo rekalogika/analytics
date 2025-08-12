@@ -158,7 +158,7 @@ final readonly class TableRenderer
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
         $table = PivotTableTransformer::transform(
-            cube: $cube,
+            cubeCell: $cube,
             subtotalDescriptionResolver: new HardcodedSubtotalDescriptionResolver(),
             unpivotedNodes: $unpivotedDimensions,
             pivotedNodes: $pivotedDimensions,

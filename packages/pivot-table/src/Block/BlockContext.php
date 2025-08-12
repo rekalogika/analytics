@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Model\CubeDecorator;
+use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
 
 final readonly class BlockContext
 {
@@ -29,7 +29,7 @@ final readonly class BlockContext
      * @param int<0,max> $blockDepth 0 is the root block, 1 is the child of the root block, and so on.
      */
     public function __construct(
-        private CubeDecorator $apexCube,
+        private CubeCellDecorator $apexCubeCell,
         array $unpivotedKeys,
         array $pivotedKeys,
         private array $skipLegends,
@@ -52,7 +52,7 @@ final readonly class BlockContext
     public function incrementSubtotal(): self
     {
         return new self(
-            apexCube: $this->apexCube,
+            apexCubeCell: $this->apexCubeCell,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -69,7 +69,7 @@ final readonly class BlockContext
     public function incrementBlockDepth(int $amount): self
     {
         return new self(
-            apexCube: $this->apexCube,
+            apexCubeCell: $this->apexCubeCell,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $this->keys->getCurrentKeyPath(),
@@ -88,7 +88,7 @@ final readonly class BlockContext
         );
 
         return new self(
-            apexCube: $this->apexCube,
+            apexCubeCell: $this->apexCubeCell,
             pivotedKeys: $this->keys->getPivotedKeys(),
             unpivotedKeys: $this->keys->getUnpivotedKeys(),
             currentKeyPath: $newPath,
@@ -213,8 +213,8 @@ final readonly class BlockContext
         return $this->blockDepth;
     }
 
-    public function getApexCube(): CubeDecorator
+    public function getApexCubeCell(): CubeCellDecorator
     {
-        return $this->apexCube;
+        return $this->apexCubeCell;
     }
 }

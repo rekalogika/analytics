@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Model\CubeDecorator;
+use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
 use Rekalogika\PivotTable\Implementation\Table\DefaultRows;
 
 final class RootBlock extends BranchBlock
@@ -21,7 +21,7 @@ final class RootBlock extends BranchBlock
     private bool $isEmpty;
 
     protected function __construct(
-        CubeDecorator $cube,
+        CubeCellDecorator $cube,
         BlockContext $context,
     ) {
         parent::__construct(

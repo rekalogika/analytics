@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Block;
 
-use Rekalogika\PivotTable\Block\Model\CubeDecorator;
+use Rekalogika\PivotTable\Block\Model\CubeCellDecorator;
 
 abstract class BlockGroup extends Block
 {
     public function __construct(
-        private readonly CubeDecorator $cube,
+        private readonly CubeCellDecorator $cube,
         BlockContext $context,
     ) {
         parent::__construct($context);
     }
 
-    protected function getCube(): CubeDecorator
+    protected function getCube(): CubeCellDecorator
     {
         return $this->cube;
     }
@@ -35,7 +35,7 @@ abstract class BlockGroup extends Block
             ?? throw new \RuntimeException('Next key is not set.');
     }
 
-    protected function getSubtotalCube(): ?CubeDecorator
+    protected function getSubtotalCube(): ?CubeCellDecorator
     {
         $childKey = $this->getChildKey();
 
@@ -57,12 +57,12 @@ abstract class BlockGroup extends Block
     //
 
     /**
-     * @var null|list<CubeDecorator>
+     * @var null|list<CubeCellDecorator>
      */
     private ?array $childCubes = null;
 
     /**
-     * @return list<CubeDecorator>
+     * @return list<CubeCellDecorator>
      */
     protected function getChildCubes(): array
     {
@@ -77,7 +77,7 @@ abstract class BlockGroup extends Block
         } else {
             $children = $this->cube->drillDownWithPrototypes(
                 dimensionName: $this->getChildKey(),
-                prototypeCubes: $prototypeCubes,
+                prototypeCubeCells: $prototypeCubes,
             );
         }
 
@@ -94,7 +94,7 @@ abstract class BlockGroup extends Block
         return $this->childCubes = array_values($children);
     }
 
-    protected function getOneChildCube(): CubeDecorator
+    protected function getOneChildCube(): CubeCellDecorator
     {
         foreach ($this->getChildCubes() as $childNode) {
             return $childNode;
@@ -157,12 +157,12 @@ abstract class BlockGroup extends Block
     //
 
     /**
-     * @var null|list<CubeDecorator>
+     * @var null|list<CubeCellDecorator>
      */
     private ?array $prototypeCubes = null;
 
     /**
-     * @return list<CubeDecorator>
+     * @return list<CubeCellDecorator>
      */
     final protected function getPrototypeCubes(): array
     {
@@ -172,7 +172,7 @@ abstract class BlockGroup extends Block
     /**
      * Returns empty if no prototype cubes are defined.
      *
-     * @return list<CubeDecorator>
+     * @return list<CubeCellDecorator>
      */
     abstract protected function createPrototypeCubes(): array;
 }

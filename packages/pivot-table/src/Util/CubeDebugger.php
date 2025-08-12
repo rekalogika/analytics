@@ -13,21 +13,19 @@ declare(strict_types=1);
 
 namespace Rekalogika\PivotTable\Util;
 
-use Rekalogika\Analytics\Contracts\Translation\NullTranslator;
-use Rekalogika\PivotTable\Contracts\Cube\Cube;
-use Symfony\Contracts\Translation\TranslatableInterface;
+use Rekalogika\PivotTable\Contracts\Cube\CubeCell;
 
 final readonly class CubeDebugger
 {
     /**
      * @return array<string,mixed>
      */
-    public static function debug(Cube $cube): array
+    public static function debug(CubeCell $cubeCell): array
     {
-        return (new self($cube))->toArray();
+        return (new self($cubeCell))->toArray();
     }
 
-    public function __construct(private Cube $cube) {}
+    public function __construct(private CubeCell $cubeCell) {}
 
     /**
      * @return array<string,mixed>
@@ -35,8 +33,8 @@ final readonly class CubeDebugger
     public function toArray(): array
     {
         $result = [
-            'tuple' => $this->normalizeItem($this->cube->getTuple()),
-            'value' => $this->normalizeItem($this->cube->getValue()),
+            'tuple' => $this->normalizeItem($this->cubeCell->getTuple()),
+            'value' => $this->normalizeItem($this->cubeCell->getValue()),
         ];
 
         return $result;
@@ -77,10 +75,10 @@ final readonly class CubeDebugger
         }
 
         // @phpstan-ignore phpat.testPackageRekalogikaPivotTable
-        if ($item instanceof TranslatableInterface) {
-            // @phpstan-ignore phpat.testPackageRekalogikaPivotTable
-            return $item->trans(new NullTranslator());
-        }
+        // if ($item instanceof TranslatableInterface) {
+        //     // @phpstan-ignore phpat.testPackageRekalogikaPivotTable
+        //     return $item->trans(new NullTranslator());
+        // }
 
         return \sprintf(
             '%s(%s)',
