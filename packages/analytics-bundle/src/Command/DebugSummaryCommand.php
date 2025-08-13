@@ -285,8 +285,6 @@ final class DebugSummaryCommand extends Command
         SymfonyStyle $io,
         DecomposedQuery $query,
     ): void {
-        $io->section('SQL Query');
-
         $io->writeln(\sprintf(
             '<info>%s;</info>',
             $query->getSql(),
@@ -315,7 +313,7 @@ final class DebugSummaryCommand extends Command
             ];
         }
 
-        $io->section('Parameters');
+        $io->writeln('');
         $io->table(['Key', 'Value', 'Type'], $parameters);
     }
 }

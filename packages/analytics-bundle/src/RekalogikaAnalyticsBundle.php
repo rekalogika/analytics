@@ -25,6 +25,7 @@ use Rekalogika\Analytics\Core\Doctrine\Function\IsNotNullFunction;
 use Rekalogika\Analytics\Core\Doctrine\Function\IsNullFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
+use Rekalogika\Analytics\Engine\Doctrine\Function\NullFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
@@ -173,6 +174,7 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             'REKALOGIKA_IS_NULL' => IsNullFunction::class,
             'REKALOGIKA_IS_NOT_NULL' => IsNotNullFunction::class,
             'REKALOGIKA_IN' => InFunction::class,
+            'REKALOGIKA_NULL' => NullFunction::class,
         ];
 
         $numericFunctions = [

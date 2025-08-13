@@ -14,73 +14,37 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryRefresher\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
-use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
-use Rekalogika\Analytics\Engine\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Handler\PartitionHandler;
-use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
-use Rekalogika\Analytics\Engine\SummaryRefresher\ValueResolver\Bust;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
-use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
-use Rekalogika\DoctrineAdvancedGroupBy\Field;
+use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
+use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 
-final class RollUpSourceToSummaryQuery extends AbstractQuery implements SummaryRefresherQuery
+final class RollUpSourceToSummaryQuery implements SummaryRefresherQuery
 {
-    private Groupings $groupings;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
+        private EntityManagerInterface $entityManager,
         private readonly PartitionHandler $partitionManager,
         private readonly SummaryMetadata $summaryMetadata,
         private readonly string $insertSql,
-    ) {
-        $simpleQueryBuilder = new SimpleQueryBuilder(
-            entityManager: $entityManager,
-            from: $this->summaryMetadata->getSourceClass(),
-            alias: 'root',
-        );
-
-        $this->groupings = Groupings::create($this->summaryMetadata);
-
-        parent::__construct($simpleQueryBuilder);
-
-        $this->initialize();
-        $this->processPartition();
-        $this->processDimensions();
-        $this->processMeasures();
-        $this->processBoundary();
-        $this->processGroupings();
-        $this->processQueryBuilderModifier();
-    }
-
-    private function getGroupings(): Groupings
-    {
-        return $this->groupings;
-    }
+        private readonly ?Partition $start = null,
+        private readonly ?Partition $end = null,
+    ) {}
 
     #[\Override]
     public function withBoundary(Partition $start, Partition $end): static
     {
-        $clone = clone $this;
-
-        /** @psalm-suppress MixedAssignment */
-        $start = $clone->partitionManager
-            ->getLowerBoundSourceValueFromPartition($start);
-
-        /** @psalm-suppress MixedAssignment */
-        $end = $clone->partitionManager
-            ->getUpperBoundSourceValueFromPartition($end);
-
-        $clone->getSimpleQueryBuilder()
-            ->setParameter('startBoundary', $start)
-            ->setParameter('endBoundary', $end);
-
-        return $clone;
+        return new self(
+            entityManager: $this->entityManager,
+            partitionManager: $this->partitionManager,
+            summaryMetadata: $this->summaryMetadata,
+            insertSql: $this->insertSql,
+            start: $start,
+            end: $end,
+        );
     }
 
     /**
@@ -89,160 +53,80 @@ final class RollUpSourceToSummaryQuery extends AbstractQuery implements SummaryR
     #[\Override]
     public function getQueries(): iterable
     {
-        yield $this->createQuery();
-    }
+        // constants
+        // @todo make this configurable
 
-    private function initialize(): void
-    {
-        $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf(
-                "REKALOGIKA_NEXTVAL(%s)",
-                $this->summaryMetadata->getSummaryClass(),
-            ));
-    }
+        $maximumGroupingSets = 4000;
+        $maximumChunkSize = 4000;
 
-    private function processPartition(): void
-    {
-        $partitionMetadata = $this->summaryMetadata->getPartition();
-        $valueResolver = $partitionMetadata->getSource();
-        $partitionClass = $partitionMetadata->getPartitionClass();
-        $partitioningLevels = $partitionClass::getAllLevels();
-        $lowestLevel = min($partitioningLevels);
-
-        $function = $partitionClass::getClassifierExpression(
-            input: $valueResolver,
-            level: $lowestLevel,
-            context: new SourceQueryContext(
-                queryBuilder: $this->getSimpleQueryBuilder(),
-                summaryMetadata: $this->summaryMetadata,
-                partitionMetadata: $partitionMetadata,
-            ),
-        );
-
-        $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf(
-                '%s AS par_key',
-                $function,
-            ))
-            ->addSelect(\sprintf(
-                '%s AS par_level',
-                $lowestLevel,
-            ));
-    }
-
-    /**
-     * @see SourceExpressionVisitor::visitField()
-     */
-    private function processDimensions(): void
-    {
-        foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
-            $valueResolver = $dimensionMetadata->getValueResolver();
-            /** @psalm-suppress ImpureMethodCall */
-            $valueResolver = Bust::create($valueResolver);
-
-            $expression = $valueResolver->getExpression(
-                context: new SourceQueryContext(
-                    queryBuilder: $this->getSimpleQueryBuilder(),
-                    summaryMetadata: $this->summaryMetadata,
-                    dimensionMetadata: $dimensionMetadata,
-                ),
-            );
-
-            $alias = $dimensionMetadata->getDqlAlias();
-
-            $this->getSimpleQueryBuilder()
-                ->addSelect(\sprintf('%s AS %s', $expression, $alias));
-
-            $this->getGroupings()->registerExpression(
-                name: $dimensionMetadata->getName(),
-                expression: $expression,
-            );
-        }
-    }
-
-    private function processMeasures(): void
-    {
-        foreach ($this->summaryMetadata->getMeasures() as $measureMetadata) {
-            if ($measureMetadata->isVirtual()) {
-                continue;
-            }
-
-            $function = $measureMetadata->getFunction();
-
-            if (!$function instanceof SummarizableAggregateFunction) {
-                continue;
-            }
-
-            $expression = $function->getSourceToAggregateExpression(
-                context: new SourceQueryContext(
-                    queryBuilder: $this->getSimpleQueryBuilder(),
-                    summaryMetadata: $this->summaryMetadata,
-                    measureMetadata: $measureMetadata,
-                ),
-            );
-
-            $this->getSimpleQueryBuilder()->addSelect($expression);
-        }
-    }
-
-    private function processBoundary(): void
-    {
-        $partitionMetadata = $this->summaryMetadata->getPartition();
-        $valueResolver = $partitionMetadata->getSource();
-        $properties = $valueResolver->getInvolvedProperties();
-
-        if (\count($properties) !== 1) {
-            throw new UnexpectedValueException(\sprintf(
-                'Expected exactly one property, got %d',
-                \count($properties),
-            ));
-        }
-
-        $property = $properties[0];
-
-        $this->getSimpleQueryBuilder()
-            ->andWhere(\sprintf(
-                "%s >= :startBoundary",
-                $this->resolve($property),
-            ))
-            ->andWhere(\sprintf(
-                "%s < :endBoundary",
-                $this->resolve($property),
-            ));
-
-        $this->getSimpleQueryBuilder()
-            ->setParameter('startBoundary', '(placeholder) the start boundary')
-            ->setParameter('endBoundary', '(placeholder) the end boundary');
-    }
-
-    private function processQueryBuilderModifier(): void
-    {
-        $class = $this->summaryMetadata->getSummaryClass();
-
-        if (is_a($class, HasQueryBuilderModifier::class, true)) {
-            /** @psalm-suppress ImpureMethodCall */
-            $class::modifyQueryBuilder(
-                $this->getSimpleQueryBuilder()->getQueryBuilder(),
-            );
-        }
-    }
-
-    private function processGroupings(): void
-    {
-        $this->getSimpleQueryBuilder()
-            ->addSelect($this->getGroupings()->getExpression());
-    }
-
-    private function createQuery(): DecomposedQuery
-    {
-        $query = $this->getSimpleQueryBuilder()->getQuery();
+        // get the flattened grouping sets
 
         $groupBy = $this->summaryMetadata->getGroupByExpression();
-        $groupBy->add(new Field('par_key'));
-        $groupBy->add(new Field('par_level'));
-        $groupBy->apply($query);
 
-        return DecomposedQuery::createFromQuery($query)
-            ->prependSql($this->insertSql);
+        $flattened = $groupBy->flatten();
+        $groupingSet = iterator_to_array($flattened, false)[0]
+            ?? throw new UnexpectedValueException('Expected at least one grouping set after flattening.');
+
+        if (!$groupingSet instanceof GroupingSet) {
+            throw new UnexpectedValueException(\sprintf(
+                'Expected instance of %s, got %s',
+                GroupingSet::class,
+                \get_class($groupingSet),
+            ));
+        }
+
+        // if the count of grouping sets is below the maximum threshold, we pass
+        // the group by as is
+
+        if ($groupingSet->count() < $maximumGroupingSets) {
+            $worker = new RollUpSourceToSummaryQueryWorker(
+                entityManager: $this->entityManager,
+                partitionManager: $this->partitionManager,
+                summaryMetadata: $this->summaryMetadata,
+                insertSql: $this->insertSql,
+                groupBy: $groupBy,
+            );
+
+            if ($this->start !== null && $this->end !== null) {
+                $worker = $worker->withBoundary($this->start, $this->end);
+            }
+
+            yield from $worker->getQueries();
+            return;
+        }
+
+        // otherwise, we need to chunk the grouping sets into smaller batches
+
+        $count = $groupingSet->count();
+        $numberOfBatch = (int) ceil($count / $maximumChunkSize);
+        $numberPerBatch = (int) ceil($count / $numberOfBatch);
+
+        if ($numberPerBatch < 1) {
+            $numberPerBatch = 1;
+        }
+
+        $fieldSets = iterator_to_array($groupingSet, false);
+        $batches = array_chunk($fieldSets, $numberPerBatch);
+
+        foreach ($batches as $currentBatch) {
+            $currentGroupingSet = new GroupingSet(...$currentBatch);
+            $currentGroupBy = new GroupBy($currentGroupingSet);
+
+            $worker = new RollUpSourceToSummaryQueryWorker(
+                entityManager: $this->entityManager,
+                partitionManager: $this->partitionManager,
+                summaryMetadata: $this->summaryMetadata,
+                insertSql: $this->insertSql,
+                groupBy: $currentGroupBy,
+            );
+
+            if ($this->start !== null && $this->end !== null) {
+                $worker = $worker->withBoundary($this->start, $this->end);
+            }
+
+            foreach ($worker->getQueries() as $query) {
+                yield $query;
+            }
+        }
     }
 }

@@ -37,7 +37,15 @@ final class GroupingConcatFunction extends FunctionNode
         $args = [];
 
         foreach ($this->concatExpressions as $expression) {
-            $args[] = 'GROUPING(' . $sqlWalker->walkStringPrimary($expression) . ')::text';
+            $argument = $sqlWalker->walkStringPrimary($expression);
+
+            // __GROUPING__ is a special value to indicate the field is always
+            // grouped, because it is not in the group by clause.
+            if ($argument === "'__GROUPING__'") {
+                $args[] = "'1'";
+            } else {
+                $args[] = 'GROUPING(' . $argument . ')::text';
+            }
         }
 
         if ($args === []) {
