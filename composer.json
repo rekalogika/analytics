@@ -116,9 +116,9 @@
         }
     },
     "replace": {
-        "rekalogika/analytics-bundle": "0.27.0",
-        "rekalogika/analytics-core": "0.27.0",
-        "rekalogika/analytics-frontend": "0.27.0",
-        "rekalogika/analytics-ux-panel": "0.27.0"
+        "rekalogika/analytics-bundle": "0.28.0",
+        "rekalogika/analytics-core": "0.28.0",
+        "rekalogika/analytics-frontend": "0.28.0",
+        "rekalogika/analytics-ux-panel": "0.28.0"
     }
 }
