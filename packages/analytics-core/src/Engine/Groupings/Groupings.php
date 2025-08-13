@@ -30,6 +30,11 @@ final class Groupings
     private array $selected = [];
 
     /**
+     * @var array<string,true>
+     */
+    private array $fieldsInGroupBy = [];
+
+    /**
      * @var list<string>
      */
     private readonly array $groupingFields;
@@ -45,17 +50,26 @@ final class Groupings
         return new self($summaryMetadata);
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getGroupingFields(): array
+    //
+    // for rollups
+    //
+
+    public function registerFieldInGroupBy(string $name): void
     {
-        return $this->groupingFields;
+        $this->fieldsInGroupBy[$name] = true;
+    }
+
+    public function isInGroupBy(string $name): bool
+    {
+        return $this->fieldsInGroupBy[$name] ?? false;
     }
 
     public function registerExpression(string $name, string $expression): void
     {
-        if (\in_array($expression, $this->nameToExpression, true)) {
+        if (
+            $expression !== 'REKALOGIKA_NULL()' // exclude null expression
+            && \in_array($expression, $this->nameToExpression, true)
+        ) {
             $previousProperty = array_search($expression, $this->nameToExpression, true);
 
             if ($previousProperty === false) {
@@ -78,11 +92,15 @@ final class Groupings
         $grouping = [];
 
         foreach ($this->groupingFields as $groupingField) {
-            $expression = $this->nameToExpression[$groupingField]
-                ?? throw new LogicException(\sprintf(
-                    'Grouping field "%s" is not registered in the groupings. Make sure to register the expression for the grouping field before calling getExpression().',
-                    $groupingField,
-                ));
+            if ($this->isInGroupBy($groupingField)) {
+                $expression = $this->nameToExpression[$groupingField]
+                    ?? throw new LogicException(\sprintf(
+                        'Grouping field "%s" is not registered in the groupings. Make sure to register the expression for the grouping field before calling getExpression().',
+                        $groupingField,
+                    ));
+            } else {
+                $expression = "'__GROUPING__'";
+            }
 
             $grouping[$groupingField] = $expression;
         }
@@ -92,20 +110,19 @@ final class Groupings
         return 'REKALOGIKA_GROUPING_CONCAT(' . implode(', ', $grouping) . ')';
     }
 
+    //
+    // for queries
+    //
+
     public function addSelected(string $name): void
     {
         $this->selected[$name] = true;
     }
 
-    public function isSelected(string $name): bool
-    {
-        return isset($this->selected[$name]);
-    }
-
     /**
      * @return list<string> The names of the selected grouping fields.
      */
-    public function getSelected(): array
+    private function getSelected(): array
     {
         return array_keys($this->selected);
     }
