@@ -23,7 +23,6 @@ jobs:
                     - analytics-core
                     - analytics-ux-panel
                     - analytics-frontend
-                    - pivot-table
     
         steps:
             -   uses: actions/checkout@v5

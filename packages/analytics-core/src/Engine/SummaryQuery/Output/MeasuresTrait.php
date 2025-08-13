@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 trait MeasuresTrait
 {
