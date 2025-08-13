@@ -85,7 +85,7 @@
         "symfony/var-exporter": "^6.4.1 || ^6.5 || ^7.0",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0",
-        "symplify/monorepo-builder": "^11.2.20 || ^11.3",
+        "symplify/monorepo-builder": "^12.0",
         "vimeo/psalm": "^6.8",
         "zenstruck/foundry": "^2.0",
         "zenstruck/messenger-test": "^1.11"
