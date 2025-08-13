@@ -18,7 +18,7 @@
         "php": "^8.2",
         "doctrine/collections": "^2.2",
         "ozdemirburak/iris": "^3.1",
-        "phpoffice/phpspreadsheet": "^4.0",
+        "phpoffice/phpspreadsheet": "^4.0 || ^5.0",
         "rekalogika/analytics-core": "^0.26.1",
         "symfony/translation": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3",
