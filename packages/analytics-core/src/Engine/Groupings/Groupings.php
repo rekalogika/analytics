@@ -56,6 +56,10 @@ final class Groupings
 
     public function registerFieldInGroupBy(string $name): void
     {
+        if (str_starts_with($name, 'par_')) {
+            return; // skip partition fields
+        }
+
         $this->fieldsInGroupBy[$name] = true;
     }
 

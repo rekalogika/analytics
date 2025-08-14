@@ -11,7 +11,7 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryRefresher\Util;
+namespace Rekalogika\Analytics\Engine\Groupings;
 
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\Visitor\AbstractVisitor;

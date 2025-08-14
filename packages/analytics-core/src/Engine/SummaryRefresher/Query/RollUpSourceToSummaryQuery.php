@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Engine\Handler\PartitionHandler;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
+use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 
@@ -48,6 +49,7 @@ final class RollUpSourceToSummaryQuery implements SummaryRefresherQuery
     }
 
     /**
+     * @todo move some of the logic to metadata for performance
      * @return iterable<DecomposedQuery>
      */
     #[\Override]
@@ -79,6 +81,9 @@ final class RollUpSourceToSummaryQuery implements SummaryRefresherQuery
         // the group by as is
 
         if ($groupingSet->count() < $maximumGroupingSets) {
+            $groupBy->add(new Field('par_key'));
+            $groupBy->add(new Field('par_level'));
+
             $worker = new RollUpSourceToSummaryQueryWorker(
                 entityManager: $this->entityManager,
                 partitionManager: $this->partitionManager,
@@ -106,11 +111,16 @@ final class RollUpSourceToSummaryQuery implements SummaryRefresherQuery
         }
 
         $fieldSets = iterator_to_array($groupingSet, false);
+
+        // chunk the field sets into batches
+
         $batches = array_chunk($fieldSets, $numberPerBatch);
 
         foreach ($batches as $currentBatch) {
             $currentGroupingSet = new GroupingSet(...$currentBatch);
             $currentGroupBy = new GroupBy($currentGroupingSet);
+            $currentGroupBy->add(new Field('par_key'));
+            $currentGroupBy->add(new Field('par_level'));
 
             $worker = new RollUpSourceToSummaryQueryWorker(
                 entityManager: $this->entityManager,

@@ -20,16 +20,15 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Core\ValueResolver\NullValue;
+use Rekalogika\Analytics\Engine\Groupings\CollectAliasesInGroupByVisitor;
 use Rekalogika\Analytics\Engine\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Handler\PartitionHandler;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
-use Rekalogika\Analytics\Engine\SummaryRefresher\Util\CollectAliasesInGroupByVisitor;
 use Rekalogika\Analytics\Engine\SummaryRefresher\ValueResolver\Bust;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
-use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 
 final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements SummaryRefresherQuery
@@ -102,11 +101,7 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
     public function getQueries(): iterable
     {
         $query = $this->getSimpleQueryBuilder()->getQuery();
-
-        $groupBy = $this->groupBy;
-        $groupBy->add(new Field('par_key'));
-        $groupBy->add(new Field('par_level'));
-        $groupBy->apply($query);
+        $this->groupBy->apply($query);
 
         yield DecomposedQuery::createFromQuery($query)
             ->prependSql($this->insertSql);
@@ -128,6 +123,11 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
         $aliasesInGroupBy = $visitor->getAliases();
 
         foreach ($aliasesInGroupBy as $alias) {
+            if (str_starts_with($alias, 'par_')) {
+                // skip partition fields
+                continue;
+            }
+
             $dimensionMetadata = $this->summaryMetadata->getDimensionByAlias($alias);
             $name = $dimensionMetadata->getName();
 
