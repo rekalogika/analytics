@@ -183,14 +183,6 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getAllCubes(): iterable
-    {
-        return $this->getResultContext()
-            ->getCellRepository()
-            ->getAllCubes();
-    }
-
-    #[\Override]
     public function getTree(): DefaultTreeNode
     {
         return $this->tree ??= DefaultTreeNode::createRoot(
@@ -211,6 +203,16 @@ final class DefaultResult implements Result
             context: $this->getResultContext(),
             dimensionality: $dimensionality,
         );
+    }
+
+    #[\Override]
+    public function getCubesByDimensionality(array $dimensionality): iterable
+    {
+        $context = $this->getResultContext();
+
+        yield from $context
+            ->getCellRepository()
+            ->getCellsByDimensionality($dimensionality);
     }
 
     // private function hasHierarchicalOrdering(): bool

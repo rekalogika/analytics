@@ -19,9 +19,9 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
+use Rekalogika\PivotTable\Util\TableToHtmlTableTransformer;
 
 final readonly class SpreadsheetRenderer
 {
@@ -36,7 +36,7 @@ final readonly class SpreadsheetRenderer
     public function render(Result $result): Spreadsheet
     {
         $table = new TableAdapter($result->getTable());
-        $table = ResultSetToTableTransformer::transform($table);
+        $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);
 

@@ -15,16 +15,16 @@ namespace Rekalogika\Analytics\Frontend\Spreadsheet\Internal;
 
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\PivotTable\Model\Cube\DimensionProperty;
-use Rekalogika\PivotTable\Table\Cell;
-use Rekalogika\PivotTable\Table\DataCell;
-use Rekalogika\PivotTable\Table\FooterCell;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Table;
-use Rekalogika\PivotTable\Table\TableBody;
-use Rekalogika\PivotTable\Table\TableFooter;
-use Rekalogika\PivotTable\Table\TableHeader;
-use Rekalogika\PivotTable\Table\TableVisitor;
+use Rekalogika\PivotTable\HtmlTable\Cell;
+use Rekalogika\PivotTable\HtmlTable\DataCell;
+use Rekalogika\PivotTable\HtmlTable\FooterCell;
+use Rekalogika\PivotTable\HtmlTable\HeaderCell;
+use Rekalogika\PivotTable\HtmlTable\Row;
+use Rekalogika\PivotTable\HtmlTable\Table;
+use Rekalogika\PivotTable\HtmlTable\TableBody;
+use Rekalogika\PivotTable\HtmlTable\TableFooter;
+use Rekalogika\PivotTable\HtmlTable\TableHeader;
+use Rekalogika\PivotTable\HtmlTable\TableVisitor;
 
 /**
  * @internal
