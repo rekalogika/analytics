@@ -17,9 +17,9 @@ use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
-use Rekalogika\Analytics\PivotTable\Adapter\ResultSet\TableAdapter;
+use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
-use Rekalogika\PivotTable\Util\ResultSetToTableTransformer;
+use Rekalogika\PivotTable\Util\TableToHtmlTableTransformer;
 use Twig\Environment;
 
 final readonly class TableRenderer
@@ -172,7 +172,7 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $table = new TableAdapter($result->getTable());
-        $table = ResultSetToTableTransformer::transform($table);
+        $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);
     }

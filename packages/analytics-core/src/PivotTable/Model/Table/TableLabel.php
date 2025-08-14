@@ -11,13 +11,13 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\PivotTable\Model\Label;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-final readonly class ResultSetLabel extends ResultSetProperty implements Label
+final readonly class TableLabel extends TableProperty implements Label
 {
     #[\Override]
     public function getContent(): TranslatableInterface

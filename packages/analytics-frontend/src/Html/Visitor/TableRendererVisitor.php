@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html\Visitor;
 
-use Rekalogika\PivotTable\Table\Cell;
-use Rekalogika\PivotTable\Table\DataCell;
-use Rekalogika\PivotTable\Table\Element;
-use Rekalogika\PivotTable\Table\FooterCell;
-use Rekalogika\PivotTable\Table\HeaderCell;
-use Rekalogika\PivotTable\Table\Row;
-use Rekalogika\PivotTable\Table\Table;
-use Rekalogika\PivotTable\Table\TableBody;
-use Rekalogika\PivotTable\Table\TableFooter;
-use Rekalogika\PivotTable\Table\TableHeader;
-use Rekalogika\PivotTable\Table\TableVisitor;
+use Rekalogika\PivotTable\HtmlTable\Cell;
+use Rekalogika\PivotTable\HtmlTable\DataCell;
+use Rekalogika\PivotTable\HtmlTable\Element;
+use Rekalogika\PivotTable\HtmlTable\FooterCell;
+use Rekalogika\PivotTable\HtmlTable\HeaderCell;
+use Rekalogika\PivotTable\HtmlTable\Row;
+use Rekalogika\PivotTable\HtmlTable\Table;
+use Rekalogika\PivotTable\HtmlTable\TableBody;
+use Rekalogika\PivotTable\HtmlTable\TableFooter;
+use Rekalogika\PivotTable\HtmlTable\TableHeader;
+use Rekalogika\PivotTable\HtmlTable\TableVisitor;
 use Twig\Environment;
 use Twig\TemplateWrapper;
 

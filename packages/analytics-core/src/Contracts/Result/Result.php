@@ -39,8 +39,6 @@ interface Result
 
     public function getTree(): TreeNode;
 
-    // public function getNormalTable(): NormalTable;
-
     public function getTable(): Table;
 
     /**
@@ -49,7 +47,10 @@ interface Result
     public function getCube(): CubeCell;
 
     /**
+     * Gets all cubes of the specified dimensionality in the result.
+     *
+     * @param list<string> $dimensionality
      * @return iterable<CubeCell>
      */
-    public function getAllCubes(): iterable;
+    public function getCubesByDimensionality(array $dimensionality): iterable;
 }

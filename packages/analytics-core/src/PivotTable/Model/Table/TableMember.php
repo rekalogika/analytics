@@ -11,8 +11,8 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
-use Rekalogika\Analytics\PivotTable\Model\Value;
+use Rekalogika\Analytics\PivotTable\Model\Member;
 
-final readonly class ResultSetValue extends ResultSetProperty implements Value {}
+final readonly class TableMember extends TableProperty implements Member {}

@@ -11,11 +11,11 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\PivotTable\Model\ResultSet;
+namespace Rekalogika\Analytics\PivotTable\Model\Table;
 
 use Rekalogika\Analytics\PivotTable\Model\Property;
 
-abstract readonly class ResultSetProperty implements Property
+abstract readonly class TableProperty implements Property
 {
     final public function __construct(private mixed $value) {}
 
