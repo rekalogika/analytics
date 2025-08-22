@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
+use Rekalogika\Analytics\Frontend\Util\FrontendUtil;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -155,7 +156,11 @@ final readonly class TableRenderer
         $dimensions = $result->getDimensionality();
         $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
-        $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
+
+        $unpivotedDimensions = FrontendUtil::getUnpivotedDimensions(
+            dimensions: $dimensions,
+            pivotedDimensions: $pivotedDimensions,
+        );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
