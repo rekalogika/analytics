@@ -68,9 +68,9 @@ final readonly class SpreadsheetRenderer
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
-            pivotedNodes: $pivotedDimensions,
+            pivoted: $pivotedDimensions,
             skipLegends: ['@values'],
-            createSubtotals: $dimensions,
+            withSubtotal: $dimensions,
         );
 
         $html = $this->visitor->visitTable($table);
