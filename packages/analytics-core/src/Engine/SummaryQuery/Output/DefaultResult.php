@@ -80,6 +80,12 @@ final class DefaultResult implements Result
         return $this->query->getGroupBy();
     }
 
+    #[\Override]
+    public function getMeasures(): array
+    {
+        return $this->query->getSelect();
+    }
+
     /**
      * @return list<array<string,mixed>>
      */

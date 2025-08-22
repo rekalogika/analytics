@@ -153,6 +153,7 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionality();
+        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
         $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
@@ -160,6 +161,7 @@ final readonly class TableRenderer
             cube: $cubeAdapter,
             unpivoted: $unpivotedDimensions,
             pivoted: $pivotedDimensions,
+            measures: $measures,
             skipLegends: ['@values'],
             withSubtotal: $dimensions,
         );

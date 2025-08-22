@@ -64,11 +64,15 @@ final readonly class SpreadsheetRenderer
         array $pivotedDimensions = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
+        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
+        $unpivotedDimensions = array_values(array_diff($dimensions, $pivotedDimensions));
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
             pivoted: $pivotedDimensions,
+            unpivoted: $unpivotedDimensions,
+            measures: $measures,
             skipLegends: ['@values'],
             withSubtotal: $dimensions,
         );
