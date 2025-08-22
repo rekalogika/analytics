@@ -158,10 +158,10 @@ final readonly class TableRenderer
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
-            unpivotedNodes: $unpivotedDimensions,
-            pivotedNodes: $pivotedDimensions,
+            unpivoted: $unpivotedDimensions,
+            pivoted: $pivotedDimensions,
             skipLegends: ['@values'],
-            createSubtotals: $dimensions,
+            withSubtotal: $dimensions,
         );
 
         return $this->getVisitor($theme)->visitTable($table);
