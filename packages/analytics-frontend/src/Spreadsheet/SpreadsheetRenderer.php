@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
+use Rekalogika\Analytics\Frontend\Util\FrontendUtil;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -64,11 +65,19 @@ final readonly class SpreadsheetRenderer
         array $pivotedDimensions = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
+        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
+
+        $unpivotedDimensions = FrontendUtil::getUnpivotedDimensions(
+            dimensions: $dimensions,
+            pivotedDimensions: $pivotedDimensions,
+        );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
             pivoted: $pivotedDimensions,
+            unpivoted: $unpivotedDimensions,
+            measures: $measures,
             skipLegends: ['@values'],
             withSubtotal: $dimensions,
         );

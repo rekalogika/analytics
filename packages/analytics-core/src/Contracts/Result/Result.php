@@ -37,6 +37,14 @@ interface Result
      */
     public function getDimensionality(): array;
 
+    /**
+     * The measure names of this result. It is the same as the select clause of
+     * the query.
+     *
+     * @return list<string>
+     */
+    public function getMeasures(): array;
+
     public function getTree(): TreeNode;
 
     public function getTable(): Table;
