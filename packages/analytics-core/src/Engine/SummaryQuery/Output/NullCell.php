@@ -85,4 +85,10 @@ final class NullCell implements CubeCell
     {
         return $this;
     }
+
+    #[\Override]
+    public function fuzzySlice(string $dimensionName, mixed $input): CubeCell
+    {
+        return $this;
+    }
 }

@@ -45,8 +45,6 @@ interface Result
      */
     public function getMeasures(): array;
 
-    public function getTree(): TreeNode;
-
     public function getTable(): Table;
 
     /**

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
@@ -40,8 +39,6 @@ final class DefaultResult implements Result
      * @var list<array<string, mixed>>|null
      */
     private ?array $queryResult = null;
-
-    private ?DefaultTreeNode $tree = null;
 
     private ?DefaultTable $table = null;
 
@@ -193,25 +190,6 @@ final class DefaultResult implements Result
         return $this->getResultContext()
             ->getCellRepository()
             ->getApexCell();
-    }
-
-    #[\Override]
-    public function getTree(): DefaultTreeNode
-    {
-        if ($this->tree !== null) {
-            return $this->tree;
-        }
-
-        $cube = $this->getCube();
-
-        if ($cube instanceof NullCell) {
-            throw new LogicException('Cannot generate tree structure when no measures are selected in the query.');
-        }
-
-        return $this->tree = DefaultTreeNode::createRoot(
-            cell: $cube,
-            dimensionality: $this->query->getGroupBy(),
-        );
     }
 
     #[\Override]
