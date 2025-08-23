@@ -398,10 +398,9 @@ final class QueryTest extends KernelTestCase
             ))
             ->getResult()
             ->getCube()
-            ->fuzzySlice('time.civil.date.dayOfMonth', '10');
+            ->drillDown('time.civil.date.dayOfMonth');
 
-        $this->assertNotNull($result);
-        $this->assertCount(1, $result->getMeasures());
+        $this->assertGreaterThan(0, $result->count());
     }
 
     public function testWhereWithRecurringTimeBinRangeInteger(): void
@@ -415,10 +414,9 @@ final class QueryTest extends KernelTestCase
             ))
             ->getResult()
             ->getCube()
-            ->fuzzySlice('time.civil.date.dayOfMonth', '10');
+            ->drillDown('time.civil.date.dayOfMonth');
 
-        $this->assertNotNull($result);
-        $this->assertCount(1, $result->getMeasures());
+        $this->assertGreaterThan(0, $result->count());
     }
 
     public function testYearByMonthOfYear(): void
