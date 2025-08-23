@@ -201,6 +201,26 @@ final class QueryTest extends KernelTestCase
         $this->assertIsInt($node?->getMeasure()?->getValue());
     }
 
+    public function testSlice(): void
+    {
+        $year = 2024;
+
+        $result = $this->getQuery()
+            ->groupBy('time.civil.year')
+            ->select('count')
+            ->getResult()
+            ->getCube();
+
+        $count = $result
+            ->slice('time.civil.year', $year)
+            ->getMeasures()
+            ->get('count')
+            ?->getValue();
+
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+    }
+
     public function testWhere(): void
     {
         $result = $this->getQuery()
