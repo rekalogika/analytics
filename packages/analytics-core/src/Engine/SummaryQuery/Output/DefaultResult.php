@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
@@ -181,8 +182,14 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getCube(): DefaultCell
+    public function getCube(): DefaultCell|NullCell
     {
+        if ($this->getMeasures() === []) {
+            return new NullCell(
+                summaryClass: $this->summaryClass,
+            );
+        }
+
         return $this->getResultContext()
             ->getCellRepository()
             ->getApexCell();
@@ -191,8 +198,18 @@ final class DefaultResult implements Result
     #[\Override]
     public function getTree(): DefaultTreeNode
     {
-        return $this->tree ??= DefaultTreeNode::createRoot(
-            cell: $this->getCube(),
+        if ($this->tree !== null) {
+            return $this->tree;
+        }
+
+        $cube = $this->getCube();
+
+        if ($cube instanceof NullCell) {
+            throw new LogicException('Cannot get tree from empty result.');
+        }
+
+        return $this->tree = DefaultTreeNode::createRoot(
+            cell: $cube,
             dimensionality: $this->query->getGroupBy(),
         );
     }
