@@ -205,7 +205,7 @@ final class DefaultResult implements Result
         $cube = $this->getCube();
 
         if ($cube instanceof NullCell) {
-            throw new LogicException('Cannot generate tree structure when no measures are selected in the query.');
+            throw new LogicException('Cannot get tree from empty result.');
         }
 
         return $this->tree = DefaultTreeNode::createRoot(

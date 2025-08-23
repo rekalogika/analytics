@@ -45,6 +45,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         ChartType $chartType = ChartType::Auto,
     ): Chart {
         try {
+            if ($result->getMeasures() === []) {
+                throw new EmptyResultException('No measures found');
+            }
+
             if ($chartType === ChartType::Auto) {
                 return $this->createAutoChart($result);
             }
@@ -103,34 +107,23 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function isFirstDimensionSequential(Result $result): bool
     {
-        $tree = $result->getTree();
+        $firstDimension = $result->getDimensionality()[0] ?? null;
 
-        $lastMember = null;
-        $direction = null;
+        if ($firstDimension === null) {
+            throw new UnsupportedData('No dimensions found');
+        }
 
-        foreach ($tree as $child) {
+        foreach ($result->getCube()->drillDown($firstDimension) as $child) {
             /** @psalm-suppress MixedAssignment */
-            $member = $child->getMember();
+            $member = $child->getTuple()->get($firstDimension)?->getMember();
+
+            if ($member === null) {
+                throw new UnsupportedData('Expected a member');
+            }
 
             if (!$member instanceof SequenceMember) {
                 return false;
             }
-
-            $class = $member::class;
-
-            if (
-                $lastMember !== null
-                && $direction !== null
-                && $class::compare($lastMember, $member) !== $direction
-            ) {
-                return false;
-            }
-
-            if ($direction === null && $lastMember !== null) {
-                $direction = $class::compare($lastMember, $member);
-            }
-
-            $lastMember = $member;
         }
 
         return true;
@@ -166,11 +159,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     private function createBarOrLineChart(Result $result, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
+        $measures = $result->getCube()->getMeasures();
 
         $selectedMeasures = $this->selectMeasures($measures);
         $numMeasures = \count($selectedMeasures);
@@ -215,14 +204,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         // populate data
 
-        foreach ($result->getTable() as $row) {
+        $cube = $result->getCube();
+        $dimensions = $result->getDimensionality();
+        $firstDimension = $dimensions[0] ?? throw new UnsupportedData('No dimensions found');
+
+        foreach ($cube->drillDown($firstDimension) as $row) {
             $tuple = $row->getTuple();
-
-            if (\count($tuple) !== 1) {
-                throw new UnsupportedData('Expected only one member');
-            }
-
-            $dimension = $tuple->getByIndex(0);
+            $dimension = $tuple->get($firstDimension);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -333,10 +321,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     private function createGroupedBarChart(Result $result, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $result->getTable()->first()?->getMeasures()->getByIndex(0);
+        $measure = $result->getCube()->getMeasures()->first();
 
         if ($measure === null) {
-            throw new UnsupportedData('Measures not found');
+            throw new UnexpectedValueException('Measures not found');
         }
 
         $labels = [];
@@ -346,60 +334,54 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $yTitle = null;
         $legendTitle = null;
 
-        // collect second dimension
+        $firstDimensionName = $result->getDimensionality()[0] ?? null;
+        $secondDimensionName = $result->getDimensionality()[1] ?? null;
 
-        $secondDimensions = [];
-
-        foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
-            $secondDimension = $tuple->getByIndex(1);
-
-            if ($secondDimension === null) {
-                throw new UnsupportedData('Expected a second dimension');
-            }
-
-            /** @psalm-suppress MixedAssignment */
-            $secondDimensions[] = $secondDimension->getMember();
+        if ($firstDimensionName === null || $secondDimensionName === null) {
+            throw new UnexpectedValueException('At least two dimensions are required');
         }
 
-        $secondDimensions = array_unique($secondDimensions, SORT_REGULAR);
-
         // populate data
-        foreach ($result->getTree() as $node) {
-            $labels[] = $this->stringifier->toString($node->getDisplayMember());
+        foreach ($result->getCube()->drillDown($firstDimensionName) as $firstCell) {
+            $firstDimension = $firstCell->getTuple()->get($firstDimensionName);
 
-            if ($xTitle === null) {
-                $xTitle = $this->stringifier->toString($node->getLabel());
+            if ($firstDimension === null) {
+                throw new UnexpectedValueException('Unable to get first dimension');
             }
 
-            /** @psalm-suppress MixedAssignment */
-            foreach ($secondDimensions as $dimension2) {
-                $node2 = $node->traverse($dimension2);
+            $labels[] = $this->stringifier->toString($firstDimension->getDisplayMember());
 
-                $signature = $this->getSignature($dimension2);
+            if ($xTitle === null) {
+                $xTitle = $this->stringifier->toString($firstDimension->getLabel());
+            }
+
+            foreach ($firstCell->drillDown($secondDimensionName) as $secondCell) {
+                $secondDimension = $secondCell->getTuple()->get($secondDimensionName);
+                $signature = $this->getSignature($secondDimension);
 
                 if (!isset($dataSets[$signature])) {
                     $dataSets[$signature] = $configuration->createChartElementConfiguration()->toArray();
                     $dataSets[$signature]['data'] = [];
                 }
 
-                if ($node2 === null) {
-                    $dataSets[$signature]['data'][] = 0;
-
-                    continue;
+                if ($secondDimension === null) {
+                    // should never happen
+                    throw new UnexpectedValueException('Unable to get second dimension');
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($node2->getDisplayMember() ?? null);
+                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimension->getDisplayMember() ?? null);
                 }
 
                 if ($legendTitle === null) {
-                    $legendTitle = $this->stringifier->toString($node2->getLabel());
+                    $legendTitle = $this->stringifier->toString($secondDimension->getLabel());
                 }
 
-                $children = iterator_to_array($node2, false);
-                $dimension = $children[0];
-                $measure = $dimension->getMeasure();
+                $measure = $secondCell->getMeasures()->first();
+
+                if ($measure === null) {
+                    throw new UnexpectedValueException('Measure not found');
+                }
 
                 $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measure->getValue());
 
@@ -409,11 +391,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($dimension->getDisplayMember()),
+                            $this->stringifier->toString($secondDimension->getDisplayMember()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($dimension->getDisplayMember());
+                        $yTitle = $this->stringifier->toString($secondDimension->getDisplayMember());
                     }
                 }
             }
