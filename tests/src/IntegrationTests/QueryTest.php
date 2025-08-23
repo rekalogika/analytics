@@ -359,10 +359,10 @@ final class QueryTest extends KernelTestCase
                 Hour::createFromDatabaseValue(2024101010),
             ))
             ->getResult()
-            ->getCube();
+            ->getCube()
+            ->drillDown('time.civil.hour.hour');
 
-        // Test that the query executes successfully by accessing the cube
-        $this->assertTrue(true); // Query executed successfully if we reach here
+        $this->assertGreaterThan(1, $result->count());
     }
 
     public function testWhereWithTimeBinRange(): void
@@ -377,14 +377,14 @@ final class QueryTest extends KernelTestCase
                 ),
                 Criteria::expr()->lte(
                     'time.civil.hour.hour',
-                    Hour::createFromDatabaseValue(2024101011),
+                    Hour::createFromDatabaseValue(2024111011),
                 ),
             ))
             ->getResult()
-            ->getCube();
+            ->getCube()
+            ->drillDown('time.civil.hour.hour');
 
-        // Test that the query executes successfully by accessing the cube
-        $this->assertTrue(true); // Query executed successfully if we reach here
+        $this->assertGreaterThan(1, $result->count());
     }
 
     public function testWhereWithRecurringTimeBinRangeEnum(): void
@@ -397,10 +397,11 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', DayOfMonth::Day12),
             ))
             ->getResult()
-            ->getCube();
+            ->getCube()
+            ->fuzzySlice('time.civil.date.dayOfMonth', '10');
 
-        // Test that the query executes successfully by accessing the cube
-        $this->assertTrue(true); // Query executed successfully if we reach here
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result->getMeasures());
     }
 
     public function testWhereWithRecurringTimeBinRangeInteger(): void
@@ -413,10 +414,11 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', 12),
             ))
             ->getResult()
-            ->getCube();
+            ->getCube()
+            ->fuzzySlice('time.civil.date.dayOfMonth', '10');
 
-        // Test that the query executes successfully by accessing the cube
-        $this->assertTrue(true); // Query executed successfully if we reach here
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result->getMeasures());
     }
 
     public function testYearByMonthOfYear(): void
