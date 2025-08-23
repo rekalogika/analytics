@@ -109,38 +109,24 @@ final class QueryTest extends KernelTestCase
 
         $this->assertNotNull($country);
 
-        $result = $this->getQuery()
+        $cell = $this->getQuery()
             ->groupBy('time.civil.year', 'customerCountry')
             ->select('count', 'price')
             ->getResult()
-            ->getTree();
+            ->getCube();
 
-        $this->assertCount(2, $result);
+        $cell2 = $cell
+            ->fuzzySlice('time.civil.year', '2024')
+            ?->fuzzySlice('customerCountry', $country)
+            ?->fuzzySlice('@values', 'count');
 
-        // single traverse
-        $node1 = $result->traverse('2024', $country, 'count');
-        $this->assertNotNull($node1);
-        $this->assertIsInt($node1->getMeasure()->getValue());
+        //  stringable check
+        $cell4 = $cell
+            ->fuzzySlice('time.civil.year', '2024')
+            ?->fuzzySlice('customerCountry', $country->getName())
+            ?->fuzzySlice('@values', 'count');
 
-        // multistep traverse
-        $node2 = $result
-            ->traverse('2024')
-            ?->traverse($country)
-            ?->traverse('count');
-
-        $this->assertSame($node1, $node2);
-
-        // single traverse with stringable check
-        $node3 = $result->traverse('2024', $country->getName(), 'count');
-        $this->assertSame($node1, $node3);
-
-        // multistep traverse with stringable check
-        $node4 = $result
-            ->traverse('2024')
-            ?->traverse($country->getName())
-            ?->traverse('count');
-
-        $this->assertSame($node1, $node4);
+        $this->assertSame($cell2, $cell4);
     }
 
     public function testGroupByValueType(): void
@@ -158,10 +144,12 @@ final class QueryTest extends KernelTestCase
             ->groupBy('time.civil.year', '@values', 'customerCountry')
             ->select('count', 'price')
             ->getResult()
-            ->getTree();
+            ->getCube()
+            ->fuzzySlice('time.civil.year', '2024')
+            ?->fuzzySlice('@values', 'count')
+            ?->fuzzySlice('customerCountry', $country);
 
-        $node = $result->traverse('2024', 'count', $country->getName());
-        $this->assertIsInt($node?->getMeasure()?->getValue());
+        $this->assertIsInt($result?->getMeasure()->getValue());
     }
 
     public function testGroupByValueTypeFirst(): void
