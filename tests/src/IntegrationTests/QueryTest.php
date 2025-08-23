@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -49,12 +50,13 @@ final class QueryTest extends KernelTestCase
 
     public function testEmptyQuery(): void
     {
+        $this->expectException(LogicException::class);
         $result = $this->getQuery()->getResult()->getTree();
-        $this->assertCount(0, $result);
     }
 
     public function testDimensionWithoutMeasure(): void
     {
+        $this->expectException(LogicException::class);
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
             ->getResult()
