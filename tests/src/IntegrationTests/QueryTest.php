@@ -17,13 +17,13 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\HierarchicalOrderingRequired;
-use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTable;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\NullCell;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -50,36 +50,34 @@ final class QueryTest extends KernelTestCase
 
     public function testEmptyQuery(): void
     {
-        $this->expectException(LogicException::class);
-        $result = $this->getQuery()->getResult()->getTree();
+        $result = $this->getQuery()
+            ->getResult()
+            ->getCube();
+
+        $this->assertInstanceOf(NullCell::class, $result);
     }
 
     public function testDimensionWithoutMeasure(): void
     {
-        $this->expectException(LogicException::class);
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
             ->getResult()
-            ->getTree()
-            ->traverse('2024')
-            ?? [];
+            ->getCube()
+            ->fuzzySlice('time.civil.year', '2024');
 
-        $this->assertCount(0, $result);
+        $this->assertInstanceOf(NullCell::class, $result);
     }
 
     public function testNoDimensionAndOneMeasure(): void
     {
-        $result = $this->getQuery()
+        $cell = $this->getQuery()
             ->select('count')
             ->getResult()
-            ->getTree();
+            ->getCube()
+            ->fuzzySlice('@values', 'count');
 
-        $this->assertCount(1, $result);
-
-        $node = $result->traverse('count');
-        $this->assertNotNull($node);
-        $this->assertEquals('@values', $node->getName());
-        $this->assertIsInt($node->getMeasure()->getValue());
+        $this->assertNotNull($cell);
+        $this->assertIsInt($cell->getMeasure()->getValue());
     }
 
     public function testInvalidDimension(): void

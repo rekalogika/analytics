@@ -47,17 +47,15 @@ final class SourceQueryTest extends KernelTestCase
 
     public function testNoDimension(): void
     {
-        $result = $this->getQuery()
+        $tuple = $this->getQuery()
             ->from(OrderSummary::class)
             ->select('count')
             ->getResult()
-            ->getTree();
-
-        $node = $result->traverse('count');
-        $this->assertNotNull($node);
+            ->getCube()
+            ->getTuple();
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($node->getTuple());
+            ->getSource($tuple);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
@@ -74,14 +72,16 @@ final class SourceQueryTest extends KernelTestCase
             ->from(OrderSummary::class)
             ->groupBy('customerCountry')
             ->select('count')
-            ->getResult()
-            ->getTree();
+            ->getResult();
 
-        $node = $result->traverse('France');
-        $this->assertNotNull($node);
+        $apexCube = $result->getCube();
+        $slices = $apexCube->drillDown('customerCountry');
+        $tuple = $slices->first()?->getTuple();
+
+        $this->assertNotNull($tuple);
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($node->getTuple());
+            ->getSource($tuple);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
@@ -98,14 +98,16 @@ final class SourceQueryTest extends KernelTestCase
             ->from(OrderSummary::class)
             ->groupBy('time.civil.year')
             ->select('count')
-            ->getResult()
-            ->getTree();
+            ->getResult();
 
-        $node = $result->traverse('2024');
-        $this->assertNotNull($node);
+        $apexCube = $result->getCube();
+        $slices = $apexCube->drillDown('time.civil.year');
+        $tuple = $slices->first()?->getTuple();
+
+        $this->assertNotNull($tuple);
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($node->getTuple());
+            ->getSource($tuple);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();

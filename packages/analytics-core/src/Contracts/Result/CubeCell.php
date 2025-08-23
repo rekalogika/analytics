@@ -44,4 +44,6 @@ interface CubeCell extends Cell
     public function drillDown(string $dimensionName): CubeCells;
 
     public function slice(string $dimensionName, mixed $member): self;
+
+    public function fuzzySlice(string $dimensionName, mixed $input): ?self;
 }

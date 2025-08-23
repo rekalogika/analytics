@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
 final class DefaultCell implements CubeCell
@@ -117,6 +118,45 @@ final class DefaultCell implements CubeCell
                 dimensionName: $dimensionName,
                 dimensionMember: $member,
             );
+    }
+
+    #[\Override]
+    public function fuzzySlice(string $dimensionName, mixed $input): ?CubeCell
+    {
+        $slices = $this->drillDown($dimensionName);
+
+        foreach ($slices as $cell) {
+            /** @psalm-suppress MixedAssignment */
+            $member = $cell->getTuple()->get($dimensionName)?->getMember();
+
+            if ($member === null) {
+                if ($input === null) {
+                    return $cell;
+                }
+
+                continue;
+            }
+
+            if (
+                $member instanceof MeasureMember
+                && $member->getMeasureProperty() === $input
+            ) {
+                return $cell;
+            }
+
+            if ($member === $input) {
+                return $cell;
+            }
+
+            if (
+                $member instanceof \Stringable
+                && $member->__toString() === $input
+            ) {
+                return $cell;
+            }
+        }
+
+        return null;
     }
 
     public function getContext(): ResultContext
