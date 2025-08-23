@@ -30,17 +30,16 @@ final class Month implements MonotonicTimeBin
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%06d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%06d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4);
         $m = (int) substr($string, 4, 2);
@@ -48,7 +47,7 @@ final class Month implements MonotonicTimeBin
         $start = \DateTimeImmutable::createFromFormat(
             'Y-m-d H:i:s',
             \sprintf('%04d-%02d-01 00:00:00', $y, $m),
-            $timeZone,
+            $this->timeZone,
         );
 
         if ($start === false) {

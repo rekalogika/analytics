@@ -29,17 +29,16 @@ final class Hour implements MonotonicTimeBin
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $ymdh = \sprintf('%010d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $ymdh = \sprintf('%010d', $this->databaseValue);
 
         $y = (int) substr($ymdh, 0, 4);
         $m = (int) substr($ymdh, 4, 2);
@@ -48,7 +47,7 @@ final class Hour implements MonotonicTimeBin
 
         $this->start = new \DateTimeImmutable(
             \sprintf('%04d-%02d-%02d %02d:00:00', $y, $m, $d, $h),
-            $timeZone,
+            $this->timeZone,
         );
 
         $this->end = $this->start->modify('+1 hour');

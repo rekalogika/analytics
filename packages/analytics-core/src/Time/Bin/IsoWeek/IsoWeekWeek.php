@@ -32,23 +32,22 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%06d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%06d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4);
         $w = (int) substr($string, 4, 2);
 
         $this->start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
+            ->setTimezone($this->timeZone)
             ->setISODate($y, $w)
             ->setTime(0, 0, 0);
 

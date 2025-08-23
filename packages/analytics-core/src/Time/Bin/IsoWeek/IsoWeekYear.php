@@ -26,22 +26,21 @@ final class IsoWeekYear implements MonotonicTimeBin
 
     public const TYPE = Types::SMALLINT;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
+    #[\Override]
+    private function initialize(): void
+    {
         $this->start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
-            ->setISODate($databaseValue, 1)
+            ->setTimezone($this->timeZone)
+            ->setISODate($this->databaseValue, 1)
             ->setTime(0, 0, 0);
 
-        $this->end = $this->start->setISODate($databaseValue + 1, 1);
+        $this->end = $this->start->setISODate($this->databaseValue + 1, 1);
     }
 
     #[\Override]

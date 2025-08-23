@@ -62,6 +62,55 @@ final class TimeBinTest extends TestCase
     }
 
     /**
+     * @param class-string<MonotonicTimeBin> $class
+     * @dataProvider timeBinInstanceCachingProvider
+     */
+    public function testInstanceCaching(
+        string $class,
+        int $databaseValue,
+    ): void {
+        // Create two instances with the same arguments
+        $instance1 = $class::createFromDatabaseValue($databaseValue);
+        $instance2 = $class::createFromDatabaseValue($databaseValue);
+
+        // They should be the exact same instance (identity check)
+        $this->assertSame($instance1, $instance2);
+
+        // Test with different timezones
+        $timeZone1 = new \DateTimeZone('UTC');
+        $timeZone2 = new \DateTimeZone('America/New_York');
+
+        $instanceUTC1 = $instance1->withTimeZone($timeZone1);
+        $instanceUTC2 = $instance1->withTimeZone($timeZone1);
+        $instanceNY1 = $instance1->withTimeZone($timeZone2);
+        $instanceNY2 = $instance1->withTimeZone($timeZone2);
+
+        // Same timezone, same database value - should be same instance
+        $this->assertSame($instanceUTC1, $instanceUTC2);
+        $this->assertSame($instanceNY1, $instanceNY2);
+
+        // Different timezone - should be different instance
+        $this->assertNotSame($instanceUTC1, $instanceNY1);
+    }
+
+    /**
+     * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int}>
+     */
+    public static function timeBinInstanceCachingProvider(): iterable
+    {
+        yield ['class' => Year::class, 'databaseValue' => 2023];
+        yield ['class' => Quarter::class, 'databaseValue' => 20233];
+        yield ['class' => Month::class, 'databaseValue' => 202303];
+        yield ['class' => Date::class, 'databaseValue' => 20231001];
+        yield ['class' => Hour::class, 'databaseValue' => 2023100112];
+        yield ['class' => IsoWeekYear::class, 'databaseValue' => 2023];
+        yield ['class' => IsoWeekWeek::class, 'databaseValue' => 202304];
+        yield ['class' => IsoWeekDate::class, 'databaseValue' => 2023042];
+        yield ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2025071];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250712];
+    }
+
+    /**
      * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int,expectedStart:string,expectedEnd:string}>
      */
     public static function timeBinProvider(): iterable

@@ -31,17 +31,16 @@ final class Quarter implements MonotonicTimeBin
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%05d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%05d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4);
         $q = (int) substr($string, 4, 1);
@@ -51,7 +50,7 @@ final class Quarter implements MonotonicTimeBin
         $start = \DateTimeImmutable::createFromFormat(
             'Y-m-d',
             \sprintf('%04d-%02d-01', $y, $m),
-            $timeZone,
+            $this->timeZone,
         );
 
         if ($start === false) {

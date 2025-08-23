@@ -27,24 +27,23 @@ final class Year implements MonotonicTimeBin
 
     public const TYPE = Types::SMALLINT;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%04d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%04d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4);
 
         $start = \DateTimeImmutable::createFromFormat(
             'Y-m-d H:i:s',
             \sprintf('%04d-01-01 00:00:00', $y),
-            $timeZone,
+            $this->timeZone,
         );
 
         if ($start === false) {
