@@ -21,22 +21,32 @@ trait TimeBinTrait
     /**
      * @var array<string,self>
      */
-    private static array $cache = [];
-
-    private int $databaseValue;
+    private static array $instances = [];
 
     private static function create(
         int $databaseValue,
         \DateTimeZone $timeZone,
     ): static {
-        $hash = hash('xxh128', serialize([
+        $hash = self::calculateHash($databaseValue, $timeZone);
+
+        if (isset(self::$instances[$hash])) {
+            return self::$instances[$hash];
+        }
+
+        $instance = new static($databaseValue, $timeZone);
+
+        return self::$instances[$hash] = $instance;
+    }
+
+    private static function calculateHash(
+        int $databaseValue,
+        \DateTimeZone $timeZone,
+    ): string {
+        return hash('xxh128', serialize([
             static::class,
             $databaseValue,
             $timeZone->getName(),
         ]));
-
-        return self::$cache[$hash]
-            ??= new static($databaseValue, $timeZone);
     }
 
     public static function createFromDatabaseValue(int $databaseValue): static
@@ -46,17 +56,30 @@ trait TimeBinTrait
         return self::create($databaseValue, $timeZone);
     }
 
-    abstract private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    );
+    final private function __construct(
+        protected readonly int $databaseValue,
+        protected readonly \DateTimeZone $timeZone,
+    ) {
+        $this->initialize();
+    }
+
+    /**
+     * Initialize the time bin. This method is called from the constructor.
+     */
+    abstract private function initialize(): void;
+
+    public function __destruct()
+    {
+        $hash = self::calculateHash($this->databaseValue, $this->timeZone);
+
+        if (isset(self::$instances[$hash])) {
+            unset(self::$instances[$hash]);
+        }
+    }
 
     public function withTimeZone(\DateTimeZone $timeZone): static
     {
-        return self::create(
-            $this->databaseValue,
-            $timeZone,
-        );
+        return self::create($this->databaseValue, $timeZone);
     }
 
     public function getDatabaseValue(): int

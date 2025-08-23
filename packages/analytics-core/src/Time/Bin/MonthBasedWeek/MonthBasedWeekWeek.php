@@ -33,21 +33,23 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private readonly int $y;
-    private readonly int $m;
-    private readonly int $w;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $y;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $m;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $w;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%07d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%07d', $this->databaseValue);
 
         $this->y = (int) substr($string, 0, 4); // Year
         $this->m = (int) substr($string, 4, 2); // Month
@@ -55,7 +57,7 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
 
         /** @var \DateTimeImmutable */
         $start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
+            ->setTimezone($this->timeZone)
             ->setDate($this->y, $this->m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
             ->modify('first thursday of this month') // Adjust to the first thursday

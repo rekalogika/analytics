@@ -33,17 +33,16 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
 
     public const TYPE = Types::INTEGER;
 
-    private readonly \DateTimeImmutable $start;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $start;
 
-    private readonly \DateTimeImmutable $end;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private \DateTimeImmutable $end;
 
-    private function __construct(
-        int $databaseValue,
-        \DateTimeZone $timeZone,
-    ) {
-        $this->databaseValue = $databaseValue;
-
-        $string = \sprintf('%08d', $databaseValue);
+    #[\Override]
+    private function initialize(): void
+    {
+        $string = \sprintf('%08d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4); // Year
         $m = (int) substr($string, 4, 2); // Month
@@ -52,7 +51,7 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
 
         /** @var \DateTimeImmutable */
         $start = (new \DateTimeImmutable())
-            ->setTimezone($timeZone)
+            ->setTimezone($this->timeZone)
             ->setDate($y, $m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
             ->modify('first thursday of this month') // Adjust to the first Monday
