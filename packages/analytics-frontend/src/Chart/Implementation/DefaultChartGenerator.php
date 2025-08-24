@@ -170,7 +170,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $xTitle = null;
         $yTitle = null;
 
-        // populate labels
+        // Populate labels.
 
         foreach ($selectedMeasures as $name) {
             $measure = $measures->get($name)
@@ -202,7 +202,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
         }
 
-        // populate data
+        // Populate data.
 
         $cube = $result->getCube();
         $dimensions = $result->getDimensionality();
@@ -216,13 +216,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 throw new UnsupportedData('Expected only one member');
             }
 
-            // get label
+            // Get label.
 
             if ($xTitle === null) {
                 $xTitle = $this->stringifier->toString($dimension->getLabel());
             }
 
-            // get value
+            // Get value.
 
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
@@ -265,7 +265,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // ytitle
+        // Y title.
 
         if ($yTitle === null) {
             $yTitle = [
@@ -279,7 +279,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // legend
+        // Legend.
 
         if ($numMeasures > 1) {
             $legend = [
@@ -341,7 +341,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             throw new UnexpectedValueException('At least two dimensions are required');
         }
 
-        // populate data
+        // Populate data.
         foreach ($result->getCube()->drillDown($firstDimensionName) as $firstCell) {
             $firstDimension = $firstCell->getTuple()->get($firstDimensionName);
 
@@ -365,7 +365,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 }
 
                 if ($secondDimension === null) {
-                    // should never happen
+                    // Should never happen.
                     throw new UnexpectedValueException('Unable to get second dimension');
                 }
 
@@ -412,7 +412,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             'datasets' => array_values($dataSets),
         ]);
 
-        // xtitle
+        // X title.
 
         if ($xTitle === null) {
             $xTitle = [
@@ -426,7 +426,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // ytitle
+        // Y title.
 
         if ($yTitle === null) {
             $yTitle = [
@@ -440,7 +440,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // legend title
+        // Legend title.
 
         if ($legendTitle === null) {
             $legendTitle = [
@@ -454,7 +454,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // legend
+        // Legend.
 
         $legend = [
             'display' => true,
@@ -510,7 +510,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             throw new UnsupportedData('Only one measure is supported');
         }
 
-        // populate labels
+        // Populate labels.
 
         $name = $selectedMeasures[0];
         $measure = $measures->get($name);
@@ -525,7 +525,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         $title = null;
 
-        // populate data
+        // Populate data.
 
         foreach ($result->getTable() as $row) {
             $tuple = $row->getTuple();
@@ -540,13 +540,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 throw new UnsupportedData('Expected only one member');
             }
 
-            // get label
+            // Get label.
 
             if ($title === null) {
                 $title = $this->stringifier->toString($dimension->getLabel());
             }
 
-            // get value
+            // Get value.
 
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
@@ -555,7 +555,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 
-            // color
+            // Color.
 
             $color = $configuration->createChartElementConfiguration()->getAreaColor();
             $dataSet['backgroundColor'][] = $color;

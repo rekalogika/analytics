@@ -145,7 +145,7 @@ final class QueryComponents
 
             $sqlPositions = $paramMappings[$key];
 
-            // optimized multi value sql positions away for now,
+            // Optimized multi-value SQL positions away for now,
             // they are not allowed in DQL anyways.
             $value      = [$value];
             $countValue = \count($value);
@@ -348,7 +348,7 @@ final class QueryComponents
                 try {
                     $resolvedParameters[$key] = $type->convertToDatabaseValue($parameter, $this->getConnection()->getDatabasePlatform());
                 } catch (\TypeError | ConversionException) {
-                    // If conversion fails, keep the original parameter value
+                    // If conversion fails, keep the original parameter value.
                     $resolvedParameters[$key] = $parameter;
                 }
             } else {

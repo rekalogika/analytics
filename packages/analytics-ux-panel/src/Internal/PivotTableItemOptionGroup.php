@@ -41,13 +41,13 @@ final class PivotTableItemOptionGroup implements
         $label = $dimension->getLabel()->getRootChildToParent();
 
         if ($label === null) {
-            return null; // No label available, cannot create group
+            return null; // No label available, cannot create group.
         }
 
         $name = $dimension->getName();
         $propertyName = $dimension->getPropertyName();
 
-        // remove from $name the last part containing $propertyName
+        // Remove from $name the last part containing $propertyName.
         if (str_ends_with($name, $propertyName)) {
             $name = substr($name, 0, -\strlen($propertyName) - 1);
         }

@@ -69,7 +69,7 @@ final readonly class PivotTableItem
             $optGroup = PivotTableItemOptionGroup::create($leaf);
 
             if ($optGroup === null) {
-                // If the option is not part of a group, we can return it directly
+                // If the option is not part of a group, we can return it directly.
                 $options[] = $option;
                 continue;
             }

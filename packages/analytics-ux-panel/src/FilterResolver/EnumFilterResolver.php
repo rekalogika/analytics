@@ -34,7 +34,7 @@ final readonly class EnumFilterResolver implements FilterResolver
         $choices = [];
 
         if (is_a($typeClass, \BackedEnum::class, true)) {
-            // For backed enums, we use the value as the choice
+            // For backed enums, we use the value as the choice.
 
             /** @psalm-suppress MixedMethodCall */
             /** @var \BackedEnum $case */
@@ -47,7 +47,7 @@ final readonly class EnumFilterResolver implements FilterResolver
                 $choices[$case->value] = $case;
             }
         } elseif (is_a($typeClass, \UnitEnum::class, true)) {
-            // For unit enums, we use the name as the choice
+            // For unit enums, we use the name as the choice.
 
             /** @psalm-suppress MixedMethodCall */
             /** @var \UnitEnum $case */

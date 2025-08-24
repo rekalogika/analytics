@@ -132,7 +132,7 @@ final readonly class AttributeUtil
                 try {
                     yield $reflectionAttribute->newInstance();
                 } catch (\Error) {
-                    // Ignore errors
+                    // Ignore errors.
                 }
             }
         }
@@ -162,7 +162,7 @@ final readonly class AttributeUtil
                 try {
                     yield $reflectionAttribute->newInstance();
                 } catch (\Error) {
-                    // Ignore errors
+                    // Ignore errors.
                 }
             }
         }
