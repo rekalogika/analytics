@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 final readonly class TupleDto
 {
     /**
-     * @param array<string,string> $members Key is dimension name, value is the
+     * @param array<string,string|null> $members Key is dimension name, value is the
      * serialized raw member value.
      */
     public function __construct(
@@ -83,7 +83,7 @@ final readonly class TupleDto
     }
 
     /**
-     * @return array<string,string>
+     * @return array<string,string|null>
      */
     public function getMembers(): array
     {

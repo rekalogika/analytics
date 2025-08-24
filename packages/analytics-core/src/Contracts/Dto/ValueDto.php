@@ -21,7 +21,7 @@ final readonly class ValueDto extends ExpressionDto
      * @param string|array<array-key,mixed> $value
      */
     public function __construct(
-        public string|array $value,
+        public string|array|null $value,
     ) {}
 
     #[\Override]

@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests\ValueSerializer;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
-use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -109,7 +108,7 @@ final class ValueSerializerTest extends KernelTestCase
             value: null,
         );
 
-        $this->assertEquals(DoctrineValueSerializer::NULL, $id);
+        $this->assertNull($id);
     }
 
     public function testNullDeserialization(): void
@@ -117,7 +116,7 @@ final class ValueSerializerTest extends KernelTestCase
         $id = $this->valueSerializer->deserialize(
             class: OrderSummary::class,
             dimension: 'customerCountry',
-            identifier: DoctrineValueSerializer::NULL,
+            identifier: null,
         );
 
         $this->assertNull($id);

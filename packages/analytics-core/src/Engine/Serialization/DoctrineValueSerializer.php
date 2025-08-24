@@ -25,11 +25,6 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class DoctrineValueSerializer implements ValueSerializer
 {
-    /**
-     * Sentinel value to indicate null
-     */
-    public const NULL = "\x1E";
-
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -41,7 +36,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): string {
+    ): ?string {
         // if value is enum, we return the value directly. no type checking is
         // done here.
 
@@ -50,7 +45,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         }
 
         if ($value === null) {
-            return self::NULL;
+            return null;
         }
 
         if (\is_string($value) || \is_int($value) || \is_float($value)) {
@@ -72,9 +67,9 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
     public function deserialize(
         string $class,
         string $dimension,
-        string $identifier,
+        ?string $identifier,
     ): mixed {
-        if ($identifier === self::NULL) {
+        if ($identifier === null) {
             return null;
         }
 
