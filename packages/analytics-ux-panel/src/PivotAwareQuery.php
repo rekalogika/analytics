@@ -73,8 +73,8 @@ final class PivotAwareQuery
         );
 
         //
-        // make sure mandatory dimensions is placed as the first dimensions of
-        // the row
+        // Make sure mandatory dimensions are placed as the first dimensions of
+        // the row.
         //
 
         $mandatoryDimensions = [];
@@ -98,7 +98,7 @@ final class PivotAwareQuery
         $this->filters = array_values(array_diff($this->filters, $mandatoryDimensions));
 
         //
-        // process filters
+        // Process filters.
         //
 
         $filterDimensions = array_merge(
@@ -221,7 +221,7 @@ final class PivotAwareQuery
     }
 
     //
-    // getter setter proxy methods
+    // Getter setter proxy methods.
     //
 
     private function syncRowsAndColumns(): void
@@ -296,7 +296,7 @@ final class PivotAwareQuery
     }
 
     //
-    // filter expressions
+    // Filter expressions.
     //
 
     public function getFilterExpressions(): Filters
@@ -305,7 +305,7 @@ final class PivotAwareQuery
     }
 
     //
-    // other proxy methods
+    // Other proxy methods.
     //
 
     /**
@@ -330,7 +330,7 @@ final class PivotAwareQuery
     }
 
     //
-    // helpers
+    // Helpers.
     //
 
     /**
@@ -343,14 +343,14 @@ final class PivotAwareQuery
 
     private function isDimensionMandatory(string $dimension): bool
     {
-        // trim dot and the string after
+        // Trim dot and the string after.
         $dimension = explode('.', $dimension)[0];
 
         return $this->metadata->getDimension($dimension)->isMandatory();
     }
 
     //
-    // getters without subitems
+    // Getters without subitems.
     //
 
     /**
@@ -367,7 +367,7 @@ final class PivotAwareQuery
             $columns[] = '@values';
         }
 
-        // items not in rows or columns
+        // Items not in rows or columns.
         return array_values(array_diff(
             $this->getAllItems(),
             $this->getRowsWithoutSubItems(),

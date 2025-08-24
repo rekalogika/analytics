@@ -35,7 +35,7 @@ final readonly class ChainFilterResolver implements FilterResolver
             try {
                 return $resolver->getFilterFactory($dimension);
             } catch (DimensionNotSupportedByFilter $e) {
-                // Continue to the next resolver
+                // Continue to the next resolver.
             }
         }
 

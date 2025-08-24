@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
 
 /**
- * Represent a list of tree nodes.
+ * Represent a list of cube cells.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

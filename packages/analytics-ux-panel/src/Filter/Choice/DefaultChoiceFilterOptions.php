@@ -31,7 +31,7 @@ final readonly class DefaultChoiceFilterOptions implements ChoiceFilterOptions
     {
         foreach ($this->choices as $id => $value) {
             /** @psalm-suppress RedundantCastGivenDocblockType */
-            $id = (string) $id; // Ensure id is a string
+            $id = (string) $id; // Ensure id is a string.
             yield $id => $value;
         }
     }

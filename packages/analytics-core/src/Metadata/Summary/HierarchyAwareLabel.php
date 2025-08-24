@@ -49,7 +49,7 @@ final class HierarchyAwareLabel implements TranslatableInterface
                 $current = $current->getParent();
             }
 
-            // Reverse the order to have root first
+            // Reverse the order to have root first.
             $this->labels = array_reverse($this->labels);
         }
 

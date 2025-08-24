@@ -90,7 +90,7 @@ final class RekalogikaPanelBundle extends AbstractBundle
             return false;
         }
 
-        // check that FrameworkBundle 6.3 or higher is installed
+        // Check that FrameworkBundle 6.3 or higher is installed.
         $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
 
         if (!\is_array($bundlesMetadata)) {

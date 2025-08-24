@@ -31,7 +31,7 @@ final readonly class Numbers implements \Stringable
         NumberRangesFilterOptions $options,
         string $input,
     ): self {
-        // strip all whitespace characters
+        // Strip all whitespace characters.
         $input = preg_replace('/\s+/', '', $input);
 
         if ($input === null) {
