@@ -62,7 +62,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
     public function deserialize(
         string $class,
         string $dimension,
-        string $identifier,
+        ?string $identifier,
     ): mixed {
         $specificService = $this->getSpecificService($class, $dimension);
 
@@ -81,7 +81,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
             'No serializer found for class "%s", dimension "%s", and identifier "%s". You may need to create a custom implementation of "%s" for this class and dimension.',
             $class,
             $dimension,
-            $identifier,
+            $identifier ?? 'null',
             ValueSerializer::class,
         ));
     }
@@ -92,7 +92,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): string {
+    ): ?string {
         $specificManager = $this->getSpecificService($class, $dimension);
 
         if ($specificManager !== null) {
