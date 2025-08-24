@@ -17,22 +17,15 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\UX\PanelBundle\Filter;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * @template T of object
- */
 final class NumberRangesFilter implements Filter
 {
     private readonly string $rawValue;
 
     private string $value = '';
 
-    /**
-     * @var Numbers<T>
-     */
     private ?Numbers $numbers = null;
 
     /**
-     * @param NumberRangesFilterOptions<T> $options
      * @param array<string,mixed> $inputArray
      */
     public function __construct(
@@ -87,9 +80,6 @@ final class NumberRangesFilter implements Filter
         return $this->value = $this->getNumbers()->__toString();
     }
 
-    /**
-     * @return Numbers<T>
-     */
     public function getNumbers(): Numbers
     {
         if ($this->numbers !== null) {
