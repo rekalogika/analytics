@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements FilterFactory<NumberRangesFilter<object>,NumberRangesFilterOptions<object>>
+ * @implements FilterFactory<NumberRangesFilter,NumberRangesFilterOptions>
  */
 final readonly class NumberRangesFilterFactory implements FilterFactory
 {

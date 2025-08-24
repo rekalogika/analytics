@@ -17,16 +17,8 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 
-/**
- * @template T of object
- */
 final readonly class NumberRange implements \Stringable
 {
-    /**
-     * @template U of object
-     * @param NumberRangesFilterOptions<U> $options
-     * @return self<U>
-     */
     public static function create(
         string $dimension,
         NumberRangesFilterOptions $options,
@@ -58,9 +50,6 @@ final readonly class NumberRange implements \Stringable
         );
     }
 
-    /**
-     * @param NumberRangesFilterOptions<T> $options
-     */
     private function __construct(
         private readonly string $dimension,
         private readonly NumberRangesFilterOptions $options,
@@ -74,34 +63,31 @@ final readonly class NumberRange implements \Stringable
         return \sprintf('%s-%s', $this->start ?? '', $this->end ?? '');
     }
 
-    /**
-     * @return ?T
-     */
-    private function getStartObject(): ?object
+    private function getStartDatabaseValue(): mixed
     {
         if ($this->start === null) {
             return null;
         }
 
-        return $this->options->transformNumberToObject($this->start);
+        /** @psalm-suppress MixedReturnStatement */
+        return $this->options->transformInputToDatabaseValue($this->start);
     }
 
-    /**
-     * @return ?T
-     */
-    private function getEndObject(): ?object
+    private function getEndDatabaseValue(): mixed
     {
         if ($this->end === null) {
             return null;
         }
 
-        return $this->options->transformNumberToObject($this->end);
+        return $this->options->transformInputToDatabaseValue($this->end);
     }
 
     public function createExpression(): Expression
     {
-        $start = $this->getStartObject();
-        $end = $this->getEndObject();
+        /** @psalm-suppress MixedAssignment */
+        $start = $this->getStartDatabaseValue();
+        /** @psalm-suppress MixedAssignment */
+        $end = $this->getEndDatabaseValue();
 
         if ($start === null && $end === null) {
             throw new LogicException('Both start and end cannot be null');
@@ -116,8 +102,8 @@ final readonly class NumberRange implements \Stringable
         }
 
         return Criteria::expr()->andX(
-            Criteria::expr()->gte($this->dimension, $this->getStartObject()),
-            Criteria::expr()->lte($this->dimension, $this->getEndObject()),
+            Criteria::expr()->gte($this->dimension, $this->getStartDatabaseValue()),
+            Criteria::expr()->lte($this->dimension, $this->getEndDatabaseValue()),
         );
     }
 }

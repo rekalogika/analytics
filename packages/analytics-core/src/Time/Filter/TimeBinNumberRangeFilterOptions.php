@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Filter;
 
+use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterOptions;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * @implements NumberRangesFilterOptions<TimeBin>
- */
 final readonly class TimeBinNumberRangeFilterOptions implements NumberRangesFilterOptions
 {
     /**
@@ -44,8 +42,15 @@ final readonly class TimeBinNumberRangeFilterOptions implements NumberRangesFilt
     }
 
     #[\Override]
-    public function transformNumberToObject(int $number): object
+    public function transformInputToDatabaseValue(int $number): mixed
     {
-        return ($this->timeBinClass)::createFromDatabaseValue($number);
+        $object = ($this->timeBinClass)::createFromDatabaseValue($number);
+
+        if ($object instanceof DatabaseValueAware) {
+            /** @psalm-suppress MixedReturnStatement */
+            return $object->getDatabaseValue();
+        }
+
+        return $object;
     }
 }

@@ -15,17 +15,11 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * @template-covariant T of object
- */
 interface NumberRangesFilterOptions
 {
     public function getLabel(): TranslatableInterface;
 
     public function getHelp(): ?TranslatableInterface;
 
-    /**
-     * @return T
-     */
-    public function transformNumberToObject(int $number): object;
+    public function transformInputToDatabaseValue(int $number): mixed;
 }

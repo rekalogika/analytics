@@ -16,16 +16,8 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 
-/**
- * @template T of object
- */
 final readonly class Number implements \Stringable
 {
-    /**
-     * @template U of object
-     * @param NumberRangesFilterOptions<U> $options
-     * @return self<U>
-     */
     public static function create(
         string $dimension,
         NumberRangesFilterOptions $options,
@@ -44,9 +36,6 @@ final readonly class Number implements \Stringable
         );
     }
 
-    /**
-     * @param NumberRangesFilterOptions<T> $options
-     */
     private function __construct(
         private string $dimension,
         private NumberRangesFilterOptions $options,
@@ -59,16 +48,13 @@ final readonly class Number implements \Stringable
         return (string) $this->number;
     }
 
-    /**
-     * @return T
-     */
-    private function getObject(): object
+    private function getDoctrineValue(): mixed
     {
-        return $this->options->transformNumberToObject($this->number);
+        return $this->options->transformInputToDatabaseValue($this->number);
     }
 
     public function createExpression(): Expression
     {
-        return Criteria::expr()->eq($this->dimension, $this->getObject());
+        return Criteria::expr()->eq($this->dimension, $this->getDoctrineValue());
     }
 }
