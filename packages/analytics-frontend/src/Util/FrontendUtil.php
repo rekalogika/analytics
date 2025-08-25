@@ -19,13 +19,13 @@ final readonly class FrontendUtil
 
     /**
      * @param list<string> $dimensions
-     * @param list<string> $pivotedDimensions
+     * @param list<string> $columns
      * @return list<string>
      */
-    public static function getUnpivotedDimensions(
+    public static function getRows(
         array $dimensions,
-        array $pivotedDimensions,
+        array $columns,
     ): array {
-        return array_values(array_diff($dimensions, $pivotedDimensions));
+        return array_values(array_diff($dimensions, $columns));
     }
 }
