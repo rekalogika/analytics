@@ -41,7 +41,7 @@ final readonly class TableRenderer
     /**
      * Render a pivot table or a regular table based on the result.
      *
-     * @param list<string> $pivotedDimensions The dimensions that will be
+     * @param list<string> $columns The dimensions that will be
      * pivoted in the table. Specify the special value '@values' to pivot the
      * measure dimension.
      * @param string|null $theme The theme to use for rendering. If null, the
@@ -52,14 +52,14 @@ final readonly class TableRenderer
      */
     public function render(
         Result $result,
-        array $pivotedDimensions = ['@values'],
+        array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderPivotTable(
                 result: $result,
-                pivotedDimensions: $pivotedDimensions,
+                columns: $columns,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -79,7 +79,7 @@ final readonly class TableRenderer
     /**
      * Render a pivot table with the specified dimensions.
      *
-     * @param list<string> $pivotedDimensions
+     * @param list<string> $columns
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
      * @param bool $throwException If true, the method will throw an exception
@@ -88,14 +88,14 @@ final readonly class TableRenderer
      */
     public function renderPivotTable(
         Result $result,
-        array $pivotedDimensions = ['@values'],
+        array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderPivotTable(
                 result: $result,
-                pivotedDimensions: $pivotedDimensions,
+                columns: $columns,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -146,26 +146,26 @@ final readonly class TableRenderer
     }
 
     /**
-     * @param list<string> $pivotedDimensions
+     * @param list<string> $columns
      */
     private function doRenderPivotTable(
         Result $result,
-        array $pivotedDimensions = ['@values'],
+        array $columns = ['@values'],
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionality();
         $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
 
-        $unpivotedDimensions = FrontendUtil::getUnpivotedDimensions(
+        $rows = FrontendUtil::getRows(
             dimensions: $dimensions,
-            pivotedDimensions: $pivotedDimensions,
+            columns: $columns,
         );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
-            unpivoted: $unpivotedDimensions,
-            pivoted: $pivotedDimensions,
+            rows: $rows,
+            columns: $columns,
             measures: $measures,
             skipLegends: ['@values'],
             withSubtotal: $dimensions,

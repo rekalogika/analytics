@@ -58,25 +58,25 @@ final readonly class SpreadsheetRenderer
     }
 
     /**
-     * @param list<string> $pivotedDimensions
+     * @param list<string> $columns
      */
     public function renderPivotTable(
         Result $result,
-        array $pivotedDimensions = [],
+        array $columns = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
         $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
 
-        $unpivotedDimensions = FrontendUtil::getUnpivotedDimensions(
+        $rows = FrontendUtil::getRows(
             dimensions: $dimensions,
-            pivotedDimensions: $pivotedDimensions,
+            columns: $columns,
         );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
-            pivoted: $pivotedDimensions,
-            unpivoted: $unpivotedDimensions,
+            rows: $rows,
+            columns: $columns,
             measures: $measures,
             skipLegends: ['@values'],
             withSubtotal: $dimensions,
