@@ -30,28 +30,22 @@
     table-group-divider
 {%- endblock tbody_class -%}
 
-{%- block th_class -%}
+{%- block td_attr -%}
     {{ parent() }}
-{%- endblock th_class -%}
-
-{%- block td_class -%}
-    {{ parent() }}
-    {% if element.context.subtotalDepth > 0 %}
-        bg-secondary
-
-        {% if element.context.subtotalDepth == 1 %}
-            bg-opacity-10
-        {% elseif element.context.subtotalDepth == 2 %}
-            bg-opacity-25
-        {% elseif element.context.subtotalDepth == 3 %}
-            bg-opacity-50
-        {% elseif element.context.subtotalDepth == 4 %}
-            bg-opacity-75 text-white
-        {% else %}
-            text-white
-        {% endif %}
+    {% if element.context.subtotalDepth == 1 %}
+        style="background-color: var(--bs-gray-100)"
+    {% elseif element.context.subtotalDepth == 2 %}
+        style="background-color: var(--bs-gray-200)"
+    {% elseif element.context.subtotalDepth == 3 %}
+        style="background-color: var(--bs-gray-300)"
+    {% elseif element.context.subtotalDepth == 4 %}
+        style="background-color: var(--bs-gray-400); color: var(--bs-white)"
+    {% elseif element.context.subtotalDepth == 5 %}
+        style="background-color: var(--bs-gray-500); color: var(--bs-white)"
+    {% elseif element.context.subtotalDepth > 5 %}
+        style="background-color: var(--bs-dark); color: var(--bs-white)"
     {% endif %}
-{%- endblock td_class -%}
+{%- endblock td_attr -%}
 
 {%- block tf_class -%}
     {{ parent() }}
