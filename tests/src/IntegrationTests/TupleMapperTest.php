@@ -31,7 +31,6 @@ final class TupleMapperTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->select('count', 'price')
             ->groupBy('customerCountry')
             ->addGroupBy('itemCategory')
             ->addGroupBy('customerType');

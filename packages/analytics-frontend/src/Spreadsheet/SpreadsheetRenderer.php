@@ -34,9 +34,13 @@ final readonly class SpreadsheetRenderer
         $this->visitor = new SpreadsheetRendererVisitor($cellifier);
     }
 
-    public function render(Result $result): Spreadsheet
+    /**
+     * @param list<string> $measures The measures that will be displayed in the
+     * table.
+     */
+    public function render(Result $result, array $measures): Spreadsheet
     {
-        $table = new TableAdapter($result->getTable());
+        $table = new TableAdapter($result->getTable(), $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);
@@ -58,14 +62,15 @@ final readonly class SpreadsheetRenderer
     }
 
     /**
+     * @param list<string> $measures
      * @param list<string> $columns
      */
     public function renderPivotTable(
         Result $result,
+        array $measures,
         array $columns = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
-        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
 
         $rows = FrontendUtil::getRows(

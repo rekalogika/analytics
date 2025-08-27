@@ -41,9 +41,11 @@ final readonly class TableRenderer
     /**
      * Render a pivot table or a regular table based on the result.
      *
-     * @param list<string> $columns The dimensions that will be
-     * pivoted in the table. Specify the special value '@values' to pivot the
-     * measure dimension.
+     * @param list<string> $measures The measures that will be displayed in the
+     * table.
+     * @param list<string> $columns The dimensions that will be pivoted in the
+     * table. Specify the special value '@values' to pivot the measure
+     * dimension.
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
      * @param bool $throwException If true, the method will throw an exception
@@ -52,6 +54,7 @@ final readonly class TableRenderer
      */
     public function render(
         Result $result,
+        array $measures,
         array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
@@ -59,6 +62,7 @@ final readonly class TableRenderer
         try {
             return $this->doRenderPivotTable(
                 result: $result,
+                measures: $measures,
                 columns: $columns,
                 theme: $theme,
             );
@@ -79,6 +83,8 @@ final readonly class TableRenderer
     /**
      * Render a pivot table with the specified dimensions.
      *
+     * @param list<string> $measures The measures that will be displayed in the
+     * table.
      * @param list<string> $columns
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
@@ -88,6 +94,7 @@ final readonly class TableRenderer
      */
     public function renderPivotTable(
         Result $result,
+        array $measures,
         array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
@@ -95,6 +102,7 @@ final readonly class TableRenderer
         try {
             return $this->doRenderPivotTable(
                 result: $result,
+                measures: $measures,
                 columns: $columns,
                 theme: $theme,
             );
@@ -115,6 +123,8 @@ final readonly class TableRenderer
     /**
      * Render a regular table from the result.
      *
+     * @param list<string> $measures The measures that will be displayed in the
+     * table
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
      * @param bool $throwException If true, the method will throw an exception
@@ -123,12 +133,14 @@ final readonly class TableRenderer
      */
     public function renderTable(
         Result $result,
+        array $measures,
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderTable(
                 result: $result,
+                measures: $measures,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -146,15 +158,16 @@ final readonly class TableRenderer
     }
 
     /**
+     * @param list<string> $measures
      * @param list<string> $columns
      */
     private function doRenderPivotTable(
         Result $result,
-        array $columns = ['@values'],
+        array $measures,
+        array $columns,
         ?string $theme = null,
     ): string {
         $dimensions = $result->getDimensionality();
-        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
 
         $rows = FrontendUtil::getRows(
@@ -174,11 +187,15 @@ final readonly class TableRenderer
         return $this->getVisitor($theme)->visitTable($table);
     }
 
+    /**
+     * @param list<string> $measures
+     */
     private function doRenderTable(
         Result $result,
+        array $measures,
         ?string $theme = null,
     ): string {
-        $table = new TableAdapter($result->getTable());
+        $table = new TableAdapter($result->getTable(), $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
@@ -54,7 +53,6 @@ final class CellRepository
             ??= new DefaultCell(
                 tuple: $tuple,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
-                measureNames: [],
                 isNull: true,
                 context: $this->context,
             );
@@ -83,7 +81,6 @@ final class CellRepository
             ??= new DefaultCell(
                 tuple: $tuple,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
-                measureNames: $baseCell->getMeasureNames(),
                 isNull: true,
                 context: $baseCell->getContext(),
             );
@@ -132,24 +129,11 @@ final class CellRepository
             // if cell is null and gap-filling is requestied, we create a new
             // cell
 
-            // if the member is a measure (i.e. '@values'), narrow the measure
-            // names to the measure name specified in the dimension.
-
-            /** @psalm-suppress MixedAssignment */
-            $member = $dimension->getMember();
-
-            if ($member instanceof MeasureMember) {
-                $measureNames = [$member->getMeasureProperty()];
-            } else {
-                $measureNames = $baseCell->getMeasureNames();
-            }
-
             $measures = $this->nullMeasureCollection->getNullMeasures();
 
             $cell = new DefaultCell(
                 tuple: $tuple,
                 measures: $measures,
-                measureNames: $measureNames,
                 isNull: true,
                 context: $baseCell->getContext(),
             );
@@ -198,7 +182,6 @@ final class CellRepository
         return $this->apexCell = new DefaultCell(
             tuple: $apexTuple,
             measures: $apexMeasures,
-            measureNames: array_keys($measures),
             isNull: true,
             context: $this->context,
         );

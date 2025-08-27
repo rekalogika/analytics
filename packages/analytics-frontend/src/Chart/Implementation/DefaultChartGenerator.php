@@ -42,35 +42,32 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     #[\Override]
     public function createChart(
         Result $result,
+        array $measures,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
         try {
-            if ($result->getMeasures() === []) {
-                throw new EmptyResultException('No measures found');
-            }
-
             if ($chartType === ChartType::Auto) {
-                return $this->createAutoChart($result);
+                return $this->createAutoChart($result, $measures);
             }
 
             if ($chartType === ChartType::Bar) {
-                return $this->createBarChart($result);
+                return $this->createBarChart($result, $measures);
             }
 
             if ($chartType === ChartType::Line) {
-                return $this->createLineChart($result);
+                return $this->createLineChart($result, $measures);
             }
 
             if ($chartType === ChartType::StackedBar) {
-                return $this->createGroupedBarChart($result, 'stackedBar');
+                return $this->createGroupedBarChart($result, $measures[0], 'stackedBar');
             }
 
             if ($chartType === ChartType::GroupedBar) {
-                return $this->createGroupedBarChart($result, 'groupedBar');
+                return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
             }
 
             if ($chartType === ChartType::Pie) {
-                return $this->createPieChart($result);
+                return $this->createPieChart($result, $measures[0]);
             }
         } catch (EmptyResultException $e) {
             throw new UnsupportedData('Result is empty', previous: $e);
@@ -81,7 +78,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         throw new UnsupportedData('Unsupported chart type');
     }
 
-    private function createAutoChart(Result $result): Chart
+    /**
+     * @param non-empty-list<string> $measures
+     */
+    private function createAutoChart(Result $result, array $measures): Chart
     {
         $row = $result->getTable()->first();
 
@@ -93,13 +93,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         if (\count($tuple) === 1) {
             if ($this->isFirstDimensionSequential($result)) {
-                return $this->createLineChart($result);
+                return $this->createLineChart($result, $measures);
             } else {
-                return $this->createBarChart($result);
+                return $this->createBarChart($result, $measures);
             }
         } elseif (\count($tuple) === 2) {
             // @todo auto detect best chart type
-            return $this->createGroupedBarChart($result, 'groupedBar');
+            return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -129,12 +129,18 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         return true;
     }
 
-    private function createBarChart(Result $result): Chart
+    /**
+     * @param non-empty-list<string> $measures
+     */
+    private function createBarChart(Result $result, array $measures): Chart
     {
-        return $this->createBarOrLineChart($result, Chart::TYPE_BAR);
+        return $this->createBarOrLineChart($result, $measures, Chart::TYPE_BAR);
     }
 
-    private function createLineChart(Result $result): Chart
+    /**
+     * @param non-empty-list<string> $measures
+     */
+    private function createLineChart(Result $result, array $measures): Chart
     {
         $row = $result->getTable()->first();
 
@@ -145,23 +151,24 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $tuple = $row->getTuple();
 
         if (\count($tuple) === 1) {
-            return $this->createBarOrLineChart($result, Chart::TYPE_LINE);
+            return $this->createBarOrLineChart($result, $measures, Chart::TYPE_LINE);
         } elseif (\count($tuple) === 2) {
-            return $this->createGroupedBarChart($result, 'multiLine');
+            return $this->createGroupedBarChart($result, $measures[0], 'multiLine');
         }
 
         throw new UnsupportedData('Unsupported chart type');
     }
 
     /**
+     * @param non-empty-list<string> $measures
      * @param Chart::TYPE_LINE|Chart::TYPE_BAR $type
      */
-    private function createBarOrLineChart(Result $result, string $type): Chart
+    private function createBarOrLineChart(Result $result, array $measures, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measures = $result->getCube()->getMeasures();
+        $measuresObject = $result->getCube()->getMeasures();
 
-        $selectedMeasures = $this->selectMeasures($measures);
+        $selectedMeasures = $this->selectMeasures($measuresObject, $measures);
         $numMeasures = \count($selectedMeasures);
 
         $labels = [];
@@ -173,7 +180,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // Populate labels.
 
         foreach ($selectedMeasures as $name) {
-            $measure = $measures->get($name)
+            $measure = $measuresObject->get($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
                     $name,
@@ -318,10 +325,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     /**
      * @param 'stackedBar'|'groupedBar'|'multiLine' $type
      */
-    private function createGroupedBarChart(Result $result, string $type): Chart
+    private function createGroupedBarChart(Result $result, string $measure, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $result->getCube()->getMeasures()->first();
+        $measure = $result->getCube()->getMeasures()->get($measure);
 
         if ($measure === null) {
             throw new UnexpectedValueException('Measures not found');
@@ -494,7 +501,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         return $chart;
     }
 
-    private function createPieChart(Result $result): Chart
+    private function createPieChart(Result $result, string $measureName): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
         $measures = $result->getTable()->first()?->getMeasures();
@@ -503,17 +510,9 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             throw new UnsupportedData('Measures not found');
         }
 
-        $selectedMeasures = $this->selectMeasures($measures);
-        $numMeasures = \count($selectedMeasures);
-
-        if ($numMeasures !== 1) {
-            throw new UnsupportedData('Only one measure is supported');
-        }
-
         // Populate labels.
 
-        $name = $selectedMeasures[0];
-        $measure = $measures->get($name);
+        $measure = $measures->get($measureName);
 
         $labels = [];
         $dataSet = [];
@@ -551,7 +550,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
 
             $measures = $row->getMeasures();
-            $measure = $measures->get($name);
+            $measure = $measures->get($measureName);
 
             $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
 
@@ -577,14 +576,19 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
+     * @param list<string> $userSuppliedMeasures
      * @return list<string>
      */
-    private function selectMeasures(Measures $measures): array
+    private function selectMeasures(Measures $measures, array $userSuppliedMeasures): array
     {
         $selectedMeasures = [];
         $selectedUnit = null;
 
         foreach ($measures as $measure) {
+            if (!\in_array($measure->getName(), $userSuppliedMeasures, true)) {
+                continue;
+            }
+
             $unit = $measure->getUnit();
 
             if ($selectedMeasures === [] && $unit === null) {

@@ -41,11 +41,6 @@ final class DefaultQuery implements Query
     private array $dimensions = [];
 
     /**
-     * @var list<string>
-     */
-    private array $measures = [];
-
-    /**
      * @var list<Expression>
      */
     private array $where = [];
@@ -252,40 +247,6 @@ final class DefaultQuery implements Query
     public function addGroupBy(string ...$dimensions): static
     {
         $this->groupBy(...array_merge($this->dimensions, $dimensions));
-
-        return $this;
-    }
-
-    //
-    // measures
-    //
-
-    /**
-     * @return list<string>
-     */
-    #[\Override]
-    public function getSelect(): array
-    {
-        return $this->measures;
-    }
-
-    #[\Override]
-    public function select(string ...$measures): static
-    {
-        $this->result = null;
-
-        $measures = array_values(array_unique($measures));
-        $this->ensureFieldValid($measures, 'measure');
-
-        $this->measures = $measures;
-
-        return $this;
-    }
-
-    #[\Override]
-    public function addSelect(string ...$measures): static
-    {
-        $this->select(...array_merge($this->measures, $measures));
 
         return $this;
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Entity;
 
+use Brick\Math\RoundingMode;
 use Brick\Money\Money;
 use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Types\Types;
@@ -246,7 +247,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
         label: new TranslatableMessage('Average spending per customer'),
         unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
-    private ?int $averageSpendingPerCustomer = null; // @phpstan-ignore property.unusedType
+    private ?float $averageSpendingPerCustomer = null; // @phpstan-ignore property.unusedType
 
     #[Analytics\Measure(
         function: new Average(
@@ -267,7 +268,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
         label: new TranslatableMessage('Price StdDev'),
         unit: new TranslatableMessage('Monetary Value (EUR)'),
     )]
-    private ?int $priceStdDev = null;  // @phpstan-ignore property.unusedType
+    private ?float $priceStdDev = null;  // @phpstan-ignore property.unusedType
 
 
     #[\Override]
@@ -344,7 +345,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->price, 'EUR');
+        return Money::ofMinor($this->price, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getMinPrice(): ?Money
@@ -353,7 +354,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->minPrice, 'EUR');
+        return Money::ofMinor($this->minPrice, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getMaxPrice(): ?Money
@@ -362,7 +363,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->maxPrice, 'EUR');
+        return Money::ofMinor($this->maxPrice, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getCount(): ?int
@@ -384,7 +385,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->averageSpendingPerCustomer, 'EUR');
+        return Money::ofMinor($this->averageSpendingPerCustomer, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getAverageOrderValue(): ?Money
@@ -393,7 +394,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->averageOrderValue, 'EUR');
+        return Money::ofMinor($this->averageOrderValue, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getPriceRange(): ?Money
@@ -402,7 +403,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->priceRange, 'EUR');
+        return Money::ofMinor($this->priceRange, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getPriceStdDev(): ?Money
@@ -411,7 +412,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->priceStdDev, 'EUR');
+        return Money::ofMinor($this->priceStdDev, 'EUR', roundingMode: RoundingMode::HALF_UP);
     }
 
     public function getPriceSumSquare(): ?float
