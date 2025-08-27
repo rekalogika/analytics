@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Serialization;
 
-use Rekalogika\Analytics\Contracts\Dto\TupleDto;
+use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
 use Rekalogika\Analytics\Contracts\Result\Cell;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 
-interface TupleMapper
+interface CoordinatesMapper
 {
-    public function toDto(Tuple $tuple): TupleDto;
+    public function toDto(Coordinates $coordinates): CoordinatesDto;
 
     /**
      * @param class-string $summaryClass
      */
-    public function fromDto(string $summaryClass, TupleDto $dto): Cell;
+    public function fromDto(string $summaryClass, CoordinatesDto $dto): Cell;
 }

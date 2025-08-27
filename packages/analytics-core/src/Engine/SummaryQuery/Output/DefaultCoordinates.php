@@ -15,13 +15,13 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
  */
-final class DefaultTuple implements Tuple, \IteratorAggregate
+final class DefaultCoordinates implements Coordinates, \IteratorAggregate
 {
     private ?string $signature = null;
 
@@ -58,10 +58,10 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     /**
      * @param list<string> $order
      */
-    public function withOrder(array $order): DefaultOrderedTuple
+    public function withOrder(array $order): DefaultOrderedCoordinates
     {
-        return new DefaultOrderedTuple(
-            tuple: $this,
+        return new DefaultOrderedCoordinates(
+            coordinates: $this,
             order: $order,
         );
     }
@@ -85,7 +85,7 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     {
         if (!isset($this->dimensions[$dimensionName])) {
             throw new UnexpectedValueException(\sprintf(
-                'Dimension "%s" not found in tuple',
+                'Dimension "%s" not found in coordinates',
                 $dimensionName,
             ));
         }
@@ -165,7 +165,7 @@ final class DefaultTuple implements Tuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getCondition(): ?Expression
+    public function getPredicate(): ?Expression
     {
         return $this->condition;
     }

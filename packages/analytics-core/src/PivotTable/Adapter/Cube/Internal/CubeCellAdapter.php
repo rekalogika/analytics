@@ -28,21 +28,21 @@ final readonly class CubeCellAdapter implements PivotTableCubeCell
     ) {}
 
     #[\Override]
-    public function getTuple(): array
+    public function getCoordinates(): array
     {
-        $tuple = [];
+        $coordinates = [];
 
-        foreach ($this->cubeCell->getTuple() as $key => $dimension) {
-            $tuple[$key] = $this->propertyMap->getDimension($dimension);
+        foreach ($this->cubeCell->getCoordinates() as $key => $dimension) {
+            $coordinates[$key] = $this->propertyMap->getDimension($dimension);
         }
 
-        return $tuple;
+        return $coordinates;
     }
 
     private function getMeasureName(): ?string
     {
         $measureMember = $this->cubeCell
-            ->getTuple()
+            ->getCoordinates()
             ->get('@values')
             ?->getRawMember();
 
@@ -94,6 +94,10 @@ final readonly class CubeCellAdapter implements PivotTableCubeCell
         }
 
         $result = $this->cubeCell->slice($dimensionName, $member);
+
+        if ($result === null) {
+            throw new LogicException('Slice operation returned null. The member might not exist.');
+        }
 
         return new self(
             cubeCell: $result,

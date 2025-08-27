@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -27,7 +29,7 @@ final class DefaultCell implements CubeCell
     private array $drillDowns = [];
 
     public function __construct(
-        private readonly DefaultTuple $tuple,
+        private readonly DefaultCoordinates $coordinates,
         private readonly DefaultMeasures $measures,
         private readonly bool $isNull,
         private readonly ResultContext $context,
@@ -36,7 +38,7 @@ final class DefaultCell implements CubeCell
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->tuple->getSummaryClass();
+        return $this->coordinates->getSummaryClass();
     }
 
     #[\Override]
@@ -58,14 +60,19 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
-    public function getTuple(): DefaultTuple
+    public function getCoordinates(): DefaultCoordinates
     {
-        return $this->tuple;
+        return $this->coordinates;
+    }
+
+    public function getMember(string $dimension): mixed
+    {
+        return $this->coordinates->get($dimension)?->getMember();
     }
 
     public function getSignature(): string
     {
-        return $this->tuple->getSignature();
+        return $this->coordinates->getSignature();
     }
 
     /**
@@ -73,78 +80,74 @@ final class DefaultCell implements CubeCell
      */
     public function getDimensionality(): array
     {
-        return $this->tuple->getDimensionality();
+        return $this->coordinates->getDimensionality();
     }
 
     #[\Override]
-    public function rollUp(string $dimensionName): DefaultCell
+    public function rollUp(string $dimension): DefaultCell
     {
-        $rolledUpTuple = $this->tuple->without($dimensionName);
+        $rolledUpCoordinates = $this->coordinates->without($dimension);
 
         return $this->context
             ->getCellRepository()
-            ->getCellByTuple($rolledUpTuple);
+            ->getCellByCoordinates($rolledUpCoordinates);
     }
 
     #[\Override]
-    public function drillDown(string $dimensionName): DefaultCells
+    public function drillDown(string $dimension): DefaultCells
     {
-        return $this->drillDowns[$dimensionName] ??= new DefaultCells(
+        return $this->drillDowns[$dimension] ??= new DefaultCells(
             baseCell: $this,
-            childDimensionName: $dimensionName,
+            childDimensionName: $dimension,
             context: $this->context,
         );
     }
 
     #[\Override]
-    public function slice(string $dimensionName, mixed $member): CubeCell
+    public function slice(string $dimension, mixed $member): CubeCell
     {
         return $this->context
             ->getCellRepository()
             ->getCellsByBaseAndDimension(
                 baseCell: $this,
-                dimensionName: $dimensionName,
+                dimensionName: $dimension,
                 dimensionMember: $member,
             );
     }
 
     #[\Override]
-    public function fuzzySlice(string $dimensionName, mixed $input): ?CubeCell
+    public function find(string $dimension, mixed $argument): ?CubeCell
     {
-        $slices = $this->drillDown($dimensionName);
+        $slices = $this->drillDown($dimension);
 
         foreach ($slices as $cell) {
             /** @psalm-suppress MixedAssignment */
-            $member = $cell->getTuple()->get($dimensionName)?->getMember();
+            $member = $cell->getMember($dimension);
 
-            if ($member === null) {
-                if ($input === null) {
+            if ($member === $argument) {
+                return $cell;
+            } elseif ($member instanceof MeasureMember) {
+                if ($member->getMeasureProperty() === $argument) {
                     return $cell;
                 }
-
-                continue;
-            }
-
-            if (
-                $member instanceof MeasureMember
-                && $member->getMeasureProperty() === $input
-            ) {
-                return $cell;
-            }
-
-            if ($member === $input) {
-                return $cell;
-            }
-
-            if (
-                $member instanceof \Stringable
-                && $member->__toString() === $input
-            ) {
-                return $cell;
+            } elseif ($member instanceof \Stringable) {
+                if ($member->__toString() === $argument) {
+                    return $cell;
+                }
+            } elseif (\is_callable($argument)) {
+                if ($argument($member) === true) {
+                    return $cell;
+                }
             }
         }
 
         return null;
+    }
+
+    #[\Override]
+    public function dice(?Expression $predicate): DefaultCell
+    {
+        throw new BadMethodCallException('dice() is not yet implemented.');
     }
 
     public function getContext(): ResultContext

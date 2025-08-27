@@ -32,7 +32,7 @@ final readonly class RowAdapter implements PivotTableRow
     #[\Override]
     public function getDimensions(): iterable
     {
-        foreach ($this->row->getTuple() as $name => $dimension) {
+        foreach ($this->row->getCoordinates() as $name => $dimension) {
             yield $name => new TableMember($dimension->getMember());
         }
     }

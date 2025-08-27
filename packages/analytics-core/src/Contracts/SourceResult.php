@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Contracts;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 
 /**
- * The source entities of a tuple from a summary query result.
+ * The source entities of coordinates from a summary query result.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

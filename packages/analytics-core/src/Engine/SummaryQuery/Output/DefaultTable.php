@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Table;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Registry\RowRegistry;
 
 /**
- * @implements \IteratorAggregate<Tuple,DefaultRow>
+ * @implements \IteratorAggregate<Coordinates,DefaultRow>
  */
 final class DefaultTable implements Table, \IteratorAggregate
 {
@@ -62,11 +62,11 @@ final class DefaultTable implements Table, \IteratorAggregate
     #[\Override]
     public function get(mixed $key): DefaultRow
     {
-        if (!$key instanceof DefaultTuple) {
-            throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
+        if (!$key instanceof DefaultCoordinates) {
+            throw new \InvalidArgumentException('This table only supports DefaultCoordinates as key');
         }
 
-        $cell = $this->cellRepository->getCellByTuple($key);
+        $cell = $this->cellRepository->getCellByCoordinates($key);
 
         return $this->registry->getRowByCell($cell);
     }
@@ -104,11 +104,11 @@ final class DefaultTable implements Table, \IteratorAggregate
     #[\Override]
     public function has(mixed $key): bool
     {
-        if (!$key instanceof DefaultTuple) {
-            throw new \InvalidArgumentException('This table only supports DefaultTuple as key');
+        if (!$key instanceof DefaultCoordinates) {
+            throw new \InvalidArgumentException('This table only supports DefaultCoordinates as key');
         }
 
-        return $this->cellRepository->hasCellWithTuple($key);
+        return $this->cellRepository->hasCellWithCoordinates($key);
     }
 
     /**
@@ -150,7 +150,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->getRows() as $row) {
-            yield $row->getTuple() => $row;
+            yield $row->getCoordinates() => $row;
         }
     }
 }

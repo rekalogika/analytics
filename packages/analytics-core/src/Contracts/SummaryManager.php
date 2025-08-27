@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 
 interface SummaryManager
 {
@@ -30,5 +30,5 @@ interface SummaryManager
 
     public function createQuery(): Query;
 
-    public function getSource(Tuple $tuple): SourceResult;
+    public function getSource(Coordinates $coordinates): SourceResult;
 }

@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Query;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
@@ -61,14 +61,14 @@ final class SourceQuery extends AbstractQuery
         return $this;
     }
 
-    public function fromTuple(Tuple $tuple): self
+    public function fromCoordinates(Coordinates $coordinates): self
     {
-        $this->addTupleDimensionsToWhere($tuple);
+        $this->addCoordinatesDimensionsToWhere($coordinates);
 
-        $expressions = $tuple->getCondition();
+        $predicate = $coordinates->getPredicate();
 
-        if ($expressions !== null) {
-            $this->addExpressionsToWhere($expressions);
+        if ($predicate !== null) {
+            $this->addExpressionsToWhere($predicate);
         }
 
         return $this;
@@ -78,7 +78,7 @@ final class SourceQuery extends AbstractQuery
     {
         $this->addQueryDimensionsToSelectGroupByOrderBy($query);
 
-        $expressions = $query->getWhere();
+        $expressions = $query->getDice();
 
         if ($expressions !== null) {
             $this->addExpressionsToWhere($expressions);
@@ -121,9 +121,9 @@ final class SourceQuery extends AbstractQuery
         }
     }
 
-    private function addTupleDimensionsToWhere(Tuple $tuple): void
+    private function addCoordinatesDimensionsToWhere(Coordinates $coordinates): void
     {
-        foreach ($tuple as $dimension) {
+        foreach ($coordinates as $dimension) {
             $name = $dimension->getName();
 
             if ($name === '@values') {
@@ -167,7 +167,7 @@ final class SourceQuery extends AbstractQuery
 
     private function addQueryDimensionsToSelectGroupByOrderBy(Query $query): void
     {
-        $dimensions = $query->getGroupBy();
+        $dimensions = $query->getDimensions();
 
         foreach ($dimensions as $dimension) {
             $dimensionMetadata = $this->summaryMetadata->getDimension($dimension);

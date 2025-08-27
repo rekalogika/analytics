@@ -36,7 +36,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\FormatterExtension;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\HtmlifierRuntime;
 use Rekalogika\Analytics\Frontend\Formatter\Twig\StringifierRuntime;
-use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
+use Rekalogika\Analytics\Frontend\Html\PredicateRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -109,7 +109,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
-        ->set(ExpressionRenderer::class)
+        ->set(PredicateRenderer::class)
         ->args([
             '$htmlifier' => service(Htmlifier::class),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),

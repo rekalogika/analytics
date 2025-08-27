@@ -17,7 +17,7 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTuple;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCoordinates;
 
 /**
  * Collects and stores cells. Cells must be added in database order.
@@ -47,11 +47,11 @@ final class CellRepository
         }
     }
 
-    public function getCellByTuple(DefaultTuple $tuple): DefaultCell
+    public function getCellByCoordinates(DefaultCoordinates $coordinates): DefaultCell
     {
-        return $this->signatureToCell[$tuple->getSignature()]
+        return $this->signatureToCell[$coordinates->getSignature()]
             ??= new DefaultCell(
-                tuple: $tuple,
+                coordinates: $coordinates,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
                 isNull: true,
                 context: $this->context,
@@ -75,11 +75,11 @@ final class CellRepository
             ));
         }
 
-        $tuple = $baseCell->getTuple()->append($dimension);
+        $coordinates = $baseCell->getCoordinates()->append($dimension);
 
-        return $this->signatureToCell[$tuple->getSignature()]
+        return $this->signatureToCell[$coordinates->getSignature()]
             ??= new DefaultCell(
-                tuple: $tuple,
+                coordinates: $coordinates,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
                 isNull: true,
                 context: $baseCell->getContext(),
@@ -105,8 +105,8 @@ final class CellRepository
         }
 
         foreach ($dimensions as $dimension) {
-            $tuple = $baseCell->getTuple()->append($dimension);
-            $cell = $this->signatureToCell[$tuple->getSignature()] ?? null;
+            $coordinates = $baseCell->getCoordinates()->append($dimension);
+            $cell = $this->signatureToCell[$coordinates->getSignature()] ?? null;
 
             // if the cell already exists and it is not the result of a gap fill,
             // we return it directly.
@@ -132,7 +132,7 @@ final class CellRepository
             $measures = $this->nullMeasureCollection->getNullMeasures();
 
             $cell = new DefaultCell(
-                tuple: $tuple,
+                coordinates: $coordinates,
                 measures: $measures,
                 isNull: true,
                 context: $baseCell->getContext(),
@@ -143,9 +143,9 @@ final class CellRepository
         }
     }
 
-    public function hasCellWithTuple(DefaultTuple $tuple): bool
+    public function hasCellWithCoordinates(DefaultCoordinates $coordinates): bool
     {
-        return isset($this->signatureToCell[$tuple->getSignature()]);
+        return isset($this->signatureToCell[$coordinates->getSignature()]);
     }
 
     /**
@@ -170,17 +170,17 @@ final class CellRepository
         }
 
         // no apex cell was produced, we have to create one here ourselves
-        $apexTuple = new DefaultTuple(
+        $apexCoordinates = new DefaultCoordinates(
             summaryClass: $this->query->getFrom(),
             dimensions: [],
-            condition: $this->query->getWhere(),
+            condition: $this->query->getDice(),
         );
 
         $apexMeasures = $this->nullMeasureCollection->getNullMeasures();
         $measures = iterator_to_array($apexMeasures, true);
 
         return $this->apexCell = new DefaultCell(
-            tuple: $apexTuple,
+            coordinates: $apexCoordinates,
             measures: $apexMeasures,
             isNull: true,
             context: $this->context,

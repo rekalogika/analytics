@@ -15,19 +15,19 @@ namespace Rekalogika\Analytics\Serialization\Mapper;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
 use Rekalogika\Analytics\Contracts\Dto\ExpressionDto;
-use Rekalogika\Analytics\Contracts\Dto\TupleDto;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
-use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
+use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Serialization\Implementation\NullRow;
 use Rekalogika\Analytics\Serialization\Mapper\Implementation\ChainMapper;
 
-final readonly class DefaultTupleMapper implements TupleMapper
+final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
 {
     /**
      * @var Mapper<object,object>
@@ -43,13 +43,13 @@ final readonly class DefaultTupleMapper implements TupleMapper
     }
 
     #[\Override]
-    public function toDto(Tuple $tuple): TupleDto
+    public function toDto(Coordinates $coordinates): CoordinatesDto
     {
-        $class = $tuple->getSummaryClass();
+        $class = $coordinates->getSummaryClass();
 
         $members = [];
 
-        foreach ($tuple as $name => $dimension) {
+        foreach ($coordinates as $name => $dimension) {
             if ($name === '@values') {
                 continue;
             }
@@ -67,7 +67,7 @@ final readonly class DefaultTupleMapper implements TupleMapper
             $members[$dimensionName] = $serializedValue;
         }
 
-        $condition = $tuple->getCondition();
+        $condition = $coordinates->getPredicate();
 
         if ($condition !== null) {
             $mapperContext = new MapperContext(
@@ -81,14 +81,14 @@ final readonly class DefaultTupleMapper implements TupleMapper
             }
         }
 
-        return new TupleDto(
+        return new CoordinatesDto(
             members: $members,
-            condition: $condition,
+            predicate: $condition,
         );
     }
 
     #[\Override]
-    public function fromDto(string $summaryClass, TupleDto $dto): Row
+    public function fromDto(string $summaryClass, CoordinatesDto $dto): Row
     {
         $metadata = $this->summaryMetadataFactory
             ->getSummaryMetadata($summaryClass);
@@ -99,7 +99,7 @@ final readonly class DefaultTupleMapper implements TupleMapper
             ->from($summaryClass);
 
         // add where condition
-        $conditionDto = $dto->getCondition();
+        $conditionDto = $dto->getPredicate();
         $condition = null;
 
         if ($conditionDto !== null) {
@@ -113,7 +113,7 @@ final readonly class DefaultTupleMapper implements TupleMapper
                 throw new UnexpectedValueException('Expected Expression, got ' . \get_class($condition));
             }
 
-            $query->where($condition);
+            $query->dice($condition);
         }
 
         // add group by
@@ -127,9 +127,9 @@ final readonly class DefaultTupleMapper implements TupleMapper
                 identifier: $serializedValue,
             );
 
-            $query->addGroupBy($dimensionName);
+            $query->addDimension($dimensionName);
 
-            $query->andWhere(Criteria::expr()->eq(
+            $query->andDice(Criteria::expr()->eq(
                 $dimensionName,
                 $rawMember,
             ));

@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'Tuple' }}{% endblock %}
+{% block title %}{{ 'Cell Information' }}{% endblock %}
 
 {% block body %}
-    <h2 class="mb-3">Tuple</h2>
+    <h2 class="mb-3">Cell Information</h2>
 
     <h3 class="mb-3">Dimensions</h3>
 
@@ -17,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for name, dimension in row.tuple %}
+            {% for name, dimension in row.coordinates %}
                 <tr>
                     <td>{{ dimension.name }}</td>
                     <td>{{ dimension.label|trans }}</td>

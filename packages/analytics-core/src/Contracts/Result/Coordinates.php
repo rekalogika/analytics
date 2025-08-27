@@ -17,25 +17,25 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Collection\MapCollection;
 
 /**
- * A tuple of dimensions. A collection of dimensions that identifies a unique
- * intersection of members from different dimensions in the cube. A tuple is in
- * no particular order. The members of a tuple must be from unique dimensions
- * from the same summary class.
+ * Coordinates of dimensions. A collection of dimensions that identifies a
+ * unique intersection of members from different dimensions in the cube. The
+ * dimensions are in no particular order. The members must be from unique
+ * dimensions from the same summary class.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
  * @extends MapCollection<string,Dimension>
  */
-interface Tuple extends MapCollection
+interface Coordinates extends MapCollection
 {
     /**
-     * The summary class that this tuple belongs to.
+     * The summary class that this coordinates belongs to.
      *
      * @return class-string
      */
     public function getSummaryClass(): string;
 
-    public function getCondition(): ?Expression;
+    public function getPredicate(): ?Expression;
 
     /**
      * @return list<string>

@@ -25,9 +25,9 @@ trait MeasuresTrait
             return $this->measure;
         }
 
-        $measureName = $this->getTuple()->getMeasureName();
+        $measureName = $this->getCoordinates()->getMeasureName();
 
-        // does not have @values in the tuple
+        // does not have @values in the coordinates
         if ($measureName === null) {
             $measure = DefaultMeasure::createMultiple();
         } else {

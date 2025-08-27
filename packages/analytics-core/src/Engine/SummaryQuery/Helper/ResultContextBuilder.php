@@ -21,11 +21,11 @@ use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCoordinates;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultDimension;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasure;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasureMember;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultMeasures;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTuple;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultUnit;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -65,7 +65,7 @@ final class ResultContextBuilder
         );
 
         $this->dimensions = array_values(array_filter(
-            $this->query->getGroupBy(),
+            $this->query->getDimensions(),
             static fn(string $dimension): bool => $dimension !== '@values',
         ));
     }
@@ -156,16 +156,16 @@ final class ResultContextBuilder
         $measureValues = $this->createMeasureValues($summaryObject);
 
         // instantiate
-        $tuple = new DefaultTuple(
+        $coordinates = new DefaultCoordinates(
             summaryClass: $this->metadata->getSummaryClass(),
             dimensions: array_values($dimensionValues),
-            condition: $this->query->getWhere(),
+            condition: $this->query->getDice(),
         );
 
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultCell(
-            tuple: $tuple,
+            coordinates: $coordinates,
             measures: $measures,
             isNull: false,
             context: $this->context,
@@ -395,14 +395,14 @@ final class ResultContextBuilder
                     \sprintf('Measure "%s" not found in row', $measure),
                 );
 
-            $tuple = $cell->getTuple()->append($measureDimension);
+            $coordinates = $cell->getCoordinates()->append($measureDimension);
 
             $measures = new DefaultMeasures([
                 $measure->getName() => $measure,
             ]);
 
             yield new DefaultCell(
-                tuple: $tuple,
+                coordinates: $coordinates,
                 measures: $measures,
                 isNull: false,
                 context: $this->context,

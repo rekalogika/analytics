@@ -28,9 +28,9 @@ final class DefaultRow implements Row
     ) {}
 
     #[\Override]
-    public function getTuple(): DefaultOrderedTuple
+    public function getCoordinates(): DefaultOrderedCoordinates
     {
-        return $this->cell->getTuple()->withOrder($this->dimensionality);
+        return $this->cell->getCoordinates()->withOrder($this->dimensionality);
     }
 
     #[\Override]

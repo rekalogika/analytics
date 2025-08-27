@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
+use Rekalogika\Analytics\Contracts\Result\OrderedCoordinates;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 /**
  * @implements \IteratorAggregate<string,NullDimension>
  */
-final readonly class NullTuple implements OrderedTuple, \IteratorAggregate
+final readonly class NullCoordinates implements OrderedCoordinates, \IteratorAggregate
 {
     /**
      * @var class-string
@@ -115,7 +115,7 @@ final readonly class NullTuple implements OrderedTuple, \IteratorAggregate
     }
 
     #[\Override]
-    public function getCondition(): ?Expression
+    public function getPredicate(): ?Expression
     {
         return $this->condition;
     }
