@@ -172,7 +172,7 @@ final class DefaultResult implements Result
     public function getTable(): DefaultTable
     {
         $dimensionality = array_values(array_filter(
-            $this->query->getGroupBy(),
+            $this->query->getDimensions(),
             static fn(string $field): bool => $field !== '@values',
         ));
 

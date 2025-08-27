@@ -18,15 +18,15 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
-use Rekalogika\Analytics\Contracts\Dto\TupleDto;
-use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
+use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
+use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
-use Rekalogika\Analytics\Frontend\Html\ExpressionRenderer;
+use Rekalogika\Analytics\Frontend\Html\PredicateRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
@@ -63,7 +63,7 @@ final class AppController extends AbstractController
         PivotAwareQueryFactory $pivotAwareQueryFactory,
         ChartGenerator $chartGenerator,
         TableRenderer $htmlRenderer,
-        ExpressionRenderer $expressionHtmlRenderer,
+        PredicateRenderer $expressionHtmlRenderer,
         string $hash,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
@@ -115,7 +115,7 @@ final class AppController extends AbstractController
         }
 
         // expression rendering
-        $expressions = $expressionHtmlRenderer->renderExpression($origQuery);
+        $expressions = $expressionHtmlRenderer->renderPredicate($origQuery);
 
         // create chart
         try {
@@ -169,11 +169,11 @@ final class AppController extends AbstractController
         ]);
     }
 
-    #[Route('/summary/tuple/{hash}/{data}', name: 'tuple')]
-    public function tuple(
+    #[Route('/summary/cell/{hash}/{data}', name: 'cell')]
+    public function cell(
         string $hash,
         string $data,
-        TupleMapper $tupleMapper,
+        CoordinatesMapper $coordinatesMapper,
         #[Autowire('@rekalogika.analytics.summary_manager')]
         DefaultSummaryManager $summaryManager,
     ): Response {
@@ -184,15 +184,15 @@ final class AppController extends AbstractController
          * @psalm-suppress MixedArgument
          * @phpstan-ignore argument.type
          */
-        $tupleDto = TupleDto::fromArray(json_decode($data, true));
-        $cell = $tupleMapper->fromDto($class, $tupleDto);
-        $queryComponents = $summaryManager->getTupleQueryComponents($cell->getTuple());
+        $coordinatesDto = CoordinatesDto::fromArray(json_decode($data, true));
+        $cell = $coordinatesMapper->fromDto($class, $coordinatesDto);
+        $queryComponents = $summaryManager->getCoordinatesQueryComponents($cell->getCoordinates());
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
         $sourceSql = $sqlFormatter->compress($sourceSql);
         $sourceSql = $sqlFormatter->highlight($sourceSql);
 
-        return $this->render('app/tuple.html.twig', [
+        return $this->render('app/cell.html.twig', [
             'row' => $cell,
             'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
@@ -253,7 +253,7 @@ final class AppController extends AbstractController
     public function dummy(
         DistinctValuesResolver $distinctValueResolver,
         ValueSerializer $valueSerializer,
-        TupleMapper $tupleSerializer,
+        CoordinatesMapper $coordinatesMapper,
     ): Response {
         return new Response();
     }

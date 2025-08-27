@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
-final readonly class TupleDto
+final readonly class CoordinatesDto
 {
     /**
      * @param array<string,string|null> $members Key is dimension name, value is the
@@ -23,7 +23,7 @@ final readonly class TupleDto
      */
     public function __construct(
         private array $members,
-        private ?ExpressionDto $condition,
+        private ?ExpressionDto $predicate,
     ) {}
 
     /**
@@ -32,9 +32,9 @@ final readonly class TupleDto
     public function toArray(): array
     {
         return [
-            'class' => 'tuple',
+            'class' => 'coordinates',
             'members' => $this->members,
-            'condition' => $this->condition?->toArray(),
+            'predicate' => $this->predicate?->toArray(),
         ];
     }
 
@@ -47,38 +47,38 @@ final readonly class TupleDto
         /** @psalm-suppress DocblockTypeContradiction */
         if (
             !isset($array['class'], $array['members'])
-            || $array['class'] !== 'tuple'
+            || $array['class'] !== 'coordinates'
             || !\is_array($array['members'])
         ) {
-            throw new InvalidArgumentException('Invalid array representation for TupleDto.');
+            throw new InvalidArgumentException('Invalid array representation for CoordinatesDto.');
         }
 
         $members = [];
 
         foreach ($array['members'] as $key => $value) {
             if (!\is_string($key) || !\is_string($value)) {
-                throw new InvalidArgumentException('Tuple members must be key-value pairs of strings.');
+                throw new InvalidArgumentException('Coordinates members must be key-value pairs of strings.');
             }
 
             $members[$key] = $value;
         }
 
-        $condition = null;
+        $predicate = null;
 
         if (
-            isset($array['condition'])
-            && \is_array($array['condition'])
+            isset($array['predicate'])
+            && \is_array($array['predicate'])
         ) {
             /**
              * @psalm-suppress MixedArgumentTypeCoercion
              * @phpstan-ignore argument.type
              */
-            $condition = ExpressionDto::fromArray($array['condition']);
+            $predicate = ExpressionDto::fromArray($array['predicate']);
         }
 
         return new self(
             members: $members,
-            condition: $condition,
+            predicate: $predicate,
         );
     }
 
@@ -90,8 +90,8 @@ final readonly class TupleDto
         return $this->members;
     }
 
-    public function getCondition(): ?ExpressionDto
+    public function getPredicate(): ?ExpressionDto
     {
-        return $this->condition;
+        return $this->predicate;
     }
 }

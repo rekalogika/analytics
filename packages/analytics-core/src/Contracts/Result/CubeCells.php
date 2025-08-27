@@ -20,6 +20,6 @@ use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<Tuple,CubeCell>
+ * @extends OrderedMapCollection<Coordinates,CubeCell>
  */
 interface CubeCells extends OrderedMapCollection {}

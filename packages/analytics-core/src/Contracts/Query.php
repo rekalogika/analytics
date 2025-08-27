@@ -39,27 +39,27 @@ interface Query
     public function from(string $class): static;
 
     //
-    // group by
+    // dimension
     //
 
     /**
      * @return list<string>
      */
-    public function getGroupBy(): array;
+    public function getDimensions(): array;
 
-    public function groupBy(string ...$dimensions): static;
+    public function setDimensions(string ...$dimensions): static;
 
-    public function addGroupBy(string ...$dimensions): static;
+    public function addDimension(string ...$dimensions): static;
 
     //
-    // where
+    // dice
     //
 
-    public function getWhere(): ?Expression;
+    public function getDice(): ?Expression;
 
-    public function where(Expression $expression): static;
+    public function dice(?Expression $predicate): static;
 
-    public function andWhere(Expression $expression): static;
+    public function andDice(Expression $predicate): static;
 
     //
     // order by

@@ -44,7 +44,7 @@ final readonly class TableAdapter implements PivotTableTable
 
         $legend = [];
 
-        foreach ($firstRow->getTuple() as $dimension) {
+        foreach ($firstRow->getCoordinates() as $dimension) {
             $legend[$dimension->getName()] = $dimension->getLabel();
         }
 
@@ -64,7 +64,7 @@ final readonly class TableAdapter implements PivotTableTable
     public function getRows(): iterable
     {
         foreach ($this->table as $row) {
-            yield $row->getTuple() => new RowAdapter($row, $this->measures);
+            yield $row->getCoordinates() => new RowAdapter($row, $this->measures);
         }
     }
 

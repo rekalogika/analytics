@@ -16,8 +16,8 @@ namespace Rekalogika\Analytics\Engine\Util;
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Comparable;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 final readonly class DimensionUtil
 {
@@ -70,7 +70,7 @@ final readonly class DimensionUtil
         return $a->getRawMember() === $b->getRawMember();
     }
 
-    public static function isTupleSame(Tuple $a, Tuple $b): bool
+    public static function isCoordinatesSame(Coordinates $a, Coordinates $b): bool
     {
         if ($a->count() !== $b->count()) {
             return false;

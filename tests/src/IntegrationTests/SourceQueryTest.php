@@ -47,14 +47,14 @@ final class SourceQueryTest extends KernelTestCase
 
     public function testNoDimension(): void
     {
-        $tuple = $this->getQuery()
+        $coordinates = $this->getQuery()
             ->from(OrderSummary::class)
             ->getResult()
             ->getCube()
-            ->getTuple();
+            ->getCoordinates();
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($tuple);
+            ->getSource($coordinates);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
@@ -69,17 +69,17 @@ final class SourceQueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->from(OrderSummary::class)
-            ->groupBy('customerCountry')
+            ->setDimensions('customerCountry')
             ->getResult();
 
         $apexCube = $result->getCube();
         $slices = $apexCube->drillDown('customerCountry');
-        $tuple = $slices->first()?->getTuple();
+        $coordinates = $slices->first()?->getCoordinates();
 
-        $this->assertNotNull($tuple);
+        $this->assertNotNull($coordinates);
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($tuple);
+            ->getSource($coordinates);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
@@ -94,17 +94,17 @@ final class SourceQueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->from(OrderSummary::class)
-            ->groupBy('time.civil.year')
+            ->setDimensions('time.civil.year')
             ->getResult();
 
         $apexCube = $result->getCube();
         $slices = $apexCube->drillDown('time.civil.year');
-        $tuple = $slices->first()?->getTuple();
+        $coordinates = $slices->first()?->getCoordinates();
 
-        $this->assertNotNull($tuple);
+        $this->assertNotNull($coordinates);
 
         $sourceResult = $this->getSummaryManager()
-            ->getSource($tuple);
+            ->getSource($coordinates);
 
         $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
         $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
@@ -132,10 +132,10 @@ final class SourceQueryTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->groupBy('customerCountry')
-            ->addGroupBy('itemCategory')
-            ->addGroupBy('customerGender')
-            ->where(Criteria::expr()->neq('customerCountry', $oneCountry));
+            ->setDimensions('customerCountry')
+            ->addDimension('itemCategory')
+            ->addDimension('customerGender')
+            ->dice(Criteria::expr()->neq('customerCountry', $oneCountry));
 
         $result = $query->getResult();
 
@@ -155,7 +155,7 @@ final class SourceQueryTest extends KernelTestCase
         $precounted = $row->getMeasures()->get('count')?->getValue() ?? 0;
         $this->assertIsInt($precounted);
 
-        $sourceResult = $summaryManager->getSource($row->getTuple());
+        $sourceResult = $summaryManager->getSource($row->getCoordinates());
 
         $count = 0;
         $pages = $sourceResult->withItemsPerPage(1000)->getPages();

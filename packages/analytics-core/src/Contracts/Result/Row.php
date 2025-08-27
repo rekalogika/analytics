@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a row in a table. A row has a tuple and one or more measures
+ * Represent a row in a table. A row has coordinates and one or more measures
  * associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.

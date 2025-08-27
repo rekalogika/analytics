@@ -43,7 +43,7 @@ final class DefaultQuery implements Query
     /**
      * @var list<Expression>
      */
-    private array $where = [];
+    private array $dice = [];
 
     /**
      * @var array<string,Order>
@@ -219,7 +219,7 @@ final class DefaultQuery implements Query
      * @return list<string>
      */
     #[\Override]
-    public function getGroupBy(): array
+    public function getDimensions(): array
     {
         $dimensions = $this->dimensions;
 
@@ -231,7 +231,7 @@ final class DefaultQuery implements Query
     }
 
     #[\Override]
-    public function groupBy(string ...$dimensions): static
+    public function setDimensions(string ...$dimensions): static
     {
         $this->result = null;
 
@@ -244,9 +244,9 @@ final class DefaultQuery implements Query
     }
 
     #[\Override]
-    public function addGroupBy(string ...$dimensions): static
+    public function addDimension(string ...$dimensions): static
     {
-        $this->groupBy(...array_merge($this->dimensions, $dimensions));
+        $this->setDimensions(...array_merge($this->dimensions, $dimensions));
 
         return $this;
     }
@@ -256,29 +256,32 @@ final class DefaultQuery implements Query
     //
 
     #[\Override]
-    public function getWhere(): ?Expression
+    public function getDice(): ?Expression
     {
-        if ($this->where === []) {
+        if ($this->dice === []) {
             return null;
         }
 
-        return Criteria::expr()->andX(...$this->where);
+        return Criteria::expr()->andX(...$this->dice);
     }
 
     #[\Override]
-    public function where(Expression $expression): static
+    public function dice(?Expression $predicate): static
     {
-        $this->where = [];
-        $this->andWhere($expression);
+        $this->dice = [];
+
+        if ($predicate !== null) {
+            $this->andDice($predicate);
+        }
 
         return $this;
     }
 
     #[\Override]
-    public function andWhere(Expression $expression): static
+    public function andDice(Expression $predicate): static
     {
         $this->result = null;
-        $this->where[] = $expression;
+        $this->dice[] = $predicate;
 
         return $this;
     }

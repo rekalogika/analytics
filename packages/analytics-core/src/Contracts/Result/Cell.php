@@ -14,17 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
- * Represent a cell, which is an object that contains a tuple and measures.
+ * Represent a cell, which is an object that contains dimension coordinates and
+ * measures.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
 interface Cell
 {
     /**
-     * Get the tuple of this cell, which is a collection of dimensions of this
-     * cell.
+     * Get the coordinates of this cell, which is a collection of dimensions of
+     * this cell.
      */
-    public function getTuple(): Tuple;
+    public function getCoordinates(): Coordinates;
 
     /**
      * The measures of this cell.

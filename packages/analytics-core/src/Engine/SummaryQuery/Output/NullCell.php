@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
+use Doctrine\Common\Collections\Expr\Expression;
+use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 
 final class NullCell implements CubeCell
@@ -51,9 +53,9 @@ final class NullCell implements CubeCell
     }
 
     #[\Override]
-    public function getTuple(): DefaultTuple
+    public function getCoordinates(): DefaultCoordinates
     {
-        return new DefaultTuple(
+        return new DefaultCoordinates(
             summaryClass: $this->summaryClass,
             dimensions: [],
             condition: null,
@@ -69,26 +71,32 @@ final class NullCell implements CubeCell
     }
 
     #[\Override]
-    public function rollUp(string $dimensionName): self
+    public function rollUp(string $dimension): self
     {
         return $this;
     }
 
     #[\Override]
-    public function drillDown(string $dimensionName): NullCells
+    public function drillDown(string $dimension): NullCells
     {
         return new NullCells();
     }
 
     #[\Override]
-    public function slice(string $dimensionName, mixed $member): CubeCell
+    public function slice(string $dimension, mixed $member): CubeCell
     {
         return $this;
     }
 
     #[\Override]
-    public function fuzzySlice(string $dimensionName, mixed $input): CubeCell
+    public function find(string $dimension, mixed $argument): CubeCell
     {
         return $this;
+    }
+
+    #[\Override]
+    public function dice(?Expression $predicate): CubeCell
+    {
+        throw new BadMethodCallException('dice() is not yet implemented.');
     }
 }

@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 use Rekalogika\Analytics\Contracts\Result\CubeCells;
 
 /**
- * @implements \IteratorAggregate<DefaultTuple,DefaultCell>
+ * @implements \IteratorAggregate<DefaultCoordinates,DefaultCell>
  */
 final class NullCells implements CubeCells, \IteratorAggregate
 {

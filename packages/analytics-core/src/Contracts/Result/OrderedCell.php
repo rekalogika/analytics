@@ -15,12 +15,13 @@ namespace Rekalogika\Analytics\Contracts\Result;
 
 /**
  * Represent an ordered cell. An ordered cell is a cell that contains an ordered
- * tuple. In an ordered tuple, the order of dimensions is significant.
+ * coordinates. In an ordered coordinates, the order of dimensions is
+ * significant.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
 interface OrderedCell extends Cell
 {
     #[\Override]
-    public function getTuple(): OrderedTuple;
+    public function getCoordinates(): OrderedCoordinates;
 }

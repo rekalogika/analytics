@@ -15,27 +15,27 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
+use Rekalogika\Analytics\Contracts\Result\OrderedCoordinates;
 use Rekalogika\Contracts\Rekapager\Exception\OutOfBoundsException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
  */
-final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
+final class DefaultOrderedCoordinates implements OrderedCoordinates, \IteratorAggregate
 {
     /**
      * @param list<string> $order
      */
     public function __construct(
-        private readonly DefaultTuple $tuple,
+        private readonly DefaultCoordinates $coordinates,
         private readonly array $order,
     ) {
         $sortedOrder = $order;
         sort($sortedOrder);
 
-        if ($tuple->getDimensionality() !== $sortedOrder) {
+        if ($coordinates->getDimensionality() !== $sortedOrder) {
             throw new InvalidArgumentException(
-                'The order of dimensions does not match the dimensionality of the tuple.',
+                'The order of dimensions does not match the dimensionality of the coordinates.',
             );
         }
     }
@@ -43,13 +43,13 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
     #[\Override]
     public function getSummaryClass(): string
     {
-        return $this->tuple->getSummaryClass();
+        return $this->coordinates->getSummaryClass();
     }
 
     #[\Override]
-    public function getCondition(): ?Expression
+    public function getPredicate(): ?Expression
     {
-        return $this->tuple->getCondition();
+        return $this->coordinates->getPredicate();
     }
 
     #[\Override]
@@ -61,22 +61,22 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
     #[\Override]
     public function get(mixed $key): mixed
     {
-        return $this->tuple->get($key);
+        return $this->coordinates->get($key);
     }
 
     #[\Override]
     public function getByIndex(int $index): mixed
     {
         $key = $this->order[$index]
-            ?? throw new OutOfBoundsException("Index {$index} is out of bounds for the ordered tuple.");
+            ?? throw new OutOfBoundsException("Index {$index} is out of bounds for the ordered coordinates.");
 
-        return $this->tuple->get($key);
+        return $this->coordinates->get($key);
     }
 
     #[\Override]
     public function has(mixed $key): bool
     {
-        return $this->tuple->has($key);
+        return $this->coordinates->has($key);
     }
 
     #[\Override]
@@ -88,7 +88,7 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
             return null;
         }
 
-        return $this->tuple->get($key);
+        return $this->coordinates->get($key);
     }
 
     #[\Override]
@@ -101,7 +101,7 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
             return null;
         }
 
-        return $this->tuple->get($key);
+        return $this->coordinates->get($key);
     }
 
     #[\Override]
@@ -114,11 +114,11 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->order as $key) {
-            $dimension = $this->tuple->get($key);
+            $dimension = $this->coordinates->get($key);
 
             if ($dimension === null) {
                 throw new InvalidArgumentException(
-                    "Dimension with key '{$key}' does not exist in the tuple.",
+                    "Dimension with key '{$key}' does not exist in the coordinates.",
                 );
             }
 
@@ -128,6 +128,6 @@ final class DefaultOrderedTuple implements OrderedTuple, \IteratorAggregate
 
     public function getMeasureName(): ?string
     {
-        return $this->tuple->getMeasureName();
+        return $this->coordinates->getMeasureName();
     }
 }

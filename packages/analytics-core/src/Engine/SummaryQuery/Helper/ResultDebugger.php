@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\NormalRow;
-use Rekalogika\Analytics\Contracts\Result\NormalTable;
-use Rekalogika\Analytics\Contracts\Result\OrderedTuple;
+use Rekalogika\Analytics\Contracts\Result\OrderedCoordinates;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Table;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
 
 /**
  * A helper class for debugging various analytics result items.
@@ -69,11 +67,11 @@ final readonly class ResultDebugger
     /**
      * @return list<string>
      */
-    public static function debugTuple(Tuple|OrderedTuple $tuple): array
+    public static function debugCoordinates(Coordinates|OrderedCoordinates $coordinates): array
     {
         $result = [];
 
-        foreach ($tuple as $dimension) {
+        foreach ($coordinates as $dimension) {
             $result[] = self::debugDimension($dimension);
         }
 
@@ -105,7 +103,7 @@ final readonly class ResultDebugger
     public static function debugRow(Row $row): array
     {
         return [
-            'tuple' => self::debugTuple($row->getTuple()),
+            'coordinates' => self::debugCoordinates($row->getCoordinates()),
             'measures' => self::debugMeasures($row->getMeasures()),
         ];
     }
@@ -129,40 +127,15 @@ final readonly class ResultDebugger
      */
     public static function debugCubeCell(CubeCell $cubeCell): array
     {
-        $tuple = $cubeCell->getTuple();
+        $coordinates = $cubeCell->getCoordinates();
         $measures = $cubeCell->getMeasures();
 
-        $tupleDebug = self::debugTuple($tuple);
+        $coordinatesDebug = self::debugCoordinates($coordinates);
         $measuresDebug = self::debugMeasures($measures);
 
         return [
-            'tuple' => $tupleDebug,
+            'coordinates' => $coordinatesDebug,
             'measures' => $measuresDebug,
         ];
     }
-
-    // /**
-    //  * @return array<string,list<string>|string>
-    //  */
-    // public static function debugNormalRow(NormalRow $row): array
-    // {
-    //     return [
-    //         'tuple' => self::debugTuple($row->getTuple()),
-    //         'measure' => self::debugMeasure($row->getMeasure()),
-    //     ];
-    // }
-
-    // /**
-    //  * @return list<array<string,list<string>|string>>
-    //  */
-    // public static function debugNormalTable(NormalTable $table): array
-    // {
-    //     $result = [];
-
-    //     foreach ($table as $row) {
-    //         $result[] = self::debugNormalRow($row);
-    //     }
-
-    //     return $result;
-    // }
 }

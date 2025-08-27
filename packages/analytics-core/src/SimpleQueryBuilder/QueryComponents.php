@@ -72,8 +72,7 @@ final class QueryComponents
     public function __construct(private Query $query) {}
 
     /**
-     * @return mixed[] tuple of (value, type)
-     * @phpstan-return array{0: mixed, 1: mixed}
+     * @return array{0:mixed,1:mixed}
      */
     private function resolveParameterValue(Parameter $parameter, Query $query): array
     {

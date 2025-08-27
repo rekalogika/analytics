@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Result\Tuple;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
@@ -71,9 +71,9 @@ final readonly class DefaultSummaryManager implements SummaryManager
     }
 
     #[\Override]
-    public function getSource(Tuple $tuple): SourceResult
+    public function getSource(Coordinates $coordinates): SourceResult
     {
-        $summaryClass = $tuple->getSummaryClass();
+        $summaryClass = $coordinates->getSummaryClass();
         $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
         $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
 
@@ -91,15 +91,15 @@ final readonly class DefaultSummaryManager implements SummaryManager
 
         $queryBuilder = $sourceQuery
             ->selectRoot()
-            ->fromTuple($tuple)
+            ->fromCoordinates($coordinates)
             ->getQueryBuilder();
 
         return new DefaultSourceResult($queryBuilder);
     }
 
-    public function getTupleQueryComponents(Tuple $tuple): QueryComponents
+    public function getCoordinatesQueryComponents(Coordinates $coordinates): QueryComponents
     {
-        $summaryClass = $tuple->getSummaryClass();
+        $summaryClass = $coordinates->getSummaryClass();
         $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
         $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
 
@@ -117,7 +117,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
 
         return $sourceQuery
             ->selectMeasures()
-            ->fromTuple($tuple)
+            ->fromCoordinates($coordinates)
             ->getQueryComponents();
     }
 }

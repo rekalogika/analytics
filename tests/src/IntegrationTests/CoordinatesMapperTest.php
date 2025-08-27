@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Rekalogika\Analytics\Contracts\Result\Row;
-use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
+use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class TupleMapperTest extends KernelTestCase
+final class CoordinatesMapperTest extends KernelTestCase
 {
-    public function testTupleMapper(): void
+    public function testCoordinatesMapper(): void
     {
         $summaryManager = self::getContainer()->get(SummaryManager::class);
         $this->assertInstanceOf(SummaryManager::class, $summaryManager);
@@ -31,9 +31,9 @@ final class TupleMapperTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->groupBy('customerCountry')
-            ->addGroupBy('itemCategory')
-            ->addGroupBy('customerType');
+            ->setDimensions('customerCountry')
+            ->addDimension('itemCategory')
+            ->addDimension('customerType');
 
         $result = $query->getResult();
 
@@ -46,17 +46,17 @@ final class TupleMapperTest extends KernelTestCase
 
     private function testOne(Row $row): void
     {
-        $tupleMapper = self::getContainer()->get(TupleMapper::class);
-        $this->assertInstanceOf(TupleMapper::class, $tupleMapper);
+        $coordinatesMapper = self::getContainer()->get(CoordinatesMapper::class);
+        $this->assertInstanceOf(CoordinatesMapper::class, $coordinatesMapper);
 
-        $tuple = $row->getTuple();
-        $class = $tuple->getSummaryClass();
+        $coordinates = $row->getCoordinates();
+        $class = $coordinates->getSummaryClass();
 
-        $tupleDto = $tupleMapper->toDto($tuple);
+        $coordinatesDto = $coordinatesMapper->toDto($coordinates);
 
-        // deserialize the tuple
+        // deserialize the coordinates
 
-        $newRow = $tupleMapper->fromDto($class, $tupleDto);
+        $newRow = $coordinatesMapper->fromDto($class, $coordinatesDto);
 
         // original measures
 

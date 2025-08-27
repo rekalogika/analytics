@@ -23,7 +23,7 @@ final readonly class NullRow implements Row
 {
     private NullMeasures $measures;
 
-    private NullTuple $tuple;
+    private NullCoordinates $coordinates;
 
     /**
      * @param array<string,mixed> $dimensionMembers
@@ -35,7 +35,7 @@ final readonly class NullRow implements Row
     ) {
         $this->measures = new NullMeasures($summaryMetadata);
 
-        $this->tuple = new NullTuple(
+        $this->coordinates = new NullCoordinates(
             summaryMetadata: $summaryMetadata,
             dimensionMembers: $dimensionMembers,
             condition: $this->condition,
@@ -55,8 +55,8 @@ final readonly class NullRow implements Row
     }
 
     #[\Override]
-    public function getTuple(): NullTuple
+    public function getCoordinates(): NullCoordinates
     {
-        return $this->tuple;
+        return $this->coordinates;
     }
 }

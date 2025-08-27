@@ -87,7 +87,7 @@ final class SummaryQuery extends AbstractQuery
 
         parent::__construct($simpleQueryBuilder);
 
-        $dimensionsInQuery = $this->query->getGroupBy();
+        $dimensionsInQuery = $this->query->getDimensions();
 
         if (!\in_array('@values', $dimensionsInQuery, true)) {
             $dimensionsInQuery[] = '@values';
@@ -241,7 +241,7 @@ final class SummaryQuery extends AbstractQuery
 
     private function addUserSuppliedWhere(): void
     {
-        $where = $this->query->getWhere();
+        $where = $this->query->getDice();
 
         if ($where === null) {
             return;
@@ -257,7 +257,7 @@ final class SummaryQuery extends AbstractQuery
         $involvedDimensions = $visitor->getInvolvedDimensions();
 
         $dimensionsInQuery = array_filter(
-            $this->query->getGroupBy(),
+            $this->query->getDimensions(),
             fn(string $dimension): bool => $dimension !== '@values',
         );
 
@@ -270,7 +270,7 @@ final class SummaryQuery extends AbstractQuery
 
     private function processAllDimensions(): void
     {
-        $dimensionsInQuery = $this->query->getGroupBy();
+        $dimensionsInQuery = $this->query->getDimensions();
 
         // add @values to the end of the dimensions if not present
         if (!\in_array('@values', $dimensionsInQuery, true)) {

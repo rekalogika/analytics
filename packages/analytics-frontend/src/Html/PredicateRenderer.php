@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Html\Visitor\ExpressionRendererVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
-final readonly class ExpressionRenderer
+final readonly class PredicateRenderer
 {
     public function __construct(
         private Htmlifier $htmlifier,
@@ -31,7 +31,7 @@ final readonly class ExpressionRenderer
     /**
      * @return list<string>
      */
-    public function renderExpression(Query $query): array
+    public function renderPredicate(Query $query): array
     {
         try {
             $summaryMetadata = $this->summaryMetadataFactory
@@ -42,7 +42,7 @@ final readonly class ExpressionRenderer
                 summaryMetadata: $summaryMetadata,
             );
 
-            $expressions = $query->getWhere();
+            $expressions = $query->getDice();
 
             if ($expressions === null) {
                 return [];

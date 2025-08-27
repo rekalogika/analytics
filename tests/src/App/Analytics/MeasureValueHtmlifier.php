@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
-use Rekalogika\Analytics\Contracts\Serialization\TupleMapper;
+use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
@@ -26,7 +26,7 @@ final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
     private ?Htmlifier $htmlifier = null;
 
     public function __construct(
-        private TupleMapper $tupleMapper,
+        private CoordinatesMapper $coordinatesMapper,
         private UrlGeneratorInterface $urlGenerator,
         private SummaryClassRegistry $summaryClassRegistry,
     ) {}
@@ -61,14 +61,14 @@ final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
         }
 
         $row = $input->getCell();
-        $tuple = $row->getTuple();
+        $coordinates = $row->getCoordinates();
 
-        $tupleDto = $this->tupleMapper->toDto($tuple);
-        $string = json_encode($tupleDto->toArray());
-        $hash = $this->summaryClassRegistry->getHashFromClass($tuple->getSummaryClass());
+        $coordinatesDto = $this->coordinatesMapper->toDto($coordinates);
+        $string = json_encode($coordinatesDto->toArray());
+        $hash = $this->summaryClassRegistry->getHashFromClass($coordinates->getSummaryClass());
 
         $url = $this->urlGenerator->generate(
-            'tuple',
+            'cell',
             [
                 'data' => $string,
                 'hash' => $hash,

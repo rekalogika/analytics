@@ -151,7 +151,7 @@ final class PivotAwareQuery
             $expression = $filterExpression->createExpression();
 
             if ($expression !== null) {
-                $this->query->andWhere($expression);
+                $this->query->andDice($expression);
             }
         }
     }
@@ -231,7 +231,7 @@ final class PivotAwareQuery
 
     private function syncRowsAndColumns(): void
     {
-        $this->query->groupBy(...array_merge($this->rows, $this->columns));
+        $this->query->setDimensions(...array_merge($this->rows, $this->columns));
     }
 
     /**

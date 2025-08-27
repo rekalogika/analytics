@@ -148,7 +148,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     {
         /** @psalm-suppress MixedAssignment */
         $member = $cube
-            ->getTuple()
+            ->getCoordinates()
             ->get($dimension)
             ?->getMember();
 
@@ -260,8 +260,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $firstDimension = $dimensions[0];
 
         foreach ($cube->drillDown($firstDimension) as $row) {
-            $tuple = $row->getTuple();
-            $dimension = $tuple->get($firstDimension);
+            $coordinates = $row->getCoordinates();
+            $dimension = $coordinates->get($firstDimension);
 
             if ($dimension === null) {
                 throw new UnsupportedData('Expected only one member');
@@ -385,7 +385,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         // Populate data.
         foreach ($cube->drillDown($firstDimension) as $firstCell) {
-            $firstDimensionObject = $firstCell->getTuple()->get($firstDimension);
+            $firstDimensionObject = $firstCell->getCoordinates()->get($firstDimension);
 
             if ($firstDimensionObject === null) {
                 throw new UnexpectedValueException('Unable to get first dimension');
@@ -398,7 +398,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
 
             foreach ($firstCell->drillDown($secondDimension) as $secondCell) {
-                $secondDimensionObject = $secondCell->getTuple()->get($secondDimension);
+                $secondDimensionObject = $secondCell->getCoordinates()->get($secondDimension);
                 $signature = $this->getSignature($secondDimensionObject);
 
                 if (!isset($dataSets[$signature])) {
@@ -560,7 +560,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // Populate data.
 
         foreach ($cube->drillDown($dimension) as $child) {
-            $dimensionObject = $child->getTuple()->get($dimension);
+            $dimensionObject = $child->getCoordinates()->get($dimension);
 
             if ($dimensionObject === null) {
                 throw new UnexpectedValueException('Expected dimension');

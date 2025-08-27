@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Result\CubeCells;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 
 /**
- * @implements \IteratorAggregate<DefaultTuple,DefaultCell>
+ * @implements \IteratorAggregate<DefaultCoordinates,DefaultCell>
  */
 final class DefaultCells implements CubeCells, \IteratorAggregate
 {
@@ -53,7 +53,7 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
         $newCells = [];
 
         foreach ($cells as $cell) {
-            $newCells[$cell->getTuple()->getSignature()] = $cell;
+            $newCells[$cell->getCoordinates()->getSignature()] = $cell;
         }
 
         return $this->cubeCells = new \ArrayObject($newCells);
@@ -63,15 +63,15 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
     public function getIterator(): \Traversable
     {
         foreach ($this->getResult() as $cell) {
-            yield $cell->getTuple() => $cell;
+            yield $cell->getCoordinates() => $cell;
         }
     }
 
     #[\Override]
     public function get(mixed $key): ?DefaultCell
     {
-        if (!$key instanceof DefaultTuple) {
-            throw new InvalidArgumentException('This class only accepts DefaultTuple as key.');
+        if (!$key instanceof DefaultCoordinates) {
+            throw new InvalidArgumentException('This class only accepts DefaultCordinates as key.');
         }
 
         $signature = $key->getSignature();
@@ -97,8 +97,8 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
     #[\Override]
     public function has(mixed $key): bool
     {
-        if (!$key instanceof DefaultTuple) {
-            throw new InvalidArgumentException('This class only accepts DefaultTuple as key.');
+        if (!$key instanceof DefaultCoordinates) {
+            throw new InvalidArgumentException('This class only accepts DefaultCoordinates as key.');
         }
 
         $signature = $key->getSignature();

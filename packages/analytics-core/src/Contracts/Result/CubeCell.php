@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Doctrine\Common\Collections\Expr\Expression;
+
 /**
- * Represent a cell in a cube. A cell has a tuple and one or more measures
+ * Represent a cell in a cube. A cell has coordinates and one or more measures
  * associated with it.
  *
  * For consumption only, do not implement. Methods may be added in the future.
@@ -39,11 +41,13 @@ interface CubeCell extends Cell
      */
     public function isNull(): bool;
 
-    public function rollUp(string $dimensionName): self;
+    public function rollUp(string $dimension): self;
 
-    public function drillDown(string $dimensionName): CubeCells;
+    public function drillDown(string $dimension): CubeCells;
 
-    public function slice(string $dimensionName, mixed $member): self;
+    public function slice(string $dimension, mixed $member): ?self;
 
-    public function fuzzySlice(string $dimensionName, mixed $input): ?self;
+    public function find(string $dimension, mixed $argument): ?self;
+
+    public function dice(?Expression $predicate): self;
 }
