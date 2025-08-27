@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
  * Collection of measures, in no particular order.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<string,Measure>
+ * @extends OrderedMap<string,Measure>
  */
-interface Measures extends OrderedMapCollection {}
+interface Measures extends OrderedMap {}

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Collection\MapCollection;
+use Rekalogika\Analytics\Contracts\Collection\Map;
 
 /**
  * Coordinates of dimensions. A collection of dimensions that identifies a
@@ -24,9 +24,9 @@ use Rekalogika\Analytics\Contracts\Collection\MapCollection;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends MapCollection<string,Dimension>
+ * @extends Map<string,Dimension>
  */
-interface Coordinates extends MapCollection
+interface Coordinates extends Map
 {
     /**
      * The summary class that this coordinates belongs to.

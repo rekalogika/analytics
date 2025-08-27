@@ -16,9 +16,9 @@ namespace Rekalogika\Analytics\Contracts\Collection;
 /**
  * @template TKey
  * @template-covariant TValue
- * @extends MapCollection<TKey,TValue>
+ * @extends Map<TKey,TValue>
  */
-interface OrderedMapCollection extends MapCollection
+interface OrderedMap extends Map
 {
     /**
      * @param int<0,max> $index

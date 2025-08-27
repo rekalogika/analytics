@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
  * Represent a list of cube cells.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<Coordinates,CubeCell>
+ * @extends OrderedMap<Coordinates,CubeCell>
  */
-interface CubeCells extends OrderedMapCollection {}
+interface CubeCells extends OrderedMap {}

@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
  * A query result in tabular format
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<OrderedCoordinates,Row>
+ * @extends OrderedMap<OrderedCoordinates,Row>
  */
-interface Table extends OrderedMapCollection
+interface Table extends OrderedMap
 {
     /**
      * @return class-string
