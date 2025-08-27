@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Chart;
 
-use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -26,7 +26,7 @@ interface ChartGenerator
      * @throws AnalyticsFrontendException
      */
     public function createChart(
-        Result $result,
+        CubeCell $cube,
         array $dimensions,
         array $measures,
         ChartType $chartType = ChartType::Auto,
