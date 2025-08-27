@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
-use Rekalogika\Analytics\Frontend\Util\FrontendUtil;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -43,6 +42,8 @@ final readonly class TableRenderer
      *
      * @param list<string> $measures The measures that will be displayed in the
      * table.
+     * @param list<string> $rows The dimensions that will be used as rows in the
+     * table.
      * @param list<string> $columns The dimensions that will be pivoted in the
      * table. Specify the special value '@values' to pivot the measure
      * dimension.
@@ -55,6 +56,7 @@ final readonly class TableRenderer
     public function render(
         Result $result,
         array $measures,
+        array $rows,
         array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
@@ -62,8 +64,9 @@ final readonly class TableRenderer
         try {
             return $this->doRenderPivotTable(
                 result: $result,
-                measures: $measures,
+                rows: $rows,
                 columns: $columns,
+                measures: $measures,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -85,7 +88,10 @@ final readonly class TableRenderer
      *
      * @param list<string> $measures The measures that will be displayed in the
      * table.
-     * @param list<string> $columns
+     * @param list<string> $rows The dimensions that will be used as rows in the
+     * table.
+     * @param list<string> $columns The dimensions that will be pivoted in the
+     * table.
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
      * @param bool $throwException If true, the method will throw an exception
@@ -95,6 +101,7 @@ final readonly class TableRenderer
     public function renderPivotTable(
         Result $result,
         array $measures,
+        array $rows,
         array $columns = ['@values'],
         ?string $theme = null,
         bool $throwException = false,
@@ -102,8 +109,9 @@ final readonly class TableRenderer
         try {
             return $this->doRenderPivotTable(
                 result: $result,
-                measures: $measures,
+                rows: $rows,
                 columns: $columns,
+                measures: $measures,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -158,22 +166,18 @@ final readonly class TableRenderer
     }
 
     /**
-     * @param list<string> $measures
+     * @param list<string> $rows
      * @param list<string> $columns
+     * @param list<string> $measures
      */
     private function doRenderPivotTable(
         Result $result,
         array $measures,
+        array $rows,
         array $columns,
         ?string $theme = null,
     ): string {
-        $dimensions = $result->getDimensionality();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
-
-        $rows = FrontendUtil::getRows(
-            dimensions: $dimensions,
-            columns: $columns,
-        );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
@@ -181,7 +185,7 @@ final readonly class TableRenderer
             columns: $columns,
             measures: $measures,
             skipLegends: ['@values'],
-            withSubtotal: $dimensions,
+            withSubtotal: array_merge($rows, $columns),
         );
 
         return $this->getVisitor($theme)->visitTable($table);

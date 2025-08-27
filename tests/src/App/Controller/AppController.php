@@ -85,14 +85,17 @@ final class AppController extends AbstractController
         $origQuery = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($origQuery, $parameters);
         $values = $query->getValues();
+        $rows = $query->getRows();
+        $columns = $query->getColumns();
         $result = $query->getResult();
 
         // create pivot table
         try {
             $pivotTable = $htmlRenderer->render(
                 result: $result,
-                measures: $query->getValues(),
-                columns: $query->getPivotedDimensions(),
+                rows: $rows,
+                columns: $columns,
+                measures: $values,
                 throwException: true,
             );
 
@@ -100,15 +103,15 @@ final class AppController extends AbstractController
         } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
             $pivotTableError = $e->trans($this->translator);
-            // } catch (\Throwable $e) {
-            //     $pivotTable = null;
-            //     $pivotTableError = 'An error occurred while rendering the pivot table.';
-            //     $this->logger->error(
-            //         'An error occurred while rendering the pivot table.',
-            //         [
-            //             'exception' => $e,
-            //         ],
-            //     );
+        } catch (\Throwable $e) {
+            $pivotTable = null;
+            $pivotTableError = 'An error occurred while rendering the pivot table.';
+            $this->logger->error(
+                'An error occurred while rendering the pivot table.',
+                [
+                    'exception' => $e,
+                ],
+            );
         }
 
         // expression rendering
@@ -119,10 +122,20 @@ final class AppController extends AbstractController
             if (\count($values) === 0) {
                 $chart = null;
             } else {
-                $chart = $chartGenerator->createChart(
-                    result: $result,
-                    measures: $values,
-                );
+                $dimensions = array_values(array_filter(
+                    array_merge($rows, $columns),
+                    static fn(string $field): bool => $field !== '@values',
+                ));
+
+                if ($dimensions === []) {
+                    $chart = null;
+                } else {
+                    $chart = $chartGenerator->createChart(
+                        result: $result,
+                        dimensions: $dimensions,
+                        measures: $values,
+                    );
+                }
             }
 
             $chartError = null;

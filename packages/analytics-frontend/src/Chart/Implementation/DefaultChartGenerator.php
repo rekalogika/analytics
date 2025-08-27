@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Chart\Implementation;
 use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Measures;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
@@ -42,32 +43,63 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     #[\Override]
     public function createChart(
         Result $result,
+        array $dimensions,
         array $measures,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
+        $cube = $result->getCube();
+
         try {
             if ($chartType === ChartType::Auto) {
-                return $this->createAutoChart($result, $measures);
+                return $this->createAutoChart(
+                    cube: $cube,
+                    dimensions: $dimensions,
+                    measures: $measures,
+                );
             }
 
             if ($chartType === ChartType::Bar) {
-                return $this->createBarChart($result, $measures);
+                return $this->createBarChart(
+                    cube: $cube,
+                    dimensions: $dimensions,
+                    measures: $measures,
+                );
             }
 
             if ($chartType === ChartType::Line) {
-                return $this->createLineChart($result, $measures);
+                return $this->createLineChart(
+                    cube: $cube,
+                    dimensions: $dimensions,
+                    measures: $measures,
+                );
             }
 
             if ($chartType === ChartType::StackedBar) {
-                return $this->createGroupedBarChart($result, $measures[0], 'stackedBar');
+                return $this->createGroupedBarChart(
+                    cube: $cube,
+                    firstDimension: $dimensions[0],
+                    secondDimension: $dimensions[1],
+                    measure: $measures[0],
+                    type: 'stackedBar',
+                );
             }
 
             if ($chartType === ChartType::GroupedBar) {
-                return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
+                return $this->createGroupedBarChart(
+                    cube: $cube,
+                    firstDimension: $dimensions[0],
+                    secondDimension: $dimensions[1],
+                    measure: $measures[0],
+                    type: 'groupedBar',
+                );
             }
 
             if ($chartType === ChartType::Pie) {
-                return $this->createPieChart($result, $measures[0]);
+                return $this->createPieChart(
+                    cube: $cube,
+                    dimension: $dimensions[0],
+                    measure: $measures[0],
+                );
             }
         } catch (EmptyResultException $e) {
             throw new UnsupportedData('Result is empty', previous: $e);
@@ -79,94 +111,112 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
+     * @param non-empty-list<string> $dimensions
      * @param non-empty-list<string> $measures
      */
-    private function createAutoChart(Result $result, array $measures): Chart
-    {
-        $row = $result->getTable()->first();
-
-        if ($row === null) {
-            throw new UnsupportedData('Result is empty');
-        }
-
-        $tuple = $row->getTuple();
-
-        if (\count($tuple) === 1) {
-            if ($this->isFirstDimensionSequential($result)) {
-                return $this->createLineChart($result, $measures);
+    private function createAutoChart(
+        CubeCell $cube,
+        array $dimensions,
+        array $measures,
+    ): Chart {
+        if (\count($dimensions) === 1) {
+            if ($this->isDimensionSequential($cube, $dimensions[0])) {
+                return $this->createLineChart(
+                    cube: $cube,
+                    dimensions: $dimensions,
+                    measures: $measures,
+                );
             } else {
-                return $this->createBarChart($result, $measures);
+                return $this->createBarChart(
+                    cube: $cube,
+                    dimensions: $dimensions,
+                    measures: $measures,
+                );
             }
-        } elseif (\count($tuple) === 2) {
+        } elseif (\count($dimensions) >= 2) {
             // @todo auto detect best chart type
-            return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
+            return $this->createGroupedBarChart(
+                cube: $cube,
+                firstDimension: $dimensions[0],
+                secondDimension: $dimensions[1],
+                measure: $measures[0],
+                type: 'groupedBar',
+            );
         }
 
         throw new UnsupportedData('Unsupported chart type');
     }
 
-    private function isFirstDimensionSequential(Result $result): bool
+    private function isDimensionSequential(CubeCell $cube, string $dimension): bool
     {
-        $firstDimension = $result->getDimensionality()[0] ?? null;
+        /** @psalm-suppress MixedAssignment */
+        $member = $cube
+            ->getTuple()
+            ->get($dimension)
+            ?->getMember();
 
-        if ($firstDimension === null) {
-            throw new UnsupportedData('No dimensions found');
-        }
-
-        foreach ($result->getCube()->drillDown($firstDimension) as $child) {
-            /** @psalm-suppress MixedAssignment */
-            $member = $child->getTuple()->get($firstDimension)?->getMember();
-
-            if ($member === null) {
-                throw new UnsupportedData('Expected a member');
-            }
-
-            if (!$member instanceof SequenceMember) {
-                return false;
-            }
-        }
-
-        return true;
+        return $member instanceof SequenceMember;
     }
 
     /**
+     * @param non-empty-list<string> $dimensions
      * @param non-empty-list<string> $measures
      */
-    private function createBarChart(Result $result, array $measures): Chart
-    {
-        return $this->createBarOrLineChart($result, $measures, Chart::TYPE_BAR);
+    private function createBarChart(
+        CubeCell $cube,
+        array $dimensions,
+        array $measures,
+    ): Chart {
+        return $this->createBarOrLineChart(
+            cube: $cube,
+            dimensions: $dimensions,
+            measures: $measures,
+            type: Chart::TYPE_BAR,
+        );
     }
 
     /**
+     * @param non-empty-list<string> $dimensions
      * @param non-empty-list<string> $measures
      */
-    private function createLineChart(Result $result, array $measures): Chart
-    {
-        $row = $result->getTable()->first();
-
-        if ($row === null) {
-            throw new UnsupportedData('Result is empty');
-        }
-
-        $tuple = $row->getTuple();
-
-        if (\count($tuple) === 1) {
-            return $this->createBarOrLineChart($result, $measures, Chart::TYPE_LINE);
-        } elseif (\count($tuple) === 2) {
-            return $this->createGroupedBarChart($result, $measures[0], 'multiLine');
+    private function createLineChart(
+        CubeCell $cube,
+        array $dimensions,
+        array $measures,
+    ): Chart {
+        if (\count($dimensions) === 1) {
+            return $this->createBarOrLineChart(
+                cube: $cube,
+                dimensions: $dimensions,
+                measures: $measures,
+                type: Chart::TYPE_LINE,
+            );
+        } elseif (\count($dimensions) > 1) {
+            return $this->createGroupedBarChart(
+                cube: $cube,
+                firstDimension: $dimensions[0],
+                secondDimension: $dimensions[1],
+                measure: $measures[0],
+                type: 'multiLine',
+            );
         }
 
         throw new UnsupportedData('Unsupported chart type');
     }
 
     /**
+     * @param non-empty-list<string> $dimensions
      * @param non-empty-list<string> $measures
      * @param Chart::TYPE_LINE|Chart::TYPE_BAR $type
      */
-    private function createBarOrLineChart(Result $result, array $measures, string $type): Chart
-    {
+    private function createBarOrLineChart(
+        CubeCell $cube,
+        array $dimensions,
+        array $measures,
+        string $type,
+    ): Chart {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measuresObject = $result->getCube()->getMeasures();
+        $measuresObject = $cube->getMeasures();
 
         $selectedMeasures = $this->selectMeasures($measuresObject, $measures);
         $numMeasures = \count($selectedMeasures);
@@ -210,10 +260,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         }
 
         // Populate data.
-
-        $cube = $result->getCube();
-        $dimensions = $result->getDimensionality();
-        $firstDimension = $dimensions[0] ?? throw new UnsupportedData('No dimensions found');
+        $firstDimension = $dimensions[0];
 
         foreach ($cube->drillDown($firstDimension) as $row) {
             $tuple = $row->getTuple();
@@ -325,10 +372,15 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     /**
      * @param 'stackedBar'|'groupedBar'|'multiLine' $type
      */
-    private function createGroupedBarChart(Result $result, string $measure, string $type): Chart
-    {
+    private function createGroupedBarChart(
+        CubeCell $cube,
+        string $firstDimension,
+        string $secondDimension,
+        string $measure,
+        string $type,
+    ): Chart {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $result->getCube()->getMeasures()->get($measure);
+        $measure = $cube->getMeasures()->get($measure);
 
         if ($measure === null) {
             throw new UnexpectedValueException('Measures not found');
@@ -341,47 +393,40 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $yTitle = null;
         $legendTitle = null;
 
-        $firstDimensionName = $result->getDimensionality()[0] ?? null;
-        $secondDimensionName = $result->getDimensionality()[1] ?? null;
-
-        if ($firstDimensionName === null || $secondDimensionName === null) {
-            throw new UnexpectedValueException('At least two dimensions are required');
-        }
-
         // Populate data.
-        foreach ($result->getCube()->drillDown($firstDimensionName) as $firstCell) {
-            $firstDimension = $firstCell->getTuple()->get($firstDimensionName);
+        foreach ($cube->drillDown($firstDimension) as $firstCell) {
+            $firstDimensionObject = $firstCell->getTuple()->get($firstDimension);
 
-            if ($firstDimension === null) {
+            if ($firstDimensionObject === null) {
                 throw new UnexpectedValueException('Unable to get first dimension');
             }
 
-            $labels[] = $this->stringifier->toString($firstDimension->getDisplayMember());
+            $labels[] = $this->stringifier->toString($firstDimensionObject->getDisplayMember());
 
             if ($xTitle === null) {
-                $xTitle = $this->stringifier->toString($firstDimension->getLabel());
+                $xTitle = $this->stringifier->toString($firstDimensionObject->getLabel());
             }
 
-            foreach ($firstCell->drillDown($secondDimensionName) as $secondCell) {
-                $secondDimension = $secondCell->getTuple()->get($secondDimensionName);
-                $signature = $this->getSignature($secondDimension);
+            foreach ($firstCell->drillDown($secondDimension) as $secondCell) {
+                $secondDimensionObject = $secondCell->getTuple()->get($secondDimension);
+                $signature = $this->getSignature($secondDimensionObject);
 
                 if (!isset($dataSets[$signature])) {
                     $dataSets[$signature] = $configuration->createChartElementConfiguration()->toArray();
                     $dataSets[$signature]['data'] = [];
                 }
 
-                if ($secondDimension === null) {
+                if ($secondDimensionObject === null) {
                     // Should never happen.
                     throw new UnexpectedValueException('Unable to get second dimension');
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimension->getDisplayMember() ?? null);
+                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimensionObject->getDisplayMember() ?? null);
                 }
 
                 if ($legendTitle === null) {
-                    $legendTitle = $this->stringifier->toString($secondDimension->getLabel());
+                    $legendTitle = $this->stringifier->toString($secondDimensionObject->getLabel());
                 }
 
                 $measure = $secondCell->getMeasures()->first();
@@ -398,11 +443,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($secondDimension->getDisplayMember()),
+                            $this->stringifier->toString($secondDimensionObject->getDisplayMember()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($secondDimension->getDisplayMember());
+                        $yTitle = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
                     }
                 }
             }
@@ -501,23 +546,21 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         return $chart;
     }
 
-    private function createPieChart(Result $result, string $measureName): Chart
-    {
+    private function createPieChart(
+        CubeCell $cube,
+        string $dimension,
+        string $measure,
+    ): Chart {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measures = $result->getTable()->first()?->getMeasures();
-
-        if ($measures === null) {
-            throw new UnsupportedData('Measures not found');
-        }
 
         // Populate labels.
 
-        $measure = $measures->get($measureName);
+        $measureObject = $cube->getMeasures()->get($measure);
 
         $labels = [];
         $dataSet = [];
 
-        $dataSet['label'] = $this->stringifier->toString($measure?->getLabel());
+        $dataSet['label'] = $this->stringifier->toString($measureObject?->getLabel());
         $dataSet['data'] = [];
         $dataSet['backgroundColor'] = [];
         $dataSet['hoverOffset'] = 4;
@@ -526,33 +569,25 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         // Populate data.
 
-        foreach ($result->getTable() as $row) {
-            $tuple = $row->getTuple();
+        foreach ($cube->drillDown($dimension) as $child) {
+            $tuple = $child->getTuple();
+            $dimensionObject = $child->getTuple()->get($dimension);
 
-            if (\count($tuple) !== 1) {
-                throw new UnsupportedData('Expected only one member');
-            }
-
-            $dimension = $tuple->getByIndex(0);
-
-            if ($dimension === null) {
-                throw new UnsupportedData('Expected only one member');
+            if ($dimensionObject === null) {
+                throw new UnexpectedValueException('Expected dimension');
             }
 
             // Get label.
 
             if ($title === null) {
-                $title = $this->stringifier->toString($dimension->getLabel());
+                $title = $this->stringifier->toString($dimensionObject->getLabel());
             }
 
             // Get value.
 
-            $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
-
-            $measures = $row->getMeasures();
-            $measure = $measures->get($measureName);
-
-            $dataSet['data'][] = $this->numberifier->toNumber($measure?->getValue());
+            $labels[] = $this->stringifier->toString($dimensionObject->getDisplayMember());
+            $measureObject = $child->getMeasures()->get($measure);
+            $dataSet['data'][] = $this->numberifier->toNumber($measureObject?->getValue());
 
             // Color.
 
