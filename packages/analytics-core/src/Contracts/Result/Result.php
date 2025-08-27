@@ -35,12 +35,4 @@ interface Result
      * Gets the apex cube cell.
      */
     public function getCube(): CubeCell;
-
-    /**
-     * Gets all cubes of the specified dimensionality in the result.
-     *
-     * @param list<string> $dimensionality
-     * @return iterable<CubeCell>
-     */
-    public function getCubesByDimensionality(array $dimensionality): iterable;
 }
