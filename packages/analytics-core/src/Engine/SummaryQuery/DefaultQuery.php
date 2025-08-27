@@ -231,7 +231,7 @@ final class DefaultQuery implements Query
     }
 
     #[\Override]
-    public function setDimensions(string ...$dimensions): static
+    public function withDimensions(string ...$dimensions): static
     {
         $this->result = null;
 
@@ -246,7 +246,7 @@ final class DefaultQuery implements Query
     #[\Override]
     public function addDimension(string ...$dimensions): static
     {
-        $this->setDimensions(...array_merge($this->dimensions, $dimensions));
+        $this->withDimensions(...array_merge($this->dimensions, $dimensions));
 
         return $this;
     }

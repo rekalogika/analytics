@@ -231,7 +231,7 @@ final class PivotAwareQuery
 
     private function syncRowsAndColumns(): void
     {
-        $this->query->setDimensions(...array_merge($this->rows, $this->columns));
+        $this->query->withDimensions(...array_merge($this->rows, $this->columns));
     }
 
     /**
