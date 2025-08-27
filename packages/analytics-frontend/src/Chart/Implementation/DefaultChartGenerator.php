@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
 use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
@@ -42,13 +41,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     #[\Override]
     public function createChart(
-        Result $result,
+        CubeCell $cube,
         array $dimensions,
         array $measures,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
-        $cube = $result->getCube();
-
         try {
             if ($chartType === ChartType::Auto) {
                 return $this->createAutoChart(

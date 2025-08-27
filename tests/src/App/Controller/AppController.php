@@ -92,7 +92,7 @@ final class AppController extends AbstractController
         // create pivot table
         try {
             $pivotTable = $htmlRenderer->render(
-                result: $result,
+                cube: $result->getCube(),
                 rows: $rows,
                 columns: $columns,
                 measures: $values,
@@ -131,7 +131,7 @@ final class AppController extends AbstractController
                     $chart = null;
                 } else {
                     $chart = $chartGenerator->createChart(
-                        result: $result,
+                        cube: $result->getCube(),
                         dimensions: $dimensions,
                         measures: $values,
                     );

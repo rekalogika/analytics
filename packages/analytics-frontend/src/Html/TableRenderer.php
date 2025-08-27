@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html;
 
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
@@ -54,7 +56,7 @@ final readonly class TableRenderer
      * string with the error message.
      */
     public function render(
-        Result $result,
+        CubeCell $cube,
         array $measures,
         array $rows,
         array $columns = ['@values'],
@@ -63,7 +65,7 @@ final readonly class TableRenderer
     ): string {
         try {
             return $this->doRenderPivotTable(
-                result: $result,
+                cube: $cube,
                 rows: $rows,
                 columns: $columns,
                 measures: $measures,
@@ -99,7 +101,7 @@ final readonly class TableRenderer
      * string with the error message.
      */
     public function renderPivotTable(
-        Result $result,
+        CubeCell $cube,
         array $measures,
         array $rows,
         array $columns = ['@values'],
@@ -108,7 +110,7 @@ final readonly class TableRenderer
     ): string {
         try {
             return $this->doRenderPivotTable(
-                result: $result,
+                cube: $cube,
                 rows: $rows,
                 columns: $columns,
                 measures: $measures,
@@ -140,14 +142,14 @@ final readonly class TableRenderer
      * string with the error message.
      */
     public function renderTable(
-        Result $result,
+        Table $table,
         array $measures,
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderTable(
-                result: $result,
+                table: $table,
                 measures: $measures,
                 theme: $theme,
             );
@@ -171,13 +173,13 @@ final readonly class TableRenderer
      * @param list<string> $measures
      */
     private function doRenderPivotTable(
-        Result $result,
+        CubeCell $cube,
         array $measures,
         array $rows,
         array $columns,
         ?string $theme = null,
     ): string {
-        $cubeAdapter = CubeAdapter::adapt($result->getCube());
+        $cubeAdapter = CubeAdapter::adapt($cube);
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
@@ -195,11 +197,11 @@ final readonly class TableRenderer
      * @param list<string> $measures
      */
     private function doRenderTable(
-        Result $result,
+        Table $table,
         array $measures,
         ?string $theme = null,
     ): string {
-        $table = new TableAdapter($result->getTable(), $measures);
+        $table = new TableAdapter($table, $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);
