@@ -213,11 +213,11 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $query = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
-
         $result = $query->getResult();
+        $measures = $query->getValues();
 
         // create pivot table
-        $spreadsheet = $spreadsheetRenderer->render(result: $result);
+        $spreadsheet = $spreadsheetRenderer->render($result, $measures);
 
         $writer = new Xlsx($spreadsheet);
 

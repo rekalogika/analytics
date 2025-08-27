@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\PivotTable\Model\Table\TableLabel;
@@ -25,8 +26,13 @@ final readonly class TableAdapter implements PivotTableTable
      */
     private array $legend;
 
+    /**
+     * @param list<string> $measures The measures that will be displayed in the
+     * table.
+     */
     public function __construct(
         private Table $table,
+        private array $measures,
     ) {
         $firstRow = $table->first();
 
@@ -42,8 +48,13 @@ final readonly class TableAdapter implements PivotTableTable
             $legend[$dimension->getName()] = $dimension->getLabel();
         }
 
-        foreach ($firstRow->getMeasures() as $measure) {
-            $legend[$measure->getName()] = $measure->getLabel();
+        foreach ($measures as $measure) {
+            $measureObject = $firstRow
+                ->getMeasures()
+                ->get($measure)
+                ?? throw new InvalidArgumentException(\sprintf('Measure "%s" does not exist in the result.', $measure));
+
+            $legend[$measure] = $measureObject->getLabel();
         }
 
         $this->legend = $legend;
@@ -53,7 +64,7 @@ final readonly class TableAdapter implements PivotTableTable
     public function getRows(): iterable
     {
         foreach ($this->table as $row) {
-            yield $row->getTuple() => new RowAdapter($row);
+            yield $row->getTuple() => new RowAdapter($row, $this->measures);
         }
     }
 

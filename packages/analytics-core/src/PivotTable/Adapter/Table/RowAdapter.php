@@ -20,8 +20,13 @@ use Rekalogika\PivotTable\Contracts\Table\Row as PivotTableRow;
 
 final readonly class RowAdapter implements PivotTableRow
 {
+    /**
+     * @param list<string> $measures The measures that will be displayed in the
+     * table
+     */
     public function __construct(
         private Row $row,
+        private array $measures,
     ) {}
 
     #[\Override]
@@ -35,8 +40,10 @@ final readonly class RowAdapter implements PivotTableRow
     #[\Override]
     public function getMeasures(): iterable
     {
-        foreach ($this->row->getMeasures() as $name => $measure) {
-            yield $name => new TableValue($measure->getValue());
+        foreach ($this->measures as $measureName) {
+            /** @psalm-suppress MixedAssignment */
+            $value = $this->row->getMeasures()->get($measureName)?->getValue();
+            yield $measureName => new TableValue($value);
         }
     }
 }

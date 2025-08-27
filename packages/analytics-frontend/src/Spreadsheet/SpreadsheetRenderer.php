@@ -34,9 +34,13 @@ final readonly class SpreadsheetRenderer
         $this->visitor = new SpreadsheetRendererVisitor($cellifier);
     }
 
-    public function render(Result $result): Spreadsheet
+    /**
+     * @param list<string> $measures The measures that will be displayed in the
+     * table.
+     */
+    public function render(Result $result, array $measures): Spreadsheet
     {
-        $table = new TableAdapter($result->getTable());
+        $table = new TableAdapter($result->getTable(), $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);

@@ -123,6 +123,8 @@ final readonly class TableRenderer
     /**
      * Render a regular table from the result.
      *
+     * @param list<string> $measures The measures that will be displayed in the
+     * table
      * @param string|null $theme The theme to use for rendering. If null, the
      * default theme will be used.
      * @param bool $throwException If true, the method will throw an exception
@@ -131,12 +133,14 @@ final readonly class TableRenderer
      */
     public function renderTable(
         Result $result,
+        array $measures,
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderTable(
                 result: $result,
+                measures: $measures,
                 theme: $theme,
             );
         } catch (\Throwable $e) {
@@ -183,11 +187,15 @@ final readonly class TableRenderer
         return $this->getVisitor($theme)->visitTable($table);
     }
 
+    /**
+     * @param list<string> $measures
+     */
     private function doRenderTable(
         Result $result,
+        array $measures,
         ?string $theme = null,
     ): string {
-        $table = new TableAdapter($result->getTable());
+        $table = new TableAdapter($result->getTable(), $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);
