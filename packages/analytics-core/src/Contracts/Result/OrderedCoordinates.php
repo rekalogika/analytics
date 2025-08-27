@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
-use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
  * An ordered coordinates of dimensions. A collection of dimensions that
@@ -23,6 +23,6 @@ use Rekalogika\Analytics\Contracts\Collection\OrderedMapCollection;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMapCollection<string,Dimension>
+ * @extends OrderedMap<string,Dimension>
  */
-interface OrderedCoordinates extends Coordinates, OrderedMapCollection {}
+interface OrderedCoordinates extends Coordinates, OrderedMap {}

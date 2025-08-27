@@ -14,23 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Collection;
 
 /**
- * @template-covariant T
- * @extends \Traversable<int,T>
+ * @template TKey
+ * @template-covariant TValue
+ * @extends \Traversable<TKey,TValue>
  */
-interface ListCollection extends \Traversable, \Countable
+interface Map extends \Traversable, \Countable
 {
     /**
-     * @return T|null
+     * @param TKey $key
+     * @return TValue|null
      */
-    public function get(int $key): mixed;
+    public function get(mixed $key): mixed;
 
     /**
-     * @return T|null
+     * @param TKey $key
      */
-    public function first(): mixed;
-
-    /**
-     * @return T|null
-     */
-    public function last(): mixed;
+    public function has(mixed $key): bool;
 }
