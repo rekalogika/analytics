@@ -59,7 +59,7 @@ final class QueryTest extends KernelTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
-            ->setDimensions('invalid')
+            ->withDimensions('invalid')
             ->getResult()
             ->getCube();
     }
@@ -76,7 +76,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $cell = $this->getQuery()
-            ->setDimensions('time.civil.year', 'customerCountry')
+            ->withDimensions('time.civil.year', 'customerCountry')
             ->getResult()
             ->getCube();
 
@@ -106,7 +106,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year', '@values', 'customerCountry')
+            ->withDimensions('time.civil.year', '@values', 'customerCountry')
             ->getResult()
             ->getCube()
             ->find('time.civil.year', '2024')
@@ -128,7 +128,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->setDimensions('@values', 'time.civil.year', 'customerCountry')
+            ->withDimensions('@values', 'time.civil.year', 'customerCountry')
             ->getResult()
             ->getCube();
 
@@ -152,7 +152,7 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($country);
 
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year', 'customerCountry', '@values')
+            ->withDimensions('time.civil.year', 'customerCountry', '@values')
             ->getResult()
             ->getCube();
 
@@ -169,7 +169,7 @@ final class QueryTest extends KernelTestCase
         $year = 2024;
 
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year')
+            ->withDimensions('time.civil.year')
             ->getResult()
             ->getCube();
 
@@ -186,7 +186,7 @@ final class QueryTest extends KernelTestCase
     public function testWhere(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year')
+            ->withDimensions('time.civil.year')
             ->dice(Criteria::expr()->eq('time.civil.year', 2024))
             ->getResult()
             ->getCube();
@@ -206,7 +206,7 @@ final class QueryTest extends KernelTestCase
         $month = Month::createFromDatabaseValue(202410);
 
         $result = $this->getQuery()
-            ->setDimensions('time.civil.month.month')
+            ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getCube()
@@ -224,7 +224,7 @@ final class QueryTest extends KernelTestCase
         ];
 
         $cube = $this->getQuery()
-            ->setDimensions('time.civil.month.month')
+            ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->in('time.civil.month.month', $months))
             ->getResult()
             ->getCube();
@@ -239,7 +239,7 @@ final class QueryTest extends KernelTestCase
         $month = 202410;
 
         $result = $this->getQuery()
-            ->setDimensions('time.civil.month.month')
+            ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getCube()
@@ -251,7 +251,7 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithOr(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year')
+            ->withDimensions('time.civil.year')
             ->dice(Criteria::expr()->orX(
                 Criteria::expr()->eq('time.civil.year', 2024),
                 Criteria::expr()->eq('time.civil.year', 2023),
@@ -300,7 +300,7 @@ final class QueryTest extends KernelTestCase
     public function testOrderByMeasureOnlyGetTable(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year')
+            ->withDimensions('time.civil.year')
             ->orderBy('count', Order::Descending)
             ->getResult()
             ->getTable();
@@ -313,7 +313,7 @@ final class QueryTest extends KernelTestCase
         $this->expectException(OverflowException::class);
 
         $result = $this->getQuery(queryResultLimit: 1)
-            ->setDimensions('time.civil.hour.hour')
+            ->withDimensions('time.civil.hour.hour')
             ->getResult();
 
         // This should trigger the overflow exception when getting the cube
@@ -323,7 +323,7 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithTimeBin(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.hour.hour')
+            ->withDimensions('time.civil.hour.hour')
             ->dice(Criteria::expr()->gte(
                 'time.civil.hour.hour',
                 Hour::createFromDatabaseValue(2024101010),
@@ -338,7 +338,7 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithTimeBinRange(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.hour.hour')
+            ->withDimensions('time.civil.hour.hour')
             ->dice(Criteria::expr()->andX(
                 Criteria::expr()->gte(
                     'time.civil.hour.hour',
@@ -359,7 +359,7 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithRecurringTimeBinRangeEnum(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.date.dayOfMonth')
+            ->withDimensions('time.civil.date.dayOfMonth')
             ->dice(Criteria::expr()->andX(
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', DayOfMonth::Day10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', DayOfMonth::Day12),
@@ -374,7 +374,7 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithRecurringTimeBinRangeInteger(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.date.dayOfMonth')
+            ->withDimensions('time.civil.date.dayOfMonth')
             ->dice(Criteria::expr()->andX(
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', 10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', 12),
@@ -389,7 +389,7 @@ final class QueryTest extends KernelTestCase
     public function testYearByMonthOfYear(): void
     {
         $result = $this->getQuery()
-            ->setDimensions('time.civil.year', 'time.civil.month.monthOfYear')
+            ->withDimensions('time.civil.year', 'time.civil.month.monthOfYear')
             ->getResult()
             ->getCube();
 

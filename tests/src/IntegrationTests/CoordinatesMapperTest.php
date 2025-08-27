@@ -31,7 +31,7 @@ final class CoordinatesMapperTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->setDimensions('customerCountry')
+            ->withDimensions('customerCountry')
             ->addDimension('itemCategory')
             ->addDimension('customerType');
 

@@ -69,7 +69,7 @@ final class SourceQueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->from(OrderSummary::class)
-            ->setDimensions('customerCountry')
+            ->withDimensions('customerCountry')
             ->getResult();
 
         $apexCube = $result->getCube();
@@ -94,7 +94,7 @@ final class SourceQueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->from(OrderSummary::class)
-            ->setDimensions('time.civil.year')
+            ->withDimensions('time.civil.year')
             ->getResult();
 
         $apexCube = $result->getCube();
@@ -132,7 +132,7 @@ final class SourceQueryTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->setDimensions('customerCountry')
+            ->withDimensions('customerCountry')
             ->addDimension('itemCategory')
             ->addDimension('customerGender')
             ->dice(Criteria::expr()->neq('customerCountry', $oneCountry));

@@ -47,7 +47,7 @@ interface Query
      */
     public function getDimensions(): array;
 
-    public function setDimensions(string ...$dimensions): static;
+    public function withDimensions(string ...$dimensions): static;
 
     public function addDimension(string ...$dimensions): static;
 
