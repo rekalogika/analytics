@@ -287,14 +287,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
                 /** @psalm-suppress MixedAssignment */
                 $value = $measure?->getValue() ?? 0;
-
                 $dataSets[$name]['data'][] = $this->numberifier->toNumber($value);
-
-                // $value = $measure?->getValue();
-                // $dataSets[$name]['data'][] = $value;
-                // $value === null
-                //     ? null
-                //     : $this->numberifier->toNumber($value);
             }
         }
 
@@ -570,7 +563,6 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         // Populate data.
 
         foreach ($cube->drillDown($dimension) as $child) {
-            $tuple = $child->getTuple();
             $dimensionObject = $child->getTuple()->get($dimension);
 
             if ($dimensionObject === null) {
