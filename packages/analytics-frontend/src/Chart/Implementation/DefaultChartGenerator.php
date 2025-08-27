@@ -59,18 +59,14 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
 
             if ($chartType === ChartType::StackedBar) {
-                return $this->createGroupedBarChart($result, $measures, 'stackedBar');
+                return $this->createGroupedBarChart($result, $measures[0], 'stackedBar');
             }
 
             if ($chartType === ChartType::GroupedBar) {
-                return $this->createGroupedBarChart($result, $measures, 'groupedBar');
+                return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
             }
 
             if ($chartType === ChartType::Pie) {
-                if (\count($measures) !== 1) {
-                    throw new UnsupportedData('Exactly one measure is required for pie chart');
-                }
-
                 return $this->createPieChart($result, $measures[0]);
             }
         } catch (EmptyResultException $e) {
@@ -103,7 +99,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
         } elseif (\count($tuple) === 2) {
             // @todo auto detect best chart type
-            return $this->createGroupedBarChart($result, $measures, 'groupedBar');
+            return $this->createGroupedBarChart($result, $measures[0], 'groupedBar');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -157,7 +153,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         if (\count($tuple) === 1) {
             return $this->createBarOrLineChart($result, $measures, Chart::TYPE_LINE);
         } elseif (\count($tuple) === 2) {
-            return $this->createGroupedBarChart($result, $measures, 'multiLine');
+            return $this->createGroupedBarChart($result, $measures[0], 'multiLine');
         }
 
         throw new UnsupportedData('Unsupported chart type');
@@ -329,10 +325,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     /**
      * @param 'stackedBar'|'groupedBar'|'multiLine' $type
      */
-    private function createGroupedBarChart(Result $result, array $measures, string $type): Chart
+    private function createGroupedBarChart(Result $result, string $measure, string $type): Chart
     {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $result->getCube()->getMeasures()->first();
+        $measure = $result->getCube()->getMeasures()->get($measure);
 
         if ($measure === null) {
             throw new UnexpectedValueException('Measures not found');

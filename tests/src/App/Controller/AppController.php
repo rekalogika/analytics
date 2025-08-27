@@ -84,7 +84,7 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $origQuery = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($origQuery, $parameters);
-
+        $values = $query->getValues();
         $result = $query->getResult();
 
         // create pivot table
@@ -116,10 +116,14 @@ final class AppController extends AbstractController
 
         // create chart
         try {
-            $chart = $chartGenerator->createChart(
-                result: $result,
-                measures: $query->getValues(),
-            );
+            if (\count($values) === 0) {
+                $chart = null;
+            } else {
+                $chart = $chartGenerator->createChart(
+                    result: $result,
+                    measures: $values,
+                );
+            }
 
             $chartError = null;
         } catch (UnsupportedData) {
