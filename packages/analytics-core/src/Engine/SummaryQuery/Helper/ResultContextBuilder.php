@@ -42,11 +42,6 @@ final class ResultContextBuilder
     private readonly array $dimensions;
 
     /**
-     * @var list<string>
-     */
-    private readonly array $measures;
-
-    /**
      * @var array<string,DefaultMeasureMember>
      */
     private array $measureMemberCache = [];
@@ -73,8 +68,6 @@ final class ResultContextBuilder
             $this->query->getGroupBy(),
             static fn(string $dimension): bool => $dimension !== '@values',
         ));
-
-        $this->measures = $this->query->getSelect();
     }
 
     /**
@@ -174,7 +167,6 @@ final class ResultContextBuilder
         return new DefaultCell(
             tuple: $tuple,
             measures: $measures,
-            measureNames: $this->measures,
             isNull: false,
             context: $this->context,
         );
@@ -214,7 +206,7 @@ final class ResultContextBuilder
         array $input,
         object $summaryObject,
     ): void {
-        $measures = $this->query->getSelect();
+        $measures = array_keys($this->metadata->getMeasures());
 
         foreach ($measures as $name) {
             if (!\array_key_exists($name, $input)) {
@@ -281,7 +273,7 @@ final class ResultContextBuilder
     private function createMeasureValues(
         object $summaryObject,
     ): array {
-        $measures = $this->query->getSelect();
+        $measures = array_keys($this->metadata->getMeasures());
         $measureValues = [];
 
         foreach ($measures as $name) {
@@ -382,7 +374,9 @@ final class ResultContextBuilder
      */
     private function unpivotRow(DefaultCell $cell): iterable
     {
-        foreach ($this->measures as $measure) {
+        $measures = array_keys($this->metadata->getMeasures());
+
+        foreach ($measures as $measure) {
             $measureMember = $this->getMeasureMember($measure);
 
             $measureDimension = $this->context
@@ -410,7 +404,6 @@ final class ResultContextBuilder
             yield new DefaultCell(
                 tuple: $tuple,
                 measures: $measures,
-                measureNames: $this->measures,
                 isNull: false,
                 context: $this->context,
             );

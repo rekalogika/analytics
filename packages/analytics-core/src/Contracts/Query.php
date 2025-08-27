@@ -52,19 +52,6 @@ interface Query
     public function addGroupBy(string ...$dimensions): static;
 
     //
-    // select
-    //
-
-    /**
-     * @return list<string>
-     */
-    public function getSelect(): array;
-
-    public function select(string ...$measures): static;
-
-    public function addSelect(string ...$measures): static;
-
-    //
     // where
     //
 

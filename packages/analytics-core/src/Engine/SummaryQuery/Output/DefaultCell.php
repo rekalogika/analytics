@@ -32,7 +32,6 @@ final class DefaultCell implements CubeCell
     public function __construct(
         private readonly DefaultTuple $tuple,
         private readonly DefaultMeasures $measures,
-        private readonly array $measureNames,
         private readonly bool $isNull,
         private readonly ResultContext $context,
     ) {}
@@ -53,14 +52,6 @@ final class DefaultCell implements CubeCell
     public function getApex(): self
     {
         return $this->context->getCellRepository()->getApexCell();
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function getMeasureNames(): array
-    {
-        return $this->measureNames;
     }
 
     #[\Override]

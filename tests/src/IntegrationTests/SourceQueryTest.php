@@ -49,7 +49,6 @@ final class SourceQueryTest extends KernelTestCase
     {
         $tuple = $this->getQuery()
             ->from(OrderSummary::class)
-            ->select('count')
             ->getResult()
             ->getCube()
             ->getTuple();
@@ -71,7 +70,6 @@ final class SourceQueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->from(OrderSummary::class)
             ->groupBy('customerCountry')
-            ->select('count')
             ->getResult();
 
         $apexCube = $result->getCube();
@@ -97,7 +95,6 @@ final class SourceQueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->from(OrderSummary::class)
             ->groupBy('time.civil.year')
-            ->select('count')
             ->getResult();
 
         $apexCube = $result->getCube();
@@ -135,7 +132,6 @@ final class SourceQueryTest extends KernelTestCase
         $query = $summaryManager
             ->createQuery()
             ->from(OrderSummary::class)
-            ->select('count', 'price')
             ->groupBy('customerCountry')
             ->addGroupBy('itemCategory')
             ->addGroupBy('customerGender')

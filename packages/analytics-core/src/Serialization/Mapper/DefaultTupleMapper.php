@@ -138,11 +138,6 @@ final readonly class DefaultTupleMapper implements TupleMapper
             $dimensionMembers[$dimensionName] = $rawMember;
         }
 
-        // select all measures
-        foreach ($metadata->getMeasures() as $measure) {
-            $query->addSelect($measure->getName());
-        }
-
         // execute
         return $query->getResult()->getTable()->first() ?? new NullRow(
             summaryMetadata: $metadata,

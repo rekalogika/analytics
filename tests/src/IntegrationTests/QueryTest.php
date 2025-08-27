@@ -70,7 +70,6 @@ final class QueryTest extends KernelTestCase
     public function testNoDimensionAndOneMeasure(): void
     {
         $cell = $this->getQuery()
-            ->select('count')
             ->getResult()
             ->getCube()
             ->fuzzySlice('@values', 'count');
@@ -92,7 +91,6 @@ final class QueryTest extends KernelTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
-            ->select('invalid')
             ->getResult()
             ->getCube();
     }
@@ -110,7 +108,6 @@ final class QueryTest extends KernelTestCase
 
         $cell = $this->getQuery()
             ->groupBy('time.civil.year', 'customerCountry')
-            ->select('count', 'price')
             ->getResult()
             ->getCube();
 
@@ -141,7 +138,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('time.civil.year', '@values', 'customerCountry')
-            ->select('count', 'price')
             ->getResult()
             ->getCube()
             ->fuzzySlice('time.civil.year', '2024')
@@ -164,7 +160,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('@values', 'time.civil.year', 'customerCountry')
-            ->select('count', 'price')
             ->getResult()
             ->getCube();
 
@@ -189,7 +184,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('time.civil.year', 'customerCountry', '@values')
-            ->select('count', 'price')
             ->getResult()
             ->getCube();
 
@@ -207,7 +201,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
-            ->select('count')
             ->getResult()
             ->getCube();
 
@@ -225,7 +218,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
-            ->select('count')
             ->where(Criteria::expr()->eq('time.civil.year', 2024))
             ->getResult()
             ->getCube();
@@ -246,7 +238,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('time.civil.month.month')
-            ->select('count')
             ->where(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getCube()
@@ -266,7 +257,6 @@ final class QueryTest extends KernelTestCase
 
         $cube = $this->getQuery()
             ->groupBy('time.civil.month.month')
-            ->select('count')
             ->where(Criteria::expr()->in('time.civil.month.month', $months))
             ->getResult()
             ->getCube();
@@ -282,7 +272,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->groupBy('time.civil.month.month')
-            ->select('count')
             ->where(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
             ->getCube()
@@ -296,7 +285,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
-            ->select('count')
             ->where(Criteria::expr()->orX(
                 Criteria::expr()->eq('time.civil.year', 2024),
                 Criteria::expr()->eq('time.civil.year', 2023),
@@ -323,7 +311,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithDimensionNotInGroupBy(): void
     {
         $all = $this->getQuery()
-            ->select('count')
             ->getResult()
             ->getCube()
             ->fuzzySlice('@values', 'count')
@@ -332,7 +319,6 @@ final class QueryTest extends KernelTestCase
         $this->assertNotNull($all);
 
         $withWhere = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->eq('time.civil.year', 2024))
             ->getResult()
             ->getCube()
@@ -348,7 +334,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.year')
-            ->select('count')
             ->orderBy('count', Order::Descending)
             ->getResult()
             ->getTable();
@@ -362,7 +347,6 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery(queryResultLimit: 1)
             ->groupBy('time.civil.hour.hour')
-            ->select('count')
             ->getResult();
 
         // This should trigger the overflow exception when getting the cube
@@ -373,7 +357,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.hour.hour')
-            ->select('count')
             ->where(Criteria::expr()->gte(
                 'time.civil.hour.hour',
                 Hour::createFromDatabaseValue(2024101010),
@@ -389,7 +372,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.hour.hour')
-            ->select('count')
             ->where(Criteria::expr()->andX(
                 Criteria::expr()->gte(
                     'time.civil.hour.hour',
@@ -411,7 +393,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.date.dayOfMonth')
-            ->select('count')
             ->where(Criteria::expr()->andX(
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', DayOfMonth::Day10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', DayOfMonth::Day12),
@@ -427,7 +408,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.date.dayOfMonth')
-            ->select('count')
             ->where(Criteria::expr()->andX(
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', 10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', 12),
@@ -443,7 +423,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.year', 'time.civil.month.monthOfYear')
-            ->select('count')
             ->getResult()
             ->getCube();
 
@@ -471,7 +450,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithEnumCondition(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->eq(
                 'customerType',
                 CustomerType::Individual,
@@ -487,7 +465,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithEnumInCondition(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->in(
                 'customerType',
                 [CustomerType::Individual],
@@ -503,7 +480,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithNullCondition(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->eq(
                 'customerGender',
                 null,
@@ -519,7 +495,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithInNullCondition(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->in(
                 'customerGender',
                 [null],
@@ -535,7 +510,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithInItemAndNullCondition(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->in(
                 'customerGender',
                 [null, Gender::Female],
@@ -551,7 +525,6 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithEmptyIn(): void
     {
         $result = $this->getQuery()
-            ->select('count')
             ->where(Criteria::expr()->in(
                 'customerGender',
                 [],
@@ -570,7 +543,6 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->groupBy('time.civil.year', 'customerType', 'customerGender')
-            ->select('count')
             ->getResult()
             ->getTable();
 
