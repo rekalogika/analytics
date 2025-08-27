@@ -26,9 +26,6 @@ final class DefaultCell implements CubeCell
      */
     private array $drillDowns = [];
 
-    /**
-     * @param list<string> $measureNames
-     */
     public function __construct(
         private readonly DefaultTuple $tuple,
         private readonly DefaultMeasures $measures,

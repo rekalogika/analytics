@@ -28,6 +28,11 @@ final class PivotAwareQuery
     /**
      * @var list<string>
      */
+    private array $values = [];
+
+    /**
+     * @var list<string>
+     */
     private array $rows = [];
 
     /**
@@ -268,7 +273,7 @@ final class PivotAwareQuery
      */
     public function getValues(): array
     {
-        return $this->query->getSelect();
+        return $this->values;
     }
 
     /**
@@ -276,7 +281,7 @@ final class PivotAwareQuery
      */
     private function setValues(array $values): void
     {
-        $this->query->select(...$values);
+        $this->values = $values;
     }
 
     /**

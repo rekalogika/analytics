@@ -78,12 +78,6 @@ final class DefaultResult implements Result
         return $this->query->getGroupBy();
     }
 
-    #[\Override]
-    public function getMeasures(): array
-    {
-        return $this->query->getSelect();
-    }
-
     /**
      * @return list<array<string,mixed>>
      */
@@ -140,12 +134,6 @@ final class DefaultResult implements Result
             return $this->queryComponents;
         }
 
-        // if no measure is selected, don't bother running the query
-        if ($this->query->getSelect() === []) {
-            $this->queryComponents = new EmptyResult();
-            return null;
-        }
-
         $summarizerQuery = $this->getSummaryQuery();
 
         if ($summarizerQuery === null) {
@@ -179,14 +167,8 @@ final class DefaultResult implements Result
     }
 
     #[\Override]
-    public function getCube(): DefaultCell|NullCell
+    public function getCube(): DefaultCell
     {
-        if ($this->getMeasures() === []) {
-            return new NullCell(
-                summaryClass: $this->summaryClass,
-            );
-        }
-
         return $this->getResultContext()
             ->getCellRepository()
             ->getApexCell();

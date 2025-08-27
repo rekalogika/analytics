@@ -91,6 +91,7 @@ final class AppController extends AbstractController
         try {
             $pivotTable = $htmlRenderer->render(
                 result: $result,
+                measures: $query->getValues(),
                 columns: $query->getPivotedDimensions(),
                 throwException: true,
             );
@@ -115,7 +116,11 @@ final class AppController extends AbstractController
 
         // create chart
         try {
-            $chart = $chartGenerator->createChart($result);
+            $chart = $chartGenerator->createChart(
+                result: $result,
+                measures: $query->getValues(),
+            );
+
             $chartError = null;
         } catch (UnsupportedData) {
             $chart = null;

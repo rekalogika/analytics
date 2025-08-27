@@ -58,14 +58,15 @@ final readonly class SpreadsheetRenderer
     }
 
     /**
+     * @param list<string> $measures
      * @param list<string> $columns
      */
     public function renderPivotTable(
         Result $result,
+        array $measures,
         array $columns = [],
     ): Spreadsheet {
         $dimensions = $result->getDimensionality();
-        $measures = $result->getMeasures();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
 
         $rows = FrontendUtil::getRows(

@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultTable;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\NullCell;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -47,26 +46,6 @@ final class QueryTest extends KernelTestCase
             ->from(OrderSummary::class);
     }
 
-    public function testEmptyQuery(): void
-    {
-        $result = $this->getQuery()
-            ->getResult()
-            ->getCube();
-
-        $this->assertInstanceOf(NullCell::class, $result);
-    }
-
-    public function testDimensionWithoutMeasure(): void
-    {
-        $result = $this->getQuery()
-            ->groupBy('time.civil.year')
-            ->getResult()
-            ->getCube()
-            ->fuzzySlice('time.civil.year', '2024');
-
-        $this->assertInstanceOf(NullCell::class, $result);
-    }
-
     public function testNoDimensionAndOneMeasure(): void
     {
         $cell = $this->getQuery()
@@ -83,14 +62,6 @@ final class QueryTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
             ->groupBy('invalid')
-            ->getResult()
-            ->getCube();
-    }
-
-    public function testInvalidMeasure(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->getQuery()
             ->getResult()
             ->getCube();
     }
@@ -244,7 +215,6 @@ final class QueryTest extends KernelTestCase
             ->fuzzySlice('time.civil.month.month', '2024-10');
 
         $this->assertNotNull($result);
-        $this->assertCount(1, $result->getMeasures());
     }
 
     public function testWhereMonthObjectIn(): void
@@ -278,7 +248,6 @@ final class QueryTest extends KernelTestCase
             ->fuzzySlice('time.civil.month.month', '2024-10');
 
         $this->assertNotNull($result);
-        $this->assertCount(1, $result->getMeasures());
     }
 
     public function testWhereWithOr(): void
