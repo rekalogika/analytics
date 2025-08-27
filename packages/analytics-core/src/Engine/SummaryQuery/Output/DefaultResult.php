@@ -182,16 +182,6 @@ final class DefaultResult implements Result
         );
     }
 
-    #[\Override]
-    public function getCubesByDimensionality(array $dimensionality): iterable
-    {
-        $context = $this->getResultContext();
-
-        yield from $context
-            ->getCellRepository()
-            ->getCellsByDimensionality($dimensionality);
-    }
-
     // private function hasHierarchicalOrdering(): bool
     // {
     //     if ($this->hasHierarchicalOrdering !== null) {
