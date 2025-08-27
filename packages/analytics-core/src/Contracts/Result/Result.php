@@ -29,18 +29,10 @@ interface Result
      */
     public function getSummaryClass(): string;
 
-    /**
-     * The dimension names of this result. It is the same as the groupBy clause
-     * of the query.
-     *
-     * @return list<string>
-     */
-    public function getDimensionality(): array;
-
     public function getTable(): Table;
 
     /**
-     * Gets the root cube cell.
+     * Gets the apex cube cell.
      */
     public function getCube(): CubeCell;
 

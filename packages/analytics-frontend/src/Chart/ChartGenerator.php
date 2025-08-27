@@ -20,12 +20,14 @@ use Symfony\UX\Chartjs\Model\Chart;
 interface ChartGenerator
 {
     /**
+     * @param non-empty-list<string> $dimensions
      * @param non-empty-list<string> $measures
      * @throws UnsupportedData
      * @throws AnalyticsFrontendException
      */
     public function createChart(
         Result $result,
+        array $dimensions,
         array $measures,
         ChartType $chartType = ChartType::Auto,
     ): Chart;

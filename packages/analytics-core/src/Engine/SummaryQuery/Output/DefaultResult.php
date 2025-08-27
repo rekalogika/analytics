@@ -72,12 +72,6 @@ final class DefaultResult implements Result
         return $this->summaryClass;
     }
 
-    #[\Override]
-    public function getDimensionality(): array
-    {
-        return $this->query->getGroupBy();
-    }
-
     /**
      * @return list<array<string,mixed>>
      */

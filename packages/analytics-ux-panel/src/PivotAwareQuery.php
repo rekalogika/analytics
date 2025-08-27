@@ -338,14 +338,6 @@ final class PivotAwareQuery
     // Helpers.
     //
 
-    /**
-     * @return list<string> $items
-     */
-    public function getPivotedDimensions(): array
-    {
-        return $this->columns;
-    }
-
     private function isDimensionMandatory(string $dimension): bool
     {
         // Trim dot and the string after.

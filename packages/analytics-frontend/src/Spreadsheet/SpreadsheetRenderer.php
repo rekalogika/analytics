@@ -18,7 +18,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
-use Rekalogika\Analytics\Frontend\Util\FrontendUtil;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
 use Rekalogika\PivotTable\PivotTableTransformer;
@@ -63,20 +62,16 @@ final readonly class SpreadsheetRenderer
 
     /**
      * @param list<string> $measures
+     * @param list<string> $rows
      * @param list<string> $columns
      */
     public function renderPivotTable(
         Result $result,
         array $measures,
-        array $columns = [],
+        array $rows,
+        array $columns,
     ): Spreadsheet {
-        $dimensions = $result->getDimensionality();
         $cubeAdapter = CubeAdapter::adapt($result->getCube());
-
-        $rows = FrontendUtil::getRows(
-            dimensions: $dimensions,
-            columns: $columns,
-        );
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
@@ -84,7 +79,7 @@ final readonly class SpreadsheetRenderer
             columns: $columns,
             measures: $measures,
             skipLegends: ['@values'],
-            withSubtotal: $dimensions,
+            withSubtotal: array_merge($rows, $columns),
         );
 
         $html = $this->visitor->visitTable($table);
