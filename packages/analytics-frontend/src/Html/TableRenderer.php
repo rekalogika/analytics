@@ -168,6 +168,17 @@ final readonly class TableRenderer
     }
 
     /**
+     * Filter out the special '@values' dimension from the list of dimensions.
+     *
+     * @param list<string> $dimensions The list of dimensions to filter.
+     * @return list<string> The filtered list of dimensions without '@values'.
+     */
+    private function filterOutValues(array $dimensions): array
+    {
+        return array_values(array_filter($dimensions, static fn($dim) => $dim !== '@values'));
+    }
+
+    /**
      * @param list<string> $rows
      * @param list<string> $columns
      * @param list<string> $measures
@@ -180,6 +191,11 @@ final readonly class TableRenderer
         ?string $theme = null,
     ): string {
         $cubeAdapter = CubeAdapter::adapt($cube);
+
+        if ($measures === []) {
+            $rows = $this->filterOutValues($rows);
+            $columns = $this->filterOutValues($columns);
+        }
 
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
