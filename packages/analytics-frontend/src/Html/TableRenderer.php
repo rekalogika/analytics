@@ -181,6 +181,11 @@ final readonly class TableRenderer
     ): string {
         $cubeAdapter = CubeAdapter::adapt($cube);
 
+        if ($measures === []) {
+            $rows = array_filter($rows, static fn($dim) => $dim !== '@values');
+            $columns = array_filter($columns, static fn($dim) => $dim !== '@values');
+        }
+
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
             rows: $rows,
