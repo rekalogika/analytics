@@ -87,7 +87,7 @@ final readonly class AttributeUtil
 
         $name = $type->getName();
 
-        if (!class_exists($name)) {
+        if (!class_exists($name) && !interface_exists($name) && !enum_exists($name)) {
             return null;
         }
 

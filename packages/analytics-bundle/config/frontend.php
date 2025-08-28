@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainHtmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainNumberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Chain\ChainStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
+use Rekalogika\Analytics\Frontend\Formatter\Implementation\CoordinatesStringifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultCellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultNumberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\DefaultStringifier;
@@ -147,6 +148,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(DefaultStringifier::class)
         ->tag('rekalogika.analytics.stringifier', [
             'priority' => -1000,
+        ])
+    ;
+
+    $services
+        ->set(CoordinatesStringifier::class)
+        ->tag('rekalogika.analytics.stringifier', [
+            'priority' => -950,
         ])
     ;
 
