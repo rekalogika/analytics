@@ -20,12 +20,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Core\AggregateFunction\Average;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\AggregateFunction\Max;
 use Rekalogika\Analytics\Core\AggregateFunction\Min;
 use Rekalogika\Analytics\Core\AggregateFunction\Range;
+use Rekalogika\Analytics\Core\AggregateFunction\Special;
 use Rekalogika\Analytics\Core\AggregateFunction\StdDev;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\AggregateFunction\SumSquare;
@@ -270,6 +272,12 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     )]
     private ?float $priceStdDev = null;  // @phpstan-ignore property.unusedType
 
+    #[Analytics\Measure(
+        function: new Special(),
+        label: new TranslatableMessage('Actions'),
+    )]
+    private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType
+
 
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
@@ -418,5 +426,10 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     public function getPriceSumSquare(): ?float
     {
         return $this->priceSumSquare;
+    }
+
+    public function getActions(): ?Coordinates
+    {
+        return $this->actions;
     }
 }

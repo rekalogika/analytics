@@ -46,6 +46,11 @@ final readonly class QueryResultToTableHelper
         mixed $value,
         SummaryMetadata|PropertyMetadata $metadata,
     ): void {
+        if (str_starts_with($property, '@')) {
+            // ignore special property
+            return;
+        }
+
         $propertyParts = explode('.', $property);
 
         if (\count($propertyParts) < 1) {
