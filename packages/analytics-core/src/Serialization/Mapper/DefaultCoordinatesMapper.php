@@ -98,21 +98,21 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
             ->from($summaryClass);
 
         // add where condition
-        $conditionDto = $dto->getPredicate();
-        $condition = null;
+        $predicateDto = $dto->getPredicate();
+        $predicate = null;
 
-        if ($conditionDto !== null) {
+        if ($predicateDto !== null) {
             $mapperContext = new MapperContext(
                 summaryClass: $summaryClass,
             );
 
-            $condition = $this->mapper->fromDto($conditionDto, $mapperContext);
+            $predicate = $this->mapper->fromDto($predicateDto, $mapperContext);
 
-            if (!$condition instanceof Expression) {
-                throw new UnexpectedValueException('Expected Expression, got ' . \get_class($condition));
+            if (!$predicate instanceof Expression) {
+                throw new UnexpectedValueException('Expected Expression, got ' . \get_class($predicate));
             }
 
-            $query->dice($condition);
+            $query->dice($predicate);
         }
 
         // add group by
@@ -134,6 +134,7 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
 
         $cube = $query->getResult()->getCube();
 
+        /** @psalm-suppress MixedAssignment */
         foreach ($dimensionMembers as $dimensionName => $rawMember) {
             $cube = $cube->slice($dimensionName, $rawMember);
 
@@ -144,7 +145,7 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
                 return new NullRow(
                     summaryMetadata: $metadata,
                     dimensionMembers: $dimensionMembers,
-                    condition: $condition,
+                    condition: $predicate,
                 );
             }
         }
