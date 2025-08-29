@@ -19,7 +19,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Engine\SourceEntities\DefaultSourceEntities;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
@@ -71,7 +70,6 @@ final class SourceQueryTest extends KernelTestCase
             ->getSourceEntitiesFactory()
             ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
@@ -97,7 +95,6 @@ final class SourceQueryTest extends KernelTestCase
             ->getSourceEntitiesFactory()
             ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
@@ -123,7 +120,6 @@ final class SourceQueryTest extends KernelTestCase
             ->getSourceEntitiesFactory()
             ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(

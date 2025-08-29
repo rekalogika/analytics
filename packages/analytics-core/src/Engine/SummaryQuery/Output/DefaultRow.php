@@ -30,8 +30,11 @@ final class DefaultRow implements Row
         private readonly SourceEntitiesFactory $sourceEntitiesFactory,
     ) {}
 
+    /**
+     * @return PageableInterface<int,object>
+     */
     #[\Override]
-    public function getSourceEntities(): ?PageableInterface
+    public function getSourceEntities(): PageableInterface
     {
         return $this->sourceEntitiesFactory
             ->getSourceEntities($this->getCoordinates());

@@ -40,7 +40,7 @@ final readonly class DefaultSourceEntities implements PageableInterface
             queryBuilder: $queryBuilder,
         );
 
-        /** @var KeysetPageable<array-key,object> $pageable */
+        /** @var KeysetPageable<int,object> $pageable */
         $pageable = new KeysetPageable(
             adapter: $adapter,
             itemsPerPage: $itemsPerPage,
