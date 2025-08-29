@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Result;
 
+use Rekalogika\Contracts\Rekapager\PageableInterface;
+
 /**
  * Represent a cell, which is an object that contains dimension coordinates and
  * measures.
@@ -38,4 +40,14 @@ interface Cell
      * value.
      */
     public function getMeasure(): Measure;
+
+    /**
+     * Get the source entities of this cell, if available. If the source
+     * entities are not available, this will return null. The source entities
+     * are the original entities that were aggregated to produce the measures in
+     * this cell.
+     *
+     * @return null|PageableInterface<int,object>
+     */
+    public function getSourceEntities(): ?PageableInterface;
 }

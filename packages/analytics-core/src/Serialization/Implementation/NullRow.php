@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Contracts\Rekapager\PageableInterface;
 
 final readonly class NullRow implements Row
 {
@@ -40,6 +41,12 @@ final readonly class NullRow implements Row
             dimensionMembers: $dimensionMembers,
             condition: $this->condition,
         );
+    }
+
+    #[\Override]
+    public function getSourceEntities(): ?PageableInterface
+    {
+        return null;
     }
 
     #[\Override]

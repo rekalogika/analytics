@@ -17,13 +17,9 @@ use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 
-/**
- * @implements PageableInterface<int,object>
- */
-final class DefaultRow implements Row, PageableInterface
+final class DefaultRow implements Row
 {
     use MeasuresTrait;
-    use PageableTrait;
 
     /**
      * @param list<string> $dimensionality
@@ -35,9 +31,10 @@ final class DefaultRow implements Row, PageableInterface
     ) {}
 
     #[\Override]
-    private function getSourceEntitiesFactory(): SourceEntitiesFactory
+    public function getSourceEntities(): ?PageableInterface
     {
-        return $this->sourceEntitiesFactory;
+        return $this->sourceEntitiesFactory
+            ->getSourceEntities($this->getCoordinates());
     }
 
     #[\Override]

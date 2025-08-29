@@ -19,15 +19,12 @@ use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 
-/**
- * @implements PageableInterface<int,object>
- */
-final class DefaultCell implements CubeCell, PageableInterface
+final class DefaultCell implements CubeCell
 {
     use MeasuresTrait;
-    use PageableTrait;
 
     /**
      * @var array<string,DefaultCells>
@@ -43,9 +40,16 @@ final class DefaultCell implements CubeCell, PageableInterface
     ) {}
 
     #[\Override]
-    private function getSourceEntitiesFactory(): SourceEntitiesFactory
+    public function getSourceEntities(): ?PageableInterface
     {
-        return $this->sourceEntitiesFactory;
+        return $this->sourceEntitiesFactory
+            ->getSourceEntities($this->getCoordinates());
+    }
+
+    public function getSourceQueryComponents(): QueryComponents
+    {
+        return $this->sourceEntitiesFactory
+            ->getCoordinatesQueryComponents($this->getCoordinates());
     }
 
     #[\Override]

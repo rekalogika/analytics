@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
+use Rekalogika\Contracts\Rekapager\PageableInterface;
 
 final class NullCell implements CubeCell
 {
@@ -27,6 +28,12 @@ final class NullCell implements CubeCell
     public function __construct(
         private readonly string $summaryClass,
     ) {}
+
+    #[\Override]
+    public function getSourceEntities(): ?PageableInterface
+    {
+        return null;
+    }
 
     #[\Override]
     public function getSummaryClass(): string

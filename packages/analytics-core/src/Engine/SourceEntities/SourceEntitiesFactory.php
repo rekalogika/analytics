@@ -16,9 +16,7 @@ namespace Rekalogika\Analytics\Engine\SourceEntities;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\SourceEntities;
 use Rekalogika\Analytics\Engine\SourceEntities\Query\SourceQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
@@ -30,12 +28,8 @@ final readonly class SourceEntitiesFactory
         private SummaryMetadataFactory $metadataFactory,
     ) {}
 
-    public function getSourceEntities(Coordinates|Cell $input): SourceEntities
+    public function getSourceEntities(Coordinates $input): DefaultSourceEntities
     {
-        if ($input instanceof Cell) {
-            $input = $input->getCoordinates();
-        }
-
         $summaryClass = $input->getSummaryClass();
         $summaryMetadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
         $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);

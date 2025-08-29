@@ -14,16 +14,18 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SourceEntities;
 
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Contracts\SourceEntities;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 use Rekalogika\Contracts\Rekapager\PageInterface;
 use Rekalogika\Rekapager\Doctrine\ORM\QueryBuilderAdapter;
 use Rekalogika\Rekapager\Keyset\KeysetPageable;
 
-final readonly class DefaultSourceEntities implements SourceEntities
+/**
+ * @implements PageableInterface<int,object>
+ */
+final readonly class DefaultSourceEntities implements PageableInterface
 {
     /**
-     * @var PageableInterface<array-key,object>
+     * @var PageableInterface<int,object>
      */
     private PageableInterface $pageable;
 
