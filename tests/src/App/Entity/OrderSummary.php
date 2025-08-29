@@ -27,11 +27,11 @@ use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\AggregateFunction\Max;
 use Rekalogika\Analytics\Core\AggregateFunction\Min;
 use Rekalogika\Analytics\Core\AggregateFunction\Range;
-use Rekalogika\Analytics\Core\AggregateFunction\Special;
 use Rekalogika\Analytics\Core\AggregateFunction\StdDev;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\AggregateFunction\SumSquare;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
+use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
 use Rekalogika\Analytics\Core\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
@@ -273,7 +273,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     private ?float $priceStdDev = null;  // @phpstan-ignore property.unusedType
 
     #[Analytics\Measure(
-        function: new Special(),
+        function: new CoordinatesMeasure(),
         label: new TranslatableMessage('Actions'),
     )]
     private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType

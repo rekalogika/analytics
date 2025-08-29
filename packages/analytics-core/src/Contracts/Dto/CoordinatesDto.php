@@ -56,8 +56,12 @@ final readonly class CoordinatesDto
         $members = [];
 
         foreach ($array['members'] as $key => $value) {
-            if (!\is_string($key) || !\is_string($value)) {
-                throw new InvalidArgumentException('Coordinates members must be key-value pairs of strings.');
+            if (!\is_string($key)) {
+                throw new InvalidArgumentException('Coordinates key must be a string.');
+            }
+
+            if (!\is_string($value) && null !== $value) {
+                throw new InvalidArgumentException('Coordinates member value must be a string or null.');
             }
 
             $members[$key] = $value;

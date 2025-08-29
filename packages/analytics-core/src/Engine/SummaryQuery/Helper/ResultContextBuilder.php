@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Context\PseudoMeasureContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
+use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
-use Rekalogika\Analytics\Core\AggregateFunction\Special;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCoordinates;
@@ -146,12 +147,6 @@ final class ResultContextBuilder
             summaryObject: $summaryObject,
         );
 
-        // populate measures
-        $this->populateMeasures(
-            input: $input,
-            summaryObject: $summaryObject,
-        );
-
         // get dimensions from object
         $dimensionValues = $this->createDimensionValues($summaryObject, $groupings);
 
@@ -162,9 +157,15 @@ final class ResultContextBuilder
             condition: $this->query->getDice(),
         );
 
-        // get measures from object
-        $measureValues = $this->createMeasureValues($summaryObject, $coordinates);
+        // populate measures
+        $this->populateMeasures(
+            input: $input,
+            summaryObject: $summaryObject,
+            coordinates: $coordinates,
+        );
 
+        // get measures from object
+        $measureValues = $this->createMeasureValues($summaryObject);
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultCell(
@@ -208,19 +209,24 @@ final class ResultContextBuilder
     private function populateMeasures(
         array $input,
         object $summaryObject,
+        DefaultCoordinates $coordinates,
     ): void {
-        $measures = array_keys($this->metadata->getMeasures());
+        foreach ($this->metadata->getMeasures() as $name => $measureMetadata) {
+            $function = $measureMetadata->getFunction();
 
-        foreach ($measures as $name) {
-            if (!\array_key_exists($name, $input)) {
-                throw new LogicException(\sprintf('Measure "%s" not found', $name));
+            if ($function instanceof PseudoMeasure) {
+                /** @psalm-suppress MixedAssignment */
+                $rawValue = $this->createPseudoMeasureValue(
+                    measureMetadata: $measureMetadata,
+                    coordinates: $coordinates,
+                );
+            } else {
+                /** @psalm-suppress MixedAssignment */
+                $rawValue = $this->normalizeRawValue(
+                    propertyName: $name,
+                    value: $input[$name],
+                );
             }
-
-            /** @psalm-suppress MixedAssignment */
-            $rawValue = $this->normalizeRawValue(
-                propertyName: $name,
-                value: $input[$name],
-            );
 
             $this->helper->setValue(
                 object: $summaryObject,
@@ -273,24 +279,11 @@ final class ResultContextBuilder
     /**
      * @return array<string,DefaultMeasure>
      */
-    private function createMeasureValues(
-        object $summaryObject,
-        DefaultCoordinates $coordinates,
-    ): array {
+    private function createMeasureValues(object $summaryObject): array
+    {
         $measureValues = [];
 
         foreach ($this->metadata->getMeasures() as $name => $measureMetadata) {
-            // special measure handling
-            if ($measureMetadata->getFunction() instanceof Special) {
-                $measure = $this->createSpecialMeasure(
-                    measureMetadata: $measureMetadata,
-                    coordinates: $coordinates,
-                );
-
-                $measureValues[$name] = $measure;
-                continue;
-            }
-
             /** @psalm-suppress MixedAssignment */
             $rawValue = $this->helper->getValue(
                 object: $summaryObject,
@@ -330,23 +323,22 @@ final class ResultContextBuilder
         return $measureValues;
     }
 
-    private function createSpecialMeasure(
+    private function createPseudoMeasureValue(
         MeasureMetadata $measureMetadata,
         DefaultCoordinates $coordinates,
-    ): DefaultMeasure {
-        $name = $measureMetadata->getName();
+    ): mixed {
+        $context = new PseudoMeasureContext(
+            measureMetadata: $measureMetadata,
+            coordinates: $coordinates,
+        );
 
-        if ($measureMetadata->getTypeClass() === Coordinates::class) {
-            return new DefaultMeasure(
-                label: $this->getLabel($name),
-                name: $name,
-                value: $coordinates,
-                rawValue: $coordinates,
-                unit: null,
-            );
+        $function = $measureMetadata->getFunction();
+
+        if (!$function instanceof PseudoMeasure) {
+            throw new LogicException('Function must be an instance of PseudoMeasure');
         }
 
-        throw new LogicException(\sprintf('Unsupported special measure "%s"', $name));
+        return $function->createPseudoMeasure($context);
     }
 
     private function normalizeRawValue(
