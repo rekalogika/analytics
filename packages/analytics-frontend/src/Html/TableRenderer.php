@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Html;
 
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
@@ -37,52 +36,6 @@ final readonly class TableRenderer
             twig: $this->twig,
             theme: $theme ?? $this->theme,
         );
-    }
-
-    /**
-     * Render a pivot table or a regular table based on the result.
-     *
-     * @param list<string> $measures The measures that will be displayed in the
-     * table.
-     * @param list<string> $rows The dimensions that will be used as rows in the
-     * table.
-     * @param list<string> $columns The dimensions that will be pivoted in the
-     * table. Specify the special value '@values' to pivot the measure
-     * dimension.
-     * @param string|null $theme The theme to use for rendering. If null, the
-     * default theme will be used.
-     * @param bool $throwException If true, the method will throw an exception
-     * if an error occurs during rendering. If false, it will return an HTML
-     * string with the error message.
-     */
-    public function render(
-        CubeCell $cube,
-        array $measures,
-        array $rows,
-        array $columns = ['@values'],
-        ?string $theme = null,
-        bool $throwException = false,
-    ): string {
-        try {
-            return $this->doRenderPivotTable(
-                cube: $cube,
-                rows: $rows,
-                columns: $columns,
-                measures: $measures,
-                theme: $theme,
-            );
-        } catch (\Throwable $e) {
-            $e = FrontendWrapperException::selectiveWrap($e);
-
-            if ($throwException) {
-                throw $e;
-            }
-
-            return $this->doRenderException(
-                exception: $e,
-                theme: $theme,
-            );
-        }
     }
 
     /**

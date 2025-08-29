@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Html;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Query;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Html\Visitor\ExpressionRendererVisitor;
@@ -31,34 +32,40 @@ final readonly class PredicateRenderer
     /**
      * @return list<string>
      */
-    public function renderPredicate(Query $query): array
+    public function renderPredicate(Coordinates|Query $input): array
     {
         try {
+            if ($input instanceof Query) {
+                $summaryClass = $input->getFrom();
+                $predicate = $input->getDice();
+            } else {
+                $summaryClass = $input->getSummaryClass();
+                $predicate = $input->getPredicate();
+            }
+
+            if ($predicate === null) {
+                return [];
+            }
+
             $summaryMetadata = $this->summaryMetadataFactory
-                ->getSummaryMetadata($query->getFrom());
+                ->getSummaryMetadata($summaryClass);
 
             $visitor = new ExpressionRendererVisitor(
                 htmlifier: $this->htmlifier,
                 summaryMetadata: $summaryMetadata,
             );
 
-            $expressions = $query->getDice();
-
-            if ($expressions === null) {
-                return [];
+            if (!$predicate instanceof CompositeExpression) {
+                throw new LogicException('Expected CompositeExpression, got: ' . get_debug_type($predicate));
             }
 
-            if (!$expressions instanceof CompositeExpression) {
-                throw new LogicException('Expected CompositeExpression, got: ' . get_debug_type($expressions));
-            }
-
-            if ($expressions->getType() !== CompositeExpression::TYPE_AND) {
-                throw new LogicException('Expected AND CompositeExpression, got: ' . $expressions->getType());
+            if ($predicate->getType() !== CompositeExpression::TYPE_AND) {
+                throw new LogicException('Expected AND CompositeExpression, got: ' . $predicate->getType());
             }
 
             $results = [];
 
-            foreach ($expressions->getExpressionList() as $expression) {
+            foreach ($predicate->getExpressionList() as $expression) {
                 $result = $visitor->dispatch($expression);
 
                 if (!\is_string($result)) {

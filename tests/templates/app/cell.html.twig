@@ -17,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for name, dimension in row.coordinates %}
+            {% for name, dimension in cell.coordinates %}
                 <tr>
                     <td>{{ dimension.name }}</td>
                     <td>{{ dimension.label|trans }}</td>
@@ -41,7 +41,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for name, measure in row.measures %}
+            {% for name, measure in cell.measures %}
                 <tr>
                     <td>{{ measure.name }}</td>
                     <td>{{ measure.label|trans }}</td>
@@ -52,6 +52,18 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <h3 class="mb-3">Predicates</h3>
+
+    {% if predicate|length > 0 %}
+        <ul>
+            {% for predicate_component in predicate %}
+                <li>{{ predicate_component|raw }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>None.</p>
+    {% endif %}
 
     <h3 class="mb-3">Source Table SQL</h3>
 

@@ -63,7 +63,7 @@ final class AppController extends AbstractController
         PivotAwareQueryFactory $pivotAwareQueryFactory,
         ChartGenerator $chartGenerator,
         TableRenderer $htmlRenderer,
-        PredicateRenderer $expressionHtmlRenderer,
+        PredicateRenderer $predicateRenderer,
         string $hash,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
@@ -91,7 +91,7 @@ final class AppController extends AbstractController
 
         // create pivot table
         try {
-            $pivotTable = $htmlRenderer->render(
+            $pivotTable = $htmlRenderer->renderPivotTable(
                 cube: $result->getCube(),
                 rows: $rows,
                 columns: $columns,
@@ -103,19 +103,19 @@ final class AppController extends AbstractController
         } catch (AnalyticsFrontendException $e) {
             $pivotTable = null;
             $pivotTableError = $e->trans($this->translator);
-            // } catch (\Throwable $e) {
-            //     $pivotTable = null;
-            //     $pivotTableError = 'An error occurred while rendering the pivot table.';
-            //     $this->logger->error(
-            //         'An error occurred while rendering the pivot table.',
-            //         [
-            //             'exception' => $e,
-            //         ],
-            //     );
+        } catch (\Throwable $e) {
+            $pivotTable = null;
+            $pivotTableError = 'An error occurred while rendering the pivot table.';
+            $this->logger->error(
+                'An error occurred while rendering the pivot table.',
+                [
+                    'exception' => $e,
+                ],
+            );
         }
 
         // expression rendering
-        $expressions = $expressionHtmlRenderer->renderPredicate($origQuery);
+        $predicate = $predicateRenderer->renderPredicate($origQuery);
 
         // create chart
         try {
@@ -164,7 +164,7 @@ final class AppController extends AbstractController
             'pivotTableError' => $pivotTableError,
             'chart' => $chart,
             'chartError' => $chartError,
-            'expressions' => $expressions,
+            'predicate' => $predicate,
             'hash' => $hash,
         ]);
     }
@@ -176,6 +176,7 @@ final class AppController extends AbstractController
         CoordinatesMapper $coordinatesMapper,
         #[Autowire('@rekalogika.analytics.summary_manager')]
         DefaultSummaryManager $summaryManager,
+        PredicateRenderer $predicateRenderer,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
         $sqlFormatter = new SqlFormatter(new HtmlHighlighter(usePre: false));
@@ -192,8 +193,12 @@ final class AppController extends AbstractController
         $sourceSql = $sqlFormatter->compress($sourceSql);
         $sourceSql = $sqlFormatter->highlight($sourceSql);
 
+        $predicate = $predicateRenderer
+            ->renderPredicate($cell->getCoordinates());
+
         return $this->render('app/cell.html.twig', [
-            'row' => $cell,
+            'cell' => $cell,
+            'predicate' => $predicate,
             'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'hash' => $hash,
@@ -230,7 +235,7 @@ final class AppController extends AbstractController
         $measures = $query->getValues();
 
         // create pivot table
-        $spreadsheet = $spreadsheetRenderer->render($result, $measures);
+        $spreadsheet = $spreadsheetRenderer->render($result->getTable(), $measures);
 
         $writer = new Xlsx($spreadsheet);
 
