@@ -24,7 +24,7 @@
         "psr/container": "^2.0",
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
-        "rekalogika/analytics-core": "^0.31",
+        "rekalogika/analytics-core": "^0.32",
         "rekalogika/pivot-table": "^0.33",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
