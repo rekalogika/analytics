@@ -13,59 +13,31 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Analytics;
 
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
-use Rekalogika\Analytics\Frontend\Formatter\HtmlifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
-use Rekalogika\Analytics\PivotTable\Model\Cube\MeasureValue;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
+final class CoordinatesHtmlifier implements Htmlifier
 {
-    private ?Htmlifier $htmlifier = null;
-
     public function __construct(
         private CoordinatesMapper $coordinatesMapper,
         private UrlGeneratorInterface $urlGenerator,
         private SummaryClassRegistry $summaryClassRegistry,
     ) {}
 
-    private function getHtmlifier(): Htmlifier
-    {
-        if (null === $this->htmlifier) {
-            throw new \LogicException('Htmlifier is not set.');
-        }
-
-        return $this->htmlifier;
-    }
-
-    #[\Override]
-    public function withHtmlifier(Htmlifier $htmlifier): static
-    {
-        if ($this->htmlifier === $htmlifier) {
-            return $this;
-        }
-
-        $self = clone $this;
-        $self->htmlifier = $htmlifier;
-
-        return $self;
-    }
-
     #[\Override]
     public function toHtml(mixed $input): string
     {
-        if (!$input instanceof MeasureValue) {
+        if (!$input instanceof Coordinates) {
             throw new ValueNotSupportedException();
         }
 
-        $row = $input->getCell();
-        $coordinates = $row->getCoordinates();
-
-        $coordinatesDto = $this->coordinatesMapper->toDto($coordinates);
+        $coordinatesDto = $this->coordinatesMapper->toDto($input);
         $string = json_encode($coordinatesDto->toArray());
-        $hash = $this->summaryClassRegistry->getHashFromClass($coordinates->getSummaryClass());
+        $hash = $this->summaryClassRegistry->getHashFromClass($input->getSummaryClass());
 
         $url = $this->urlGenerator->generate(
             'cell',
@@ -75,12 +47,9 @@ final class MeasureValueHtmlifier implements Htmlifier, HtmlifierAware
             ],
         );
 
-        $content = $this->getHtmlifier()->toHtml($input->getContent());
-
         return \sprintf(
-            '<a href="%s" target="_blank">%s</a>',
+            '<a href="%s" target="_blank">Debug Cell</a>',
             htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5),
-            $content,
         );
     }
 }
