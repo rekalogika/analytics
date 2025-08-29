@@ -429,6 +429,9 @@ final class ArchitectureTest
                 // doctrine
                 Selector::inNamespace('Doctrine\Common\Collections'),
 
+                // rekalogika
+                Selector::inNamespace('Rekalogika\Contracts\Rekapager'),
+
                 // php misc
                 Selector::classname(\Override::class),
 
