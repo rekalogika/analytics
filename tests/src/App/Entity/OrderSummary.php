@@ -278,7 +278,6 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
     )]
     private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType
 
-
     #[\Override]
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
     {

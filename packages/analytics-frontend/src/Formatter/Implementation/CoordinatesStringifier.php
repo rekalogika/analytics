@@ -17,6 +17,11 @@ use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 
+/**
+ * A stringifier for Coordinates objects that returns an empty string. If you
+ * need to render the coordinates, you need to create your custom implementation
+ * to handle Coordinates objects.
+ */
 final readonly class CoordinatesStringifier implements Stringifier
 {
     #[\Override]
