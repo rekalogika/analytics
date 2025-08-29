@@ -14,25 +14,20 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Attribute;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class Measure
 {
-    /**
-     * @param AggregateFunction $function
-     */
     public function __construct(
-        private AggregateFunction $function,
+        private AggregateFunction|PseudoMeasure $function,
         private null|string|TranslatableInterface $label = null,
         private null|string|TranslatableInterface $unit = null,
         private bool $hidden = false,
     ) {}
 
-    /**
-     * @return AggregateFunction
-     */
-    public function getFunction(): AggregateFunction
+    public function getFunction(): AggregateFunction|PseudoMeasure
     {
         return $this->function;
     }

@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Exception\QueryResultOverflowException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Engine\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
@@ -296,6 +297,13 @@ final class SummaryQuery extends AbstractQuery
         $measureMetadatas = $this->metadata->getMeasures();
 
         foreach ($measureMetadatas as $name => $measureMetadata) {
+            $function = $measureMetadata->getFunction();
+
+            if ($function instanceof PseudoMeasure) {
+                // virtual measure, skip
+                continue;
+            }
+
             $summaryContext = SummaryQueryContext::create(
                 queryBuilder: $this->getSimpleQueryBuilder(),
                 summaryMetadata: $this->metadata,

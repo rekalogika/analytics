@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Context;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -65,6 +66,11 @@ final readonly class SummaryQueryContext
         if ($function instanceof SummarizableAggregateFunction) {
             $aggregateToAggregateExpression =
                 $function->getAggregateToAggregateExpression($field);
+        } elseif ($function instanceof PseudoMeasure) {
+            throw new UnexpectedValueException(\sprintf(
+                'The special measure "%s" cannot be resolved in this context.',
+                $property,
+            ));
         } else {
             $aggregateToAggregateExpression = '';
         }

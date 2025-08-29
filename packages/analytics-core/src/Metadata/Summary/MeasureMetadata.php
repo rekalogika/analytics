@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Summary\AggregateFunction;
+use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -24,7 +25,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
      * @param class-string $typeClass
      */
     public function __construct(
-        private AggregateFunction $function,
+        private AggregateFunction|PseudoMeasure $function,
         string $summaryProperty,
         TranslatableInterface $label,
         ?string $typeClass,
@@ -69,7 +70,7 @@ final readonly class MeasureMetadata extends PropertyMetadata
         );
     }
 
-    public function getFunction(): AggregateFunction
+    public function getFunction(): AggregateFunction|PseudoMeasure
     {
         return $this->function;
     }
