@@ -16,9 +16,11 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Core\Partition\SingleLevelIntegerPartition;
+use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
 use Rekalogika\Analytics\Metadata\Attribute as Analytics;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
@@ -124,6 +126,12 @@ class OccupancyHistorySummary extends BaseSummary
     )]
     private ?int $count = null;
 
+    #[Analytics\Measure(
+        function: new CoordinatesMeasure(),
+        label: new TranslatableMessage('Actions'),
+    )]
+    private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType
+
     //
     // getters
     //
@@ -164,5 +172,10 @@ class OccupancyHistorySummary extends BaseSummary
     public function getCount(): ?int
     {
         return $this->count;
+    }
+
+    public function getActions(): ?Coordinates
+    {
+        return $this->actions;
     }
 }

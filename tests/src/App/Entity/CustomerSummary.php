@@ -15,8 +15,10 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
+use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Metadata\Attribute as Analytics;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
@@ -70,6 +72,12 @@ class CustomerSummary extends BaseSummary
     )]
     private ?int $count = null;
 
+    #[Analytics\Measure(
+        function: new CoordinatesMeasure(),
+        label: new TranslatableMessage('Actions'),
+    )]
+    private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType
+
     //
     // getters
     //
@@ -92,5 +100,10 @@ class CustomerSummary extends BaseSummary
     public function getCount(): ?int
     {
         return $this->count;
+    }
+
+    public function getActions(): ?Coordinates
+    {
+        return $this->actions;
     }
 }
