@@ -40,43 +40,57 @@ trait PageableTrait
             ->getSourceEntities($this->getCoordinates());
     }
 
-    #[\Override]
+    /**
+     * @return PageInterface<int,object>
+     */
     public function getPageByIdentifier(object $pageIdentifier): PageInterface
     {
         return $this->getPageable()->getPageByIdentifier($pageIdentifier);
     }
 
-    #[\Override]
+    /**
+     * @return class-string
+     */
     public function getPageIdentifierClass(): string
     {
         return $this->getPageable()->getPageIdentifierClass();
     }
 
-    #[\Override]
+    /**
+     * @return PageInterface<int,object>
+     */
     public function getFirstPage(): PageInterface
     {
         return $this->getPageable()->getFirstPage();
     }
 
-    #[\Override]
+    /**
+     * @return null|PageInterface<int,object>
+     */
     public function getLastPage(): ?PageInterface
     {
         return $this->getPageable()->getLastPage();
     }
 
-    #[\Override]
+    /**
+     * @return \Iterator<PageInterface<int,object>>
+     */
     public function getPages(?object $start = null): \Iterator
     {
         return $this->getPageable()->getPages($start);
     }
 
-    #[\Override]
+    /**
+     * @return int<1,max>
+     */
     public function getItemsPerPage(): int
     {
         return $this->getPageable()->getItemsPerPage();
     }
 
-    #[\Override]
+    /**
+     * @param int<1,max> $itemsPerPage
+     */
     public function withItemsPerPage(int $itemsPerPage): static
     {
         $new = clone $this;
@@ -85,13 +99,17 @@ trait PageableTrait
         return $new;
     }
 
-    #[\Override]
+    /**
+     * @return null|int<0,max>
+     */
     public function getTotalPages(): ?int
     {
         return $this->getPageable()->getTotalPages();
     }
 
-    #[\Override]
+    /**
+     * @return null|int<0,max>
+     */
     public function getTotalItems(): ?int
     {
         return $this->getPageable()->getTotalItems();
@@ -104,6 +122,6 @@ trait PageableTrait
     public function getSourceQueryComponents(): QueryComponents
     {
         return $this->sourceEntitiesFactory
-            ->getCoordinatesQueryComponents($this->coordinates);
+            ->getCoordinatesQueryComponents($this->getCoordinates());
     }
 }

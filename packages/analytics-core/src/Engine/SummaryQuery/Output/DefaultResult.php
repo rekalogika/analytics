@@ -182,6 +182,7 @@ final class DefaultResult implements Result
         return $this->table ??= DefaultTable::create(
             context: $this->getResultContext(),
             dimensionality: $dimensionality,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 

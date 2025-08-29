@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Table;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Registry\RowRegistry;
@@ -38,8 +39,12 @@ final class DefaultTable implements Table, \IteratorAggregate
     public static function create(
         ResultContext $context,
         array $dimensionality,
+        SourceEntitiesFactory $sourceEntitiesFactory,
     ): self {
-        $registry = new RowRegistry($dimensionality);
+        $registry = new RowRegistry(
+            dimensionality: $dimensionality,
+            sourceEntitiesFactory: $sourceEntitiesFactory,
+        );
 
         return new self(
             context: $context,
