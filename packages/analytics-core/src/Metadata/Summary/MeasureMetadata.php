@@ -89,4 +89,9 @@ final readonly class MeasureMetadata extends PropertyMetadata
     {
         return $this->virtual;
     }
+
+    public function isPseudoMeasure(): bool
+    {
+        return $this->function instanceof PseudoMeasure;
+    }
 }
