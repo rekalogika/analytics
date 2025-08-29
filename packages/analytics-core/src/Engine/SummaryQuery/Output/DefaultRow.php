@@ -14,10 +14,16 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
+use Rekalogika\Contracts\Rekapager\PageableInterface;
 
-final class DefaultRow implements Row
+/**
+ * @implements PageableInterface<int,object>
+ */
+final class DefaultRow implements Row, PageableInterface
 {
     use MeasuresTrait;
+    use PageableTrait;
 
     /**
      * @param list<string> $dimensionality
@@ -25,7 +31,14 @@ final class DefaultRow implements Row
     public function __construct(
         private readonly DefaultCell $cell,
         private readonly array $dimensionality,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
     ) {}
+
+    #[\Override]
+    private function getSourceEntitiesFactory(): SourceEntitiesFactory
+    {
+        return $this->sourceEntitiesFactory;
+    }
 
     #[\Override]
     public function getCoordinates(): DefaultOrderedCoordinates

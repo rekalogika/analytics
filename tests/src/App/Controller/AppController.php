@@ -19,10 +19,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
-use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
@@ -32,7 +33,6 @@ use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -174,8 +174,6 @@ final class AppController extends AbstractController
         string $hash,
         string $data,
         CoordinatesMapper $coordinatesMapper,
-        #[Autowire('@rekalogika.analytics.summary_manager')]
-        DefaultSummaryManager $summaryManager,
         PredicateRenderer $predicateRenderer,
     ): Response {
         $class = $this->summaryClassRegistry->getClassFromHash($hash);
@@ -187,7 +185,16 @@ final class AppController extends AbstractController
          */
         $coordinatesDto = CoordinatesDto::fromArray(json_decode($data, true));
         $cell = $coordinatesMapper->fromDto($class, $coordinatesDto);
-        $queryComponents = $summaryManager->getCoordinatesQueryComponents($cell->getCoordinates());
+
+        if (!$cell instanceof DefaultCell) {
+            throw new UnexpectedValueException(\sprintf(
+                'Expected %s, got %s',
+                DefaultCell::class,
+                get_debug_type($cell),
+            ));
+        }
+
+        $queryComponents = $cell->getSourceQueryComponents();
 
         $sourceSql = $queryComponents->getInterpolatedSqlStatement() . ';';
         $sourceSql = $sqlFormatter->compress($sourceSql);

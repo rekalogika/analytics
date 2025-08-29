@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -56,6 +57,7 @@ final class DefaultResult implements Result
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly EntityManagerInterface $entityManager,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
         private int $nodesLimit,
         private int $queryResultLimit,
     ) {}
@@ -157,6 +159,7 @@ final class DefaultResult implements Result
             propertyAccessor: $this->propertyAccessor,
             input: $this->getQueryResult(),
             nodesLimit: $this->nodesLimit,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 
@@ -179,6 +182,7 @@ final class DefaultResult implements Result
         return $this->table ??= DefaultTable::create(
             context: $this->getResultContext(),
             dimensionality: $dimensionality,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 

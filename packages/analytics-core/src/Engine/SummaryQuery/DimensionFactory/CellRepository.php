@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
@@ -35,6 +36,7 @@ final class CellRepository
         private readonly DimensionCollection $dimensionCollection,
         private readonly NullMeasureCollection $nullMeasureCollection,
         private readonly DefaultQuery $query,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
         private readonly ResultContext $context,
     ) {}
 
@@ -55,6 +57,7 @@ final class CellRepository
                 measures: $this->nullMeasureCollection->getNullMeasures(),
                 isNull: true,
                 context: $this->context,
+                sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
     }
 
@@ -83,6 +86,7 @@ final class CellRepository
                 measures: $this->nullMeasureCollection->getNullMeasures(),
                 isNull: true,
                 context: $baseCell->getContext(),
+                sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
     }
 
@@ -136,6 +140,7 @@ final class CellRepository
                 measures: $measures,
                 isNull: true,
                 context: $baseCell->getContext(),
+                sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
 
             $this->collectCell($cell);
@@ -177,13 +182,13 @@ final class CellRepository
         );
 
         $apexMeasures = $this->nullMeasureCollection->getNullMeasures();
-        $measures = iterator_to_array($apexMeasures, true);
 
         return $this->apexCell = new DefaultCell(
             coordinates: $apexCoordinates,
             measures: $apexMeasures,
             isNull: true,
             context: $this->context,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 

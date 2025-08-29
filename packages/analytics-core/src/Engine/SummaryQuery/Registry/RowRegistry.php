@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Registry;
 
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultRow;
 
@@ -29,6 +30,7 @@ final class RowRegistry
      */
     public function __construct(
         private array $dimensionality,
+        private SourceEntitiesFactory $sourceEntitiesFactory,
     ) {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->rows = new \WeakMap();
@@ -46,6 +48,7 @@ final class RowRegistry
         $row = new DefaultRow(
             cell: $cell,
             dimensionality: $this->dimensionality,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
 
         return $this->rows[$cell] = $row;

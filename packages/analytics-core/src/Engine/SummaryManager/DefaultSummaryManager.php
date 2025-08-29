@@ -13,18 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Contracts\Exception\LogicException;
-use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\SourceResult;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\DefaultSourceResult;
-use Rekalogika\Analytics\Engine\SummaryQuery\Query\SourceQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final readonly class DefaultSummaryManager implements SummaryManager
@@ -34,6 +28,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private SummaryMetadataFactory $metadataFactory,
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
+        private SourceEntitiesFactory $sourceEntitiesFactory,
         private int $queryResultLimit,
         private int $fillingNodesLimit,
     ) {}
@@ -65,59 +60,9 @@ final readonly class DefaultSummaryManager implements SummaryManager
             managerRegistry: $this->managerRegistry,
             summaryMetadataFactory: $this->metadataFactory,
             propertyAccessor: $this->propertyAccessor,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
             queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
             fillingNodesLimit: $fillingNodesLimit ?? $this->fillingNodesLimit,
         );
-    }
-
-    #[\Override]
-    public function getSource(Coordinates $coordinates): SourceResult
-    {
-        $summaryClass = $coordinates->getSummaryClass();
-        $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
-        $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
-
-        if (!$entityManager instanceof EntityManagerInterface) {
-            throw new LogicException(\sprintf(
-                'The entity manager for class "%s" is not an instance of "EntityManagerInterface".',
-                $summaryClass,
-            ));
-        }
-
-        $sourceQuery = new SourceQuery(
-            entityManager: $entityManager,
-            summaryMetadata: $metadata,
-        );
-
-        $queryBuilder = $sourceQuery
-            ->selectRoot()
-            ->fromCoordinates($coordinates)
-            ->getQueryBuilder();
-
-        return new DefaultSourceResult($queryBuilder);
-    }
-
-    public function getCoordinatesQueryComponents(Coordinates $coordinates): QueryComponents
-    {
-        $summaryClass = $coordinates->getSummaryClass();
-        $metadata = $this->metadataFactory->getSummaryMetadata($summaryClass);
-        $entityManager = $this->managerRegistry->getManagerForClass($summaryClass);
-
-        if (!$entityManager instanceof EntityManagerInterface) {
-            throw new LogicException(\sprintf(
-                'The entity manager for class "%s" is not an instance of "EntityManagerInterface".',
-                $summaryClass,
-            ));
-        }
-
-        $sourceQuery = new SourceQuery(
-            entityManager: $entityManager,
-            summaryMetadata: $metadata,
-        );
-
-        return $sourceQuery
-            ->selectMeasures()
-            ->fromCoordinates($coordinates)
-            ->getQueryComponents();
     }
 }

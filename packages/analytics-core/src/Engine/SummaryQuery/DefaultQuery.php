@@ -21,6 +21,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultResult;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -70,6 +71,7 @@ final class DefaultQuery implements Query
         private readonly ManagerRegistry $managerRegistry,
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly PropertyAccessorInterface $propertyAccessor,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
         private readonly int $queryResultLimit,
         private readonly int $fillingNodesLimit,
     ) {}
@@ -90,6 +92,7 @@ final class DefaultQuery implements Query
             entityManager: $this->getEntityManager(),
             nodesLimit: $this->fillingNodesLimit,
             queryResultLimit: $this->queryResultLimit,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 

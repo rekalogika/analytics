@@ -24,6 +24,7 @@ use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
@@ -60,6 +61,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
+            '$sourceEntitiesFactory' => service('rekalogika.analytics.source_entities_factory'),
             '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
             '$fillingNodesLimit' => '%rekalogika.analytics.filling_nodes_limit%',
         ])
@@ -87,6 +89,19 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
         ->tag('kernel.reset', [
             'method' => 'reset',
+        ])
+    ;
+
+    //
+    // source entities
+    //
+
+    $services
+        ->set('rekalogika.analytics.source_entities_factory')
+        ->class(SourceEntitiesFactory::class)
+        ->args([
+            '$managerRegistry' => service('doctrine'),
+            '$metadataFactory' => service(SummaryMetadataFactory::class),
         ])
     ;
 
