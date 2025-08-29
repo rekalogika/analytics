@@ -1,15 +1,15 @@
 {
     "name": "rekalogika/analytics",
     "description": "Adds OLAP functionality to Doctrine entities.",
+    "homepage": "https://rekalogika.dev/analytics",
     "license": "MIT",
-    "type": "library",
     "authors": [
         {
             "name": "Priyadi Iman Nurcahyo",
             "email": "priyadi@rekalogika.com"
         }
     ],
-    "homepage": "https://rekalogika.dev/analytics",
+    "type": "library",
     "require": {
         "php": "^8.2",
         "doctrine/collections": "^2.2",
@@ -90,12 +90,6 @@
         "zenstruck/foundry": "^2.0",
         "zenstruck/messenger-test": "^1.11"
     },
-    "replace": {
-        "rekalogika/analytics-bundle": "0.30.0",
-        "rekalogika/analytics-core": "0.30.0",
-        "rekalogika/analytics-frontend": "0.30.0",
-        "rekalogika/analytics-ux-panel": "0.30.0"
-    },
     "autoload": {
         "psr-4": {
             "Rekalogika\\Analytics\\": "packages/analytics-core/src/",
@@ -120,5 +114,11 @@
             "symfony/runtime": true,
             "symfony/flex": false
         }
+    },
+    "replace": {
+        "rekalogika/analytics-bundle": "0.31.0",
+        "rekalogika/analytics-core": "0.31.0",
+        "rekalogika/analytics-frontend": "0.31.0",
+        "rekalogika/analytics-ux-panel": "0.31.0"
     }
 }
