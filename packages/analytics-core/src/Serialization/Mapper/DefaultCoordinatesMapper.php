@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Serialization\Mapper;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
 use Rekalogika\Analytics\Contracts\Dto\ExpressionDto;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -67,53 +66,53 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
             $members[$dimensionName] = $serializedValue;
         }
 
-        $condition = $coordinates->getPredicate();
+        $predicate = $coordinates->getPredicate();
 
-        if ($condition !== null) {
+        if ($predicate !== null) {
             $mapperContext = new MapperContext(
                 summaryClass: $class,
             );
 
-            $condition = $this->mapper->toDto($condition, $mapperContext);
+            $predicate = $this->mapper->toDto($predicate, $mapperContext);
 
-            if (!$condition instanceof ExpressionDto) {
-                throw new UnexpectedValueException('Expected ExpressionDto, got ' . \get_class($condition));
+            if (!$predicate instanceof ExpressionDto) {
+                throw new UnexpectedValueException('Expected ExpressionDto, got ' . \get_class($predicate));
             }
         }
 
         return new CoordinatesDto(
             members: $members,
-            predicate: $condition,
+            predicate: $predicate,
         );
     }
 
+    /**
+     * @todo limit dimensions member in query for efficiency
+     */
     #[\Override]
-    public function fromDto(string $summaryClass, CoordinatesDto $dto): Row
+    public function fromDto(string $summaryClass, CoordinatesDto $dto): Cell
     {
-        $metadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($summaryClass);
-
         // create query
         $query = $this->summaryManager
             ->createQuery()
             ->from($summaryClass);
 
         // add where condition
-        $conditionDto = $dto->getPredicate();
-        $condition = null;
+        $predicateDto = $dto->getPredicate();
+        $predicate = null;
 
-        if ($conditionDto !== null) {
+        if ($predicateDto !== null) {
             $mapperContext = new MapperContext(
                 summaryClass: $summaryClass,
             );
 
-            $condition = $this->mapper->fromDto($conditionDto, $mapperContext);
+            $predicate = $this->mapper->fromDto($predicateDto, $mapperContext);
 
-            if (!$condition instanceof Expression) {
-                throw new UnexpectedValueException('Expected Expression, got ' . \get_class($condition));
+            if (!$predicate instanceof Expression) {
+                throw new UnexpectedValueException('Expected Expression, got ' . \get_class($predicate));
             }
 
-            $query->dice($condition);
+            $query->dice($predicate);
         }
 
         // add group by
@@ -129,20 +128,28 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
 
             $query->addDimension($dimensionName);
 
-            $query->andDice(Criteria::expr()->eq(
-                $dimensionName,
-                $rawMember,
-            ));
-
             /** @psalm-suppress MixedAssignment */
             $dimensionMembers[$dimensionName] = $rawMember;
         }
 
-        // execute
-        return $query->getResult()->getTable()->first() ?? new NullRow(
-            summaryMetadata: $metadata,
-            dimensionMembers: $dimensionMembers,
-            condition: $condition,
-        );
+        $cube = $query->getResult()->getCube();
+
+        /** @psalm-suppress MixedAssignment */
+        foreach ($dimensionMembers as $dimensionName => $rawMember) {
+            $cube = $cube->slice($dimensionName, $rawMember);
+
+            if ($cube === null) {
+                $metadata = $this->summaryMetadataFactory
+                    ->getSummaryMetadata($summaryClass);
+
+                return new NullRow(
+                    summaryMetadata: $metadata,
+                    dimensionMembers: $dimensionMembers,
+                    condition: $predicate,
+                );
+            }
+        }
+
+        return $cube;
     }
 }

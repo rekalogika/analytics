@@ -31,10 +31,10 @@
                    class="btn btn-secondary btn-sm float-end mb-2"
                    href="{{ path('download', {hash: hash, parameters: app.request.query.get('parameters') }) }}">Download</a>
 
-                {% if expressions|length > 0 %}
+                {% if predicate|length > 0 %}
                     <h5 class="">{{ 'Active criteria'|trans }}:</h5>
                     <ul>
-                        {% for expression in expressions %}<li>{{ expression|raw }}</li>{% endfor %}
+                        {% for predicate_component in predicate %}<li>{{ predicate_component|raw }}</li>{% endfor %}
                     </ul>
                 {% endif %}
 

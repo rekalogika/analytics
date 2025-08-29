@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Frontend\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
@@ -27,9 +28,8 @@ final readonly class SpreadsheetRenderer
 {
     private SpreadsheetRendererVisitor $visitor;
 
-    public function __construct(
-        Cellifier $cellifier,
-    ) {
+    public function __construct(Cellifier $cellifier)
+    {
         $this->visitor = new SpreadsheetRendererVisitor($cellifier);
     }
 
@@ -37,9 +37,9 @@ final readonly class SpreadsheetRenderer
      * @param list<string> $measures The measures that will be displayed in the
      * table.
      */
-    public function render(Result $result, array $measures): Spreadsheet
+    public function render(Table $table, array $measures): Spreadsheet
     {
-        $table = new TableAdapter($result->getTable(), $measures);
+        $table = new TableAdapter($table, $measures);
         $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);
