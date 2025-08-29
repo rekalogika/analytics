@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts;
 
-use Rekalogika\Analytics\Contracts\Result\Coordinates;
-
 interface SummaryManager
 {
     /**
@@ -29,6 +27,4 @@ interface SummaryManager
     ): void;
 
     public function createQuery(): Query;
-
-    public function getSource(Coordinates $coordinates): SourceResult;
 }

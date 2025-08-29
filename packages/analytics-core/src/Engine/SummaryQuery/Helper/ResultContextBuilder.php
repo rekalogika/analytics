@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCoordinates;
@@ -58,6 +59,7 @@ final class ResultContextBuilder
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
         int $nodesLimit,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $this->helper = new QueryResultToTableHelper();
@@ -66,6 +68,7 @@ final class ResultContextBuilder
             metadata: $metadata,
             query: $query,
             nodesLimit: $nodesLimit,
+            sourceEntitiesFactory: $sourceEntitiesFactory,
         );
 
         $this->dimensions = array_values(array_filter(
@@ -82,6 +85,7 @@ final class ResultContextBuilder
         SummaryMetadata $metadata,
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
+        SourceEntitiesFactory $sourceEntitiesFactory,
         int $nodesLimit,
         array $input,
     ): ResultContext {
@@ -91,6 +95,7 @@ final class ResultContextBuilder
             entityManager: $entityManager,
             propertyAccessor: $propertyAccessor,
             nodesLimit: $nodesLimit,
+            sourceEntitiesFactory: $sourceEntitiesFactory,
         );
 
         return $transformer->process($input);
@@ -173,6 +178,7 @@ final class ResultContextBuilder
             measures: $measures,
             isNull: false,
             context: $this->context,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 
@@ -431,6 +437,7 @@ final class ResultContextBuilder
                 measures: $measures,
                 isNull: false,
                 context: $this->context,
+                sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
         }
     }

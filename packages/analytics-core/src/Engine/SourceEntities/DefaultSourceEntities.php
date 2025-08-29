@@ -11,16 +11,16 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryQuery;
+namespace Rekalogika\Analytics\Engine\SourceEntities;
 
 use Doctrine\ORM\QueryBuilder;
-use Rekalogika\Analytics\Contracts\SourceResult;
+use Rekalogika\Analytics\Contracts\SourceEntities;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 use Rekalogika\Contracts\Rekapager\PageInterface;
 use Rekalogika\Rekapager\Doctrine\ORM\QueryBuilderAdapter;
 use Rekalogika\Rekapager\Keyset\KeysetPageable;
 
-final readonly class DefaultSourceResult implements SourceResult
+final readonly class DefaultSourceEntities implements SourceEntities
 {
     /**
      * @var PageableInterface<array-key,object>

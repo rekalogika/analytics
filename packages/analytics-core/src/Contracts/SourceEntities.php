@@ -22,4 +22,4 @@ use Rekalogika\Contracts\Rekapager\PageableInterface;
  *
  * @extends PageableInterface<array-key,object>
  */
-interface SourceResult extends PageableInterface {}
+interface SourceEntities extends PageableInterface {}

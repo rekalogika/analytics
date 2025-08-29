@@ -17,11 +17,17 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
+use Rekalogika\Contracts\Rekapager\PageableInterface;
 
-final class DefaultCell implements CubeCell
+/**
+ * @implements PageableInterface<int,object>
+ */
+final class DefaultCell implements CubeCell, PageableInterface
 {
     use MeasuresTrait;
+    use PageableTrait;
 
     /**
      * @var array<string,DefaultCells>
@@ -33,7 +39,14 @@ final class DefaultCell implements CubeCell
         private readonly DefaultMeasures $measures,
         private readonly bool $isNull,
         private readonly ResultContext $context,
+        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
     ) {}
+
+    #[\Override]
+    private function getSourceEntitiesFactory(): SourceEntitiesFactory
+    {
+        return $this->sourceEntitiesFactory;
+    }
 
     #[\Override]
     public function getSummaryClass(): string

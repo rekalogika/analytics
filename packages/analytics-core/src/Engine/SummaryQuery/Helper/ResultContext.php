@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionCollection;
@@ -37,6 +38,7 @@ final readonly class ResultContext
     public function __construct(
         private SummaryMetadata $metadata,
         private DefaultQuery $query,
+        private SourceEntitiesFactory $sourceEntitiesFactory,
         int $nodesLimit,
     ) {
         $orderByResolver = new MetadataOrderByResolver(
@@ -57,6 +59,7 @@ final readonly class ResultContext
             nullMeasureCollection: $this->nullMeasureCollection,
             query: $this->query,
             context: $this,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
 

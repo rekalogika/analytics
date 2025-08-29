@@ -19,8 +19,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\SourceEntities\DefaultSourceEntities;
+use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
-use Rekalogika\Analytics\Engine\SummaryQuery\DefaultSourceResult;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -45,6 +46,19 @@ final class SourceQueryTest extends KernelTestCase
         return $summaryManager;
     }
 
+    private function getSourceEntitiesFactory(): SourceEntitiesFactory
+    {
+        $sourceEntitiesFactory = static::getContainer()
+            ->get('rekalogika.analytics.source_entities_factory');
+
+        $this->assertInstanceOf(
+            SourceEntitiesFactory::class,
+            $sourceEntitiesFactory,
+        );
+
+        return $sourceEntitiesFactory;
+    }
+
     public function testNoDimension(): void
     {
         $coordinates = $this->getQuery()
@@ -53,11 +67,12 @@ final class SourceQueryTest extends KernelTestCase
             ->getCube()
             ->getCoordinates();
 
-        $sourceResult = $this->getSummaryManager()
-            ->getSource($coordinates);
+        $sourceEntities = $this
+            ->getSourceEntitiesFactory()
+            ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
-        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
+        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
+        $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
             'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId ORDER BY root.id ASC',
@@ -78,11 +93,12 @@ final class SourceQueryTest extends KernelTestCase
 
         $this->assertNotNull($coordinates);
 
-        $sourceResult = $this->getSummaryManager()
-            ->getSource($coordinates);
+        $sourceEntities = $this
+            ->getSourceEntitiesFactory()
+            ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
-        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
+        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
+        $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
             'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE root.id > :minId AND IDENTITY(_a0.country) = :boundparameter0 ORDER BY root.id ASC',
@@ -103,11 +119,12 @@ final class SourceQueryTest extends KernelTestCase
 
         $this->assertNotNull($coordinates);
 
-        $sourceResult = $this->getSummaryManager()
-            ->getSource($coordinates);
+        $sourceEntities = $this
+            ->getSourceEntitiesFactory()
+            ->getSourceEntities($coordinates);
 
-        $this->assertInstanceOf(DefaultSourceResult::class, $sourceResult);
-        $dql = $sourceResult->getQueryBuilder()->getQuery()->getDQL();
+        $this->assertInstanceOf(DefaultSourceEntities::class, $sourceEntities);
+        $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
             "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId AND REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'YYYY') = :boundparameter0 ORDER BY root.id ASC",
@@ -148,17 +165,16 @@ final class SourceQueryTest extends KernelTestCase
 
     private function testOneCount(Row $row): void
     {
-        $summaryManager = self::getContainer()->get(SummaryManager::class);
-        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
-
         /** @psalm-suppress MixedAssignment */
         $precounted = $row->getMeasures()->get('count')?->getValue() ?? 0;
         $this->assertIsInt($precounted);
 
-        $sourceResult = $summaryManager->getSource($row->getCoordinates());
+        $sourceEntities = $this
+            ->getSourceEntitiesFactory()
+            ->getSourceEntities($row->getCoordinates());
 
         $count = 0;
-        $pages = $sourceResult->withItemsPerPage(1000)->getPages();
+        $pages = $sourceEntities->withItemsPerPage(1000)->getPages();
 
         foreach ($pages as $page) {
             foreach ($page as $item) {
