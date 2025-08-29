@@ -181,11 +181,12 @@ final class DebugSummaryCommand extends Command
                 $measure->getFunction()::class,
                 $measure->isVirtual() ? 'Yes' : 'No',
                 $measure->isHidden() ? 'Yes' : 'No',
+                $measure->isPseudoMeasure() ? 'Yes' : 'No',
             ];
         }
 
         $io->table(
-            headers: ['Property', 'Label', 'Function', 'Virtual', 'Hidden'],
+            headers: ['Property', 'Label', 'Function', 'Virtual', 'Hidden', 'Pseudo'],
             rows: $measureRows,
         );
     }
