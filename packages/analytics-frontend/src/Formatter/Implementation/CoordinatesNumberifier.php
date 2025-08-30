@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 final readonly class CoordinatesNumberifier implements Numberifier
 {
     #[\Override]
-    public function toNumber(mixed $input): int|float
+    public function toNumber(mixed $input): int
     {
         if (!$input instanceof Coordinates) {
             throw new ValueNotSupportedException();
