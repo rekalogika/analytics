@@ -625,9 +625,14 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $selectedMeasures = [];
         $selectedUnit = null;
 
-        foreach ($measures as $measure) {
-            if (!\in_array($measure->getName(), $userSuppliedMeasures, true)) {
-                continue;
+        foreach ($userSuppliedMeasures as $measureName) {
+            $measure = $measures->get($measureName);
+
+            if ($measure === null) {
+                throw new UnexpectedValueException(\sprintf(
+                    'Measure "%s" not found',
+                    $measureName,
+                ));
             }
 
             $unit = $measure->getUnit();
