@@ -108,14 +108,22 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
+     * @param list<string> $dimensions
+     * @param list<string> $measures
      */
     private function createAutoChart(
         CubeCell $cube,
         array $dimensions,
         array $measures,
     ): Chart {
+        if ($dimensions === []) {
+            throw new UnsupportedData('At least one dimension is required');
+        }
+
+        if ($measures === []) {
+            throw new UnsupportedData('At least one measure is required');
+        }
+
         if (\count($dimensions) === 1) {
             if ($this->isDimensionSequential($cube, $dimensions[0])) {
                 return $this->createLineChart(
@@ -156,8 +164,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
+     * @param list<string> $dimensions
+     * @param list<string> $measures
      */
     private function createBarChart(
         CubeCell $cube,
@@ -173,8 +181,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
+     * @param list<string> $dimensions
+     * @param list<string> $measures
      */
     private function createLineChart(
         CubeCell $cube,
@@ -202,8 +210,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
+     * @param list<string> $dimensions
+     * @param list<string> $measures
      * @param Chart::TYPE_LINE|Chart::TYPE_BAR $type
      */
     private function createBarOrLineChart(
@@ -288,6 +296,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
         }
 
+        if ($dataSets === []) {
+            throw new UnsupportedData('No data available for the chart');
+        }
+
         $chart = $this->chartBuilder->createChart($type);
 
         $chart->setData([
@@ -370,11 +382,6 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         string $type,
     ): Chart {
         $configuration = $this->configurationFactory->createChartConfiguration();
-        $measure = $cube->getMeasures()->get($measure);
-
-        if ($measure === null) {
-            throw new UnexpectedValueException('Measures not found');
-        }
 
         $labels = [];
         $dataSets = [];
@@ -443,6 +450,12 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             }
         }
 
+        $dataSets = array_values($dataSets);
+
+        if ($dataSets === []) {
+            throw new UnsupportedData('No data available for the chart');
+        }
+
         if ($type === 'multiLine') {
             $chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
         } else {
@@ -451,7 +464,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         $chart->setData([
             'labels' => $labels,
-            'datasets' => array_values($dataSets),
+            'datasets' => $dataSets,
         ]);
 
         // X title.
@@ -582,6 +595,10 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             $color = $configuration->createChartElementConfiguration()->getAreaColor();
             $dataSet['backgroundColor'][] = $color;
+        }
+
+        if ($dataSet['data'] === []) {
+            throw new UnsupportedData('No data available for the chart');
         }
 
         $chart = $this->chartBuilder->createChart(Chart::TYPE_PIE);
