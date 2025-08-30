@@ -271,6 +271,14 @@ final class PivotAwareQuery
     /**
      * @return list<string>
      */
+    public function getDimensions(): array
+    {
+        return array_merge($this->rows, $this->columns);
+    }
+
+    /**
+     * @return list<string>
+     */
     public function getValues(): array
     {
         return $this->values;
