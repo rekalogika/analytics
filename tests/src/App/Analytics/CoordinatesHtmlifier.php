@@ -36,7 +36,7 @@ final class CoordinatesHtmlifier implements Htmlifier
         }
 
         $coordinatesDto = $this->coordinatesMapper->toDto($input);
-        $string = json_encode($coordinatesDto->toArray());
+        $string = json_encode($coordinatesDto);
         $hash = $this->summaryClassRegistry->getHashFromClass($input->getSummaryClass());
 
         $url = $this->urlGenerator->generate(
