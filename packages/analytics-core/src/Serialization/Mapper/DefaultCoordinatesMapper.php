@@ -42,13 +42,17 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
     }
 
     #[\Override]
-    public function toDto(Coordinates $coordinates): CoordinatesDto
+    public function toDto(Coordinates|Cell $input): CoordinatesDto
     {
-        $class = $coordinates->getSummaryClass();
+        if ($input instanceof Cell) {
+            $input = $input->getCoordinates();
+        }
+
+        $class = $input->getSummaryClass();
 
         $members = [];
 
-        foreach ($coordinates as $name => $dimension) {
+        foreach ($input as $name => $dimension) {
             if ($name === '@values') {
                 continue;
             }
@@ -66,7 +70,7 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
             $members[$dimensionName] = $serializedValue;
         }
 
-        $predicate = $coordinates->getPredicate();
+        $predicate = $input->getPredicate();
 
         if ($predicate !== null) {
             $mapperContext = new MapperContext(
