@@ -130,9 +130,10 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
-    public function rollUp(string $dimension): DefaultCell
+    public function rollUp(string|array $dimension): DefaultCell
     {
-        $rolledUpCoordinates = $this->coordinates->withoutDimension($dimension);
+        $dimensions = \is_array($dimension) ? $dimension : [$dimension];
+        $rolledUpCoordinates = $this->coordinates->withoutDimensions($dimensions);
 
         return $this->context
             ->getCellRepository()
@@ -140,11 +141,14 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
-    public function drillDown(string $dimension): DefaultCells
+    public function drillDown(string|array $dimension): DefaultCells
     {
-        return $this->drillDowns[$dimension] ??= new DefaultCells(
+        $hash = \is_array($dimension) ? implode('|', $dimension) : $dimension;
+        $dimensions = \is_array($dimension) ? $dimension : [$dimension];
+
+        return $this->drillDowns[$hash] ??= new DefaultCells(
             baseCell: $this,
-            childDimensionName: $dimension,
+            childDimensionNames: $dimensions,
             context: $this->context,
         );
     }

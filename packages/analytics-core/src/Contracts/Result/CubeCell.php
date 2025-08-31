@@ -49,9 +49,15 @@ interface CubeCell extends Cell
      */
     public function pivot(array $dimensions): self;
 
-    public function rollUp(string $dimension): self;
+    /**
+     * @param string|non-empty-list<string> $dimension
+     */
+    public function rollUp(string|array $dimension): self;
 
-    public function drillDown(string $dimension): CubeCells;
+    /**
+     * @param string|non-empty-list<string> $dimension
+     */
+    public function drillDown(string|array $dimension): CubeCells;
 
     public function slice(string $dimension, mixed $member): ?self;
 
