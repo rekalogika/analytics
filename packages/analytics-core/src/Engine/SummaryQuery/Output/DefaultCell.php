@@ -55,6 +55,22 @@ final class DefaultCell implements CubeCell
             ->getCoordinatesQueryComponents($this->getCoordinates());
     }
 
+    /**
+     * @param list<string> $dimensions
+     */
+    public function withOrdering(array $dimensions): self
+    {
+        $newCoordinates = $this->coordinates->withDimensions($dimensions);
+
+        return new self(
+            coordinates: $newCoordinates,
+            measures: $this->measures,
+            isNull: $this->isNull,
+            context: $this->context,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
+        );
+    }
+
     #[\Override]
     public function getSummaryClass(): string
     {
@@ -104,9 +120,19 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
+    public function pivot(array $dimensions): self
+    {
+        $pivotedCoordinates = $this->coordinates->withDimensions($dimensions);
+
+        return $this->context
+            ->getCellRepository()
+            ->getCellByCoordinates($pivotedCoordinates);
+    }
+
+    #[\Override]
     public function rollUp(string $dimension): DefaultCell
     {
-        $rolledUpCoordinates = $this->coordinates->without($dimension);
+        $rolledUpCoordinates = $this->coordinates->withoutDimension($dimension);
 
         return $this->context
             ->getCellRepository()
@@ -128,7 +154,7 @@ final class DefaultCell implements CubeCell
     {
         return $this->context
             ->getCellRepository()
-            ->getCellsByBaseAndDimension(
+            ->getCellByBaseAndDimension(
                 baseCell: $this,
                 dimensionName: $dimension,
                 dimensionMember: $member,

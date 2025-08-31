@@ -42,6 +42,11 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
             return $this->cubeCells;
         }
 
+        $dimensionNames = [
+            ...$this->baseCell->getCoordinates()->getDimensionNames(),
+            $this->childDimensionName,
+        ];
+
         $cells = $this->context
             ->getCellRepository()
             ->getCellsByBaseAndDimensionName(
@@ -53,7 +58,8 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
         $newCells = [];
 
         foreach ($cells as $cell) {
-            $newCells[$cell->getCoordinates()->getSignature()] = $cell;
+            $newCells[$cell->getCoordinates()->getSignature()]
+                = $cell->withOrdering($dimensionNames);
         }
 
         return $this->cubeCells = new \ArrayObject($newCells);

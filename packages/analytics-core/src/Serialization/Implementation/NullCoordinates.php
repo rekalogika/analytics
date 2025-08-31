@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Result\OrderedCoordinates;
+use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 /**
  * @implements \IteratorAggregate<string,NullDimension>
  */
-final readonly class NullCoordinates implements OrderedCoordinates, \IteratorAggregate
+final readonly class NullCoordinates implements Coordinates, \IteratorAggregate
 {
     /**
      * @var class-string

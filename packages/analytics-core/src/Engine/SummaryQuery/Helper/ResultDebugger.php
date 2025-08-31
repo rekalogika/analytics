@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\OrderedCoordinates;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Table;
 
@@ -67,7 +66,7 @@ final readonly class ResultDebugger
     /**
      * @return list<string>
      */
-    public static function debugCoordinates(Coordinates|OrderedCoordinates $coordinates): array
+    public static function debugCoordinates(Coordinates $coordinates): array
     {
         $result = [];
 

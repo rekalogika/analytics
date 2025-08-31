@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Collection\Map;
+use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
  * Coordinates of dimensions. A collection of dimensions that identifies a
@@ -24,9 +24,9 @@ use Rekalogika\Analytics\Contracts\Collection\Map;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends Map<string,Dimension>
+ * @extends OrderedMap<string,Dimension>
  */
-interface Coordinates extends Map
+interface Coordinates extends OrderedMap
 {
     /**
      * The summary class that this coordinates belongs to.

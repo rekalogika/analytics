@@ -19,4 +19,4 @@ namespace Rekalogika\Analytics\Contracts\Result;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
-interface Row extends OrderedCell {}
+interface Row extends Cell {}

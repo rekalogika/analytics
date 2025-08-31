@@ -41,6 +41,14 @@ interface CubeCell extends Cell
      */
     public function isNull(): bool;
 
+    /**
+     * Pivot the cell to the given dimensions order. The specified dimensions
+     * must exist in the current coordinates, but may skip some dimensions.
+     *
+     * @param list<string> $dimensions
+     */
+    public function pivot(array $dimensions): self;
+
     public function rollUp(string $dimension): self;
 
     public function drillDown(string $dimension): CubeCells;
