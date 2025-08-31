@@ -51,7 +51,7 @@ final class CellRepository
 
     public function getCellByCoordinates(DefaultCoordinates $coordinates): DefaultCell
     {
-        return $this->signatureToCell[$coordinates->getSignature()]
+        $cell = $this->signatureToCell[$coordinates->getSignature()]
             ??= new DefaultCell(
                 coordinates: $coordinates,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
@@ -59,9 +59,12 @@ final class CellRepository
                 context: $this->context,
                 sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
+
+        // preserve the dimension ordering as in the coordinates
+        return $cell->withOrdering($coordinates->getDimensionNames());
     }
 
-    public function getCellsByBaseAndDimension(
+    public function getCellByBaseAndDimension(
         DefaultCell $baseCell,
         string $dimensionName,
         mixed $dimensionMember,
@@ -80,7 +83,7 @@ final class CellRepository
 
         $coordinates = $baseCell->getCoordinates()->append($dimension);
 
-        return $this->signatureToCell[$coordinates->getSignature()]
+        $cell = $this->signatureToCell[$coordinates->getSignature()]
             ??= new DefaultCell(
                 coordinates: $coordinates,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
@@ -88,6 +91,8 @@ final class CellRepository
                 context: $baseCell->getContext(),
                 sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
+
+        return $cell->withOrdering($coordinates->getDimensionNames());
     }
 
     /**

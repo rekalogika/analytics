@@ -46,8 +46,7 @@ final class RowRegistry
         }
 
         $row = new DefaultRow(
-            cell: $cell,
-            dimensionality: $this->dimensionality,
+            cell: $cell->pivot($this->dimensionality),
             sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
 

@@ -21,12 +21,8 @@ final class DefaultRow implements Row
 {
     use MeasuresTrait;
 
-    /**
-     * @param list<string> $dimensionality
-     */
     public function __construct(
         private readonly DefaultCell $cell,
-        private readonly array $dimensionality,
         private readonly SourceEntitiesFactory $sourceEntitiesFactory,
     ) {}
 
@@ -41,9 +37,9 @@ final class DefaultRow implements Row
     }
 
     #[\Override]
-    public function getCoordinates(): DefaultOrderedCoordinates
+    public function getCoordinates(): DefaultCoordinates
     {
-        return $this->cell->getCoordinates()->withOrder($this->dimensionality);
+        return $this->cell->getCoordinates();
     }
 
     #[\Override]

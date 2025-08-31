@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
+use Rekalogika\Contracts\Rekapager\Exception\OutOfBoundsException;
 
 /**
  * @implements \IteratorAggregate<string,DefaultDimension>
@@ -50,20 +51,7 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
             $dimensionsArray[$dimension->getName()] = $dimension;
         }
 
-        ksort($dimensionsArray);
-
         $this->dimensions = $dimensionsArray;
-    }
-
-    /**
-     * @param list<string> $order
-     */
-    public function withOrder(array $order): DefaultOrderedCoordinates
-    {
-        return new DefaultOrderedCoordinates(
-            coordinates: $this,
-            order: $order,
-        );
     }
 
     #[\Override]
@@ -71,6 +59,43 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
     {
         return $this->summaryClass;
     }
+
+    #[\Override]
+    public function getByIndex(int $index): mixed
+    {
+        $key = array_keys($this->dimensions)[$index] ?? null;
+
+        if ($key === null) {
+            return null;
+        }
+
+        return $this->dimensions[$key];
+    }
+
+    #[\Override]
+    public function first(): mixed
+    {
+        $firstKey = array_key_first($this->dimensions);
+
+        if ($firstKey === null) {
+            return null;
+        }
+
+        return $this->dimensions[$firstKey];
+    }
+
+    #[\Override]
+    public function last(): mixed
+    {
+        $lastKey = array_key_last($this->dimensions);
+
+        if ($lastKey === null) {
+            return null;
+        }
+
+        return $this->dimensions[$lastKey];
+    }
+
 
     public function append(DefaultDimension $dimension): static
     {
@@ -81,7 +106,7 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
         );
     }
 
-    public function without(string $dimensionName): static
+    public function withoutDimension(string $dimensionName): static
     {
         if (!isset($this->dimensions[$dimensionName])) {
             throw new UnexpectedValueException(\sprintf(
@@ -100,21 +125,27 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
         );
     }
 
-    public function withoutMeasure(): static
+    /**
+     * @param list<string> $dimensionNames
+     */
+    public function withDimensions(array $dimensionNames): static
     {
-        $dimensionsWithoutMeasure = [];
+        $dimensionsOnly = [];
 
-        foreach ($this->dimensions as $dimension) {
-            if ($dimension->getName() === '@values') {
-                continue;
+        foreach ($dimensionNames as $name) {
+            if (!isset($this->dimensions[$name])) {
+                throw new OutOfBoundsException(\sprintf(
+                    'Dimension "%s" not found in coordinates',
+                    $name,
+                ));
             }
 
-            $dimensionsWithoutMeasure[] = $dimension;
+            $dimensionsOnly[$name] = $this->dimensions[$name];
         }
 
         return new self(
             summaryClass: $this->summaryClass,
-            dimensions: $dimensionsWithoutMeasure,
+            dimensions: $dimensionsOnly,
             condition: $this->condition,
         );
     }
@@ -170,6 +201,13 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
         return $this->condition;
     }
 
+    /**
+     * Note: the signature does not account for the dimension ordering.
+     * Different ordering will produce the same signature as long as the
+     * dimensions and their members are the same.
+     *
+     * @return string
+     */
     public function getSignature(): string
     {
         if ($this->signature !== null) {
@@ -204,5 +242,15 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
         sort($dimensionality);
 
         return $this->dimensionality = $dimensionality;
+    }
+
+    /**
+     * Get the list of dimension names in the order they were added.
+     *
+     * @return list<string>
+     */
+    public function getDimensionNames(): array
+    {
+        return array_keys($this->dimensions);
     }
 }

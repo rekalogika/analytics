@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *
- * @extends OrderedMap<OrderedCoordinates,Row>
+ * @extends OrderedMap<Coordinates,Row>
  */
 interface Table extends OrderedMap
 {
