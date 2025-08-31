@@ -19,7 +19,7 @@ use Rekalogika\Analytics\Contracts\Result\Coordinates;
 
 interface CoordinatesMapper
 {
-    public function toDto(Coordinates $coordinates): CoordinatesDto;
+    public function toDto(Coordinates|Cell $input): CoordinatesDto;
 
     /**
      * @param class-string $summaryClass
