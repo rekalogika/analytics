@@ -80,13 +80,13 @@ final class NullCell implements CubeCell
     #[\Override]
     public function pivot(array $dimensions): self
     {
-        throw new BadMethodCallException('pivot() is not yet implemented.');
+        throw new BadMethodCallException('pivot() is not implemented.');
     }
 
     #[\Override]
     public function rollUp(string $dimension): self
     {
-        throw new BadMethodCallException('pivot() is not yet implemented.');
+        throw new BadMethodCallException('rollUp() is not implemented.');
     }
 
     #[\Override]
@@ -98,18 +98,18 @@ final class NullCell implements CubeCell
     #[\Override]
     public function slice(string $dimension, mixed $member): CubeCell
     {
-        throw new BadMethodCallException('pivot() is not yet implemented.');
+        throw new BadMethodCallException('slice() is not implemented.');
     }
 
     #[\Override]
     public function find(string $dimension, mixed $argument): CubeCell
     {
-        throw new BadMethodCallException('pivot() is not yet implemented.');
+        throw new BadMethodCallException('find() is not implemented.');
     }
 
     #[\Override]
     public function dice(?Expression $predicate): CubeCell
     {
-        throw new BadMethodCallException('dice() is not yet implemented.');
+        throw new BadMethodCallException('dice() is not implemented.');
     }
 }
