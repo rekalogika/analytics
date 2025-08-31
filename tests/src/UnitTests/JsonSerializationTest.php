@@ -21,7 +21,7 @@ use Rekalogika\Analytics\Contracts\Dto\ExpressionDto;
 use Rekalogika\Analytics\Contracts\Dto\ValueDto;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
-class JsonSerializationTest extends TestCase
+final class JsonSerializationTest extends TestCase
 {
     public function testValueDtoJsonSerialization(): void
     {
