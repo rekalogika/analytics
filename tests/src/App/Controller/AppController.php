@@ -205,6 +205,7 @@ final class AppController extends AbstractController
 
         return $this->render('app/cell.html.twig', [
             'cell' => $cell,
+            'serialized_coordinates' => $data,
             'predicate' => $predicate,
             'source_sql' => $sourceSql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),

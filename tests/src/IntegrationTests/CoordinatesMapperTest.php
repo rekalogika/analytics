@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\OrderedCell;
 use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -44,7 +46,7 @@ final class CoordinatesMapperTest extends KernelTestCase
         }
     }
 
-    private function testOne(Row $row): void
+    private function testOne(Cell $row): void
     {
         $coordinatesMapper = self::getContainer()->get(CoordinatesMapper::class);
         $this->assertInstanceOf(CoordinatesMapper::class, $coordinatesMapper);

@@ -5,7 +5,7 @@
 {% block body %}
     <h2 class="mb-3">Cell Information</h2>
 
-    <h3 class="mb-3">Dimensions</h3>
+    <h3 class="mb-3">Coordinates</h3>
 
     <table class="table">
         <thead>
@@ -64,6 +64,10 @@
     {% else %}
         <p>None.</p>
     {% endif %}
+
+    <h3 class="mb-3">Serialized Coordinates</h3>
+
+    <pre class="user-select-all" style="white-space: pre-wrap">{{ serialized_coordinates }}</pre>
 
     <h3 class="mb-3">Source Table SQL</h3>
 

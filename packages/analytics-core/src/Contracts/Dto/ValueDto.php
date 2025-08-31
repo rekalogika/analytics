@@ -38,9 +38,10 @@ final readonly class ValueDto extends ExpressionDto
     {
         /** @psalm-suppress DocblockTypeContradiction */
         if (
-            !isset($array['class'], $array['value'])
+            !\array_key_exists('value', $array)
+            || !\array_key_exists('class', $array)
             || $array['class'] !== 'value'
-            || (!\is_string($array['value']) && !\is_array($array['value']))
+            || (!\is_string($array['value']) && !\is_array($array['value']) && $array['value'] !== null)
         ) {
             throw new InvalidArgumentException('Invalid array representation for ValueDto.');
         }
