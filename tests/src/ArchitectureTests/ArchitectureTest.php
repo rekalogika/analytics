@@ -64,6 +64,7 @@ final class ArchitectureTest
                 // php array
                 Selector::classname(\Traversable::class),
                 Selector::classname(\Countable::class),
+                Selector::classname(\JsonSerializable::class),
             );
     }
 

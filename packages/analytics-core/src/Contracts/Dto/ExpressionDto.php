@@ -15,12 +15,18 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
-abstract readonly class ExpressionDto
+abstract readonly class ExpressionDto implements \JsonSerializable
 {
     /**
      * @return array<string,mixed>
      */
     abstract public function toArray(): array;
+
+    #[\Override]
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
+    }
 
     /**
      * @param array<string,mixed> $array

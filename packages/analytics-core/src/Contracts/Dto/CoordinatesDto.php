@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
-final readonly class CoordinatesDto
+final readonly class CoordinatesDto implements \JsonSerializable
 {
     /**
      * @param array<string,string|null> $members Key is dimension name, value is the
@@ -25,6 +25,12 @@ final readonly class CoordinatesDto
         private array $members,
         private ?ExpressionDto $predicate,
     ) {}
+
+    #[\Override]
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
+    }
 
     /**
      * @return array<string,mixed>
