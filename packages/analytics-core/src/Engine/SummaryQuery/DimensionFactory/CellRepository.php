@@ -96,13 +96,23 @@ final class CellRepository
     }
 
     /**
+     * Note: the results do not have ordered dimensions.
+     *
+     * @param list<string> $dimensionNames
      * @return iterable<DefaultCell>
      */
     public function getCellsByBaseAndDimensionName(
         DefaultCell $baseCell,
-        string $dimensionName,
+        array $dimensionNames,
         bool $fillGaps,
     ): iterable {
+        $dimensionName = array_shift($dimensionNames);
+
+        if ($dimensionName === null) {
+            yield $baseCell;
+            return;
+        }
+
         if ($fillGaps) {
             $dimensions = $this->dimensionCollection
                 ->getDimensionsByName($dimensionName)
@@ -126,7 +136,16 @@ final class CellRepository
                     continue;
                 }
 
-                yield $cell;
+                $childCells = $this->getCellsByBaseAndDimensionName(
+                    baseCell: $cell,
+                    dimensionNames: $dimensionNames,
+                    fillGaps: $fillGaps,
+                );
+
+                foreach ($childCells as $childCell) {
+                    yield $childCell;
+                }
+
                 continue;
             }
 
@@ -135,7 +154,7 @@ final class CellRepository
                 continue;
             }
 
-            // if cell is null and gap-filling is requestied, we create a new
+            // if cell is null and gap-filling is requested, we create a new
             // cell
 
             $measures = $this->nullMeasureCollection->getNullMeasures();
@@ -149,7 +168,16 @@ final class CellRepository
             );
 
             $this->collectCell($cell);
-            yield $cell;
+
+            $childCells = $this->getCellsByBaseAndDimensionName(
+                baseCell: $cell,
+                dimensionNames: $dimensionNames,
+                fillGaps: $fillGaps,
+            );
+
+            foreach ($childCells as $childCell) {
+                yield $childCell;
+            }
         }
     }
 

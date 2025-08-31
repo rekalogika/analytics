@@ -106,17 +106,23 @@ final class DefaultCoordinates implements Coordinates, \IteratorAggregate
         );
     }
 
-    public function withoutDimension(string $dimensionName): static
+    /**
+     * @param non-empty-list<string> $dimensionNames
+     */
+    public function withoutDimensions(array $dimensionNames): static
     {
-        if (!isset($this->dimensions[$dimensionName])) {
-            throw new UnexpectedValueException(\sprintf(
-                'Dimension "%s" not found in coordinates',
-                $dimensionName,
-            ));
-        }
-
         $dimensionsWithout = $this->dimensions;
-        unset($dimensionsWithout[$dimensionName]);
+
+        foreach ($dimensionNames as $name) {
+            if (!isset($this->dimensions[$name])) {
+                throw new UnexpectedValueException(\sprintf(
+                    'Dimension "%s" not found in coordinates',
+                    $name,
+                ));
+            }
+
+            unset($dimensionsWithout[$name]);
+        }
 
         return new self(
             summaryClass: $this->summaryClass,

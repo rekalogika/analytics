@@ -183,6 +183,83 @@ final class QueryTest extends KernelTestCase
         $this->assertGreaterThan(0, $count);
     }
 
+    public function testDrillDown(): void
+    {
+        $year = 2024;
+
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.year')
+            ->getResult()
+            ->getCube();
+
+        $cells = $result
+            ->drillDown('time.civil.year');
+
+        $this->assertGreaterThan(0, $cells->count());
+
+        foreach ($cells as $cell) {
+            if ($cell->getCoordinates()->get('time.civil.year')?->getMember() === $year) {
+                $count = $cell->getMeasures()->get('count')?->getValue();
+                $this->assertIsInt($count);
+                $this->assertGreaterThan(0, $count);
+                return;
+            }
+        }
+    }
+
+    public function testRollUp(): void
+    {
+        // get a valid country
+        $country = static::getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?->getCountry();
+
+        $year = 2024;
+
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.year', 'customerCountry')
+            ->getResult()
+            ->getCube();
+
+        $cell = $result
+            ->slice('time.civil.year', 2023)
+            ?->slice('customerCountry', $country);
+
+        $this->assertNotNull($cell);
+
+        $rolledUp = $cell->rollUp(['time.civil.year', 'customerCountry']);
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $rolledUp->getMeasures()->get('count')?->getValue();
+        $this->assertEquals(190, $count);
+    }
+
+    public function testDrillDownMulti(): void
+    {
+        $year = 2024;
+
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.year', 'customerCountry')
+            ->getResult()
+            ->getCube();
+
+        $cells = $result
+            ->drillDown(['time.civil.year', 'customerCountry']);
+
+        $this->assertGreaterThan(0, $cells->count());
+
+        foreach ($cells as $cell) {
+            if ($cell->getCoordinates()->get('time.civil.year')?->getMember() === $year) {
+                $count = $cell->getMeasures()->get('count')?->getValue();
+                $this->assertIsInt($count);
+                $this->assertGreaterThan(0, $count);
+                return;
+            }
+        }
+    }
+
     public function testWhere(): void
     {
         $result = $this->getQuery()

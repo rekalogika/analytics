@@ -27,9 +27,12 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
      */
     private ?\ArrayObject $cubeCells = null;
 
+    /**
+     * @param non-empty-list<string> $childDimensionNames
+     */
     public function __construct(
         private DefaultCell $baseCell,
-        private string $childDimensionName,
+        private array $childDimensionNames,
         private ResultContext $context,
     ) {}
 
@@ -44,14 +47,14 @@ final class DefaultCells implements CubeCells, \IteratorAggregate
 
         $dimensionNames = [
             ...$this->baseCell->getCoordinates()->getDimensionNames(),
-            $this->childDimensionName,
+            ...$this->childDimensionNames,
         ];
 
         $cells = $this->context
             ->getCellRepository()
             ->getCellsByBaseAndDimensionName(
                 baseCell: $this->baseCell,
-                dimensionName: $this->childDimensionName,
+                dimensionNames: $this->childDimensionNames,
                 fillGaps: true,
             );
 

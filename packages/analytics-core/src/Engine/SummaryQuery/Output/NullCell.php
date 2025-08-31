@@ -84,13 +84,13 @@ final class NullCell implements CubeCell
     }
 
     #[\Override]
-    public function rollUp(string $dimension): self
+    public function rollUp(string|array $dimension): self
     {
         throw new BadMethodCallException('rollUp() is not implemented.');
     }
 
     #[\Override]
-    public function drillDown(string $dimension): NullCells
+    public function drillDown(string|array $dimension): NullCells
     {
         return new NullCells();
     }
