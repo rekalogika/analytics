@@ -18,10 +18,10 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 final readonly class ValueDto extends ExpressionDto
 {
     /**
-     * @param string|array<array-key,mixed> $value
+     * @param int|string|array<array-key,mixed> $value
      */
     public function __construct(
-        public string|array|null $value,
+        public string|int|array|null $value,
     ) {}
 
     #[\Override]
@@ -41,7 +41,12 @@ final readonly class ValueDto extends ExpressionDto
             !\array_key_exists('value', $array)
             || !\array_key_exists('class', $array)
             || $array['class'] !== 'value'
-            || (!\is_string($array['value']) && !\is_array($array['value']) && $array['value'] !== null)
+            || (
+                !\is_string($array['value'])
+                && !\is_int($array['value'])
+                && !\is_array($array['value'])
+                && $array['value'] !== null
+            )
         ) {
             throw new InvalidArgumentException('Invalid array representation for ValueDto.');
         }

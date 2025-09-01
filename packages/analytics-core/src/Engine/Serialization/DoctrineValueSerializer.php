@@ -36,7 +36,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): ?string {
+    ): int|string|null {
         // if value is enum, we return the value directly. no type checking is
         // done here.
 
@@ -48,7 +48,11 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             return null;
         }
 
-        if (\is_string($value) || \is_int($value) || \is_float($value)) {
+        if (\is_string($value) || \is_int($value)) {
+            return $value;
+        }
+
+        if (\is_float($value)) {
             return (string) $value;
         }
 
@@ -67,7 +71,7 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
     public function deserialize(
         string $class,
         string $dimension,
-        ?string $identifier,
+        int|string|null $identifier,
     ): mixed {
         if ($identifier === null) {
             return null;
