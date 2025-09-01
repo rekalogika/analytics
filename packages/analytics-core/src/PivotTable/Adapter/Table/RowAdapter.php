@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\PivotTable\Model\Table\TableMember;
 use Rekalogika\Analytics\PivotTable\Model\Table\TableValue;
 use Rekalogika\PivotTable\Contracts\Table\Row as PivotTableRow;
@@ -25,7 +25,7 @@ final readonly class RowAdapter implements PivotTableRow
      * table
      */
     public function __construct(
-        private Row $row,
+        private Cell $row,
         private array $measures,
     ) {}
 

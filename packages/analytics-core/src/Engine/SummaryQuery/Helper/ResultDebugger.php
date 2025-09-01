@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Contracts\Result\Table;
 
 /**
@@ -97,25 +96,14 @@ final readonly class ResultDebugger
     }
 
     /**
-     * @return array<string,list<string>>
-     */
-    public static function debugRow(Row $row): array
-    {
-        return [
-            'coordinates' => self::debugCoordinates($row->getCoordinates()),
-            'measures' => self::debugMeasures($row->getMeasures()),
-        ];
-    }
-
-    /**
-     * @return list<array<string,list<string>>>
+     * @return list<array<string,mixed>>
      */
     public static function debugTable(Table $table): array
     {
         $result = [];
 
         foreach ($table as $row) {
-            $result[] = self::debugRow($row);
+            $result[] = self::debugCell($row);
         }
 
         return $result;
@@ -124,10 +112,10 @@ final readonly class ResultDebugger
     /**
      * @return array<string,mixed>
      */
-    public static function debugCubeCell(CubeCell $cubeCell): array
+    public static function debugCell(Cell $cell): array
     {
-        $coordinates = $cubeCell->getCoordinates();
-        $measures = $cubeCell->getMeasures();
+        $coordinates = $cell->getCoordinates();
+        $measures = $cell->getMeasures();
 
         $coordinatesDebug = self::debugCoordinates($coordinates);
         $measuresDebug = self::debugMeasures($measures);

@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Query;
-use Rekalogika\Analytics\Contracts\Result\Row;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
@@ -159,7 +159,7 @@ final class SourceQueryTest extends KernelTestCase
         }
     }
 
-    private function testOneCount(Row $row): void
+    private function testOneCount(Cell $row): void
     {
         /** @psalm-suppress MixedAssignment */
         $precounted = $row->getMeasures()->get('count')?->getValue() ?? 0;

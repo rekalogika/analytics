@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Serialization\Implementation;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Result\Measure;
-use Rekalogika\Analytics\Contracts\Result\Row;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
 
-final readonly class NullRow implements Row
+final readonly class NullCell implements Cell
 {
     private NullMeasures $measures;
 

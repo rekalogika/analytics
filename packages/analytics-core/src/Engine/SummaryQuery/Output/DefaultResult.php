@@ -182,31 +182,6 @@ final class DefaultResult implements Result
         return $this->table ??= DefaultTable::create(
             context: $this->getResultContext(),
             dimensionality: $dimensionality,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
-
-    // private function hasHierarchicalOrdering(): bool
-    // {
-    //     if ($this->hasHierarchicalOrdering !== null) {
-    //         return $this->hasHierarchicalOrdering;
-    //     }
-
-    //     $orderBy = $this->query->getOrderBy();
-
-    //     if ($orderBy === []) {
-    //         return $this->hasHierarchicalOrdering = true;
-    //     }
-
-    //     $orderFields = array_keys($orderBy);
-    //     $groupByFields = $this->query->getGroupBy();
-
-    //     // remove @values
-    //     $groupByFields = array_filter(
-    //         $groupByFields,
-    //         static fn(string $field): bool => $field !== '@values',
-    //     );
-
-    //     return $this->hasHierarchicalOrdering = $orderFields === $groupByFields;
-    // }
 }
