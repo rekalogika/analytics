@@ -15,20 +15,18 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Table;
-use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
-use Rekalogika\Analytics\Engine\SummaryQuery\Registry\RowRegistry;
 
 /**
- * @implements \IteratorAggregate<Coordinates,DefaultRow>
+ * @implements \IteratorAggregate<Coordinates,DefaultCell>
  */
 final class DefaultTable implements Table, \IteratorAggregate
 {
     private readonly CellRepository $cellRepository;
 
     /**
-     * @var \ArrayObject<int<0,max>,DefaultRow>|null
+     * @var \ArrayObject<int<0,max>,DefaultCell>|null
      * @phpstan-ignore property.unusedType
      */
     private ?\ArrayObject $rows = null;
@@ -39,17 +37,10 @@ final class DefaultTable implements Table, \IteratorAggregate
     public static function create(
         ResultContext $context,
         array $dimensionality,
-        SourceEntitiesFactory $sourceEntitiesFactory,
     ): self {
-        $registry = new RowRegistry(
-            dimensionality: $dimensionality,
-            sourceEntitiesFactory: $sourceEntitiesFactory,
-        );
-
         return new self(
             context: $context,
             dimensionality: $dimensionality,
-            registry: $registry,
         );
     }
 
@@ -59,25 +50,22 @@ final class DefaultTable implements Table, \IteratorAggregate
     public function __construct(
         private readonly ResultContext $context,
         private readonly array $dimensionality,
-        private readonly RowRegistry $registry,
     ) {
         $this->cellRepository = $context->getCellRepository();
     }
 
     #[\Override]
-    public function get(mixed $key): DefaultRow
+    public function get(mixed $key): DefaultCell
     {
         if (!$key instanceof DefaultCoordinates) {
             throw new \InvalidArgumentException('This table only supports DefaultCoordinates as key');
         }
 
-        $cell = $this->cellRepository->getCellByCoordinates($key);
-
-        return $this->registry->getRowByCell($cell);
+        return $this->cellRepository->getCellByCoordinates($key);
     }
 
     /**
-     * @return \ArrayObject<int<0,max>,DefaultRow>
+     * @return \ArrayObject<int<0,max>,DefaultCell>
      */
     private function getRows(): \ArrayObject
     {
@@ -85,23 +73,19 @@ final class DefaultTable implements Table, \IteratorAggregate
             return $this->rows;
         }
 
-        $cells = $this->cellRepository
+        $rows = $this->cellRepository
             ->getCellsByDimensionality($this->dimensionality);
 
-        $rows = [];
-
-        foreach ($cells as $cell) {
-            $rows[] = $this->registry->getRowByCell($cell);
-        }
+        $rows = iterator_to_array($rows, false);
 
         /**
-         * @var \ArrayObject<int<0,max>,DefaultRow>
+         * @var \ArrayObject<int<0,max>,DefaultCell>
          */
         return $this->rows = new \ArrayObject($rows, \ArrayObject::ARRAY_AS_PROPS); // @phpstan-ignore-line
     }
 
     #[\Override]
-    public function getByIndex(int $index): ?DefaultRow
+    public function getByIndex(int $index): ?DefaultCell
     {
         return $this->getRows()[$index] ?? null;
     }
@@ -126,7 +110,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function first(): ?DefaultRow
+    public function first(): ?DefaultCell
     {
         $rows = $this->getRows();
 
@@ -134,7 +118,7 @@ final class DefaultTable implements Table, \IteratorAggregate
     }
 
     #[\Override]
-    public function last(): ?DefaultRow
+    public function last(): ?DefaultCell
     {
         $rows = $this->getRows();
 

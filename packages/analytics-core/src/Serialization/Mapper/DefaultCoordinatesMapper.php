@@ -23,7 +23,7 @@ use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Rekalogika\Analytics\Serialization\Implementation\NullRow;
+use Rekalogika\Analytics\Serialization\Implementation\NullCell;
 use Rekalogika\Analytics\Serialization\Mapper\Implementation\ChainMapper;
 
 final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
@@ -146,7 +146,7 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
                 $metadata = $this->summaryMetadataFactory
                     ->getSummaryMetadata($summaryClass);
 
-                return new NullRow(
+                return new NullCell(
                     summaryMetadata: $metadata,
                     dimensionMembers: $dimensionMembers,
                     condition: $predicate,
