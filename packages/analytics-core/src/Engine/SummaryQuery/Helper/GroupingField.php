@@ -96,8 +96,8 @@ final readonly class GroupingField
         return $this->groupingFields;
     }
 
-    public function isSubtotal(): bool
+    public function hasOneNonGroupingField(): bool
     {
-        return $this->getGroupingFields() !== [];
+        return \count($this->nonGroupingFields) === 1;
     }
 }

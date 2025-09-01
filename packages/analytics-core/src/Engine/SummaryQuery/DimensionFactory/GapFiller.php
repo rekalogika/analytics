@@ -31,8 +31,13 @@ final readonly class GapFiller
     public static function process(
         array $dimensions,
         DimensionFactory $dimensionFactory,
+        DimensionFieldCollection $dimensionFieldCollection,
     ): array {
-        $self = new self($dimensions, $dimensionFactory);
+        $self = new self(
+            dimensions: $dimensions,
+            dimensionFactory: $dimensionFactory,
+            dimensionFieldCollection: $dimensionFieldCollection,
+        );
 
         return $self->getOutput();
     }
@@ -52,6 +57,7 @@ final readonly class GapFiller
     private function __construct(
         array $dimensions,
         private DimensionFactory $dimensionFactory,
+        private DimensionFieldCollection $dimensionFieldCollection,
     ) {
         $newDimensions = [];
         $class = null;
@@ -145,7 +151,11 @@ final readonly class GapFiller
     ): DefaultDimension {
         $objectId = spl_object_id($member);
 
-        return $this->dimensions[$objectId] ?? $this->dimensionFactory->createDimension(
+        if (isset($this->dimensions[$objectId])) {
+            return $this->dimensions[$objectId];
+        }
+
+        $dimension = $this->dimensionFactory->createDimension(
             name: $this->name,
             label: $this->label,
             member: $member,
@@ -153,5 +163,9 @@ final readonly class GapFiller
             displayMember: $member,
             interpolation: true,
         );
+
+        $this->dimensionFieldCollection->collectDimension($dimension);
+
+        return $dimension;
     }
 }

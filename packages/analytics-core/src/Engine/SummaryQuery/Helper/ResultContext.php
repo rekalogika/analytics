@@ -47,11 +47,14 @@ final readonly class ResultContext
         );
 
         $this->dimensionFactory = new DimensionFactory(
-            orderByResolver: $orderByResolver,
             nodesLimit: $nodesLimit,
         );
 
-        $this->dimensionCollection = $this->dimensionFactory->getDimensionCollection();
+        $this->dimensionCollection = new DimensionCollection(
+            dimensionFactory: $this->dimensionFactory,
+            orderByResolver: $orderByResolver,
+        );
+
         $this->nullMeasureCollection = new NullMeasureCollection();
 
         $this->cellRepository = new CellRepository(

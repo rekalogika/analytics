@@ -35,14 +35,12 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
+use Rekalogika\DoctrineAdvancedGroupBy\FieldSet;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 
 final class SummaryQuery extends AbstractQuery
 {
-    /**
-     * @var list<string>
-     */
-    private array $cubeFields = [];
+    private Cube $cube;
 
     /**
      * This field is used for subtotal rollups, and is not related to the
@@ -79,6 +77,7 @@ final class SummaryQuery extends AbstractQuery
         private readonly int $queryResultLimit,
     ) {
         $summaryClass = $metadata->getSummaryClass();
+        $this->cube = new Cube();
 
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -126,17 +125,7 @@ final class SummaryQuery extends AbstractQuery
 
         // create group by
 
-        $cube = new Cube();
-
-        foreach ($this->cubeFields as $field) {
-            $this->getSimpleQueryBuilder()->addGroupBy($field);
-            $cube->add(new Field($field));
-        }
-
-        $groupBy = new GroupBy();
-        $groupBy->add($cube);
-
-        // create query & apply group by
+        $groupBy = new GroupBy($this->cube);
 
         $this->doctrineQuery = $this->getSimpleQueryBuilder()->getQuery();
 
@@ -380,9 +369,12 @@ final class SummaryQuery extends AbstractQuery
             // order by
 
             $orderBy = $dimensionMetadata->getOrderBy();
+            $fieldSet = new FieldSet(new Field($alias));
 
             if (!\is_array($orderBy)) {
                 $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
+
+                $fieldSet->add(new Field($fieldExpression));
             } else {
                 foreach ($orderBy as $orderField => $order) {
                     $orderExpression = $this->resolve(\sprintf(
@@ -399,18 +391,19 @@ final class SummaryQuery extends AbstractQuery
 
                     $this->getSimpleQueryBuilder()
                         ->addSelect(\sprintf(
-                            'MIN(%s) AS HIDDEN %s',
+                            '%s AS HIDDEN %s',
                             $orderExpression,
                             $orderAlias,
                         ))
                         ->addOrderBy($orderAlias, $order->value);
+
+                    $fieldSet->add(new Field($orderAlias));
                 }
             }
 
             // group by and grouping fields
-
-            $this->cubeFields[] = $alias;
             $this->groupingFields[] = $fieldExpression;
+            $this->cube->add($fieldSet);
 
             return;
         }
@@ -435,7 +428,7 @@ final class SummaryQuery extends AbstractQuery
             )
         ;
 
-        $this->cubeFields[] = $alias;
+        $this->cube->add(new Field($alias));
 
         $this->groupingFields[] =
             $this->resolve($dimensionMetadata->getName());

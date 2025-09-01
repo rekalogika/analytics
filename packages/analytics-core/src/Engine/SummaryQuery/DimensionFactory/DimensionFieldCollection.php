@@ -160,6 +160,10 @@ final class DimensionFieldCollection
             return $dimensions;
         }
 
-        return GapFiller::process($dimensions, $this->dimensionFactory);
+        return GapFiller::process(
+            dimensions: $dimensions,
+            dimensionFactory: $this->dimensionFactory,
+            dimensionFieldCollection: $this,
+        );
     }
 }

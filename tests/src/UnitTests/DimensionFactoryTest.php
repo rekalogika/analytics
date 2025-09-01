@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionCollection;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultDimension;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -25,11 +26,15 @@ final class DimensionFactoryTest extends TestCase
     public function testNullLast(): void
     {
         $dimensionFactory = new DimensionFactory(
-            orderByResolver: new HardcodedOrderByResolver(Order::Ascending),
             nodesLimit: 1000,
         );
 
-        $dimensionFactory->createDimension(
+        $dimensionCollection = new DimensionCollection(
+            dimensionFactory: $dimensionFactory,
+            orderByResolver: new HardcodedOrderByResolver(Order::Ascending),
+        );
+
+        $dimension = $dimensionFactory->createDimension(
             label: new TranslatableMessage('Female'),
             name: 'gender',
             rawMember: Gender::Female,
@@ -38,7 +43,9 @@ final class DimensionFactoryTest extends TestCase
             interpolation: false,
         );
 
-        $dimensionFactory->createDimension(
+        $dimensionCollection->collectDimension($dimension);
+
+        $dimension = $dimensionFactory->createDimension(
             label: new TranslatableMessage('Male'),
             name: 'gender',
             rawMember: Gender::Male,
@@ -47,7 +54,9 @@ final class DimensionFactoryTest extends TestCase
             interpolation: false,
         );
 
-        $dimensionFactory->createDimension(
+        $dimensionCollection->collectDimension($dimension);
+
+        $dimension = $dimensionFactory->createDimension(
             label: new TranslatableMessage('Other'),
             name: 'gender',
             rawMember: Gender::Other,
@@ -56,7 +65,9 @@ final class DimensionFactoryTest extends TestCase
             interpolation: false,
         );
 
-        $dimensionFactory->createDimension(
+        $dimensionCollection->collectDimension($dimension);
+
+        $dimension = $dimensionFactory->createDimension(
             label: new TranslatableMessage('Unknown'),
             name: 'gender',
             rawMember: null,
@@ -65,7 +76,8 @@ final class DimensionFactoryTest extends TestCase
             interpolation: false,
         );
 
-        $dimensionCollection = $dimensionFactory->getDimensionCollection();
+        $dimensionCollection->collectDimension($dimension);
+
         $dimensionsByName = $dimensionCollection->getDimensionsByName('gender');
 
         $result = array_map(
