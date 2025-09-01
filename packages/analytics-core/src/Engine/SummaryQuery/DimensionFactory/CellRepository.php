@@ -77,7 +77,7 @@ final class CellRepository
             throw new UnexpectedValueException(\sprintf(
                 'Dimension "%s" with member "%s" not found in the dimension collection.',
                 $dimensionName,
-                get_debug_type($dimensionMember),
+                var_export($dimensionMember, true),
             ));
         }
 

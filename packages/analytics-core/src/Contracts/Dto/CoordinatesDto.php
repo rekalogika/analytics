@@ -18,7 +18,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 final readonly class CoordinatesDto implements \JsonSerializable
 {
     /**
-     * @param array<string,string|null> $members Key is dimension name, value is the
+     * @param array<string,int|string|null> $members Key is dimension name, value is the
      * serialized raw member value.
      */
     public function __construct(
@@ -66,8 +66,12 @@ final readonly class CoordinatesDto implements \JsonSerializable
                 throw new InvalidArgumentException('Coordinates key must be a string.');
             }
 
-            if (!\is_string($value) && null !== $value) {
-                throw new InvalidArgumentException('Coordinates member value must be a string or null.');
+            if (
+                !\is_string($value)
+                && !\is_int($value)
+                && null !== $value
+            ) {
+                throw new InvalidArgumentException('Coordinates member value must be a string, an integer, or null.');
             }
 
             $members[$key] = $value;
@@ -93,7 +97,7 @@ final readonly class CoordinatesDto implements \JsonSerializable
     }
 
     /**
-     * @return array<string,string|null>
+     * @return array<string,int|string|null>
      */
     public function getMembers(): array
     {
