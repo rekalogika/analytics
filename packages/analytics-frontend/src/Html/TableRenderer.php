@@ -150,13 +150,17 @@ final readonly class TableRenderer
             $columns = $this->filterOutValues($columns);
         }
 
+        $dimensions = array_merge($rows, $columns);
+        // convert $dimensions to array<string,true>
+        $dimensions = array_combine($dimensions, array_fill(0, \count($dimensions), true));
+
         $table = PivotTableTransformer::transform(
             cube: $cubeAdapter,
             rows: $rows,
             columns: $columns,
             measures: $measures,
             skipLegends: ['@values'],
-            withSubtotal: array_merge($rows, $columns),
+            subtotals: $dimensions,
         );
 
         return $this->getVisitor($theme)->visitTable($table);
