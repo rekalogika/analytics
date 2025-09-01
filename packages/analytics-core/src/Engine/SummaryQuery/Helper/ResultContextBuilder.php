@@ -267,14 +267,22 @@ final class ResultContextBuilder
             /** @psalm-suppress MixedAssignment */
             $displayValue = $value ?? $this->getNullValue($name);
 
-            $dimension = $this->context->getDimensionFactory()->createDimension(
-                label: $this->getLabel($name),
-                name: $name,
-                member: $value,
-                rawMember: $rawValue,
-                displayMember: $displayValue,
-                interpolation: false,
-            );
+            $dimension = $this->context
+                ->getDimensionFactory()
+                ->createDimension(
+                    label: $this->getLabel($name),
+                    name: $name,
+                    member: $value,
+                    rawMember: $rawValue,
+                    displayMember: $displayValue,
+                    interpolation: false,
+                );
+
+            if ($groupingField->hasOneNonGroupingField()) {
+                $this->context
+                    ->getDimensionCollection()
+                    ->collectDimension($dimension);
+            }
 
             $dimensionValues[$name] = $dimension;
         }
@@ -420,6 +428,10 @@ final class ResultContextBuilder
                     displayMember: $measureMember,
                     interpolation: false,
                 );
+
+            $this->context
+                ->getDimensionCollection()
+                ->collectDimension($measureDimension);
 
             $measure = $cell->getMeasures()->get($measure)
                 ?? throw new UnexpectedValueException(

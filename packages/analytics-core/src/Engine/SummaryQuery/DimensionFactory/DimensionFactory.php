@@ -26,22 +26,7 @@ final class DimensionFactory
 
     private int $currentNodesCount = 0;
 
-    private readonly DimensionCollection $dimensionCollection;
-
-    public function __construct(
-        private readonly OrderByResolver $orderByResolver,
-        private int $nodesLimit,
-    ) {
-        $this->dimensionCollection = new DimensionCollection(
-            dimensionFactory: $this,
-            orderByResolver: $this->orderByResolver,
-        );
-    }
-
-    public function getDimensionCollection(): DimensionCollection
-    {
-        return $this->dimensionCollection;
-    }
+    public function __construct(private int $nodesLimit) {}
 
     public function createDimension(
         string $name,
@@ -78,8 +63,6 @@ final class DimensionFactory
                 throw new InterpolationOverflowException($this->nodesLimit);
             }
         }
-
-        $this->dimensionCollection->collectDimension($dimension);
 
         return $dimension;
     }
