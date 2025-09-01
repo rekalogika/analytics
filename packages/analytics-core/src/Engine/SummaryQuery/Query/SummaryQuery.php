@@ -129,7 +129,7 @@ final class SummaryQuery extends AbstractQuery
 
         $this->doctrineQuery = $this->getSimpleQueryBuilder()->getQuery();
 
-        if (\count($groupBy) > 0) {
+        if (\count($this->cube) > 0) {
             $groupBy->apply($this->doctrineQuery);
         }
     }
@@ -373,8 +373,6 @@ final class SummaryQuery extends AbstractQuery
 
             if (!\is_array($orderBy)) {
                 $this->getSimpleQueryBuilder()->addOrderBy($fieldExpression, $orderBy->value);
-
-                $fieldSet->add(new Field($fieldExpression));
             } else {
                 foreach ($orderBy as $orderField => $order) {
                     $orderExpression = $this->resolve(\sprintf(
