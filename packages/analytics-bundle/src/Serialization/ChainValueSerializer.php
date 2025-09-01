@@ -62,7 +62,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
     public function deserialize(
         string $class,
         string $dimension,
-        ?string $identifier,
+        int|string|null $identifier,
     ): mixed {
         $specificService = $this->getSpecificService($class, $dimension);
 
@@ -92,7 +92,7 @@ final readonly class ChainValueSerializer implements ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): ?string {
+    ): int|string|null {
         $specificManager = $this->getSpecificService($class, $dimension);
 
         if ($specificManager !== null) {

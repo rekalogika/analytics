@@ -19,7 +19,7 @@ interface ValueSerializer
 {
     /**
      * @param class-string $class The summary entity class name.
-     * @return ?string The serialized value.
+     * @return int|string|null The serialized value.
      * @throws UnsupportedValue If the serializer does not support the value
      * type.
      * @throws InvalidArgumentException If the value cannot be serialized.
@@ -28,7 +28,7 @@ interface ValueSerializer
         string $class,
         string $dimension,
         mixed $value,
-    ): ?string;
+    ): int|string|null;
 
     /**
      * @param class-string $class The summary entity class name.
@@ -40,6 +40,6 @@ interface ValueSerializer
     public function deserialize(
         string $class,
         string $dimension,
-        ?string $identifier,
+        int|string|null $identifier,
     ): mixed;
 }
