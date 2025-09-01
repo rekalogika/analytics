@@ -400,11 +400,11 @@ final class JsonSerializationTest extends TestCase
     public function testInvalidCoordinatesMemberValueThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Coordinates member value must be a string or null');
+        $this->expectExceptionMessage('Coordinates member value must be a string, an integer, or null.');
 
         CoordinatesDto::fromArray([
             'class' => 'coordinates',
-            'members' => ['valid-key' => 123], // Invalid value type
+            'members' => ['valid-key' => 123.3], // Invalid value type
         ]);
     }
 }
