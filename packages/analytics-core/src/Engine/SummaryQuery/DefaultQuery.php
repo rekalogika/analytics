@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\QueryProcessor;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -51,7 +51,7 @@ final class DefaultQuery implements Query
      */
     private array $orderBy = [];
 
-    private ?QueryProcessor $result = null;
+    private ?CubeCell $result = null;
 
     /**
      * @var list<string>|null
@@ -79,24 +79,21 @@ final class DefaultQuery implements Query
     #[\Override]
     public function getResult(): CubeCell
     {
-        return $this->getQueryProcessor()->getCube();
-    }
-
-    private function getQueryProcessor(): QueryProcessor
-    {
         if ($this->result !== null) {
             return $this->result;
         }
 
-        return $this->result = new QueryProcessor(
+        $context = ResultContextBuilder::createContext(
             query: $this,
             metadata: $this->getSummaryMetadata(),
             propertyAccessor: $this->propertyAccessor,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
             entityManager: $this->getEntityManager(),
             nodesLimit: $this->fillingNodesLimit,
             queryResultLimit: $this->queryResultLimit,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
+
+        return $this->result = $context->getCellRepository()->getApexCell();
     }
 
     //

@@ -45,8 +45,9 @@ interface CubeCell extends Cell
     public function isNull(): bool;
 
     /**
-     * Pivot the cell to the given dimensions order. The specified dimensions
-     * must exist in the current coordinates, but may skip some dimensions.
+     * Pivot, or reorder the cells to the given dimensions order. The specified
+     * dimensions must exist in the current coordinates, but may skip some
+     * dimensions.
      *
      * @param list<string> $dimensions
      */

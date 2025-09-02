@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionCollectio
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\MetadataOrderByResolver;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\NullMeasureCollection;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -90,5 +91,10 @@ final readonly class ResultContext
     public function getCellRepository(): CellRepository
     {
         return $this->cellRepository;
+    }
+
+    public function getApexCell(): DefaultCell
+    {
+        return $this->cellRepository->getApexCell();
     }
 }

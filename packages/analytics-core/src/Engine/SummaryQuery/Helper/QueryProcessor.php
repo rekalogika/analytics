@@ -14,14 +14,10 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @internal
@@ -30,29 +26,22 @@ final class QueryProcessor
 {
     private SummaryQuery|EmptyResult|null $summarizerQuery = null;
 
-    // private QueryComponents|EmptyResult|null $queryComponents = null;
-
     /**
      * @var list<array<string, mixed>>|null
      */
     private ?array $queryResult = null;
 
-    private ?ResultContext $resultContext = null;
-
     public function __construct(
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
-        private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly EntityManagerInterface $entityManager,
-        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
-        private int $nodesLimit,
         private int $queryResultLimit,
     ) {}
 
     /**
      * @return list<array<string,mixed>>
      */
-    private function getQueryResult(): array
+    public function getQueryResult(): array
     {
         if ($this->queryResult !== null) {
             return $this->queryResult;
@@ -95,26 +84,6 @@ final class QueryProcessor
         );
     }
 
-    // public function getQueryComponents(): ?QueryComponents
-    // {
-    //     if ($this->queryComponents !== null) {
-    //         if ($this->queryComponents instanceof EmptyResult) {
-    //             return null;
-    //         }
-
-    //         return $this->queryComponents;
-    //     }
-
-    //     $summarizerQuery = $this->getSummaryQuery();
-
-    //     if ($summarizerQuery === null) {
-    //         $this->queryComponents = new EmptyResult();
-    //         return null;
-    //     }
-
-    //     return $this->queryComponents = $summarizerQuery->getQueryComponents();
-    // }
-
     private function getLowestPartitionLastId(): int|string|null
     {
         $query = new LowestPartitionLastIdQuery(
@@ -123,25 +92,5 @@ final class QueryProcessor
         );
 
         return $query->getLowestLevelPartitionMaxId();
-    }
-
-    private function getResultContext(): ResultContext
-    {
-        return $this->resultContext ??= ResultContextBuilder::createContext(
-            query: $this->query,
-            metadata: $this->metadata,
-            entityManager: $this->entityManager,
-            propertyAccessor: $this->propertyAccessor,
-            input: $this->getQueryResult(),
-            nodesLimit: $this->nodesLimit,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
-        );
-    }
-
-    public function getCube(): DefaultCell
-    {
-        return $this->getResultContext()
-            ->getCellRepository()
-            ->getApexCell();
     }
 }
