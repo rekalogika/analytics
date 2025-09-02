@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Contracts\Context\PseudoMeasureContext;
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
-use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 use Rekalogika\Analytics\Contracts\Summary\PseudoMeasure;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
@@ -77,9 +76,6 @@ final class ResultContextBuilder
         ));
     }
 
-    /**
-     * @param list<array<string,mixed>> $input
-     */
     public static function createContext(
         DefaultQuery $query,
         SummaryMetadata $metadata,
@@ -87,8 +83,17 @@ final class ResultContextBuilder
         PropertyAccessorInterface $propertyAccessor,
         SourceEntitiesFactory $sourceEntitiesFactory,
         int $nodesLimit,
-        array $input,
+        int $queryResultLimit,
     ): ResultContext {
+        $queryProcessor = new QueryProcessor(
+            query: $query,
+            metadata: $metadata,
+            entityManager: $entityManager,
+            queryResultLimit: $queryResultLimit,
+        );
+
+        $input = $queryProcessor->getQueryResult();
+
         $transformer = new self(
             query: $query,
             metadata: $metadata,
