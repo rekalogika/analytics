@@ -380,7 +380,8 @@ final class QueryTest extends KernelTestCase
             ->withDimensions('time.civil.year')
             ->orderBy('count', Order::Descending)
             ->getResult()
-            ->getTable();
+            ->getCube()
+            ->drillDown('time.civil.year');
 
         $this->assertCount(2, $result);
     }

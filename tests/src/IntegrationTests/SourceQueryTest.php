@@ -154,20 +154,23 @@ final class SourceQueryTest extends KernelTestCase
 
         // test all rows
 
-        foreach ($result->getTable() as $currentRow) {
-            $this->testOneCount($currentRow);
+        $cells = $result->getCube()
+            ->drillDown(['customerCountry', 'itemCategory', 'customerGender']);
+
+        foreach ($cells as $currentCell) {
+            $this->testOneCount($currentCell);
         }
     }
 
-    private function testOneCount(Cell $row): void
+    private function testOneCount(Cell $cell): void
     {
         /** @psalm-suppress MixedAssignment */
-        $precounted = $row->getMeasures()->get('count')?->getValue() ?? 0;
+        $precounted = $cell->getMeasures()->get('count')?->getValue() ?? 0;
         $this->assertIsInt($precounted);
 
         $sourceEntities = $this
             ->getSourceEntitiesFactory()
-            ->getSourceEntities($row->getCoordinates());
+            ->getSourceEntities($cell->getCoordinates());
 
         $count = 0;
         $pages = $sourceEntities->withItemsPerPage(1000)->getPages();

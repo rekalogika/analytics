@@ -240,10 +240,15 @@ final class AppController extends AbstractController
         $query = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
         $result = $query->getResult();
+        $dimensions = $query->getDimensions();
         $measures = $query->getValues();
 
         // create pivot table
-        $spreadsheet = $spreadsheetRenderer->render($result->getTable(), $measures);
+        $spreadsheet = $spreadsheetRenderer->render(
+            cell: $result->getCube(),
+            dimensions: $dimensions,
+            measures: $measures,
+        );
 
         $writer = new Xlsx($spreadsheet);
 

@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\MetadataOrderByResolver;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @internal
@@ -66,14 +67,9 @@ final readonly class ResultContext
         );
     }
 
-    public function getQuery(): DefaultQuery
+    public function getSummaryLabel(): TranslatableInterface
     {
-        return $this->query;
-    }
-
-    public function getMetadata(): SummaryMetadata
-    {
-        return $this->metadata;
+        return $this->metadata->getLabel();
     }
 
     public function getDimensionCollection(): DimensionCollection
