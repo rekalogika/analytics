@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Contracts;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Result;
 
 /**
@@ -84,5 +85,5 @@ interface Query
     // result
     //
 
-    public function getResult(): Result;
+    public function getResult(): CubeCell;
 }

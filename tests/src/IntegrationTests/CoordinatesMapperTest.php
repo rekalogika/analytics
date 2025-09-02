@@ -35,11 +35,11 @@ final class CoordinatesMapperTest extends KernelTestCase
             ->addDimension('itemCategory')
             ->addDimension('customerType');
 
-        $result = $query->getResult();
+        $cubeCell = $query->getResult();
 
         // test all rows
 
-        $cells = $result->getCube()
+        $cells = $cubeCell
             ->drillDown(['customerCountry', 'itemCategory', 'customerType']);
 
         foreach ($cells as $currentCell) {

@@ -48,7 +48,6 @@ final class QueryTest extends KernelTestCase
     {
         $cell = $this->getQuery()
             ->getResult()
-            ->getCube()
             ->find('@values', 'count');
 
         $this->assertNotNull($cell);
@@ -60,8 +59,7 @@ final class QueryTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->getQuery()
             ->withDimensions('invalid')
-            ->getResult()
-            ->getCube();
+            ->getResult();
     }
 
     public function testTraversal(): void
@@ -77,8 +75,7 @@ final class QueryTest extends KernelTestCase
 
         $cell = $this->getQuery()
             ->withDimensions('time.civil.year', 'customerCountry')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $cell2 = $cell
             ->find('time.civil.year', '2024')
@@ -108,7 +105,6 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', '@values', 'customerCountry')
             ->getResult()
-            ->getCube()
             ->find('time.civil.year', '2024')
             ?->find('@values', 'count')
             ?->find('customerCountry', $country);
@@ -129,8 +125,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('@values', 'time.civil.year', 'customerCountry')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $node = $result
             ->find('@values', 'count')
@@ -153,8 +148,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'customerCountry', '@values')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $node = $result
             ->find('time.civil.year', '2024')
@@ -170,8 +164,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('time.civil.year')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $count = $result
             ->slice('time.civil.year', $year)
@@ -189,8 +182,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('time.civil.year')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $cells = $result
             ->drillDown('time.civil.year');
@@ -220,8 +212,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'customerCountry')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $cell = $result
             ->slice('time.civil.year', 2023)
@@ -242,8 +233,7 @@ final class QueryTest extends KernelTestCase
 
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'customerCountry')
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $cells = $result
             ->drillDown(['time.civil.year', 'customerCountry']);
@@ -265,8 +255,7 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->withDimensions('time.civil.year')
             ->dice(Criteria::expr()->eq('time.civil.year', 2024))
-            ->getResult()
-            ->getCube();
+            ->getResult();
 
         $count = $result
             ->find('time.civil.year', '2024')
@@ -286,7 +275,6 @@ final class QueryTest extends KernelTestCase
             ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->eq('time.civil.month.month', $month))
             ->getResult()
-            ->getCube()
             ->find('time.civil.month.month', '2024-10');
 
         $this->assertNotNull($result);
@@ -304,7 +292,7 @@ final class QueryTest extends KernelTestCase
             ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->in('time.civil.month.month', $months))
             ->getResult()
-            ->getCube();
+        ;
 
         $this->assertNotNull($cube->find('time.civil.month.month', '2024-10'));
         $this->assertNotNull($cube->find('time.civil.month.month', '2024-11'));
@@ -318,9 +306,7 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->eq('time.civil.month.month', $month))
-            ->getResult()
-            ->getCube()
-            ->find('time.civil.month.month', '2024-10');
+            ->getResult()->find('time.civil.month.month', '2024-10');
 
         $this->assertNotNull($result);
     }
@@ -334,7 +320,7 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->eq('time.civil.year', 2023),
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         // Test that we can access both years' data
         $count2023 = $result->find('time.civil.year', '2023')
@@ -355,18 +341,14 @@ final class QueryTest extends KernelTestCase
     public function testWhereWithDimensionNotInGroupBy(): void
     {
         $all = $this->getQuery()
-            ->getResult()
-            ->getCube()
-            ->find('@values', 'count')
+            ->getResult()->find('@values', 'count')
             ?->getMeasure()?->getValue();
 
         $this->assertNotNull($all);
 
         $withWhere = $this->getQuery()
             ->dice(Criteria::expr()->eq('time.civil.year', 2024))
-            ->getResult()
-            ->getCube()
-            ->find('@values', 'count')
+            ->getResult()->find('@values', 'count')
             ?->getMeasure()?->getValue();
 
         $this->assertNotNull($withWhere);
@@ -379,9 +361,7 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->withDimensions('time.civil.year')
             ->orderBy('count', Order::Descending)
-            ->getResult()
-            ->getCube()
-            ->drillDown('time.civil.year');
+            ->getResult()->drillDown('time.civil.year');
 
         $this->assertCount(2, $result);
     }
@@ -395,7 +375,7 @@ final class QueryTest extends KernelTestCase
             ->getResult();
 
         // This should trigger the overflow exception when getting the cube
-        $cube = $result->getCube();
+        $cube = $result;
     }
 
     public function testWhereWithTimeBin(): void
@@ -407,7 +387,6 @@ final class QueryTest extends KernelTestCase
                 Hour::createFromDatabaseValue(2024101010),
             ))
             ->getResult()
-            ->getCube()
             ->drillDown('time.civil.hour.hour');
 
         $this->assertGreaterThan(1, $result->count());
@@ -427,9 +406,7 @@ final class QueryTest extends KernelTestCase
                     Hour::createFromDatabaseValue(2024111011),
                 ),
             ))
-            ->getResult()
-            ->getCube()
-            ->drillDown('time.civil.hour.hour');
+            ->getResult()->drillDown('time.civil.hour.hour');
 
         $this->assertGreaterThan(1, $result->count());
     }
@@ -442,9 +419,7 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', DayOfMonth::Day10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', DayOfMonth::Day12),
             ))
-            ->getResult()
-            ->getCube()
-            ->drillDown('time.civil.date.dayOfMonth');
+            ->getResult()->drillDown('time.civil.date.dayOfMonth');
 
         $this->assertGreaterThan(0, $result->count());
     }
@@ -457,9 +432,7 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->gte('time.civil.date.dayOfMonth', 10),
                 Criteria::expr()->lte('time.civil.date.dayOfMonth', 12),
             ))
-            ->getResult()
-            ->getCube()
-            ->drillDown('time.civil.date.dayOfMonth');
+            ->getResult()->drillDown('time.civil.date.dayOfMonth');
 
         $this->assertGreaterThan(0, $result->count());
     }
@@ -469,7 +442,7 @@ final class QueryTest extends KernelTestCase
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'time.civil.month.monthOfYear')
             ->getResult()
-            ->getCube();
+        ;
 
         // Test that we can access data for both years and various months
         $year2023Data = $result->find('time.civil.year', '2023');
@@ -500,7 +473,7 @@ final class QueryTest extends KernelTestCase
                 CustomerType::Individual,
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -515,7 +488,7 @@ final class QueryTest extends KernelTestCase
                 [CustomerType::Individual],
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -530,7 +503,7 @@ final class QueryTest extends KernelTestCase
                 null,
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -545,7 +518,7 @@ final class QueryTest extends KernelTestCase
                 [null],
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -560,7 +533,7 @@ final class QueryTest extends KernelTestCase
                 [null, Gender::Female],
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -575,7 +548,7 @@ final class QueryTest extends KernelTestCase
                 [],
             ))
             ->getResult()
-            ->getCube();
+        ;
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertNull($count);
