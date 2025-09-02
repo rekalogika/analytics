@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\PivotTable\Adapter\Table;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Result\Table;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\PivotTable\Model\Table\TableLabel;
 use Rekalogika\PivotTable\Contracts\Table\Table as PivotTableTable;
@@ -27,16 +27,31 @@ final readonly class TableAdapter implements PivotTableTable
     private array $legend;
 
     /**
+     * @var iterable<CubeCell>
+     */
+    private iterable $cells;
+
+    /**
+     * @param CubeCell $cell The root cell that contains the table data.
+     * @param list<string> $dimensions The dimensions that will be displayed in
+     * the table.
      * @param list<string> $measures The measures that will be displayed in the
      * table.
      */
     public function __construct(
-        private Table $table,
+        CubeCell $cell,
+        array $dimensions,
         private array $measures,
     ) {
-        $firstRow = $table->first();
+        if ($dimensions === []) {
+            $this->cells = [$cell];
+            $first = $cell;
+        } else {
+            $this->cells = $cell->drillDown($dimensions);
+            $first = $this->cells->first();
+        }
 
-        if ($firstRow === null) {
+        if ($first === null) {
             $this->legend = [];
 
             return;
@@ -44,12 +59,12 @@ final readonly class TableAdapter implements PivotTableTable
 
         $legend = [];
 
-        foreach ($firstRow->getCoordinates() as $dimension) {
+        foreach ($first->getCoordinates() as $dimension) {
             $legend[$dimension->getName()] = $dimension->getLabel();
         }
 
         foreach ($measures as $measure) {
-            $measureObject = $firstRow
+            $measureObject = $first
                 ->getMeasures()
                 ->get($measure)
                 ?? throw new InvalidArgumentException(\sprintf('Measure "%s" does not exist in the result.', $measure));
@@ -63,8 +78,8 @@ final readonly class TableAdapter implements PivotTableTable
     #[\Override]
     public function getRows(): iterable
     {
-        foreach ($this->table as $row) {
-            yield $row->getCoordinates() => new RowAdapter($row, $this->measures);
+        foreach ($this->cells as $cell) {
+            yield $cell->getCoordinates() => new RowAdapter($cell, $this->measures);
         }
     }
 

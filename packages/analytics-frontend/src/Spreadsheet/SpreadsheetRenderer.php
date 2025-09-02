@@ -15,8 +15,8 @@ namespace Rekalogika\Analytics\Frontend\Spreadsheet;
 
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\Result;
-use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
@@ -34,12 +34,23 @@ final readonly class SpreadsheetRenderer
     }
 
     /**
+     * @param CubeCell $cell The root cell that contains the table data.
+     * @param list<string> $dimensions The dimensions that will be displayed in
+     * the table.
      * @param list<string> $measures The measures that will be displayed in the
      * table.
      */
-    public function render(Table $table, array $measures): Spreadsheet
-    {
-        $table = new TableAdapter($table, $measures);
+    public function render(
+        CubeCell $cell,
+        array $dimensions,
+        array $measures,
+    ): Spreadsheet {
+        $table = new TableAdapter(
+            cell: $cell,
+            dimensions: $dimensions,
+            measures: $measures,
+        );
+
         $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);

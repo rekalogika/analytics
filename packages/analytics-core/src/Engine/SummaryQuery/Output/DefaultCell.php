@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Rekalogika\Contracts\Rekapager\PageableInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class DefaultCell implements CubeCell
 {
@@ -75,6 +76,12 @@ final class DefaultCell implements CubeCell
     public function getSummaryClass(): string
     {
         return $this->coordinates->getSummaryClass();
+    }
+
+    #[\Override]
+    public function getSummaryLabel(): TranslatableInterface
+    {
+        return $this->context->getSummaryLabel();
     }
 
     #[\Override]

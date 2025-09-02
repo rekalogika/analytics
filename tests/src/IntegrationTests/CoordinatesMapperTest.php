@@ -39,17 +39,20 @@ final class CoordinatesMapperTest extends KernelTestCase
 
         // test all rows
 
-        foreach ($result->getTable() as $currentRow) {
-            $this->testOne($currentRow);
+        $cells = $result->getCube()
+            ->drillDown(['customerCountry', 'itemCategory', 'customerType']);
+
+        foreach ($cells as $currentCell) {
+            $this->testOne($currentCell);
         }
     }
 
-    private function testOne(Cell $row): void
+    private function testOne(Cell $cell): void
     {
         $coordinatesMapper = self::getContainer()->get(CoordinatesMapper::class);
         $this->assertInstanceOf(CoordinatesMapper::class, $coordinatesMapper);
 
-        $coordinates = $row->getCoordinates();
+        $coordinates = $cell->getCoordinates();
         $class = $coordinates->getSummaryClass();
 
         $coordinatesDto = $coordinatesMapper->toDto($coordinates);
@@ -61,9 +64,9 @@ final class CoordinatesMapperTest extends KernelTestCase
         // original measures
 
         /** @psalm-suppress MixedAssignment */
-        $count = $row->getMeasures()->get('count')?->getRawValue();
+        $count = $cell->getMeasures()->get('count')?->getRawValue();
         /** @psalm-suppress MixedAssignment */
-        $price = $row->getMeasures()->get('price')?->getRawValue();
+        $price = $cell->getMeasures()->get('price')?->getRawValue();
 
         /** @psalm-suppress MixedAssignment */
         $deserializedCount = $newRow->getMeasures()->get('count')?->getRawValue();

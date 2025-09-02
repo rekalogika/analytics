@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Result;
 
 use Doctrine\Common\Collections\Expr\Expression;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Represent a cell in a cube. A cell has coordinates and one or more measures
@@ -29,6 +30,8 @@ interface CubeCell extends Cell
      * @return class-string
      */
     public function getSummaryClass(): string;
+
+    public function getSummaryLabel(): TranslatableInterface;
 
     /**
      * The apex CubeCell, or the CubeCell without any dimensions.

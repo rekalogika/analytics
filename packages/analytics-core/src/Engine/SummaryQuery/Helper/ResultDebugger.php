@@ -18,7 +18,6 @@ use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Result\Dimension;
 use Rekalogika\Analytics\Contracts\Result\Measure;
 use Rekalogika\Analytics\Contracts\Result\Measures;
-use Rekalogika\Analytics\Contracts\Result\Table;
 
 /**
  * A helper class for debugging various analytics result items.
@@ -90,20 +89,6 @@ final readonly class ResultDebugger
 
         foreach ($measures as $measure) {
             $result[] = self::debugMeasure($measure);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return list<array<string,mixed>>
-     */
-    public static function debugTable(Table $table): array
-    {
-        $result = [];
-
-        foreach ($table as $row) {
-            $result[] = self::debugCell($row);
         }
 
         return $result;

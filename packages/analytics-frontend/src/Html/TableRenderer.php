@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Html;
 
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Contracts\Result\Table;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
@@ -86,6 +85,9 @@ final readonly class TableRenderer
     /**
      * Render a regular table from the result.
      *
+     * @param CubeCell $cell The root cell that contains the table data.
+     * @param list<string> $dimensions The dimensions that will be displayed in
+     * the table
      * @param list<string> $measures The measures that will be displayed in the
      * table
      * @param string|null $theme The theme to use for rendering. If null, the
@@ -95,14 +97,16 @@ final readonly class TableRenderer
      * string with the error message.
      */
     public function renderTable(
-        Table $table,
+        CubeCell $cell,
+        array $dimensions,
         array $measures,
         ?string $theme = null,
         bool $throwException = false,
     ): string {
         try {
             return $this->doRenderTable(
-                table: $table,
+                cell: $cell,
+                dimensions: $dimensions,
                 measures: $measures,
                 theme: $theme,
             );
@@ -167,14 +171,21 @@ final readonly class TableRenderer
     }
 
     /**
+     * @param list<string> $dimensions
      * @param list<string> $measures
      */
     private function doRenderTable(
-        Table $table,
+        CubeCell $cell,
+        array $dimensions,
         array $measures,
         ?string $theme = null,
     ): string {
-        $table = new TableAdapter($table, $measures);
+        $table = new TableAdapter(
+            cell: $cell,
+            dimensions: $dimensions,
+            measures: $measures,
+        );
+
         $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);

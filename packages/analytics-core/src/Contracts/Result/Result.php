@@ -29,8 +29,6 @@ interface Result
      */
     public function getSummaryClass(): string;
 
-    public function getTable(): Table;
-
     /**
      * Gets the apex cube cell.
      */

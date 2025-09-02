@@ -41,10 +41,6 @@ final class DefaultResult implements Result
      */
     private ?array $queryResult = null;
 
-    private ?DefaultTable $table = null;
-
-    // private ?bool $hasHierarchicalOrdering = null;
-
     private ?ResultContext $resultContext = null;
 
     /**
@@ -169,19 +165,5 @@ final class DefaultResult implements Result
         return $this->getResultContext()
             ->getCellRepository()
             ->getApexCell();
-    }
-
-    #[\Override]
-    public function getTable(): DefaultTable
-    {
-        $dimensionality = array_values(array_filter(
-            $this->query->getDimensions(),
-            static fn(string $field): bool => $field !== '@values',
-        ));
-
-        return $this->table ??= DefaultTable::create(
-            context: $this->getResultContext(),
-            dimensionality: $dimensionality,
-        );
     }
 }
