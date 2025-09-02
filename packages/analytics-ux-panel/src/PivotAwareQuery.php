@@ -15,7 +15,7 @@ namespace Rekalogika\Analytics\UX\PanelBundle;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
-use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Metadata\Summary\PropertyMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\Internal\FilterFactoryLocator;
@@ -337,7 +337,7 @@ final class PivotAwareQuery
         return $this->metadata->getMeasures();
     }
 
-    public function getResult(): Result
+    public function getResult(): CubeCell
     {
         return $this->query->getResult();
     }

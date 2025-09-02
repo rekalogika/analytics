@@ -87,12 +87,12 @@ final class AppController extends AbstractController
         $values = $query->getValues();
         $rows = $query->getRows();
         $columns = $query->getColumns();
-        $result = $query->getResult();
+        $cube = $query->getResult();
 
         // create pivot table
         try {
             $pivotTable = $htmlRenderer->renderPivotTable(
-                cube: $result->getCube(),
+                cube: $cube,
                 rows: $rows,
                 columns: $columns,
                 measures: $values,
@@ -131,7 +131,7 @@ final class AppController extends AbstractController
                     $chart = null;
                 } else {
                     $chart = $chartGenerator->createChart(
-                        cube: $result->getCube(),
+                        cube: $cube,
                         dimensions: $dimensions,
                         measures: $values,
                     );
@@ -157,7 +157,7 @@ final class AppController extends AbstractController
         }
 
         return $this->render('app/summary.html.twig', [
-            'title' => $result->getLabel(),
+            'title' => $cube->getSummaryLabel(),
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'query' => $query,
             'pivotTable' => $pivotTable,
@@ -239,13 +239,13 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $query = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
-        $result = $query->getResult();
+        $cubeCell = $query->getResult();
         $dimensions = $query->getDimensions();
         $measures = $query->getValues();
 
         // create pivot table
         $spreadsheet = $spreadsheetRenderer->render(
-            cell: $result->getCube(),
+            cell: $cubeCell,
             dimensions: $dimensions,
             measures: $measures,
         );

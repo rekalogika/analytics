@@ -136,7 +136,7 @@ final readonly class DefaultCoordinatesMapper implements CoordinatesMapper
             $dimensionMembers[$dimensionName] = $rawMember;
         }
 
-        $cube = $query->getResult()->getCube();
+        $cube = $query->getResult();
 
         /** @psalm-suppress MixedAssignment */
         foreach ($dimensionMembers as $dimensionName => $rawMember) {

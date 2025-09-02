@@ -63,7 +63,6 @@ final class SourceQueryTest extends KernelTestCase
         $coordinates = $this->getQuery()
             ->from(OrderSummary::class)
             ->getResult()
-            ->getCube()
             ->getCoordinates();
 
         $sourceEntities = $this
@@ -80,13 +79,12 @@ final class SourceQueryTest extends KernelTestCase
 
     public function testDimension(): void
     {
-        $result = $this->getQuery()
+        $cubeCell = $this->getQuery()
             ->from(OrderSummary::class)
             ->withDimensions('customerCountry')
             ->getResult();
 
-        $apexCube = $result->getCube();
-        $slices = $apexCube->drillDown('customerCountry');
+        $slices = $cubeCell->drillDown('customerCountry');
         $coordinates = $slices->first()?->getCoordinates();
 
         $this->assertNotNull($coordinates);
@@ -105,13 +103,12 @@ final class SourceQueryTest extends KernelTestCase
 
     public function testDimensionProperty(): void
     {
-        $result = $this->getQuery()
+        $cubeCell = $this->getQuery()
             ->from(OrderSummary::class)
             ->withDimensions('time.civil.year')
             ->getResult();
 
-        $apexCube = $result->getCube();
-        $slices = $apexCube->drillDown('time.civil.year');
+        $slices = $cubeCell->drillDown('time.civil.year');
         $coordinates = $slices->first()?->getCoordinates();
 
         $this->assertNotNull($coordinates);
@@ -150,11 +147,11 @@ final class SourceQueryTest extends KernelTestCase
             ->addDimension('customerGender')
             ->dice(Criteria::expr()->neq('customerCountry', $oneCountry));
 
-        $result = $query->getResult();
+        $cubeCell = $query->getResult();
 
         // test all rows
 
-        $cells = $result->getCube()
+        $cells = $cubeCell
             ->drillDown(['customerCountry', 'itemCategory', 'customerGender']);
 
         foreach ($cells as $currentCell) {

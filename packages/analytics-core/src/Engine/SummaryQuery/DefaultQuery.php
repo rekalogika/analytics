@@ -20,9 +20,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
-use Rekalogika\Analytics\Contracts\Result\Result;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
-use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultResult;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\QueryProcessor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -51,7 +51,7 @@ final class DefaultQuery implements Query
      */
     private array $orderBy = [];
 
-    private ?Result $result = null;
+    private ?QueryProcessor $result = null;
 
     /**
      * @var list<string>|null
@@ -77,15 +77,18 @@ final class DefaultQuery implements Query
     ) {}
 
     #[\Override]
-    public function getResult(): Result
+    public function getResult(): CubeCell
+    {
+        return $this->getQueryProcessor()->getCube();
+    }
+
+    private function getQueryProcessor(): QueryProcessor
     {
         if ($this->result !== null) {
             return $this->result;
         }
 
-        return $this->result = new DefaultResult(
-            label: $this->getSummaryMetadata()->getLabel(),
-            summaryClass: $this->getSummaryMetadata()->getSummaryClass(),
+        return $this->result = new QueryProcessor(
             query: $this,
             metadata: $this->getSummaryMetadata(),
             propertyAccessor: $this->propertyAccessor,

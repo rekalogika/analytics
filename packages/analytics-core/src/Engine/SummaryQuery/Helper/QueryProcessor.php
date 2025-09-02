@@ -11,30 +11,26 @@ declare(strict_types=1);
  * that was distributed with this source code.
  */
 
-namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
+namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\EmptyResult;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @internal
  */
-final class DefaultResult implements Result
+final class QueryProcessor
 {
     private SummaryQuery|EmptyResult|null $summarizerQuery = null;
 
-    private QueryComponents|EmptyResult|null $queryComponents = null;
+    // private QueryComponents|EmptyResult|null $queryComponents = null;
 
     /**
      * @var list<array<string, mixed>>|null
@@ -43,12 +39,7 @@ final class DefaultResult implements Result
 
     private ?ResultContext $resultContext = null;
 
-    /**
-     * @param class-string $summaryClass
-     */
     public function __construct(
-        private readonly TranslatableInterface $label,
-        private readonly string $summaryClass,
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly PropertyAccessorInterface $propertyAccessor,
@@ -57,18 +48,6 @@ final class DefaultResult implements Result
         private int $nodesLimit,
         private int $queryResultLimit,
     ) {}
-
-    #[\Override]
-    public function getLabel(): TranslatableInterface
-    {
-        return $this->label;
-    }
-
-    #[\Override]
-    public function getSummaryClass(): string
-    {
-        return $this->summaryClass;
-    }
 
     /**
      * @return list<array<string,mixed>>
@@ -116,25 +95,25 @@ final class DefaultResult implements Result
         );
     }
 
-    public function getQueryComponents(): ?QueryComponents
-    {
-        if ($this->queryComponents !== null) {
-            if ($this->queryComponents instanceof EmptyResult) {
-                return null;
-            }
+    // public function getQueryComponents(): ?QueryComponents
+    // {
+    //     if ($this->queryComponents !== null) {
+    //         if ($this->queryComponents instanceof EmptyResult) {
+    //             return null;
+    //         }
 
-            return $this->queryComponents;
-        }
+    //         return $this->queryComponents;
+    //     }
 
-        $summarizerQuery = $this->getSummaryQuery();
+    //     $summarizerQuery = $this->getSummaryQuery();
 
-        if ($summarizerQuery === null) {
-            $this->queryComponents = new EmptyResult();
-            return null;
-        }
+    //     if ($summarizerQuery === null) {
+    //         $this->queryComponents = new EmptyResult();
+    //         return null;
+    //     }
 
-        return $this->queryComponents = $summarizerQuery->getQueryComponents();
-    }
+    //     return $this->queryComponents = $summarizerQuery->getQueryComponents();
+    // }
 
     private function getLowestPartitionLastId(): int|string|null
     {
@@ -159,7 +138,6 @@ final class DefaultResult implements Result
         );
     }
 
-    #[\Override]
     public function getCube(): DefaultCell
     {
         return $this->getResultContext()

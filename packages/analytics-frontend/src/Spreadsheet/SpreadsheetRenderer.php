@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Frontend\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Contracts\Result\Result;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
 use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
@@ -77,12 +76,12 @@ final readonly class SpreadsheetRenderer
      * @param list<string> $columns
      */
     public function renderPivotTable(
-        Result $result,
+        CubeCell $cube,
         array $measures,
         array $rows,
         array $columns,
     ): Spreadsheet {
-        $cubeAdapter = CubeAdapter::adapt($result->getCube());
+        $cubeAdapter = CubeAdapter::adapt($cube);
 
         $dimensions = array_merge($rows, $columns);
         // convert $dimensions to array<string,true>
