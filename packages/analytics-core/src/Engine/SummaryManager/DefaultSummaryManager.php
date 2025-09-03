@@ -17,12 +17,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextFactory;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final readonly class DefaultSummaryManager implements SummaryManager
 {
+    private ResultContextFactory $resultContextFactory;
+
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $metadataFactory,
@@ -31,7 +34,16 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private SourceEntitiesFactory $sourceEntitiesFactory,
         private int $queryResultLimit,
         private int $fillingNodesLimit,
-    ) {}
+    ) {
+        $this->resultContextFactory = new ResultContextFactory(
+            summaryMetadataFactory: $this->metadataFactory,
+            managerRegistry: $this->managerRegistry,
+            propertyAccessor: $this->propertyAccessor,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
+            nodesLimit: $this->fillingNodesLimit,
+            queryResultLimit: $this->queryResultLimit,
+        );
+    }
 
     #[\Override]
     public function refresh(
@@ -56,13 +68,21 @@ final readonly class DefaultSummaryManager implements SummaryManager
         ?int $queryResultLimit = null,
         ?int $fillingNodesLimit = null,
     ): DefaultQuery {
+        $resultContextFactory = $this->resultContextFactory;
+
+        if ($queryResultLimit !== null) {
+            $resultContextFactory = $resultContextFactory
+                ->withQueryResultLimit($queryResultLimit);
+        }
+
+        if ($fillingNodesLimit !== null) {
+            $resultContextFactory = $resultContextFactory
+                ->withNodesLimit($fillingNodesLimit);
+        }
+
         return new DefaultQuery(
-            managerRegistry: $this->managerRegistry,
             summaryMetadataFactory: $this->metadataFactory,
-            propertyAccessor: $this->propertyAccessor,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
-            queryResultLimit: $queryResultLimit ?? $this->queryResultLimit,
-            fillingNodesLimit: $fillingNodesLimit ?? $this->fillingNodesLimit,
+            resultContextFactory: $resultContextFactory,
         );
     }
 }

@@ -291,8 +291,7 @@ final class QueryTest extends KernelTestCase
         $cube = $this->getQuery()
             ->withDimensions('time.civil.month.month')
             ->dice(Criteria::expr()->in('time.civil.month.month', $months))
-            ->getResult()
-        ;
+            ->getResult();
 
         $this->assertNotNull($cube->find('time.civil.month.month', '2024-10'));
         $this->assertNotNull($cube->find('time.civil.month.month', '2024-11'));
@@ -319,8 +318,7 @@ final class QueryTest extends KernelTestCase
                 Criteria::expr()->eq('time.civil.year', 2024),
                 Criteria::expr()->eq('time.civil.year', 2023),
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         // Test that we can access both years' data
         $count2023 = $result->find('time.civil.year', '2023')
@@ -441,8 +439,7 @@ final class QueryTest extends KernelTestCase
     {
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'time.civil.month.monthOfYear')
-            ->getResult()
-        ;
+            ->getResult();
 
         // Test that we can access data for both years and various months
         $year2023Data = $result->find('time.civil.year', '2023');
@@ -472,8 +469,7 @@ final class QueryTest extends KernelTestCase
                 'customerType',
                 CustomerType::Individual,
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -487,8 +483,7 @@ final class QueryTest extends KernelTestCase
                 'customerType',
                 [CustomerType::Individual],
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -502,8 +497,7 @@ final class QueryTest extends KernelTestCase
                 'customerGender',
                 null,
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -517,8 +511,7 @@ final class QueryTest extends KernelTestCase
                 'customerGender',
                 [null],
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -532,8 +525,7 @@ final class QueryTest extends KernelTestCase
                 'customerGender',
                 [null, Gender::Female],
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertIsInt($count);
@@ -547,10 +539,32 @@ final class QueryTest extends KernelTestCase
                 'customerGender',
                 [],
             ))
-            ->getResult()
-        ;
+            ->getResult();
 
         $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
         $this->assertNull($count);
+    }
+
+    public function testDice(): void
+    {
+        $result = $this->getQuery()->getResult();
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $result
+            ->getMeasures()
+            ->get('count')
+            ?->getValue();
+
+        $this->assertEquals(190, $count);
+
+        $result = $result->dice(Criteria::expr()->eq('time.civil.year', 2023));
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $result
+            ->getMeasures()
+            ->get('count')
+            ?->getValue();
+
+        $this->assertLessThan(190, $count);
     }
 }

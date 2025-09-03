@@ -16,22 +16,16 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
-use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextBuilder;
+use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class DefaultQuery implements Query
 {
     /**
-     * The class of the summary table.
-     *
      * @var null|class-string
      */
     private ?string $from = null;
@@ -54,26 +48,12 @@ final class DefaultQuery implements Query
     private ?CubeCell $result = null;
 
     /**
-     * @var list<string>|null
+     * @param SummaryMetadataFactory $summaryMetadataFactory
+     * @param ResultContextFactory $resultContextFactory
      */
-    private ?array $dimensionChoices = null;
-
-    /**
-     * @var list<string>|null
-     */
-    private ?array $measureChoices = null;
-
-    private ?SummaryMetadata $summaryMetadata = null;
-
-    private ?EntityManagerInterface $entityManager = null;
-
     public function __construct(
-        private readonly ManagerRegistry $managerRegistry,
-        private readonly SummaryMetadataFactory $summaryMetadataFactory,
-        private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly SourceEntitiesFactory $sourceEntitiesFactory,
-        private readonly int $queryResultLimit,
-        private readonly int $fillingNodesLimit,
+        private SummaryMetadataFactory $summaryMetadataFactory,
+        private ResultContextFactory $resultContextFactory,
     ) {}
 
     #[\Override]
@@ -83,15 +63,7 @@ final class DefaultQuery implements Query
             return $this->result;
         }
 
-        $context = ResultContextBuilder::createContext(
-            query: $this,
-            metadata: $this->getSummaryMetadata(),
-            propertyAccessor: $this->propertyAccessor,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
-            entityManager: $this->getEntityManager(),
-            nodesLimit: $this->fillingNodesLimit,
-            queryResultLimit: $this->queryResultLimit,
-        );
+        $context = $this->resultContextFactory->createResultContext($this);
 
         return $this->result = $context->getCellRepository()->getApexCell();
     }
@@ -102,31 +74,8 @@ final class DefaultQuery implements Query
 
     private function getSummaryMetadata(): SummaryMetadata
     {
-        return $this->summaryMetadata
-            ??= $this->summaryMetadataFactory
+        return $this->summaryMetadataFactory
             ->getSummaryMetadata($this->getFrom());
-    }
-
-    //
-    // doctrine
-    //
-
-    private function getEntityManager(): EntityManagerInterface
-    {
-        if ($this->entityManager === null) {
-            $entityManager = $this->managerRegistry->getManagerForClass($this->getFrom());
-
-            if (!$entityManager instanceof EntityManagerInterface) {
-                throw new InvalidArgumentException(\sprintf(
-                    'The class "%s" is not managed by Doctrine ORM.',
-                    $this->getFrom(),
-                ));
-            }
-
-            $this->entityManager = $entityManager;
-        }
-
-        return $this->entityManager;
     }
 
     //
@@ -139,50 +88,17 @@ final class DefaultQuery implements Query
      */
     private function ensureFieldValid(array $fields, string $type): void
     {
-        $invalid = [];
-        $type = match ($type) {
-            'dimension' => $this->getDimensionChoices(),
-            'measure' => $this->getMeasureChoices(),
-            'both' => array_merge($this->getDimensionChoices(), $this->getMeasureChoices()),
-        };
-
-        foreach ($fields as $field) {
-            if (!\in_array($field, $type, true)) {
-                $invalid[] = $field;
-            }
+        if ($type === 'dimension') {
+            $this->getSummaryMetadata()->ensureDimensionsValid($fields);
+            return;
         }
 
-        if ($invalid !== []) {
-            throw new InvalidArgumentException(\sprintf(
-                'Invalid field: %s',
-                implode(', ', $invalid),
-            ));
+        if ($type === 'measure') {
+            $this->getSummaryMetadata()->ensureMeasuresValid($fields);
+            return;
         }
-    }
 
-    //
-    // choices
-    //
-
-    /**
-     * @return list<string>
-     */
-    private function getDimensionChoices(): array
-    {
-        return $this->dimensionChoices
-            ??= array_merge(
-                array_keys($this->getSummaryMetadata()->getLeafDimensions()),
-                ['@values'],
-            );
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function getMeasureChoices(): array
-    {
-        return $this->measureChoices
-            ??= array_keys($this->getSummaryMetadata()->getMeasures());
+        $this->getSummaryMetadata()->ensurePropertiesValid($fields);
     }
 
     //
