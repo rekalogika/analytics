@@ -50,27 +50,29 @@ final class ResultContextBuilder
      */
     private array $measureMemberCache = [];
 
-    private readonly ResultContext $context;
+    private readonly QueryProcessor $queryProcessor;
 
-    private function __construct(
+    private ?ResultContext $resultContext = null;
+
+    public function __construct(
         private readonly DefaultQuery $query,
         private readonly SummaryMetadata $metadata,
         private readonly EntityManagerInterface $entityManager,
         private readonly PropertyAccessorInterface $propertyAccessor,
-        int $nodesLimit,
+        private readonly int $nodesLimit,
+        int $queryResultLimit,
         private readonly SourceEntitiesFactory $sourceEntitiesFactory,
         private readonly ResultContextFactory $resultContextFactory,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
-        $this->helper = new QueryResultToTableHelper();
-
-        $this->context = new ResultContext(
-            metadata: $metadata,
+        $this->queryProcessor = new QueryProcessor(
             query: $query,
-            nodesLimit: $nodesLimit,
-            sourceEntitiesFactory: $sourceEntitiesFactory,
-            resultContextFactory: $this->resultContextFactory,
+            metadata: $metadata,
+            entityManager: $entityManager,
+            queryResultLimit: $queryResultLimit,
         );
+
+        $this->helper = new QueryResultToTableHelper();
 
         $this->dimensions = array_values(array_filter(
             $this->query->getDimensions(),
@@ -78,62 +80,47 @@ final class ResultContextBuilder
         ));
     }
 
-    public static function createContext(
-        DefaultQuery $query,
-        SummaryMetadata $metadata,
-        EntityManagerInterface $entityManager,
-        PropertyAccessorInterface $propertyAccessor,
-        SourceEntitiesFactory $sourceEntitiesFactory,
-        ResultContextFactory $resultContextFactory,
-        int $nodesLimit,
-        int $queryResultLimit,
-    ): ResultContext {
-        $queryProcessor = new QueryProcessor(
-            query: $query,
-            metadata: $metadata,
-            entityManager: $entityManager,
-            queryResultLimit: $queryResultLimit,
-        );
-
-        $input = $queryProcessor->getQueryResult();
-
-        $transformer = new self(
-            query: $query,
-            metadata: $metadata,
-            entityManager: $entityManager,
-            propertyAccessor: $propertyAccessor,
-            nodesLimit: $nodesLimit,
-            sourceEntitiesFactory: $sourceEntitiesFactory,
-            resultContextFactory: $resultContextFactory,
-        );
-
-        return $transformer->process($input);
-    }
-
-    /**
-     * @param list<array<string,mixed>> $input
-     */
-    private function process(array $input): ResultContext
+    public function getResultContext(): ResultContext
     {
-        $cellRepository = $this->context->getCellRepository();
+        if ($this->resultContext !== null) {
+            return $this->resultContext;
+        }
+
+        $input = $this->queryProcessor->getQueryResult();
+
+        $resultContext = new ResultContext(
+            metadata: $this->metadata,
+            query: $this->query,
+            nodesLimit: $this->nodesLimit,
+            sourceEntitiesFactory: $this->sourceEntitiesFactory,
+            resultContextFactory: $this->resultContextFactory,
+        );
+
+        $cellRepository = $resultContext->getCellRepository();
 
         foreach ($input as $item) {
-            $cell = $this->transformOne($item);
+            $cell = $this->transformOne(
+                resultContext: $resultContext,
+                input: $item,
+            );
+
             $cellRepository->collectCell($cell);
 
-            foreach ($this->unpivotRow($cell) as $row) {
+            foreach ($this->unpivotRow($resultContext, $cell) as $row) {
                 $cellRepository->collectCell($row);
             }
         }
 
-        return $this->context;
+        return $this->resultContext = $resultContext;
     }
 
     /**
      * @param array<string,mixed> $input
      */
-    private function transformOne(array $input): DefaultCell
-    {
+    private function transformOne(
+        ResultContext $resultContext,
+        array $input,
+    ): DefaultCell {
         // create the object
         $summaryClass = $this->metadata->getSummaryClass();
         $reflectionClass = new \ReflectionClass($summaryClass);
@@ -162,7 +149,11 @@ final class ResultContextBuilder
         );
 
         // get dimensions from object
-        $dimensionValues = $this->createDimensionValues($summaryObject, $groupings);
+        $dimensionValues = $this->createDimensionValues(
+            resultContext: $resultContext,
+            summaryObject: $summaryObject,
+            groupingField: $groupings,
+        );
 
         // create coordinates
         $coordinates = new DefaultCoordinates(
@@ -179,14 +170,14 @@ final class ResultContextBuilder
         );
 
         // get measures from object
-        $measureValues = $this->createMeasureValues($summaryObject);
+        $measureValues = $this->createMeasureValues($resultContext, $summaryObject);
         $measures = new DefaultMeasures($measureValues);
 
         return new DefaultCell(
             coordinates: $coordinates,
             measures: $measures,
             isNull: false,
-            context: $this->context,
+            context: $resultContext,
             sourceEntitiesFactory: $this->sourceEntitiesFactory,
         );
     }
@@ -256,6 +247,7 @@ final class ResultContextBuilder
      * @return array<string,DefaultDimension>
      */
     private function createDimensionValues(
+        ResultContext $resultContext,
         object $summaryObject,
         GroupingField $groupingField,
     ): array {
@@ -276,7 +268,7 @@ final class ResultContextBuilder
             /** @psalm-suppress MixedAssignment */
             $displayValue = $value ?? $this->getNullValue($name);
 
-            $dimension = $this->context
+            $dimension = $resultContext
                 ->getDimensionFactory()
                 ->createDimension(
                     label: $this->getLabel($name),
@@ -288,7 +280,7 @@ final class ResultContextBuilder
                 );
 
             if ($groupingField->hasOneNonGroupingField()) {
-                $this->context
+                $resultContext
                     ->getDimensionCollection()
                     ->collectDimension($dimension);
             }
@@ -302,8 +294,10 @@ final class ResultContextBuilder
     /**
      * @return array<string,DefaultMeasure>
      */
-    private function createMeasureValues(object $summaryObject): array
-    {
+    private function createMeasureValues(
+        ResultContext $resultContext,
+        object $summaryObject,
+    ): array {
         $measureValues = [];
 
         foreach ($this->metadata->getMeasures() as $name => $measureMetadata) {
@@ -340,7 +334,7 @@ final class ResultContextBuilder
 
             $measureValues[$name] = $measure;
 
-            $this->context->getNullMeasureCollection()->collectMeasure($measure);
+            $resultContext->getNullMeasureCollection()->collectMeasure($measure);
         }
 
         return $measureValues;
@@ -420,14 +414,16 @@ final class ResultContextBuilder
     /**
      * @return iterable<DefaultCell>
      */
-    private function unpivotRow(DefaultCell $cell): iterable
-    {
+    private function unpivotRow(
+        ResultContext $resultContext,
+        DefaultCell $cell,
+    ): iterable {
         $measures = array_keys($this->metadata->getMeasures());
 
         foreach ($measures as $measure) {
             $measureMember = $this->getMeasureMember($measure);
 
-            $measureDimension = $this->context
+            $measureDimension = $resultContext
                 ->getDimensionFactory()
                 ->createDimension(
                     label: $this->measureLabel,
@@ -438,8 +434,7 @@ final class ResultContextBuilder
                     interpolation: false,
                 );
 
-            $this->context
-                ->getDimensionCollection()
+            $resultContext->getDimensionCollection()
                 ->collectDimension($measureDimension);
 
             $measure = $cell->getMeasures()->get($measure)
@@ -457,7 +452,7 @@ final class ResultContextBuilder
                 coordinates: $coordinates,
                 measures: $measures,
                 isNull: false,
-                context: $this->context,
+                context: $resultContext,
                 sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
         }

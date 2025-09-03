@@ -72,7 +72,7 @@ final readonly class ResultContextFactory
             ));
         }
 
-        return ResultContextBuilder::createContext(
+        $resultContextBuilder = new ResultContextBuilder(
             query: $query,
             metadata: $summaryMetadata,
             entityManager: $entityManager,
@@ -82,5 +82,7 @@ final readonly class ResultContextFactory
             nodesLimit: $this->nodesLimit,
             queryResultLimit: $this->queryResultLimit,
         );
+
+        return $resultContextBuilder->getResultContext();
     }
 }
