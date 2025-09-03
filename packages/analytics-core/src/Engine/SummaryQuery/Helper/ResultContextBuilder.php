@@ -59,6 +59,7 @@ final class ResultContextBuilder
         private readonly PropertyAccessorInterface $propertyAccessor,
         int $nodesLimit,
         private readonly SourceEntitiesFactory $sourceEntitiesFactory,
+        private readonly ResultContextFactory $resultContextFactory,
         private readonly TranslatableInterface $measureLabel = new TranslatableMessage('Values'),
     ) {
         $this->helper = new QueryResultToTableHelper();
@@ -68,6 +69,7 @@ final class ResultContextBuilder
             query: $query,
             nodesLimit: $nodesLimit,
             sourceEntitiesFactory: $sourceEntitiesFactory,
+            resultContextFactory: $this->resultContextFactory,
         );
 
         $this->dimensions = array_values(array_filter(
@@ -82,6 +84,7 @@ final class ResultContextBuilder
         EntityManagerInterface $entityManager,
         PropertyAccessorInterface $propertyAccessor,
         SourceEntitiesFactory $sourceEntitiesFactory,
+        ResultContextFactory $resultContextFactory,
         int $nodesLimit,
         int $queryResultLimit,
     ): ResultContext {
@@ -101,6 +104,7 @@ final class ResultContextBuilder
             propertyAccessor: $propertyAccessor,
             nodesLimit: $nodesLimit,
             sourceEntitiesFactory: $sourceEntitiesFactory,
+            resultContextFactory: $resultContextFactory,
         );
 
         return $transformer->process($input);

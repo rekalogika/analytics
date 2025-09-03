@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Output;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
@@ -204,7 +203,10 @@ final class DefaultCell implements CubeCell
     #[\Override]
     public function dice(?Expression $predicate): DefaultCell
     {
-        throw new BadMethodCallException('dice() is not yet implemented.');
+        return $this->context
+            ->withDicePredicate($predicate)
+            ->getCellRepository()
+            ->getCellByCoordinates($this->coordinates);
     }
 
     public function getContext(): ResultContext

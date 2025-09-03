@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\Helper;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\CellRepository;
@@ -37,12 +38,17 @@ final readonly class ResultContext
 
     private CellRepository $cellRepository;
 
+    private TranslatableInterface $label;
+
     public function __construct(
-        private SummaryMetadata $metadata,
+        SummaryMetadata $metadata,
         private DefaultQuery $query,
-        private SourceEntitiesFactory $sourceEntitiesFactory,
+        SourceEntitiesFactory $sourceEntitiesFactory,
         int $nodesLimit,
+        private ResultContextFactory $resultContextFactory,
     ) {
+        $this->label = $metadata->getLabel();
+
         $orderByResolver = new MetadataOrderByResolver(
             metadata: $metadata,
             query: $query,
@@ -62,15 +68,15 @@ final readonly class ResultContext
         $this->cellRepository = new CellRepository(
             dimensionCollection: $this->dimensionCollection,
             nullMeasureCollection: $this->nullMeasureCollection,
-            query: $this->query,
+            query: $query,
             context: $this,
-            sourceEntitiesFactory: $this->sourceEntitiesFactory,
+            sourceEntitiesFactory: $sourceEntitiesFactory,
         );
     }
 
     public function getSummaryLabel(): TranslatableInterface
     {
-        return $this->metadata->getLabel();
+        return $this->label;
     }
 
     public function getDimensionCollection(): DimensionCollection
@@ -96,5 +102,13 @@ final readonly class ResultContext
     public function getApexCell(): DefaultCell
     {
         return $this->cellRepository->getApexCell();
+    }
+
+    public function withDicePredicate(?Expression $predicate): self
+    {
+        $newQuery = clone $this->query;
+        $newQuery->dice($predicate);
+
+        return $this->resultContextFactory->createResultContext($newQuery);
     }
 }

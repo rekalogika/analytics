@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
@@ -401,5 +402,66 @@ final readonly class SummaryMetadata
     public function getGroupByExpression(): GroupBy
     {
         return clone $this->groupByExpression;
+    }
+
+    //
+    // validity checkers
+    //
+
+    /**
+     * @param list<string> $dimensions
+     */
+    public function ensureDimensionsValid(array $dimensions): void
+    {
+        foreach ($dimensions as $dimension) {
+            if ($dimension === '@values') {
+                // special dimension to get all leaf dimensions
+                continue;
+            }
+
+            if (!\array_key_exists($dimension, $this->leafDimensions)) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Dimension not found: %s',
+                    $dimension,
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param list<string> $measures
+     */
+    public function ensureMeasuresValid(array $measures): void
+    {
+        foreach ($measures as $measure) {
+            if (!\array_key_exists($measure, $this->measures)) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Measure not found: %s',
+                    $measure,
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param list<string> $properties
+     */
+    public function ensurePropertiesValid(array $properties): void
+    {
+        foreach ($properties as $property) {
+            if ($property === '@values') {
+                continue;
+            }
+
+            if (
+                !\array_key_exists($property, $this->leafDimensions)
+                && !\array_key_exists($property, $this->measures)
+            ) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Property not found: %s',
+                    $property,
+                ));
+            }
+        }
     }
 }
