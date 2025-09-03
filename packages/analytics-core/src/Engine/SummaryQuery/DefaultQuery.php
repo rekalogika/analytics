@@ -63,7 +63,7 @@ final class DefaultQuery implements Query
             return $this->result;
         }
 
-        $context = $this->resultContextFactory->createResultContext($this);
+        $context = $this->resultContextFactory->createResultContext(clone $this);
 
         return $this->result = $context->getCellRepository()->getApexCell();
     }
