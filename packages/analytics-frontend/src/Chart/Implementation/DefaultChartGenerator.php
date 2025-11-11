@@ -426,16 +426,16 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     $legendTitle = $this->stringifier->toString($secondDimensionObject->getLabel());
                 }
 
-                $measure = $secondCell->getMeasures()->first();
+                $measureObject = $secondCell->getMeasures()->get($measure);
 
-                if ($measure === null) {
+                if ($measureObject === null) {
                     throw new UnexpectedValueException('Measure not found');
                 }
 
-                $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measure->getValue());
+                $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measureObject->getValue());
 
                 if ($yTitle === null) {
-                    $unit = $measure->getUnit();
+                    $unit = $measureObject->getUnit();
 
                     if ($unit !== null) {
                         $yTitle = \sprintf(
