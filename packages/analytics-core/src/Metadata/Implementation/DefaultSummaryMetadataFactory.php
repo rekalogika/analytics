@@ -37,12 +37,14 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
-final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
+final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
+    private array $summaryClassCache;
+
     public function __construct(
-        private ManagerRegistry $managerRegistry,
-        private AttributeCollectionFactory $attributeCollectionFactory,
-        private DimensionMetadataFactory $dimensionMetadataFactory,
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly AttributeCollectionFactory $attributeCollectionFactory,
+        private readonly DimensionMetadataFactory $dimensionMetadataFactory,
     ) {}
 
     /**
@@ -57,7 +59,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
     #[\Override]
     public function getSummaryClasses(): array
     {
-        $classes = [];
+        if (isset($this->summaryClassCache)) {
+            return array_keys($this->summaryClassCache);
+        }
+
+        $this->summaryClassCache = [];
 
         foreach ($this->managerRegistry->getManagers() as $manager) {
             if (!$manager instanceof EntityManagerInterface) {
@@ -77,11 +83,11 @@ final readonly class DefaultSummaryMetadataFactory implements SummaryMetadataFac
                     continue;
                 }
 
-                $classes[$class] = true;
+                $this->summaryClassCache[$class] = true;
             }
         }
 
-        return array_keys($classes);
+        return array_keys($this->summaryClassCache);
     }
 
     /**
