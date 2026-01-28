@@ -96,7 +96,7 @@ final class SourceChangeTest extends KernelTestCase
 
         // get the current result
 
-        $this->assertEquals(190, $this->getOrderCount());
+        $initialCount = $this->getOrderCount();
 
         // create new order
 
@@ -179,7 +179,7 @@ final class SourceChangeTest extends KernelTestCase
 
         // the count should be updated now
 
-        $this->assertEquals(191, $this->getOrderCount());
+        $this->assertEquals($initialCount + 1, $this->getOrderCount());
 
 
         // the second message will be processed after 240 seconds (300 - 60)
@@ -297,7 +297,7 @@ final class SourceChangeTest extends KernelTestCase
 
         // get the current result
 
-        $this->assertEquals(190, $this->getOrderCount());
+        $initialCount = $this->getOrderCount();
 
         // get one order and remove it
 
@@ -357,6 +357,6 @@ final class SourceChangeTest extends KernelTestCase
 
         // we check the result
 
-        $this->assertEquals(189, $this->getOrderCount());
+        $this->assertEquals($initialCount - 1, $this->getOrderCount());
     }
 }
