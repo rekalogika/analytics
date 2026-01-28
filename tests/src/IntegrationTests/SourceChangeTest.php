@@ -28,344 +28,339 @@ use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 final class SourceChangeTest extends KernelTestCase
 {
-    public function testFoo(): void
+    use InteractsWithMessenger;
+    use ClockSensitiveTrait;
+
+    /**
+     * Sequences are not affected by transactions, so we need to reset them
+     * manually
+     */
+    #[\Override]
+    protected function tearDown(): void
     {
-        $this->assertEquals(1, 1);
+        parent::tearDown();
+
+        $connection = static::getContainer()
+            ->get(Connection::class);
+
+        $sql = "SELECT setval(pg_get_serial_sequence('order', 'id'), 201) FROM \"order\"";
+
+        $connection->executeStatement($sql);
     }
 
-    // use InteractsWithMessenger;
-    // use ClockSensitiveTrait;
+    private function getOrderCount(): int
+    {
+        $summaryManager = static::getContainer()
+            ->get(SummaryManager::class);
 
-    // /**
-    //  * Sequences are not affected by transactions, so we need to reset them
-    //  * manually
-    //  */
-    // #[\Override]
-    // protected function tearDown(): void
-    // {
-    //     parent::tearDown();
+        $result = $summaryManager->createQuery()
+            ->from(OrderSummary::class)
+            ->select('count')
+            ->getResult()
+            ->getTree();
 
-    //     $connection = static::getContainer()
-    //         ->get(Connection::class);
+        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
 
-    //     $sql = "SELECT setval(pg_get_serial_sequence('order', 'id'), 201) FROM \"order\"";
+        return $count;
+    }
 
-    //     $connection->executeStatement($sql);
-    // }
+    private function getOrderCountIn2030(): int
+    {
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
 
-    // private function getOrderCount(): int
-    // {
-    //     $summaryManager = static::getContainer()
-    //         ->get(SummaryManager::class);
+        $result = $summaryManager->createQuery()
+            ->from(OrderSummary::class)
+            ->groupBy('time.civil.year')
+            ->select('count')
+            ->getResult()
+            ->getTree();
 
-    //     $result = $summaryManager->createQuery()
-    //         ->from(OrderSummary::class)
-    //         ->select('count')
-    //         ->getResult()
-    //         ->getTree();
+        $count = $result->traverse('2030', 'count')?->getMeasure()?->getValue() ?? 0;
+        $this->assertIsInt($count);
 
-    //     $count = $result->traverse('count')?->getMeasure()?->getValue();
-    //     $this->assertIsInt($count);
+        return $count;
+    }
 
-    //     return $count;
-    // }
+    public function testSourceCreation(): void
+    {
+        $clock = self::mockTime();
 
-    // private function getOrderCountIn2030(): int
-    // {
-    //     $summaryManager = static::getContainer()->get(SummaryManager::class);
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
 
-    //     $result = $summaryManager->createQuery()
-    //         ->from(OrderSummary::class)
-    //         ->groupBy('time.civil.year')
-    //         ->select('count')
-    //         ->getResult()
-    //         ->getTree();
+        // clear existing dirty flags if exists
 
-    //     $count = $result->traverse('2030', 'count')?->getMeasure()?->getValue() ?? 0;
-    //     $this->assertIsInt($count);
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
-    //     return $count;
-    // }
+        // get the current result
 
-    // public function testSourceCreation(): void
-    // {
-    //     $clock = self::mockTime();
+        $this->assertEquals(190, $this->getOrderCount());
 
-    //     $entityManager = static::getContainer()
-    //         ->get(EntityManagerInterface::class);
+        // create new order
 
-    //     // clear existing dirty flags if exists
+        $item = $entityManager
+            ->getRepository(Item::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Item not found');
 
-    //     $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->createQueryBuilder('df')
-    //         ->delete()
-    //         ->getQuery()
-    //         ->execute();
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Customer not found');
 
-    //     // get the current result
+        $time = $clock->now();
 
-    //     $this->assertEquals(190, $this->getOrderCount());
+        $order = new Order();
+        $order->setItem($item);
+        $order->setCustomer($customer);
+        $order->setTime($time);
+        $order->setShipped($time->modify('+3 days'));
 
-    //     // create new order
+        // persist and flush
 
-    //     $item = $entityManager
-    //         ->getRepository(Item::class)
-    //         ->findOneBy([])
-    //         ?? throw new \RuntimeException('Item not found');
+        $entityManager->persist($order);
+        $entityManager->flush();
+        $entityManager->clear();
 
-    //     $customer = $entityManager
-    //         ->getRepository(Customer::class)
-    //         ->findOneBy([])
-    //         ?? throw new \RuntimeException('Customer not found');
+        // check dirty flag
 
-    //     $time = $clock->now();
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findAll();
 
-    //     $order = new Order();
-    //     $order->setItem($item);
-    //     $order->setCustomer($customer);
-    //     $order->setTime($time);
-    //     $order->setShipped($time->modify('+3 days'));
+        $this->assertCount(1, $dirtyFlags);
+        $dirtyFlag = $dirtyFlags[0];
+        $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
+        $this->assertNull($dirtyFlag->getKey());
+        $this->assertNull($dirtyFlag->getLevel());
 
-    //     // persist and flush
+        // check if NewDirtyFlagEvent is emitted
 
-    //     $entityManager->persist($order);
-    //     $entityManager->flush();
-    //     $entityManager->clear();
+        $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
+        $this->assertCount(1, $listener->getEvents());
 
-    //     // check dirty flag
+        // check messenger now, it should have one pending message
 
-    //     $dirtyFlags = $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->findAll();
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $this->assertCount(1, $dirtyFlags);
-    //     $dirtyFlag = $dirtyFlags[0];
-    //     $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
-    //     $this->assertNull($dirtyFlag->getKey());
-    //     $this->assertNull($dirtyFlag->getLevel());
+        // check messenger in 59 seconds, should not consume the message
 
-    //     // check if NewDirtyFlagEvent is emitted
+        $clock->sleep(59);
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-    //     $this->assertCount(1, $listener->getEvents());
+        // in the exact 60th second it should process the message. the
+        // processing converts the "there are new entities" refresh command to
+        // the "refresh this partition" command. the message should generate two
+        // refreshCommands:
+        //
+        // 1. primary "refresh this partition" command, delayed 60s
+        // 2. secondary "there are new entities" command, delayed 300s
 
-    //     // check messenger now, it should have one pending message
+        $clock->sleep(1);
+        $transport->process(1);
+        $transport->queue()->assertCount(2);
 
-    //     $transport = $this->transport('async');
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // cannot process the messages now as they are delayed
 
-    //     // check messenger in 59 seconds, should not consume the message
+        $transport->process();
+        $transport->queue()->assertCount(2);
 
-    //     $clock->sleep(59);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // the first message will be processed after 60 seconds, and the
+        // then the corresponding secondary refresh command will be dispatched
 
-    //     // in the exact 60th second it should process the message. the
-    //     // processing converts the "there are new entities" refresh command to
-    //     // the "refresh this partition" command. the message should generate two
-    //     // refreshCommands:
-    //     //
-    //     // 1. primary "refresh this partition" command, delayed 60s
-    //     // 2. secondary "there are new entities" command, delayed 300s
+        $clock->sleep(60);
+        $transport->process();
+        $transport->queue()->assertCount(2);
 
-    //     $clock->sleep(1);
-    //     $transport->process(1);
-    //     $transport->queue()->assertCount(2);
+        // the count should be updated now
 
-    //     // cannot process the messages now as they are delayed
+        $this->assertEquals(191, $this->getOrderCount());
 
-    //     $transport->process();
-    //     $transport->queue()->assertCount(2);
 
-    //     // the first message will be processed after 60 seconds, and the
-    //     // then the corresponding secondary refresh command will be dispatched
+        // the second message will be processed after 240 seconds (300 - 60)
 
-    //     $clock->sleep(60);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(2);
+        $clock->sleep(240);
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     // the count should be updated now
+        // the other secondary command will be processed after 60 seconds
+        // or 300 seconds after the primary was processed
 
-    //     $this->assertEquals(191, $this->getOrderCount());
+        $clock->sleep(60);
+        $transport->process();
+        $transport->queue()->assertCount(0);
 
+        // dump($transport->queue()->messages());
+    }
 
-    //     // the second message will be processed after 240 seconds (300 - 60)
+    public function testSourceModification(): void
+    {
+        $clock = self::mockTime();
 
-    //     $clock->sleep(240);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
 
-    //     // the other secondary command will be processed after 60 seconds
-    //     // or 300 seconds after the primary was processed
+        // clear existing dirty flags if exists
 
-    //     $clock->sleep(60);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(0);
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
-    //     // dump($transport->queue()->messages());
-    // }
+        // get the current result
 
-    // public function testSourceModification(): void
-    // {
-    //     $clock = self::mockTime();
+        $this->assertEquals(0, $this->getOrderCountIn2030());
 
-    //     $entityManager = static::getContainer()
-    //         ->get(EntityManagerInterface::class);
+        // get one order and modify the time to 2030
 
-    //     // clear existing dirty flags if exists
+        $order = $entityManager
+            ->getRepository(Order::class)
+            ->find(50)
+            ?? throw new \RuntimeException('Order not found');
 
-    //     $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->createQueryBuilder('df')
-    //         ->delete()
-    //         ->getQuery()
-    //         ->execute();
+        $order->setTime(new \DateTimeImmutable('2030-02-01 00:00:00'));
 
-    //     // get the current result
+        // flush
 
-    //     $this->assertEquals(0, $this->getOrderCountIn2030());
+        $entityManager->flush();
+        $entityManager->clear();
 
-    //     // get one order and modify the time to 2030
+        // check dirty flag
 
-    //     $order = $entityManager
-    //         ->getRepository(Order::class)
-    //         ->find(50)
-    //         ?? throw new \RuntimeException('Order not found');
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findAll();
 
-    //     $order->setTime(new \DateTimeImmutable('2030-02-01 00:00:00'));
+        $this->assertCount(1, $dirtyFlags);
+        $dirtyFlag = $dirtyFlags[0];
+        $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
+        $this->assertNotNull($dirtyFlag->getKey());
+        $this->assertNotNull($dirtyFlag->getLevel());
 
-    //     // flush
+        // check if NewDirtyFlagEvent is emitted
 
-    //     $entityManager->flush();
-    //     $entityManager->clear();
+        $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
+        $this->assertCount(1, $listener->getEvents());
 
-    //     // check dirty flag
+        // check messenger now, it should have one pending message
 
-    //     $dirtyFlags = $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->findAll();
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $this->assertCount(1, $dirtyFlags);
-    //     $dirtyFlag = $dirtyFlags[0];
-    //     $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
-    //     $this->assertNotNull($dirtyFlag->getKey());
-    //     $this->assertNotNull($dirtyFlag->getLevel());
+        // check messenger in 59 seconds, should not consume the message
 
-    //     // check if NewDirtyFlagEvent is emitted
+        $clock->sleep(59);
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-    //     $this->assertCount(1, $listener->getEvents());
+        // in the exact 60th second it should process the message, and generates
+        // the corresponding secondary refresh command
 
-    //     // check messenger now, it should have one pending message
+        $clock->sleep(1);
 
-    //     $transport = $this->transport('async');
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // i'm lazy so we just blindly process the messages here until it does
+        // not emit more messages.
 
-    //     // check messenger in 59 seconds, should not consume the message
+        while ($transport->queue()->messages()) {
+            $clock->sleep(60);
+            $transport->process();
+        }
 
-    //     $clock->sleep(59);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // we check the result
 
-    //     // in the exact 60th second it should process the message, and generates
-    //     // the corresponding secondary refresh command
+        $this->assertEquals(1, $this->getOrderCountIn2030());
+    }
 
-    //     $clock->sleep(1);
+    public function testSourceDeletion(): void
+    {
+        $clock = self::mockTime();
 
-    //     // i'm lazy so we just blindly process the messages here until it does
-    //     // not emit more messages.
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
 
-    //     while ($transport->queue()->messages()) {
-    //         $clock->sleep(60);
-    //         $transport->process();
-    //     }
+        // clear existing dirty flags if exists
 
-    //     // we check the result
+        $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->createQueryBuilder('df')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
-    //     $this->assertEquals(1, $this->getOrderCountIn2030());
-    // }
+        // get the current result
 
-    // public function testSourceDeletion(): void
-    // {
-    //     $clock = self::mockTime();
+        $this->assertEquals(190, $this->getOrderCount());
 
-    //     $entityManager = static::getContainer()
-    //         ->get(EntityManagerInterface::class);
+        // get one order and remove it
 
-    //     // clear existing dirty flags if exists
+        $order = $entityManager
+            ->getRepository(Order::class)
+            ->find(50)
+            ?? throw new \RuntimeException('Order not found');
 
-    //     $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->createQueryBuilder('df')
-    //         ->delete()
-    //         ->getQuery()
-    //         ->execute();
+        $entityManager->remove($order);
 
-    //     // get the current result
+        // flush
 
-    //     $this->assertEquals(190, $this->getOrderCount());
+        $entityManager->flush();
+        $entityManager->clear();
 
-    //     // get one order and remove it
+        // check dirty flag
 
-    //     $order = $entityManager
-    //         ->getRepository(Order::class)
-    //         ->find(50)
-    //         ?? throw new \RuntimeException('Order not found');
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findAll();
 
-    //     $entityManager->remove($order);
+        $this->assertCount(1, $dirtyFlags);
+        $dirtyFlag = $dirtyFlags[0];
+        $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
+        $this->assertNotNull($dirtyFlag->getKey());
+        $this->assertNotNull($dirtyFlag->getLevel());
 
-    //     // flush
+        // check if NewDirtyFlagEvent is emitted
 
-    //     $entityManager->flush();
-    //     $entityManager->clear();
+        $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
+        $this->assertCount(1, $listener->getEvents());
 
-    //     // check dirty flag
+        // check messenger now, it should have one pending message
 
-    //     $dirtyFlags = $entityManager
-    //         ->getRepository(DirtyFlag::class)
-    //         ->findAll();
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $this->assertCount(1, $dirtyFlags);
-    //     $dirtyFlag = $dirtyFlags[0];
-    //     $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
-    //     $this->assertNotNull($dirtyFlag->getKey());
-    //     $this->assertNotNull($dirtyFlag->getLevel());
+        // check messenger in 59 seconds, should not consume the message
 
-    //     // check if NewDirtyFlagEvent is emitted
+        $clock->sleep(59);
+        $transport->process();
+        $transport->queue()->assertCount(1);
 
-    //     $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-    //     $this->assertCount(1, $listener->getEvents());
+        // in the exact 60th second it should process the message, and generates
+        // the corresponding secondary refresh command
 
-    //     // check messenger now, it should have one pending message
+        $clock->sleep(1);
 
-    //     $transport = $this->transport('async');
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // i'm lazy so we just blindly process the messages here until it does
+        // not emit more messages.
 
-    //     // check messenger in 59 seconds, should not consume the message
+        while ($transport->queue()->messages()) {
+            $clock->sleep(60);
+            $transport->process();
+        }
 
-    //     $clock->sleep(59);
-    //     $transport->process();
-    //     $transport->queue()->assertCount(1);
+        // we check the result
 
-    //     // in the exact 60th second it should process the message, and generates
-    //     // the corresponding secondary refresh command
-
-    //     $clock->sleep(1);
-
-    //     // i'm lazy so we just blindly process the messages here until it does
-    //     // not emit more messages.
-
-    //     while ($transport->queue()->messages()) {
-    //         $clock->sleep(60);
-    //         $transport->process();
-    //     }
-
-    //     // we check the result
-
-    //     $this->assertEquals(189, $this->getOrderCount());
-    // }
+        $this->assertEquals(189, $this->getOrderCount());
+    }
 }
