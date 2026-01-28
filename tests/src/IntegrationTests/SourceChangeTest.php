@@ -55,11 +55,9 @@ final class SourceChangeTest extends KernelTestCase
 
         $result = $summaryManager->createQuery()
             ->from(OrderSummary::class)
-            ->select('count')
-            ->getResult()
-            ->getTree();
+            ->getResult();
 
-        $count = $result->traverse('count')?->getMeasure()?->getValue();
+        $count = $result->getMeasures()->get('count')?->getValue();
         $this->assertIsInt($count);
 
         return $count;
@@ -71,12 +69,10 @@ final class SourceChangeTest extends KernelTestCase
 
         $result = $summaryManager->createQuery()
             ->from(OrderSummary::class)
-            ->groupBy('time.civil.year')
-            ->select('count')
-            ->getResult()
-            ->getTree();
+            ->withDimensions('time.civil.year')
+            ->getResult();
 
-        $count = $result->traverse('2030', 'count')?->getMeasure()?->getValue() ?? 0;
+        $count = $result->find('time.civil.year', '2030')?->getMeasures()->get('count')?->getValue() ?? 0;
         $this->assertIsInt($count);
 
         return $count;
