@@ -147,53 +147,21 @@ final class SourceChangeTest extends KernelTestCase
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // check messenger in 59 seconds, should not consume the message
+        // check messenger in 0.999999 seconds, should not consume the message
 
-        $clock->sleep(59);
+        $clock->sleep(0.999999);
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // in the exact 60th second it should process the message. the
-        // processing converts the "there are new entities" refresh command to
-        // the "refresh this partition" command. the message should generate two
-        // refreshCommands:
-        //
-        // 1. primary "refresh this partition" command, delayed 60s
-        // 2. secondary "there are new entities" command, delayed 300s
+        // in the exact 1st second it should process the message.
 
-        $clock->sleep(1);
-        $transport->process(1);
-        $transport->queue()->assertCount(2);
-
-        // cannot process the messages now as they are delayed
-
+        $clock->sleep(0.000001);
         $transport->process();
-        $transport->queue()->assertCount(2);
-
-        // the first message will be processed after 60 seconds, and the
-        // then the corresponding secondary refresh command will be dispatched
-
-        $clock->sleep(60);
-        $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(0);
 
         // the count should be updated now
 
         $this->assertEquals($initialCount + 1, $this->getOrderCount());
-
-
-        // the second message will be processed after 240 seconds (300 - 60)
-
-        $clock->sleep(240);
-        $transport->process();
-        $transport->queue()->assertCount(1);
-
-        // the other secondary command will be processed after 60 seconds
-        // or 300 seconds after the primary was processed
-
-        $clock->sleep(60);
-        $transport->process();
-        $transport->queue()->assertCount(0);
 
         // dump($transport->queue()->messages());
     }
@@ -255,24 +223,17 @@ final class SourceChangeTest extends KernelTestCase
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // check messenger in 59 seconds, should not consume the message
+        // check messenger in 0.999999 seconds, should not consume the message
 
-        $clock->sleep(59);
+        $clock->sleep(0.999999);
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // in the exact 60th second it should process the message, and generates
-        // the corresponding secondary refresh command
+        // in the exact 1st second it should process the message.
 
-        $clock->sleep(1);
-
-        // i'm lazy so we just blindly process the messages here until it does
-        // not emit more messages.
-
-        while ($transport->queue()->messages()) {
-            $clock->sleep(60);
-            $transport->process();
-        }
+        $clock->sleep(0.000001);
+        $transport->process();
+        $transport->queue()->assertCount(0);
 
         // we check the result
 
@@ -336,24 +297,17 @@ final class SourceChangeTest extends KernelTestCase
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // check messenger in 59 seconds, should not consume the message
+        // check messenger in 0.999999 seconds, should not consume the message
 
-        $clock->sleep(59);
+        $clock->sleep(0.999999);
         $transport->process();
         $transport->queue()->assertCount(1);
 
-        // in the exact 60th second it should process the message, and generates
-        // the corresponding secondary refresh command
+        // in the exact 1st second it should process the message.
 
-        $clock->sleep(1);
-
-        // i'm lazy so we just blindly process the messages here until it does
-        // not emit more messages.
-
-        while ($transport->queue()->messages()) {
-            $clock->sleep(60);
-            $transport->process();
-        }
+        $clock->sleep(0.000001);
+        $transport->process();
+        $transport->queue()->assertCount(0);
 
         // we check the result
 
