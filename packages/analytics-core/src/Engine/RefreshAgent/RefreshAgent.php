@@ -30,9 +30,16 @@ final readonly class RefreshAgent
             return;
         }
 
+        $refreshAgentStrategy = new DefaultRefreshAgentStrategy(
+            minimumAge: null,
+            // @todo: probably we want to have enable idle delay handling. If there are idle items, another refresh
+            // message with delayUntil the lowest idle item time should be dispatched.
+            minimumIdleDelay: null,
+        );
+
         $this->summaryRefresherFactory
             ->createSummaryRefresher($message->getSummaryClass())
-            ->refresh();
+            ->refresh($refreshAgentStrategy);
 
         $this->refreshAgentLock->release($class);
     }
