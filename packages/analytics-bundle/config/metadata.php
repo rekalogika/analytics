@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
+use Rekalogika\Analytics\Bundle\CacheWarmer\AttributeCollectionCacheWarmer;
 use Rekalogika\Analytics\Metadata\Implementation\CachingAttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultAttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultDimensionGroupMetadataFactory;
@@ -47,7 +48,20 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->decorate('rekalogika.analytics.metadata.attribute_collection_factory')
         ->args([
             '$decorated' => service('.inner'),
+            '$cache' => service('cache.system'),
         ]);
+
+    //
+    // attribute collection cache warmer — pre-populates the configured
+    // cache pool (cache.system by default) during cache:warmup so the
+    // first request after deploy doesn't pay the reflection cost of
+    // parsing every summary's #[Dimension] / #[Measure] attributes.
+    //
+
+    $services
+        ->set(AttributeCollectionCacheWarmer::class)
+        ->args(['$summaryMetadataFactory' => service(SummaryMetadataFactory::class)])
+        ->tag('kernel.cache_warmer');
 
     //
     // dimension metadata factory
