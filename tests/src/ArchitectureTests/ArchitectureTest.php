@@ -239,6 +239,7 @@ final class ArchitectureTest
                 Selector::classname(\Override::class),
                 Selector::classname(\Stringable::class),
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\Throwable::class),
 
                 // php array
                 Selector::classname(\IteratorAggregate::class),
