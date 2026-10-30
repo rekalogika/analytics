@@ -131,6 +131,20 @@ final class RefreshAgentLock implements ResetInterface
     }
 
     /**
+     * Acquire lock, wait until another process releases the lock if
+     * necessary.
+     *
+     * @param class-string $summaryClass
+     */
+    public function waitAndAcquire(string $summaryClass): void
+    {
+        $store = $this->getStoreBySummaryClass($summaryClass);
+        $key = $this->getKey($summaryClass);
+
+        $store->waitAndSave($key);
+    }
+
+    /**
      * Release key
      *
      * @param class-string $summaryClass

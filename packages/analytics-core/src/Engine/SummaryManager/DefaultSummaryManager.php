@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContextFactory;
@@ -32,6 +33,7 @@ final readonly class DefaultSummaryManager implements SummaryManager
         private PropertyAccessorInterface $propertyAccessor,
         private SummaryRefresherFactory $refresherFactory,
         private SourceEntitiesFactory $sourceEntitiesFactory,
+        private RefreshAgentLock $refreshAgentLock,
         private int $queryResultLimit,
         private int $fillingNodesLimit,
     ) {
@@ -53,14 +55,23 @@ final readonly class DefaultSummaryManager implements SummaryManager
         int $batchSize = 1,
         ?string $resumeId = null,
     ): void {
-        $this->refresherFactory
-            ->createSummaryRefresher($class)
-            ->manualRefresh(
-                start: $start,
-                end: $end,
-                batchSize: $batchSize,
-                resumeId: $resumeId,
-            );
+        // wait for the refresh agent if it is refreshing the same summary,
+        // concurrent refreshes of the same partition produce duplicate rows
+
+        $this->refreshAgentLock->waitAndAcquire($class);
+
+        try {
+            $this->refresherFactory
+                ->createSummaryRefresher($class)
+                ->manualRefresh(
+                    start: $start,
+                    end: $end,
+                    batchSize: $batchSize,
+                    resumeId: $resumeId,
+                );
+        } finally {
+            $this->refreshAgentLock->release($class);
+        }
     }
 
     #[\Override]

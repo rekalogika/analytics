@@ -21,7 +21,7 @@ services:
             retries: 1
 
     messenger:
-        image: ghcr.io/rekalogika/php-zts-dev:8.3.1010
+        image: ghcr.io/rekalogika/php-zts-dev:8.5.1003
         command: ["php", "tests/bin/console", "messenger:consume", "async", '-vvv']
         user: ${DUID}:${DGID}
         environment:
