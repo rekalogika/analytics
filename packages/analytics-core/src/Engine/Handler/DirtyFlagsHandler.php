@@ -115,7 +115,7 @@ final readonly class DirtyFlagsHandler
                 Types::DATETIME_IMMUTABLE,
             );
 
-            if (($maximumAge = $refreshAgentStrategy->getMaximumAge()) === null) {
+            if (($maximumAge = $refreshAgentStrategy->getMaximumAge()) !== null) {
                 $expression = $queryBuilder->expr()->orX(
                     $expression,
                     $queryBuilder->expr()->gte(

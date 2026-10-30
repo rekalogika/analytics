@@ -37,10 +37,12 @@ final readonly class RefreshAgent
             minimumIdleDelay: null,
         );
 
-        $this->summaryRefresherFactory
-            ->createSummaryRefresher($message->getSummaryClass())
-            ->refresh($refreshAgentStrategy);
-
-        $this->refreshAgentLock->release($class);
+        try {
+            $this->summaryRefresherFactory
+                ->createSummaryRefresher($message->getSummaryClass())
+                ->refresh($refreshAgentStrategy);
+        } finally {
+            $this->refreshAgentLock->release($class);
+        }
     }
 }
