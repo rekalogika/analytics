@@ -397,5 +397,11 @@
         <target>Telah terjadi kesalahan. Coba kembali beberapa saat lagi dan hubungi dukungan teknis apabila masalah masih terjadi.</target>
       </segment>
     </unit>
+    <unit id="k6N0_i2">
+      <segment>
+        <source>This summary cannot combine these dimensions: {dimensions}. Remove one or more dimensions or filters.</source>
+        <target>Ringkasan ini tidak dapat menggabungkan dimensi berikut: {dimensions}. Hapus satu atau beberapa dimensi atau filter.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

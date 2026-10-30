@@ -17,6 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
@@ -128,7 +129,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $dirtyFlags = $entityManager
             ->getRepository(DirtyFlag::class)
-            ->findAll();
+            ->findBy(['class' => OrderSummary::class]);
 
         $this->assertCount(1, $dirtyFlags);
         $dirtyFlag = $dirtyFlags[0];
@@ -139,19 +140,24 @@ final class SourceChangeTest extends KernelTestCase
         // check if NewDirtyFlagEvent is emitted
 
         $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-        $this->assertCount(1, $listener->getEvents());
+        $events = array_filter(
+            $listener->getEvents(),
+            static fn(NewDirtyFlagEvent $event): bool => $event->getDirtyFlag()->getClass() === OrderSummary::class,
+        );
+        $this->assertCount(1, $events);
 
-        // check messenger now, it should have one pending message
+        // check messenger now, it should have one pending message for each
+        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // check messenger in 0.999999 seconds, should not consume the message
 
         $clock->sleep(0.999999);
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // in the exact 1st second it should process the message.
 
@@ -204,7 +210,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $dirtyFlags = $entityManager
             ->getRepository(DirtyFlag::class)
-            ->findAll();
+            ->findBy(['class' => OrderSummary::class]);
 
         $this->assertCount(1, $dirtyFlags);
         $dirtyFlag = $dirtyFlags[0];
@@ -215,19 +221,24 @@ final class SourceChangeTest extends KernelTestCase
         // check if NewDirtyFlagEvent is emitted
 
         $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-        $this->assertCount(1, $listener->getEvents());
+        $events = array_filter(
+            $listener->getEvents(),
+            static fn(NewDirtyFlagEvent $event): bool => $event->getDirtyFlag()->getClass() === OrderSummary::class,
+        );
+        $this->assertCount(1, $events);
 
-        // check messenger now, it should have one pending message
+        // check messenger now, it should have one pending message for each
+        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // check messenger in 0.999999 seconds, should not consume the message
 
         $clock->sleep(0.999999);
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // in the exact 1st second it should process the message.
 
@@ -278,7 +289,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $dirtyFlags = $entityManager
             ->getRepository(DirtyFlag::class)
-            ->findAll();
+            ->findBy(['class' => OrderSummary::class]);
 
         $this->assertCount(1, $dirtyFlags);
         $dirtyFlag = $dirtyFlags[0];
@@ -289,19 +300,24 @@ final class SourceChangeTest extends KernelTestCase
         // check if NewDirtyFlagEvent is emitted
 
         $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
-        $this->assertCount(1, $listener->getEvents());
+        $events = array_filter(
+            $listener->getEvents(),
+            static fn(NewDirtyFlagEvent $event): bool => $event->getDirtyFlag()->getClass() === OrderSummary::class,
+        );
+        $this->assertCount(1, $events);
 
-        // check messenger now, it should have one pending message
+        // check messenger now, it should have one pending message for each
+        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // check messenger in 0.999999 seconds, should not consume the message
 
         $clock->sleep(0.999999);
         $transport->process();
-        $transport->queue()->assertCount(1);
+        $transport->queue()->assertCount(2);
 
         // in the exact 1st second it should process the message.
 

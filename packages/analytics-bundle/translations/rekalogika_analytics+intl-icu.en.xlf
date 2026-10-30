@@ -397,5 +397,11 @@
         <target>An error occurred. Please try again later and contact technical support if the problem persists.</target>
       </segment>
     </unit>
+    <unit id="k6N0_i2">
+      <segment>
+        <source>This summary cannot combine these dimensions: {dimensions}. Remove one or more dimensions or filters.</source>
+        <target>This summary cannot combine these dimensions: {dimensions}. Remove one or more dimensions or filters.</target>
+      </segment>
+    </unit>
   </file>
 </xliff>

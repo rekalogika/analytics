@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Metadata\Summary;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
+use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\Analytics\Metadata\Implementation\RootGroupingStrategy;
@@ -73,6 +74,9 @@ final readonly class SummaryMetadata
      * @param class-string $summaryClass
      * @param non-empty-array<string,DimensionMetadata> $dimensions
      * @param non-empty-array<string,MeasureMetadata> $measures
+     * @param GroupingStrategy|null $groupingStrategy The grouping strategy of
+     * the root dimensions. If null, the summary stores the cube of all the
+     * root dimensions.
      */
     public function __construct(
         private string $sourceClass,
@@ -83,6 +87,7 @@ final readonly class SummaryMetadata
         private string $groupingsProperty,
         private AttributeCollection $attributes,
         private TranslatableInterface $label,
+        ?GroupingStrategy $groupingStrategy = null,
     ) {
         $allProperties = [];
 
@@ -188,7 +193,6 @@ final readonly class SummaryMetadata
         // group by expression
         //
 
-        $strategy = new RootGroupingStrategy();
         $childrenExpressions = [];
 
         foreach ($this->rootDimensions as $key => $dimension) {
@@ -196,11 +200,45 @@ final readonly class SummaryMetadata
         }
 
         $childrenExpressions = new DefaultGroupByExpressions($childrenExpressions);
-        $groupingSets = $strategy->getGroupByExpression($childrenExpressions);
-        $groupBy = new GroupBy();
 
-        foreach ($groupingSets as $groupingSet) {
-            $groupBy->add($groupingSet);
+        if ($groupingStrategy === null) {
+            // default: the cube of every root dimension. Each item returned
+            // by the root strategy becomes a separate item in the GROUP BY
+            // clause, so the result is the cross product of all of them.
+
+            $groupingSets = (new RootGroupingStrategy())
+                ->getGroupByExpression($childrenExpressions);
+
+            $groupBy = new GroupBy();
+
+            foreach ($groupingSets as $groupingSet) {
+                $groupBy->add($groupingSet);
+            }
+        } else {
+            // user-supplied strategy: the result is the complete group by
+            // expression of the summary, the same way as the result of a
+            // dimension group's strategy is the complete expression of that
+            // dimension group.
+
+            try {
+                $expression = $groupingStrategy
+                    ->getGroupByExpression($childrenExpressions);
+            } catch (InvalidArgumentException $e) {
+                throw new MetadataException(\sprintf(
+                    'Invalid grouping strategy in summary class "%s": %s',
+                    $summaryClass,
+                    $e->getMessage(),
+                ), previous: $e);
+            }
+
+            if (\count($expression) === 0) {
+                throw new MetadataException(\sprintf(
+                    'The grouping strategy of summary class "%s" does not produce any grouping set.',
+                    $summaryClass,
+                ));
+            }
+
+            $groupBy = new GroupBy($expression);
         }
 
         $this->groupByExpression = $groupBy;
