@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\CacheWarmer;
 
-use Rekalogika\Analytics\Contracts\Exception\SummaryNotFound;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
@@ -30,10 +29,12 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  * for every relevant class and property, which the caching decorator
  * persists.
  *
- * isOptional() returns true so a warmup-time Doctrine boot failure (rare
- * but possible in environments without DB connectivity at compile time)
- * never blocks deploy; the cache then falls back to lazy population on
- * first request, matching the pre-warmer behaviour of the bundle.
+ * Failures are caught so a warmup-time Doctrine boot failure (rare but
+ * possible in environments without DB connectivity at compile time) never
+ * blocks deploy; the cache then falls back to lazy population on first
+ * request, matching the pre-warmer behaviour of the bundle. Symfony does not
+ * catch exceptions thrown by optional warmers, isOptional() only lets them be
+ * skipped with --no-optional-warmers.
  */
 final readonly class AttributeCollectionCacheWarmer implements CacheWarmerInterface
 {
@@ -50,12 +51,18 @@ final readonly class AttributeCollectionCacheWarmer implements CacheWarmerInterf
     #[\Override]
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
-        foreach ($this->summaryMetadataFactory->getSummaryClasses() as $summaryClass) {
+        try {
+            $summaryClasses = $this->summaryMetadataFactory->getSummaryClasses();
+        } catch (\Throwable) {
+            return [];
+        }
+
+        foreach ($summaryClasses as $summaryClass) {
             try {
                 $this->summaryMetadataFactory->getSummaryMetadata($summaryClass);
-            } catch (SummaryNotFound) {
-                // Defensive: getSummaryClasses() already filters, but a race
-                // between metadata layers shouldn't fail the whole warmup.
+            } catch (\Throwable) {
+                // Invalid metadata shouldn't fail the whole warmup, the error
+                // will surface when the summary is used.
             }
         }
 

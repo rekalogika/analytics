@@ -22,11 +22,15 @@ use Rekalogika\Analytics\Metadata\Implementation\DefaultSourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Implementation\DefaultSummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
+return static function (
+    ContainerConfigurator $containerConfigurator,
+    ContainerBuilder $containerBuilder,
+): void {
     $services = $containerConfigurator->services();
 
     //
@@ -42,26 +46,32 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.metadata.attribute_collection_factory')
         ->class(DefaultAttributeCollectionFactory::class);
 
-    $services
+    $caching = $services
         ->set('rekalogika.analytics.metadata.attribute_collection_factory.caching')
         ->class(CachingAttributeCollectionFactory::class)
         ->decorate('rekalogika.analytics.metadata.attribute_collection_factory')
         ->args([
             '$decorated' => service('.inner'),
-            '$cache' => service('cache.system'),
         ]);
 
-    //
-    // attribute collection cache warmer — pre-populates the configured
-    // cache pool (cache.system by default) during cache:warmup so the
-    // first request after deploy doesn't pay the reflection cost of
-    // parsing every summary's #[Dimension] / #[Measure] attributes.
-    //
+    // in debug mode, keep using the default in-memory cache, so that changes
+    // to the attributes take effect without having to clear the cache
 
-    $services
-        ->set(AttributeCollectionCacheWarmer::class)
-        ->args(['$summaryMetadataFactory' => service(SummaryMetadataFactory::class)])
-        ->tag('kernel.cache_warmer');
+    if ($containerBuilder->getParameter('kernel.debug') === false) {
+        $caching->arg('$cache', service('cache.system'));
+
+        //
+        // attribute collection cache warmer — pre-populates cache.system
+        // during cache:warmup so the first request after deploy doesn't pay
+        // the reflection cost of parsing every summary's #[Dimension] /
+        // #[Measure] attributes.
+        //
+
+        $services
+            ->set(AttributeCollectionCacheWarmer::class)
+            ->args(['$summaryMetadataFactory' => service(SummaryMetadataFactory::class)])
+            ->tag('kernel.cache_warmer');
+    }
 
     //
     // dimension metadata factory
