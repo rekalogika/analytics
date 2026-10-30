@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -37,6 +38,7 @@ final class RefreshCommand extends Command
         private readonly RefreshCommandOutputEventSubscriber $refreshCommandOutputEventSubscriber,
         private readonly SummaryRefresherFactory $summaryRefresherFactory,
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
+        private readonly RefreshAgentLock $refreshAgentLock,
     ) {
         parent::__construct();
     }
@@ -86,9 +88,18 @@ final class RefreshCommand extends Command
             minimumIdleDelay: null,
         );
 
-        $this->summaryRefresherFactory
-            ->createSummaryRefresher($class)
-            ->refresh($strategy, maxIterations: null);
+        // wait for the refresh agent if it is refreshing the same summary,
+        // concurrent refreshes of the same partition produce duplicate rows
+
+        $this->refreshAgentLock->waitAndAcquire($class);
+
+        try {
+            $this->summaryRefresherFactory
+                ->createSummaryRefresher($class)
+                ->refresh($strategy, maxIterations: null);
+        } finally {
+            $this->refreshAgentLock->release($class);
+        }
 
         return Command::SUCCESS;
     }

@@ -62,6 +62,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$propertyAccessor' => service('property_accessor'),
             '$refresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$sourceEntitiesFactory' => service('rekalogika.analytics.source_entities_factory'),
+            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
             '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
             '$fillingNodesLimit' => '%rekalogika.analytics.filling_nodes_limit%',
         ])
