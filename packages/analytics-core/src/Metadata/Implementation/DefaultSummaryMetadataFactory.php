@@ -39,6 +39,9 @@ use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
 final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
+    /**
+     * @var array<class-string,true>
+     */
     private array $summaryClassCache;
 
     public function __construct(
