@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Factory;
 
 use Rekalogika\Analytics\Tests\App\Entity\Country;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Country>
+ * @extends PersistentObjectFactory<Country>
  */
-final class CountryFactory extends PersistentProxyObjectFactory
+final class CountryFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

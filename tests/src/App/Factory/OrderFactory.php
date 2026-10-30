@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\App\Factory;
 
 use Rekalogika\Analytics\Tests\App\Entity\Order;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Order>
+ * @extends PersistentObjectFactory<Order>
  */
-final class OrderFactory extends PersistentProxyObjectFactory
+final class OrderFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

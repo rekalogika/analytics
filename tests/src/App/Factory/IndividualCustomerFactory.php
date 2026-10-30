@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Factory;
 
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<IndividualCustomer>
+ * @extends PersistentObjectFactory<IndividualCustomer>
  */
-final class IndividualCustomerFactory extends PersistentProxyObjectFactory
+final class IndividualCustomerFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

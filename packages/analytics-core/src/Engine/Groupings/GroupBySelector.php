@@ -99,7 +99,7 @@ final class GroupBySelector
         $parent = $this->getParent($fieldSet);
 
         if ($parent instanceof GroupingSet) {
-            $this->selectGroupingSet($parent, $fieldSet);
+            $this->selectGroupingSet($parent);
         } elseif ($parent instanceof GroupBy) {
             $this->selectGroupBy($parent);
         } elseif ($parent instanceof Cube) {
@@ -119,7 +119,7 @@ final class GroupBySelector
         $parent = $this->getParent($cube);
 
         if ($parent instanceof GroupingSet) {
-            $this->selectGroupingSet($parent, $cube);
+            $this->selectGroupingSet($parent);
         } elseif ($parent instanceof GroupBy) {
             $this->selectGroupBy($parent);
         } else {
@@ -147,7 +147,7 @@ final class GroupBySelector
         $parent = $this->getParent($rollUp);
 
         if ($parent instanceof GroupingSet) {
-            $this->selectGroupingSet($parent, $rollUp);
+            $this->selectGroupingSet($parent);
         } elseif ($parent instanceof GroupBy) {
             $this->selectGroupBy($parent);
         } else {
@@ -158,16 +158,14 @@ final class GroupBySelector
         }
     }
 
-    private function selectGroupingSet(
-        GroupingSet $groupingSet,
-        FieldSet|Cube|RollUp|GroupingSet $incoming,
-    ): void {
+    private function selectGroupingSet(GroupingSet $groupingSet): void
+    {
         $parent = $this->getParent($groupingSet);
 
         if ($parent instanceof GroupBy) {
             $this->selectGroupBy($parent);
         } elseif ($parent instanceof GroupingSet) {
-            $this->selectGroupingSet($parent, $groupingSet);
+            $this->selectGroupingSet($parent);
         } else {
             throw new InvalidArgumentException(\sprintf(
                 'Unexpected parent type "%s" for GroupingSet.',

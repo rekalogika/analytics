@@ -38,7 +38,7 @@ final class PathTest extends TestCase
         $this->assertSame('d', $path->getFirstElement()->getName());
 
         $this->expectException(LogicException::class);
-        [,$path] = $path->shift();
+        $path->shift();
     }
 
     public function testAlias(): void

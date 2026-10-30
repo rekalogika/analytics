@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Factory;
 
 use Brick\Money\Money;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Item>
+ * @extends PersistentObjectFactory<Item>
  */
-final class ItemFactory extends PersistentProxyObjectFactory
+final class ItemFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

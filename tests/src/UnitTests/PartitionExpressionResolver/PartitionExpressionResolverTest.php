@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests\PartitionExpressionResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\PartitionExpressionResolver;
 
 final class PartitionExpressionResolverTest extends TestCase
 {
-    /**
-     * @dataProvider partitionExpressionProvider
-     */
+    #[DataProvider('partitionExpressionProvider')]
     public function testPartitionExpressionResolver(
         int $lastKey,
         string $expected,

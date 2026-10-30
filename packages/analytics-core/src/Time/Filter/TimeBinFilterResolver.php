@@ -45,7 +45,6 @@ final readonly class TimeBinFilterResolver implements FilterResolver
     #[\Override]
     public function getFilterFactory(DimensionMetadata $dimension): FilterSpecification
     {
-        $typeClass = $dimension->getTypeClass();
         $valueResolver = $dimension->getValueResolver();
 
         if (!$valueResolver instanceof TimeBinValueResolver) {

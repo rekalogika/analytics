@@ -35,6 +35,19 @@
                 <directory name="packages/analytics-core/src/Time/Dimension" />
             </errorLevel>
         </ClassMustBeFinal>
+        <!-- deprecated in DBAL 4.5, but its replacement Table::edit() creates
+             a new table, and we need to modify the table in place -->
+        <DeprecatedMethod>
+            <errorLevel type="suppress">
+                <referencedMethod name="Doctrine\DBAL\Schema\Table::addIndex" />
+            </errorLevel>
+        </DeprecatedMethod>
+        <!-- the replacement ExpressionWithReturnType is not available in ORM 2 -->
+        <DeprecatedInterface>
+            <errorLevel type="suppress">
+                <referencedClass name="Doctrine\ORM\Query\AST\TypedExpression" />
+            </errorLevel>
+        </DeprecatedInterface>
         <MoreSpecificReturnType>
             <errorLevel type="suppress">
                 <file name="packages/analytics-bundle/src/Common/ApplicableDimensionsTrait.php" />

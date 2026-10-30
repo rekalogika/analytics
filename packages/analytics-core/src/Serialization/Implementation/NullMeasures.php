@@ -74,8 +74,7 @@ final readonly class NullMeasures implements Measures, \IteratorAggregate
     #[\Override]
     public function first(): ?NullMeasure
     {
-        $keys = array_keys($this->measures);
-        $key = $keys[0] ?? null;
+        $key = array_key_first($this->measures);
 
         if ($key === null) {
             return null;

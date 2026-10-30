@@ -87,12 +87,6 @@ final class SummaryQuery extends AbstractQuery
 
         parent::__construct($simpleQueryBuilder);
 
-        $dimensionsInQuery = $this->query->getDimensions();
-
-        if (!\in_array('@values', $dimensionsInQuery, true)) {
-            $dimensionsInQuery[] = '@values';
-        }
-
         $this->groupings = Groupings::create($metadata);
 
         // initialize range conditions resolver
