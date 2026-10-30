@@ -27,6 +27,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Frontend\Exception\AnalyticsFrontendException;
+use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\PredicateRenderer;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
 use Rekalogika\Analytics\Frontend\Spreadsheet\SpreadsheetRenderer;
@@ -87,78 +88,103 @@ final class AppController extends AbstractController
         $values = $query->getValues();
         $rows = $query->getRows();
         $columns = $query->getColumns();
-        $cube = $query->getResult();
-
-        // create pivot table
-        try {
-            $pivotTable = $htmlRenderer->renderPivotTable(
-                cube: $cube,
-                rows: $rows,
-                columns: $columns,
-                measures: $values,
-                throwException: true,
-            );
-
-            $pivotTableError = null;
-        } catch (AnalyticsFrontendException $e) {
-            $pivotTable = null;
-            $pivotTableError = $e->trans($this->translator);
-        } catch (\Throwable $e) {
-            $pivotTable = null;
-            $pivotTableError = 'An error occurred while rendering the pivot table.';
-            $this->logger->error(
-                'An error occurred while rendering the pivot table.',
-                [
-                    'exception' => $e,
-                ],
-            );
-        }
 
         // expression rendering
         $predicate = $predicateRenderer->renderPredicate($origQuery);
 
-        // create chart
+        // execute the query. a user-facing error, like a combination of
+        // dimensions that is not available in the summary, is displayed
+        // instead of the pivot table.
         try {
-            if (\count($values) === 0) {
-                $chart = null;
-            } else {
-                $dimensions = array_values(array_filter(
-                    array_merge($rows, $columns),
-                    static fn(string $field): bool => $field !== '@values',
-                ));
+            $cube = $query->getResult();
+            $resultError = null;
+        } catch (\Throwable $e) {
+            $e = FrontendWrapperException::selectiveWrap($e);
 
-                if ($dimensions === []) {
-                    $chart = null;
-                } else {
-                    $chart = $chartGenerator->createChart(
-                        cube: $cube,
-                        dimensions: $dimensions,
-                        measures: $values,
-                    );
-                }
+            if (!$e instanceof AnalyticsFrontendException) {
+                throw $e;
             }
 
-            $chartError = null;
-        } catch (UnsupportedData) {
-            $chart = null;
-            $chartError = null;
-        } catch (AnalyticsFrontendException $e) {
-            $chart = null;
-            $chartError = $e->trans($this->translator);
-        } catch (\Throwable $e) {
-            $chart = null;
-            $chartError = 'An error occurred while creating the chart: ';
-            $this->logger->error(
-                'An error occurred while creating the chart.',
-                [
-                    'exception' => $e,
-                ],
-            );
+            $cube = null;
+            $resultError = $e->trans($this->translator);
         }
 
+        if ($cube === null) {
+            $pivotTable = null;
+            $pivotTableError = $resultError;
+            $chart = null;
+            $chartError = null;
+        } else {
+            // create pivot table
+            try {
+                $pivotTable = $htmlRenderer->renderPivotTable(
+                    cube: $cube,
+                    rows: $rows,
+                    columns: $columns,
+                    measures: $values,
+                    throwException: true,
+                );
+
+                $pivotTableError = null;
+            } catch (AnalyticsFrontendException $e) {
+                $pivotTable = null;
+                $pivotTableError = $e->trans($this->translator);
+            } catch (\Throwable $e) {
+                $pivotTable = null;
+                $pivotTableError = 'An error occurred while rendering the pivot table.';
+                $this->logger->error(
+                    'An error occurred while rendering the pivot table.',
+                    [
+                        'exception' => $e,
+                    ],
+                );
+            }
+
+            // create chart
+            try {
+                if (\count($values) === 0) {
+                    $chart = null;
+                } else {
+                    $dimensions = array_values(array_filter(
+                        array_merge($rows, $columns),
+                        static fn(string $field): bool => $field !== '@values',
+                    ));
+
+                    if ($dimensions === []) {
+                        $chart = null;
+                    } else {
+                        $chart = $chartGenerator->createChart(
+                            cube: $cube,
+                            dimensions: $dimensions,
+                            measures: $values,
+                        );
+                    }
+                }
+
+                $chartError = null;
+            } catch (UnsupportedData) {
+                $chart = null;
+                $chartError = null;
+            } catch (AnalyticsFrontendException $e) {
+                $chart = null;
+                $chartError = $e->trans($this->translator);
+            } catch (\Throwable $e) {
+                $chart = null;
+                $chartError = 'An error occurred while creating the chart: ';
+                $this->logger->error(
+                    'An error occurred while creating the chart.',
+                    [
+                        'exception' => $e,
+                    ],
+                );
+            }
+        }
+
+        $hashToLabel = $this->summaryClassRegistry->getHashToLabel();
+
         return $this->render('app/summary.html.twig', [
-            'title' => $cube->getSummaryLabel(),
-            'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
+            'title' => $cube?->getSummaryLabel() ?? $hashToLabel[$hash] ?? $class,
+            'class_hashes' => $hashToLabel,
             'query' => $query,
             'pivotTable' => $pivotTable,
             'pivotTableError' => $pivotTableError,

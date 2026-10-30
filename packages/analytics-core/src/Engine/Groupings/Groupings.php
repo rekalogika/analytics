@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Groupings;
 
+use Rekalogika\Analytics\Contracts\Exception\GroupingSetNotAvailable;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class Groupings
 {
@@ -129,17 +131,27 @@ final class Groupings
 
     public function getGroupingStringForSelect(): string
     {
-        $groupBySelector =
-            new GroupBySelector($this->summaryMetadata->getGroupByExpression());
+        $selector = new GroupingSetSelector(
+            $this->summaryMetadata->getGroupByExpression(),
+        );
 
-        foreach ($this->getSelected() as $name) {
-            $dimension = $this->summaryMetadata->getDimension($name);
-            $alias = $dimension->getDqlAlias();
+        $selected = $this->getSelected();
 
-            $groupBySelector->select($alias);
+        $aliases = array_map(
+            fn(string $name): string => $this->summaryMetadata
+                ->getDimension($name)
+                ->getDqlAlias(),
+            $selected,
+        );
+
+        $result = $selector->select($aliases);
+
+        if ($result === null) {
+            throw $this->createGroupingSetNotAvailableException(
+                selector: $selector,
+                selected: $selected,
+            );
         }
-
-        $result = $groupBySelector->getSelectedFields();
 
         $groupingFields = [];
 
@@ -147,13 +159,46 @@ final class Groupings
             $groupingFields[$groupingField] = '1';
         }
 
-        foreach ($result as $field) {
-            $dimension = $this->summaryMetadata->getDimensionByAlias($field->getContent());
+        foreach ($result as $alias) {
+            $dimension = $this->summaryMetadata->getDimensionByAlias($alias);
             $groupingFields[$dimension->getName()] = '0';
         }
 
         ksort($groupingFields);
 
         return implode('', $groupingFields);
+    }
+
+    /**
+     * @param list<string> $selected
+     */
+    private function createGroupingSetNotAvailableException(
+        GroupingSetSelector $selector,
+        array $selected,
+    ): GroupingSetNotAvailable {
+        $labels = array_map(
+            fn(string $name): TranslatableInterface => $this->summaryMetadata
+                ->getDimension($name)
+                ->getLabel(),
+            $selected,
+        );
+
+        $availableSets = array_map(
+            fn(array $aliases): array => array_map(
+                fn(string $alias): string => $this->summaryMetadata
+                    ->getDimensionByAlias($alias)
+                    ->getName(),
+                $aliases,
+            ),
+            $selector->getSets(20),
+        );
+
+        return new GroupingSetNotAvailable(
+            summaryClass: $this->summaryMetadata->getSummaryClass(),
+            dimensions: $selected,
+            dimensionLabels: $labels,
+            availableSets: $availableSets,
+            availableSetsCount: $selector->count(),
+        );
     }
 }

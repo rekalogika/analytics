@@ -205,6 +205,7 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
             groupingsProperty: $groupingsProperty,
             attributes: $classAttributes,
             label: $label,
+            groupingStrategy: $summaryAttribute->getGroupingStrategy(),
         );
     }
 

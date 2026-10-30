@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
+use Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -32,13 +33,13 @@ final class MetadataTest extends KernelTestCase
 
         $this->assertEquals(Order::class, $orderMetadata->getClass());
 
-        $this->assertEquals(
-            [OrderSummary::class],
+        $this->assertEqualsCanonicalizing(
+            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class],
             $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer']),
         );
 
-        $this->assertEquals(
-            [OrderSummary::class],
+        $this->assertEqualsCanonicalizing(
+            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class],
             $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer', 'item']),
         );
 

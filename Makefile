@@ -171,11 +171,15 @@ doctrine-schema-create: compose-restart
 #
 
 .PHONY: summary-refreshrange
-summary-refreshrange: summary-refreshrange-order summary-refreshrange-customer summary-refreshrange-occupancy-history
+summary-refreshrange: summary-refreshrange-order summary-refreshrange-order-explicit-grouping-sets summary-refreshrange-customer summary-refreshrange-occupancy-history
 
 .PHONY: summary-refreshrange-order
 summary-refreshrange-order:
 	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+
+.PHONY: summary-refreshrange-order-explicit-grouping-sets
+summary-refreshrange-order-explicit-grouping-sets:
+	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary'
 
 .PHONY: summary-refreshrange-customer
 summary-refreshrange-customer:
@@ -190,11 +194,15 @@ summary-refreshrange-occupancy-history:
 #
 
 .PHONY: summary-refresh
-summary-refresh: summary-refresh-order summary-refresh-customer summary-refresh-occupancy-history
+summary-refresh: summary-refresh-order summary-refresh-order-explicit-grouping-sets summary-refresh-customer summary-refresh-occupancy-history
 
 .PHONY: summary-refresh-order
 summary-refresh-order:
 	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\OrderSummary'
+
+.PHONY: summary-refresh-order-explicit-grouping-sets
+summary-refresh-order-explicit-grouping-sets:
+	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary'
 
 .PHONY: summary-refresh-customer
 summary-refresh-customer:
