@@ -13,13 +13,26 @@ jobs:
   test:
     runs-on: ${{ matrix.operating-system }}
 
+    # PHP 8.6 is not yet released
+    continue-on-error: ${{ matrix.php == '8.6' }}
+
     strategy:
+      fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
-        php: [ '8.2', '8.3', '8.4' ]
-        symfony: [ '6.*', '7.*' ]
+        php: [ '8.2', '8.3', '8.4', '8.5', '8.6' ]
+        symfony: [ '6.*', '7.*', '8.*' ]
         orm: ['^2.20', '^3.3']
         dep: [highest,lowest]
+        exclude:
+          # Symfony 8 requires PHP 8.4
+          - symfony: '8.*'
+            php: '8.2'
+          - symfony: '8.*'
+            php: '8.3'
+          # DoctrineBundle 3 (required for Symfony 8) requires ORM 3
+          - symfony: '8.*'
+            orm: '^2.20'
 
     name: SF ${{ matrix.symfony }}, ${{ matrix.dep }} deps, ORM ${{ matrix.orm }}, PHP ${{ matrix.php }}, ${{ matrix.operating-system }}
 
@@ -41,7 +54,7 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -57,7 +70,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -73,17 +86,17 @@ jobs:
       uses: ramsey/composer-install@v3
       with:
         dependency-versions: ${{ matrix.dep }}
-        composer-options: --prefer-dist --no-progress --no-scripts --ignore-platform-reqs --with=doctrine/orm:${{ matrix.orm }}
+        composer-options: --prefer-dist --no-progress --no-scripts --ignore-platform-req=php+ --with=doctrine/orm:${{ matrix.orm }}
       env:
         SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
     - name: Run psalm
       run: vendor/bin/psalm
-      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
+      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3' && matrix.php != '8.6'
 
     - name: Run phpstan
       run: vendor/bin/phpstan analyse
-      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3'
+      if: matrix.dep == 'highest' && matrix.symfony == '7.*' && matrix.orm == '^3.3' && matrix.php != '8.6'
 
     - name: Validate monorepo
       run: vendor/bin/monorepo-builder validate

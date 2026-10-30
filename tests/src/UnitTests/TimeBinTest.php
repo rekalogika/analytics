@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
@@ -30,8 +31,8 @@ final class TimeBinTest extends TestCase
 {
     /**
      * @param class-string<MonotonicTimeBin> $class
-     * @dataProvider timeBinProvider
      */
+    #[DataProvider('timeBinProvider')]
     public function testDatabaseValueToObject(
         string $class,
         int $databaseValue,
@@ -49,8 +50,8 @@ final class TimeBinTest extends TestCase
 
     /**
      * @param class-string<MonotonicTimeBin> $class
-     * @dataProvider timeBinDateTimeProvider
      */
+    #[DataProvider('timeBinDateTimeProvider')]
     public function testDateTimeToObject(
         string $class,
         \DateTimeInterface $dateTime,
@@ -63,8 +64,8 @@ final class TimeBinTest extends TestCase
 
     /**
      * @param class-string<MonotonicTimeBin> $class
-     * @dataProvider timeBinInstanceCachingProvider
      */
+    #[DataProvider('timeBinInstanceCachingProvider')]
     public function testInstanceCaching(
         string $class,
         int $databaseValue,

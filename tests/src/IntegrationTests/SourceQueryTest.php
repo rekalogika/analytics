@@ -173,9 +173,7 @@ final class SourceQueryTest extends KernelTestCase
         $pages = $sourceEntities->withItemsPerPage(1000)->getPages();
 
         foreach ($pages as $page) {
-            foreach ($page as $item) {
-                $count++;
-            }
+            $count += iterator_count($page);
         }
 
         if ($count !== $precounted) {

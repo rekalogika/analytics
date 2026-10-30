@@ -30,8 +30,13 @@ final readonly class SymfonyRefreshAgentDispatcher implements RefreshAgentDispat
         RefreshAgentStartCommand $command,
         \DateTimeInterface $runAt,
     ): void {
+        // not using DelayStamp::delayUntil() because its reference time
+        // differs between Symfony versions: wall clock before 8.1,
+        // Clock::get() since 8.1. $runAt is always based on the wall clock.
+        $delay = (int) round(((float) $runAt->format('U.u') - microtime(true)) * 1000.0);
+
         $envelope = new Envelope($command, [
-            DelayStamp::delayUntil($runAt),
+            new DelayStamp(max(0, $delay)),
         ]);
 
         $this->messageBus->dispatch($envelope);

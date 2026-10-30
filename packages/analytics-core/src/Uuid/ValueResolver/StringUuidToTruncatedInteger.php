@@ -66,6 +66,6 @@ final readonly class StringUuidToTruncatedInteger implements PartitionValueResol
     #[\Override]
     public function transformSummaryValueToSourceValue(int $value): string
     {
-        return UuidV7Util::getNilOfInteger($value <<= 16);
+        return UuidV7Util::getNilOfInteger($value << 16);
     }
 }

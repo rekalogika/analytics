@@ -103,7 +103,7 @@ final class RefreshAgentLock implements ResetInterface
     private function getKey(string $summaryClass): Key
     {
         return $this->summaryClassToKey[$summaryClass]
-            ?? new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
+            ??= new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
     }
 
     private function removeKey(string $summaryClass): void

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
@@ -21,6 +22,7 @@ use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @internal
@@ -42,17 +44,18 @@ final class DoctrineEntityPass implements CompilerPassInterface
             $parameterKey = \sprintf('rekalogika.analytics.doctrine.orm.%s_entity_manager', $name);
             $container->setParameter($parameterKey, $name);
 
-            $pass = DoctrineOrmMappingsPass::createAttributeMappingDriver(
-                namespaces: [
+            // not using DoctrineOrmMappingsPass::createAttributeMappingDriver()
+            // because its signature differs between DoctrineBundle 2 and 3
+            $pass = new DoctrineOrmMappingsPass(
+                new Definition(AttributeDriver::class, [$directories, true]),
+                [
                     'Rekalogika\Analytics\Core\Entity',
                     'Rekalogika\Analytics\Core\Partition',
                     'Rekalogika\Analytics\Engine\Entity',
                     'Rekalogika\Analytics\Time\Dimension',
                     'Rekalogika\Analytics\Uuid\Partition',
                 ],
-                directories: $directories,
-                managerParameters: [$parameterKey],
-                reportFieldsWhereDeclared: true,
+                [$parameterKey],
             );
 
             $pass->process($container);
@@ -82,7 +85,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
 
         // time
 
-        if (class_exists(MonotonicTimeBin::class)) {
+        if (interface_exists(MonotonicTimeBin::class)) {
             $reflection = new \ReflectionClass(MonotonicTimeBin::class);
             $fileName = $reflection->getFileName();
 
@@ -90,7 +93,7 @@ final class DoctrineEntityPass implements CompilerPassInterface
                 throw new LogicException('Reflection failed');
             }
 
-            $directories[] = \dirname($fileName, 2) . '/Dimension';
+            $directories[] = \dirname($fileName) . '/Dimension';
         }
 
         // uuid

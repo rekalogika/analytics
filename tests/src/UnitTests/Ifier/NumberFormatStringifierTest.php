@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests\Ifier;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Frontend\Formatter\Implementation\NumberFormatStringifier;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -20,15 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /** @psalm-suppress MissingConstructor */
 final class NumberFormatStringifierTest extends TestCase
 {
-    /**
-     * @dataProvider provideFormatStringifier
-     */
+    #[DataProvider('provideFormatStringifier')]
     public function testFormatStringifier(
         mixed $input,
         string $locale,
         string $expected,
     ): void {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('getLocale')->willReturn($locale);
 
         $stringifier = new NumberFormatStringifier($translator);

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App;
 
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
@@ -91,6 +93,20 @@ final class Kernel extends BaseKernel
     {
         $this->baseRegisterContainerConfiguration($loader);
 
-        $loader->load(function (ContainerBuilder $container): void {});
+        $loader->load(function (ContainerBuilder $container): void {
+            // options removed in DoctrineBundle 3
+            if (!InstalledVersions::satisfies(new VersionParser(), 'doctrine/doctrine-bundle', '^3')) {
+                $container->loadFromExtension('doctrine', [
+                    'dbal' => [
+                        'use_savepoints' => true,
+                    ],
+                    'orm' => [
+                        'auto_generate_proxy_classes' => true,
+                        'enable_lazy_ghost_objects' => true,
+                        'report_fields_where_declared' => true,
+                    ],
+                ]);
+            }
+        });
     }
 }

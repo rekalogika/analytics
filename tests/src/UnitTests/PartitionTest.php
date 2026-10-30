@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 
 final class PartitionTest extends TestCase
 {
-    /**
-     * @dataProvider partitionProvider
-     */
+    #[DataProvider('partitionProvider')]
     public function testPartition(
         int $sourceValue,
         int $level,

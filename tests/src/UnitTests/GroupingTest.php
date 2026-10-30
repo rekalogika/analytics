@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\GroupingField;
@@ -23,8 +24,8 @@ final class GroupingTest extends TestCase
      * @param list<string> $dimensions
      * @param list<string> $expectedGroupingFields
      * @param list<string> $expectedNonGroupingFields
-     * @dataProvider groupingFieldProvider
      */
+    #[DataProvider('groupingFieldProvider')]
     public function testGroupingField(
         mixed $groupingField,
         array $dimensions,

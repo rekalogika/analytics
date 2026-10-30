@@ -20,7 +20,7 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\UX\PanelBundle\FilterFactory;
 
 /**
- * @implements FilterFactory<ChoiceFilter,ChoiceFilterOptions>
+ * @implements FilterFactory<ChoiceFilter,ChoiceFilterOptions<mixed>>
  */
 final readonly class ChoiceFilterFactory implements FilterFactory
 {
