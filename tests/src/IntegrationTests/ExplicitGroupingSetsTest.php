@@ -129,7 +129,7 @@ final class ExplicitGroupingSetsTest extends KernelTestCase
         $metadata = $this->getMetadata();
 
         $this->expectException(MetadataException::class);
-        $this->expectExceptionMessage('Unknown dimension "foo"');
+        $this->expectExceptionMessageMatches('/Unknown dimension "foo"/');
 
         new SummaryMetadata(
             sourceClass: $metadata->getSourceClass(),

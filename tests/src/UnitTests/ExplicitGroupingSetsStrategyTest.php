@@ -138,7 +138,7 @@ final class ExplicitGroupingSetsStrategyTest extends TestCase
         $strategy = new ExplicitGroupingSetsStrategy([['company', 'foo']]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown dimension "foo"');
+        $this->expectExceptionMessageMatches('/Unknown dimension "foo"/');
         $strategy->getGroupByExpression($this->getFields());
     }
 
