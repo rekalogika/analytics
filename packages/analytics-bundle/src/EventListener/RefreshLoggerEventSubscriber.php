@@ -33,7 +33,7 @@ final readonly class RefreshLoggerEventSubscriber implements EventSubscriberInte
     ) {}
 
     #[\Override]
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RefreshStartEvent::class => 'onRefreshStartEvent',

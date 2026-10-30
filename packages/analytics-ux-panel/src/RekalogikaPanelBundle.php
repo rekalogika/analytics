@@ -33,15 +33,15 @@ final class RekalogikaPanelBundle extends AbstractBundle
     #[\Override]
     public function loadExtension(
         array $config,
-        ContainerConfigurator $container,
-        ContainerBuilder $builder,
+        ContainerConfigurator $configurator,
+        ContainerBuilder $container,
     ): void {
-        $container->import('../config/services.php');
+        $configurator->import('../config/services.php');
 
-        $builder->registerForAutoconfiguration(FilterFactory::class)
+        $container->registerForAutoconfiguration(FilterFactory::class)
             ->addTag('rekalogika.analytics.specific_filter_factory');
 
-        $builder->registerForAutoconfiguration(FilterResolver::class)
+        $container->registerForAutoconfiguration(FilterResolver::class)
             ->addTag('rekalogika.analytics.ux-panel.filter_resolver');
     }
 
@@ -50,11 +50,11 @@ final class RekalogikaPanelBundle extends AbstractBundle
      */
     #[\Override]
     public function prependExtension(
-        ContainerConfigurator $container,
-        ContainerBuilder $builder,
+        ContainerConfigurator $configurator,
+        ContainerBuilder $container,
     ): void {
-        $this->prependTwig($builder);
-        $this->prependAssetMapper($builder);
+        $this->prependTwig($container);
+        $this->prependAssetMapper($container);
     }
 
     private function prependTwig(ContainerBuilder $builder): void

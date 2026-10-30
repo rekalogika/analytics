@@ -68,6 +68,9 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $container->addCompilerPass(new ValueSerializerPass());
     }
 
+    /**
+     * @psalm-suppress InvalidTemplateParam
+     */
     #[\Override]
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -95,22 +98,22 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
     #[\Override]
     public function loadExtension(
         array $config,
-        ContainerConfigurator $container,
-        ContainerBuilder $builder,
+        ContainerConfigurator $configurator,
+        ContainerBuilder $container,
     ): void {
-        $container->import('../config/metadata.php');
-        $container->import('../config/engine.php');
-        $container->import('../config/bundle.php');
+        $configurator->import('../config/metadata.php');
+        $configurator->import('../config/engine.php');
+        $configurator->import('../config/bundle.php');
 
         if (class_exists(TableRenderer::class)) {
-            $container->import('../config/frontend.php');
+            $configurator->import('../config/frontend.php');
         }
 
         if (interface_exists(TimeBin::class)) {
-            $container->import('../config/time.php');
+            $configurator->import('../config/time.php');
         }
 
-        $container->parameters()
+        $configurator->parameters()
             ->set(
                 'rekalogika.analytics.query_result_limit',
                 $config['query_result_limit'],
@@ -125,22 +128,22 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             )
         ;
 
-        $builder->registerForAutoconfiguration(ValueSerializer::class)
+        $container->registerForAutoconfiguration(ValueSerializer::class)
             ->addTag('rekalogika.analytics.value_serializer');
 
-        $builder->registerForAutoconfiguration(DistinctValuesResolver::class)
+        $container->registerForAutoconfiguration(DistinctValuesResolver::class)
             ->addTag('rekalogika.analytics.distinct_values_resolver');
 
-        $builder->registerForAutoconfiguration(Stringifier::class)
+        $container->registerForAutoconfiguration(Stringifier::class)
             ->addTag('rekalogika.analytics.stringifier');
 
-        $builder->registerForAutoconfiguration(Htmlifier::class)
+        $container->registerForAutoconfiguration(Htmlifier::class)
             ->addTag('rekalogika.analytics.htmlifier');
 
-        $builder->registerForAutoconfiguration(Numberifier::class)
+        $container->registerForAutoconfiguration(Numberifier::class)
             ->addTag('rekalogika.analytics.numberifier');
 
-        $builder->registerForAutoconfiguration(Cellifier::class)
+        $container->registerForAutoconfiguration(Cellifier::class)
             ->addTag('rekalogika.analytics.cellifier');
     }
 
@@ -149,12 +152,12 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
      */
     #[\Override]
     public function prependExtension(
-        ContainerConfigurator $container,
-        ContainerBuilder $builder,
+        ContainerConfigurator $configurator,
+        ContainerBuilder $container,
     ): void {
-        $this->prependTwig($builder);
-        $this->prependDQLFunctions($builder);
-        $this->prependMigrations($builder);
+        $this->prependTwig($container);
+        $this->prependDQLFunctions($container);
+        $this->prependMigrations($container);
     }
 
     private function prependDQLFunctions(ContainerBuilder $builder): void

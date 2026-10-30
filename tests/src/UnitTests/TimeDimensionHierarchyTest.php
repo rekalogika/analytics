@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
@@ -29,9 +30,9 @@ use Symfony\Component\Translation\Translator;
 final class TimeDimensionHierarchyTest extends TestCase
 {
     /**
-     * @dataProvider intervalProvider
      * @param class-string<MonotonicTimeBin> $class
      */
+    #[DataProvider('intervalProvider')]
     public function testInterval(
         int $databaseInput,
         string $class,

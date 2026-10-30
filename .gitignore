@@ -7,3 +7,4 @@ tools
 rector.log
 local.mk
 phpstan.neon
+tests/config/reference.php

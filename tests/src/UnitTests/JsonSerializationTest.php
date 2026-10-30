@@ -347,7 +347,7 @@ final class JsonSerializationTest extends TestCase
     public function testUnsupportedClassThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unsupported expression class: unsupported');
+        $this->expectExceptionMessageMatches('/Unsupported expression class: unsupported/');
 
         ExpressionDto::fromArray(['class' => 'unsupported']);
     }
@@ -389,7 +389,7 @@ final class JsonSerializationTest extends TestCase
     public function testInvalidCoordinatesMemberKeyThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Coordinates key must be a string');
+        $this->expectExceptionMessageMatches('/Coordinates key must be a string/');
 
         CoordinatesDto::fromArray([
             'class' => 'coordinates',
@@ -400,7 +400,7 @@ final class JsonSerializationTest extends TestCase
     public function testInvalidCoordinatesMemberValueThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Coordinates member value must be a string, an integer, or null.');
+        $this->expectExceptionMessageMatches('/Coordinates member value must be a string, an integer, or null\./');
 
         CoordinatesDto::fromArray([
             'class' => 'coordinates',

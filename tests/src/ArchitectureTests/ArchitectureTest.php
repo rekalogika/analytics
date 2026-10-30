@@ -233,6 +233,7 @@ final class ArchitectureTest
                 Selector::inNamespace('Doctrine\Persistence'),
                 Selector::inNamespace('Doctrine\Common\Collections'),
                 Selector::inNamespace('Doctrine\DBAL\Types'),
+                Selector::classname('Doctrine\ORM\Mapping\Driver\AttributeDriver'),
 
                 // php misc
                 Selector::classname(\Override::class),

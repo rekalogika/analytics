@@ -15,12 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Factory;
 
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistory;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<OccupancyHistory>
+ * @extends PersistentObjectFactory<OccupancyHistory>
  */
-final class OccupancyHistoryFactory extends PersistentProxyObjectFactory
+final class OccupancyHistoryFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

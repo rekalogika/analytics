@@ -419,7 +419,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimensionObject->getDisplayMember() ?? null);
+                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
                 }
 
                 if ($legendTitle === null) {

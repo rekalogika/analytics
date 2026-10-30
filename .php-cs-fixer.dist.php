@@ -16,6 +16,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/tests/src')
     ->in(__DIR__ . '/tests/config')
     ->in(__DIR__ . '/tests/public')
+    ->notPath('#^reference\.php$#')
     ->append([
         __DIR__ . '/.php-cs-fixer.dist.php',
         __DIR__ . '/rector.php',

@@ -208,8 +208,6 @@ final class QueryTest extends KernelTestCase
             ->findOneBy([])
             ?->getCountry();
 
-        $year = 2024;
-
         $result = $this->getQuery()
             ->withDimensions('time.civil.year', 'customerCountry')
             ->getResult();
@@ -368,12 +366,10 @@ final class QueryTest extends KernelTestCase
     {
         $this->expectException(OverflowException::class);
 
-        $result = $this->getQuery(queryResultLimit: 1)
+        // This should trigger the overflow exception when getting the result
+        $this->getQuery(queryResultLimit: 1)
             ->withDimensions('time.civil.hour.hour')
             ->getResult();
-
-        // This should trigger the overflow exception when getting the cube
-        $cube = $result;
     }
 
     public function testWhereWithTimeBin(): void

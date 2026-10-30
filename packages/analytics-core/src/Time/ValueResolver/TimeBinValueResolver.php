@@ -99,7 +99,7 @@ final readonly class TimeBinValueResolver implements
 
         $dimensionMetadata = $context->getDimensionMetadata();
 
-        [$sourceTimeZone, $summaryTimeZone] = TimeZoneUtil::resolveTimeZones(
+        [, $summaryTimeZone] = TimeZoneUtil::resolveTimeZones(
             $dimensionMetadata,
         );
 

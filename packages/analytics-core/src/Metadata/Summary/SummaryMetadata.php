@@ -116,7 +116,7 @@ final readonly class SummaryMetadata
         $leafDimensions = [];
         $aliasToDimension = [];
 
-        foreach ($dimensions as $dimensionKey => $dimension) {
+        foreach ($dimensions as $dimension) {
             $dimension = $dimension->withSummaryMetadata(
                 summaryMetadata: $this,
             );
@@ -130,7 +130,7 @@ final readonly class SummaryMetadata
                 $aliasToDimension[$dimension->getDqlAlias()] = $dimension;
             }
 
-            foreach ($dimension->getDescendants() as $dimensionKey => $descendant) {
+            foreach ($dimension->getDescendants() as $descendant) {
                 if (!$descendant->hasChildren()) {
                     // this is a leaf dimension
                     $leafDimensions[$descendant->getName()] = $descendant;

@@ -407,13 +407,7 @@ final class QueryComponents
                 break;
 
             case \is_array($result):
-                /** @psalm-suppress MixedAssignment */
-                foreach ($result as &$value) {
-                    $value = static::escapeFunction($value);
-                }
-
-                /** @psalm-suppress MixedArgumentTypeCoercion */
-                $result = implode(', ', $result) ?: 'NULL';
+                $result = implode(', ', array_map(static::escapeFunction(...), $result)) ?: 'NULL';
                 break;
 
             case $result instanceof \Stringable:

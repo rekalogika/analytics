@@ -98,10 +98,9 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             ));
         }
 
-        // get dimension metadata
+        // make sure the class is a summary class
 
-        $summaryMetadata = $this->summaryMetadataFactory
-            ->getSummaryMetadata($class);
+        $this->summaryMetadataFactory->getSummaryMetadata($class);
 
         // if it is a relation, we get the unique values from the source entity
 

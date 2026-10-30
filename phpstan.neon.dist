@@ -46,6 +46,20 @@ parameters:
         -
             message: '#Cannot call method modify\(\) on DateTimeImmutable\|false#'
             reportUnmatched: false
+        -
+            # inline @phpstan-ignore is not honored in trait context
+            identifier: notIdentical.alwaysFalse
+            path: packages/analytics-core/src/Time/Bin/Trait/TimeBinTrait.php
+        -
+            # deprecated in DBAL 4.5, but its replacement Table::edit() creates
+            # a new table, and we need to modify the table in place
+            message: '#Call to deprecated method addIndex\(\) of class Doctrine\\DBAL\\Schema\\Table#'
+            path: packages/analytics-core/src/Engine/Doctrine/EventListener/SummaryPostGenerateSchemaTableListener.php
+            reportUnmatched: false
+        -
+            # the replacement ExpressionWithReturnType is not available in ORM 2
+            message: '#implements deprecated interface Doctrine\\ORM\\Query\\AST\\TypedExpression#'
+            reportUnmatched: false
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
