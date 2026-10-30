@@ -55,6 +55,7 @@ final class SummaryHandler implements ResetInterface
     public function reset(): void
     {
         $this->sourceOfSummaryHandler->reset();
+        $this->latestKey = null;
     }
 
     /**
@@ -98,6 +99,7 @@ final class SummaryHandler implements ResetInterface
     public function updateLatestKey(int|string|null $max): void
     {
         $this->createSummaryPropertiesManager()->updateMax($max);
+        $this->latestKey = $max;
     }
 
     public function getDirtyFlags(): DirtyFlagsHandler
