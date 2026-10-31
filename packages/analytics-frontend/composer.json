@@ -19,7 +19,7 @@
         "doctrine/collections": "^2.2 || ^3.0",
         "ozdemirburak/iris": "^3.1",
         "phpoffice/phpspreadsheet": "^4.0 || ^5.0",
-        "rekalogika/analytics-core": "^0.36",
+        "rekalogika/analytics-core": "^0.37.1",
         "symfony/translation": "^6.4 || ^7.0 || ^8.0",
         "symfony/translation-contracts": "^3",
         "symfony/ux-chartjs": "^2.23 || ^3.0",
