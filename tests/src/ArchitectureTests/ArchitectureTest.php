@@ -23,7 +23,7 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(Selectors::selectAnalyticsContracts())
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsContracts(),
 
@@ -72,7 +72,7 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(Selectors::selectAnalyticsCore())
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsCore(),
 
@@ -113,7 +113,7 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(Selectors::selectAnalyticsEngine())
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsEngine(),
 
@@ -188,7 +188,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsBundle(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsBundle(),
 
@@ -264,7 +264,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsFrontend(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsFrontend(),
 
@@ -312,7 +312,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsUXPanel(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsUXPanel(),
 
@@ -361,7 +361,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsMetadata(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsMetadata(),
 
@@ -418,7 +418,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsSerialization(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsSerialization(),
 
@@ -451,7 +451,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsTime(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsTime(),
 
@@ -502,7 +502,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLHll(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLHll(),
 
@@ -531,7 +531,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLExtra(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsPostgreSQLExtra(),
 
@@ -554,7 +554,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsUuid(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsUuid(),
 
@@ -583,7 +583,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectAnalyticsPivotTable(),
 
@@ -613,7 +613,7 @@ final class ArchitectureTest
             ->classes(
                 Selectors::selectPivotTable(),
             )
-            ->canOnlyDependOn()
+            ->canOnly()->dependOn()
             ->classes(
                 Selectors::selectPivotTable(),
 
