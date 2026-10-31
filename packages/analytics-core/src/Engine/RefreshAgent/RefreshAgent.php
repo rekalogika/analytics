@@ -20,6 +20,8 @@ final readonly class RefreshAgent
     public function __construct(
         private SummaryRefresherFactory $summaryRefresherFactory,
         private RefreshAgentLock $refreshAgentLock,
+        private RefreshAgentRunner $refreshAgentRunner,
+        private RefreshAgentStrategy $refreshAgentStrategy = new DefaultRefreshAgentStrategy(),
     ) {}
 
     public function run(RefreshAgentStartCommand $message): void
@@ -27,20 +29,29 @@ final readonly class RefreshAgent
         $class = $message->getSummaryClass();
 
         if ($this->refreshAgentLock->acquire($class) === false) {
+            // another refresh is running. it might have missed the dirty flags
+            // created after it started, so we try again later
+
+            $this->refreshAgentRunner->refresh($class, minimumDelay: 10);
+
             return;
         }
 
-        $refreshAgentStrategy = new DefaultRefreshAgentStrategy(
-            minimumAge: null,
-            // @todo: probably we want to have enable idle delay handling. If there are idle items, another refresh
-            // message with delayUntil the lowest idle item time should be dispatched.
-            minimumIdleDelay: null,
-        );
-
         try {
-            $this->summaryRefresherFactory
-                ->createSummaryRefresher($message->getSummaryClass())
-                ->refresh($refreshAgentStrategy);
+            $summaryRefresher = $this->summaryRefresherFactory
+                ->createSummaryRefresher($class);
+
+            $summaryRefresher->refresh($this->refreshAgentStrategy);
+
+            // some dirty partitions might not be ready to be refreshed yet,
+            // schedule another run when the earliest of them will be
+
+            $nextRefreshTime = $summaryRefresher
+                ->getNextRefreshTime($this->refreshAgentStrategy);
+
+            if ($nextRefreshTime !== null) {
+                $this->refreshAgentRunner->scheduleAt($class, $nextRefreshTime);
+            }
         } finally {
             $this->refreshAgentLock->release($class);
         }

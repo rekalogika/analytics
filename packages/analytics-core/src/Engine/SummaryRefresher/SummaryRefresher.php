@@ -99,6 +99,12 @@ final class SummaryRefresher
                 break;
             }
         } while (true);
+
+        // the dirty upper partitions are caused by our refresh, not by changes
+        // in the source, so they are not subject to the refresh agent
+        // strategy, and we refresh them now
+
+        $this->refreshUpperPartitions($refreshAgentStrategy);
     }
 
     private function refreshOne(RefreshAgentStrategy $refreshAgentStrategy): int
@@ -112,6 +118,71 @@ final class SummaryRefresher
         }
 
         return \count($dirtyPartitions);
+    }
+
+    /**
+     * Refreshes the dirty upper partitions, from the lowest to the highest
+     * level, so that the refresh propagates to the top level in a single run.
+     * Partitions that have been refreshed within the cooldown period are
+     * skipped, and their dirty flags are kept for a later run.
+     */
+    private function refreshUpperPartitions(
+        RefreshAgentStrategy $refreshAgentStrategy,
+    ): void {
+        $partitionClass = $this->metadata->getPartition()->getPartitionClass();
+        $cooldown = $refreshAgentStrategy->getUpperPartitionCooldown();
+        $dirtyFlags = $this->summaryHandler->getDirtyFlags();
+
+        // all the partitions refreshed in this run are recorded with the same
+        // time, so that their cooldown periods end at the same time
+
+        $now = new \DateTimeImmutable();
+
+        if ($cooldown !== null) {
+            $dirtyFlags->removeRefreshLogs(
+                $now->modify(\sprintf('-%d seconds', $cooldown)),
+            );
+        }
+
+        // levels are ordered from the highest to the lowest, we skip the
+        // lowest level, and process from the second lowest level upwards
+
+        $levels = \array_slice(array_reverse($partitionClass::getAllLevels()), 1);
+
+        foreach ($levels as $level) {
+            $partitions = $dirtyFlags->getDirtyUpperPartitions(
+                level: $level,
+                cooldown: $cooldown,
+                now: $now,
+            );
+
+            foreach ($partitions as $partition) {
+                $this->refreshPartition($partition);
+
+                if ($cooldown !== null) {
+                    $this->entityManager->persist(
+                        $dirtyFlags->createRefreshLog($partition, $now),
+                    );
+                }
+            }
+
+            $this->entityManager->flush();
+        }
+    }
+
+    /**
+     * Gets the time the refresh agent should run again to process the
+     * remaining dirty flags. Returns null if there are no dirty flags left.
+     */
+    public function getNextRefreshTime(
+        RefreshAgentStrategy $refreshAgentStrategy,
+    ): ?\DateTimeImmutable {
+        return $this->summaryHandler
+            ->getDirtyFlags()
+            ->getNextRefreshTime(
+                refreshAgentStrategy: $refreshAgentStrategy,
+                now: new \DateTimeImmutable(),
+            );
     }
 
     /**
@@ -467,9 +538,29 @@ final class SummaryRefresher
 
         $range = $this->summaryHandler->getNewEntitiesRange();
 
+        // if there are no new entities, the new flags are stale. remove them,
+        // otherwise the refresh agent would keep rescheduling itself to
+        // process them
+
         if ($range === null) {
-            $this->getConnection()->rollBack();
+            $this->summaryHandler->getDirtyFlags()->removeNewFlags();
+            $this->getConnection()->commit();
+
             return [];
+        }
+
+        // the new partition flags inherit the time of the new flags, so that
+        // the refresh agent strategy works on the time the source records
+        // were created, not the time they are converted here
+
+        $timeRange = $this->summaryHandler->getDirtyFlags()->getNewFlagsTimeRange();
+
+        if ($timeRange === null) {
+            $createdTimes = [new \DateTimeImmutable()];
+        } elseif ($timeRange[0] == $timeRange[1]) {
+            $createdTimes = [$timeRange[0]];
+        } else {
+            $createdTimes = $timeRange;
         }
 
         $this->summaryHandler->getDirtyFlags()->removeNewFlags();
@@ -477,12 +568,14 @@ final class SummaryRefresher
         $dirtyFlags = [];
 
         foreach ($range as $partition) {
-            $dirtyFlag = $this->summaryHandler
-                ->getDirtyFlags()
-                ->createDirtyFlagForPartition($partition);
+            foreach ($createdTimes as $created) {
+                $dirtyFlag = $this->summaryHandler
+                    ->getDirtyFlags()
+                    ->createDirtyFlagForPartition($partition, $created);
 
-            $dirtyFlags[] = $dirtyFlag;
-            $this->entityManager->persist($dirtyFlag);
+                $dirtyFlags[] = $dirtyFlag;
+                $this->entityManager->persist($dirtyFlag);
+            }
         }
 
         // update the latest key of the summary handler

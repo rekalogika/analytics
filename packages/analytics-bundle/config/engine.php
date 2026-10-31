@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryEntityListener;
 use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryPostGenerateSchemaTableListener;
 use Rekalogika\Analytics\Engine\EventListener\DirtySummaryEventListener;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
@@ -31,6 +32,7 @@ use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -43,6 +45,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
     $parameters->set('rekalogika.analytics.query_result_limit', 5000);
     $parameters->set('rekalogika.analytics.filling_nodes_limit', 10000);
+    $parameters->set('rekalogika.analytics.refresh.minimum_age', 600);
+    $parameters->set('rekalogika.analytics.refresh.minimum_idle_delay', 300);
+    $parameters->set('rekalogika.analytics.refresh.maximum_age', 1800);
+    $parameters->set('rekalogika.analytics.refresh.upper_partition_cooldown', 300);
 
     //
     // summary manager
@@ -191,11 +197,23 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     ;
 
     $services
+        ->set('rekalogika.analytics.engine.refresh.strategy')
+        ->class(DefaultRefreshAgentStrategy::class)
+        ->args([
+            '$minimumAge' => param('rekalogika.analytics.refresh.minimum_age'),
+            '$minimumIdleDelay' => param('rekalogika.analytics.refresh.minimum_idle_delay'),
+            '$maximumAge' => param('rekalogika.analytics.refresh.maximum_age'),
+            '$upperPartitionCooldown' => param('rekalogika.analytics.refresh.upper_partition_cooldown'),
+        ])
+    ;
+
+    $services
         ->set('rekalogika.analytics.engine.refresh.runner')
         ->class(RefreshAgentRunner::class)
         ->args([
             '$refreshAgentDispatcher' => service('rekalogika.analytics.bundle.refresh.dispatcher'),
-            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
         ])
     ;
 
@@ -205,6 +223,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
+            '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
+            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
         ])
     ;
 };

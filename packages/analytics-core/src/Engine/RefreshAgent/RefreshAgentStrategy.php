@@ -33,7 +33,18 @@ interface RefreshAgentStrategy
     /**
      * Returns the maximum age of a dirty partition that will trigger a refresh.
      * A dirty partition older than this maximum age will be refreshed, ignoring
-     * the minimum idle delay.
+     * the minimum idle delay. This prevents a partition that is continuously
+     * receiving changes from being postponed indefinitely.
      */
     public function getMaximumAge(): ?int;
+
+    /**
+     * Returns the cooldown period of the upper-level partitions. The dirty
+     * upper-level partitions are caused by the refresh of the partitions below
+     * them, and are refreshed immediately, unless they have been refreshed
+     * within this cooldown period. In that case, the refresh is postponed
+     * until the cooldown period ends. Null means the upper-level partitions
+     * are always refreshed immediately.
+     */
+    public function getUpperPartitionCooldown(): ?int;
 }

@@ -199,6 +199,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
             '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
+            '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
+            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
         ])
         ->tag('messenger.message_handler', [
             'method' => 'run',

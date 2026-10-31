@@ -13,14 +13,21 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
 #[ORM\Table(name: 'rekalogika_summary_properties')]
 class SummaryProperties
 {
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastId = null;
+
+    /**
+     * The time the refresh agent is scheduled to run next.
+     */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $scheduledRefresh = null;
 
     /**
      * @param class-string $summaryClass
@@ -47,5 +54,15 @@ class SummaryProperties
     public function setLastId(string $lastId): void
     {
         $this->lastId = $lastId;
+    }
+
+    public function getScheduledRefresh(): ?\DateTimeImmutable
+    {
+        return $this->scheduledRefresh;
+    }
+
+    public function setScheduledRefresh(?\DateTimeImmutable $scheduledRefresh): void
+    {
+        $this->scheduledRefresh = $scheduledRefresh;
     }
 }

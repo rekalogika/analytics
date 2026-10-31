@@ -37,6 +37,8 @@ class DirtyFlag
      * needs refreshing. Null level and keys means there are new records.
      *
      * @param class-string $class The summary class that needs refreshing.
+     * @param \DateTimeImmutable|null $created The time the partition became
+     * dirty, defaults to now.
      */
     public function __construct(
         #[ORM\Column(length: 255, nullable: false)]
@@ -45,8 +47,9 @@ class DirtyFlag
         private ?int $level,
         #[ORM\Column(type: Types::BIGINT, nullable: true)]
         private ?int $key,
+        ?\DateTimeImmutable $created = null,
     ) {
-        $this->created = new \DateTimeImmutable();
+        $this->created = $created ?? new \DateTimeImmutable();
     }
 
     public function getSignature(): string

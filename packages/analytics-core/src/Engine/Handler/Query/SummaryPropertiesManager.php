@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Handler\Query;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\Entity\SummaryProperties;
 
@@ -73,6 +74,51 @@ final readonly class SummaryPropertiesManager
         $statement = $connection->prepare($sql);
         $statement->bindValue('summaryClass', $this->summaryClass);
         $statement->bindValue('lastId', $max);
+        $statement->executeStatement();
+    }
+
+    public function getScheduledRefresh(): ?\DateTimeImmutable
+    {
+        /** @var array{scheduledRefresh:\DateTimeImmutable|null}|null */
+        $result = $this->entityManager->createQueryBuilder()
+            ->select('p.scheduledRefresh')
+            ->from(SummaryProperties::class, 'p')
+            ->where('p.summaryClass = :summaryClass')
+            ->setParameter('summaryClass', $this->summaryClass)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result['scheduledRefresh'] ?? null;
+    }
+
+    public function updateScheduledRefresh(\DateTimeImmutable $scheduledRefresh): void
+    {
+        $connection = $this->entityManager->getConnection();
+        $metadata = $this->entityManager
+            ->getClassMetadata(SummaryProperties::class);
+
+        $tableName = $metadata->getTableName();
+        $summaryClassColumn = $metadata->getColumnName('summaryClass');
+        $scheduledRefreshColumn = $metadata->getColumnName('scheduledRefresh');
+
+        $sql = \sprintf(
+            "
+                INSERT INTO %s (
+                    %s, %s
+                ) VALUES (
+                    :summaryClass, :scheduledRefresh
+                ) ON CONFLICT (%s) DO UPDATE SET %s = :scheduledRefresh
+            ",
+            $tableName,
+            $summaryClassColumn,
+            $scheduledRefreshColumn,
+            $summaryClassColumn,
+            $scheduledRefreshColumn,
+        );
+
+        $statement = $connection->prepare($sql);
+        $statement->bindValue('summaryClass', $this->summaryClass);
+        $statement->bindValue('scheduledRefresh', $scheduledRefresh, Types::DATETIME_IMMUTABLE);
         $statement->executeStatement();
     }
 

@@ -86,6 +86,7 @@ final class RefreshCommand extends Command
             minimumAge: null,
             maximumAge: null,
             minimumIdleDelay: null,
+            upperPartitionCooldown: null,
         );
 
         // wait for the refresh agent if it is refreshing the same summary,
