@@ -4,7 +4,7 @@
     {%- if choices|length > 0 -%}
         <select id="{{ filter.dimension }}-{{ id }}"
                 class="filterelement"
-                placeholder="{{ t('Select items...', domain = 'rekalogika_analytics') }}"
+                placeholder="{{ t('Select items...', domain = 'rekalogika_analytics')|trans }}"
                 multiple
                 data-controller="rekalogika--analytics-ux-panel--choice-filter"
                 data-dimension="{{ filter.dimension }}"
@@ -21,6 +21,6 @@
                readonly
                disabled
                class="form-control text-secondary"
-               value="{{ t('Unable to find choices to present.', domain = 'rekalogika_analytics', domain = 'rekalogika_analytics') |trans }}">
+               value="{{ t('Unable to find choices to present.', domain = 'rekalogika_analytics')|trans }}">
     {%- endif -%}
 {%- endblock filter -%}
