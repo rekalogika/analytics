@@ -1,0 +1,58 @@
+# Self-contained demo image: PostgreSQL (with HLL) + PHP + Symfony CLI, with
+# the schema, fixtures and summary tables already created at build time.
+#
+#   docker build -f container/demo/Containerfile -t analytics-demo .
+#   docker run --rm -p 8080:8000 analytics-demo
+
+FROM postgres:17-trixie
+
+ARG TARGETARCH
+
+ENV PGDATA=/var/lib/postgresql/demo \
+    POSTGRES_DB=app \
+    POSTGRES_USER=app \
+    COMPOSER_ALLOW_SUPERUSER=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl git make unzip \
+        postgresql-17-hll \
+        php8.4-cli php8.4-fpm php8.4-curl php8.4-gd php8.4-intl \
+        php8.4-mbstring php8.4-pgsql php8.4-xml php8.4-zip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL "https://github.com/symfony-cli/symfony-cli/releases/latest/download/symfony-cli_linux_${TARGETARCH}.tar.gz" \
+        | tar -xz -C /usr/local/bin symfony
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+WORKDIR /srv/app
+
+COPY . .
+
+RUN composer install --prefer-dist --no-progress --no-interaction \
+    && make version-sync \
+    && php tests/bin/console importmap:install \
+    && php tests/bin/console asset:install tests/public/ \
+    && composer clear-cache
+
+# Initialize the database and populate it, so the container starts instantly.
+# PGDATA is outside the VOLUME declared by the base image, so the data persists
+# in the image layer.
+RUN gosu postgres initdb --username="$POSTGRES_USER" --auth=trust \
+    && gosu postgres pg_ctl -w start -o "-c listen_addresses=127.0.0.1" \
+    && gosu postgres createdb --username="$POSTGRES_USER" "$POSTGRES_DB" \
+    && gosu postgres psql --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" -c "CREATE EXTENSION hll" \
+    && php tests/bin/console doctrine:schema:create --no-interaction \
+    && php tests/bin/console doctrine:migrations:migrate --no-interaction \
+    && php tests/bin/console doctrine:fixtures:load --no-interaction \
+    && make summary-refreshrange PHP=php \
+    && gosu postgres pg_ctl -w stop \
+    && php tests/bin/console cache:clear \
+    && rm -rf tests/var/log/*
+
+COPY container/demo/entrypoint.sh /usr/local/bin/demo-entrypoint
+
+EXPOSE 8000
+
+ENTRYPOINT ["demo-entrypoint"]
