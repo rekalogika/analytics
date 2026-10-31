@@ -14,14 +14,17 @@ export default class extends Controller {
             .replace(/[^a-zA-Z0-9_]/g, '')
 
         if (this.lang) {
-            import("flatpickr/dist/l10n/" + this.lang + ".js")
-                .catch((error) => {
-                    this.initialize(null)
-                })
+            // the zh_tw locale is in zh-tw.js
+            const file = this.lang === 'zh_tw' ? 'zh-tw' : this.lang
+
+            import("flatpickr/dist/l10n/" + file + ".js")
                 .then((module) => {
                     const lang = module.default.default[this.lang]
 
                     this.initialize(lang)
+                })
+                .catch((error) => {
+                    this.initialize(null)
                 })
         } else {
             this.initialize(null)

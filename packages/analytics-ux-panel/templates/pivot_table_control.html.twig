@@ -184,7 +184,7 @@
 {%- endblock -%}
 
 {%- block item_option -%}
-    <option value="{{ option.key }}" {{ selected == option.key ? 'selected' }}>{{ option|trans }}
+    <option value="{{ option.key }}" {{ item.key ~ '.' ~ selected == option.key ? 'selected' }}>{{ option|trans }}
     </option>
 {%- endblock -%}
 

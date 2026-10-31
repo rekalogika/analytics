@@ -23,34 +23,34 @@ return [
         'version' => '3.2.2',
     ],
     'sortablejs' => [
-        'version' => '1.15.6',
+        'version' => '1.15.7',
     ],
     '@hotwired/turbo' => [
-        'version' => '8.0.13',
+        'version' => '8.0.23',
     ],
     'tom-select' => [
-        'version' => '2.4.3',
+        'version' => '2.6.2',
     ],
     '@orchidjs/sifter' => [
         'version' => '1.1.0',
     ],
     '@orchidjs/unicode-variants' => [
-        'version' => '1.1.2',
+        'version' => '1.2.2',
     ],
     'tom-select/dist/css/tom-select.default.min.css' => [
-        'version' => '2.4.3',
+        'version' => '2.6.2',
         'type' => 'css',
     ],
     'tom-select/dist/css/tom-select.bootstrap4.min.css' => [
-        'version' => '2.4.3',
+        'version' => '2.6.2',
         'type' => 'css',
     ],
     'tom-select/dist/css/tom-select.bootstrap5.min.css' => [
-        'version' => '2.4.3',
+        'version' => '2.6.2',
         'type' => 'css',
     ],
     'chart.js' => [
-        'version' => '4.4.8',
+        'version' => '4.6.1',
     ],
     'flatpickr' => [
         'version' => '4.6.13',
