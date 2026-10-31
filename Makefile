@@ -52,8 +52,12 @@ php-cs-fixer: tools/php-cs-fixer
 tools/php-cs-fixer:
 	phive install php-cs-fixer
 
+.PHONY: version-sync
+version-sync:
+	$(PHP) -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION, PHP_EOL;' > tests/.php-version
+
 .PHONY: serve
-serve:
+serve: version-sync
 	$(PHP) tests/bin/console cache:clear
 	$(PHP) tests/bin/console asset:install tests/public/
 	cd tests && sh -c "$(SYMFONY) server:start --document-root=public"
