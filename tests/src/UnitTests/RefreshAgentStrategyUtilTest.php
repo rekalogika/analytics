@@ -42,11 +42,11 @@ final class RefreshAgentStrategyUtilTest extends TestCase
         $refreshTime = RefreshAgentStrategyUtil::getRefreshTime(
             refreshAgentStrategy: $strategy,
             earliest: $earliest,
-            latest: $earliest->modify(\sprintf('+%d seconds', $latest)),
+            latest: $earliest->add(new \DateInterval(\sprintf('PT%dS', $latest))),
         );
 
         $this->assertEquals(
-            $earliest->modify(\sprintf('+%d seconds', $expected)),
+            $earliest->add(new \DateInterval(\sprintf('PT%dS', $expected))),
             $refreshTime,
         );
     }

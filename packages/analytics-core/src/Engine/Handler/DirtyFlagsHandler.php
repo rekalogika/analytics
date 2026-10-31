@@ -258,7 +258,7 @@ final readonly class DirtyFlagsHandler
                 // after the cooldown period ends
 
                 $refreshTime = $lastRefreshes[$level][$key]
-                    ->modify(\sprintf('+%d seconds', $cooldown));
+                    ->add(new \DateInterval(\sprintf('PT%dS', $cooldown)));
             } else {
                 $refreshTime = $now;
             }
@@ -325,7 +325,7 @@ final readonly class DirtyFlagsHandler
             ->setParameter('class', $this->metadata->getSummaryClass())
             ->setParameter(
                 'threshold',
-                $now->modify(\sprintf('-%d seconds', $cooldown)),
+                $now->sub(new \DateInterval(\sprintf('PT%dS', $cooldown))),
                 Types::DATETIME_IMMUTABLE,
             )
             ->groupBy('rl.level, rl.key')

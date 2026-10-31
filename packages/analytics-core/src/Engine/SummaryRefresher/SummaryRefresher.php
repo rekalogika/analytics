@@ -140,7 +140,7 @@ final class SummaryRefresher
 
         if ($cooldown !== null) {
             $dirtyFlags->removeRefreshLogs(
-                $now->modify(\sprintf('-%d seconds', $cooldown)),
+                $now->sub(new \DateInterval(\sprintf('PT%dS', $cooldown))),
             );
         }
 

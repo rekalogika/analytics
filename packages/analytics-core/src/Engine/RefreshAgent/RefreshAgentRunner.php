@@ -46,7 +46,7 @@ final readonly class RefreshAgentRunner
         $now = new \DateTimeImmutable();
 
         $runAt = max(
-            $now->modify(\sprintf('+%d seconds', $minimumDelay)),
+            $now->add(new \DateInterval(\sprintf('PT%dS', $minimumDelay))),
             RefreshAgentStrategyUtil::getRefreshTime(
                 refreshAgentStrategy: $this->refreshAgentStrategy,
                 earliest: $now,

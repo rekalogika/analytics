@@ -38,12 +38,12 @@ final readonly class RefreshAgentStrategyUtil
         $refreshTime = $earliest;
 
         if ($minimumIdleDelay !== null) {
-            $refreshTime = $latest->modify(\sprintf('+%d seconds', $minimumIdleDelay));
+            $refreshTime = $latest->add(new \DateInterval(\sprintf('PT%dS', $minimumIdleDelay)));
 
             if ($maximumAge !== null) {
                 $refreshTime = min(
                     $refreshTime,
-                    $earliest->modify(\sprintf('+%d seconds', $maximumAge)),
+                    $earliest->add(new \DateInterval(\sprintf('PT%dS', $maximumAge))),
                 );
             }
         }
@@ -51,7 +51,7 @@ final readonly class RefreshAgentStrategyUtil
         if ($minimumAge !== null) {
             $refreshTime = max(
                 $refreshTime,
-                $earliest->modify(\sprintf('+%d seconds', $minimumAge)),
+                $earliest->add(new \DateInterval(\sprintf('PT%dS', $minimumAge))),
             );
         }
 
