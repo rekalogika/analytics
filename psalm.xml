@@ -48,6 +48,13 @@
                 <referencedClass name="Doctrine\ORM\Query\AST\TypedExpression" />
             </errorLevel>
         </DeprecatedInterface>
+        <!-- deprecated in doctrine/collections 3.1, but its replacement
+        SortDirection is not available in doctrine/collections 2 -->
+        <DeprecatedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="Doctrine\Common\Collections\Order" />
+            </errorLevel>
+        </DeprecatedClass>
         <MoreSpecificReturnType>
             <errorLevel type="suppress">
                 <file name="packages/analytics-bundle/src/Common/ApplicableDimensionsTrait.php" />

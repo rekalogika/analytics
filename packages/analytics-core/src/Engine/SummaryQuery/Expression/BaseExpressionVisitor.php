@@ -276,7 +276,7 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
     }
 
     #[\Override]
-    public function walkCompositeExpression(CompositeExpression $expr)
+    public function walkCompositeExpression(CompositeExpression $expr): mixed
     {
         /**
          * @var list<ORMComparison|Andx|Orx|string>

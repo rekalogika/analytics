@@ -60,6 +60,11 @@ parameters:
             # the replacement ExpressionWithReturnType is not available in ORM 2
             message: '#implements deprecated interface Doctrine\\ORM\\Query\\AST\\TypedExpression#'
             reportUnmatched: false
+        -
+            # deprecated in doctrine/collections 3.1, but its replacement
+            # SortDirection is not available in doctrine/collections 2
+            message: '#deprecated enum Doctrine\\Common\\Collections\\Order#'
+            reportUnmatched: false
 
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
