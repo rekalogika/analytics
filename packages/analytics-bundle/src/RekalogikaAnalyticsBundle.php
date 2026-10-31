@@ -45,6 +45,7 @@ use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\Uuid\Doctrine\TruncateUuidToBigintFunction;
 use Rekalogika\Analytics\Uuid\Doctrine\UuidToDateTimeFunction;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -90,6 +91,53 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         $root->children()->scalarNode('table_theme')
             ->defaultValue('@RekalogikaAnalyticsFrontend/renderer.html.twig')
             ->info('The theme to be used for rendering pivot tables. This theme should be a Twig template that extends the `@RekalogikaAnalyticsFrontend/renderer.html.twig` template.');
+
+        $refresh = $root->children()->arrayNode('refresh')
+            ->addDefaultsIfNotSet()
+            ->info('Determines when the refresh agent refreshes the dirty partitions of the summary tables. All values are in seconds, null disables the setting.')
+            ->children();
+
+        $this->addDurationNode(
+            $refresh,
+            'minimum_age',
+            600,
+            'A dirty partition is not refreshed until its oldest change is at least this old.',
+        );
+
+        $this->addDurationNode(
+            $refresh,
+            'minimum_idle_delay',
+            300,
+            'A dirty partition is not refreshed until there have been no new changes for this long.',
+        );
+
+        $this->addDurationNode(
+            $refresh,
+            'maximum_age',
+            1800,
+            'A dirty partition is refreshed once its oldest change is this old, ignoring minimum_idle_delay.',
+        );
+
+        $this->addDurationNode(
+            $refresh,
+            'upper_partition_cooldown',
+            300,
+            'An upper-level partition is refreshed immediately after the partitions below it, unless it has been refreshed within this period.',
+        );
+    }
+
+    private function addDurationNode(
+        NodeBuilder $builder,
+        string $name,
+        int $default,
+        string $info,
+    ): void {
+        $builder->scalarNode($name)
+            ->defaultValue($default)
+            ->info($info)
+            ->validate()
+            ->ifTrue(static fn(mixed $value): bool => $value !== null && (!\is_int($value) || $value < 0))
+            ->thenInvalid('The value must be a non-negative integer or null, got %s.');
     }
 
     /**
@@ -127,6 +175,14 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 $config['table_theme'],
             )
         ;
+
+        /** @var array<string,int|null> */
+        $refresh = $config['refresh'];
+
+        foreach ($refresh as $key => $value) {
+            $configurator->parameters()
+                ->set(\sprintf('rekalogika.analytics.refresh.%s', $key), $value);
+        }
 
         $container->registerForAutoconfiguration(ValueSerializer::class)
             ->addTag('rekalogika.analytics.value_serializer');

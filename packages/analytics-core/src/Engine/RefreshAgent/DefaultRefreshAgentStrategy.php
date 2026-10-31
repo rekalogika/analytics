@@ -18,7 +18,8 @@ final readonly class DefaultRefreshAgentStrategy implements RefreshAgentStrategy
     public function __construct(
         private ?int $minimumAge = 600, // 10 minutes
         private ?int $minimumIdleDelay = 300, // 5 minutes
-        private ?int $maximumAge = 21600, // 6 hours
+        private ?int $maximumAge = 1800, // 30 minutes
+        private ?int $upperPartitionCooldown = 300, // 5 minutes
     ) {}
 
     #[\Override]
@@ -37,5 +38,11 @@ final readonly class DefaultRefreshAgentStrategy implements RefreshAgentStrategy
     public function getMaximumAge(): ?int
     {
         return $this->maximumAge;
+    }
+
+    #[\Override]
+    public function getUpperPartitionCooldown(): ?int
+    {
+        return $this->upperPartitionCooldown;
     }
 }

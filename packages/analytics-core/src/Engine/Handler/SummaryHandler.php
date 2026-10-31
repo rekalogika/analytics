@@ -102,6 +102,24 @@ final class SummaryHandler implements ResetInterface
         $this->latestKey = $max;
     }
 
+    /**
+     * Gets the time the refresh agent is scheduled to run next. The value is
+     * always read from the database.
+     */
+    public function getScheduledRefresh(): ?\DateTimeImmutable
+    {
+        return $this->createSummaryPropertiesManager()->getScheduledRefresh();
+    }
+
+    /**
+     * Records the time the refresh agent is scheduled to run next.
+     */
+    public function updateScheduledRefresh(\DateTimeImmutable $scheduledRefresh): void
+    {
+        $this->createSummaryPropertiesManager()
+            ->updateScheduledRefresh($scheduledRefresh);
+    }
+
     public function getDirtyFlags(): DirtyFlagsHandler
     {
         return $this->dirtyFlagsHandler;
