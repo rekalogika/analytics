@@ -21,7 +21,7 @@ use Doctrine\Common\Collections\Expr\Value;
 final class SqlExpressionVisitor extends ExpressionVisitor
 {
     #[\Override]
-    public function walkComparison(Comparison $comparison)
+    public function walkComparison(Comparison $comparison): string
     {
         $field = $comparison->getField();
         $operator = $comparison->getOperator();
@@ -65,7 +65,7 @@ final class SqlExpressionVisitor extends ExpressionVisitor
     }
 
     #[\Override]
-    public function walkCompositeExpression(CompositeExpression $expr)
+    public function walkCompositeExpression(CompositeExpression $expr): string
     {
         $type = $expr->getType();
 

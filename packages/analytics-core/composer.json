@@ -12,7 +12,7 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "doctrine/collections": "^2.2",
+        "doctrine/collections": "^2.2 || ^3.0",
         "doctrine/dbal": "^3 || ^4",
         "doctrine/migrations": "^3.5",
         "doctrine/orm": "^2.20 || ^3.2",

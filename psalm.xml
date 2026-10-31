@@ -48,6 +48,15 @@
                 <referencedClass name="Doctrine\ORM\Query\AST\TypedExpression" />
             </errorLevel>
         </DeprecatedInterface>
+        <!-- deprecated in doctrine/collections 3.1, but its replacement
+        SortDirection is not available in doctrine/collections 2. 'info'
+        instead of 'suppress', because 'suppress' fails as unused with
+        doctrine/collections 2, i.e. on PHP < 8.4 -->
+        <DeprecatedClass>
+            <errorLevel type="info">
+                <referencedClass name="Doctrine\Common\Collections\Order" />
+            </errorLevel>
+        </DeprecatedClass>
         <MoreSpecificReturnType>
             <errorLevel type="suppress">
                 <file name="packages/analytics-bundle/src/Common/ApplicableDimensionsTrait.php" />
