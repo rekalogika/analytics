@@ -93,15 +93,19 @@ final class SqlFactory
     // rollup summary to summary
     //
 
-    private ?SummaryRefresherQuery $rollUpSummaryToSummaryQuery = null;
+    /**
+     * @var array<int,SummaryRefresherQuery>
+     */
+    private array $rollUpSummaryToSummaryQueries = [];
 
-    public function getRollUpSummaryToSummaryQuery(): SummaryRefresherQuery
+    public function getRollUpSummaryToSummaryQuery(int $level): SummaryRefresherQuery
     {
-        return $this->rollUpSummaryToSummaryQuery ??=
+        return $this->rollUpSummaryToSummaryQueries[$level] ??=
             new RollUpSummaryToSummaryGroupAllStrategyQuery(
                 entityManager: $this->entityManager,
                 metadata: $this->summaryMetadata,
                 insertSql: $this->getInsertIntoSummaryQuery(),
+                level: $level,
             );
     }
 }

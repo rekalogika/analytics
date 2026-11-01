@@ -113,8 +113,15 @@ interface Partition extends \Stringable
      * that rolls up the source entities, so that the rows of each partition
      * are aggregated separately.
      *
-     * @param PartitionValueResolver<mixed> $input The resolver that gives the
-     * DQL expression of the partitioning value of the source entity.
+     * The framework also uses it when rolling up a lower level of the summary
+     * table to a higher level. In this case, the input is the key of the lower
+     * level partition, and the expression must give the key of the higher
+     * level partition containing it.
+     *
+     * @template T
+     * @param PartitionValueResolver<T> $input The resolver that gives the
+     * DQL expression of the integer value to classify: the partitioning value
+     * of the source entity, or the key of a lower level partition.
      * @param int $level The level of the partitions to classify into.
      * @param SourceQueryContext $context The context of the roll-up query.
      */

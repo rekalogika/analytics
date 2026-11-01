@@ -529,7 +529,7 @@ final class SummaryRefresher
         $this->eventDispatcher?->dispatch($startEvent);
 
         $queries = $this->getSqlFactory()
-            ->getRollUpSummaryToSummaryQuery()
+            ->getRollUpSummaryToSummaryQuery($range->getLevel())
             ->withBoundary(
                 start: $range->getStart(),
                 end: $range->getEnd(),
