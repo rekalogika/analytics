@@ -393,8 +393,17 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        // get the latest key of the summary at the beginning
+        // get the latest key of the summary at the beginning. the key is in
+        // the source domain (e.g. a UUID string), so we convert it to the
+        // integer domain of the partition bounds before comparing them
+
         $summaryLatestKey = $this->summaryHandler->getLatestKey();
+
+        $summaryLatestValue = $summaryLatestKey === null
+            ? null
+            : $this->summaryHandler
+                ->getPartition()
+                ->transformSourceValueToSummaryValue($summaryLatestKey);
 
         $this->getConnection()->beginTransaction();
 
@@ -413,7 +422,7 @@ final class SummaryRefresher
             $necessaryToMarkUpperAsDirty =
                 $this->isNecessaryToMarkUpperPartitionAsDirty(
                     partition: $partition,
-                    summaryLatestKey: $summaryLatestKey,
+                    summaryLatestValue: $summaryLatestValue,
                 );
 
             if ($necessaryToMarkUpperAsDirty) {
@@ -440,12 +449,16 @@ final class SummaryRefresher
         return $dirtyFlags;
     }
 
+    /**
+     * @param int|null $summaryLatestValue The latest key of the summary,
+     * transformed to the integer domain of the partition bounds.
+     */
     private function isNecessaryToMarkUpperPartitionAsDirty(
         Partition $partition,
-        int|string|null $summaryLatestKey,
+        ?int $summaryLatestValue,
     ): bool {
-        $isNew = $summaryLatestKey === null
-            || $partition->getUpperBound() > $summaryLatestKey;
+        $isNew = $summaryLatestValue === null
+            || $partition->getUpperBound() > $summaryLatestValue;
 
         $upperPartition = $partition->getContaining();
 
@@ -464,7 +477,7 @@ final class SummaryRefresher
         // summary, then it is not necessary to mark the upper partition as
         // dirty
 
-        return $upperPartition->getUpperBound() <= $summaryLatestKey;
+        return $upperPartition->getUpperBound() <= $summaryLatestValue;
     }
 
     private function deleteSummaryRange(PartitionRange $range): void
