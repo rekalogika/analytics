@@ -16,6 +16,12 @@ namespace Rekalogika\Analytics\Contracts\Context;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 
+/**
+ * Context given to `PseudoMeasure::createPseudoMeasure()`. It describes the
+ * measure being created and the cell it is being created for.
+ *
+ * @see \Rekalogika\Analytics\Contracts\Summary\PseudoMeasure
+ */
 final readonly class PseudoMeasureContext
 {
     public function __construct(
@@ -23,11 +29,17 @@ final readonly class PseudoMeasureContext
         private Coordinates $coordinates,
     ) {}
 
+    /**
+     * The metadata of the pseudo-measure being created.
+     */
     public function getMeasureMetadata(): MeasureMetadata
     {
         return $this->measureMetadata;
     }
 
+    /**
+     * The coordinates of the cell the measure value is being created for.
+     */
     public function getCoordinates(): Coordinates
     {
         return $this->coordinates;

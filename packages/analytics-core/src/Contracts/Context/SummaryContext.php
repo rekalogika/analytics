@@ -19,25 +19,53 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
+/**
+ * Context given to a `ContextAwareSummary` when the framework instantiates
+ * the summary entity from a row of the query result. It gives the getters of
+ * the summary access to the metadata, and lets them turn the raw values of the
+ * row into user-facing values.
+ *
+ * @see ContextAwareSummary
+ */
 final readonly class SummaryContext
 {
     /**
-     * @param array<string,mixed> $rawInput
+     * @param SummaryMetadata $summaryMetadata The metadata of the summary
+     * class.
+     * @param array<string,mixed> $rawInput The row of the query result, keyed
+     * by property name, with the raw values as returned by Doctrine.
      */
     public function __construct(
         private SummaryMetadata $summaryMetadata,
         private array $rawInput,
     ) {}
 
+    /**
+     * The metadata of the summary class.
+     */
     public function getSummaryMetadata(): SummaryMetadata
     {
         return $this->summaryMetadata;
     }
 
     /**
+     * Returns the user-facing value of a property of the summary. The raw
+     * value is taken from the query result row, and transformed using the
+     * `UserValueTransformer` of the property: the value resolver for a
+     * dimension, or the aggregate function for a measure.
+     *
+     * Call this from the getter of the property, so the getter returns the
+     * user-facing value instead of the raw value stored in the database.
+     *
      * @template T of object
-     * @param null|class-string<T> $class
+     * @param string $property The name of the property in the summary class.
+     * @param null|class-string<T> $class If given, the result is checked to be
+     * an instance of this class, and the return type is narrowed accordingly.
      * @return ($class is null ? mixed : T|null)
+     * @throws InvalidArgumentException If the property is not in the result
+     * row, if it is neither a dimension nor a measure, if its resolver or
+     * function is not a `UserValueTransformer`, or if the result is not an
+     * instance of `$class`.
      */
     public function getUserValue(
         string $property,

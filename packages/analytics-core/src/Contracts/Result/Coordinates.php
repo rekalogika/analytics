@@ -35,9 +35,19 @@ interface Coordinates extends OrderedMap
      */
     public function getSummaryClass(): string;
 
+    /**
+     * The dice predicate that was in effect when the cell was produced, or
+     * null if there was none. Together with the dimension members, it
+     * determines which source entities the cell aggregates.
+     */
     public function getPredicate(): ?Expression;
 
     /**
+     * The names of the dimensions in these coordinates, in a canonical order
+     * that does not depend on the order of the dimensions in the coordinates.
+     * Two cells with the same dimensionality are at the same level of detail
+     * in the cube. The apex cell has an empty dimensionality.
+     *
      * @return list<string>
      */
     public function getDimensionality(): array;

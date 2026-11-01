@@ -17,6 +17,11 @@ use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
+/**
+ * Default implementation of AttributeCollection. Indexes the attribute
+ * instances by their class, their parent classes, and their interfaces, so a
+ * lookup by any of them finds the attribute.
+ */
 final readonly class DefaultAttributeCollection implements AttributeCollection
 {
     /**
@@ -25,7 +30,9 @@ final readonly class DefaultAttributeCollection implements AttributeCollection
     private array $classToAttributes;
 
     /**
-     * @param iterable<object> $attributes
+     * @param iterable<object> $attributes The attribute instances, in the
+     * order they were found. The first one of a type is the one returned by
+     * `getAttribute()`.
      */
     public function __construct(iterable $attributes)
     {

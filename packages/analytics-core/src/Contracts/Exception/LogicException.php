@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when the framework detects a programming error, e.g. a method called
+ * before the object has been initialized.
+ */
 class LogicException extends \LogicException implements AnalyticsException {}

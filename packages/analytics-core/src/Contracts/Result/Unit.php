@@ -16,7 +16,8 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a unit of measurement
+ * Represent a unit of measurement, e.g. a currency or a count. Translating the
+ * unit gives its label.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
@@ -24,7 +25,8 @@ interface Unit extends TranslatableInterface
 {
     /**
      * The unit signature. Two units with the same signature are considered
-     * identical.
+     * identical, e.g. two measures with the same unit signature can share an
+     * axis in a chart.
      */
     public function getSignature(): string;
 }

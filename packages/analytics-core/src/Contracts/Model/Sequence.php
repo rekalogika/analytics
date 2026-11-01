@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Model;
 
 /**
- * A sequence, which is a series of ordered elements
+ * A sequence, which is a bounded series of ordered elements. Iterating the
+ * sequence yields every member from the first to the last, including the ones
+ * in between.
  *
  * @template T of SequenceMember
  * @extends \Traversable<T>
@@ -22,11 +24,15 @@ namespace Rekalogika\Analytics\Contracts\Model;
 interface Sequence extends \Traversable
 {
     /**
+     * The first member of the sequence.
+     *
      * @return T
      */
     public function getFirst(): SequenceMember;
 
     /**
+     * The last member of the sequence.
+     *
      * @return T
      */
     public function getLast(): SequenceMember;

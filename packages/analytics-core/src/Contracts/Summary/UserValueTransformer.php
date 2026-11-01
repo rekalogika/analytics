@@ -13,20 +13,29 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Summary;
 
+use Rekalogika\Analytics\Contracts\Context\DimensionGroupContext;
+use Rekalogika\Analytics\Contracts\Context\SummaryContext;
 use Rekalogika\Analytics\Contracts\Context\ValueTransformerContext;
 
 /**
- * If a value resolver implements this interface, it has the capability to
- * transform the raw value (as returned by Doctrine), into a canonical value
- * suitable for the caller.
+ * If a value resolver or an aggregate function implements this interface, it
+ * has the capability to transform the raw value (as returned by Doctrine),
+ * into a canonical value suitable for the caller.
  *
  * This is used in data binning, where a resulting integer value is converted
  * into a `Bin` instance. It is done like this so the user does not have to: 1.
- * create a custom Doctrine type every time they want to bin data, and 2.they
+ * create a custom Doctrine type every time they want to bin data, and 2. they
  * don't have to repeat the logic in the getter over and over again.
  *
- * @template I
- * @template O
+ * The transformation is applied when the framework builds the `Dimension` and
+ * `Measure` objects of the result, and when a summary or dimension group asks
+ * for a user value through its context.
+ *
+ * @see SummaryContext::getUserValue()
+ * @see DimensionGroupContext::getUserValue()
+ *
+ * @template I The type of the raw value.
+ * @template O The type of the user value.
  */
 interface UserValueTransformer
 {

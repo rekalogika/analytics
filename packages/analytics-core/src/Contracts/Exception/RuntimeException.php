@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown for errors that can only be detected at runtime.
+ */
 class RuntimeException extends \RuntimeException implements AnalyticsException {}

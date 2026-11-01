@@ -19,10 +19,26 @@ use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Metadata of a measure of a summary class.
+ */
 final readonly class MeasureMetadata extends PropertyMetadata
 {
     /**
-     * @param class-string $typeClass
+     * @param AggregateFunction|PseudoMeasure $function How the value is
+     * computed.
+     * @param string $summaryProperty The name of the PHP property.
+     * @param TranslatableInterface $label The human-readable name.
+     * @param class-string|null $typeClass The class of the property type.
+     * @param TranslatableInterface|null $unit The unit of measurement.
+     * @param string|null $unitSignature Identifies the unit, so measures with
+     * the same unit can be recognized. Null if there is no unit.
+     * @param bool $virtual Whether the measure has no column in the summary
+     * table.
+     * @param bool $hidden Whether the measure is hidden from the user
+     * interface.
+     * @param AttributeCollection $attributes The attributes of the property.
+     * @param SummaryMetadata|null $summaryMetadata The owning summary.
      */
     public function __construct(
         private AggregateFunction|PseudoMeasure $function,
@@ -54,6 +70,10 @@ final readonly class MeasureMetadata extends PropertyMetadata
         );
     }
 
+    /**
+     * Returns a copy of this measure attached to the given summary. Called by
+     * `SummaryMetadata`.
+     */
     public function withSummaryMetadata(SummaryMetadata $summaryMetadata): self
     {
         return new self(
@@ -70,26 +90,46 @@ final readonly class MeasureMetadata extends PropertyMetadata
         );
     }
 
+    /**
+     * How the value of the measure is computed.
+     */
     public function getFunction(): AggregateFunction|PseudoMeasure
     {
         return $this->function;
     }
 
+    /**
+     * The unit of measurement, or null if the measure has none.
+     */
     public function getUnit(): null|TranslatableInterface
     {
         return $this->unit;
     }
 
+    /**
+     * A string identifying the unit. Two measures with the same signature
+     * have the same unit, e.g. they can share an axis in a chart. Null if the
+     * measure has no unit.
+     */
     public function getUnitSignature(): ?string
     {
         return $this->unitSignature;
     }
 
+    /**
+     * Returns true if the measure has no column in the summary table. This is
+     * the case for a measure derived from other measures, and for a
+     * pseudo-measure. The refresh engine skips virtual measures.
+     */
     public function isVirtual(): bool
     {
         return $this->virtual;
     }
 
+    /**
+     * Returns true if the measure is computed in PHP by a `PseudoMeasure`
+     * rather than by a DQL expression.
+     */
     public function isPseudoMeasure(): bool
     {
         return $this->function instanceof PseudoMeasure;

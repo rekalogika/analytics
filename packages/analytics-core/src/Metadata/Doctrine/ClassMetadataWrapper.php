@@ -22,7 +22,12 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 
 /**
  * Compatibility layer for Doctrine ClassMetadata. Abstracts the differences
- * between the different versions of Doctrine ORM.
+ * between the different versions of Doctrine ORM, and adds the type checks
+ * needed for static analysis.
+ *
+ * The framework uses it to inspect both the source and the summary entities:
+ * which properties are fields, associations, or embeddables, their column
+ * names, and their types.
  */
 final readonly class ClassMetadataWrapper
 {
@@ -34,7 +39,11 @@ final readonly class ClassMetadataWrapper
     private EntityManagerInterface $manager;
 
     /**
-     * @param class-string $class
+     * @param ObjectManager|ManagerRegistry|null $manager The entity manager
+     * of the class, or a registry to look it up in.
+     * @param class-string $class The entity class.
+     * @throws UnexpectedValueException If no entity manager is available for
+     * the class.
      */
     public function __construct(
         ObjectManager|ManagerRegistry|null $manager,
@@ -66,6 +75,10 @@ final readonly class ClassMetadataWrapper
         $this->classMetadata = $this->manager->getClassMetadata($class);
     }
 
+    /**
+     * Returns the metadata of the nearest mapped parent class, or null if the
+     * class has no mapped parent.
+     */
     public function getParent(): ?self
     {
         $parentClass = $this->classMetadata->parentClasses[0] ?? null;
@@ -82,6 +95,8 @@ final readonly class ClassMetadataWrapper
     }
 
     /**
+     * The entity class this metadata describes.
+     *
      * @return class-string
      */
     public function getClass(): string
@@ -95,29 +110,46 @@ final readonly class ClassMetadataWrapper
         return $class;
     }
 
+    /**
+     * Returns true if the property is mapped, either as a scalar field or as
+     * an association. Embedded properties are not included.
+     */
     public function hasProperty(string $property): bool
     {
         return $this->isPropertyField($property) || $this->isPropertyEntity($property);
     }
 
+    /**
+     * Returns true if the property is an association to another entity.
+     */
     public function isPropertyEntity(string $property): bool
     {
         return $this->classMetadata->hasAssociation($property);
     }
 
+    /**
+     * Returns true if the property is a scalar field, i.e. mapped to a column
+     * and not an embeddable.
+     */
     public function isPropertyField(string $property): bool
     {
         return $this->classMetadata->hasField($property)
             && !$this->isPropertyEmbedded($property);
     }
 
+    /**
+     * Returns true if the property is an embeddable.
+     */
     public function isPropertyEmbedded(string $property): bool
     {
         return isset($this->classMetadata->embeddedClasses[$property]);
     }
 
     /**
+     * Returns the class of the embeddable in the property.
+     *
      * @return class-string
+     * @throws MetadataException If the property is not an embeddable.
      */
     public function getEmbeddedClassOfProperty(string $property): string
     {
@@ -130,11 +162,21 @@ final readonly class ClassMetadataWrapper
         return $class;
     }
 
+    /**
+     * The name of the identifier property. The entity must have a single
+     * identifier.
+     */
     public function getIdentifierFieldName(): string
     {
         return $this->classMetadata->getSingleIdentifierFieldName();
     }
 
+    /**
+     * Returns the identifier of the entity as a string.
+     *
+     * @throws MetadataException If the entity has a composite identifier, no
+     * identifier value, or an identifier that is not a string or a number.
+     */
     public function getStringIdentifierFromObject(object $entity): string
     {
         $identifierValues = $this->classMetadata->getIdentifierValues($entity);
@@ -161,16 +203,31 @@ final readonly class ClassMetadataWrapper
         ));
     }
 
+    /**
+     * The name of the database table of the entity.
+     */
     public function getSQLTableName(): string
     {
         return $this->classMetadata->getTableName();
     }
 
+    /**
+     * The name of the identifier column. The entity must have a single
+     * identifier.
+     */
     public function getSQLIdentifierFieldName(): string
     {
         return $this->classMetadata->getSingleIdentifierColumnName();
     }
 
+    /**
+     * Returns the name of the column of the property. For an association, the
+     * name of its join column. Properties inside embeddables are referred to
+     * using dot notation, e.g. `partition.key`.
+     *
+     * @throws MetadataException If the property is neither a field nor an
+     * association.
+     */
     public function getSQLFieldName(string $property): string
     {
         if ($this->isPropertyField($property)) {
@@ -183,6 +240,8 @@ final readonly class ClassMetadataWrapper
     }
 
     /**
+     * Returns the entity class the association property points to.
+     *
      * @return class-string
      */
     public function getAssociationTargetClass(string $property): string
@@ -196,6 +255,10 @@ final readonly class ClassMetadataWrapper
         return $targetClass;
     }
 
+    /**
+     * Returns the DBAL type name of the field, e.g. `integer`, or null if the
+     * mapping does not specify one.
+     */
     public function getScalarType(string $property): ?string
     {
         $fieldMapping = $this->classMetadata->getFieldMapping($property);
@@ -214,6 +277,9 @@ final readonly class ClassMetadataWrapper
     }
 
     /**
+     * Returns the enum class the field is mapped to, or null if the field is
+     * not an enum.
+     *
      * @return class-string<\UnitEnum>|null
      */
     public function getEnumType(string $property): ?string

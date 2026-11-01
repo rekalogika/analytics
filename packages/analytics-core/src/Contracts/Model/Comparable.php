@@ -19,10 +19,14 @@ namespace Rekalogika\Analytics\Contracts\Model;
 interface Comparable
 {
     /**
+     * Compares two objects of the same class. The framework uses this to sort
+     * dimension members, and to determine the direction of a sequence.
+     *
      * @template U of Comparable
      * @param U $a
      * @param U $b
-     * @return -1|0|1
+     * @return -1|0|1 -1 if `$a` is less than `$b`, 0 if they are equal, 1 if
+     * `$a` is greater than `$b`.
      */
     public static function compare(
         Comparable $a,

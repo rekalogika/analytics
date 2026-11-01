@@ -15,4 +15,8 @@ namespace Rekalogika\Analytics\Contracts\Exception;
 
 use Doctrine\ORM\Query\QueryException as DoctrineQueryException;
 
+/**
+ * Thrown when a DQL query built by the framework cannot be constructed or
+ * executed. Extends the Doctrine ORM exception of the same name.
+ */
 class QueryException extends DoctrineQueryException implements AnalyticsException {}

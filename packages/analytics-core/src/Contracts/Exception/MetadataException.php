@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Exception;
 
 /**
- * Indicates errors in metadata
+ * Indicates errors in metadata, i.e. the summary class or its attributes are
+ * not defined correctly, or a piece of metadata is requested where it does not
+ * apply.
  */
 class MetadataException extends DomainException implements AnalyticsException {}

@@ -37,6 +37,15 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
+/**
+ * Default implementation of SummaryMetadataFactory. Builds the metadata of a
+ * summary class from its PHP attributes and its Doctrine mapping, and
+ * validates that the class is well-formed: at least one dimension, at least
+ * one measure, exactly one partition, and a groupings property.
+ *
+ * Summary classes are discovered by scanning every entity known to Doctrine
+ * for the `Summary` attribute.
+ */
 final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
 {
     /**
@@ -210,7 +219,12 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
     }
 
     /**
+     * Builds the partition metadata. The partition property must be an
+     * embeddable implementing the `Partition` contract, with exactly one
+     * `PartitionKey` and one `PartitionLevel` property.
+     *
      * @param Partition<mixed> $partitionAttribute
+     * @throws MetadataException If any of the above conditions is not met.
      */
     private function createPartitionMetadata(
         string $summaryProperty,
@@ -286,6 +300,10 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
     }
 
     /**
+     * Builds the measure metadata. A measure without a mapped Doctrine column
+     * is virtual: it has no storage in the summary table, and is computed
+     * from other measures at query time.
+     *
      * @param class-string $summaryClass
      * @param class-string|null $typeClass
      */

@@ -16,27 +16,57 @@ namespace Rekalogika\Analytics\Contracts\Model;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 
+/**
+ * Describes how the rows of a summary table are partitioned.
+ *
+ * Each source entity has a partitioning value, e.g. its integer primary key,
+ * resolved by the `PartitionValueResolver` of the summary. The value is
+ * classified into a partition, which is a contiguous range of partitioning
+ * values. The summary table stores one set of aggregated rows per partition,
+ * which allows the framework to refresh only the partitions touched by a
+ * change in the source, instead of the whole table.
+ *
+ * Partitions are organized in levels. A partition at a higher level covers a
+ * larger range, and contains whole partitions of the next lower level. The
+ * framework stores aggregates at every level, so a query spanning a long
+ * range can read a few high-level rows instead of many low-level ones.
+ *
+ * Implementations are Doctrine embeddables that are embedded in the summary
+ * entity, holding the level and the key as columns. See `IntegerPartition` for
+ * the implementation used for integer primary keys. The string form of a
+ * partition is for display and debugging.
+ */
 interface Partition extends \Stringable
 {
     /**
-     * Returns all the levels of partitioning that can be used.
+     * Returns all the levels of partitioning that can be used, from the
+     * highest (covering the largest range) to the lowest (covering the
+     * smallest range).
      *
      * @return non-empty-list<int>
      */
     public static function getAllLevels(): array;
 
     /**
-     * Returns the level of this partition.
+     * Returns the level of this partition. One of the values returned by
+     * `getAllLevels()`.
      */
     public function getLevel(): int;
 
     /**
-     * Returns the key of this partition.
+     * Returns the key of this partition. The key identifies the partition
+     * among the partitions of the same level. Together with the level, it
+     * identifies the partition uniquely.
      */
     public function getKey(): int;
 
     /**
-     * Creates a partition from the source value and level.
+     * Creates a partition from the source value and level, i.e. the partition
+     * at the given level that contains the given source value.
+     *
+     * @param mixed $source The partitioning value of a source entity, as
+     * resolved by the `PartitionValueResolver`.
+     * @param int $level One of the values returned by `getAllLevels()`.
      */
     public static function createFromSourceValue(
         mixed $source,
@@ -56,19 +86,20 @@ interface Partition extends \Stringable
     public function getUpperBound(): int;
 
     /**
-     * Returns the higher partition that contains this partition.
+     * Returns the partition at the next higher level that contains this
+     * partition, or null if this partition is already at the highest level.
      */
     public function getContaining(): ?static;
 
     /**
      * Returns the next neighboring partition on the same level as this
-     * partition.
+     * partition, or null if there is none.
      */
     public function getNext(): ?static;
 
     /**
      * Returns the previous neighboring partition on the same level as this
-     * partition.
+     * partition, or null if there is none.
      */
     public function getPrevious(): ?static;
 
@@ -78,7 +109,14 @@ interface Partition extends \Stringable
      * Essentially, it classifies the source into a partition in the summary
      * table.
      *
-     * @param PartitionValueResolver<mixed> $input
+     * The framework uses the expression in the GROUP BY clause of the query
+     * that rolls up the source entities, so that the rows of each partition
+     * are aggregated separately.
+     *
+     * @param PartitionValueResolver<mixed> $input The resolver that gives the
+     * DQL expression of the partitioning value of the source entity.
+     * @param int $level The level of the partitions to classify into.
+     * @param SourceQueryContext $context The context of the roll-up query.
      */
     public static function getClassifierExpression(
         PartitionValueResolver $input,

@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Collection;
 
 /**
+ * A map whose entries have a defined order, so the values can also be accessed
+ * by their position. Iteration follows the same order.
+ *
  * @template TKey
  * @template-covariant TValue
  * @extends Map<TKey,TValue>
@@ -21,17 +24,24 @@ namespace Rekalogika\Analytics\Contracts\Collection;
 interface OrderedMap extends Map
 {
     /**
+     * Returns the value at the given zero-based position, or null if the
+     * position is out of range.
+     *
      * @param int<0,max> $index
      * @return TValue|null
      */
     public function getByIndex(int $index): mixed;
 
     /**
+     * Returns the first value, or null if the map is empty.
+     *
      * @return TValue|null
      */
     public function first(): mixed;
 
     /**
+     * Returns the last value, or null if the map is empty.
+     *
      * @return TValue|null
      */
     public function last(): mixed;

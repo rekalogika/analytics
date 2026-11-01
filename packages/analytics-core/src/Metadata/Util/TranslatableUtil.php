@@ -16,11 +16,19 @@ namespace Rekalogika\Analytics\Metadata\Util;
 use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Helpers for the labels given in attributes, which may be plain strings or
+ * translatables.
+ */
 final class TranslatableUtil
 {
     private function __construct() {}
 
     /**
+     * Converts a label to a translatable. A plain string is wrapped in a
+     * `LiteralString`, so it is displayed as is. A translatable is returned
+     * unchanged, and null stays null.
+     *
      * @return ($translatable is null ? null : TranslatableInterface)
      */
     public static function normalize(

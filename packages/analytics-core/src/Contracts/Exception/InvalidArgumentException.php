@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when an argument given to the framework is invalid, e.g. a property
+ * name that does not exist in the summary class.
+ */
 class InvalidArgumentException extends \InvalidArgumentException implements AnalyticsException {}

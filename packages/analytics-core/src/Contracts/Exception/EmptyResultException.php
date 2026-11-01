@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when an operation needs at least one row in the query result, but
+ * the result is empty. For example, when generating a chart.
+ */
 class EmptyResultException extends UnderflowException {}

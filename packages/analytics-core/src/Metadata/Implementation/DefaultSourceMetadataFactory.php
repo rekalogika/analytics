@@ -18,6 +18,12 @@ use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
+/**
+ * Default implementation of SourceMetadataFactory. On construction, it goes
+ * through every summary class, and inverts the relationship: from each source
+ * class and each of its properties, to the summary classes that depend on
+ * that property.
+ */
 final readonly class DefaultSourceMetadataFactory implements SourceMetadataFactory
 {
     /**
@@ -75,6 +81,11 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
         return $uniqueInvolvedProperties;
     }
 
+    /**
+     * Also includes the summaries of the parent classes of the source, so
+     * that a change to an entity of a subclass is detected by a summary
+     * declared on the superclass.
+     */
     #[\Override]
     public function getSourceMetadata(string $sourceClassName): SourceMetadata
     {

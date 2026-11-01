@@ -16,6 +16,11 @@ namespace Rekalogika\Analytics\Metadata\Util;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 
 /**
+ * Recursive iterator over a dimension tree, where the children of a dimension
+ * are the dimensions of the group it holds. Wrap it in a
+ * `\RecursiveIteratorIterator`, or a `\RecursiveTreeIterator` for display,
+ * to walk the whole tree.
+ *
  * @implements \RecursiveIterator<array-key,DimensionMetadata>
  */
 final readonly class DimensionMetadataIterator implements \RecursiveIterator
@@ -26,7 +31,8 @@ final readonly class DimensionMetadataIterator implements \RecursiveIterator
     private \ArrayIterator $iterator;
 
     /**
-     * @param array<array-key,DimensionMetadata> $dimensions
+     * @param array<array-key,DimensionMetadata> $dimensions The dimensions at
+     * this level of the tree, e.g. the root dimensions of a summary.
      */
     public function __construct(array $dimensions)
     {

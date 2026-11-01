@@ -13,9 +13,17 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Source;
 
+/**
+ * Provides the metadata of source entity classes, i.e. the entities being
+ * summarized. The inverse of `SummaryMetadataFactory`: given a source, which
+ * summaries depend on it.
+ */
 interface SourceMetadataFactory
 {
     /**
+     * Returns the metadata of the source class. Every class is a valid
+     * source. A class that no summary depends on gets empty metadata.
+     *
      * @param class-string $sourceClassName
      */
     public function getSourceMetadata(

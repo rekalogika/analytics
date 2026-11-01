@@ -23,10 +23,21 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
+/**
+ * Default implementation of DimensionMetadataFactory. Reads the `Dimension`
+ * attribute of the property, and, if the type of the property is a dimension
+ * group, recursively builds the metadata of the group's dimensions as the
+ * children of the dimension.
+ */
 final readonly class DefaultDimensionMetadataFactory implements DimensionMetadataFactory
 {
     private DimensionGroupMetadataFactory $dimensionGroupMetadataFactory;
 
+    /**
+     * @param DimensionGroupMetadataFactory $dimensionGroupMetadataFactory
+     * This factory passes itself to it using `with()`, so the group factory
+     * can create the metadata of the dimensions inside a group.
+     */
     public function __construct(
         private AttributeCollectionFactory $attributeCollectionFactory,
         DimensionGroupMetadataFactory $dimensionGroupMetadataFactory,

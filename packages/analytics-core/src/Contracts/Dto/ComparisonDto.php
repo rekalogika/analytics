@@ -15,8 +15,18 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
+/**
+ * Serializable representation of a Doctrine Collections `Comparison`: a field
+ * compared with a value using an operator, e.g. `country = 'FR'`.
+ */
 final readonly class ComparisonDto extends ExpressionDto
 {
+    /**
+     * @param string $field The dimension name.
+     * @param string $operator The comparison operator, as used by Doctrine
+     * Collections, e.g. `=`, `<>`, `<`, `IN`.
+     * @param ValueDto $value The value to compare the field with.
+     */
     public function __construct(
         public string $field,
         public string $operator,

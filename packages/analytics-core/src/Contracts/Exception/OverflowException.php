@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when a result exceeds a configured safeguard limit.
+ */
 class OverflowException extends \OverflowException implements AnalyticsException {}

@@ -17,6 +17,10 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * A message to be translated, with its parameters and translation domain. The
+ * framework uses it for its own messages, which live in the
+ * `rekalogika_analytics` domain by default.
+ *
  * Modified from Symfony\Component\Translation\TranslatableMessage, so we don't
  * have to depend on the Translation component.
  *
@@ -25,7 +29,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class TranslatableMessage implements TranslatableInterface, \Stringable
 {
     /**
-     * @param array<string,mixed> $parameters
+     * @param string $message The message id.
+     * @param array<string,mixed> $parameters The parameters to substitute in
+     * the message. A parameter that is itself translatable is translated
+     * first.
+     * @param string|null $domain The translation domain.
      */
     public function __construct(
         private string $message,

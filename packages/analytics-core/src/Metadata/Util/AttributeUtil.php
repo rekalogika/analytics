@@ -13,11 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Util;
 
+/**
+ * Reflection helpers for reading attributes and property types, taking class
+ * inheritance into account.
+ */
 final readonly class AttributeUtil
 {
     private function __construct() {}
 
     /**
+     * Returns the class of the object, followed by all of its parent classes
+     * and all the interfaces it implements.
+     *
      * @param object|class-string $objectOrClass
      * @return iterable<class-string>
      */
@@ -42,6 +49,10 @@ final readonly class AttributeUtil
     }
 
     /**
+     * Returns the properties of the class, including the private properties
+     * declared in its parent classes, which plain reflection does not return.
+     * A property redeclared in a subclass is returned once, from the subclass.
+     *
      * @param class-string $class
      * @return iterable<\ReflectionProperty>
      */
@@ -66,6 +77,11 @@ final readonly class AttributeUtil
     }
 
     /**
+     * Returns the class, interface, or enum named in the type declaration of
+     * the property, or null if the property is untyped, has a built-in type
+     * such as `int`, has a union or intersection type, or names a class that
+     * does not exist. A nullable type such as `?Country` returns the class.
+     *
      * @return class-string|null
      */
     public static function getTypeClassFromReflection(
@@ -95,6 +111,10 @@ final readonly class AttributeUtil
     }
 
     /**
+     * Like `getTypeClassFromReflection()`, but looks the property up by name,
+     * searching the parent classes if it is not declared in the class itself.
+     * Returns null if the property does not exist.
+     *
      * @param class-string $class
      * @return class-string|null
      */
@@ -119,6 +139,10 @@ final readonly class AttributeUtil
 
 
     /**
+     * Instantiates the attributes of the class, followed by those of its
+     * parent classes and interfaces. Attributes that cannot be instantiated,
+     * e.g. because their class is not loaded, are skipped.
+     *
      * @param class-string $class
      * @return iterable<object>
      */
@@ -139,6 +163,10 @@ final readonly class AttributeUtil
     }
 
     /**
+     * Instantiates the attributes of the property, as declared in the class
+     * and in each of its parent classes that declares the same property.
+     * Attributes that cannot be instantiated are skipped.
+     *
      * @param class-string $class
      * @param string $property
      * @return iterable<object>
