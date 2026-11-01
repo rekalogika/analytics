@@ -18,6 +18,11 @@ use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Thrown when a query returns more rows than the configured safeguard limit.
+ * The limit protects against queries that would consume too much memory, e.g.
+ * a query grouped by a high-cardinality dimension without a dice predicate.
+ */
 class QueryResultOverflowException extends OverflowException implements TranslatableInterface
 {
     public function __construct(private int $limit)
@@ -36,6 +41,9 @@ class QueryResultOverflowException extends OverflowException implements Translat
         return $translatable->trans($translator, $locale);
     }
 
+    /**
+     * The configured maximum number of rows.
+     */
     public function getLimit(): int
     {
         return $this->limit;

@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when there is too little data for an operation, e.g. an empty
+ * result.
+ */
 class UnderflowException extends \UnderflowException implements AnalyticsException {}

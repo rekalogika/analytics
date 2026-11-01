@@ -18,8 +18,18 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * Implemented by summary entities that needs to modify the query builder used
  * for rolling-up the source.
+ *
+ * This is the way to restrict which source entities are summarized, e.g. to
+ * exclude cancelled orders or soft-deleted records. The framework applies the
+ * modification to every query it makes against the source entities: the
+ * roll-up into the summary table, the determination of the key range to
+ * refresh, and the listing of the source entities of a cell.
  */
 interface HasQueryBuilderModifier
 {
+    /**
+     * Modifies the query builder, typically by adding WHERE conditions. The
+     * root alias of the source entity can be obtained from the query builder.
+     */
     public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void;
 }

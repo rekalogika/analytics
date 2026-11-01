@@ -16,7 +16,10 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
- * Represent a list of cube cells.
+ * Represent a list of cube cells, keyed by their coordinates, as returned by
+ * `CubeCell::drillDown()`. The cells are in the order determined by the
+ * query's `orderBy()`, or in the natural order of the dimension members if
+ * none was given.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

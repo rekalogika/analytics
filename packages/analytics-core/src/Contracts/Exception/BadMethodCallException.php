@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when a method is called in an unsupported way, e.g. when it is not
+ * applicable to the state of the object.
+ */
 class BadMethodCallException extends \BadMethodCallException implements AnalyticsException {}

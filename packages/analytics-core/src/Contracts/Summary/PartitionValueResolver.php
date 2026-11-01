@@ -14,7 +14,15 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Contracts\Summary;
 
 /**
- * @template T
+ * The value resolver of the partition of a summary class. It resolves the
+ * partitioning value of the source entity, e.g. its primary key, and converts
+ * it between the representation in the source and the integer the partition
+ * works with.
+ *
+ * Used in the `Partition` attribute of the summary class.
+ *
+ * @template T The type of the partitioning value in the source entity, e.g.
+ * `int` for an integer primary key.
  */
 interface PartitionValueResolver extends ValueResolver
 {
@@ -30,14 +38,17 @@ interface PartitionValueResolver extends ValueResolver
     /**
      * Transforms a source value to the summary value in PHP. It must be able to
      * accept input in string format because the value may come from a CLI
-     * argument.
+     * argument, e.g. the start and end of `SummaryManager::refresh()`.
      *
      * @param T|string $value
+     * @return int The integer the partition is computed from.
      */
     public function transformSourceValueToSummaryValue(mixed $value): int;
 
     /**
-     * Transforms a summary value to the source value in PHP.
+     * Transforms a summary value to the source value in PHP. The inverse of
+     * `transformSourceValueToSummaryValue()`, used e.g. to query the source
+     * entities belonging to a partition.
      *
      * @return T
      */

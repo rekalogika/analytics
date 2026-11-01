@@ -28,14 +28,15 @@ interface Measure extends Property
     public function getValue(): mixed;
 
     /**
-     * The value returned by Doctrine.
+     * The value returned by Doctrine, bypassing getters and the user value
+     * transformation of the aggregate function.
      */
     public function getRawValue(): mixed;
 
     /**
-     * The value's unit of measurement. This is useful for formatting, or used
-     * by charting libraries to determine if different measures can be plotted
-     * on the same axis.
+     * The value's unit of measurement, or null if the measure has none. This
+     * is useful for formatting, or used by charting libraries to determine if
+     * different measures can be plotted on the same axis.
      */
     public function getUnit(): ?Unit;
 }

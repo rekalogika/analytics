@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when a requested item does not exist.
+ */
 class NotFoundException extends RuntimeException implements AnalyticsException {}

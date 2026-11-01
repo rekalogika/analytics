@@ -19,6 +19,12 @@ use Rekalogika\Contracts\Rekapager\PageableInterface;
  * Represent a cell, which is an object that contains dimension coordinates and
  * measures.
  *
+ * The coordinates identify the cell: one member for each dimension in the
+ * cell. The measures are the aggregated values over all the source entities
+ * that match the coordinates. This interface is the common base of
+ * `CubeCell`, the cell inside a query result, and the standalone cell
+ * produced by `CoordinatesMapper`.
+ *
  * For consumption only, do not implement. Methods may be added in the future.
  */
 interface Cell
@@ -30,7 +36,7 @@ interface Cell
     public function getCoordinates(): Coordinates;
 
     /**
-     * The measures of this cell.
+     * The measures of this cell, keyed by measure name.
      */
     public function getMeasures(): Measures;
 

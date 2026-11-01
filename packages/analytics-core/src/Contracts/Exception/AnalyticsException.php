@@ -13,4 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Marker interface implemented by every exception thrown by the framework, so
+ * that callers can catch all of them at once.
+ */
 interface AnalyticsException extends \Throwable {}

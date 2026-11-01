@@ -13,4 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Contracts\Exception;
 
+/**
+ * Thrown when a value does not match the expected type or set of values.
+ */
 class UnexpectedValueException extends \UnexpectedValueException implements AnalyticsException {}

@@ -16,10 +16,23 @@ namespace Rekalogika\Analytics\Contracts\DimensionGroup;
 use Rekalogika\Analytics\Contracts\Context\DimensionGroupContext;
 
 /**
- * If a dimension group is context-aware, it will get an instance of
- * HierarchyContext when the hierarchy is created.
+ * A dimension group is an embeddable object holding several related
+ * dimensions, e.g. the year, month, and day of a date. If a dimension group
+ * implements this interface, the framework calls `setContext()` right after
+ * populating the object from a row of the query result, before any of its
+ * getters are called.
+ *
+ * The context lets the getters of the group return user-facing values
+ * computed from the raw values stored in the properties. Use
+ * `ContextAwareDimensionGroupTrait` for a ready-made implementation of this
+ * interface.
+ *
+ * @see DimensionGroupContext
  */
 interface ContextAwareDimensionGroup
 {
+    /**
+     * Receives the context from the framework.
+     */
     public function setContext(DimensionGroupContext $context): void;
 }

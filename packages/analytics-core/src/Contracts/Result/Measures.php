@@ -16,7 +16,8 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Rekalogika\Analytics\Contracts\Collection\OrderedMap;
 
 /**
- * Collection of measures, in no particular order.
+ * Collection of the measures of a cell, keyed by measure name, in no
+ * particular order.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  *

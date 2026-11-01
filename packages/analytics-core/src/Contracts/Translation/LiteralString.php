@@ -17,7 +17,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Translatable that simply returns a string, without translation.
+ * Translatable that simply returns a string, without translation. Useful where
+ * the framework expects a `TranslatableInterface`, e.g. as a label, but the
+ * text should be shown as is.
  */
 final readonly class LiteralString implements TranslatableInterface, \Stringable
 {

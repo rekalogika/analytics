@@ -16,19 +16,22 @@ namespace Rekalogika\Analytics\Contracts\Result;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * Represent a property, which can be either a dimension or a measure
+ * Represent a property, which can be either a dimension or a measure. The
+ * common base of `Dimension` and `Measure`.
  *
  * For consumption only, do not implement. Methods may be added in the future.
  */
 interface Property
 {
     /**
-     * Property name (e.g. country, time.hour, count, etc)
+     * Property name (e.g. country, time.hour, count, etc). Properties inside a
+     * dimension group are named using dot notation.
      */
     public function getName(): string;
 
     /**
-     * Description of the property (e.g. Country, Hour of the day)
+     * Description of the property (e.g. Country, Hour of the day), as given in
+     * the `Dimension` or `Measure` attribute of the summary class.
      */
     public function getLabel(): TranslatableInterface;
 }

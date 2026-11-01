@@ -15,10 +15,17 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
+/**
+ * Serializable representation of a Doctrine Collections
+ * `CompositeExpression`: several expressions combined with a logical
+ * operator.
+ */
 final readonly class CompositeExpressionDto extends ExpressionDto
 {
     /**
-     * @param list<ExpressionDto> $expressions
+     * @param string $type The logical operator, as used by Doctrine
+     * Collections: `AND`, `OR`, or `NOT`.
+     * @param list<ExpressionDto> $expressions The expressions being combined.
      */
     public function __construct(
         public string $type,

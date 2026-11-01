@@ -15,11 +15,25 @@ namespace Rekalogika\Analytics\Contracts\Dto;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 
+/**
+ * Serializable representation of a `Coordinates`: the members of each
+ * dimension, plus the dice predicate in effect. Use `CoordinatesMapper` to
+ * convert between the two.
+ *
+ * The DTO converts to and from a plain array, and can be JSON-encoded. This
+ * allows a cell to be identified outside of a query result, e.g. in a URL that
+ * links from a cell in a chart to a page listing its source entities.
+ *
+ * @see \Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper
+ */
 final readonly class CoordinatesDto implements \JsonSerializable
 {
     /**
-     * @param array<string,int|string|null> $members Key is dimension name, value is the
-     * serialized raw member value.
+     * @param array<string,int|string|null> $members Key is dimension name,
+     * value is the serialized raw member value, as produced by the
+     * `ValueSerializer` of the dimension.
+     * @param ExpressionDto|null $predicate The dice predicate in effect when
+     * the cell was produced, or null if none.
      */
     public function __construct(
         private array $members,
@@ -33,6 +47,8 @@ final readonly class CoordinatesDto implements \JsonSerializable
     }
 
     /**
+     * Converts the coordinates to their array form.
+     *
      * @return array<string,mixed>
      */
     public function toArray(): array
@@ -45,8 +61,10 @@ final readonly class CoordinatesDto implements \JsonSerializable
     }
 
     /**
+     * Converts the array form, as produced by `toArray()`, back into a DTO.
+     *
      * @param array<string,mixed> $array
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If the array is not valid coordinates.
      */
     public static function fromArray(array $array): self
     {
@@ -97,6 +115,8 @@ final readonly class CoordinatesDto implements \JsonSerializable
     }
 
     /**
+     * The serialized members, keyed by dimension name.
+     *
      * @return array<string,int|string|null>
      */
     public function getMembers(): array
@@ -104,6 +124,9 @@ final readonly class CoordinatesDto implements \JsonSerializable
         return $this->members;
     }
 
+    /**
+     * The dice predicate, or null if none.
+     */
     public function getPredicate(): ?ExpressionDto
     {
         return $this->predicate;
