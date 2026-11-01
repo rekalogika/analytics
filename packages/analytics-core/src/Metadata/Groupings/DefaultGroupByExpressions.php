@@ -21,7 +21,9 @@ use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 
 /**
- * Default implementation of GroupByExpressions.
+ * Default implementation of GroupByExpressions, backed by an array. Created by
+ * the metadata when it asks a grouping strategy for the group by expression
+ * of a summary class or a dimension group.
  *
  * @implements \IteratorAggregate<string,Field|FieldSet|Cube|RollUp|GroupingSet>
  */
@@ -31,6 +33,7 @@ final readonly class DefaultGroupByExpressions implements
 {
     /**
      * @param array<string,Field|FieldSet|Cube|RollUp|GroupingSet> $expressions
+     * The group by expressions, keyed by dimension property name.
      */
     public function __construct(
         private array $expressions,

@@ -20,6 +20,12 @@ use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 
 /**
+ * The grouping strategy used for the root dimensions of a summary class that
+ * does not specify one. Each plain dimension becomes a `Cube` of its own,
+ * while a dimension group keeps the expression of its own strategy. The
+ * summary metadata puts each item in the GROUP BY clause separately, so the
+ * result is the cross product: every combination of every root dimension.
+ *
  * @internal
  */
 final readonly class RootGroupingStrategy implements GroupingStrategy

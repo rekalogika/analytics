@@ -17,9 +17,22 @@ use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 
+/**
+ * Attribute collection of a dimension inside a dimension group, that falls
+ * back to the attributes of the parent dimension when the dimension itself
+ * does not have the requested attribute. This lets an attribute placed on the
+ * property holding the group apply to every dimension inside it, e.g. a time
+ * zone setting on a time dimension applying to its year, month, and day.
+ */
 final readonly class DimensionAwareAttributeCollectionDecorator implements
     AttributeCollection
 {
+    /**
+     * @param AttributeCollection $decorated The attributes of the dimension
+     * itself.
+     * @param DimensionMetadata $dimensionMetadata The parent dimension, whose
+     * attributes are used as the fallback.
+     */
     public function __construct(
         private AttributeCollection $decorated,
         private DimensionMetadata $dimensionMetadata,

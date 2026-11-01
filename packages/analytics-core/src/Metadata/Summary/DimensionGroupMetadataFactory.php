@@ -13,15 +13,27 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+/**
+ * Creates the metadata of dimension group classes.
+ */
 interface DimensionGroupMetadataFactory
 {
     /**
-     * @param class-string $class
+     * Returns the metadata of the dimension group class.
+     *
+     * @param class-string $class A class having the `DimensionGroup`
+     * attribute.
      */
     public function getDimensionGroupMetadata(
         string $class,
     ): DimensionGroupMetadata;
 
+    /**
+     * Returns a copy of this factory that uses the given factory to create
+     * the metadata of the dimensions inside a group. This breaks the circular
+     * dependency between the two factories: the dimension metadata factory
+     * calls this with itself.
+     */
     public function with(
         DimensionMetadataFactory $dimensionMetadataFactory,
     ): static;

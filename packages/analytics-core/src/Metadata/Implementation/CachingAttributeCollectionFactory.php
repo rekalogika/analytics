@@ -18,8 +18,18 @@ use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\CacheInterface;
 
+/**
+ * Decorator that caches the attribute collections returned by another
+ * factory, so each class and property is reflected only once.
+ */
 final readonly class CachingAttributeCollectionFactory implements AttributeCollectionFactory
 {
+    /**
+     * @param AttributeCollectionFactory $decorated The factory doing the
+     * actual work.
+     * @param CacheInterface $cache Where the collections are stored. Defaults
+     * to an in-memory cache that lives as long as this object.
+     */
     public function __construct(
         private AttributeCollectionFactory $decorated,
         private CacheInterface $cache = new ArrayAdapter(),

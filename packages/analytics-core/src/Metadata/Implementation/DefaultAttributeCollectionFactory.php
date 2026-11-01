@@ -17,6 +17,11 @@ use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
+/**
+ * Reads attributes using reflection, walking up the parent classes and
+ * interfaces of the given class. Usually wrapped in a
+ * `CachingAttributeCollectionFactory`.
+ */
 final readonly class DefaultAttributeCollectionFactory implements AttributeCollectionFactory
 {
     /**

@@ -23,8 +23,22 @@ use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
 
+/**
+ * Default implementation of DimensionGroupMetadataFactory. Finds the
+ * properties of the group having the `Dimension` attribute, and delegates the
+ * creation of their metadata to the `DimensionMetadataFactory`.
+ *
+ * The two factories depend on each other, because a dimension can hold a
+ * group and a group holds dimensions. The circular dependency is resolved by
+ * `with()`: the dimension metadata factory passes itself to this factory at
+ * construction time.
+ */
 final readonly class DefaultDimensionGroupMetadataFactory implements DimensionGroupMetadataFactory
 {
+    /**
+     * @param DimensionMetadataFactory|null $dimensionMetadataFactory Usually
+     * left null, and supplied later through `with()`.
+     */
     public function __construct(
         private AttributeCollectionFactory $attributeCollectionFactory,
         private ?DimensionMetadataFactory $dimensionMetadataFactory = null,

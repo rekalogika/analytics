@@ -18,6 +18,23 @@ use Rekalogika\Analytics\Metadata\Util\HierarchicalTranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The label of a dimension, with access to the labels of its ancestors. For a
+ * dimension inside a dimension group, e.g. the year inside a time group, the
+ * label alone ("Year") is often ambiguous, so the user interface can choose
+ * between several combinations of the labels along the path from the root
+ * dimension to this one. Translating the object directly gives the leaf
+ * label.
+ *
+ * Given the path Time / Civil / Year, the methods return:
+ *
+ * - `getLeaf()`: Year
+ * - `getRoot()`: Time
+ * - `getRootToLeaf()`: Time / Civil / Year
+ * - `getRootAndLeaf()`: Time / Year
+ * - `getRootToParent()`: Time / Civil
+ * - `getRootChildToParent()`: Civil
+ */
 final class HierarchyAwareLabel implements TranslatableInterface
 {
     /**
@@ -36,6 +53,8 @@ final class HierarchyAwareLabel implements TranslatableInterface
     }
 
     /**
+     * The labels along the path, root first, leaf last.
+     *
      * @return list<TranslatableInterface>
      */
     private function getLabels(): array
@@ -56,6 +75,9 @@ final class HierarchyAwareLabel implements TranslatableInterface
         return $this->labels;
     }
 
+    /**
+     * The label of the dimension itself.
+     */
     public function getLeaf(): TranslatableInterface
     {
         $labels = $this->getLabels();
@@ -70,6 +92,10 @@ final class HierarchyAwareLabel implements TranslatableInterface
         return $result;
     }
 
+    /**
+     * The label of the root dimension. Same as `getLeaf()` for a root
+     * dimension.
+     */
     public function getRoot(): TranslatableInterface
     {
         $labels = $this->getLabels();
@@ -88,11 +114,18 @@ final class HierarchyAwareLabel implements TranslatableInterface
         return $result;
     }
 
+    /**
+     * Every label along the path, joined with " / ".
+     */
     public function getRootToLeaf(): TranslatableInterface
     {
         return new HierarchicalTranslatableMessage($this->getLabels());
     }
 
+    /**
+     * The root and the leaf labels joined with " / ", skipping the levels in
+     * between. Just the label for a root dimension.
+     */
     public function getRootAndLeaf(): TranslatableInterface
     {
         $root = $this->getRoot();
@@ -108,6 +141,11 @@ final class HierarchyAwareLabel implements TranslatableInterface
         ]);
     }
 
+    /**
+     * Every label along the path except the leaf, joined with " / ".
+     *
+     * @throws LogicException For a root dimension.
+     */
     public function getRootToParent(): ?TranslatableInterface
     {
         $labels = $this->getLabels();
@@ -126,6 +164,12 @@ final class HierarchyAwareLabel implements TranslatableInterface
         return new HierarchicalTranslatableMessage($result);
     }
 
+    /**
+     * The labels between the root and the leaf, both excluded, joined with
+     * " / ". Null if the dimension is a direct child of the root.
+     *
+     * @throws LogicException For a root dimension.
+     */
     public function getRootChildToParent(): ?TranslatableInterface
     {
         $labels = $this->getLabels();

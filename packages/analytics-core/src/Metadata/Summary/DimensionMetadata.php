@@ -29,14 +29,30 @@ use Rekalogika\DoctrineAdvancedGroupBy\GroupingSet;
 use Rekalogika\DoctrineAdvancedGroupBy\RollUp;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Metadata of a dimension, at any level of the dimension tree. A dimension
+ * holding a dimension group has the group's dimensions as children, and its
+ * grouping strategy decides which combinations of them are stored. A
+ * dimension without children is a leaf: it has a column in the summary table,
+ * and can be used in queries. The string form of the metadata is the property
+ * name.
+ *
+ * The metadata is immutable. A dimension is first created standalone, then
+ * re-created with its parent and its summary through `withParent()` and
+ * `withSummaryMetadata()` as the tree is assembled from the leaves up.
+ */
 final readonly class DimensionMetadata extends PropertyMetadata implements \Stringable
 {
     /**
+     * The children, keyed by fully qualified name.
+     *
      * @var array<string,DimensionMetadata>
      */
     private array $children;
 
     /**
+     * The children, keyed by property name.
+     *
      * @var array<string,DimensionMetadata>
      */
     private array $childrenByPropertyName;
@@ -50,9 +66,35 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     private Field|FieldSet|Cube|RollUp|GroupingSet $groupByExpression;
 
     /**
-     * @param null|class-string $typeClass
-     * @param array<string,DimensionMetadata> $children
-     * @param Order|array<string,Order> $orderBy
+     * @param string $propertyName The name of the PHP property.
+     * @param ValueResolver $valueResolver How the value is derived from the
+     * source entity. For a child dimension, it is combined with
+     * `$parentValueResolver` through `DimensionGroupAware::withInput()`.
+     * @param TranslatableInterface $label The label of this dimension alone,
+     * without the labels of its ancestors.
+     * @param null|class-string $typeClass The class of the property type.
+     * @param TranslatableInterface $nullLabel The label shown for a null
+     * member.
+     * @param Order|array<string,Order> $orderBy The default ordering of the
+     * members, see the `Dimension` attribute.
+     * @param bool $mandatory Whether the user interface prevents removing the
+     * dimension from a pivot table.
+     * @param bool $hidden Whether the dimension is hidden from the user
+     * interface.
+     * @param AttributeCollection $attributes The attributes of the property.
+     * @param GroupingStrategy|null $groupingStrategy The strategy of the
+     * dimension group held by this dimension, or null for a leaf.
+     * @param array<string,DimensionMetadata> $children The dimensions of the
+     * group held by this dimension, or an empty array for a leaf.
+     * @param self|null $parent The dimension holding the group this dimension
+     * belongs to, or null for a root dimension.
+     * @param string|null $parentPath The fully qualified name of the parent,
+     * prepended to the property name to form this dimension's name.
+     * @param ValueResolver|null $parentValueResolver The value resolver of
+     * the parent, fed into this dimension's resolver.
+     * @param SummaryMetadata|null $summaryMetadata The owning summary.
+     * @throws LogicException If a child dimension's value resolver does not
+     * implement `DimensionGroupAware`.
      */
     public function __construct(
         string $propertyName,
@@ -168,6 +210,11 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return $this->getPropertyName();
     }
 
+    /**
+     * The label of the dimension, aware of the labels of its ancestors, so the
+     * caller can choose to show e.g. "Time / Civil / Year" or only "Year".
+     * Translating it directly gives the label of this dimension alone.
+     */
     #[\Override]
     public function getLabel(): HierarchyAwareLabel
     {
@@ -175,6 +222,8 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     }
 
     /**
+     * The label of this dimension alone, as given in the attribute.
+     *
      * @internal
      */
     public function getRawLabel(): TranslatableInterface
@@ -182,6 +231,10 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return parent::getLabel();
     }
 
+    /**
+     * Returns a copy of this dimension, and of its descendants, attached to
+     * the given summary. Called by `SummaryMetadata` on the root dimensions.
+     */
     public function withSummaryMetadata(
         SummaryMetadata $summaryMetadata,
     ): self {
@@ -201,6 +254,12 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         );
     }
 
+    /**
+     * Returns a copy of this dimension placed under the given parent. The
+     * copy gets its fully qualified name from the parent's path, and its
+     * value resolver takes the parent's resolver as input. Called by the
+     * parent's constructor on each of its children.
+     */
     public function withParent(
         self $parent,
         string $parentPath,
@@ -231,22 +290,37 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         );
     }
 
+    /**
+     * How the value of the dimension is derived from the source entity. For a
+     * child dimension, this already incorporates the resolvers of its
+     * ancestors.
+     */
     public function getValueResolver(): ValueResolver
     {
         return $this->valueResolver;
     }
 
+    /**
+     * The identifier the framework uses for this dimension in the DQL queries
+     * it generates. Derived from the fully qualified name, so it is stable
+     * and safe to use as an alias.
+     */
     public function getDqlAlias(): string
     {
         return $this->dqlAlias;
     }
 
+    /**
+     * The label shown in place of a null member.
+     */
     public function getNullLabel(): TranslatableInterface
     {
         return $this->nullLabel;
     }
 
     /**
+     * The default ordering of the members, see the `Dimension` attribute.
+     *
      * @return Order|array<string,Order>
      */
     public function getOrderBy(): Order|array
@@ -255,6 +329,9 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     }
 
     /**
+     * Whether the user interface prevents the dimension from being removed
+     * from a pivot table.
+     *
      * @todo deprecate this?
      */
     public function isMandatory(): bool
@@ -262,17 +339,27 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return $this->mandatory;
     }
 
+    /**
+     * The dimension holding the group this dimension belongs to, or null for
+     * a root dimension.
+     */
     public function getParent(): ?self
     {
         return $this->parent;
     }
 
+    /**
+     * Returns true if this is not a root dimension.
+     */
     public function hasParent(): bool
     {
         return $this->parent !== null;
     }
 
     /**
+     * The direct children of this dimension, keyed by fully qualified name.
+     * Empty for a leaf dimension.
+     *
      * @return array<string,DimensionMetadata>
      */
     public function getChildren(): array
@@ -280,14 +367,21 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return $this->children;
     }
 
+    /**
+     * Returns true if this dimension holds a dimension group, i.e. it is not
+     * a leaf.
+     */
     public function hasChildren(): bool
     {
         return $this->children !== [];
     }
 
     /**
+     * Returns a direct child by its property name.
+     *
      * @param string $name Name is the property name of the child dimension. Not
      * the fully-qualified name.
+     * @throws LogicException If there is no such child.
      */
     public function getChild(string $name): DimensionMetadata
     {
@@ -300,6 +394,9 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     }
 
     /**
+     * Returns every dimension below this one, at any depth, keyed by fully
+     * qualified name, in depth-first order.
+     *
      * @return iterable<string,DimensionMetadata>
      */
     public function getDescendants(): iterable
@@ -314,6 +411,9 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     }
 
     /**
+     * Returns the leaf dimensions below this one, keyed by fully qualified
+     * name. Does not include this dimension itself, even if it is a leaf.
+     *
      * @return iterable<string,DimensionMetadata>
      */
     public function getLeaves(): iterable
@@ -325,16 +425,30 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         }
     }
 
+    /**
+     * The grouping strategy of the dimension group held by this dimension, or
+     * null for a leaf dimension.
+     */
     public function getGroupingStrategy(): ?GroupingStrategy
     {
         return $this->groupingStrategy;
     }
 
+    /**
+     * The group by expression of this dimension, as used by the strategy of
+     * its parent. A plain `Field` for a leaf dimension, or the result of this
+     * dimension's own grouping strategy applied to its children.
+     */
     public function getGroupByExpression(): Field|FieldSet|Cube|RollUp|GroupingSet
     {
         return $this->groupByExpression;
     }
 
+    /**
+     * The attributes of the property. For a child dimension, the attributes
+     * of its parent are used as a fallback, so an attribute on the property
+     * holding a group applies to the dimensions inside the group.
+     */
     #[\Override]
     public function getAttributes(): AttributeCollection
     {

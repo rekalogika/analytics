@@ -22,6 +22,18 @@ use Rekalogika\Analytics\Metadata\Implementation\RootGroupingStrategy;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+/**
+ * Metadata of a summary class: everything the framework derives from the
+ * class's attributes and Doctrine mapping. Obtain it from
+ * `SummaryMetadataFactory`.
+ *
+ * Dimensions form a tree. The root dimensions are the properties of the
+ * summary class with the `Dimension` attribute. A root dimension whose type
+ * is a dimension group has the group's dimensions as children, and so on. The
+ * leaf dimensions are the ones without children; they are the only ones that
+ * can be used in queries, and are referred to by their fully qualified name,
+ * e.g. `time.civil.year`.
+ */
 final readonly class SummaryMetadata
 {
     /**
@@ -69,14 +81,23 @@ final readonly class SummaryMetadata
     private GroupBy $groupByExpression;
 
     /**
-     *
-     * @param class-string $sourceClass
-     * @param class-string $summaryClass
-     * @param non-empty-array<string,DimensionMetadata> $dimensions
-     * @param non-empty-array<string,MeasureMetadata> $measures
+     * @param class-string $sourceClass The entity class being summarized.
+     * @param class-string $summaryClass The summary entity class.
+     * @param PartitionMetadata $partition The partition of the summary.
+     * @param non-empty-array<string,DimensionMetadata> $dimensions The root
+     * dimensions, keyed by property name.
+     * @param non-empty-array<string,MeasureMetadata> $measures The measures,
+     * keyed by property name.
+     * @param string $groupingsProperty The property with the `Groupings`
+     * attribute.
+     * @param AttributeCollection $attributes The attributes of the summary
+     * class.
+     * @param TranslatableInterface $label The label of the summary.
      * @param GroupingStrategy|null $groupingStrategy The grouping strategy of
      * the root dimensions. If null, the summary stores the cube of all the
      * root dimensions.
+     * @throws MetadataException If the grouping strategy is invalid or
+     * produces no grouping set.
      */
     public function __construct(
         private string $sourceClass,
@@ -245,6 +266,8 @@ final readonly class SummaryMetadata
     }
 
     /**
+     * The summary entity class.
+     *
      * @return class-string
      */
     public function getSummaryClass(): string
@@ -253,6 +276,8 @@ final readonly class SummaryMetadata
     }
 
     /**
+     * The entity class being summarized.
+     *
      * @return class-string
      */
     public function getSourceClass(): string
@@ -260,11 +285,18 @@ final readonly class SummaryMetadata
         return $this->sourceClass;
     }
 
+    /**
+     * The label of the summary, as given in the `Summary` attribute, or the
+     * short class name if none was given.
+     */
     public function getLabel(): TranslatableInterface
     {
         return $this->label;
     }
 
+    /**
+     * The attributes of the summary class, including custom ones.
+     */
     public function getAttributes(): AttributeCollection
     {
         return $this->attributes;
@@ -275,6 +307,10 @@ final readonly class SummaryMetadata
     //
 
     /**
+     * Returns every property having analytics metadata: all the dimensions at
+     * every level of the tree, the measures, and the partition, keyed by
+     * fully qualified name.
+     *
      * @return array<string,PropertyMetadata>
      */
     public function getProperties(): array
@@ -282,6 +318,12 @@ final readonly class SummaryMetadata
         return $this->properties;
     }
 
+    /**
+     * Returns a property by its fully qualified name, e.g. `time.civil.year`
+     * or `count`.
+     *
+     * @throws MetadataException If there is no such property.
+     */
     public function getProperty(string $propertyName): PropertyMetadata
     {
         return $this->properties[$propertyName]
@@ -292,6 +334,9 @@ final readonly class SummaryMetadata
     }
 
     /**
+     * Alias of `getProperties()`, for treating the summary as the root of the
+     * property tree.
+     *
      * @return array<string,PropertyMetadata>
      */
     public function getChildren(): array
@@ -299,6 +344,10 @@ final readonly class SummaryMetadata
         return $this->getProperties();
     }
 
+    /**
+     * Alias of `getProperty()`, for treating the summary as the root of the
+     * property tree.
+     */
     public function getChild(string $propertyName): PropertyMetadata
     {
         return $this->getProperty($propertyName);
@@ -308,11 +357,18 @@ final readonly class SummaryMetadata
     // partition
     //
 
+    /**
+     * The partition of the summary.
+     */
     public function getPartition(): PartitionMetadata
     {
         return $this->partition;
     }
 
+    /**
+     * The name of the property with the `Groupings` attribute, which stores
+     * the grouping set of each row.
+     */
     public function getGroupingsProperty(): string
     {
         return $this->groupingsProperty;
@@ -323,8 +379,9 @@ final readonly class SummaryMetadata
     //
 
     /**
-     * Returns all the root dimensions. The DimensionPropertyMetadatas of a
-     * DimensionMetadata are not included in this list.
+     * Returns all the root dimensions, i.e. the properties of the summary
+     * class having the `Dimension` attribute. The children of a dimension
+     * group are not included in this list.
      *
      * @return non-empty-array<string,DimensionMetadata>
      */
@@ -333,6 +390,11 @@ final readonly class SummaryMetadata
         return $this->rootDimensions;
     }
 
+    /**
+     * Returns a root dimension by its name.
+     *
+     * @throws MetadataException If there is no such root dimension.
+     */
     public function getRootDimension(string $dimensionName): DimensionMetadata
     {
         return $this->rootDimensions[$dimensionName]
@@ -344,9 +406,10 @@ final readonly class SummaryMetadata
 
 
     /**
-     * Returns all the leaf dimensions, which can be either a DimensionMetadata
-     * or a DimensionPropertyMetadata. The DimensionMetadata of a
-     * DimensionPropertyMetadata is not included in this list.
+     * Returns all the leaf dimensions, i.e. the dimensions without children,
+     * keyed by fully qualified name. These are the dimensions that can be
+     * used in queries and that have a column in the summary table. A root
+     * dimension that is not a dimension group is also a leaf.
      *
      * @return non-empty-array<string,DimensionMetadata>
      */
@@ -355,6 +418,11 @@ final readonly class SummaryMetadata
         return $this->leafDimensions;
     }
 
+    /**
+     * Returns a leaf dimension by its fully qualified name.
+     *
+     * @throws MetadataException If there is no such leaf dimension.
+     */
     public function getLeafDimension(string $dimensionName): DimensionMetadata
     {
         return $this->leafDimensions[$dimensionName]
@@ -366,7 +434,7 @@ final readonly class SummaryMetadata
 
     /**
      * Returns all the dimensions, including root, leaf, and intermediate
-     * dimensions.
+     * dimensions, keyed by fully qualified name.
      *
      * @return non-empty-array<string,DimensionMetadata>
      */
@@ -375,6 +443,12 @@ final readonly class SummaryMetadata
         return $this->allDimensions;
     }
 
+    /**
+     * Returns a dimension at any level of the tree by its fully qualified
+     * name.
+     *
+     * @throws MetadataException If there is no such dimension.
+     */
     public function getDimension(string $dimensionName): DimensionMetadata
     {
         return $this->allDimensions[$dimensionName]
@@ -385,9 +459,11 @@ final readonly class SummaryMetadata
     }
 
     /**
-     * Returns the dimension by its DQL alias.
+     * Returns the leaf dimension by its DQL alias, the identifier the
+     * framework uses for the dimension in the queries it generates.
      *
-     * @return DimensionMetadata
+     * @see DimensionMetadata::getDqlAlias()
+     * @throws MetadataException If no leaf dimension has the alias.
      */
     public function getDimensionByAlias(string $alias): DimensionMetadata
     {
@@ -403,6 +479,8 @@ final readonly class SummaryMetadata
     //
 
     /**
+     * Returns all the measures, keyed by property name.
+     *
      * @return non-empty-array<string,MeasureMetadata>
      */
     public function getMeasures(): array
@@ -410,6 +488,11 @@ final readonly class SummaryMetadata
         return $this->measures;
     }
 
+    /**
+     * Returns a measure by its property name.
+     *
+     * @throws MetadataException If there is no such measure.
+     */
     public function getMeasure(string $measureName): MeasureMetadata
     {
         return $this->measures[$measureName]
@@ -424,7 +507,13 @@ final readonly class SummaryMetadata
     //
 
     /**
-     * Source class to the list of its properties that influence this summary.
+     * The properties of the source class that influence this summary, as
+     * declared by the value resolvers and aggregate functions of the
+     * dimensions and measures. Only the first segment of each property path
+     * is kept, e.g. `customer` for `customer.country`, because a change to
+     * the `customer` association is what Doctrine reports. The refresh engine
+     * uses this to decide whether a change to a source entity affects the
+     * summary.
      *
      * @return list<string>
      */
@@ -437,6 +526,11 @@ final readonly class SummaryMetadata
     // group by expression
     //
 
+    /**
+     * The complete GROUP BY clause used when rolling up the source entities
+     * into the summary table. It determines which grouping sets are stored.
+     * A copy is returned, so the caller may modify it.
+     */
     public function getGroupByExpression(): GroupBy
     {
         return clone $this->groupByExpression;
@@ -447,7 +541,11 @@ final readonly class SummaryMetadata
     //
 
     /**
+     * Checks that every name is a leaf dimension or the special `@values`
+     * dimension.
+     *
      * @param list<string> $dimensions
+     * @throws InvalidArgumentException If one of the names is not valid.
      */
     public function ensureDimensionsValid(array $dimensions): void
     {
@@ -467,7 +565,10 @@ final readonly class SummaryMetadata
     }
 
     /**
+     * Checks that every name is a measure.
+     *
      * @param list<string> $measures
+     * @throws InvalidArgumentException If one of the names is not valid.
      */
     public function ensureMeasuresValid(array $measures): void
     {
@@ -482,7 +583,11 @@ final readonly class SummaryMetadata
     }
 
     /**
+     * Checks that every name is a leaf dimension, a measure, or the special
+     * `@values` dimension.
+     *
      * @param list<string> $properties
+     * @throws InvalidArgumentException If one of the names is not valid.
      */
     public function ensurePropertiesValid(array $properties): void
     {

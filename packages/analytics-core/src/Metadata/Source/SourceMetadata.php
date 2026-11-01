@@ -13,6 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Source;
 
+/**
+ * Metadata of a source entity class: which summary classes depend on it, and
+ * through which of its properties. The refresh engine uses it to decide which
+ * summaries to mark as outdated when an entity is created, updated, or
+ * deleted.
+ */
 final readonly class SourceMetadata
 {
     /**
@@ -21,8 +27,10 @@ final readonly class SourceMetadata
     private array $allInvolvedSummaryClasses;
 
     /**
-     * @param class-string $class
-     * @param array<string,list<class-string>> $propertyToSummaryClasses
+     * @param class-string $class The source entity class.
+     * @param array<string,list<class-string>> $propertyToSummaryClasses For
+     * each property of the source, the summary classes whose values depend on
+     * it.
      */
     public function __construct(
         private string $class,
@@ -41,6 +49,8 @@ final readonly class SourceMetadata
     }
 
     /**
+     * The source entity class.
+     *
      * @return class-string
      */
     public function getClass(): string
@@ -49,6 +59,9 @@ final readonly class SourceMetadata
     }
 
     /**
+     * For each property of the source, the summary classes whose values
+     * depend on it.
+     *
      * @return array<string,list<class-string>>
      */
     public function getPropertyToSummaryClasses(): array
@@ -57,6 +70,10 @@ final readonly class SourceMetadata
     }
 
     /**
+     * Returns the summary classes affected by a change to the given
+     * properties. Used when an entity is updated, so that summaries that do
+     * not use any of the changed properties are not refreshed needlessly.
+     *
      * @param list<string> $changedProperties
      * @return list<class-string>
      */
@@ -78,6 +95,9 @@ final readonly class SourceMetadata
     }
 
     /**
+     * Returns every summary class that depends on this source. Used when an
+     * entity is created or deleted, which affects every summary of it.
+     *
      * @return list<class-string>
      */
     public function getAllInvolvedSummaryClasses(): array

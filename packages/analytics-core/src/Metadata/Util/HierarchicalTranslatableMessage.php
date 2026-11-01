@@ -16,10 +16,18 @@ namespace Rekalogika\Analytics\Metadata\Util;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translatable that translates each of several labels and joins them with
+ * " / ". Used to display the path of a dimension inside dimension groups,
+ * e.g. "Time / Civil / Year".
+ *
+ * @see \Rekalogika\Analytics\Metadata\Summary\HierarchyAwareLabel
+ */
 final readonly class HierarchicalTranslatableMessage implements TranslatableInterface
 {
     /**
-     * @param list<TranslatableInterface> $labels
+     * @param list<TranslatableInterface> $labels The labels to join, in
+     * order.
      */
     public function __construct(
         private array $labels,
