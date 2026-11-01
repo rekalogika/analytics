@@ -71,6 +71,19 @@ final readonly class PartitionHandler
     }
 
     /**
+     * Transforms a value of the partitioning key from the source into the
+     * integer domain of the partitions, i.e. the domain of
+     * `Partition::getLowerBound()` and `Partition::getUpperBound()`.
+     */
+    public function transformSourceValueToSummaryValue(
+        mixed $sourceValue,
+    ): int {
+        return $this->partitionMetadata
+            ->getSource()
+            ->transformSourceValueToSummaryValue($sourceValue);
+    }
+
+    /**
      * Takes a value of the partitioning key from the source, then creates the
      * partition object from the value and the specified level.
      */
@@ -79,8 +92,7 @@ final readonly class PartitionHandler
         int $level,
     ): Partition {
         $partitionClass = $this->partitionMetadata->getPartitionClass();
-        $valueResolver = $this->partitionMetadata->getSource();
-        $inputValue = $valueResolver->transformSourceValueToSummaryValue($sourceValue);
+        $inputValue = $this->transformSourceValueToSummaryValue($sourceValue);
 
         return $partitionClass::createFromSourceValue($inputValue, $level);
     }

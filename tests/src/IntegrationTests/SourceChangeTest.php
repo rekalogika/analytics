@@ -18,11 +18,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\EventListener\TestNewDirtyFlagListener;
+use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
@@ -457,5 +460,40 @@ final class SourceChangeTest extends KernelTestCase
         $transport->process();
         $transport->queue()->assertCount(0);
         $this->assertEquals(2, $this->getOrderCountIn2030());
+    }
+
+    /**
+     * The latest key of a UUID-partitioned summary is a UUID string, while
+     * the partition bounds are integers. Refreshing an old partition that is
+     * not the last child of its containing partition must still mark the
+     * containing partition as dirty.
+     */
+    public function testUuidPartitionRefreshMarksUpperPartitionDirty(): void
+    {
+        $this->clearRefreshState();
+
+        $refresher = static::getContainer()
+            ->get('rekalogika.analytics.summary_refresher_factory');
+
+        $this->assertInstanceOf(SummaryRefresherFactory::class, $refresher);
+
+        $refresher = $refresher->createSummaryRefresher(CustomerSummary::class);
+
+        // the first lowest-level partition of the level-27 partition
+        // containing 2020-01-01, well before the latest summarized customer
+
+        $key = intdiv(1577836800000, 1 << 27) * (1 << 27);
+        $partition = UuidV7IntegerPartition::createFromSourceValue($key, 22);
+        $upperPartition = $partition->getContaining();
+
+        $this->assertNotNull($upperPartition);
+        $this->assertNotSame($upperPartition->getUpperBound(), $partition->getUpperBound());
+
+        $dirtyFlags = $refresher->refreshPartition($partition);
+
+        $this->assertCount(1, $dirtyFlags);
+        $this->assertSame(CustomerSummary::class, $dirtyFlags[0]->getClass());
+        $this->assertSame($upperPartition->getLevel(), $dirtyFlags[0]->getLevel());
+        $this->assertSame($upperPartition->getKey(), $dirtyFlags[0]->getKey());
     }
 }
