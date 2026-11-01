@@ -29,6 +29,7 @@ use Symfony\Bundle\MonologBundle\MonologBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\UX\Chartjs\ChartjsBundle;
@@ -53,7 +54,26 @@ final class Kernel extends BaseKernel
     }
 
     #[\Override]
-    protected function build(ContainerBuilder $container): void {}
+    protected function build(ContainerBuilder $container): void
+    {
+        // stimulus-bundle before 2.15 looks for UX packages in the vendor
+        // directory under the project directory. the project directory of
+        // this app is not where the vendor directory is.
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            #[\Override]
+            public function process(ContainerBuilder $container): void
+            {
+                $id = 'stimulus.asset_mapper.ux_package_reader';
+
+                if (!$container->hasDefinition($id)) {
+                    return;
+                }
+
+                $container->getDefinition($id)
+                    ->setArgument(0, \dirname(__DIR__, 3));
+            }
+        });
+    }
 
     #[\Override]
     public function registerBundles(): iterable
