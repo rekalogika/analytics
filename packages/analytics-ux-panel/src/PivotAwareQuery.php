@@ -78,31 +78,6 @@ final class PivotAwareQuery
         );
 
         //
-        // Make sure mandatory dimensions are placed as the first dimensions of
-        // the row.
-        //
-
-        $mandatoryDimensions = [];
-
-        foreach ($this->metadata->getLeafDimensions() as $name => $dimension) {
-            if ($name === '@values') {
-                continue;
-            }
-
-            if ($this->isDimensionMandatory($name)) {
-                $mandatoryDimensions[] = $name;
-            }
-        }
-
-        $this->rows = array_merge(
-            $mandatoryDimensions,
-            array_values(array_diff($this->rows, $mandatoryDimensions)),
-        );
-
-        $this->columns = array_values(array_diff($this->columns, $mandatoryDimensions));
-        $this->filters = array_values(array_diff($this->filters, $mandatoryDimensions));
-
-        //
         // Process filters.
         //
 
@@ -340,18 +315,6 @@ final class PivotAwareQuery
     public function getResult(): CubeCell
     {
         return $this->query->getResult();
-    }
-
-    //
-    // Helpers.
-    //
-
-    private function isDimensionMandatory(string $dimension): bool
-    {
-        // Trim dot and the string after.
-        $dimension = explode('.', $dimension)[0];
-
-        return $this->metadata->getDimension($dimension)->isMandatory();
     }
 
     //

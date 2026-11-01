@@ -37,6 +37,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -265,7 +266,22 @@ final class AppController extends AbstractController
         // populate query from url parameter
         $query = $this->summaryManager->createQuery()->from($class);
         $query = $pivotAwareQueryFactory->createFromParameters($query, $parameters);
-        $cubeCell = $query->getResult();
+
+        // a user-facing error, like a combination of dimensions that is not
+        // available in the summary, becomes a bad request instead of a server
+        // error.
+        try {
+            $cubeCell = $query->getResult();
+        } catch (\Throwable $e) {
+            $e = FrontendWrapperException::selectiveWrap($e);
+
+            if (!$e instanceof AnalyticsFrontendException) {
+                throw $e;
+            }
+
+            throw new BadRequestHttpException($e->trans($this->translator), $e);
+        }
+
         $dimensions = $query->getDimensions();
         $measures = $query->getValues();
 

@@ -77,8 +77,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
      * member.
      * @param Order|array<string,Order> $orderBy The default ordering of the
      * members, see the `Dimension` attribute.
-     * @param bool $mandatory Whether the user interface prevents removing the
-     * dimension from a pivot table.
      * @param bool $hidden Whether the dimension is hidden from the user
      * interface.
      * @param AttributeCollection $attributes The attributes of the property.
@@ -103,7 +101,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         ?string $typeClass,
         private TranslatableInterface $nullLabel,
         private Order|array $orderBy,
-        private bool $mandatory,
         bool $hidden,
         AttributeCollection $attributes,
         private ?GroupingStrategy $groupingStrategy,
@@ -245,7 +242,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
             orderBy: $this->orderBy,
-            mandatory: $this->mandatory,
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
             groupingStrategy: $this->groupingStrategy,
@@ -278,7 +274,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
             orderBy: $this->orderBy,
-            mandatory: $this->mandatory,
             hidden: $this->isHidden(),
             attributes: $this->getAttributes(),
             groupingStrategy: $this->groupingStrategy,
@@ -326,17 +321,6 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
     public function getOrderBy(): Order|array
     {
         return $this->orderBy;
-    }
-
-    /**
-     * Whether the user interface prevents the dimension from being removed
-     * from a pivot table.
-     *
-     * @todo deprecate this?
-     */
-    public function isMandatory(): bool
-    {
-        return $this->mandatory;
     }
 
     /**

@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
+use Rekalogika\Analytics\Core\GroupingStrategy\ExplicitGroupingSetsStrategy;
 use Rekalogika\Analytics\Core\Partition\SingleLevelIntegerPartition;
 use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
 use Rekalogika\Analytics\Core\ValueResolver\PropertyValue;
@@ -32,10 +33,22 @@ use Rekalogika\Analytics\Time\ValueResolver\DateToInteger;
 use Rekalogika\Analytics\Time\ValueResolver\TimeBinValueResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
+/**
+ * Occupancy is a snapshot, so it is mostly meaningful per date. The summary
+ * stores the daily figures, and a few breakdowns by calendar attribute. Other
+ * combinations, like day of week together with day of month, are not stored,
+ * and querying them fails with `GroupingSetNotAvailable`.
+ */
 #[ORM\Entity()]
 #[Analytics\Summary(
     sourceClass: OccupancyHistory::class,
     label: new TranslatableMessage('Occupancy History'),
+    groupingStrategy: new ExplicitGroupingSetsStrategy([
+        ['date', 'dayOfWeek', 'gender'],
+        ['dayOfWeek', 'gender'],
+        ['dayOfMonth', 'gender'],
+        ['dayOfYear', 'gender'],
+    ]),
 )]
 class OccupancyHistorySummary extends BaseSummary
 {
@@ -58,7 +71,6 @@ class OccupancyHistorySummary extends BaseSummary
             binClass: Date::class,
         ),
         label: new TranslatableMessage('Date', domain: 'rekalogika_analytics'),
-        mandatory: true,
     )]
     #[TimeProperties(
         sourceTimeZone: new \DateTimeZone('Asia/Jakarta'),

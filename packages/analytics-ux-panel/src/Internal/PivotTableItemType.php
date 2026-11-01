@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\UX\PanelBundle\Internal;
 enum PivotTableItemType: string
 {
     case Dimension = 'dimension';
-    case MandatoryDimension = 'mandatorydimension';
     case Measure = 'measure';
     case Values = 'values';
 }
