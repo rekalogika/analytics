@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryRefresher\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
+use Rekalogika\Analytics\Core\ValueResolver\IntegerValue;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
@@ -25,7 +27,9 @@ use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 /**
- * Roll up lower level summary to higher level by grouping by the entire row set
+ * Roll up lower level summary to higher level by grouping by the entire row set.
+ * The rows are classified into the partitions of the given level, so a range
+ * may span multiple partitions.
  */
 final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery implements SummaryRefresherQuery
 {
@@ -33,6 +37,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
         EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $metadata,
         private readonly string $insertSql,
+        private readonly int $level,
     ) {
         $simpleQueryBuilder = new SimpleQueryBuilder(
             entityManager: $entityManager,
@@ -58,7 +63,14 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
         $lowerBound = $start->getLowerBound();
         $upperBound = $end->getUpperBound();
         $lowerLevel = PartitionUtil::getLowerLevel($start);
-        $currentLevel = $start->getLevel();
+
+        if ($start->getLevel() !== $this->level) {
+            throw new LogicException(\sprintf(
+                'The query is for partition level "%d", but got a range on level "%d"',
+                $this->level,
+                $start->getLevel(),
+            ));
+        }
 
         if ($lowerLevel === null) {
             throw new LogicException('The lowest level must be rolled up from the source');
@@ -67,8 +79,7 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
         $clone->getSimpleQueryBuilder()
             ->setParameter('lowerBound', $lowerBound)
             ->setParameter('upperBound', $upperBound)
-            ->setParameter('lowerLevel', $lowerLevel)
-            ->setParameter('currentLevel', $currentLevel);
+            ->setParameter('lowerLevel', $lowerLevel);
 
         return $clone;
     }
@@ -91,14 +102,27 @@ final class RollUpSummaryToSummaryGroupAllStrategyQuery extends AbstractQuery im
     private function processPartition(): void
     {
         $partitionMetadata = $this->metadata->getPartition();
+        $partitionClass = $partitionMetadata->getPartitionClass();
 
-        $partitionKeyProperty = $this->getSimpleQueryBuilder()
-            ->resolve($partitionMetadata->getFullyQualifiedPartitionKeyProperty());
+        // classify the keys of the lower level partitions into the partitions
+        // of the current level. the keys are already in the integer domain of
+        // the partition, so they are used as is.
+
+        $classifier = $partitionClass::getClassifierExpression(
+            input: new IntegerValue($partitionMetadata->getFullyQualifiedPartitionKeyProperty()),
+            level: $this->level,
+            context: new SourceQueryContext(
+                queryBuilder: $this->getSimpleQueryBuilder(),
+                summaryMetadata: $this->metadata,
+                partitionMetadata: $partitionMetadata,
+            ),
+        );
 
         $this->getSimpleQueryBuilder()
-            ->addSelect(\sprintf('MIN(%s) AS p_key', $partitionKeyProperty))
+            ->addSelect(\sprintf('%s AS p_key', $classifier))
             ->addSelect('0 + :currentLevel AS p_level')
-            ->setParameter('currentLevel', '(placeholder) partition level')
+            ->setParameter('currentLevel', $this->level)
+            ->addGroupBy('p_key')
             ->addGroupBy('p_level')
         ;
     }

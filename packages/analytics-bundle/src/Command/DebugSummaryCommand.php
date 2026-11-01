@@ -117,7 +117,7 @@ final class DebugSummaryCommand extends Command
             ->createSummaryRefresher($summaryClass);
 
         $this->printSourceToSummaryRollupSql($io, $refresher);
-        $this->printSummaryToSummaryRollupSql($io, $refresher);
+        $this->printSummaryToSummaryRollupSql($io, $refresher, $summaryClass);
         $this->printDeleteSummarySql($io, $refresher);
     }
 
@@ -257,16 +257,34 @@ final class DebugSummaryCommand extends Command
         );
     }
 
+    /**
+     * @param class-string $summaryClass
+     */
     private function printSummaryToSummaryRollupSql(
         SymfonyStyle $io,
         SummaryRefresher $refresher,
+        string $summaryClass,
     ): void {
+        $partitionClass = $this->summaryMetadataFactory
+            ->getSummaryMetadata($summaryClass)
+            ->getPartition()
+            ->getPartitionClass();
+
+        // the query is specific to a level, we print the one rolling up the
+        // lowest level. a partition with a single level has no such query.
+
+        $level = array_reverse($partitionClass::getAllLevels())[1] ?? null;
+
+        if ($level === null) {
+            return;
+        }
+
         $sqlFactory = $refresher->getSqlFactory();
 
         $this->printSummaryEntityQuery(
             io: $io,
-            query: $sqlFactory->getRollUpSummaryToSummaryQuery(),
-            title: 'SQL for Rolling Up Summary to Summary',
+            query: $sqlFactory->getRollUpSummaryToSummaryQuery($level),
+            title: \sprintf('SQL for Rolling Up Summary to Summary (Level %d)', $level),
         );
     }
 
