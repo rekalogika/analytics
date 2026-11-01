@@ -56,8 +56,6 @@ final readonly class Dimension
      * @param null|string|TranslatableInterface $nullLabel The label shown in
      * place of a null member, i.e. source entities with no value for this
      * dimension. Defaults to "(None)".
-     * @param bool $mandatory If true, the user interface does not allow the
-     * dimension to be removed from a pivot table.
      * @param bool $hidden If true, the dimension is not offered in the user
      * interface, but can still be used in queries.
      */
@@ -66,7 +64,6 @@ final readonly class Dimension
         private null|string|TranslatableInterface $label = null,
         private Order|array $orderBy = Order::Ascending,
         private null|string|TranslatableInterface $nullLabel = null,
-        private bool $mandatory = false,
         private bool $hidden = false,
     ) {}
 
@@ -104,15 +101,6 @@ final readonly class Dimension
     public function getNullLabel(): null|string|TranslatableInterface
     {
         return $this->nullLabel;
-    }
-
-    /**
-     * Whether the user interface prevents the dimension from being removed
-     * from a pivot table.
-     */
-    public function isMandatory(): bool
-    {
-        return $this->mandatory;
     }
 
     /**

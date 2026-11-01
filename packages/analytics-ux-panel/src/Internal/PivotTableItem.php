@@ -41,11 +41,7 @@ final readonly class PivotTableItem
     public function getTypeEnum(): PivotTableItemType
     {
         if ($this->property instanceof DimensionMetadata) {
-            if ($this->property->isMandatory()) {
-                return PivotTableItemType::MandatoryDimension;
-            } else {
-                return PivotTableItemType::Dimension;
-            }
+            return PivotTableItemType::Dimension;
         } elseif ($this->property instanceof MeasureMetadata) {
             return PivotTableItemType::Measure;
         } else {

@@ -134,6 +134,9 @@ jobs:
         php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
         php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
 
+    - name: Install importmap packages
+      run: php tests/bin/console importmap:install
+
     - name: Run phpunit
       run: |
         export SYMFONY_DEPRECATIONS_HELPER='max[direct]=0'
