@@ -187,6 +187,7 @@ final class DefaultQuery implements Query
     #[\Override]
     public function dice(?Expression $predicate): static
     {
+        $this->result = null;
         $this->dice = [];
 
         if ($predicate !== null) {
