@@ -106,7 +106,7 @@ final class Month implements MonotonicTimeBin
                 dateType: \IntlDateFormatter::FULL,
                 timeType: \IntlDateFormatter::FULL,
                 timezone: $this->start->getTimezone(),
-                pattern: 'MMMM YYYY',
+                pattern: 'MMMM y',
             );
 
             $formatted = $intlDateFormatter->format($dateTime);

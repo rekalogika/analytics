@@ -157,7 +157,7 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
                 dateType: \IntlDateFormatter::FULL,
                 timeType: \IntlDateFormatter::FULL,
                 timezone: $this->start->getTimezone(),
-                pattern: 'MMMM YYYY',
+                pattern: 'MMMM y',
             );
 
             $month = $intlDateFormatter->format($monthDateTime);

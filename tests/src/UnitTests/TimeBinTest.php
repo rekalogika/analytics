@@ -26,6 +26,7 @@ use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Symfony\Component\Translation\IdentityTranslator;
 
 final class TimeBinTest extends TestCase
 {
@@ -160,6 +161,26 @@ final class TimeBinTest extends TestCase
         $this->assertSame(
             [2025033005, 2025033004, 2025033003, 2025033001, 2025033000],
             $visited,
+        );
+    }
+
+    public function testMonthLabelUsesCalendarYear(): void
+    {
+        // 2021-01-01 is a Friday, so it belongs to ISO week-year 2020.
+        $month = Month::createFromDatabaseValue(202101);
+
+        foreach (['de_DE' => 'Januar 2021', 'fr_FR' => 'janvier 2021', 'en_GB' => 'January 2021'] as $locale => $expected) {
+            $translator = new IdentityTranslator();
+            $translator->setLocale($locale);
+
+            $this->assertSame($expected, $month->trans($translator));
+        }
+
+        $week = MonthBasedWeekWeek::createFromDatabaseValue(2021011);
+
+        $this->assertSame(
+            'Week 1, Januar 2021',
+            $week->trans(new IdentityTranslator(), 'de_DE'),
         );
     }
 
