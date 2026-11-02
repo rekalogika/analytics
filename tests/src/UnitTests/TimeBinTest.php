@@ -291,6 +291,8 @@ final class TimeBinTest extends TestCase
         yield ['class' => Date::class, 'databaseValue' => 20241399];
         yield ['class' => Date::class, 'databaseValue' => 20240230];
         yield ['class' => Hour::class, 'databaseValue' => 2024010125];
+        yield ['class' => IsoWeekWeek::class, 'databaseValue' => 202153];
+        yield ['class' => IsoWeekWeek::class, 'databaseValue' => 202500];
     }
 
     /**
