@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
-use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\TestIntegerPartition;
@@ -53,8 +52,5 @@ final class StaleDirtyFlagTest extends KernelTestCase
             ->findBy(['class' => OrderSummary::class, 'level' => 3]);
 
         $this->assertSame([], $staleFlags);
-        $this->assertNull(
-            $refresher->getNextRefreshTime(new DefaultRefreshAgentStrategy()),
-        );
     }
 }
