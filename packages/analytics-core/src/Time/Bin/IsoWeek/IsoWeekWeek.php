@@ -62,14 +62,14 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
             dateType: \IntlDateFormatter::FULL,
             timeType: \IntlDateFormatter::NONE,
             timezone: $this->start->getTimezone(),
-            pattern: 'D MMMM YYYY',
+            pattern: 'd MMMM y',
         );
 
         return new TranslatableMessage(
             'Week starting on {start}, ending on {end}',
             [
                 '{start}' => $dateFormatter->format($this->start),
-                '{end}' => $dateFormatter->format($this->end),
+                '{end}' => $dateFormatter->format($this->end->modify('-1 day')),
             ],
         );
     }

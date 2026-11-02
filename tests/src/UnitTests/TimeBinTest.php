@@ -202,6 +202,21 @@ final class TimeBinTest extends TestCase
         }
     }
 
+    public function testWeekTitles(): void
+    {
+        $translator = new IdentityTranslator();
+
+        $this->assertSame(
+            'Week starting on 30 December 2024, ending on 5 January 2025',
+            IsoWeekWeek::createFromDatabaseValue(202501)->getTitle()->trans($translator, 'en'),
+        );
+
+        $this->assertSame(
+            'Week starting on 3 February 2025, ending on 9 February 2025',
+            MonthBasedWeekWeek::createFromDatabaseValue(2025021)->getTitle()->trans($translator, 'en'),
+        );
+    }
+
     /**
      * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int}>
      */
