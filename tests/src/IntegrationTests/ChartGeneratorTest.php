@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
+use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -24,8 +25,8 @@ use Symfony\UX\Chartjs\Model\Chart;
 final class ChartGeneratorTest extends KernelTestCase
 {
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
+     * @param list<string> $dimensions
+     * @param list<string> $measures
      */
     private function createChart(
         array $dimensions,
@@ -157,6 +158,64 @@ final class ChartGeneratorTest extends KernelTestCase
         );
 
         $this->assertSame($expectedNulls, $actualNulls);
+    }
+
+    public function testMeasuresWithDifferentUnitsGetTheirOwnAxis(): void
+    {
+        $chart = $this->createChart(
+            ['customerCountry'],
+            ['count', 'price', 'uniqueCustomers', 'maxPrice'],
+            ChartType::Bar,
+        );
+
+        /** @var array{datasets:list<array{yAxisID?:string}>} */
+        $data = $chart->getData();
+
+        $this->assertSame(
+            ['y', 'y1', 'y', 'y1'],
+            array_map(
+                static fn(array $dataSet): ?string => $dataSet['yAxisID'] ?? null,
+                $data['datasets'],
+            ),
+        );
+
+        /** @var array{scales:array<string,array{position?:string,title:array{display:bool,text?:string}}>} */
+        $options = $chart->getOptions();
+        $scales = $options['scales'];
+
+        $this->assertSame(['x', 'y', 'y1'], array_keys($scales));
+
+        // unitless measures, the legend tells them apart
+        $this->assertFalse($scales['y']['title']['display']);
+
+        $this->assertSame('Monetary Value (EUR)', $scales['y1']['title']['text'] ?? null);
+        $this->assertSame('right', $scales['y1']['position'] ?? null);
+    }
+
+    /**
+     * @return iterable<string,array{list<string>,list<string>,ChartType}>
+     */
+    public static function provideUnsupportedData(): iterable
+    {
+        yield 'no dimension' => [[], ['count'], ChartType::Bar];
+        yield 'no measure' => [['customerCountry'], [], ChartType::Bar];
+        yield 'stacked bar with one dimension' => [['customerCountry'], ['count'], ChartType::StackedBar];
+        yield 'grouped bar with one dimension' => [['customerCountry'], ['count'], ChartType::GroupedBar];
+    }
+
+    /**
+     * @param list<string> $dimensions
+     * @param list<string> $measures
+     */
+    #[DataProvider('provideUnsupportedData')]
+    public function testUnsupportedData(
+        array $dimensions,
+        array $measures,
+        ChartType $chartType,
+    ): void {
+        $this->expectException(UnsupportedData::class);
+
+        $this->createChart($dimensions, $measures, $chartType);
     }
 
     private function getYTitle(Chart $chart): ?string

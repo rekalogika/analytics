@@ -20,9 +20,10 @@ use Symfony\UX\Chartjs\Model\Chart;
 interface ChartGenerator
 {
     /**
-     * @param non-empty-list<string> $dimensions
-     * @param non-empty-list<string> $measures
-     * @throws UnsupportedData
+     * @param list<string> $dimensions
+     * @param list<string> $measures
+     * @throws UnsupportedData If the dimensions or measures are not suitable
+     * for the chart type
      * @throws AnalyticsFrontendException
      */
     public function createChart(
