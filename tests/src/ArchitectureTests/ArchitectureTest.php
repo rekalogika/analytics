@@ -159,6 +159,7 @@ final class ArchitectureTest
                 Selector::classname(\Override::class),
                 Selector::classname(\BackedEnum::class),
                 Selector::classname(\UnitEnum::class),
+                Selector::classname(\Closure::class),
 
                 // reflections
                 Selector::classname(\ReflectionClass::class),
