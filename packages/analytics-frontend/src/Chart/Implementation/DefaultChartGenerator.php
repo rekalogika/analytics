@@ -301,9 +301,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             foreach ($selectedMeasures as $name) {
                 $measure = $measures->get($name);
 
-                /** @psalm-suppress MixedAssignment */
-                $value = $measure?->getValue() ?? 0;
-                $dataSets[$name]['data'][] = $this->numberifier->toNumber($value);
+                $dataSets[$name]['data'][] = $this->toChartValue($measure?->getValue());
             }
         }
 
@@ -443,7 +441,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     throw new UnexpectedValueException('Measure not found');
                 }
 
-                $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measureObject->getValue());
+                $dataSets[$signature]['data'][] = $this->toChartValue($measureObject->getValue());
 
                 if ($yTitle === null) {
                     $unit = $measureObject->getUnit();
@@ -552,7 +550,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     'display' => false,
                 ],
             ],
-
+            'spanGaps' => true,
         ]);
 
         return $chart;
@@ -663,6 +661,19 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         }
 
         return $selectedMeasures;
+    }
+
+    /**
+     * A missing value is emitted as null, not zero, so that the chart shows a
+     * gap instead of a dip to zero.
+     */
+    private function toChartValue(mixed $value): int|float|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return $this->numberifier->toNumber($value);
     }
 
     private function getSignature(mixed $variable): string

@@ -111,6 +111,54 @@ final class ChartGeneratorTest extends KernelTestCase
         $this->assertArrayNotHasKey('labels', $legend);
     }
 
+    #[DataProvider('provideTwoDimensionalChartType')]
+    public function testMissingValueIsNullInTwoDimensionalChart(ChartType $chartType): void
+    {
+        $dimensions = ['time.civil.month.month', 'customerGender'];
+
+        $result = static::getContainer()
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions(...$dimensions)
+            ->getResult();
+
+        $chart = static::getContainer()
+            ->get(ChartGenerator::class)
+            ->createChart(
+                cube: $result,
+                dimensions: $dimensions,
+                measures: ['price'],
+                chartType: $chartType,
+            );
+
+        $expectedNulls = [];
+
+        foreach ($result->drillDown($dimensions[0]) as $firstCell) {
+            $i = 0;
+
+            foreach ($firstCell->drillDown($dimensions[1]) as $secondCell) {
+                $expectedNulls[$i][] = $secondCell->getMeasures()->get('price')?->getValue() === null;
+                $i++;
+            }
+        }
+
+        $this->assertContains(true, array_merge(...$expectedNulls), 'Fixture has no missing value');
+
+        /** @var array{datasets:list<array{data:list<int|float|null>}>} */
+        $data = $chart->getData();
+
+        $actualNulls = array_map(
+            static fn(array $dataSet): array => array_map(
+                static fn(int|float|null $value): bool => $value === null,
+                $dataSet['data'],
+            ),
+            $data['datasets'],
+        );
+
+        $this->assertSame($expectedNulls, $actualNulls);
+    }
+
     private function getYTitle(Chart $chart): ?string
     {
         /** @var array{scales?:array{y?:array{title?:array{text?:string}}}} */
