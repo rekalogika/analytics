@@ -17,22 +17,22 @@ use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Decorator that caches the attribute collections returned by another
  * factory, so each class and property is reflected only once.
  */
-final readonly class CachingAttributeCollectionFactory implements AttributeCollectionFactory
+final class CachingAttributeCollectionFactory implements AttributeCollectionFactory
 {
     /**
-     * Collections that cannot be serialized, e.g. because an attribute holds
-     * a closure, so they cannot be stored in the cache. They are kept here
-     * instead, so they are still reflected only once per process.
+     * The collections already fetched, so the cache is consulted only once
+     * per process for each. This also covers collections the cache fails to
+     * store, e.g. because an attribute holds a closure, which would otherwise
+     * be reflected again on every call.
      *
-     * @var \ArrayObject<string,AttributeCollection>
+     * @var array<string,AttributeCollection>
      */
-    private \ArrayObject $unserializableCollections;
+    private array $collections = [];
 
     /**
      * @param AttributeCollectionFactory $decorated The factory doing the
@@ -41,11 +41,9 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
      * to an in-memory cache that lives as long as this object.
      */
     public function __construct(
-        private AttributeCollectionFactory $decorated,
-        private CacheInterface $cache = new ArrayAdapter(),
-    ) {
-        $this->unserializableCollections = new \ArrayObject();
-    }
+        private readonly AttributeCollectionFactory $decorated,
+        private readonly CacheInterface $cache = new ArrayAdapter(),
+    ) {}
 
     /**
      * @param class-string $class
@@ -56,9 +54,11 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
     ): AttributeCollection {
         $cacheKey = hash('xxh128', 'attributes_class_' . $class);
 
-        return $this->get(
+        return $this->collections[$cacheKey] ??= $this->cache->get(
             $cacheKey,
-            fn(): AttributeCollection => $this->decorated->getClassAttributes($class),
+            function () use ($class) {
+                return $this->decorated->getClassAttributes($class);
+            },
         );
     }
 
@@ -73,35 +73,10 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
         // `::` cannot occur in a class or property name, unlike `_`
         $cacheKey = hash('xxh128', 'attributes_property_' . $class . '::' . $property);
 
-        return $this->get(
+        return $this->collections[$cacheKey] ??= $this->cache->get(
             $cacheKey,
-            fn(): AttributeCollection => $this->decorated->getPropertyAttributes($class, $property),
-        );
-    }
-
-    /**
-     * @param \Closure(): AttributeCollection $factory
-     */
-    private function get(string $cacheKey, \Closure $factory): AttributeCollection
-    {
-        if (isset($this->unserializableCollections[$cacheKey])) {
-            return $this->unserializableCollections[$cacheKey];
-        }
-
-        /** @var AttributeCollection */
-        return $this->cache->get(
-            $cacheKey,
-            function (ItemInterface $item, bool &$save) use ($cacheKey, $factory): AttributeCollection {
-                $collection = $factory();
-
-                try {
-                    serialize($collection);
-                } catch (\Throwable) {
-                    $save = false;
-                    $this->unserializableCollections[$cacheKey] = $collection;
-                }
-
-                return $collection;
+            function () use ($class, $property) {
+                return $this->decorated->getPropertyAttributes($class, $property);
             },
         );
     }
