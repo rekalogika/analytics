@@ -411,7 +411,7 @@ final class QueryComponents
                 break;
 
             case $result instanceof \Stringable:
-                $result = addslashes((string) $result);
+                $result = self::escapeFunction((string) $result);
                 break;
 
             case $result === null:
