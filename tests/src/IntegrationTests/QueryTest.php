@@ -563,4 +563,18 @@ final class QueryTest extends KernelTestCase
 
         $this->assertLessThan(190, $count);
     }
+
+    public function testDiceNullResetsResult(): void
+    {
+        $query = $this->getQuery()
+            ->dice(Criteria::expr()->eq('time.civil.year', 2024));
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $query->getResult()->getMeasures()->get('count')?->getValue();
+        $this->assertLessThan(190, $count);
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $query->dice(null)->getResult()->getMeasures()->get('count')?->getValue();
+        $this->assertEquals(190, $count);
+    }
 }
