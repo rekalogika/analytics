@@ -388,7 +388,9 @@ final class QueryTest extends KernelTestCase
         $counts = [];
 
         foreach ($result as $cell) {
-            $counts[] = $cell->getMeasures()->get('count')?->getValue();
+            $count = $cell->getMeasures()->get('count')?->getValue();
+            $this->assertIsInt($count);
+            $counts[] = $count;
         }
 
         $this->assertGreaterThan(1, \count($counts));
