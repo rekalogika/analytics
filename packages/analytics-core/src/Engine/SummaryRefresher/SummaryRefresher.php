@@ -293,17 +293,27 @@ final class SummaryRefresher
 
         // remove new entity flags
 
-        $this->getConnection()->beginTransaction();
-        $this->summaryHandler->getDirtyFlags()->removeNewFlags();
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
 
-        $sourceLatestKey = $this->summaryHandler
-            ->getSource()
-            ->getLatestKey();
+        try {
+            $this->summaryHandler->getDirtyFlags()->removeNewFlags();
 
-        if ($end === null || $end >= $sourceLatestKey) {
-            $this->getConnection()->commit();
-        } else {
-            $this->getConnection()->rollBack();
+            $sourceLatestKey = $this->summaryHandler
+                ->getSource()
+                ->getLatestKey();
+
+            if ($end === null || $end >= $sourceLatestKey) {
+                $connection->commit();
+            } else {
+                $connection->rollBack();
+            }
+        } catch (\Throwable $e) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
+            }
+
+            throw $e;
         }
 
         // dispatch end event
@@ -415,8 +425,24 @@ final class SummaryRefresher
                 ->getPartition()
                 ->transformSourceValueToSummaryValue($summaryLatestKey);
 
-        $this->getConnection()->beginTransaction();
+        $dirtyFlags = $this->getConnection()->transactional(
+            fn(): array => $this->doRefreshRange($range, $summaryLatestValue),
+        );
 
+        $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
+
+        return $dirtyFlags;
+    }
+
+    /**
+     * @param int|null $summaryLatestValue The latest key of the summary,
+     * transformed to the integer domain of the partition bounds.
+     * @return list<DirtyFlag>
+     */
+    private function doRefreshRange(
+        PartitionRange $range,
+        ?int $summaryLatestValue,
+    ): array {
         $this->deleteSummaryRange($range);
         $this->summaryHandler->getDirtyFlags()->removeDirtyFlags($range);
 
@@ -453,8 +479,6 @@ final class SummaryRefresher
         }
 
         $this->entityManager->flush();
-        $this->getConnection()->commit();
-        $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
 
         return $dirtyFlags;
     }
@@ -557,8 +581,16 @@ final class SummaryRefresher
      */
     public function convertNewRecordsToDirtyFlags(): array
     {
-        $this->getConnection()->beginTransaction();
+        return $this->getConnection()->transactional(
+            $this->doConvertNewRecordsToDirtyFlags(...),
+        );
+    }
 
+    /**
+     * @return list<DirtyFlag>
+     */
+    private function doConvertNewRecordsToDirtyFlags(): array
+    {
         $range = $this->summaryHandler->getNewEntitiesRange();
 
         // if there are no new entities, the new flags are stale. remove them,
@@ -567,7 +599,6 @@ final class SummaryRefresher
 
         if ($range === null) {
             $this->summaryHandler->getDirtyFlags()->removeNewFlags();
-            $this->getConnection()->commit();
 
             return [];
         }
@@ -612,7 +643,6 @@ final class SummaryRefresher
         // flush the changes
 
         $this->entityManager->flush();
-        $this->getConnection()->commit();
 
         return $dirtyFlags;
     }
