@@ -64,6 +64,6 @@ final class TruncateUuidToBigintFunction extends FunctionNode implements TypedEx
     #[\Override]
     public function getReturnType(): Type
     {
-        return Type::getType(Types::DATETIME_IMMUTABLE);
+        return Type::getType(Types::BIGINT);
     }
 }
