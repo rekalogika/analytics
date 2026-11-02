@@ -349,5 +349,37 @@ final class TimeBinTest extends TestCase
             'dateTime' => new \DateTimeImmutable('2025-07-01 00:00:00'),
             'databaseValue' => 20250712,
         ];
+
+        // Friday to Sunday belong to the week of the preceding Thursday
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-01-31 12:00:00'),
+            'databaseValue' => 2025015,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-02 23:00:00'),
+            'databaseValue' => 2025015,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-03 00:00:00'),
+            'databaseValue' => 2025021,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekDate::class,
+            'dateTime' => new \DateTimeImmutable('2025-01-31 12:00:00'),
+            'databaseValue' => 20250155,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekDate::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-02 00:00:00'),
+            'databaseValue' => 20250157,
+        ];
     }
 }

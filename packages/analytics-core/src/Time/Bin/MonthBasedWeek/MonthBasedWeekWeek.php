@@ -109,8 +109,10 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
     ): static {
+        // Thursday of the ISO week containing the date. The week belongs to
+        // the month of its Thursday.
         $thursdayThisWeek = \DateTimeImmutable::createFromInterface($dateTime)
-            ->modify('this thursday');
+            ->modify(\sprintf('%+d days', 4 - (int) $dateTime->format('N')));
 
         $thursdayDateOfMonth = (int) $thursdayThisWeek->format('d');
         $weekOfMonth = (int) ceil($thursdayDateOfMonth / 7);
