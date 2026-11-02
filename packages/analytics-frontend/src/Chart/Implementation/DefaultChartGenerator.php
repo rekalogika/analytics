@@ -525,6 +525,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $legend = [
             'display' => true,
             'position' => 'top',
+            'title' => $legendTitle,
         ];
 
         $scales = [
@@ -546,10 +547,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             'locale' => $this->localeSwitcher->getLocale(),
             'scales' => $scales,
             'plugins' => [
-                'legend' => [
-                    'title' => $legendTitle,
-                    'labels' => $legend,
-                ],
+                'legend' => $legend,
                 'title' => [
                     'display' => false,
                 ],
