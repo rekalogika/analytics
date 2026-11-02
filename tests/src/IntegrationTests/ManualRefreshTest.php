@@ -25,6 +25,9 @@ use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresher;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
+use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\Item;
+use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\TestIntegerPartition;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -163,6 +166,90 @@ final class ManualRefreshTest extends KernelTestCase
 
         $this->assertInstanceOf(SummaryProperties::class, $properties);
         $this->assertSame('100', $properties->getLastId());
+
+        $newFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class, 'level' => null, 'key' => null]);
+
+        $this->assertCount(1, $newFlags);
+    }
+
+    /**
+     * A record that arrives during a manual refresh is not covered by the
+     * refresh. Its new entity flag must survive, and the latest key must stay
+     * at the end of the refreshed range, so the refresh agent processes the
+     * record later.
+     */
+    public function testRecordArrivingDuringRefreshKeepsNewFlag(): void
+    {
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $handlerFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_manager.handler_factory');
+
+        $this->assertInstanceOf(HandlerFactory::class, $handlerFactory);
+
+        $summaryHandler = $handlerFactory->getSummary(OrderSummary::class);
+        $summaryHandler->updateLatestKey(100);
+        $sourceLatestKey = $summaryHandler->getSource()->getLatestKey();
+        $this->assertIsInt($sourceLatestKey);
+
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $this->assertInstanceOf(EventDispatcherInterface::class, $eventDispatcher);
+
+        // insert an order while the first range is being refreshed
+
+        $isInserted = false;
+
+        $eventDispatcher->addListener(
+            DeleteRangeStartEvent::class,
+            static function () use ($entityManager, &$isInserted): void {
+                if ($isInserted) {
+                    return;
+                }
+
+                $isInserted = true;
+
+                $item = $entityManager
+                    ->getRepository(Item::class)
+                    ->findOneBy([])
+                    ?? throw new \RuntimeException('Item not found');
+
+                $customer = $entityManager
+                    ->getRepository(Customer::class)
+                    ->findOneBy([])
+                    ?? throw new \RuntimeException('Customer not found');
+
+                $time = new \DateTimeImmutable();
+
+                $order = new Order();
+                $order->setItem($item);
+                $order->setCustomer($customer);
+                $order->setTime($time);
+                $order->setShipped($time->modify('+3 days'));
+
+                $entityManager->persist($order);
+                $entityManager->flush();
+                $entityManager->clear();
+            },
+        );
+
+        $this->createRefresher()->manualRefresh(
+            start: null,
+            end: null,
+            batchSize: 1,
+            resumeId: null,
+        );
+
+        $this->assertTrue($isInserted);
+
+        $properties = $entityManager
+            ->getRepository(SummaryProperties::class)
+            ->findOneBy(['summaryClass' => OrderSummary::class]);
+
+        $this->assertInstanceOf(SummaryProperties::class, $properties);
+        $this->assertSame((string) $sourceLatestKey, $properties->getLastId());
 
         $newFlags = $entityManager
             ->getRepository(DirtyFlag::class)
