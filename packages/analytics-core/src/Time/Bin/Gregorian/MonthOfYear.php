@@ -54,7 +54,7 @@ enum MonthOfYear: int implements RecurringTimeBin
         $dateTime = (new \DateTimeImmutable('now'))
             ->setDate(2000, $this->value, 1);
 
-        $locale = $translator->getLocale();
+        $locale ??= $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             locale: $locale,

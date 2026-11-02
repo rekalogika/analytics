@@ -101,6 +101,8 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
+        $locale ??= $translator->getLocale();
+
         $formatter = new \IntlDateFormatter(
             locale: $locale,
             dateType: \IntlDateFormatter::MEDIUM,

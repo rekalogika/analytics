@@ -16,8 +16,10 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\MonthOfYear;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
@@ -27,6 +29,7 @@ use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class TimeBinTest extends TestCase
 {
@@ -247,6 +250,58 @@ final class TimeBinTest extends TestCase
 
             $current = $next;
         }
+    }
+
+    /**
+     * @param array{de_DE:string,fr_FR:string} $expected
+     */
+    #[DataProvider('localeProvider')]
+    public function testTransLocale(TranslatableInterface $timeBin, array $expected): void
+    {
+        $translator = new IdentityTranslator();
+        $translator->setLocale('de_DE');
+
+        // the translator's locale when no locale is given
+        $this->assertSame($expected['de_DE'], $timeBin->trans($translator));
+
+        // the given locale otherwise
+        $this->assertSame($expected['fr_FR'], $timeBin->trans($translator, 'fr_FR'));
+    }
+
+    /**
+     * @return iterable<array-key,array{timeBin:TranslatableInterface,expected:array{de_DE:string,fr_FR:string}}>
+     */
+    public static function localeProvider(): iterable
+    {
+        yield 'month' => [
+            'timeBin' => Month::createFromDatabaseValue(202503),
+            'expected' => ['de_DE' => 'März 2025', 'fr_FR' => 'mars 2025'],
+        ];
+
+        yield 'day of week' => [
+            'timeBin' => DayOfWeek::Monday,
+            'expected' => ['de_DE' => 'Montag', 'fr_FR' => 'lundi'],
+        ];
+
+        yield 'month of year' => [
+            'timeBin' => MonthOfYear::March,
+            'expected' => ['de_DE' => 'März', 'fr_FR' => 'mars'],
+        ];
+
+        yield 'date' => [
+            'timeBin' => Date::createFromDatabaseValue(20250303),
+            'expected' => ['de_DE' => '03.03.2025', 'fr_FR' => '3 mars 2025'],
+        ];
+
+        yield 'iso week' => [
+            'timeBin' => IsoWeekWeek::createFromDatabaseValue(202510),
+            'expected' => ['de_DE' => '03.03.2025 - 09.03.2025', 'fr_FR' => '3 mars 2025 - 9 mars 2025'],
+        ];
+
+        yield 'month based week' => [
+            'timeBin' => MonthBasedWeekWeek::createFromDatabaseValue(2025031),
+            'expected' => ['de_DE' => 'Week 1, März 2025', 'fr_FR' => 'Week 1, mars 2025'],
+        ];
     }
 
     /**

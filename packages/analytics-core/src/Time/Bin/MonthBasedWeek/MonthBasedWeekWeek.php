@@ -148,6 +148,8 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
+        $locale ??= $translator->getLocale();
+
         try {
             $monthDateTime = new \DateTimeImmutable(
                 \sprintf('%04d-%02d-01 00:00:00', $this->y, $this->m),

@@ -99,7 +99,7 @@ final class Month implements MonotonicTimeBin
         );
 
         try {
-            $locale = $translator->getLocale();
+            $locale ??= $translator->getLocale();
 
             $intlDateFormatter = new \IntlDateFormatter(
                 locale: $locale,
