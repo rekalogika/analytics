@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\SimpleQueryBuilder\Path;
 
+use Doctrine\ORM\QueryBuilder;
+
 final class PathContext
 {
     private int $aliasCounter = 0;
@@ -26,6 +28,24 @@ final class PathContext
      * @var array<string,BaseEntity>
      */
     private array $pathCache = [];
+
+    /**
+     * Returns a copy of this context whose base entities add their joins to
+     * the given query builder.
+     */
+    public function withQueryBuilder(QueryBuilder $queryBuilder): self
+    {
+        $context = new self();
+        $context->aliasCounter = $this->aliasCounter;
+        $context->baseToAlias = $this->baseToAlias;
+
+        foreach ($this->pathCache as $baseEntity) {
+            // the new base entity registers itself in the new context
+            $baseEntity->withQueryBuilder($queryBuilder, $context);
+        }
+
+        return $context;
+    }
 
     public function getAlias(string $basePath): string
     {

@@ -49,8 +49,11 @@ final class SimpleQueryBuilder
             $this->queryBuilder = clone $this->queryBuilder;
         }
 
+        // the path resolver must add its joins to the cloned query builder,
+        // not the original one
         if ($this->pathResolver !== null) {
-            $this->pathResolver = clone $this->pathResolver;
+            $this->pathResolver = $this->pathResolver
+                ->withQueryBuilder($this->getQueryBuilder());
         }
     }
 
