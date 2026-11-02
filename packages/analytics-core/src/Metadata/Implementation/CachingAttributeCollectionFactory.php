@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Decorator that caches the attribute collections returned by another
@@ -24,6 +25,15 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 final readonly class CachingAttributeCollectionFactory implements AttributeCollectionFactory
 {
+    /**
+     * Collections that cannot be serialized, e.g. because an attribute holds
+     * a closure, so they cannot be stored in the cache. They are kept here
+     * instead, so they are still reflected only once per process.
+     *
+     * @var \ArrayObject<string,AttributeCollection>
+     */
+    private \ArrayObject $unserializableCollections;
+
     /**
      * @param AttributeCollectionFactory $decorated The factory doing the
      * actual work.
@@ -33,7 +43,9 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
     public function __construct(
         private AttributeCollectionFactory $decorated,
         private CacheInterface $cache = new ArrayAdapter(),
-    ) {}
+    ) {
+        $this->unserializableCollections = new \ArrayObject();
+    }
 
     /**
      * @param class-string $class
@@ -44,11 +56,9 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
     ): AttributeCollection {
         $cacheKey = hash('xxh128', 'attributes_class_' . $class);
 
-        return $this->cache->get(
+        return $this->get(
             $cacheKey,
-            function () use ($class) {
-                return $this->decorated->getClassAttributes($class);
-            },
+            fn(): AttributeCollection => $this->decorated->getClassAttributes($class),
         );
     }
 
@@ -63,10 +73,35 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
         // `::` cannot occur in a class or property name, unlike `_`
         $cacheKey = hash('xxh128', 'attributes_property_' . $class . '::' . $property);
 
+        return $this->get(
+            $cacheKey,
+            fn(): AttributeCollection => $this->decorated->getPropertyAttributes($class, $property),
+        );
+    }
+
+    /**
+     * @param \Closure(): AttributeCollection $factory
+     */
+    private function get(string $cacheKey, \Closure $factory): AttributeCollection
+    {
+        if (isset($this->unserializableCollections[$cacheKey])) {
+            return $this->unserializableCollections[$cacheKey];
+        }
+
+        /** @var AttributeCollection */
         return $this->cache->get(
             $cacheKey,
-            function () use ($class, $property) {
-                return $this->decorated->getPropertyAttributes($class, $property);
+            function (ItemInterface $item, bool &$save) use ($cacheKey, $factory): AttributeCollection {
+                $collection = $factory();
+
+                try {
+                    serialize($collection);
+                } catch (\Throwable) {
+                    $save = false;
+                    $this->unserializableCollections[$cacheKey] = $collection;
+                }
+
+                return $collection;
             },
         );
     }
