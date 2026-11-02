@@ -71,4 +71,44 @@ final class TableRendererTest extends KernelTestCase
         $this->assertStringNotContainsString('<table', $html);
         $this->assertStringContainsString('No Data', $html);
     }
+
+    public function testTableWithBootstrapTheme(): void
+    {
+        $html = $this->getRenderer()->renderTable(
+            cell: $this->getResult(['customerCountry']),
+            dimensions: ['customerCountry'],
+            measures: ['count'],
+            theme: '@RekalogikaAnalyticsFrontend/bootstrap_5_renderer.html.twig',
+            throwException: true,
+        );
+
+        $this->assertStringContainsString('<table', $html);
+    }
+
+    public function testPivotTableWithBootstrapTheme(): void
+    {
+        $html = $this->getRenderer()->renderPivotTable(
+            cube: $this->getResult(['customerCountry', 'customerGender']),
+            measures: ['count'],
+            rows: ['customerCountry'],
+            columns: ['customerGender', '@values'],
+            theme: '@RekalogikaAnalyticsFrontend/bootstrap_5_renderer.html.twig',
+            throwException: true,
+        );
+
+        $this->assertStringContainsString('<table', $html);
+        $this->assertStringContainsString('var(--bs-gray-100)', $html);
+    }
+
+    public function testTableWithConfiguredTheme(): void
+    {
+        $html = $this->getRenderer()->renderTable(
+            cell: $this->getResult(['customerCountry']),
+            dimensions: ['customerCountry'],
+            measures: ['count'],
+            throwException: true,
+        );
+
+        $this->assertStringContainsString('<table', $html);
+    }
 }
