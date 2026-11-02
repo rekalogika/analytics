@@ -61,21 +61,37 @@ final class PivotAwareQuery
     ) {
         $this->metadata = new PivotAwareMetadataProxy($metadata);
 
-        $this->setRows(
+        //
+        // Process rows, columns, values and filters. Unknown and hidden items
+        // are dropped. An item can only be either in rows or columns.
+        //
+
+        $leafDimensions = $this->metadata->getLeafDimensions();
+        $rowsOrColumns = [...$leafDimensions, '@values' => true];
+
+        $rows = $this->filterItems(
             $this->getListOfStringFromArray($parameters['rows'] ?? null),
+            $rowsOrColumns,
         );
 
-        $this->setColumns(
+        $columns = $this->filterItems(
             $this->getListOfStringFromArray($parameters['columns'] ?? null),
+            $rowsOrColumns,
+            $rows,
         );
 
-        $this->setValues(
+        $this->setRows($rows);
+        $this->setColumns($columns);
+
+        $this->setValues($this->filterItems(
             $this->getListOfStringFromArray($parameters['values'] ?? null),
-        );
+            $this->metadata->getMeasures(),
+        ));
 
-        $this->setFilters(
+        $this->setFilters($this->filterItems(
             $this->getListOfStringFromArray($parameters['filters'] ?? null),
-        );
+            $leafDimensions,
+        ));
 
         //
         // Process filters.
@@ -147,6 +163,37 @@ final class PivotAwareQuery
             if (\is_string($item)) {
                 $result[] = $item;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the items that are among the allowed ones, without duplicates
+     * and without the excluded ones.
+     *
+     * @param list<string> $items
+     * @param array<string,mixed> $allowed
+     * @param list<string> $excluded
+     * @return list<string>
+     */
+    private function filterItems(
+        array $items,
+        array $allowed,
+        array $excluded = [],
+    ): array {
+        $result = [];
+
+        foreach ($items as $item) {
+            if (
+                !\array_key_exists($item, $allowed)
+                || \in_array($item, $result, true)
+                || \in_array($item, $excluded, true)
+            ) {
+                continue;
+            }
+
+            $result[] = $item;
         }
 
         return $result;

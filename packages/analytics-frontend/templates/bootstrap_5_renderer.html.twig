@@ -32,17 +32,19 @@
 
 {%- block td_attr -%}
     {{ parent() }}
-    {% if element.context.subtotalDepth == 1 %}
+    {#- cells of a regular table do not have a context -#}
+    {% set subtotalDepth = element.context is not null ? element.context.subtotalDepth : 0 %}
+    {% if subtotalDepth == 1 %}
         style="background-color: var(--bs-gray-100)"
-    {% elseif element.context.subtotalDepth == 2 %}
+    {% elseif subtotalDepth == 2 %}
         style="background-color: var(--bs-gray-200)"
-    {% elseif element.context.subtotalDepth == 3 %}
+    {% elseif subtotalDepth == 3 %}
         style="background-color: var(--bs-gray-300)"
-    {% elseif element.context.subtotalDepth == 4 %}
+    {% elseif subtotalDepth == 4 %}
         style="background-color: var(--bs-gray-400); color: var(--bs-white)"
-    {% elseif element.context.subtotalDepth == 5 %}
+    {% elseif subtotalDepth == 5 %}
         style="background-color: var(--bs-gray-500); color: var(--bs-white)"
-    {% elseif element.context.subtotalDepth > 5 %}
+    {% elseif subtotalDepth > 5 %}
         style="background-color: var(--bs-dark); color: var(--bs-white)"
     {% endif %}
 {%- endblock td_attr -%}

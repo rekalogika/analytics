@@ -24,6 +24,8 @@ interface ChoiceFilterOptions
     public function getChoices(): iterable;
 
     /**
+     * Returns the value of the given id, or null if the id is not known.
+     *
      * @return T|null
      */
     public function getValueFromId(string $id): mixed;

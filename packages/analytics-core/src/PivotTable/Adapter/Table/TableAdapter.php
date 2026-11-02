@@ -31,6 +31,8 @@ final readonly class TableAdapter implements PivotTableTable
      */
     private iterable $cells;
 
+    private bool $empty;
+
     /**
      * @param CubeCell $cell The root cell that contains the table data.
      * @param list<string> $dimensions The dimensions that will be displayed in
@@ -53,9 +55,12 @@ final readonly class TableAdapter implements PivotTableTable
 
         if ($first === null) {
             $this->legend = [];
+            $this->empty = true;
 
             return;
         }
+
+        $this->empty = false;
 
         $legend = [];
 
@@ -73,6 +78,14 @@ final readonly class TableAdapter implements PivotTableTable
         }
 
         $this->legend = $legend;
+    }
+
+    /**
+     * Whether the table has no rows.
+     */
+    public function isEmpty(): bool
+    {
+        return $this->empty;
     }
 
     #[\Override]

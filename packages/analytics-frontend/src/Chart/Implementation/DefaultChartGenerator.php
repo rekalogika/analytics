@@ -154,13 +154,24 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
     private function isDimensionSequential(CubeCell $cube, string $dimension): bool
     {
-        /** @psalm-suppress MixedAssignment */
-        $member = $cube
-            ->getCoordinates()
-            ->get($dimension)
-            ?->getMember();
+        // The given cell does not have the dimension in its coordinates, look
+        // at the members of its children instead. The null member does not
+        // tell us anything, skip it.
+        foreach ($cube->drillDown($dimension) as $cell) {
+            /** @psalm-suppress MixedAssignment */
+            $member = $cell
+                ->getCoordinates()
+                ->get($dimension)
+                ?->getMember();
 
-        return $member instanceof SequenceMember;
+            if ($member === null) {
+                continue;
+            }
+
+            return $member instanceof SequenceMember;
+        }
+
+        return false;
     }
 
     /**
@@ -440,11 +451,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($secondDimensionObject->getDisplayMember()),
+                            $this->stringifier->toString($measureObject->getLabel()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
+                        $yTitle = $this->stringifier->toString($measureObject->getLabel());
                     }
                 }
             }

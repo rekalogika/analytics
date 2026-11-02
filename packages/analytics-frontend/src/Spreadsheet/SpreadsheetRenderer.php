@@ -50,6 +50,14 @@ final readonly class SpreadsheetRenderer
             measures: $measures,
         );
 
+        // the transformer does not accept a table without rows
+        if ($table->isEmpty()) {
+            $spreadsheet = new Spreadsheet();
+            $spreadsheet->getActiveSheet()->setTitle('Pivot Table');
+
+            return $spreadsheet;
+        }
+
         $table = TableToHtmlTableTransformer::transform($table);
 
         $html = $this->visitor->visitTable($table);

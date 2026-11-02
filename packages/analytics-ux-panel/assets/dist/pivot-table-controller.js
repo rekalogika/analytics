@@ -54,7 +54,8 @@ export default class extends Controller {
         }
       });
     });
-    document.addEventListener('turbo:before-stream-render', this.beforeStreamRender.bind(this));
+    this.boundBeforeStreamRender = this.beforeStreamRender.bind(this);
+    document.addEventListener('turbo:before-stream-render', this.boundBeforeStreamRender);
   }
   disconnect() {
     this.sortableItems.destroy();
@@ -62,7 +63,7 @@ export default class extends Controller {
     this.sortableColumns.destroy();
     this.sortableValues.destroy();
     this.sortableFilters.destroy();
-    document.removeEventListener('turbo:before-frame-render', this.beforeStreamRender.bind(this));
+    document.removeEventListener('turbo:before-stream-render', this.boundBeforeStreamRender);
   }
   beforeStreamRender(event) {
     const defaultActions = event.detail.render;
