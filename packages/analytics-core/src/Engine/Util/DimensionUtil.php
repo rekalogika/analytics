@@ -164,7 +164,14 @@ final readonly class DimensionUtil
             return $aMember::compare($aMember, $bMember);
         }
 
-        return $a->getRawMember() <=> $b->getRawMember();
+        // PHP compares objects property by property, which is meaningless for
+        // objects like entities or Doctrine proxies. Consider them equal, so
+        // that the stable sort keeps the database order.
+        if (\is_object($aRawMember) || \is_object($bRawMember)) {
+            return 0;
+        }
+
+        return $aRawMember <=> $bRawMember;
     }
 
     /**
