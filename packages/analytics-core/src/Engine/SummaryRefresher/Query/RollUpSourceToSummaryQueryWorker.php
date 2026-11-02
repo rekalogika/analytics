@@ -171,13 +171,15 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
      */
     private function processDimensions(): void
     {
+        $bustId = 0;
+
         foreach ($this->summaryMetadata->getLeafDimensions() as $dimensionMetadata) {
             // if dimension is in group by
             if ($this->fieldsInGroupBy[$dimensionMetadata->getName()] ?? false) {
                 $valueResolver = $dimensionMetadata->getValueResolver();
 
                 /** @psalm-suppress ImpureMethodCall */
-                $valueResolver = Bust::create($valueResolver);
+                $valueResolver = Bust::create($valueResolver, ++$bustId);
             } else {
                 $valueResolver = new NullValue();
             }

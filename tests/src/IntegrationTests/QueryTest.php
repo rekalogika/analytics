@@ -23,6 +23,7 @@ use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerType;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
@@ -528,6 +529,46 @@ final class QueryTest extends KernelTestCase
             ->getResult()->drillDown('time.civil.date.dayOfMonth');
 
         $this->assertGreaterThan(0, $result->count());
+    }
+
+    /**
+     * Null cells created for coordinates without a row must not show up as
+     * query rows.
+     */
+    public function testNullCellsAreNotQueryRows(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.date.date', 'customerCountry')
+            ->getResult();
+
+        $this->assertInstanceOf(DefaultCell::class, $result);
+
+        $cellRepository = $result->getContext()->getCellRepository();
+        $rowCount = \count(iterator_to_array($cellRepository->getAllCubes()));
+
+        $nullCell = null;
+
+        foreach ($result->drillDown(['time.civil.date.date', 'customerCountry']) as $cell) {
+            if ($cell->isNull()) {
+                $nullCell = $cell;
+                break;
+            }
+        }
+
+        $this->assertInstanceOf(DefaultCell::class, $nullCell);
+
+        // looking up the coordinates again still gives a null cell
+        $this->assertTrue(
+            $cellRepository
+                ->getCellByCoordinates($nullCell->getCoordinates())
+                ->isNull(),
+        );
+
+        $this->assertCount($rowCount, iterator_to_array($cellRepository->getAllCubes()));
+
+        foreach ($cellRepository->getAllCubes() as $cell) {
+            $this->assertFalse($cell->isNull());
+        }
     }
 
     public function testYearByMonthOfYear(): void

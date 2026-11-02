@@ -114,8 +114,10 @@ final readonly class TimeBinValueResolver implements
 
         /** @var class-string<MonotonicTimeBin> $binClass */
 
-        return $binClass::createFromDatabaseValue($rawValue)
-            ->withTimeZone($summaryTimeZone);
+        return $binClass::createFromDatabaseValueAndTimeZone(
+            $rawValue,
+            $summaryTimeZone,
+        );
     }
 
     /**

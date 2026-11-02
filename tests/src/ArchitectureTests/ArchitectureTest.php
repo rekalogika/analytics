@@ -477,6 +477,7 @@ final class ArchitectureTest
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
                 Selector::classname(\Attribute::class),
+                Selector::classname(\WeakReference::class),
 
                 // php enum
                 Selector::classname(\BackedEnum::class),

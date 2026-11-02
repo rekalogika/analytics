@@ -17,20 +17,24 @@ use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Summary\ValueResolver;
 
 /**
- * Wraps the inner value resolver with a random noop function. This allows you
- * to have identical clauses in the group by and grouping clauses without
- * confusing the database.
+ * Wraps the inner value resolver with a noop function tagged with an
+ * identifier. This allows you to have identical clauses in the group by and
+ * grouping clauses without confusing the database. The identifier must be
+ * unique within a query, but should be deterministic so that the resulting SQL
+ * is stable across runs.
  */
 final readonly class Bust implements ValueResolver
 {
     public static function create(
         ValueResolver $input,
+        int $id,
     ): self {
-        return new self($input);
+        return new self($input, $id);
     }
 
     private function __construct(
         private ValueResolver $input,
+        private int $id,
     ) {}
 
     #[\Override]
@@ -43,12 +47,11 @@ final readonly class Bust implements ValueResolver
     public function getExpression(SourceQueryContext $context): string
     {
         $innerExpression = $this->input->getExpression($context);
-        $random = rand(1, 2147483647);
 
         return \sprintf(
-            'REKALOGIKA_BUST(%s, %s)',
+            'REKALOGIKA_BUST(%s, %d)',
             $innerExpression,
-            $random,
+            $this->id,
         );
     }
 }
