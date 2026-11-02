@@ -238,7 +238,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return new self(
             propertyName: $this->getPropertyName(),
             valueResolver: $this->valueResolver,
-            label: $this->getLabel(),
+            label: $this->getRawLabel(),
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
             orderBy: $this->orderBy,
@@ -270,7 +270,7 @@ final readonly class DimensionMetadata extends PropertyMetadata implements \Stri
         return new self(
             propertyName: $this->getPropertyName(),
             valueResolver: $this->valueResolver,
-            label: $this->getLabel(),
+            label: $this->getRawLabel(),
             typeClass: $this->getTypeClass(),
             nullLabel: $this->nullLabel,
             orderBy: $this->orderBy,

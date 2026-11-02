@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Metadata\Attribute\Partition;
 use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
 use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\HierarchyAwareLabel;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
@@ -99,5 +101,26 @@ final class MetadataTest extends KernelTestCase
         $this->assertTrue($attributes->hasAttribute(Partition::class));
         $this->assertFalse($attributes->hasAttribute(PartitionKey::class));
         $this->assertFalse($attributes->hasAttribute(PartitionLevel::class));
+    }
+
+    /**
+     * @return iterable<string,array{string}>
+     */
+    public static function provideDimensionName(): iterable
+    {
+        yield 'root dimension' => ['customerCountry'];
+        yield 'child dimension' => ['time.civil.month.month'];
+    }
+
+    #[DataProvider('provideDimensionName')]
+    public function testRawLabelIsNotHierarchyAware(string $name): void
+    {
+        $dimension = static::getContainer()
+            ->get(SummaryMetadataFactory::class)
+            ->getSummaryMetadata(OrderSummary::class)
+            ->getDimension($name);
+
+        $this->assertNotInstanceOf(HierarchyAwareLabel::class, $dimension->getRawLabel());
+        $this->assertSame($dimension->getRawLabel(), $dimension->getLabel()->getLeaf());
     }
 }
