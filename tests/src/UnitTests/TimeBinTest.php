@@ -217,6 +217,38 @@ final class TimeBinTest extends TestCase
         );
     }
 
+    public function testMonthBasedWeekDateSequence(): void
+    {
+        $date = MonthBasedWeekDate::createFromDatabaseValue(20250712);
+
+        $this->assertSame('2025-07-W1-2', (string) $date);
+        $this->assertSame('2025-07-W1-2', $date->trans(new IdentityTranslator()));
+        $this->assertSame(20250713, $date->getNext()->getDatabaseValue());
+        $this->assertSame(20250711, $date->getPrevious()->getDatabaseValue());
+
+        // 2025-06-30 is the Monday of the first week of July, 2025-06-29 the
+        // Sunday of the fourth week of June.
+        $this->assertSame(
+            20250647,
+            MonthBasedWeekDate::createFromDatabaseValue(20250711)->getPrevious()->getDatabaseValue(),
+        );
+
+        // walk two months day by day
+        $current = MonthBasedWeekDate::createFromDatabaseValue(20250111);
+
+        for ($i = 0; $i < 60; $i++) {
+            $next = $current->getNext();
+
+            $this->assertEquals(
+                \DateTimeImmutable::createFromInterface($current->getStart())->modify('+1 day'),
+                $next->getStart(),
+            );
+            $this->assertSame($current, $next->getPrevious());
+
+            $current = $next;
+        }
+    }
+
     /**
      * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int}>
      */
