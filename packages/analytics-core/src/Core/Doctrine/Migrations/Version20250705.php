@@ -45,7 +45,7 @@ final class Version20250705 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            DROP FUNCTION IF EXISTS REKALOGIKA_BUST(anyelement, anyelement);
+            DROP FUNCTION IF EXISTS REKALOGIKA_BUST(anyelement, anycompatible);
         SQL);
     }
 }
