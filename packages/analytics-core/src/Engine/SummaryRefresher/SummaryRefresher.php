@@ -410,6 +410,14 @@ final class SummaryRefresher
                 break;
             }
 
+            // if the range is inside a single upper level partition without
+            // filling it, the upper level range is empty, and so are the
+            // ranges of the levels above it
+
+            if (PartitionUtil::isGreaterThan($upperLevelStart, $end)) {
+                break;
+            }
+
             // create the new range
 
             yield $range = new PartitionRange($upperLevelStart, $end);

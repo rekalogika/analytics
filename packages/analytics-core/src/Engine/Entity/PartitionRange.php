@@ -33,6 +33,14 @@ final readonly class PartitionRange implements \IteratorAggregate, \Countable
                 $end->getLevel(),
             ));
         }
+
+        if (PartitionUtil::isGreaterThan($start, $end)) {
+            throw new InvalidArgumentException(\sprintf(
+                'The start partition "%s" must not be greater than the end partition "%s"',
+                (string) $start,
+                (string) $end,
+            ));
+        }
     }
 
     public function getSignature(): string
