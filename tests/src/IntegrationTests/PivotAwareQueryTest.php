@@ -115,4 +115,36 @@ final class PivotAwareQueryTest extends KernelTestCase
             $this->getChoiceFilter($query, 'customerCountry')->getValues(),
         );
     }
+
+    public function testUnknownAndHiddenItemsAreDropped(): void
+    {
+        $query = $this->createPivotAwareQuery([
+            'rows' => ['foo', 'customerCountry', 'time'],
+            'columns' => ['time.civil.month.month', 'bar', '@values'],
+            'values' => ['count', 'baz', 'priceSumSquare', 'price'],
+            'filters' => ['qux', 'customerGender', '@values'],
+        ]);
+
+        $this->assertSame(['customerCountry'], $query->getRows());
+        $this->assertSame(['time.civil.month.month', '@values'], $query->getColumns());
+        $this->assertSame(['count', 'price'], $query->getValues());
+        $this->assertSame(['customerGender'], $query->getFilters());
+
+        $this->assertNotNull($query->getResult()->getMeasures()->get('count'));
+    }
+
+    public function testDuplicateItemsAreDropped(): void
+    {
+        $query = $this->createPivotAwareQuery([
+            'rows' => ['customerCountry', '@values', 'customerCountry'],
+            'columns' => ['customerCountry', 'customerGender', '@values'],
+            'values' => ['count', 'count'],
+            'filters' => ['itemCategory', 'itemCategory'],
+        ]);
+
+        $this->assertSame(['customerCountry', '@values'], $query->getRows());
+        $this->assertSame(['customerGender'], $query->getColumns());
+        $this->assertSame(['count'], $query->getValues());
+        $this->assertSame(['itemCategory'], $query->getFilters());
+    }
 }
