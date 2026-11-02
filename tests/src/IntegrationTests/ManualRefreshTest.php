@@ -23,6 +23,7 @@ use Rekalogika\Analytics\Engine\Entity\SummaryProperties;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeStartEvent;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\RefreshRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresher;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -122,6 +123,35 @@ final class ManualRefreshTest extends KernelTestCase
 
         $this->assertPartitionMatchesLowestLevel($first);
         $this->assertPartitionMatchesLowestLevel($second);
+    }
+
+    /**
+     * A range that does not fill any upper level partition only refreshes
+     * the lowest level. The upper level ranges would be empty, with the start
+     * after the end, and must be skipped instead of being created.
+     */
+    public function testRangeNotFillingUpperPartitionOnlyRefreshesLowestLevel(): void
+    {
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $this->assertInstanceOf(EventDispatcherInterface::class, $eventDispatcher);
+
+        $levels = [];
+
+        $eventDispatcher->addListener(
+            RefreshRangeStartEvent::class,
+            static function (RefreshRangeStartEvent $event) use (&$levels): void {
+                $levels[] = $event->getRange()->getLevel();
+            },
+        );
+
+        // [41, 42] is in the level 2 partition [40, 44), which does not fill
+        // the level 4 partition [32, 48)
+
+        $refresher = $this->createRefresher();
+        $refresher->manualRefresh(start: 41, end: 42, batchSize: 1, resumeId: null);
+
+        $this->assertSame([2], $levels);
+        $this->assertGreaterThan(0, $this->getSummarizedCount(2, 40, 44));
     }
 
     /**

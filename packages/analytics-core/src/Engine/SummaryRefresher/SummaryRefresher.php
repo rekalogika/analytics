@@ -84,6 +84,8 @@ final class SummaryRefresher
             $refreshAgentStrategy = new DefaultRefreshAgentStrategy();
         }
 
+        $this->summaryHandler->getDirtyFlags()->removeStaleFlags();
+
         $i = 0;
 
         do {
@@ -407,6 +409,14 @@ final class SummaryRefresher
             // but just in case
 
             if ($upperLevelStart === null) {
+                break;
+            }
+
+            // if the range is inside a single upper level partition without
+            // filling it, the upper level range is empty, and so are the
+            // ranges of the levels above it
+
+            if (PartitionUtil::isGreaterThan($upperLevelStart, $end)) {
                 break;
             }
 

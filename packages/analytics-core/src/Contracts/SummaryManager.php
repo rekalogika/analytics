@@ -41,8 +41,10 @@ interface SummaryManager
      * from the earliest key in the source if the summary is empty.
      * @param int|string|null $end The last key to process, inclusive. If null,
      * the refresh runs until the latest key present in the source.
-     * @param int $batchSize The number of lowest-level partitions to process
-     * in one unit of work.
+     * @param int $batchSize The number of partitions to process in one unit
+     * of work. It applies to every partition level: the lowest level is
+     * refreshed in batches of this many partitions, then each upper level is
+     * rolled up in batches of this many partitions of that level.
      * @param string|null $resumeId The identifier of the batch to resume from,
      * as reported when a previous run was interrupted. Batches before it are
      * skipped.
