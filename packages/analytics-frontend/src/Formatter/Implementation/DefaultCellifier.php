@@ -43,6 +43,13 @@ final readonly class DefaultCellifier implements Cellifier
             );
         }
 
+        if (\is_int($input) || (\is_float($input) && is_finite($input))) {
+            return new CellProperties(
+                type: DataType::TYPE_NUMERIC,
+                content: (string) $input,
+            );
+        }
+
         throw new ValueNotSupportedException();
     }
 }
