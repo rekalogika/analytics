@@ -29,15 +29,7 @@ final readonly class ComparableUtil
      */
     public static function compare(Comparable $a, Comparable $b): int
     {
-        // two fresh closures are never identical, compare the classes
-        // declaring the implementations instead
-        $aImplementation = (new \ReflectionMethod($a, 'compare'))
-            ->getDeclaringClass()->getName();
-
-        $bImplementation = (new \ReflectionMethod($b, 'compare'))
-            ->getDeclaringClass()->getName();
-
-        if ($aImplementation !== $bImplementation) {
+        if ($a::class !== $b::class) {
             throw new UnexpectedValueException(\sprintf(
                 'Cannot compare "%s" with "%s".',
                 $a::class,
