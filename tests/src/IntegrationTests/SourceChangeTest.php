@@ -23,7 +23,10 @@ use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
+use Rekalogika\Analytics\Tests\App\Entity\Gender;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
+use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistory;
+use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\EventListener\TestNewDirtyFlagListener;
@@ -552,6 +555,39 @@ final class SourceChangeTest extends KernelTestCase
             ));
 
         $this->assertEquals($initialCount + 1, $this->getOrderCount());
+    }
+
+    /**
+     * The partitioning key of OccupancyHistorySummary is a date, not a string
+     * or an integer. Inserting a record must still create the dirty flag of
+     * its partition.
+     */
+    public function testCreationWithDatePartitioningKey(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $occupancyHistory = new OccupancyHistory();
+        $occupancyHistory->setDate(new \DateTimeImmutable('2024-06-01'));
+        $occupancyHistory->setGender(Gender::Male);
+        $occupancyHistory->setCount(1);
+
+        $entityManager->persist($occupancyHistory);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $partition = $this->getHandlerFactory()
+            ->getSummary(OccupancyHistorySummary::class)
+            ->getPartition()
+            ->getLowestPartitionFromEntity($occupancyHistory);
+
+        $this->assertNotNull($entityManager->getRepository(DirtyFlag::class)->findOneBy([
+            'class' => OccupancyHistorySummary::class,
+            'level' => $partition->getLevel(),
+            'key' => $partition->getKey(),
+        ]));
     }
 
     public function testManualRefreshOfSingleNewRecord(): void
