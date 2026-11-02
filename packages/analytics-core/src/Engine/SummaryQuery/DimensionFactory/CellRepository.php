@@ -28,9 +28,19 @@ final class CellRepository
     private ?DefaultCell $apexCell = null;
 
     /**
+     * Cells from the query result.
+     *
      * @var array<string,DefaultCell>
      */
     private array $signatureToCell = [];
+
+    /**
+     * Null cells created for coordinates without a row in the query result.
+     * Kept separately so that they don't show up as query rows.
+     *
+     * @var array<string,DefaultCell>
+     */
+    private array $signatureToNullCell = [];
 
     public function __construct(
         private readonly DimensionCollection $dimensionCollection,
@@ -51,17 +61,31 @@ final class CellRepository
 
     public function getCellByCoordinates(DefaultCoordinates $coordinates): DefaultCell
     {
-        $cell = $this->signatureToCell[$coordinates->getSignature()]
+        $cell = $this->getOrCreateCell($coordinates, $this->context);
+
+        // preserve the dimension ordering as in the coordinates
+        return $cell->withOrdering($coordinates->getDimensionNames());
+    }
+
+    /**
+     * Returns the cell from the query result, or a null cell if there is no
+     * row for the coordinates.
+     */
+    private function getOrCreateCell(
+        DefaultCoordinates $coordinates,
+        ResultContext $context,
+    ): DefaultCell {
+        $signature = $coordinates->getSignature();
+
+        return $this->signatureToCell[$signature]
+            ?? $this->signatureToNullCell[$signature]
             ??= new DefaultCell(
                 coordinates: $coordinates,
                 measures: $this->nullMeasureCollection->getNullMeasures(),
                 isNull: true,
-                context: $this->context,
+                context: $context,
                 sourceEntitiesFactory: $this->sourceEntitiesFactory,
             );
-
-        // preserve the dimension ordering as in the coordinates
-        return $cell->withOrdering($coordinates->getDimensionNames());
     }
 
     /**
@@ -90,15 +114,7 @@ final class CellRepository
         }
 
         $coordinates = $baseCell->getCoordinates()->append($dimension);
-
-        $cell = $this->signatureToCell[$coordinates->getSignature()]
-            ??= new DefaultCell(
-                coordinates: $coordinates,
-                measures: $this->nullMeasureCollection->getNullMeasures(),
-                isNull: true,
-                context: $baseCell->getContext(),
-                sourceEntitiesFactory: $this->sourceEntitiesFactory,
-            );
+        $cell = $this->getOrCreateCell($coordinates, $baseCell->getContext());
 
         return $cell->withOrdering($coordinates->getDimensionNames());
     }
@@ -132,49 +148,16 @@ final class CellRepository
 
         foreach ($dimensions as $dimension) {
             $coordinates = $baseCell->getCoordinates()->append($dimension);
-            $cell = $this->signatureToCell[$coordinates->getSignature()] ?? null;
 
-            // if the cell already exists and it is not the result of a gap fill,
-            // we return it directly.
-            if ($cell !== null) {
-                // if fillGaps is false, we don't return cells previously
-                // created due to gap filling
-                if (!$fillGaps && $cell->isNull()) {
-                    continue;
-                }
+            // if gap-filling is requested, we create a null cell for
+            // coordinates without a row. otherwise, we skip them.
+            $cell = $fillGaps
+                ? $this->getOrCreateCell($coordinates, $baseCell->getContext())
+                : $this->signatureToCell[$coordinates->getSignature()] ?? null;
 
-                $childCells = $this->getCellsByBaseAndDimensionName(
-                    baseCell: $cell,
-                    dimensionNames: $dimensionNames,
-                    fillGaps: $fillGaps,
-                );
-
-                foreach ($childCells as $childCell) {
-                    yield $childCell;
-                }
-
+            if ($cell === null) {
                 continue;
             }
-
-            // if cell is null and we are not filling gaps, we skip it
-            if (!$fillGaps) {
-                continue;
-            }
-
-            // if cell is null and gap-filling is requested, we create a new
-            // cell
-
-            $measures = $this->nullMeasureCollection->getNullMeasures();
-
-            $cell = new DefaultCell(
-                coordinates: $coordinates,
-                measures: $measures,
-                isNull: true,
-                context: $baseCell->getContext(),
-                sourceEntitiesFactory: $this->sourceEntitiesFactory,
-            );
-
-            $this->collectCell($cell);
 
             $childCells = $this->getCellsByBaseAndDimensionName(
                 baseCell: $cell,
