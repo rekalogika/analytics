@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 use Doctrine\Common\Collections\Order;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
+use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class MetadataOrderByResolver implements OrderByResolver
@@ -30,9 +31,17 @@ final readonly class MetadataOrderByResolver implements OrderByResolver
     {
         $orderBy = $this->query->getOrderBy();
 
-        foreach ($orderBy as $dimensionName => $order) {
-            if ($dimensionName === $name) {
+        // The database rows are sorted by the user-supplied order by. If a
+        // measure comes before this dimension, the order of the members is
+        // determined by the measure, so we keep the database order.
+
+        foreach ($orderBy as $field => $order) {
+            if ($field === $name) {
                 return $order;
+            }
+
+            if ($this->metadata->getProperty($field) instanceof MeasureMetadata) {
+                return null;
             }
         }
 

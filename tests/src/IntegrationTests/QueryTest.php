@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -360,6 +361,71 @@ final class QueryTest extends KernelTestCase
             ->getResult()->drillDown('time.civil.year');
 
         $this->assertCount(2, $result);
+    }
+
+    /**
+     * @return iterable<string,array{string,Order}>
+     */
+    public static function orderByMeasureProvider(): iterable
+    {
+        foreach (['customerType', 'customerGender', 'customerCountry', 'time.civil.month.month'] as $dimension) {
+            foreach ([Order::Ascending, Order::Descending] as $order) {
+                yield $dimension . ' ' . $order->value => [$dimension, $order];
+            }
+        }
+    }
+
+    #[DataProvider('orderByMeasureProvider')]
+    public function testOrderByMeasureDrillDownOrder(
+        string $dimension,
+        Order $order,
+    ): void {
+        $result = $this->getQuery()
+            ->withDimensions($dimension)
+            ->orderBy('count', $order)
+            ->getResult()->drillDown($dimension);
+
+        $counts = [];
+
+        foreach ($result as $cell) {
+            $count = $cell->getMeasures()->get('count')?->getValue();
+            $this->assertIsInt($count);
+            $counts[] = $count;
+        }
+
+        $this->assertGreaterThan(1, \count($counts));
+
+        $expected = $counts;
+
+        if ($order === Order::Ascending) {
+            sort($expected);
+        } else {
+            rsort($expected);
+        }
+
+        $this->assertSame($expected, $counts);
+    }
+
+    public function testOrderByDimensionThenMeasure(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('customerType')
+            ->orderBy('customerType', Order::Descending)
+            ->addOrderBy('count', Order::Ascending)
+            ->getResult()->drillDown('customerType');
+
+        $types = [];
+
+        foreach ($result as $cell) {
+            $member = $cell->getCoordinates()->get('customerType')?->getMember();
+            $this->assertInstanceOf(CustomerType::class, $member);
+            $types[] = $member->value;
+        }
+
+        $expected = $types;
+        rsort($expected);
+
+        $this->assertSame($expected, $types);
     }
 
     public function testQueryResultLimit(): void

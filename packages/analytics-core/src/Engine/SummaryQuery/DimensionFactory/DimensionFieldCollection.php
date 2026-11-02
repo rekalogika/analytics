@@ -154,6 +154,13 @@ final class DimensionFieldCollection
      */
     private function tryFillGaps(array $dimensions): array
     {
+        // Gap filling requires the members to be sorted by their value. If the
+        // order is null, we keep the database order, which might be determined
+        // by a measure.
+        if ($this->order === null) {
+            return $dimensions;
+        }
+
         $firstMember = $dimensions[0]->getMember();
 
         if (!$firstMember instanceof SequenceMember) {

@@ -17,5 +17,9 @@ use Doctrine\Common\Collections\Order;
 
 interface OrderByResolver
 {
+    /**
+     * Returns the order to sort the members of the dimension, or null to keep
+     * the order of the database result.
+     */
     public function getDimensionNameOrderBy(string $name): ?Order;
 }
