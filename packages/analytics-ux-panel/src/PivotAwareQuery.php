@@ -373,20 +373,12 @@ final class PivotAwareQuery
      */
     public function getAvailableWithoutSubItems(): array
     {
-        $columns = $this->getColumnsWithoutSubitems();
-
-        if (
-            !\in_array('@values', $this->columns, true)
-            && !\in_array('@values', $this->rows, true)
-        ) {
-            $columns[] = '@values';
-        }
-
-        // Items not in rows or columns.
+        // Items not in rows or columns. The columns include @values if it is
+        // not placed anywhere yet.
         return array_values(array_diff(
             $this->getAllItems(),
             $this->getRowsWithoutSubItems(),
-            $columns,
+            $this->getColumnsWithoutSubitems(),
             $this->getValues(),
             $this->getFiltersWithoutSubitems(),
         ));
