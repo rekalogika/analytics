@@ -463,6 +463,103 @@ final class SourceChangeTest extends KernelTestCase
     }
 
     /**
+     * A manual refresh without a range must process a single new record, even
+     * if the computed start and end are the same key.
+     */
+    public function testManualRefreshOfSingleNewRecord(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $summaryManager = static::getContainer()
+            ->get(SummaryManager::class);
+
+        $initialCount = $this->getOrderCount();
+
+        // make sure the new order gets the key right after the latest one
+
+        static::getContainer()
+            ->get(Connection::class)
+            ->executeStatement("SELECT setval(pg_get_serial_sequence('order', 'id'), (SELECT max(id) FROM \"order\"))");
+
+        $item = $entityManager
+            ->getRepository(Item::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Item not found');
+
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Customer not found');
+
+        $time = new \DateTimeImmutable('2024-06-01 00:00:00');
+
+        $order = new Order();
+        $order->setItem($item);
+        $order->setCustomer($customer);
+        $order->setTime($time);
+        $order->setShipped($time->modify('+3 days'));
+
+        $entityManager->persist($order);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $this->assertSame(201, $order->getId());
+
+        $summaryManager->refresh(OrderSummary::class, null, null);
+
+        $this->assertEquals($initialCount + 1, $this->getOrderCount());
+
+        // nothing new, refreshing again must not change anything
+
+        $summaryManager->refresh(OrderSummary::class, null, null);
+
+        $this->assertEquals($initialCount + 1, $this->getOrderCount());
+    }
+
+    /**
+     * The bounds of a manual refresh are inclusive, so a range with the same
+     * start and end processes that key.
+     */
+    public function testManualRefreshOfSingleKeyRange(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $summaryManager = static::getContainer()
+            ->get(SummaryManager::class);
+
+        // modifying order 50 marks its lowest-level partition as dirty
+
+        $this->modifyOrderTime(50, new \DateTimeImmutable('2030-02-01 00:00:00'));
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class]);
+
+        $this->assertCount(1, $dirtyFlags);
+        $lowestLevel = $dirtyFlags[0]->getLevel();
+        $entityManager->clear();
+
+        // refreshing the range [50, 50] refreshes the lowest-level partition,
+        // which removes its dirty flag. the range does not cover the whole
+        // containing partition, so the containing partition is marked dirty
+
+        $summaryManager->refresh(OrderSummary::class, 50, 50);
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class]);
+
+        $this->assertCount(1, $dirtyFlags);
+        $this->assertNotSame($lowestLevel, $dirtyFlags[0]->getLevel());
+    }
+
+    /**
      * The latest key of a UUID-partitioned summary is a UUID string, while
      * the partition bounds are integers. Refreshing an old partition that is
      * not the last child of its containing partition must still mark the

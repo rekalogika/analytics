@@ -202,13 +202,19 @@ final class SummaryRefresher
         $summaryLatestKey = $this->summaryHandler->getLatestKey();
 
         // determine start
-        // first check the stored latest key, and start from there
+        // first check the stored latest key, and start from there. integer
+        // keys are incremented, other keys cannot be, so the start is the
+        // already summarized latest key itself
+
+        $isStartAlreadySummarized = false;
 
         if ($start === null) {
             $start = $summaryLatestKey;
 
             if (\is_int($start)) {
                 $start++;
+            } elseif ($start !== null) {
+                $isStartAlreadySummarized = true;
             }
         }
 
@@ -232,9 +238,15 @@ final class SummaryRefresher
             $end = $sourceLatestKey;
         }
 
-        // if start is greater than end, then return
+        // determine if there is nothing to do: the range is empty, or it only
+        // contains the already summarized latest key. the range is inclusive,
+        // so start equal to end is otherwise a valid single-key range
 
-        if ($start > $end) {
+        $isNothingToDo = $end === null
+            || $start > $end
+            || ($start === $end && $isStartAlreadySummarized);
+
+        if ($isNothingToDo) {
             $end = $start;
         }
 
@@ -248,9 +260,7 @@ final class SummaryRefresher
 
         $this->eventDispatcher?->dispatch($startEvent);
 
-        // if end is same as start, and not yet recorded in the summary,
-
-        if ($start === $end && $summaryLatestKey !== null) {
+        if ($isNothingToDo) {
             $this->eventDispatcher?->dispatch($startEvent->createEndEvent());
             return;
         }
