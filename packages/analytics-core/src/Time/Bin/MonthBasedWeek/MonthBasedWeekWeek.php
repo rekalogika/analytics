@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\Util\TranslatableDate;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -74,19 +75,11 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
     #[\Override]
     public function getTitle(): TranslatableInterface
     {
-        $dateFormatter = new \IntlDateFormatter(
-            locale: 'en',
-            dateType: \IntlDateFormatter::FULL,
-            timeType: \IntlDateFormatter::NONE,
-            timezone: $this->start->getTimezone(),
-            pattern: 'd MMMM y',
-        );
-
         return new TranslatableMessage(
             'Week starting on {start}, ending on {end}',
             [
-                '{start}' => $dateFormatter->format($this->start),
-                '{end}' => $dateFormatter->format($this->end->modify('-1 day')),
+                '{start}' => new TranslatableDate($this->start),
+                '{end}' => new TranslatableDate($this->end->modify('-1 day')),
             ],
         );
     }

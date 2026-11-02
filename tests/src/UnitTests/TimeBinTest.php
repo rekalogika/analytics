@@ -210,15 +210,32 @@ final class TimeBinTest extends TestCase
     public function testWeekTitles(): void
     {
         $translator = new IdentityTranslator();
+        $translator->setLocale('de_DE');
 
+        $isoWeek = IsoWeekWeek::createFromDatabaseValue(202501);
+        $monthBasedWeek = MonthBasedWeekWeek::createFromDatabaseValue(2025021);
+
+        // the dates follow the given locale (the message itself is not
+        // translated by the identity translator)
         $this->assertSame(
             'Week starting on 30 December 2024, ending on 5 January 2025',
-            IsoWeekWeek::createFromDatabaseValue(202501)->getTitle()->trans($translator, 'en'),
+            $isoWeek->getTitle()->trans($translator, 'en_GB'),
         );
 
         $this->assertSame(
             'Week starting on 3 February 2025, ending on 9 February 2025',
-            MonthBasedWeekWeek::createFromDatabaseValue(2025021)->getTitle()->trans($translator, 'en'),
+            $monthBasedWeek->getTitle()->trans($translator, 'en_GB'),
+        );
+
+        // or the translator's locale if none is given
+        $this->assertSame(
+            'Week starting on 30. Dezember 2024, ending on 5. Januar 2025',
+            $isoWeek->getTitle()->trans($translator),
+        );
+
+        $this->assertSame(
+            'Week starting on 3. Februar 2025, ending on 9. Februar 2025',
+            $monthBasedWeek->getTitle()->trans($translator),
         );
     }
 
