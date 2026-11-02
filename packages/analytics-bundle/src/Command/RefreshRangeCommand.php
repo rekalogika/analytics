@@ -99,7 +99,7 @@ final class RefreshRangeCommand extends Command implements SignalableCommandInte
         $this->addOption(
             name: 'batchsize',
             mode: InputOption::VALUE_REQUIRED,
-            description: 'Batch size',
+            description: 'Number of partitions to process in one unit of work, at every partition level',
             default: 1,
         );
     }
