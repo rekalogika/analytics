@@ -57,6 +57,13 @@ final class ExpressionRendererVisitor extends ExpressionVisitor
             return '(' . implode(', ', $parts) . ')';
         }
 
+        // The value is compared against a dimension. An integer dimension
+        // member is an identifier, like a year, not a quantity. Do not let the
+        // number formatter add grouping separators.
+        if (\is_int($value)) {
+            return (string) $value;
+        }
+
         return $this->htmlifier->toHtml($value);
     }
 

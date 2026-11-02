@@ -302,7 +302,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             // Get value.
 
-            $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
+            $labels[] = $this->memberToString($dimension->getDisplayMember());
 
             $rowMeasures = $row->getMeasures();
 
@@ -463,7 +463,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 throw new UnexpectedValueException('Unable to get first dimension');
             }
 
-            $labels[] = $this->stringifier->toString($firstDimensionObject->getDisplayMember());
+            $labels[] = $this->memberToString($firstDimensionObject->getDisplayMember());
 
             if ($xTitle === null) {
                 $xTitle = $this->stringifier->toString($firstDimensionObject->getLabel());
@@ -484,7 +484,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
+                    $dataSets[$signature]['label'] = $this->memberToString($secondDimensionObject->getDisplayMember());
                 }
 
                 if ($legendTitle === null) {
@@ -650,7 +650,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             // Get value.
 
-            $labels[] = $this->stringifier->toString($dimensionObject->getDisplayMember());
+            $labels[] = $this->memberToString($dimensionObject->getDisplayMember());
             $measureObject = $child->getMeasures()->get($measure);
             $dataSet['data'][] = $this->numberifier->toNumber($measureObject?->getValue());
 
@@ -677,6 +677,19 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         ]);
 
         return $chart;
+    }
+
+    /**
+     * An integer dimension member is an identifier, like a year, not a
+     * quantity. Do not let the number formatter add grouping separators.
+     */
+    private function memberToString(mixed $member): string
+    {
+        if (\is_int($member)) {
+            return (string) $member;
+        }
+
+        return $this->stringifier->toString($member);
     }
 
     /**

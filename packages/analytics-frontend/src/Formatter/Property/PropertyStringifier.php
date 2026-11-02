@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\StringifierAware;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
+use Rekalogika\Analytics\PivotTable\Model\Member;
 use Rekalogika\Analytics\PivotTable\Model\Property;
 
 final readonly class PropertyStringifier implements Stringifier, StringifierAware
@@ -49,6 +50,12 @@ final readonly class PropertyStringifier implements Stringifier, StringifierAwar
 
         /** @psalm-suppress MixedAssignment */
         $content = $input->getContent();
+
+        // An integer dimension member is an identifier, like a year, not a
+        // quantity. Do not let the number formatter add grouping separators.
+        if ($input instanceof Member && \is_int($content)) {
+            return (string) $content;
+        }
 
         return $this->getStringifier()->toString($content);
     }
