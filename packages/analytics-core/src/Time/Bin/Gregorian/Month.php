@@ -99,14 +99,14 @@ final class Month implements MonotonicTimeBin
         );
 
         try {
-            $locale = $translator->getLocale();
+            $locale ??= $translator->getLocale();
 
             $intlDateFormatter = new \IntlDateFormatter(
                 locale: $locale,
                 dateType: \IntlDateFormatter::FULL,
                 timeType: \IntlDateFormatter::FULL,
                 timezone: $this->start->getTimezone(),
-                pattern: 'MMMM YYYY',
+                pattern: 'MMMM y',
             );
 
             $formatted = $intlDateFormatter->format($dateTime);

@@ -47,7 +47,7 @@ enum DayOfWeek: int implements RecurringTimeBin
     ): string {
         $dayOfWeek = $this->name;
         $dateTime = new \DateTimeImmutable('next ' . $dayOfWeek);
-        $locale = $translator->getLocale();
+        $locale ??= $translator->getLocale();
 
         $intlDateFormatter = new \IntlDateFormatter(
             locale: $locale,

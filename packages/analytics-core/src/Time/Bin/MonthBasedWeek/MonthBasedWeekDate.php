@@ -39,25 +39,34 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
     /** @psalm-suppress PropertyNotSetInConstructor */
     private \DateTimeImmutable $end;
 
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $y;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $m;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $w;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private int $d;
+
     #[\Override]
     private function initialize(): void
     {
         $string = \sprintf('%08d', $this->databaseValue);
 
-        $y = (int) substr($string, 0, 4); // Year
-        $m = (int) substr($string, 4, 2); // Month
-        $w = (int) substr($string, 6, 1); // Week of the month (1-5)
-        $d = (int) substr($string, 7, 1); // Day of the week (1-7, where 1 is Monday)
+        $this->y = (int) substr($string, 0, 4); // Year
+        $this->m = (int) substr($string, 4, 2); // Month
+        $this->w = (int) substr($string, 6, 1); // Week of the month (1-5)
+        $this->d = (int) substr($string, 7, 1); // Day of the week (1-7, where 1 is Monday)
 
         /** @var \DateTimeImmutable */
         $start = (new \DateTimeImmutable())
             ->setTimezone($this->timeZone)
-            ->setDate($y, $m, 1) // Start from the first day of the month
+            ->setDate($this->y, $this->m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
-            ->modify('first thursday of this month') // Adjust to the first Monday
+            ->modify('first thursday of this month') // Adjust to the first Thursday
             ->modify('previous monday') // Move to the Monday of the week
-            ->modify(\sprintf('+%d weeks', $w - 1)) // Move to the correct week
-            ->modify(\sprintf('+%d days', $d - 1)); // Move to the correct day
+            ->modify(\sprintf('+%d weeks', $this->w - 1)) // Move to the correct week
+            ->modify(\sprintf('+%d days', $this->d - 1)); // Move to the correct day
 
         /** @var \DateTimeImmutable */
         $end = $start->modify('+1 day');
@@ -79,8 +88,10 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
     public static function createFromDateTime(
         \DateTimeInterface $dateTime,
     ): static {
+        // Thursday of the ISO week containing the date. The week belongs to
+        // the month of its Thursday.
         $thursdayThisWeek = \DateTimeImmutable::createFromInterface($dateTime)
-            ->modify('this thursday');
+            ->modify(\sprintf('%+d days', 4 - (int) $dateTime->format('N')));
 
         $thursdayDateOfMonth = (int) $thursdayThisWeek->format('d');
         $weekOfMonth = (int) ceil($thursdayDateOfMonth / 7);
@@ -105,7 +116,13 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
     #[\Override]
     public function __toString(): string
     {
-        return $this->start->format('o-\WW');
+        return \sprintf(
+            '%04d-%02d-W%01d-%01d',
+            $this->y,
+            $this->m,
+            $this->w,
+            $this->d,
+        );
     }
 
     #[\Override]
@@ -113,18 +130,7 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
-        $formatter = new \IntlDateFormatter(
-            locale: $locale,
-            dateType: \IntlDateFormatter::MEDIUM,
-            timeType: \IntlDateFormatter::NONE,
-            timezone: $this->start->getTimezone(),
-        );
-
-        return \sprintf(
-            '%s - %s',
-            $formatter->format($this->start),
-            $formatter->format($this->end->modify('-1 day')),
-        );
+        return $this->__toString();
     }
 
     #[\Override]
@@ -139,41 +145,19 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
         return $this->end;
     }
 
-    // public function getStartDatabaseValue(): int
-    // {
-    //     return (int) $this->start->format('oW');
-    // }
-
-    // public function getEndDatabaseValue(): int
-    // {
-    //     return (int) $this->end->format('oW');
-    // }
-
-    // private function getContainingWeekYear(): WeekYear
-    // {
-    //     return WeekYear::createFromDatabaseValue(
-    //         (int) $this->start->format('o'),
-    //         $this->start->getTimezone(),
-    //     );
-    // }
-
     #[\Override]
     public function getNext(): static
     {
-        return self::create(
-            (int) $this->end->format('oW'),
-            $this->end->getTimezone(),
-        );
+        $nextDateTime = $this->start->modify('+1 day');
+
+        return self::createFromDateTime($nextDateTime);
     }
 
     #[\Override]
     public function getPrevious(): static
     {
-        $previousWeek = $this->start->modify('-1 week');
+        $previousDateTime = $this->start->modify('-1 day');
 
-        return self::create(
-            (int) $previousWeek->format('oW'),
-            $previousWeek->getTimezone(),
-        );
+        return self::createFromDateTime($previousDateTime);
     }
 }

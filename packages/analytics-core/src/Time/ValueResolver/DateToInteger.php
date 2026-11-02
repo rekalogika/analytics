@@ -50,13 +50,21 @@ final readonly class DateToInteger implements PartitionValueResolver
             $value = new \DateTimeImmutable($value);
         }
 
-        if ($value->getTimestamp() < 0) {
+        // Work on the calendar date in the value's own time zone, like
+        // `DATE()` on the SQL side. Diffing the instant against the epoch in
+        // the default time zone is off by one day when the zones differ.
+        $date = new \DateTimeImmutable(
+            $value->format('Y-m-d'),
+            new \DateTimeZone('UTC'),
+        );
+
+        $days = intdiv($date->getTimestamp(), 86400);
+
+        if ($days < 0) {
             throw new LogicException('Date cannot be before epoch.');
         }
 
-        $days = $value->diff(new \DateTimeImmutable('1970-01-01'))->format('%a');
-
-        return \intval($days);
+        return $days;
     }
 
     #[\Override]

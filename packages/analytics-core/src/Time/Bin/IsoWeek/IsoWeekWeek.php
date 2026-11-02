@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\Util\TranslatableDate;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -57,19 +58,11 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
     #[\Override]
     public function getTitle(): TranslatableInterface
     {
-        $dateFormatter = new \IntlDateFormatter(
-            locale: 'en',
-            dateType: \IntlDateFormatter::FULL,
-            timeType: \IntlDateFormatter::NONE,
-            timezone: $this->start->getTimezone(),
-            pattern: 'D MMMM YYYY',
-        );
-
         return new TranslatableMessage(
             'Week starting on {start}, ending on {end}',
             [
-                '{start}' => $dateFormatter->format($this->start),
-                '{end}' => $dateFormatter->format($this->end),
+                '{start}' => new TranslatableDate($this->start),
+                '{end}' => new TranslatableDate($this->end->modify('-1 day')),
             ],
         );
     }
@@ -101,6 +94,8 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
         TranslatorInterface $translator,
         ?string $locale = null,
     ): string {
+        $locale ??= $translator->getLocale();
+
         $formatter = new \IntlDateFormatter(
             locale: $locale,
             dateType: \IntlDateFormatter::MEDIUM,

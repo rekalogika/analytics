@@ -21,7 +21,12 @@ trait RecurringTimeBinTrait
 {
     public static function createFromDatabaseValue(int $databaseValue): static
     {
-        return self::from($databaseValue);
+        return self::tryFrom($databaseValue)
+            ?? throw new InvalidArgumentException(\sprintf(
+                'Invalid database value for "%s": %d',
+                static::class,
+                $databaseValue,
+            ));
     }
 
     /**

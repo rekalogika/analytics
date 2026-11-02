@@ -15,9 +15,12 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
+use Rekalogika\Analytics\Time\Bin\Gregorian\MonthOfYear;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Quarter;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Year;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekDate;
@@ -26,6 +29,9 @@ use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class TimeBinTest extends TestCase
 {
@@ -161,6 +167,182 @@ final class TimeBinTest extends TestCase
             [2025033005, 2025033004, 2025033003, 2025033001, 2025033000],
             $visited,
         );
+    }
+
+    public function testMonthLabelUsesCalendarYear(): void
+    {
+        // 2021-01-01 is a Friday, so it belongs to ISO week-year 2020.
+        $month = Month::createFromDatabaseValue(202101);
+
+        foreach (['de_DE' => 'Januar 2021', 'fr_FR' => 'janvier 2021', 'en_GB' => 'January 2021'] as $locale => $expected) {
+            $translator = new IdentityTranslator();
+            $translator->setLocale($locale);
+
+            $this->assertSame($expected, $month->trans($translator));
+        }
+
+        $week = MonthBasedWeekWeek::createFromDatabaseValue(2021011);
+
+        $this->assertSame(
+            'Week 1, Januar 2021',
+            $week->trans(new IdentityTranslator(), 'de_DE'),
+        );
+    }
+
+    public function testMonthBasedWeekLabelInAnotherTimeZone(): void
+    {
+        $defaultTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        try {
+            $week = MonthBasedWeekWeek::createFromDatabaseValue(2025021)
+                ->withTimeZone(new \DateTimeZone('America/New_York'));
+
+            $this->assertSame(
+                'Week 1, February 2025',
+                $week->trans(new IdentityTranslator(), 'en'),
+            );
+        } finally {
+            date_default_timezone_set($defaultTimeZone);
+        }
+    }
+
+    public function testWeekTitles(): void
+    {
+        $translator = new IdentityTranslator();
+        $translator->setLocale('de_DE');
+
+        $isoWeek = IsoWeekWeek::createFromDatabaseValue(202501);
+        $monthBasedWeek = MonthBasedWeekWeek::createFromDatabaseValue(2025021);
+
+        // the dates follow the given locale (the message itself is not
+        // translated by the identity translator)
+        $this->assertSame(
+            'Week starting on 30 December 2024, ending on 5 January 2025',
+            $isoWeek->getTitle()->trans($translator, 'en_GB'),
+        );
+
+        $this->assertSame(
+            'Week starting on 3 February 2025, ending on 9 February 2025',
+            $monthBasedWeek->getTitle()->trans($translator, 'en_GB'),
+        );
+
+        // or the translator's locale if none is given
+        $this->assertSame(
+            'Week starting on 30. Dezember 2024, ending on 5. Januar 2025',
+            $isoWeek->getTitle()->trans($translator),
+        );
+
+        $this->assertSame(
+            'Week starting on 3. Februar 2025, ending on 9. Februar 2025',
+            $monthBasedWeek->getTitle()->trans($translator),
+        );
+    }
+
+    public function testMonthBasedWeekDateSequence(): void
+    {
+        $date = MonthBasedWeekDate::createFromDatabaseValue(20250712);
+
+        $this->assertSame('2025-07-W1-2', (string) $date);
+        $this->assertSame('2025-07-W1-2', $date->trans(new IdentityTranslator()));
+        $this->assertSame(20250713, $date->getNext()->getDatabaseValue());
+        $this->assertSame(20250711, $date->getPrevious()->getDatabaseValue());
+
+        // 2025-06-30 is the Monday of the first week of July, 2025-06-29 the
+        // Sunday of the fourth week of June.
+        $this->assertSame(
+            20250647,
+            MonthBasedWeekDate::createFromDatabaseValue(20250711)->getPrevious()->getDatabaseValue(),
+        );
+
+        // walk two months day by day
+        $current = MonthBasedWeekDate::createFromDatabaseValue(20250111);
+
+        for ($i = 0; $i < 60; $i++) {
+            $next = $current->getNext();
+
+            $this->assertEquals(
+                \DateTimeImmutable::createFromInterface($current->getStart())->modify('+1 day'),
+                $next->getStart(),
+            );
+            $this->assertSame($current, $next->getPrevious());
+
+            $current = $next;
+        }
+    }
+
+    /**
+     * @param class-string<TimeBin> $class
+     */
+    #[DataProvider('invalidDatabaseValueProvider')]
+    public function testInvalidDatabaseValue(string $class, int $databaseValue): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $class::createFromDatabaseValue($databaseValue);
+    }
+
+    /**
+     * @return iterable<array-key,array{class:class-string<TimeBin>,databaseValue:int}>
+     */
+    public static function invalidDatabaseValueProvider(): iterable
+    {
+        yield ['class' => DayOfWeek::class, 'databaseValue' => 8];
+        yield ['class' => MonthOfYear::class, 'databaseValue' => 0];
+        yield ['class' => Date::class, 'databaseValue' => 20241399];
+        yield ['class' => Date::class, 'databaseValue' => 20240230];
+        yield ['class' => Hour::class, 'databaseValue' => 2024010125];
+    }
+
+    /**
+     * @param array{de_DE:string,fr_FR:string} $expected
+     */
+    #[DataProvider('localeProvider')]
+    public function testTransLocale(TranslatableInterface $timeBin, array $expected): void
+    {
+        $translator = new IdentityTranslator();
+        $translator->setLocale('de_DE');
+
+        // the translator's locale when no locale is given
+        $this->assertSame($expected['de_DE'], $timeBin->trans($translator));
+
+        // the given locale otherwise
+        $this->assertSame($expected['fr_FR'], $timeBin->trans($translator, 'fr_FR'));
+    }
+
+    /**
+     * @return iterable<array-key,array{timeBin:TranslatableInterface,expected:array{de_DE:string,fr_FR:string}}>
+     */
+    public static function localeProvider(): iterable
+    {
+        yield 'month' => [
+            'timeBin' => Month::createFromDatabaseValue(202503),
+            'expected' => ['de_DE' => 'März 2025', 'fr_FR' => 'mars 2025'],
+        ];
+
+        yield 'day of week' => [
+            'timeBin' => DayOfWeek::Monday,
+            'expected' => ['de_DE' => 'Montag', 'fr_FR' => 'lundi'],
+        ];
+
+        yield 'month of year' => [
+            'timeBin' => MonthOfYear::March,
+            'expected' => ['de_DE' => 'März', 'fr_FR' => 'mars'],
+        ];
+
+        yield 'date' => [
+            'timeBin' => Date::createFromDatabaseValue(20250303),
+            'expected' => ['de_DE' => '03.03.2025', 'fr_FR' => '3 mars 2025'],
+        ];
+
+        yield 'iso week' => [
+            'timeBin' => IsoWeekWeek::createFromDatabaseValue(202510),
+            'expected' => ['de_DE' => '03.03.2025 - 09.03.2025', 'fr_FR' => '3 mars 2025 - 9 mars 2025'],
+        ];
+
+        yield 'month based week' => [
+            'timeBin' => MonthBasedWeekWeek::createFromDatabaseValue(2025031),
+            'expected' => ['de_DE' => 'Week 1, März 2025', 'fr_FR' => 'Week 1, mars 2025'],
+        ];
     }
 
     /**
@@ -327,6 +509,38 @@ final class TimeBinTest extends TestCase
             'class' => MonthBasedWeekDate::class,
             'dateTime' => new \DateTimeImmutable('2025-07-01 00:00:00'),
             'databaseValue' => 20250712,
+        ];
+
+        // Friday to Sunday belong to the week of the preceding Thursday
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-01-31 12:00:00'),
+            'databaseValue' => 2025015,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-02 23:00:00'),
+            'databaseValue' => 2025015,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekWeek::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-03 00:00:00'),
+            'databaseValue' => 2025021,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekDate::class,
+            'dateTime' => new \DateTimeImmutable('2025-01-31 12:00:00'),
+            'databaseValue' => 20250155,
+        ];
+
+        yield [
+            'class' => MonthBasedWeekDate::class,
+            'dateTime' => new \DateTimeImmutable('2025-02-02 00:00:00'),
+            'databaseValue' => 20250157,
         ];
     }
 }
