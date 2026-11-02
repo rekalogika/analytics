@@ -20,10 +20,10 @@ export default class extends Controller {
             },
             render: {
                 option: function (data, escape) {
-                    return `<div>${data.html}</div>`;
+                    return `<div>${escape(data.text)}</div>`;
                 },
                 item: function (item, escape) {
-                    return `<div>${item.html}</div>`;
+                    return `<div>${escape(item.text)}</div>`;
                 }
             }
         })
