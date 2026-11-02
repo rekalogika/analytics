@@ -184,6 +184,13 @@ final readonly class AttributeUtil
                 continue;
             }
 
+            // `getProperty()` also returns non-private properties inherited
+            // from a parent class. Those are handled when the parent class
+            // itself is visited.
+            if ($reflectionProperty->getDeclaringClass()->getName() !== $class) {
+                continue;
+            }
+
             $reflectionAttributes = $reflectionProperty->getAttributes();
 
             foreach ($reflectionAttributes as $reflectionAttribute) {
