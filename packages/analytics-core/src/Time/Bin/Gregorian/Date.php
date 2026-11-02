@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
@@ -43,6 +44,10 @@ final class Date implements MonotonicTimeBin
         $y = (int) substr($string, 0, 4);
         $m = (int) substr($string, 4, 2);
         $d = (int) substr($string, 6, 2);
+
+        if (!checkdate($m, $d, $y)) {
+            throw new InvalidArgumentException(\sprintf('Invalid date: %d', $this->databaseValue));
+        }
 
         $this->start = new \DateTimeImmutable(
             \sprintf('%04d-%02d-%02d 00:00:00', $y, $m, $d),

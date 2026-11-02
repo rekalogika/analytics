@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Time\Filter;
 
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
 use Rekalogika\Analytics\Time\TimeBin;
 use Rekalogika\Analytics\UX\PanelBundle\Filter\NumberRanges\NumberRangesFilterOptions;
@@ -44,7 +45,14 @@ final readonly class TimeBinNumberRangeFilterOptions implements NumberRangesFilt
     #[\Override]
     public function transformInputToDatabaseValue(int $number): mixed
     {
-        $object = ($this->timeBinClass)::createFromDatabaseValue($number);
+        try {
+            $object = ($this->timeBinClass)::createFromDatabaseValue($number);
+        } catch (InvalidArgumentException) {
+            // Not a valid bin, e.g. 8 for a day of week. The number is still
+            // compared with the database values: on its own it matches
+            // nothing, and as the bound of a range it still works.
+            return $number;
+        }
 
         if ($object instanceof DatabaseValueAware) {
             /** @psalm-suppress MixedReturnStatement */

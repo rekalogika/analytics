@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
@@ -28,6 +29,7 @@ use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -250,6 +252,28 @@ final class TimeBinTest extends TestCase
 
             $current = $next;
         }
+    }
+
+    /**
+     * @param class-string<TimeBin> $class
+     */
+    #[DataProvider('invalidDatabaseValueProvider')]
+    public function testInvalidDatabaseValue(string $class, int $databaseValue): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $class::createFromDatabaseValue($databaseValue);
+    }
+
+    /**
+     * @return iterable<array-key,array{class:class-string<TimeBin>,databaseValue:int}>
+     */
+    public static function invalidDatabaseValueProvider(): iterable
+    {
+        yield ['class' => DayOfWeek::class, 'databaseValue' => 8];
+        yield ['class' => MonthOfYear::class, 'databaseValue' => 0];
+        yield ['class' => Date::class, 'databaseValue' => 20241399];
+        yield ['class' => Date::class, 'databaseValue' => 20240230];
+        yield ['class' => Hour::class, 'databaseValue' => 2024010125];
     }
 
     /**

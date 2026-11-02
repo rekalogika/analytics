@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Criteria;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\Exception\GroupingSetNotAvailable;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
 use Rekalogika\Analytics\Tests\App\Service\SummaryClassRegistry;
+use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
+use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,6 +116,41 @@ final class OccupancyHistorySummaryTest extends KernelTestCase
         ]);
 
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testNumberRangeFilterWithInvalidTimeBin(): void
+    {
+        // 8 is not a day of week: on its own it matches nothing, as the
+        // bound of a range it still works
+        /** @psalm-suppress MixedAssignment */
+        $count = static::getContainer()
+            ->get(PivotAwareQueryFactory::class)
+            ->createFromParameters($this->getQuery(), [
+                'values' => ['count'],
+                'filters' => ['dayOfWeek'],
+                'filterExpressions' => ['dayOfWeek' => ['value' => '2,5-8,8']],
+            ])
+            ->getResult()
+            ->getMeasures()
+            ->get('count')
+            ?->getRawValue();
+
+        $expected = $this->getQuery()
+            ->withDimensions()
+            ->dice(Criteria::expr()->in('dayOfWeek', [
+                DayOfWeek::Tuesday,
+                DayOfWeek::Friday,
+                DayOfWeek::Saturday,
+                DayOfWeek::Sunday,
+            ]))
+            ->getResult()
+            ->getMeasures()
+            ->get('count')
+            ?->getRawValue();
+
+        $this->assertIsNumeric($expected);
+        $this->assertGreaterThan(0, (int) $expected);
+        $this->assertEquals($expected, $count);
     }
 
     /**

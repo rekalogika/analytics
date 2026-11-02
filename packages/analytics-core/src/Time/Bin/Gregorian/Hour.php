@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
@@ -44,6 +45,10 @@ final class Hour implements MonotonicTimeBin
         $m = (int) substr($ymdh, 4, 2);
         $d = (int) substr($ymdh, 6, 2);
         $h = (int) substr($ymdh, 8, 2);
+
+        if (!checkdate($m, $d, $y) || $h > 23) {
+            throw new InvalidArgumentException(\sprintf('Invalid hour: %d', $this->databaseValue));
+        }
 
         $this->start = new \DateTimeImmutable(
             \sprintf('%04d-%02d-%02d %02d:00:00', $y, $m, $d, $h),
