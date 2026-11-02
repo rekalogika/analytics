@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
@@ -555,6 +558,105 @@ final class SourceChangeTest extends KernelTestCase
             ));
 
         $this->assertEquals($initialCount + 1, $this->getOrderCount());
+    }
+
+    /**
+     * @return iterable<string,array{DoctrineOrder}>
+     */
+    public static function provideOrder(): iterable
+    {
+        yield 'ascending' => [DoctrineOrder::Ascending];
+        yield 'descending' => [DoctrineOrder::Descending];
+    }
+
+    /**
+     * An order that is not shipped yet has a null member in the shipped date
+     * dimension, a sequence dimension. The drill-down must still include it,
+     * and the gap filling must still happen.
+     */
+    #[DataProvider('provideOrder')]
+    public function testNullMemberOfSequenceDimension(DoctrineOrder $order): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $item = $entityManager
+            ->getRepository(Item::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Item not found');
+
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Customer not found');
+
+        $unshipped = new Order();
+        $unshipped->setItem($item);
+        $unshipped->setCustomer($customer);
+        $unshipped->setTime(new \DateTimeImmutable('2024-06-01 00:00:00'));
+
+        $entityManager->persist($unshipped);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        static::getContainer()
+            ->get(SummaryManager::class)
+            ->refresh(OrderSummary::class, null, null, 1);
+
+        $result = static::getContainer()
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions('shippedDate')
+            ->orderBy('shippedDate', $order)
+            ->getResult();
+
+        $total = $result->getMeasures()->get('count')?->getValue();
+        $this->assertIsInt($total);
+
+        $sum = 0;
+        $members = [];
+
+        foreach ($result->drillDown('shippedDate') as $cell) {
+            $dimension = $cell->getCoordinates()->get('shippedDate');
+            $this->assertNotNull($dimension);
+
+            /** @psalm-suppress MixedAssignment */
+            $members[] = $dimension->getMember();
+
+            $count = $cell->getMeasures()->get('count')?->getValue() ?? 0;
+            $this->assertIsInt($count);
+            $sum += $count;
+        }
+
+        $this->assertSame($total, $sum);
+
+        // the null member is at the end where it sorts
+        if ($order === DoctrineOrder::Ascending) {
+            $this->assertNull(array_pop($members));
+        } else {
+            $this->assertNull(array_shift($members));
+        }
+
+        // the other members are a gapless sequence
+        $previous = null;
+
+        foreach ($members as $member) {
+            $this->assertInstanceOf(SequenceMember::class, $member);
+
+            if ($previous !== null) {
+                $this->assertSame(
+                    $order === DoctrineOrder::Ascending
+                        ? $previous->getNext()
+                        : $previous->getPrevious(),
+                    $member,
+                );
+            }
+
+            $previous = $member;
+        }
     }
 
     /**

@@ -52,6 +52,15 @@ final readonly class GapFiller
     private string $name;
 
     /**
+     * The dimension with the null member, if any. It is not part of the
+     * sequence, and is put back at the same end of the output where it was
+     * in the input.
+     */
+    private ?DefaultDimension $nullDimension;
+
+    private bool $isNullDimensionFirst;
+
+    /**
      * @param list<DefaultDimension> $dimensions
      */
     private function __construct(
@@ -63,15 +72,20 @@ final readonly class GapFiller
         $class = null;
         $label = null;
         $name = null;
+        $nullDimension = null;
+        $isNullDimensionFirst = false;
 
-        foreach ($dimensions as $dimension) {
+        foreach ($dimensions as $index => $dimension) {
             $member = $dimension->getMember();
 
             $label ??= $dimension->getLabel();
             $name ??= $dimension->getName();
 
-            // @todo we skip null value if there is a null value in the dimensions
+            // the null member is not part of the sequence, we keep it aside
             if ($member === null) {
+                $nullDimension = $dimension;
+                $isNullDimensionFirst = $index === 0;
+
                 continue;
             }
 
@@ -98,6 +112,8 @@ final readonly class GapFiller
         }
 
         $this->dimensions = $newDimensions;
+        $this->nullDimension = $nullDimension;
+        $this->isNullDimensionFirst = $isNullDimensionFirst;
 
         if ($label === null) {
             $label = new LiteralString('-');
@@ -141,6 +157,14 @@ final readonly class GapFiller
 
         foreach ($sequence as $current) {
             $output[] = $this->getDimensionFromSequenceMember($current);
+        }
+
+        if ($this->nullDimension !== null) {
+            if ($this->isNullDimensionFirst) {
+                array_unshift($output, $this->nullDimension);
+            } else {
+                $output[] = $this->nullDimension;
+            }
         }
 
         return $output;
