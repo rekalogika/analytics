@@ -46,6 +46,11 @@ final readonly class MeasureLabel implements Label
             );
     }
 
+    public function getMeasureName(): ?string
+    {
+        return $this->measureName;
+    }
+
     public function getCell(): CubeCell
     {
         return $this->cell;

@@ -42,6 +42,11 @@ final readonly class MeasureValue implements Value
             ?->getValue();
     }
 
+    public function getMeasureName(): ?string
+    {
+        return $this->measureName;
+    }
+
     public function getCell(): CubeCell
     {
         return $this->cell;

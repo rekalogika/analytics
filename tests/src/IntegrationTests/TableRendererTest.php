@@ -56,6 +56,7 @@ final class TableRendererTest extends KernelTestCase
         );
 
         $this->assertStringContainsString('<table', $html);
+        $this->assertStringContainsString('analytics-measure-count', $html);
     }
 
     public function testTableOfEmptyResult(): void
@@ -98,6 +99,7 @@ final class TableRendererTest extends KernelTestCase
 
         $this->assertStringContainsString('<table', $html);
         $this->assertStringContainsString('var(--bs-gray-100)', $html);
+        $this->assertStringContainsString('analytics-measure-count', $html);
     }
 
     public function testTableWithConfiguredTheme(): void

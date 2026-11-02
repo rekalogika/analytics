@@ -43,7 +43,7 @@ final readonly class RowAdapter implements PivotTableRow
         foreach ($this->measures as $measureName) {
             /** @psalm-suppress MixedAssignment */
             $value = $this->row->getMeasures()->get($measureName)?->getValue();
-            yield $measureName => new TableValue($value);
+            yield $measureName => new TableValue($value, $measureName);
         }
     }
 }
