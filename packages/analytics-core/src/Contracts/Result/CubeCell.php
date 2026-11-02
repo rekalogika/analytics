@@ -138,14 +138,16 @@ interface CubeCell extends Cell
      * cell along the given dimension, and returns the first one whose member
      * matches the argument. Returns null if none matches.
      *
-     * A member matches if it is identical to the argument, if it is a
-     * `MeasureMember` whose measure property equals the argument, if it is a
-     * `\Stringable` whose string form equals the argument, or, if the argument
-     * is a callable, if the callable returns true when given the member.
+     * If the argument is a `\Closure`, a member matches if the closure returns
+     * true when given the member. Otherwise, a member matches if it is
+     * identical to the argument, if it is a `MeasureMember` whose measure
+     * property equals the argument, or if it is a `\Stringable` whose string
+     * form equals the argument. Other callables, such as a function name in a
+     * string, are matched as values and not called.
      *
      * @param string $dimension The dimension to search along.
      * @param mixed $argument The member, its string form, the measure name
-     * for the `@values` dimension, or a `callable(mixed $member): bool`.
+     * for the `@values` dimension, or a `\Closure(mixed $member): bool`.
      */
     public function find(string $dimension, mixed $argument): ?self;
 

@@ -82,11 +82,13 @@ final class DimensionFieldCollection
     {
         $memberSignature = DefaultDimension::getMemberSignature($member);
 
+        // An interpolated member is only collected when the gaps are filled.
+        // Fill them so that the member can be found as in the drill-down.
         if (!isset($this->byMember[$memberSignature])) {
-            return null;
+            $this->getGapFilled();
         }
 
-        return $this->byMember[$memberSignature];
+        return $this->byMember[$memberSignature] ?? null;
     }
 
     /**
@@ -161,7 +163,18 @@ final class DimensionFieldCollection
             return $dimensions;
         }
 
-        $firstMember = $dimensions[0]->getMember();
+        // The null member sorts first in descending order, so we look for the
+        // first non-null member.
+        $firstMember = null;
+
+        foreach ($dimensions as $dimension) {
+            /** @psalm-suppress MixedAssignment */
+            $firstMember = $dimension->getMember();
+
+            if ($firstMember !== null) {
+                break;
+            }
+        }
 
         if (!$firstMember instanceof SequenceMember) {
             return $dimensions;

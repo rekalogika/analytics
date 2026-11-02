@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
+use Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
@@ -30,6 +31,7 @@ final class PathResolverTest extends KernelTestCase
     private function createPathResolver(
         string $class,
         string $alias,
+        string $idField = 'id',
     ): PathResolver {
         $manager = self::getContainer()
             ->get(ManagerRegistry::class)
@@ -40,7 +42,7 @@ final class PathResolverTest extends KernelTestCase
         $queryBuilder = $manager
             ->createQueryBuilder()
             ->from($class, $alias)
-            ->select($alias . '.id');
+            ->select($alias . '.' . $idField);
 
         return new PathResolver(
             baseClass: $class,
@@ -256,6 +258,29 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 LEFT JOIN Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer _a1 WITH _a1.id = _a0.id',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    /**
+     * The join condition must use the identifier of the related entity, not
+     * the one of the base entity.
+     */
+    public function testManyToOneEntityCastWithDifferentIdentifierName(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Shipment::class,
+            alias: 'root',
+            idField: 'shipmentId',
+        );
+
+        $this->assertEquals(
+            '_a1.gender',
+            $pathResolver->resolve('customer(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.shipmentId FROM Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment root LEFT JOIN root.customer _a0 LEFT JOIN Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer _a1 WITH _a1.id = _a0.id',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }

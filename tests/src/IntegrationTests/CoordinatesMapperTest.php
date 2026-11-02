@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Criteria;
 use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
 use Rekalogika\Analytics\Contracts\Result\Cell;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
@@ -67,6 +68,38 @@ final class CoordinatesMapperTest extends KernelTestCase
             // members arrive as strings when they come from a URL
             $this->testOne($cell, stringify: true);
         }
+    }
+
+    /**
+     * The dice leaves a gap of two months, which the gap filler fills with
+     * interpolated members. Their cells must round trip like the others.
+     */
+    public function testRoundTripOfInterpolatedMembers(): void
+    {
+        $summaryManager = self::getContainer()->get(SummaryManager::class);
+        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        $cells = $summaryManager
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions('time.civil.month.month', 'customerType')
+            ->dice(Criteria::expr()->in('time.civil.month.month', [202301, 202304]))
+            ->getResult()
+            ->drillDown(['time.civil.month.month', 'customerType']);
+
+        $months = [];
+
+        foreach ($cells as $cell) {
+            /** @psalm-suppress MixedAssignment */
+            $month = $cell->getCoordinates()->get('time.civil.month.month')?->getRawMember();
+            $this->assertIsInt($month);
+            $months[$month] = true;
+
+            $this->testOne($cell);
+            $this->testOne($cell, stringify: true);
+        }
+
+        $this->assertSame([202301, 202302, 202303, 202304], array_keys($months));
     }
 
     public function testMemberMissingFromResultYieldsNullCell(): void

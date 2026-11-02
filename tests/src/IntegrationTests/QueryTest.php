@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
+use Rekalogika\Analytics\Contracts\Result\MeasureMember;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -674,5 +675,45 @@ final class QueryTest extends KernelTestCase
         /** @psalm-suppress MixedAssignment */
         $count = $query->dice(null)->getResult()->getMeasures()->get('count')?->getValue();
         $this->assertEquals(190, $count);
+    }
+
+    public function testFindWithClosure(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.month.month')
+            ->getResult();
+
+        $cell = $result->find(
+            '@values',
+            static fn(mixed $member): bool => $member instanceof MeasureMember
+                && $member->getMeasureProperty() === 'count',
+        );
+
+        $this->assertNotNull($cell);
+        $this->assertEquals('count', $cell->getMeasure()->getName());
+
+        // time bin members are \Stringable
+        $cell = $result->find(
+            'time.civil.month.month',
+            static fn(mixed $member): bool => $member instanceof Month
+                && $member->getDatabaseValue() === 202410,
+        );
+
+        $this->assertNotNull($cell);
+
+        $member = $cell->getCoordinates()->get('time.civil.month.month')?->getMember();
+        $this->assertInstanceOf(Month::class, $member);
+        $this->assertSame(202410, $member->getDatabaseValue());
+    }
+
+    public function testFindDoesNotCallCallableString(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('customerType')
+            ->getResult();
+
+        // a string that happens to be the name of a function must be matched
+        // as a string, not called
+        $this->assertNull($result->find('customerType', 'is_object'));
     }
 }

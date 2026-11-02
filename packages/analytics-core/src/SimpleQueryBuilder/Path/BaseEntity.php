@@ -183,7 +183,10 @@ final readonly class BaseEntity
 
         $baseEntityWithoutCast = $this->createBaseEntityWithoutCast($firstElement);
         $castedAlias = $this->context->getAlias($basePath);
-        $idProperty = $this->getIdOfClass();
+
+        // the identifier of the related entity, which the class we cast to
+        // shares, not the one of this entity
+        $idProperty = $baseEntityWithoutCast->getIdOfClass();
 
         $this->queryBuilder->leftJoin(
             $classCast,

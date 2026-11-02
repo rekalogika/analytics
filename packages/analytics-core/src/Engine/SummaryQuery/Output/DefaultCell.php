@@ -180,7 +180,11 @@ final class DefaultCell implements CubeCell
             /** @psalm-suppress MixedAssignment */
             $member = $cell->getMember($dimension);
 
-            if ($member === $argument) {
+            if ($argument instanceof \Closure) {
+                if ($argument($member) === true) {
+                    return $cell;
+                }
+            } elseif ($member === $argument) {
                 return $cell;
             } elseif ($member instanceof MeasureMember) {
                 if ($member->getMeasureProperty() === $argument) {
@@ -188,10 +192,6 @@ final class DefaultCell implements CubeCell
                 }
             } elseif ($member instanceof \Stringable) {
                 if ($member->__toString() === $argument) {
-                    return $cell;
-                }
-            } elseif (\is_callable($argument)) {
-                if ($argument($member) === true) {
                     return $cell;
                 }
             }
