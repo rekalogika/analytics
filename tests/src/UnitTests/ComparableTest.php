@@ -15,8 +15,10 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 
 use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\Util\ComparableUtil;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
+use Rekalogika\Analytics\Time\Bin\Gregorian\Month;
 
 final class ComparableTest extends TestCase
 {
@@ -65,6 +67,29 @@ final class ComparableTest extends TestCase
                 Date::createFromDatabaseValue(20250101),
             ],
             $items,
+        );
+    }
+
+    public function testCompare(): void
+    {
+        $this->assertSame(-1, ComparableUtil::compare(
+            Date::createFromDatabaseValue(20250101),
+            Date::createFromDatabaseValue(20250102),
+        ));
+
+        $this->assertSame(0, ComparableUtil::compare(
+            Date::createFromDatabaseValue(20250101),
+            Date::createFromDatabaseValue(20250101),
+        ));
+    }
+
+    public function testCompareDifferentClasses(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+
+        ComparableUtil::compare(
+            Date::createFromDatabaseValue(20250101),
+            Month::createFromDatabaseValue(202501),
         );
     }
 }

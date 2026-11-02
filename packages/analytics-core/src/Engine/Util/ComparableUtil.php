@@ -29,7 +29,7 @@ final readonly class ComparableUtil
      */
     public static function compare(Comparable $a, Comparable $b): int
     {
-        if ($a::compare(...) !== $b::compare(...)) {
+        if ($a::class !== $b::class) {
             throw new UnexpectedValueException(\sprintf(
                 'Cannot compare "%s" with "%s".',
                 $a::class,

@@ -81,8 +81,8 @@ final class Groupings
             throw new InvalidArgumentException(\sprintf(
                 'Expression "%s" already exists for property "%s", and you are trying to add the same expression for property "%s". Two properties with the same expression in the same summary class is not allowed because it will confuse the database.',
                 $expression,
-                $name,
                 $previousProperty,
+                $name,
             ));
         }
 

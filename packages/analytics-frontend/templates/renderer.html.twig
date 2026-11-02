@@ -111,9 +111,10 @@
 
 {%- block td_class -%}
     analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
-    {% if element.content.node.measure.key is defined -%}
+    {% set measure = element.content.measureName ?? null %}
+    {% if measure is not null -%}
         analytics-measure
-        analytics-measure-{{ element.content.node.measure.key }}
+        analytics-measure-{{ measure }}
     {%- else -%}
         analytics-dimension
     {%- endif -%}
@@ -121,9 +122,10 @@
 
 {%- block tf_class -%}
     analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
-    {% if element.content.node.measure.key is defined -%}
+    {% set measure = element.content.measureName ?? null %}
+    {% if measure is not null -%}
         analytics-measure
-        analytics-measure-{{ element.content.node.measure.key }}
+        analytics-measure-{{ measure }}
     {%- else -%}
         analytics-dimension
     {%- endif -%}
@@ -131,9 +133,10 @@
 
 {%- block th_class -%}
     analytics-dimension-{{ element.key|replace({"@": "--", ".": "--"}) }}
-    {% if element.content.node.measure.key is defined -%}
+    {% set measure = element.content.measureName ?? null %}
+    {% if measure is not null -%}
         analytics-measure
-        analytics-measure-{{ element.content.node.measure.key }}
+        analytics-measure-{{ measure }}
     {%- else -%}
         analytics-dimension
     {%- endif -%}

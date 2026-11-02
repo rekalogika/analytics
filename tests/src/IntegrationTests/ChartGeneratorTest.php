@@ -94,6 +94,23 @@ final class ChartGeneratorTest extends KernelTestCase
         $this->assertSame($expected, $this->getYTitle($chart));
     }
 
+    #[DataProvider('provideTwoDimensionalChartType')]
+    public function testTwoDimensionalChartLegendPosition(ChartType $chartType): void
+    {
+        $chart = $this->createChart(
+            ['customerCountry', 'customerGender'],
+            ['price'],
+            $chartType,
+        );
+
+        /** @var array{plugins?:array{legend?:array<string,mixed>}} */
+        $options = $chart->getOptions();
+        $legend = $options['plugins']['legend'] ?? [];
+
+        $this->assertSame('top', $legend['position'] ?? null);
+        $this->assertArrayNotHasKey('labels', $legend);
+    }
+
     private function getYTitle(Chart $chart): ?string
     {
         /** @var array{scales?:array{y?:array{title?:array{text?:string}}}} */

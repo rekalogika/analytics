@@ -22,7 +22,6 @@ use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryPostGenerateSchema
 use Rekalogika\Analytics\Engine\EventListener\DirtySummaryEventListener;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
-use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
@@ -216,17 +215,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->args([
             '$refreshAgentDispatcher' => service('rekalogika.analytics.bundle.refresh.dispatcher'),
             '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
-            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
-        ])
-    ;
-
-    $services
-        ->set('rekalogika.analytics.engine.refresh.agent')
-        ->class(RefreshAgent::class)
-        ->args([
-            '$summaryRefresherFactory' => service('rekalogika.analytics.summary_refresher_factory'),
-            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
-            '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
             '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
         ])
     ;

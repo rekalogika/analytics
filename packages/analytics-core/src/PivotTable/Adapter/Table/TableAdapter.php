@@ -102,7 +102,10 @@ final readonly class TableAdapter implements PivotTableTable
         /** @psalm-suppress MixedAssignment */
         $result = $this->legend[$key] ?? null;
 
-        return new TableLabel($result);
+        return new TableLabel(
+            $result,
+            \in_array($key, $this->measures, true) ? $key : null,
+        );
     }
 
     #[\Override]

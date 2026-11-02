@@ -16,7 +16,7 @@ namespace Rekalogika\Analytics\SimpleQueryBuilder\Path;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 
-final readonly class PathResolver
+final class PathResolver
 {
     private PathContext $context;
 
@@ -39,6 +39,24 @@ final readonly class PathResolver
             queryBuilder: $queryBuilder,
             context: $this->context,
         );
+    }
+
+    /**
+     * Returns a copy of this resolver that adds its joins to the given query
+     * builder, which must be a clone of the current one. The joins already
+     * made are kept, under the same aliases.
+     */
+    public function withQueryBuilder(QueryBuilder $queryBuilder): self
+    {
+        $context = $this->context->withQueryBuilder($queryBuilder);
+
+        $clone = clone $this;
+        $clone->queryBuilder = $queryBuilder;
+        $clone->context = $context;
+        $clone->baseEntity = $context->getBaseEntityFromCache($this->baseEntity->getBasePath())
+            ?? throw new LogicException('Base entity is not in the context');
+
+        return $clone;
     }
 
     public function resolve(string $path): string

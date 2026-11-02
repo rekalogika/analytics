@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import TomSelect from 'tom-select';
 export default class extends Controller {
   connect() {
-    if (!this.element instanceof HTMLSelectElement) {
+    if (!(this.element instanceof HTMLSelectElement)) {
       throw new Error('Element is not a select element');
     }
     this.element.labelEmpty = this.element.dataset.labelEmpty;

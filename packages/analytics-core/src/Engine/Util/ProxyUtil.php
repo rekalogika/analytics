@@ -27,12 +27,15 @@ final readonly class ProxyUtil
      */
     public static function normalizeClassName(string $className): string
     {
+        // trim first, so that the offsets below are computed on the string
+        // they are applied to
+        $className = ltrim($className, '\\');
+
         if (false !== $pos = strrpos($className, '\\__CG__\\')) {
             // Doctrine Common proxy marker
             $realClass = substr($className, $pos + 8);
         } elseif (false !== $pos = strrpos($className, '\\__PM__\\')) {
             // Ocramius Proxy Manager
-            $className = ltrim($className, '\\');
             $rpos = strrpos($className, '\\');
 
             if (false === $rpos) {

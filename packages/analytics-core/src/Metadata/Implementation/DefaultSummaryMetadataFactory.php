@@ -120,9 +120,7 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
             ->tryGetAttribute(Summary::class);
 
         if ($summaryAttribute === null) {
-            throw new SummaryNotFound(
-                \sprintf('Class "%s" is not a summary class', $summaryClassName),
-            );
+            throw new SummaryNotFound($summaryClassName);
         }
 
         $sourceClass = $summaryAttribute->getSourceClass();

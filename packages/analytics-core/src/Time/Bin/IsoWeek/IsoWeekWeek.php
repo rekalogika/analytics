@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\IsoWeek;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
@@ -51,6 +52,12 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
             ->setTimezone($this->timeZone)
             ->setISODate($y, $w)
             ->setTime(0, 0, 0);
+
+        // `setISODate()` silently overflows an invalid week, e.g. 2021-W53
+        // into 2022-W01
+        if ((int) $this->start->format('oW') !== $this->databaseValue) {
+            throw new InvalidArgumentException(\sprintf('Invalid ISO week: %d', $this->databaseValue));
+        }
 
         $this->end = $this->start->modify('+1 week');
     }

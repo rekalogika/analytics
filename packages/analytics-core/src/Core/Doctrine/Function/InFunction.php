@@ -51,7 +51,7 @@ final class InFunction extends FunctionNode
 
         while ($parser->getLexer()->isNextToken(TokenType::T_COMMA)) {
             $parser->match(TokenType::T_COMMA);
-            $this->matches[] = $parser->StringPrimary();
+            $this->matches[] = $parser->ArithmeticPrimary();
         }
 
         $parser->match(TokenType::T_CLOSE_PARENTHESIS);

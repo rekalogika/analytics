@@ -16,7 +16,6 @@ namespace Rekalogika\Analytics\Metadata\Implementation;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Metadata\Attribute\Dimension;
 use Rekalogika\Analytics\Metadata\Attribute\DimensionGroup;
-use Rekalogika\Analytics\Metadata\Attribute\Summary;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollectionFactory;
 use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadata;
 use Rekalogika\Analytics\Metadata\Summary\DimensionGroupMetadataFactory;
@@ -69,17 +68,14 @@ final readonly class DefaultDimensionGroupMetadataFactory implements DimensionGr
         $classAttributes = $this->attributeCollectionFactory
             ->getClassAttributes($class);
 
-        if (
-            !$classAttributes->hasAttribute(DimensionGroup::class)
-            && !$classAttributes->hasAttribute(Summary::class)
-        ) {
+        $dimensionGroup = $classAttributes->tryGetAttribute(DimensionGroup::class);
+
+        if ($dimensionGroup === null) {
             throw new InvalidArgumentException(\sprintf(
-                'Class "%s" does not have a DimensionGroup or Summary attribute.',
+                'Class "%s" does not have a DimensionGroup attribute.',
                 $class,
             ));
         }
-
-        $dimensionGroup = $classAttributes->getAttribute(DimensionGroup::class);
 
         $propertyReflections = AttributeUtil::getPropertiesOfClass($class);
         $dimensions = [];

@@ -17,11 +17,23 @@ use Rekalogika\Analytics\PivotTable\Model\Property;
 
 abstract readonly class TableProperty implements Property
 {
-    final public function __construct(private mixed $value) {}
+    /**
+     * @param string|null $measureName The measure this property belongs to,
+     * or null if it belongs to a dimension.
+     */
+    final public function __construct(
+        private mixed $value,
+        private ?string $measureName = null,
+    ) {}
 
     #[\Override]
     public function getContent(): mixed
     {
         return $this->value;
+    }
+
+    public function getMeasureName(): ?string
+    {
+        return $this->measureName;
     }
 }

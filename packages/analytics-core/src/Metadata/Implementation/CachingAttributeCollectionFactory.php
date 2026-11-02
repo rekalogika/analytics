@@ -22,8 +22,18 @@ use Symfony\Contracts\Cache\CacheInterface;
  * Decorator that caches the attribute collections returned by another
  * factory, so each class and property is reflected only once.
  */
-final readonly class CachingAttributeCollectionFactory implements AttributeCollectionFactory
+final class CachingAttributeCollectionFactory implements AttributeCollectionFactory
 {
+    /**
+     * The collections already fetched, so the cache is consulted only once
+     * per process for each. This also covers collections the cache fails to
+     * store, e.g. because an attribute holds a closure, which would otherwise
+     * be reflected again on every call.
+     *
+     * @var array<string,AttributeCollection>
+     */
+    private array $collections = [];
+
     /**
      * @param AttributeCollectionFactory $decorated The factory doing the
      * actual work.
@@ -31,8 +41,8 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
      * to an in-memory cache that lives as long as this object.
      */
     public function __construct(
-        private AttributeCollectionFactory $decorated,
-        private CacheInterface $cache = new ArrayAdapter(),
+        private readonly AttributeCollectionFactory $decorated,
+        private readonly CacheInterface $cache = new ArrayAdapter(),
     ) {}
 
     /**
@@ -44,7 +54,7 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
     ): AttributeCollection {
         $cacheKey = hash('xxh128', 'attributes_class_' . $class);
 
-        return $this->cache->get(
+        return $this->collections[$cacheKey] ??= $this->cache->get(
             $cacheKey,
             function () use ($class) {
                 return $this->decorated->getClassAttributes($class);
@@ -60,9 +70,10 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
         string $class,
         string $property,
     ): AttributeCollection {
-        $cacheKey = hash('xxh128', 'attributes_property_' . $class . '_' . $property);
+        // `::` cannot occur in a class or property name, unlike `_`
+        $cacheKey = hash('xxh128', 'attributes_property_' . $class . '::' . $property);
 
-        return $this->cache->get(
+        return $this->collections[$cacheKey] ??= $this->cache->get(
             $cacheKey,
             function () use ($class, $property) {
                 return $this->decorated->getPropertyAttributes($class, $property);

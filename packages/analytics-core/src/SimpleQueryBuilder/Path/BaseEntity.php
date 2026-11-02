@@ -32,6 +32,19 @@ final readonly class BaseEntity
         $context->addBaseEntity($this);
     }
 
+    public function withQueryBuilder(
+        QueryBuilder $queryBuilder,
+        PathContext $context,
+    ): self {
+        return new self(
+            basePath: $this->basePath,
+            baseClass: $this->baseClass,
+            baseAlias: $this->baseAlias,
+            queryBuilder: $queryBuilder,
+            context: $context,
+        );
+    }
+
     public function getBasePath(): string
     {
         return $this->basePath;

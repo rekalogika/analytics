@@ -63,5 +63,22 @@ final class Version20250801 extends AbstractMigration
     }
 
     #[\Override]
-    public function down(Schema $schema): void {}
+    public function down(Schema $schema): void
+    {
+        $this->addSql(<<<'SQL'
+            DROP AGGREGATE IF EXISTS public.rekalogika_first (anyelement);
+        SQL);
+
+        $this->addSql(<<<'SQL'
+            DROP FUNCTION IF EXISTS public.rekalogika_first_agg (anyelement, anyelement);
+        SQL);
+
+        $this->addSql(<<<'SQL'
+            DROP AGGREGATE IF EXISTS public.rekalogika_last (anyelement);
+        SQL);
+
+        $this->addSql(<<<'SQL'
+            DROP FUNCTION IF EXISTS public.rekalogika_last_agg (anyelement, anyelement);
+        SQL);
+    }
 }
