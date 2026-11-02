@@ -454,21 +454,33 @@ final class QueryTest extends KernelTestCase
 
     public function testWhereWithTimeBinRange(): void
     {
+        // the fixtures place 200 orders at random times in 2023-2024, so the
+        // range must be wide enough to always contain more than one order.
+        $start = 2024010100;
+        $end = 2024063023;
+
         $result = $this->getQuery()
             ->withDimensions('time.civil.hour.hour')
             ->dice(Criteria::expr()->andX(
                 Criteria::expr()->gte(
                     'time.civil.hour.hour',
-                    Hour::createFromDatabaseValue(2024101010),
+                    Hour::createFromDatabaseValue($start),
                 ),
                 Criteria::expr()->lte(
                     'time.civil.hour.hour',
-                    Hour::createFromDatabaseValue(2024111011),
+                    Hour::createFromDatabaseValue($end),
                 ),
             ))
             ->getResult()->drillDown('time.civil.hour.hour');
 
         $this->assertGreaterThan(1, $result->count());
+
+        foreach ($result as $cell) {
+            $hour = $cell->getCoordinates()->get('time.civil.hour.hour')?->getMember();
+            $this->assertInstanceOf(Hour::class, $hour);
+            $this->assertGreaterThanOrEqual($start, $hour->getDatabaseValue());
+            $this->assertLessThanOrEqual($end, $hour->getDatabaseValue());
+        }
     }
 
     public function testWhereWithRecurringTimeBinRangeEnum(): void

@@ -111,6 +111,16 @@ final readonly class ClassMetadataWrapper
     }
 
     /**
+     * Returns true if the class is an entity, not a mapped superclass or an
+     * embeddable.
+     */
+    public function isEntity(): bool
+    {
+        return !$this->classMetadata->isMappedSuperclass
+            && !$this->classMetadata->isEmbeddedClass;
+    }
+
+    /**
      * Returns true if the property is mapped, either as a scalar field or as
      * an association. Embedded properties are not included.
      */
@@ -175,7 +185,8 @@ final readonly class ClassMetadataWrapper
      * Returns the identifier of the entity as a string.
      *
      * @throws MetadataException If the entity has a composite identifier, no
-     * identifier value, or an identifier that is not a string or a number.
+     * identifier value, or an identifier that is not a string, a number, or
+     * a `Stringable` object such as a `Uuid`.
      */
     public function getStringIdentifierFromObject(object $entity): string
     {
@@ -192,7 +203,7 @@ final readonly class ClassMetadataWrapper
             throw new MetadataException('Entity does not have an identifier value.');
         }
 
-        if (\is_string($id) || is_numeric($id)) {
+        if (\is_string($id) || is_numeric($id) || $id instanceof \Stringable) {
             return (string) $id;
         }
 

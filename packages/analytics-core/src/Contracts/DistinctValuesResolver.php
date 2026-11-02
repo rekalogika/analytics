@@ -22,7 +22,9 @@ namespace Rekalogika\Analytics\Contracts;
  * default implementation cannot handle. The default implementation handles
  * dimensions that are relations to other entities and dimensions that are
  * backed enums. Under Symfony, implementations are registered automatically
- * and tried in turn until one returns a non-null result.
+ * and tried in turn until one returns a non-null result, in the order of the
+ * `priority` of their `rekalogika.analytics.distinct_values_resolver` tag,
+ * highest first. The default implementation has priority -1000.
  */
 interface DistinctValuesResolver
 {

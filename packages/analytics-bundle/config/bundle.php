@@ -138,7 +138,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$propertyAccessor' => service('property_accessor'),
         ])
-        ->tag('rekalogika.analytics.distinct_values_resolver');
+        ->tag('rekalogika.analytics.distinct_values_resolver', [
+            'priority' => -1000,
+        ]);
 
     //
     // value serializer
@@ -160,7 +162,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
         ])
-        ->tag('rekalogika.analytics.value_serializer');
+        ->tag('rekalogika.analytics.value_serializer', [
+            'priority' => -1000,
+        ]);
 
     //
     // coordinates mapper

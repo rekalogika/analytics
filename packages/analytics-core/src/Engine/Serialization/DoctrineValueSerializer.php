@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\Serialization;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Serialization\UnsupportedValue;
@@ -25,6 +27,22 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
 final readonly class DoctrineValueSerializer implements ValueSerializer
 {
+    /**
+     * Doctrine types whose PHP values are objects. They are left to other
+     * serializers.
+     */
+    private const OBJECT_TYPES = [
+        Types::DATE_MUTABLE,
+        Types::DATE_IMMUTABLE,
+        Types::DATEINTERVAL,
+        Types::DATETIME_MUTABLE,
+        Types::DATETIME_IMMUTABLE,
+        Types::DATETIMETZ_MUTABLE,
+        Types::DATETIMETZ_IMMUTABLE,
+        Types::TIME_MUTABLE,
+        Types::TIME_IMMUTABLE,
+    ];
+
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -56,15 +74,35 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             return (string) $value;
         }
 
+        if (\is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
         if (!\is_object($value)) {
             throw new UnsupportedValue();
         }
 
-        $class = ProxyUtil::normalizeClassName($value::class);
-        $metadata = new ClassMetadataWrapper($this->managerRegistry, $class);
+        // only entities with a single identifier convertible to a string are
+        // handled here. other objects are left to other serializers.
 
-        // again, no checking is done here yet.
-        return $metadata->getStringIdentifierFromObject($value);
+        $class = ProxyUtil::normalizeClassName($value::class);
+        $manager = $this->managerRegistry->getManagerForClass($class);
+
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new UnsupportedValue();
+        }
+
+        $metadata = new ClassMetadataWrapper($manager, $class);
+
+        if (!$metadata->isEntity()) {
+            throw new UnsupportedValue();
+        }
+
+        try {
+            return $metadata->getStringIdentifierFromObject($value);
+        } catch (MetadataException) {
+            throw new UnsupportedValue();
+        }
     }
 
     #[\Override]
@@ -127,9 +165,23 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             ));
         }
 
+        // if boolean
+
+        $scalarType = $metadata->getScalarType($dimension);
+
+        if ($scalarType === Types::BOOLEAN) {
+            return filter_var($identifier, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE)
+                ?? throw new InvalidArgumentException(\sprintf(
+                    'Invalid boolean identifier "%s" for dimension "%s" of class "%s"',
+                    $identifier,
+                    $dimension,
+                    $class,
+                ));
+        }
+
         // if scalar
 
-        if ($metadata->getScalarType($dimension) !== null) {
+        if ($scalarType !== null && !\in_array($scalarType, self::OBJECT_TYPES, true)) {
             return $identifier;
         }
 

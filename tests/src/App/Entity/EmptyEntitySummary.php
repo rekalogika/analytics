@@ -52,6 +52,14 @@ class EmptyEntitySummary extends BaseSummary
     )]
     private ?string $name;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
+    #[Analytics\Dimension(
+        source: new PropertyValue('active'),
+        label: new TranslatableMessage('Active'),
+        orderBy: DoctrineOrder::Ascending,
+    )]
+    private ?bool $active = null;
+
     //
     // measures
     //
@@ -70,6 +78,11 @@ class EmptyEntitySummary extends BaseSummary
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
     }
 
     public function getCount(): ?int
