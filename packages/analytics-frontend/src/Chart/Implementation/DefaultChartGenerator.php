@@ -451,11 +451,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     if ($unit !== null) {
                         $yTitle = \sprintf(
                             '%s - %s',
-                            $this->stringifier->toString($secondDimensionObject->getDisplayMember()),
+                            $this->stringifier->toString($measureObject->getLabel()),
                             $this->stringifier->toString($unit),
                         );
                     } else {
-                        $yTitle = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
+                        $yTitle = $this->stringifier->toString($measureObject->getLabel());
                     }
                 }
             }

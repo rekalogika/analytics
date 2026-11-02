@@ -65,4 +65,40 @@ final class ChartGeneratorTest extends KernelTestCase
 
         $this->assertSame($expectedType, $chart->getType());
     }
+
+    /**
+     * @return iterable<string,array{ChartType}>
+     */
+    public static function provideTwoDimensionalChartType(): iterable
+    {
+        yield 'grouped bar' => [ChartType::GroupedBar];
+        yield 'stacked bar' => [ChartType::StackedBar];
+        yield 'multi line' => [ChartType::Line];
+    }
+
+    #[DataProvider('provideTwoDimensionalChartType')]
+    public function testTwoDimensionalChartYTitleIsTheMeasure(ChartType $chartType): void
+    {
+        $expected = $this->getYTitle(
+            $this->createChart(['customerCountry'], ['price'], ChartType::Bar),
+        );
+
+        $this->assertNotNull($expected);
+
+        $chart = $this->createChart(
+            ['customerCountry', 'customerGender'],
+            ['price'],
+            $chartType,
+        );
+
+        $this->assertSame($expected, $this->getYTitle($chart));
+    }
+
+    private function getYTitle(Chart $chart): ?string
+    {
+        /** @var array{scales?:array{y?:array{title?:array{text?:string}}}} */
+        $options = $chart->getOptions();
+
+        return $options['scales']['y']['title']['text'] ?? null;
+    }
 }
