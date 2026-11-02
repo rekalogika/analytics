@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Engine\SummaryRefresher;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\PartitionRange;
@@ -283,6 +284,17 @@ final class SummaryRefresher
                     $this->refreshRange($batchRange);
                 }
             }
+        }
+
+        // if the resume id did not match any batch, nothing was processed.
+        // fail before updating the latest key and removing the new entity
+        // flags, otherwise the skipped records are never summarized
+
+        if (!$doWork) {
+            throw new InvalidArgumentException(\sprintf(
+                'The resume ID "%s" does not match any batch in the range. Resuming requires the same arguments and batch size as the interrupted run.',
+                (string) $resumeId,
+            ));
         }
 
         // update latest key

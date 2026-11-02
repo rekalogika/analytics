@@ -16,7 +16,11 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Entity\SummaryProperties;
+use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresher;
@@ -115,6 +119,56 @@ final class ManualRefreshTest extends KernelTestCase
 
         $this->assertPartitionMatchesLowestLevel($first);
         $this->assertPartitionMatchesLowestLevel($second);
+    }
+
+    /**
+     * A resume ID that does not match any batch, e.g. a mistyped one or one
+     * from a run with a different batch size, must fail without moving the
+     * latest key or removing the new entity flags. Otherwise the records it
+     * skipped are never summarized.
+     */
+    public function testNonMatchingResumeIdFails(): void
+    {
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $handlerFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_manager.handler_factory');
+
+        $this->assertInstanceOf(HandlerFactory::class, $handlerFactory);
+
+        $handlerFactory
+            ->getSummary(OrderSummary::class)
+            ->updateLatestKey(100);
+
+        $entityManager->persist(new DirtyFlag(OrderSummary::class, null, null));
+        $entityManager->flush();
+        $entityManager->clear();
+
+        try {
+            $this->createRefresher()->manualRefresh(
+                start: null,
+                end: null,
+                batchSize: 1,
+                resumeId: 'nonexistent',
+            );
+
+            $this->fail('The refresh should have failed.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $properties = $entityManager
+            ->getRepository(SummaryProperties::class)
+            ->findOneBy(['summaryClass' => OrderSummary::class]);
+
+        $this->assertInstanceOf(SummaryProperties::class, $properties);
+        $this->assertSame('100', $properties->getLastId());
+
+        $newFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class, 'level' => null, 'key' => null]);
+
+        $this->assertCount(1, $newFlags);
     }
 
     /**
