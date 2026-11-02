@@ -30,9 +30,14 @@ final readonly class RefreshAgent
 
         if ($this->refreshAgentLock->acquire($class) === false) {
             // another refresh is running. it might have missed the dirty flags
-            // created after it started, so we try again later
+            // created after it started, so we try again in 10 seconds. not
+            // using `refresh()`, which would delay it to when the strategy
+            // considers new dirty flags ready
 
-            $this->refreshAgentRunner->refresh($class, minimumDelay: 10);
+            $this->refreshAgentRunner->scheduleAt(
+                $class,
+                new \DateTimeImmutable('+10 seconds'),
+            );
 
             return;
         }
