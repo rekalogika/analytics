@@ -54,7 +54,24 @@ final readonly class PartitionHandler
      */
     public function getLowestPartitionFromEntity(object $entity): Partition
     {
+        return $this->tryGetLowestPartitionFromEntity($entity)
+            ?? throw new UnexpectedValueException(
+                'Partition source value must be a string or an integer, "null" given',
+            );
+    }
+
+    /**
+     * Same as `getLowestPartitionFromEntity()`, but returns null if the
+     * partitioning key of the entity is null, e.g. an identity column of an
+     * entity that is not yet inserted.
+     */
+    public function tryGetLowestPartitionFromEntity(object $entity): ?Partition
+    {
         $sourceValue = $this->propertyAccessor->getValue($entity, $this->getSourceProperty());
+
+        if ($sourceValue === null) {
+            return null;
+        }
 
         if ($sourceValue instanceof \Stringable) {
             $sourceValue = $sourceValue->__toString();

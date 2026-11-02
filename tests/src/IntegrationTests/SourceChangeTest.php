@@ -17,6 +17,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -90,6 +92,16 @@ final class SourceChangeTest extends KernelTestCase
             'UPDATE rekalogika_summary_properties SET scheduled_refresh = scheduled_refresh - make_interval(secs => ?)',
             [$seconds],
         );
+    }
+
+    private function getHandlerFactory(): HandlerFactory
+    {
+        $handlerFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_manager.handler_factory');
+
+        $this->assertInstanceOf(HandlerFactory::class, $handlerFactory);
+
+        return $handlerFactory;
     }
 
     private function modifyOrderTime(int $id, \DateTimeImmutable $time): void
@@ -179,17 +191,27 @@ final class SourceChangeTest extends KernelTestCase
         $entityManager->flush();
         $entityManager->clear();
 
-        // check dirty flag
+        // check dirty flags: a new entity flag, and the flag of the lowest
+        // partition containing the new order
 
-        $dirtyFlags = $entityManager
-            ->getRepository(DirtyFlag::class)
-            ->findBy(['class' => OrderSummary::class]);
+        $repository = $entityManager->getRepository(DirtyFlag::class);
 
-        $this->assertCount(1, $dirtyFlags);
-        $dirtyFlag = $dirtyFlags[0];
-        $this->assertEquals(OrderSummary::class, $dirtyFlag->getClass());
-        $this->assertNull($dirtyFlag->getKey());
-        $this->assertNull($dirtyFlag->getLevel());
+        $this->assertCount(2, $repository->findBy(['class' => OrderSummary::class]));
+
+        $newFlag = $repository->findOneBy(['class' => OrderSummary::class, 'level' => null]);
+        $this->assertNotNull($newFlag);
+        $this->assertNull($newFlag->getKey());
+
+        $partition = $this->getHandlerFactory()
+            ->getSummary(OrderSummary::class)
+            ->getPartition()
+            ->getLowestPartitionFromEntity($order);
+
+        $this->assertNotNull($repository->findOneBy([
+            'class' => OrderSummary::class,
+            'level' => $partition->getLevel(),
+            'key' => $partition->getKey(),
+        ]));
 
         // check if NewDirtyFlagEvent is emitted
 
@@ -198,7 +220,7 @@ final class SourceChangeTest extends KernelTestCase
             $listener->getEvents(),
             static fn(NewDirtyFlagEvent $event): bool => $event->getDirtyFlag()->getClass() === OrderSummary::class,
         );
-        $this->assertCount(1, $events);
+        $this->assertCount(2, $events);
 
         // check messenger now, it should have one pending message for each
         // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
@@ -466,6 +488,72 @@ final class SourceChangeTest extends KernelTestCase
      * A manual refresh without a range must process a single new record, even
      * if the computed start and end are the same key.
      */
+    /**
+     * New records are found by comparing the latest summarized key with the
+     * latest key in the source. A record whose transaction commits after a
+     * refresh has moved the latest key past its key, e.g. a long-running
+     * import holding lower ids, is therefore not new by that comparison. The
+     * dirty flag of its partition, committed together with the record, must
+     * still get it summarized.
+     */
+    public function testRecordCommittedAfterLatestKeyIsSummarized(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $initialCount = $this->getOrderCount();
+
+        $item = $entityManager
+            ->getRepository(Item::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Item not found');
+
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Customer not found');
+
+        $time = new \DateTimeImmutable('2024-06-01 00:00:00');
+
+        $order = new Order();
+        $order->setItem($item);
+        $order->setCustomer($customer);
+        $order->setTime($time);
+        $order->setShipped($time->modify('+3 days'));
+
+        $entityManager->persist($order);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $orderId = $order->getId();
+        $this->assertNotNull($orderId);
+
+        // simulate a refresh that ran while the order was not yet visible,
+        // and moved the latest key past it
+
+        $this->getHandlerFactory()
+            ->getSummary(OrderSummary::class)
+            ->updateLatestKey($orderId);
+
+        $refresherFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_refresher_factory');
+
+        $this->assertInstanceOf(SummaryRefresherFactory::class, $refresherFactory);
+
+        $refresherFactory
+            ->createSummaryRefresher(OrderSummary::class)
+            ->refresh(new DefaultRefreshAgentStrategy(
+                minimumAge: null,
+                minimumIdleDelay: null,
+                maximumAge: null,
+                upperPartitionCooldown: null,
+            ));
+
+        $this->assertEquals($initialCount + 1, $this->getOrderCount());
+    }
+
     public function testManualRefreshOfSingleNewRecord(): void
     {
         $this->clearRefreshState();

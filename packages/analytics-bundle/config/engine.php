@@ -139,6 +139,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             'event' => Events::onFlush,
         ])
         ->tag('doctrine.event_listener', [
+            'event' => Events::postPersist,
+        ])
+        ->tag('doctrine.event_listener', [
             'event' => Events::postFlush,
         ])
         ->tag('kernel.reset', [
