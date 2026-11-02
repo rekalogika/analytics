@@ -61,6 +61,16 @@ trait TimeBinTrait
         return self::create($databaseValue, $timeZone);
     }
 
+    /**
+     * @internal
+     */
+    public static function createFromDatabaseValueAndTimeZone(
+        int $databaseValue,
+        \DateTimeZone $timeZone,
+    ): static {
+        return self::create($databaseValue, $timeZone);
+    }
+
     final private function __construct(
         protected readonly int $databaseValue,
         protected readonly \DateTimeZone $timeZone,

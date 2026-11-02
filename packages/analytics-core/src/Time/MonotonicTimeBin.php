@@ -29,6 +29,18 @@ interface MonotonicTimeBin extends
         \DateTimeInterface $dateTime,
     ): static;
 
+    /**
+     * Equivalent to `createFromDatabaseValue($databaseValue)
+     * ->withTimeZone($timeZone)`, without creating the intermediate UTC
+     * instance.
+     *
+     * @internal
+     */
+    public static function createFromDatabaseValueAndTimeZone(
+        int $databaseValue,
+        \DateTimeZone $timeZone,
+    ): static;
+
     public function withTimeZone(\DateTimeZone $timeZone): static;
 
     public function getStart(): \DateTimeInterface;

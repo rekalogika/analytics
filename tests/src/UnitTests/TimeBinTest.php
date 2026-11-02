@@ -116,6 +116,25 @@ final class TimeBinTest extends TestCase
         $this->assertCount($countBefore, (array) $cache->getValue());
     }
 
+    public function testCreateFromDatabaseValueAndTimeZone(): void
+    {
+        $cache = new \ReflectionProperty(Year::class, 'instances');
+        $countBefore = \count((array) $cache->getValue());
+        $timeZone = new \DateTimeZone('Asia/Jakarta');
+
+        $instance = Year::createFromDatabaseValueAndTimeZone(2986, $timeZone);
+
+        // no intermediate UTC instance
+        $this->assertCount($countBefore + 1, (array) $cache->getValue());
+
+        $this->assertSame(
+            Year::createFromDatabaseValue(2986)->withTimeZone($timeZone),
+            $instance,
+        );
+
+        $this->assertSame('Asia/Jakarta', $instance->getStart()->getTimezone()->getName());
+    }
+
     public function testHourSequenceAcrossSpringForward(): void
     {
         // 2025-03-09 in New York: the clock jumps from 02:00 EST to 03:00 EDT,
