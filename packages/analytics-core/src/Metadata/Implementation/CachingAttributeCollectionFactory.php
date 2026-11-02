@@ -60,7 +60,8 @@ final readonly class CachingAttributeCollectionFactory implements AttributeColle
         string $class,
         string $property,
     ): AttributeCollection {
-        $cacheKey = hash('xxh128', 'attributes_property_' . $class . '_' . $property);
+        // `::` cannot occur in a class or property name, unlike `_`
+        $cacheKey = hash('xxh128', 'attributes_property_' . $class . '::' . $property);
 
         return $this->cache->get(
             $cacheKey,
