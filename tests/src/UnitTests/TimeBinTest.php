@@ -184,6 +184,24 @@ final class TimeBinTest extends TestCase
         );
     }
 
+    public function testMonthBasedWeekLabelInAnotherTimeZone(): void
+    {
+        $defaultTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        try {
+            $week = MonthBasedWeekWeek::createFromDatabaseValue(2025021)
+                ->withTimeZone(new \DateTimeZone('America/New_York'));
+
+            $this->assertSame(
+                'Week 1, February 2025',
+                $week->trans(new IdentityTranslator(), 'en'),
+            );
+        } finally {
+            date_default_timezone_set($defaultTimeZone);
+        }
+    }
+
     /**
      * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int}>
      */

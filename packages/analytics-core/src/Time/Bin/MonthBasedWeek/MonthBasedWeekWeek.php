@@ -149,10 +149,10 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
         ?string $locale = null,
     ): string {
         try {
-            $monthDateTime = (new \DateTimeImmutable())
-                ->setDate($this->y, $this->m, 1)
-                ->setTime(0, 0, 0)
-                ->setTimezone($this->start->getTimezone());
+            $monthDateTime = new \DateTimeImmutable(
+                \sprintf('%04d-%02d-01 00:00:00', $this->y, $this->m),
+                $this->start->getTimezone(),
+            );
 
             $intlDateFormatter = new \IntlDateFormatter(
                 locale: $locale,
