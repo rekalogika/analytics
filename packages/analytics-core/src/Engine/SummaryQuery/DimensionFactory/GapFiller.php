@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Translation\LiteralString;
 use Rekalogika\Analytics\Engine\Sequence\SequenceUtil;
@@ -179,11 +180,19 @@ final readonly class GapFiller
             return $this->dimensions[$objectId];
         }
 
+        // The raw member of a dimension from the query is the value stored in
+        // the summary table. An interpolated dimension must have the same, so
+        // that it can be serialized and matched like the others.
+        /** @psalm-suppress MixedAssignment */
+        $rawMember = $member instanceof DatabaseValueAware
+            ? $member->getDatabaseValue()
+            : $member;
+
         $dimension = $this->dimensionFactory->createDimension(
             name: $this->name,
             label: $this->label,
             member: $member,
-            rawMember: $member,
+            rawMember: $rawMember,
             displayMember: $member,
             interpolation: true,
         );

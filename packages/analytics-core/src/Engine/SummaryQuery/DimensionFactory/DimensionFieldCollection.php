@@ -82,11 +82,13 @@ final class DimensionFieldCollection
     {
         $memberSignature = DefaultDimension::getMemberSignature($member);
 
+        // An interpolated member is only collected when the gaps are filled.
+        // Fill them so that the member can be found as in the drill-down.
         if (!isset($this->byMember[$memberSignature])) {
-            return null;
+            $this->getGapFilled();
         }
 
-        return $this->byMember[$memberSignature];
+        return $this->byMember[$memberSignature] ?? null;
     }
 
     /**
