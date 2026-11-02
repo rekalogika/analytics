@@ -13,12 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
+use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DeleteRangeStartEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresher;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\TestIntegerPartition;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ManualRefreshTest extends KernelTestCase
 {
@@ -109,5 +115,51 @@ final class ManualRefreshTest extends KernelTestCase
 
         $this->assertPartitionMatchesLowestLevel($first);
         $this->assertPartitionMatchesLowestLevel($second);
+    }
+
+    /**
+     * A failed refresh rolls back its transaction. Otherwise the lock release
+     * fails on the aborted transaction, replaces the original exception, and
+     * the connection stays unusable.
+     */
+    public function testFailedRefreshRollsBackTransaction(): void
+    {
+        $connection = static::getContainer()->get(Connection::class);
+        $this->assertInstanceOf(Connection::class, $connection);
+
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $this->assertInstanceOf(EventDispatcherInterface::class, $eventDispatcher);
+
+        // fail inside the transaction with a statement that aborts it
+
+        $eventDispatcher->addListener(
+            DeleteRangeStartEvent::class,
+            static function () use ($connection): void {
+                $connection->executeQuery('SELECT 1/0');
+            },
+        );
+
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
+        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        try {
+            $summaryManager->refresh(OrderSummary::class, 1, 1);
+            $this->fail('The refresh should have failed.');
+        } catch (DriverException $e) {
+            // division_by_zero, not in_failed_sql_transaction from the lock
+            // release
+
+            $this->assertSame('22012', $e->getSQLState());
+        }
+
+        $this->assertFalse($connection->isTransactionActive());
+        $this->assertEquals(1, $connection->fetchOne('SELECT 1'));
+
+        $lock = static::getContainer()
+            ->get('rekalogika.analytics.engine.refresh.lock');
+
+        $this->assertInstanceOf(RefreshAgentLock::class, $lock);
+        $this->assertTrue($lock->acquire(OrderSummary::class));
+        $lock->release(OrderSummary::class);
     }
 }

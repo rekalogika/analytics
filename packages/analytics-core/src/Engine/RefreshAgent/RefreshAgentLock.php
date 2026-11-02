@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\RefreshAgent;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
@@ -145,15 +146,29 @@ final class RefreshAgentLock implements ResetInterface
     }
 
     /**
-     * Release key
+     * Release key. Does not throw if the connection is unusable, so that it
+     * can be called in a `finally` block without replacing the exception that
+     * made the connection unusable.
      *
      * @param class-string $summaryClass
      */
     public function release(string $summaryClass): void
     {
-        $store = $this->getStoreBySummaryClass($summaryClass);
+        $connection = $this->getConnectionBySummaryClass($summaryClass);
+        $store = $this->getStoreByConnection($connection);
         $key = $this->getKey($summaryClass);
-        $store->delete($key);
         $this->removeKey($summaryClass);
+
+        try {
+            $store->delete($key);
+        } catch (DBALException) {
+            // the connection is unusable, e.g. it is in an aborted transaction.
+            // closing it ends the database session, which releases the
+            // advisory lock. dbal reconnects on the next use. the store is
+            // discarded because it still remembers the key.
+
+            unset($this->connectionToStore[$connection]);
+            $connection->close();
+        }
     }
 }
