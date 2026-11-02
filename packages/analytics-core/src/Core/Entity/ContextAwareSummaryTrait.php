@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Core\Entity;
 
 use Rekalogika\Analytics\Contracts\Context\SummaryContext;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
 
 /**
@@ -21,7 +22,7 @@ use Rekalogika\Analytics\Contracts\Summary\ContextAwareSummary;
  */
 trait ContextAwareSummaryTrait
 {
-    private SummaryContext $context;
+    private ?SummaryContext $context = null;
 
     final public function setContext(SummaryContext $context): void
     {
@@ -30,6 +31,10 @@ trait ContextAwareSummaryTrait
 
     protected function getContext(): SummaryContext
     {
+        if (null === $this->context) {
+            throw new LogicException('Context is not set.');
+        }
+
         return $this->context;
     }
 }
