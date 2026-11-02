@@ -1,0 +1,118 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of rekalogika/analytics package.
+ *
+ * (c) Priyadi Iman Nurcahyo <https://rekalogika.dev>
+ *
+ * For the full copyright and license information, please view the LICENSE file
+ * that was distributed with this source code.
+ */
+
+namespace Rekalogika\Analytics\Tests\IntegrationTests;
+
+use Doctrine\Common\Collections\Expr\Comparison;
+use Rekalogika\Analytics\Contracts\SummaryManager;
+use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\UX\PanelBundle\Filter;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\Choice;
+use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
+use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQuery;
+use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+final class PivotAwareQueryTest extends KernelTestCase
+{
+    /**
+     * @param array<string,mixed> $parameters
+     */
+    private function createPivotAwareQuery(array $parameters): PivotAwareQuery
+    {
+        $query = static::getContainer()
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OrderSummary::class);
+
+        return static::getContainer()
+            ->get(PivotAwareQueryFactory::class)
+            ->createFromParameters($query, $parameters);
+    }
+
+    private function getFilter(PivotAwareQuery $query, string $dimension): Filter
+    {
+        foreach ($query->getFilterExpressions() as $name => $filter) {
+            if ($name === $dimension) {
+                return $filter;
+            }
+        }
+
+        $this->fail(\sprintf('Filter "%s" not found', $dimension));
+    }
+
+    private function getChoiceFilter(PivotAwareQuery $query, string $dimension): ChoiceFilter
+    {
+        $filter = $this->getFilter($query, $dimension);
+        $this->assertInstanceOf(ChoiceFilter::class, $filter);
+
+        return $filter;
+    }
+
+    public function testChoiceFilterIgnoresUnknownId(): void
+    {
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+            'filterExpressions' => [
+                'customerCountry' => ['values' => ['999999999']],
+            ],
+        ]);
+
+        $filter = $this->getChoiceFilter($query, 'customerCountry');
+
+        $this->assertSame([], $filter->getValues());
+        $this->assertNull($filter->createExpression());
+
+        foreach ($filter->getChoices() as $choice) {
+            $this->assertFalse($choice->isSelected());
+        }
+    }
+
+    public function testChoiceFilterKeepsKnownIdsAndExplicitNull(): void
+    {
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+        ]);
+
+        $id = $this->getChoiceFilter($query, 'customerCountry')
+            ->getChoices()[0]
+            ->getId();
+
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+            'filterExpressions' => [
+                'customerCountry' => ['values' => [$id, '999999999']],
+            ],
+        ]);
+
+        $filter = $this->getChoiceFilter($query, 'customerCountry');
+        $this->assertCount(1, $filter->getValues());
+        $this->assertNotNull($filter->getValues()[0]);
+
+        $expression = $filter->createExpression();
+        $this->assertInstanceOf(Comparison::class, $expression);
+        $this->assertNotContains(null, (array) $expression->getValue()->getValue());
+
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+            'filterExpressions' => [
+                'customerCountry' => ['values' => [Choice::NULL]],
+            ],
+        ]);
+
+        $this->assertSame(
+            [null],
+            $this->getChoiceFilter($query, 'customerCountry')->getValues(),
+        );
+    }
+}

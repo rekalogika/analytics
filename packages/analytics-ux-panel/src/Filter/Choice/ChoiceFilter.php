@@ -93,7 +93,17 @@ final class ChoiceFilter implements Filter
                 throw new InvalidArgumentException('Invalid input value');
             }
 
-            $values[] = $this->options->getValueFromId($v);
+            /** @psalm-suppress MixedAssignment */
+            $value = $this->options->getValueFromId($v);
+
+            // An id that does not resolve, e.g. a deleted entity or one that
+            // is no longer among the choices, must not become a filter for
+            // null values. Null is only selected explicitly with Choice::NULL.
+            if ($value === null) {
+                continue;
+            }
+
+            $values[] = $value;
         }
 
         return $this->values = $values;
