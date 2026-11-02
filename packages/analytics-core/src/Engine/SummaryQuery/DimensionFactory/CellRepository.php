@@ -121,15 +121,14 @@ final class CellRepository
             return;
         }
 
-        if ($fillGaps) {
-            $dimensions = $this->dimensionCollection
-                ->getDimensionsByName($dimensionName)
-                ->getGapFilled();
-        } else {
-            $dimensions = $this->dimensionCollection
-                ->getDimensionsByName($dimensionName)
-                ->getUnprocessed();
-        }
+        $dimensionFieldCollection = $this->dimensionCollection
+            ->getDimensionsByName($dimensionName);
+
+        // without gap filling, interpolated members are skipped anyway, so we
+        // don't need to produce them
+        $dimensions = $fillGaps
+            ? $dimensionFieldCollection->getGapFilled()
+            : $dimensionFieldCollection->getSorted();
 
         foreach ($dimensions as $dimension) {
             $coordinates = $baseCell->getCoordinates()->append($dimension);

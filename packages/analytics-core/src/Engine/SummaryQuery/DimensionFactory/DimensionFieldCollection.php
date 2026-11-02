@@ -131,26 +131,6 @@ final class DimensionFieldCollection
     }
 
     /**
-     * @return list<DefaultDimension>
-     */
-    public function getUnprocessed(): array
-    {
-        $dimensions = $this->collected;
-
-        if ($this->order instanceof Order) {
-            $dimensions = DimensionUtil::sort(
-                dimensions: array_values($dimensions),
-                order: $this->order,
-            );
-        }
-
-        // Fill gaps if the first member is a sequence member
-        $dimensions = $this->tryFillGaps(array_values($dimensions));
-
-        return $dimensions;
-    }
-
-    /**
      * @param list<DefaultDimension> $dimensions
      * @return list<DefaultDimension>
      */
