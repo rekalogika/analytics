@@ -137,30 +137,27 @@ final readonly class DimensionUtil
         /** @psalm-suppress MixedAssignment */
         $bRawMember = $b->getRawMember();
 
-        // check null in raw member
+        // check null in raw member. null is greater than any non-null value,
+        // so it sorts last in ascending order
         if ($aRawMember === null) {
             if ($bRawMember === null) {
                 return 0; // Both are null
             }
 
-            // null is considered less than any non-null value
-            return 1; // $a is less than $b
+            return 1; // $a is null, so it comes after $b
         } elseif ($bRawMember === null) {
-            // Any non-null value is considered greater than null
-            return -1; // $a is greater than $b;
+            return -1; // $b is null, so it comes after $a
         }
 
-        // check null in member
+        // check null in member, likewise
         if ($aMember === null) {
             if ($bMember === null) {
                 return 0; // Both are null
             }
 
-            // null is considered less than any non-null value
-            return 1; // $a is less than $b
+            return 1; // $a is null, so it comes after $b
         } elseif ($bMember === null) {
-            // Any non-null value is considered greater than null
-            return -1; // $a is greater than $b
+            return -1; // $b is null, so it comes after $a
         }
 
         if ($aMember instanceof Comparable && $bMember instanceof Comparable) {
