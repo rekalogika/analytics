@@ -27,6 +27,11 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class DateRangeFilter implements Filter
 {
+    /**
+     * The date format of the input, the default format of flatpickr.
+     */
+    private const FORMAT = 'Y-m-d';
+
     private ?string $rawUpperBound = null;
 
     /**
@@ -69,20 +74,37 @@ final class DateRangeFilter implements Filter
         return $this->options->getLabel();
     }
 
+    /**
+     * Returns the date from the input array, or null if it is missing or not
+     * a valid date in the expected format.
+     */
+    private function getInputDate(string $key): ?\DateTimeImmutable
+    {
+        /** @psalm-suppress MixedAssignment */
+        $string = $this->inputArray[$key] ?? null;
+
+        if (!\is_string($string)) {
+            return null;
+        }
+
+        $date = \DateTimeImmutable::createFromFormat('!' . self::FORMAT, $string);
+
+        // reject overflowing dates, e.g. 2024-02-30
+        if ($date === false || $date->format(self::FORMAT) !== $string) {
+            return null;
+        }
+
+        return $date;
+    }
+
     public function getRawStart(): string
     {
         if ($this->rawLowerBound !== null) {
             return $this->rawLowerBound;
         }
 
-        /** @psalm-suppress MixedAssignment */
-        $string = $this->inputArray['start'] ?? null;
-
-        if (!\is_string($string)) {
-            $string = '';
-        }
-
-        return $this->rawLowerBound = $string;
+        return $this->rawLowerBound = $this->getInputDate('start')
+            ?->format(self::FORMAT) ?? '';
     }
 
     public function getRawEnd(): string
@@ -91,14 +113,8 @@ final class DateRangeFilter implements Filter
             return $this->rawUpperBound;
         }
 
-        /** @psalm-suppress MixedAssignment */
-        $string = $this->inputArray['end'] ?? null;
-
-        if (!\is_string($string)) {
-            $string = '';
-        }
-
-        return $this->rawUpperBound = $string;
+        return $this->rawUpperBound = $this->getInputDate('end')
+            ?->format(self::FORMAT) ?? '';
     }
 
     public function getRawValue(): string
@@ -126,14 +142,14 @@ final class DateRangeFilter implements Filter
             return $this->lowerBound;
         }
 
-        $rawStart = $this->getRawStart();
+        $date = $this->getInputDate('start');
 
-        if ($rawStart === '') {
+        if ($date === null) {
             return null;
         }
 
         return $this->lowerBound = $this->options
-            ->transformDateToObject(new \DateTimeImmutable($rawStart));
+            ->transformDateToObject($date);
     }
 
     /**
@@ -145,14 +161,14 @@ final class DateRangeFilter implements Filter
             return $this->upperBound;
         }
 
-        $rawEnd = $this->getRawEnd();
+        $date = $this->getInputDate('end');
 
-        if ($rawEnd === '') {
+        if ($date === null) {
             return null;
         }
 
         return $this->upperBound = $this->options
-            ->transformDateToObject(new \DateTimeImmutable($rawEnd));
+            ->transformDateToObject($date);
     }
 
     #[\Override]
