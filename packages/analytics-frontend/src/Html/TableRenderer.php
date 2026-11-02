@@ -186,6 +186,13 @@ final readonly class TableRenderer
             measures: $measures,
         );
 
+        // the transformer does not accept a table without rows
+        if ($table->isEmpty()) {
+            return $this->twig
+                ->load($theme ?? $this->theme)
+                ->renderBlock('no_data');
+        }
+
         $table = TableToHtmlTableTransformer::transform($table);
 
         return $this->getVisitor($theme)->visitTable($table);
