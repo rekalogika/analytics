@@ -100,6 +100,22 @@ final class TimeBinTest extends TestCase
         $this->assertNotSame($instanceUTC1, $instanceNY1);
     }
 
+    public function testInstanceCacheReleasesUnusedInstances(): void
+    {
+        $cache = new \ReflectionProperty(Year::class, 'instances');
+        $countBefore = \count((array) $cache->getValue());
+
+        $instance = Year::createFromDatabaseValue(2987);
+        $reference = \WeakReference::create($instance);
+
+        $this->assertCount($countBefore + 1, (array) $cache->getValue());
+
+        unset($instance);
+
+        $this->assertNull($reference->get());
+        $this->assertCount($countBefore, (array) $cache->getValue());
+    }
+
     public function testHourSequenceAcrossSpringForward(): void
     {
         // 2025-03-09 in New York: the clock jumps from 02:00 EST to 03:00 EDT,

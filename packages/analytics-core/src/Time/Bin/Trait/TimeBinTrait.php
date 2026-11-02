@@ -19,7 +19,10 @@ use Rekalogika\Analytics\Contracts\Model\Comparable;
 trait TimeBinTrait
 {
     /**
-     * @var array<string,self>
+     * Weak references, so that the cache does not keep the instances alive.
+     * The entry is removed by the destructor.
+     *
+     * @var array<string,\WeakReference<self>>
      */
     private static array $instances = [];
 
@@ -28,14 +31,16 @@ trait TimeBinTrait
         \DateTimeZone $timeZone,
     ): static {
         $hash = self::calculateHash($databaseValue, $timeZone);
+        $instance = (self::$instances[$hash] ?? null)?->get();
 
-        if (isset(self::$instances[$hash])) {
-            return self::$instances[$hash];
+        if ($instance !== null) {
+            return $instance;
         }
 
         $instance = new static($databaseValue, $timeZone);
+        self::$instances[$hash] = \WeakReference::create($instance);
 
-        return self::$instances[$hash] = $instance;
+        return $instance;
     }
 
     private static function calculateHash(
@@ -71,8 +76,10 @@ trait TimeBinTrait
     public function __destruct()
     {
         $hash = self::calculateHash($this->databaseValue, $this->timeZone);
+        $instance = (self::$instances[$hash] ?? null)?->get();
 
-        if (isset(self::$instances[$hash])) {
+        // do not remove the entry of another instance, e.g. if this is a clone
+        if ($instance === null || $instance === $this) {
             unset(self::$instances[$hash]);
         }
     }
