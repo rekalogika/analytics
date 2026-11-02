@@ -160,7 +160,7 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
-    public function slice(string $dimension, mixed $member): CubeCell
+    public function slice(string $dimension, mixed $member): ?CubeCell
     {
         return $this->context
             ->getCellRepository()

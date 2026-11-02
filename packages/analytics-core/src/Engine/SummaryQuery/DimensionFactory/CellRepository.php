@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory;
 
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultContext;
@@ -64,21 +64,29 @@ final class CellRepository
         return $cell->withOrdering($coordinates->getDimensionNames());
     }
 
+    /**
+     * Returns null if the member does not occur in the result for the
+     * dimension. Returns a null cell if it does, but there is no row for the
+     * resulting coordinates.
+     */
     public function getCellByBaseAndDimension(
         DefaultCell $baseCell,
         string $dimensionName,
         mixed $dimensionMember,
-    ): DefaultCell {
+    ): ?DefaultCell {
+        if (!\in_array($dimensionName, $this->query->getDimensions(), true)) {
+            throw new InvalidArgumentException(\sprintf(
+                'Dimension "%s" is not among the dimensions of the query.',
+                $dimensionName,
+            ));
+        }
+
         $dimension = $this->dimensionCollection
             ->getDimensionsByName($dimensionName)
             ->getDimensionByMember($dimensionMember);
 
         if ($dimension === null) {
-            throw new UnexpectedValueException(\sprintf(
-                'Dimension "%s" with member "%s" not found in the dimension collection.',
-                $dimensionName,
-                var_export($dimensionMember, true),
-            ));
+            return null;
         }
 
         $coordinates = $baseCell->getCoordinates()->append($dimension);

@@ -43,6 +43,24 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
         Types::TIME_IMMUTABLE,
     ];
 
+    /**
+     * Doctrine types whose PHP values are integers.
+     */
+    private const INTEGER_TYPES = [
+        Types::SMALLINT,
+        Types::INTEGER,
+        Types::BIGINT,
+    ];
+
+    /**
+     * Doctrine types whose PHP values are floats. `smallfloat` is spelled out
+     * because `Types::SMALLFLOAT` does not exist in DBAL 3.
+     */
+    private const FLOAT_TYPES = [
+        Types::FLOAT,
+        'smallfloat',
+    ];
+
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private SummaryMetadataFactory $summaryMetadataFactory,
@@ -70,8 +88,11 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
             return $value;
         }
 
+        // var_export() uses serialize_precision, so the string converts back
+        // to the same float. A string cast uses precision and can lose digits.
+
         if (\is_float($value)) {
-            return (string) $value;
+            return var_export($value, true);
         }
 
         if (\is_bool($value)) {
@@ -179,7 +200,38 @@ final readonly class DoctrineValueSerializer implements ValueSerializer
                 ));
         }
 
-        // if scalar
+        // if integer or float. the identifier may arrive as a string, e.g. from
+        // a query string, but the member in the result has the PHP type of the
+        // field, and members are matched by type.
+
+        if (\in_array($scalarType, self::INTEGER_TYPES, true)) {
+            if (\is_int($identifier)) {
+                return $identifier;
+            }
+
+            return filter_var($identifier, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE)
+                ?? throw new InvalidArgumentException(\sprintf(
+                    'Invalid integer identifier "%s" for dimension "%s" of class "%s"',
+                    $identifier,
+                    $dimension,
+                    $class,
+                ));
+        }
+
+        if (\in_array($scalarType, self::FLOAT_TYPES, true)) {
+            if (!is_numeric($identifier)) {
+                throw new InvalidArgumentException(\sprintf(
+                    'Invalid float identifier "%s" for dimension "%s" of class "%s"',
+                    $identifier,
+                    $dimension,
+                    $class,
+                ));
+            }
+
+            return (float) $identifier;
+        }
+
+        // other scalars
 
         if ($scalarType !== null && !\in_array($scalarType, self::OBJECT_TYPES, true)) {
             return $identifier;
