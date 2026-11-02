@@ -84,6 +84,8 @@ final class SummaryRefresher
             $refreshAgentStrategy = new DefaultRefreshAgentStrategy();
         }
 
+        $this->summaryHandler->getDirtyFlags()->removeStaleFlags();
+
         $i = 0;
 
         do {

@@ -238,7 +238,7 @@ final readonly class DirtyFlagsHandler
             $key = $row['key'] === null ? null : (int) $row['key'];
 
             // flags of levels no longer used by the partition will never be
-            // processed
+            // processed, they are removed by the next refresh
 
             if ($level !== null && !\in_array($level, $levels, true)) {
                 continue;
@@ -400,6 +400,27 @@ final readonly class DirtyFlagsHandler
             ->andWhere('s.level IS NULL')
             ->andWhere('s.key IS NULL')
             ->setParameter('class', $this->metadata->getSummaryClass())
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Removes the dirty flags of the levels no longer used by the partition,
+     * e.g. after a change of the partition class. They will never be
+     * processed.
+     */
+    public function removeStaleFlags(): void
+    {
+        $this->entityManager->createQueryBuilder()
+            ->delete(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level IS NOT NULL')
+            ->andWhere('s.level NOT IN (:levels)')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter(
+                'levels',
+                $this->metadata->getPartition()->getPartitionClass()::getAllLevels(),
+            )
             ->getQuery()
             ->execute();
     }
