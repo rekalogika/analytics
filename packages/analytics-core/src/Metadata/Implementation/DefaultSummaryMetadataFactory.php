@@ -255,13 +255,13 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
         foreach ($properties as $reflectionProperty) {
             $property = $reflectionProperty->getName();
 
-            $attributes = $this->attributeCollectionFactory
+            $propertyAttributes = $this->attributeCollectionFactory
                 ->getPropertyAttributes($partitionClass, $property);
 
-            $partitionLevelAttribute = $attributes
+            $partitionLevelAttribute = $propertyAttributes
                 ->tryGetAttribute(PartitionLevel::class);
 
-            $partitionKeyAttribute = $attributes
+            $partitionKeyAttribute = $propertyAttributes
                 ->tryGetAttribute(PartitionKey::class);
 
             if ($partitionLevelAttribute !== null) {

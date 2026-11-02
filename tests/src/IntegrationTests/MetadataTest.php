@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Rekalogika\Analytics\Metadata\Attribute\Partition;
+use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
+use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
@@ -82,5 +86,18 @@ final class MetadataTest extends KernelTestCase
             [CustomerSummary::class],
             $metadata->getInvolvedSummaryClassesByChangedProperties(['country']),
         );
+    }
+
+    public function testPartitionMetadataAttributes(): void
+    {
+        $attributes = static::getContainer()
+            ->get(SummaryMetadataFactory::class)
+            ->getSummaryMetadata(OrderSummary::class)
+            ->getPartition()
+            ->getAttributes();
+
+        $this->assertTrue($attributes->hasAttribute(Partition::class));
+        $this->assertFalse($attributes->hasAttribute(PartitionKey::class));
+        $this->assertFalse($attributes->hasAttribute(PartitionLevel::class));
     }
 }
