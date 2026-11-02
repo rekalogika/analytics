@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\OverflowException;
 use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -175,6 +176,25 @@ final class QueryTest extends KernelTestCase
 
         $this->assertIsInt($count);
         $this->assertGreaterThan(0, $count);
+    }
+
+    public function testSliceMemberMissingFromResult(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.year')
+            ->getResult();
+
+        $this->assertNull($result->slice('time.civil.year', 1900));
+    }
+
+    public function testSliceDimensionNotInQuery(): void
+    {
+        $result = $this->getQuery()
+            ->withDimensions('time.civil.year')
+            ->getResult();
+
+        $this->expectException(InvalidArgumentException::class);
+        $result->slice('customerCountry', null);
     }
 
     public function testDrillDown(): void

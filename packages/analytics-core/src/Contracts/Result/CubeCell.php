@@ -120,7 +120,8 @@ interface CubeCell extends Cell
      * Returns the child cell for one specific member of the given dimension,
      * i.e. the cell whose coordinates are the coordinates of this cell plus
      * the given member. Returns a null cell (see `isNull()`) if the query
-     * returned no row for these coordinates.
+     * returned no row for these coordinates, and null if the member does not
+     * occur anywhere in the result for the dimension.
      *
      * @param string $dimension The dimension to add. Must be among the
      * dimensions of the query, and not already in the coordinates of this

@@ -106,7 +106,37 @@ final class ValueSerializerTest extends KernelTestCase
             identifier: (string) $value,
         );
 
-        $this->assertEquals($value, $id);
+        $this->assertSame($value, $id);
+    }
+
+    public function testInvalidIntegerDeserialization(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->valueSerializer->deserialize(
+            class: OrderSummary::class,
+            dimension: 'time.civil.month.month',
+            identifier: '2023-01',
+        );
+    }
+
+    public function testFloatRoundTrip(): void
+    {
+        $value = 0.1 + 0.2;
+
+        $id = $this->valueSerializer->serialize(
+            class: OrderSummary::class,
+            dimension: 'priceSumSquare',
+            value: $value,
+        );
+
+        $this->assertIsString($id);
+
+        $this->assertSame($value, $this->valueSerializer->deserialize(
+            class: OrderSummary::class,
+            dimension: 'priceSumSquare',
+            identifier: $id,
+        ));
     }
 
     public function testNullSerialization(): void
