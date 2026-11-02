@@ -311,9 +311,12 @@ final class SummaryRefresher
         try {
             $this->summaryHandler->getDirtyFlags()->removeNewFlags();
 
+            // read the latest key again, uncached. if new records arrived
+            // during the refresh, keep their new entity flags
+
             $sourceLatestKey = $this->summaryHandler
                 ->getSource()
-                ->getLatestKey();
+                ->refreshLatestKey();
 
             if ($end === null || $end >= $sourceLatestKey) {
                 $connection->commit();

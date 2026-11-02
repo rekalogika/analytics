@@ -65,6 +65,15 @@ final class SourceOfSummaryHandler implements ResetInterface
             ??= $this->createRangeDeterminer()->getMaxKey();
     }
 
+    /**
+     * Gets the latest key from the database, bypassing the cached value, and
+     * caches the result.
+     */
+    public function refreshLatestKey(): int|string|null
+    {
+        return $this->latestKey = $this->createRangeDeterminer()->getMaxKey();
+    }
+
     public function getEarliestKey(): int|string|null
     {
         return  $this->earliestKey
