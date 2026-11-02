@@ -50,7 +50,40 @@ final class Hour implements MonotonicTimeBin
             $this->timeZone,
         );
 
-        $this->end = $this->start->modify('+1 hour');
+        // In a DST spring-forward gap the wall-clock hour does not exist and
+        // PHP normalizes it to the next existing hour, which is the start of
+        // the following bin. Such a bin can never hold data, so make it empty
+        // instead of letting it overlap the following bin.
+        if ((int) $this->start->format('YmdH') !== $this->databaseValue) {
+            $this->end = $this->start;
+
+            return;
+        }
+
+        $this->end = self::getNextHourBoundary($this->start);
+    }
+
+    /**
+     * Returns the first instant after the given one whose hour label
+     * (YYYYMMDDHH in its time zone) differs from the given one's.
+     *
+     * The arithmetic is done on instants, not on the wall clock, so DST
+     * transitions are handled: across a fall-back one label spans two
+     * hours, and across a spring-forward one label is skipped. Wall-clock
+     * arithmetic (`modify('-1 hour')`) would land on a non-existent hour
+     * and be normalized back to where it started.
+     */
+    private static function getNextHourBoundary(
+        \DateTimeImmutable $dateTime,
+    ): \DateTimeImmutable {
+        $label = $dateTime->format('YmdH');
+        $result = $dateTime;
+
+        do {
+            $result = $result->setTimestamp($result->getTimestamp() + 3600);
+        } while ($result->format('YmdH') === $label);
+
+        return $result;
     }
 
     #[\Override]
@@ -124,22 +157,27 @@ final class Hour implements MonotonicTimeBin
     #[\Override]
     public function getNext(): static
     {
-        $next = $this->start->modify('+1 hour');
-
+        // $end is the first instant that belongs to the next bin. For an
+        // empty bin (spring-forward gap) it equals $start, whose label is
+        // already that of the next existing bin.
         return self::create(
-            (int) $next->format('YmdH'),
-            $next->getTimezone(),
+            (int) $this->end->format('YmdH'),
+            $this->timeZone,
         );
     }
 
     #[\Override]
     public function getPrevious(): static
     {
-        $previous = $this->start->modify('-1 hour');
+        // Subtract one hour of elapsed time; the instant one hour before the
+        // start of this bin always lies inside the previous existing bin.
+        $previous = $this->start->setTimestamp(
+            $this->start->getTimestamp() - 3600,
+        );
 
         return self::create(
             (int) $previous->format('YmdH'),
-            $previous->getTimezone(),
+            $this->timeZone,
         );
     }
 }

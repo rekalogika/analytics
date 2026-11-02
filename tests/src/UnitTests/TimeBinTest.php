@@ -94,6 +94,75 @@ final class TimeBinTest extends TestCase
         $this->assertNotSame($instanceUTC1, $instanceNY1);
     }
 
+    public function testHourSequenceAcrossSpringForward(): void
+    {
+        // 2025-03-09 in New York: the clock jumps from 02:00 EST to 03:00 EDT,
+        // so hour 02 does not exist.
+        $timeZone = new \DateTimeZone('America/New_York');
+        $hour = Hour::createFromDatabaseValue(2025030903)->withTimeZone($timeZone);
+
+        $this->assertSame('2025-03-09 03:00:00 EDT', $hour->getStart()->format('Y-m-d H:i:s T'));
+        $this->assertSame('2025-03-09 04:00:00 EDT', $hour->getEnd()->format('Y-m-d H:i:s T'));
+
+        $previous = $hour->getPrevious();
+        $this->assertNotSame($hour, $previous);
+        $this->assertSame(2025030901, $previous->getDatabaseValue());
+        $this->assertSame('2025-03-09 01:00:00 EST', $previous->getStart()->format('Y-m-d H:i:s T'));
+        $this->assertSame('2025-03-09 03:00:00 EDT', $previous->getEnd()->format('Y-m-d H:i:s T'));
+
+        $this->assertSame(2025030903, $previous->getNext()->getDatabaseValue());
+        $this->assertSame(2025030904, $hour->getNext()->getDatabaseValue());
+    }
+
+    public function testHourInSpringForwardGapIsEmpty(): void
+    {
+        $timeZone = new \DateTimeZone('America/New_York');
+        $hour = Hour::createFromDatabaseValue(2025030902)->withTimeZone($timeZone);
+
+        $this->assertEquals($hour->getStart(), $hour->getEnd());
+        $this->assertSame(2025030901, $hour->getPrevious()->getDatabaseValue());
+        $this->assertSame(2025030903, $hour->getNext()->getDatabaseValue());
+    }
+
+    public function testHourSequenceAcrossFallBack(): void
+    {
+        // 2025-11-02 in New York: the clock goes from 02:00 EDT back to 01:00
+        // EST, so hour 01 occurs twice and the bin spans two hours.
+        $timeZone = new \DateTimeZone('America/New_York');
+        $hour = Hour::createFromDatabaseValue(2025110201)->withTimeZone($timeZone);
+
+        $this->assertSame('2025-11-02 01:00:00 EDT', $hour->getStart()->format('Y-m-d H:i:s T'));
+        $this->assertSame('2025-11-02 02:00:00 EST', $hour->getEnd()->format('Y-m-d H:i:s T'));
+
+        $this->assertSame(2025110200, $hour->getPrevious()->getDatabaseValue());
+        $this->assertSame(2025110202, $hour->getNext()->getDatabaseValue());
+        $this->assertSame(2025110201, $hour->getNext()->getPrevious()->getDatabaseValue());
+        $this->assertSame(2025110201, $hour->getPrevious()->getNext()->getDatabaseValue());
+    }
+
+    public function testHourDescendingWalkAcrossSpringForwardTerminates(): void
+    {
+        $timeZone = new \DateTimeZone('Europe/Berlin');
+        // 2025-03-30: 02:00 CET -> 03:00 CEST
+        $current = Hour::createFromDatabaseValue(2025033005)->withTimeZone($timeZone);
+        $last = Hour::createFromDatabaseValue(2025033000)->withTimeZone($timeZone);
+
+        $visited = [];
+
+        while ($current !== $last) {
+            $visited[] = $current->getDatabaseValue();
+            $current = $current->getPrevious();
+            $this->assertLessThan(10, \count($visited), 'Descending walk did not terminate.');
+        }
+
+        $visited[] = $current->getDatabaseValue();
+
+        $this->assertSame(
+            [2025033005, 2025033004, 2025033003, 2025033001, 2025033000],
+            $visited,
+        );
+    }
+
     /**
      * @return iterable<array-key,array{class:class-string<MonotonicTimeBin>,databaseValue:int}>
      */
