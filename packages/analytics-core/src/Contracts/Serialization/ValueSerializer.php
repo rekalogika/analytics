@@ -21,9 +21,13 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
  * typically serialized as its primary key, and an enum as its backing value.
  *
  * Implement this interface to handle member types that the default
- * implementation does not support. Under Symfony, implementations are
+ * implementation does not support. The default implementation handles
+ * scalars, booleans, backed enums, and entities with a single identifier that
+ * is a scalar or a `Stringable` object. Under Symfony, implementations are
  * registered automatically and tried in turn until one does not throw
- * `UnsupportedValue`.
+ * `UnsupportedValue`, in the order of the `priority` of their
+ * `rekalogika.analytics.value_serializer` tag, highest first. The default
+ * implementation has priority -1000.
  *
  * @see CoordinatesMapper
  */

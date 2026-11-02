@@ -14,10 +14,19 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests\ValueSerializer;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Bundle\Serialization\ChainValueSerializer;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Serialization\UnsupportedValue;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
+use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
+use Rekalogika\Analytics\Tests\App\Entity\EmptyEntitySummary;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\Tests\App\Entity\TestIntegerPartition;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 final class ValueSerializerTest extends KernelTestCase
 {
@@ -120,5 +129,118 @@ final class ValueSerializerTest extends KernelTestCase
         );
 
         $this->assertNull($id);
+    }
+
+    public function testBooleanSerialization(): void
+    {
+        $this->assertSame('true', $this->valueSerializer->serialize(
+            class: EmptyEntitySummary::class,
+            dimension: 'active',
+            value: true,
+        ));
+
+        $this->assertSame('false', $this->valueSerializer->serialize(
+            class: EmptyEntitySummary::class,
+            dimension: 'active',
+            value: false,
+        ));
+    }
+
+    public function testBooleanDeserialization(): void
+    {
+        $this->assertTrue($this->valueSerializer->deserialize(
+            class: EmptyEntitySummary::class,
+            dimension: 'active',
+            identifier: 'true',
+        ));
+
+        $this->assertFalse($this->valueSerializer->deserialize(
+            class: EmptyEntitySummary::class,
+            dimension: 'active',
+            identifier: 'false',
+        ));
+    }
+
+    public function testInvalidBooleanDeserialization(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->valueSerializer->deserialize(
+            class: EmptyEntitySummary::class,
+            dimension: 'active',
+            identifier: 'foo',
+        );
+    }
+
+    public function testNonEntityObjectIsUnsupported(): void
+    {
+        $this->expectException(UnsupportedValue::class);
+
+        $this->createDoctrineValueSerializer()->serialize(
+            class: OrderSummary::class,
+            dimension: 'customerCountry',
+            value: new \DateTimeImmutable(),
+        );
+    }
+
+    public function testEmbeddableIsUnsupported(): void
+    {
+        $this->expectException(UnsupportedValue::class);
+
+        $this->createDoctrineValueSerializer()->serialize(
+            class: OrderSummary::class,
+            dimension: 'customerCountry',
+            value: TestIntegerPartition::createFromSourceValue(1, 16),
+        );
+    }
+
+    public function testChainFallsThroughToNextSerializer(): void
+    {
+        $dateSerializer = new class implements ValueSerializer {
+            #[\Override]
+            public function serialize(
+                string $class,
+                string $dimension,
+                mixed $value,
+            ): string {
+                if (!$value instanceof \DateTimeInterface) {
+                    throw new UnsupportedValue();
+                }
+
+                return $value->format('Y-m-d');
+            }
+
+            #[\Override]
+            public function deserialize(
+                string $class,
+                string $dimension,
+                int|string|null $identifier,
+            ): mixed {
+                return new \DateTimeImmutable((string) $identifier);
+            }
+        };
+
+        $chain = new ChainValueSerializer(
+            specificServiceLocator: new ServiceLocator([]),
+            nonSpecificServices: [
+                $this->createDoctrineValueSerializer(),
+                $dateSerializer,
+            ],
+        );
+
+        $this->assertSame('2025-01-31', $chain->serialize(
+            class: OrderSummary::class,
+            dimension: 'customerCountry',
+            value: new \DateTimeImmutable('2025-01-31'),
+        ));
+    }
+
+    private function createDoctrineValueSerializer(): DoctrineValueSerializer
+    {
+        return new DoctrineValueSerializer(
+            managerRegistry: self::getContainer()->get(ManagerRegistry::class),
+            summaryMetadataFactory: self::getContainer()
+                ->get(SummaryMetadataFactory::class),
+        );
     }
 }

@@ -17,6 +17,7 @@ use Rekalogika\Analytics\Bundle\Common\ApplicableDimensionsAware;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -26,16 +27,22 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class DistinctValuesResolverPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        $managers = $container
-            ->findTaggedServiceIds('rekalogika.analytics.distinct_values_resolver');
+        // sorted by the priority of the tag, the highest first
+        $managers = $this->findAndSortTaggedServices(
+            'rekalogika.analytics.distinct_values_resolver',
+            $container,
+        );
 
         $specificServices = [];
         $nonSpecificServices = [];
 
-        foreach (array_keys($managers) as $serviceId) {
+        foreach ($managers as $reference) {
+            $serviceId = (string) $reference;
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass()
                 ?? throw new InvalidArgumentException(\sprintf('Service "%s" does not have a class', $serviceId));
