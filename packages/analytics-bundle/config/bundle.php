@@ -19,6 +19,9 @@ use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
 use Rekalogika\Analytics\Bundle\Command\StatusCommand;
 use Rekalogika\Analytics\Bundle\Command\SweepCommand;
+use Rekalogika\Analytics\Bundle\Command\TriggerDropCommand;
+use Rekalogika\Analytics\Bundle\Command\TriggerDumpCommand;
+use Rekalogika\Analytics\Bundle\Command\TriggerInstallCommand;
 use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
@@ -137,6 +140,33 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.trigger_dump')
+        ->class(TriggerDumpCommand::class)
+        ->args([
+            '$triggerSqlGenerator' => service('rekalogika.analytics.engine.trigger.sql_generator'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.trigger_install')
+        ->class(TriggerInstallCommand::class)
+        ->args([
+            '$triggerInstaller' => service('rekalogika.analytics.engine.trigger.installer'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.trigger_drop')
+        ->class(TriggerDropCommand::class)
+        ->args([
+            '$triggerInstaller' => service('rekalogika.analytics.engine.trigger.installer'),
         ])
         ->tag('console.command')
     ;

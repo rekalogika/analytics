@@ -129,6 +129,36 @@ final class AnalyticsSchedule implements ScheduleProviderInterface
 }
 ```
 
+## Database Triggers
+
+Changes made through the ORM are detected automatically. Changes made
+otherwise, e.g. DQL `UPDATE` and `DELETE`, native SQL, migrations, or database
+cascades, are not. On PostgreSQL, the bundle can generate triggers that create
+the dirty flags for every change to the source tables, and to the tables of
+the entities the summaries read through an association:
+
+```bash
+# print the SQL, to put in a migration
+php bin/console rekalogika:analytics:trigger:dump
+
+# or, in development, install them directly, and drop them
+php bin/console rekalogika:analytics:trigger:install
+php bin/console rekalogika:analytics:trigger:drop
+```
+
+The triggers are statement-level, with transition tables, so a statement
+costs one `INSERT … SELECT` per summary, whatever the number of rows. An
+update only flags the rows whose columns read by a summary have changed.
+Regenerate them after changing a summary.
+
+The triggers only create the dirty flags. Run the [sweeper](#sweeper)
+periodically to dispatch the refresh agent. The flags are created in the time
+zone of PHP when the SQL is generated, which must be the time zone the
+application runs with.
+
+Not supported: class table inheritance, composite identifiers, `TRUNCATE`,
+and updates of primary keys.
+
 ## Console Commands
 
 | Command | Description |
@@ -137,6 +167,9 @@ final class AnalyticsSchedule implements ScheduleProviderInterface
 | `rekalogika:analytics:refresh:range` | Refreshes a range of source records, regardless of whether they are dirty. Usually run once after creating a summary table. Supports `--resume` and `--batchsize`. |
 | `rekalogika:analytics:truncate` | Truncates a summary table. |
 | `rekalogika:analytics:sweep` | Dispatches the refresh agent of the summaries that have dirty partitions but no pending run. See [Sweeper](#sweeper). |
+| `rekalogika:analytics:trigger:dump` | Prints the SQL creating the PostgreSQL triggers, or dropping them with `--drop`. See [Database Triggers](#database-triggers). |
+| `rekalogika:analytics:trigger:install` | Installs the PostgreSQL triggers directly, replacing the existing ones. For development. |
+| `rekalogika:analytics:trigger:drop` | Drops the PostgreSQL triggers. |
 | `rekalogika:analytics:status` | Shows the refresh status of the summary tables: pending dirty flags, the next and the scheduled refresh, and the latest summarized key against the latest source key. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
 | `rekalogika:analytics:debug:source` | Shows which changes to a source class refresh its summaries, and which paths through related entities are not tracked. |
