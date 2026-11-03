@@ -122,6 +122,11 @@ js-compile:
 asset-map:
 	$(PHP) tests/bin/console asset-map:compile
 
+# compiled assets take precedence over the live ones, even in debug mode
+.PHONY: asset-map-clear
+asset-map-clear:
+	rm -rf tests/public/assets
+
 .PHONY: js-symlink
 js-symlink:
 	mkdir -p tests/assets/controllers/rekalogika/analytics-ux-panel && cd tests/assets/controllers/rekalogika/analytics-ux-panel && rm -f * ; for A in ../../../../../packages/analytics-ux-panel/assets/dist/*; do ln -sf $$A ; done
@@ -131,7 +136,7 @@ importmap-install:
 	$(PHP) tests/bin/console importmap:install
 
 .PHONY: js
-js: js-compile js-symlink importmap-install asset-map
+js: js-compile js-symlink importmap-install asset-map-clear
 
 #
 # translation
