@@ -47,6 +47,14 @@
             <errorLevel type="suppress">
                 <referencedClass name="Doctrine\ORM\Query\AST\TypedExpression" />
             </errorLevel>
+            <!-- deprecated in Symfony 8.1, inherited from HttpKernel's
+            AbstractBundle, which is not deprecated. The replacement in the
+            DependencyInjection component is not available in Symfony < 8.1.
+            'info' instead of 'suppress', because 'suppress' fails as unused
+            with Symfony < 8.1 -->
+            <errorLevel type="info">
+                <referencedClass name="Symfony\Component\HttpKernel\Bundle\BundleInterface" />
+            </errorLevel>
         </DeprecatedInterface>
         <!-- deprecated in doctrine/collections 3.1, but its replacement
         SortDirection is not available in doctrine/collections 2. 'info'
