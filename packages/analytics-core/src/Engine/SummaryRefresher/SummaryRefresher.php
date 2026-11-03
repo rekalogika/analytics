@@ -198,6 +198,15 @@ final class SummaryRefresher
         int $batchSize,
         ?string $resumeId,
     ): void {
+        // a batch size of 0 or less would put every partition in one batch
+
+        if ($batchSize < 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'Batch size must be at least 1, got %d.',
+                $batchSize,
+            ));
+        }
+
         $inputStart = $start;
         $inputEnd = $end;
 

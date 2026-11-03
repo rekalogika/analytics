@@ -113,6 +113,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$refreshCommandOutputEventSubscriber' => service('rekalogika.analytics.event_subscriber.refresh_command_output'),
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
         ])
         ->tag('console.command')
     ;

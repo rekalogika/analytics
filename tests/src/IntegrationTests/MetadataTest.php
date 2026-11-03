@@ -19,10 +19,12 @@ use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
 use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\HierarchyAwareLabel;
+use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
+use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
@@ -122,5 +124,40 @@ final class MetadataTest extends KernelTestCase
 
         $this->assertNotInstanceOf(HierarchyAwareLabel::class, $dimension->getRawLabel());
         $this->assertSame($dimension->getRawLabel(), $dimension->getLabel()->getLeaf());
+    }
+
+    /**
+     * A source property used only by the partition must still be an involved
+     * property, a change to it moves the entity to another partition.
+     */
+    public function testInvolvedSourcePropertiesIncludePartition(): void
+    {
+        $summaryMetadataFactory = static::getContainer()
+            ->get(SummaryMetadataFactory::class);
+
+        $metadata = $summaryMetadataFactory->getSummaryMetadata(OrderSummary::class);
+
+        // the partition of OccupancyHistorySummary uses the `date` property,
+        // OrderSummary does not use it
+
+        $partition = $summaryMetadataFactory
+            ->getSummaryMetadata(OccupancyHistorySummary::class)
+            ->getPartition();
+
+        $this->assertSame(['date'], $partition->getSource()->getInvolvedProperties());
+        $this->assertNotContains('date', $metadata->getInvolvedSourceProperties());
+
+        $newMetadata = new SummaryMetadata(
+            sourceClass: $metadata->getSourceClass(),
+            summaryClass: $metadata->getSummaryClass(),
+            partition: $partition,
+            dimensions: $metadata->getRootDimensions(),
+            measures: $metadata->getMeasures(),
+            groupingsProperty: $metadata->getGroupingsProperty(),
+            attributes: $metadata->getAttributes(),
+            label: $metadata->getLabel(),
+        );
+
+        $this->assertContains('date', $newMetadata->getInvolvedSourceProperties());
     }
 }

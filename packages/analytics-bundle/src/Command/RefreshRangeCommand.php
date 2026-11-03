@@ -163,11 +163,15 @@ final class RefreshRangeCommand extends Command implements SignalableCommandInte
         /** @var mixed */
         $batchSize = $input->getOption('batchsize');
 
-        if (!is_numeric($batchSize)) {
-            throw new InvalidArgumentException('Invalid batch size: ' . get_debug_type($batchSize));
-        }
+        $batchSize = \is_int($batchSize) || \is_string($batchSize)
+            ? filter_var($batchSize, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
 
-        $batchSize = (int) $batchSize;
+        if ($batchSize === false) {
+            $this->io->error('The batch size must be an integer of at least 1.');
+
+            return Command::FAILURE;
+        }
 
         $this->summaryManager->refresh(
             class: $class,
