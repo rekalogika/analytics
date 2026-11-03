@@ -23,7 +23,8 @@ services:
     messenger:
         image: ghcr.io/rekalogika/php-zts-dev:8.5.1003
         command: ["php", "tests/bin/console", "messenger:consume", "async", '-vvv']
-        user: ${DUID}:${DGID}
+        restart: unless-stopped
+        user: ${DUID:-1000}:${DGID:-1000}
         environment:
             DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=17&charset=utf8
             LOCK_DSN: postgresql://app:app@database:5432/app?serverVersion=17&charset=utf8
