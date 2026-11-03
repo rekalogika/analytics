@@ -134,6 +134,7 @@ final class ArchitectureTest
 
                 // psr/symfony contracts
                 Selector::inNamespace('Psr\EventDispatcher'),
+                Selector::inNamespace('Psr\Log'),
                 Selector::inNamespace('Symfony\Contracts\Service'),
                 Selector::inNamespace('Symfony\Contracts\Translation'),
 
