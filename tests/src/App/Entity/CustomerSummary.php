@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
 use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
+use Rekalogika\Analytics\Core\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Metadata\Attribute as Analytics;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
@@ -61,6 +62,17 @@ class CustomerSummary extends BaseSummary
     )]
     private ?Region $region = null;
 
+    /**
+     * Reads a property of a subclass through a cast of the root entity.
+     */
+    #[ORM\Column(enumType: Gender::class, nullable: true)]
+    #[Analytics\Dimension(
+        source: new CustomExpression('[(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).gender]'),
+        label: new TranslatableMessage('Gender'),
+        nullLabel: new TranslatableMessage('Unspecified'),
+    )]
+    private ?Gender $gender = null;
+
     //
     // measures
     //
@@ -95,6 +107,11 @@ class CustomerSummary extends BaseSummary
     public function getRegion(): ?Region
     {
         return $this->region;
+    }
+
+    public function getGender(): ?Gender
+    {
+        return $this->gender;
     }
 
     public function getCount(): ?int

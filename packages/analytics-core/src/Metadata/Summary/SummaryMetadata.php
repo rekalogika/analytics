@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\Analytics\Metadata\Implementation\RootGroupingStrategy;
+use Rekalogika\Analytics\Metadata\Util\InvolvedPropertyUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -202,13 +203,10 @@ final readonly class SummaryMetadata
 
         foreach ($involvedMetadata as $propertyMetadata) {
             foreach ($propertyMetadata->getInvolvedSourceProperties() as $property) {
-                // normalize property
-                // - remove everything after dot
-                $property = explode('.', $property)[0];
-                // - remove everything after (
-                $property = explode('(', $property)[0];
-
-                $properties[] = $property;
+                $properties = [
+                    ...$properties,
+                    ...InvolvedPropertyUtil::getChangeSetKeys($property),
+                ];
             }
         }
 
@@ -513,9 +511,9 @@ final readonly class SummaryMetadata
     /**
      * The properties of the source class that influence this summary, as
      * declared by the value resolvers and aggregate functions of the
-     * dimensions and measures. Only the first segment of each property path
-     * is kept, e.g. `customer` for `customer.country`, because a change to
-     * the `customer` association is what Doctrine reports. The refresh engine
+     * dimensions and measures, converted to the keys Doctrine reports in the
+     * change set, e.g. `customer` for `customer.country`. See
+     * `InvolvedPropertyUtil::getChangeSetKeys()`. The refresh engine
      * uses this to decide whether a change to a source entity affects the
      * summary.
      *
