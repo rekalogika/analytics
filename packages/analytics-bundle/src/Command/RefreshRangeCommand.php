@@ -15,7 +15,6 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -111,22 +110,22 @@ final class RefreshRangeCommand extends Command implements SignalableCommandInte
 
         $this->refreshCommandOutputEventSubscriber->initialize($this->io);
 
+        /** @var mixed */
         $class = $input->getArgument('class');
 
-        /** @psalm-suppress TypeDoesNotContainType */
         if (!\is_string($class)) {
-            throw new UnexpectedValueException(\sprintf(
+            $this->io->error(\sprintf(
                 'Class name must be a string, got "%s".',
                 get_debug_type($class),
             ));
+
+            return Command::FAILURE;
         }
 
-        /** @psalm-suppress TypeDoesNotContainType */
         if (!class_exists($class)) {
-            throw new UnexpectedValueException(\sprintf(
-                'Class "%s" not found.',
-                $class,
-            ));
+            $this->io->error(\sprintf('Class "%s" not found.', $class));
+
+            return Command::FAILURE;
         }
 
         /** @var mixed */

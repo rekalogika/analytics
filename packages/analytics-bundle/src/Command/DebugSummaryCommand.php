@@ -36,8 +36,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 final class DebugSummaryCommand extends Command
 {
-    private ?SymfonyStyle $io = null;
-
     public function __construct(
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly SummaryRefresherFactory $summaryRefresherFactory,
@@ -68,17 +66,37 @@ final class DebugSummaryCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $class = $input->getArgument('summaryClass') ?? $io->choice(
-            question: 'Please select the summary class to view',
-            choices: $this->summaryMetadataFactory->getSummaryClasses(),
-            default: null,
-        );
+        /** @var mixed */
+        $class = $input->getArgument('summaryClass');
+
+        if ($class === null) {
+            if (!$input->isInteractive()) {
+                $io->error('The "summaryClass" argument is required in non-interactive mode.');
+
+                return Command::FAILURE;
+            }
+
+            /** @var mixed */
+            $class = $io->choice(
+                question: 'Please select the summary class to view',
+                choices: $this->summaryMetadataFactory->getSummaryClasses(),
+            );
+        }
 
         $showQueries = $input->getOption('query');
 
-        if (!\is_string($class) || !class_exists($class)) {
-            $this->io = new SymfonyStyle($input, $output);
-            $this->io->error('Class does not exist.');
+        if (!\is_string($class)) {
+            $io->error(\sprintf(
+                'Class name must be a string, got "%s".',
+                get_debug_type($class),
+            ));
+
+            return Command::FAILURE;
+        }
+
+        if (!class_exists($class)) {
+            $io->error(\sprintf('Class "%s" does not exist.', $class));
+
             return Command::FAILURE;
         }
 

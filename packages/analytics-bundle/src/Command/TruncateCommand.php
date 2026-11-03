@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -62,28 +61,38 @@ final class TruncateCommand extends Command
         // Get the summary class from the input argument or prompt the user to
         // select one
 
-        $class = $input->getArgument('class') ?? $this->io->choice(
-            question: 'Please select the summary class to truncate',
-            choices: $this->summaryMetadataFactory->getSummaryClasses(),
-            default: null,
-        );
+        /** @var mixed */
+        $class = $input->getArgument('class');
+
+        if ($class === null) {
+            if (!$input->isInteractive()) {
+                $this->io->error('The "class" argument is required in non-interactive mode.');
+
+                return Command::FAILURE;
+            }
+
+            /** @var mixed */
+            $class = $this->io->choice(
+                question: 'Please select the summary class to truncate',
+                choices: $this->summaryMetadataFactory->getSummaryClasses(),
+            );
+        }
 
         // Validate the class name
 
-        /** @psalm-suppress TypeDoesNotContainType */
         if (!\is_string($class)) {
-            throw new UnexpectedValueException(\sprintf(
+            $this->io->error(\sprintf(
                 'Class name must be a string, got "%s".',
                 get_debug_type($class),
             ));
+
+            return Command::FAILURE;
         }
 
-        /** @psalm-suppress TypeDoesNotContainType */
         if (!class_exists($class)) {
-            throw new UnexpectedValueException(\sprintf(
-                'Class "%s" not found.',
-                $class,
-            ));
+            $this->io->error(\sprintf('Class "%s" not found.', $class));
+
+            return Command::FAILURE;
         }
 
         // Confirm the action
