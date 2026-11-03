@@ -19,9 +19,11 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Entity\PartitionRange;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
@@ -1064,6 +1066,128 @@ final class SourceChangeTest extends KernelTestCase
         $this->assertSame(CustomerSummary::class, $dirtyFlags[0]->getClass());
         $this->assertSame($upperPartition->getLevel(), $dirtyFlags[0]->getLevel());
         $this->assertSame($upperPartition->getKey(), $dirtyFlags[0]->getKey());
+    }
+
+    /**
+     * A change made outside the ORM is not detected. `markDirty()` makes the
+     * refresh agent pick it up.
+     */
+    public function testMarkDirty(): void
+    {
+        $clock = self::mockTime();
+        $this->clearRefreshState();
+
+        $this->assertEquals(0, $this->getOrderCountIn2030());
+
+        $connection = static::getContainer()->get(Connection::class);
+
+        $connection->executeStatement(
+            'UPDATE "order" SET time = ? WHERE id = ?',
+            ['2030-02-01 00:00:00', 50],
+        );
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $this->assertCount(0, $entityManager->getRepository(DirtyFlag::class)->findAll());
+
+        static::getContainer()
+            ->get(SummaryManager::class)
+            ->markDirty(OrderSummary::class, [50, '50']);
+
+        $expectedPartition = $this->getHandlerFactory()
+            ->getSummary(OrderSummary::class)
+            ->getPartition()
+            ->createLowestPartitionFromSourceValue(50);
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class]);
+
+        $this->assertCount(1, $dirtyFlags);
+        $this->assertSame($expectedPartition->getLevel(), $dirtyFlags[0]->getLevel());
+        $this->assertSame($expectedPartition->getKey(), $dirtyFlags[0]->getKey());
+
+        $listener = static::getContainer()->get(TestNewDirtyFlagListener::class);
+        $events = array_filter(
+            $listener->getEvents(),
+            static fn(NewDirtyFlagEvent $event): bool => $event->getDirtyFlag()->getClass() === OrderSummary::class,
+        );
+        $this->assertCount(1, $events);
+
+        // only OrderSummary is scheduled
+
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
+
+        $this->travel($clock, 600);
+        $transport->process();
+        $transport->queue()->assertCount(0);
+
+        $this->assertEquals(1, $this->getOrderCountIn2030());
+    }
+
+    public function testMarkDirtyWithoutKeys(): void
+    {
+        $this->clearRefreshState();
+
+        static::getContainer()
+            ->get(SummaryManager::class)
+            ->markDirty(OrderSummary::class, []);
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $this->assertCount(0, $entityManager->getRepository(DirtyFlag::class)->findAll());
+        $this->transport('async')->queue()->assertCount(0);
+    }
+
+    public function testMarkDirtyRange(): void
+    {
+        $this->clearRefreshState();
+
+        static::getContainer()
+            ->get(SummaryManager::class)
+            ->markDirtyRange(OrderSummary::class, 1, 200);
+
+        $partitionHandler = $this->getHandlerFactory()
+            ->getSummary(OrderSummary::class)
+            ->getPartition();
+
+        $expectedKeys = [];
+
+        foreach (new PartitionRange(
+            $partitionHandler->createLowestPartitionFromSourceValue(1),
+            $partitionHandler->createLowestPartitionFromSourceValue(200),
+        ) as $partition) {
+            $expectedKeys[] = $partition->getKey();
+        }
+
+        $this->assertGreaterThan(1, \count($expectedKeys));
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OrderSummary::class], ['key' => 'ASC']);
+
+        $this->assertSame(
+            $expectedKeys,
+            array_map(static fn(DirtyFlag $flag): ?int => $flag->getKey(), $dirtyFlags),
+        );
+
+        $this->transport('async')->queue()->assertCount(1);
+    }
+
+    public function testMarkDirtyRangeWithReversedKeys(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        static::getContainer()
+            ->get(SummaryManager::class)
+            ->markDirtyRange(OrderSummary::class, 200, 1);
     }
 
     private function getCustomerCount(?Country $country = null): int

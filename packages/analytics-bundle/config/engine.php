@@ -70,6 +70,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
             '$queryResultLimit' => '%rekalogika.analytics.query_result_limit%',
             '$fillingNodesLimit' => '%rekalogika.analytics.filling_nodes_limit%',
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
         ])
     ;
 
