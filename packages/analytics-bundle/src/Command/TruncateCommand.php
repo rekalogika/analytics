@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -36,6 +37,7 @@ final class TruncateCommand extends Command
         private readonly RefreshCommandOutputEventSubscriber $refreshCommandOutputEventSubscriber,
         private readonly SummaryMetadataFactory $summaryMetadataFactory,
         private readonly HandlerFactory $handlerFactory,
+        private readonly RefreshAgentLock $refreshAgentLock,
     ) {
         parent::__construct();
     }
@@ -97,11 +99,18 @@ final class TruncateCommand extends Command
             return Command::SUCCESS;
         }
 
-        // Truncate the summary table for the specified class
+        // Truncate the summary table for the specified class. The lock
+        // prevents a refresh from running at the same time
 
-        $this->handlerFactory
-            ->getSummary($class)
-            ->truncate();
+        $this->refreshAgentLock->waitAndAcquire($class);
+
+        try {
+            $this->handlerFactory
+                ->getSummary($class)
+                ->truncate();
+        } finally {
+            $this->refreshAgentLock->release($class);
+        }
 
         // Success
 
