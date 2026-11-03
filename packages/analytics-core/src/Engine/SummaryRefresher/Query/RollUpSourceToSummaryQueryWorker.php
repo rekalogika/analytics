@@ -26,6 +26,7 @@ use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Util\CollectAliasesInGroupByVisitor;
 use Rekalogika\Analytics\Engine\SummaryRefresher\ValueResolver\Bust;
+use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
@@ -142,8 +143,7 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
         $valueResolver = $partitionMetadata->getSource();
         $partitionClass = $partitionMetadata->getPartitionClass();
         /** @psalm-suppress ImpureMethodCall */
-        $partitioningLevels = $partitionClass::getAllLevels();
-        $lowestLevel = min($partitioningLevels);
+        $lowestLevel = PartitionUtil::getLowestLevel($partitionClass);
 
         $function = $partitionClass::getClassifierExpression(
             input: $valueResolver,
