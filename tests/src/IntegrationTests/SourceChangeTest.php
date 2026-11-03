@@ -1190,6 +1190,68 @@ final class SourceChangeTest extends KernelTestCase
             ->markDirtyRange(OrderSummary::class, 200, 1);
     }
 
+    /**
+     * A dimension reading a property of a subclass through a cast of the root
+     * entity, `(IndividualCustomer).gender`, must be refreshed when the
+     * property changes.
+     */
+    public function testRootCastPropertyModification(): void
+    {
+        $clock = self::mockTime();
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $customer = $entityManager
+            ->getRepository(IndividualCustomer::class)
+            ->findOneBy(['gender' => Gender::Male])
+            ?? throw new \RuntimeException('Customer not found');
+
+        $initialMale = $this->getCustomerCountByGender(Gender::Male);
+        $initialOther = $this->getCustomerCountByGender(Gender::Other);
+
+        $customer->setGender(Gender::Other);
+
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => CustomerSummary::class]);
+
+        $this->assertCount(1, $dirtyFlags);
+        $this->assertNotNull($dirtyFlags[0]->getKey());
+
+        $this->runCustomerSummaryRefreshAgent($clock);
+
+        $this->assertSame($initialMale - 1, $this->getCustomerCountByGender(Gender::Male));
+        $this->assertSame($initialOther + 1, $this->getCustomerCountByGender(Gender::Other));
+    }
+
+    private function getCustomerCountByGender(Gender $gender): int
+    {
+        $summaryManager = static::getContainer()
+            ->get(SummaryManager::class);
+
+        /** @psalm-suppress MixedAssignment */
+        $count = $summaryManager->createQuery()
+            ->from(CustomerSummary::class)
+            ->withDimensions('gender')
+            ->getResult()
+            ->find(
+                'gender',
+                static fn(mixed $member): bool => $member === $gender,
+            )
+            ?->getMeasures()
+            ->get('count')
+            ?->getValue() ?? 0;
+
+        $this->assertIsInt($count);
+
+        return $count;
+    }
+
     private function getCustomerCount(?Country $country = null): int
     {
         $summaryManager = static::getContainer()

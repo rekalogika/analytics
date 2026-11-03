@@ -90,6 +90,16 @@ final class MetadataTest extends KernelTestCase
             [CustomerSummary::class],
             $metadata->getInvolvedSummaryClassesByChangedProperties(['country']),
         );
+
+        // read through a cast of the root entity: (IndividualCustomer).gender
+
+        $this->assertEquals(
+            [CustomerSummary::class],
+            $metadata->getInvolvedSummaryClassesByChangedProperties(['gender']),
+        );
+
+        $this->assertArrayNotHasKey('', $metadata->getPropertyToSummaryClasses());
+        $this->assertArrayNotHasKey('*', $metadata->getPropertyToSummaryClasses());
     }
 
     public function testPartitionMetadataAttributes(): void
