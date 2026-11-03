@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\HasTitle;
@@ -65,11 +66,33 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
             ->modify('previous monday') // Move to the Monday of the week
             ->modify(\sprintf('+%d weeks', $this->w - 1)); // Move to the correct week
 
+        // The arithmetic above silently overflows an invalid month or week,
+        // e.g. 2025025 into 2025-03-W1. A valid week has its Thursday in the
+        // given month.
+        if (!self::isWeekInMonth($start, $this->y, $this->m)) {
+            throw new InvalidArgumentException(\sprintf('Invalid month based week: %d', $this->databaseValue));
+        }
+
         /** @var \DateTimeImmutable */
         $end = $start->modify('+1 week');
 
         $this->start = $start;
         $this->end = $end;
+    }
+
+    /**
+     * Whether the week starting on `$weekStart` belongs to the given month,
+     * i.e. its Thursday falls in that month.
+     *
+     * @internal
+     */
+    public static function isWeekInMonth(
+        \DateTimeImmutable $weekStart,
+        int $year,
+        int $month,
+    ): bool {
+        return $weekStart->modify('+3 days')->format('Ym')
+            === \sprintf('%04d%02d', $year, $month);
     }
 
     #[\Override]

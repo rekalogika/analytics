@@ -417,6 +417,18 @@ final class TimeBinTest extends TestCase
         yield ['class' => Hour::class, 'databaseValue' => 2024010125];
         yield ['class' => IsoWeekWeek::class, 'databaseValue' => 202153];
         yield ['class' => IsoWeekWeek::class, 'databaseValue' => 202500];
+        yield ['class' => Month::class, 'databaseValue' => 202413];
+        yield ['class' => Month::class, 'databaseValue' => 202400];
+        yield ['class' => IsoWeekDate::class, 'databaseValue' => 2021531];
+        yield ['class' => IsoWeekDate::class, 'databaseValue' => 2025010];
+        yield ['class' => IsoWeekDate::class, 'databaseValue' => 2025018];
+        yield ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2025025];
+        yield ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2025020];
+        yield ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2024131];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250251];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250210];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250218];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20241311];
     }
 
     /**

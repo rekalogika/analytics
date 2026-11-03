@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
@@ -43,6 +44,10 @@ final class Month implements MonotonicTimeBin
 
         $y = (int) substr($string, 0, 4);
         $m = (int) substr($string, 4, 2);
+
+        if ($m < 1 || $m > 12) {
+            throw new InvalidArgumentException(\sprintf('Invalid month: %d', $this->databaseValue));
+        }
 
         $start = \DateTimeImmutable::createFromFormat(
             'Y-m-d H:i:s',
