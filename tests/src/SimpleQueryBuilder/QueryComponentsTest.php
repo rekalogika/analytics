@@ -25,11 +25,18 @@ final class QueryComponentsTest extends TestCase
      */
     public static function provideEscapeFunction(): iterable
     {
-        yield 'string' => ["it's", "'it\\'s'"];
+        yield 'string' => ['foo', "'foo'"];
+        yield 'string with quote' => ["it's", "'it''s'"];
+        yield 'string with backslash' => ['a\\b', "'a\\b'"];
+        yield 'string with backslash and quote' => ["\\' OR 1=1--", "'\\'' OR 1=1--'"];
+        yield 'non-utf8 string' => ["\xff\x00A", "'\\xff0041'::bytea"];
         yield 'null' => [null, 'NULL'];
-        yield 'bool' => [true, '1'];
+        yield 'true' => [true, 'TRUE'];
+        yield 'false' => [false, 'FALSE'];
         yield 'int' => [42, '42'];
+        yield 'float' => [1.5, '1.5'];
         yield 'array' => [['a', 1], "'a', 1"];
+        yield 'empty array' => [[], 'NULL'];
 
         yield 'stringable' => [
             Uuid::fromString('0192f0e4-5f5e-7c3a-9a6b-2f0d1e3c4b5a'),

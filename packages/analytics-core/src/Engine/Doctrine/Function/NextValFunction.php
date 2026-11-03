@@ -66,11 +66,9 @@ final class NextValFunction extends FunctionNode
 
         $classMetadata = $sqlWalker->getEntityManager()->getClassMetadata($this->class);
         $sequence = $classMetadata->getSequenceName($platform);
-        $sequenceSelect = $platform->getSequenceNextValSQL($sequence);
 
-        // remove SELECT from the statement, so we can use it as a function
-        $sequenceFunction = str_replace('SELECT ', '', $sequenceSelect);
-
-        return $sequenceFunction;
+        // not a scalar subquery: an uncorrelated subquery is evaluated once
+        // per query, which would give the same value to every row
+        return 'NEXTVAL(' . $platform->quoteStringLiteral($sequence) . ')';
     }
 }

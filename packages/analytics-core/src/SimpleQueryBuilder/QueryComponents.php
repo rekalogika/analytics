@@ -358,6 +358,15 @@ final class QueryComponents
         return $this->resolvedParameters = $resolvedParameters;
     }
 
+    /**
+     * Returns the SQL statement with the parameters inlined, for display and
+     * debugging only. The result must not be executed.
+     *
+     * Doctrine's SQL walker emits only positional `?` placeholders, and the
+     * parameters are a contiguous 0-based list. Quoted string literals and
+     * quoted identifiers are skipped, so a `?` or `:word` inside them is not
+     * mistaken for a placeholder.
+     */
     public function getInterpolatedSqlStatement(): string
     {
         $sql = $this->getSqlStatement();
@@ -365,25 +374,21 @@ final class QueryComponents
 
         $i = 0;
 
-        if (! \array_key_exists(0, $parameters) && \array_key_exists(1, $parameters)) {
-            $i = 1;
-        }
-
         return preg_replace_callback(
-            '/\?|((?<!:):[a-z0-9_]+)/i',
-            static function ($matches) use ($parameters, &$i) {
-                $key = substr($matches[0], 1);
+            '/\'(?:[^\']++|\'\')*+\'|"(?:[^"]++|"")*+"|\?/',
+            static function (array $matches) use ($parameters, &$i): string {
+                $match = $matches[0];
 
-                if (! \array_key_exists($i, $parameters) && ! \array_key_exists($key, $parameters)) {
-                    return $matches[0];
+                // a string literal or a quoted identifier, keep it as is
+                if ($match !== '?') {
+                    return $match;
                 }
 
-                /** @psalm-suppress MixedAssignment */
-                $value  = \array_key_exists($i, $parameters) ? $parameters[$i] : $parameters[$key];
-                $result = self::escapeFunction($value);
-                $i++;
+                if (!\array_key_exists($i, $parameters)) {
+                    return $match;
+                }
 
-                return $result;
+                return self::escapeFunction($parameters[$i++]);
             },
             $sql,
         ) ?? throw new UnexpectedValueException(
@@ -391,6 +396,11 @@ final class QueryComponents
         );
     }
 
+    /**
+     * Renders a parameter value as a PostgreSQL literal, for display and
+     * debugging only. The result must not be executed; use bound parameters
+     * to pass values to a query.
+     */
     public static function escapeFunction(mixed $parameter): string
     {
         /** @psalm-suppress MixedAssignment */
@@ -399,11 +409,11 @@ final class QueryComponents
         switch (true) {
             // Check if result is non-unicode string using PCRE_UTF8 modifier
             case \is_string($result) && ! preg_match('//u', $result):
-                $result = '0x' . strtoupper(bin2hex($result));
+                $result = "'\\x" . bin2hex($result) . "'::bytea";
                 break;
 
             case \is_string($result):
-                $result = "'" . addslashes($result) . "'";
+                $result = "'" . str_replace("'", "''", $result) . "'";
                 break;
 
             case \is_array($result):
@@ -419,7 +429,7 @@ final class QueryComponents
                 break;
 
             case \is_bool($result):
-                $result = $result ? '1' : '0';
+                $result = $result ? 'TRUE' : 'FALSE';
                 break;
         }
 

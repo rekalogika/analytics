@@ -418,4 +418,16 @@ final class PathResolverTest extends KernelTestCase
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }
+
+    public function testEmptyPath(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Customer::class,
+            alias: 'root',
+        );
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessageMatches('/empty segment/');
+        $pathResolver->resolve('');
+    }
 }

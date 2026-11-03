@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
 use PHPUnit\Framework\TestCase;
+use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathElement;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 
@@ -54,5 +55,11 @@ final class PathElementTest extends TestCase
         $pathElement = PathElement::createFromString('(Rekalogika\Analytics\Tests\App\Entity\Country)');
         $this->assertEquals(Country::class, $pathElement->getClassCast());
         $this->assertSame('', $pathElement->getName());
+    }
+
+    public function testEmpty(): void
+    {
+        $this->expectException(LogicException::class);
+        PathElement::createFromString(' ');
     }
 }

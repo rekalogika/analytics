@@ -42,7 +42,18 @@ final readonly class Path implements \Stringable, \Countable
     public static function createFromString(string $path): self
     {
         $elements = array_map(
-            fn(string $part): PathElement|Alias => PathElement::createFromString(trim($part)),
+            function (string $part) use ($path): PathElement|Alias {
+                $part = trim($part);
+
+                if ($part === '') {
+                    throw new LogicException(\sprintf(
+                        'Path "%s" is empty or has an empty segment',
+                        $path,
+                    ));
+                }
+
+                return PathElement::createFromString($part);
+            },
             explode('.', $path),
         );
 

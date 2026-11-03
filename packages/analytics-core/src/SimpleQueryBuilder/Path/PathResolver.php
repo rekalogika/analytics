@@ -63,10 +63,6 @@ final class PathResolver
     {
         $path = Path::createFromString($path);
 
-        if (\count($path) === 0) {
-            throw new LogicException('Path is empty, cannot resolve');
-        }
-
         return $this->baseEntity->resolve($path);
     }
 
