@@ -652,7 +652,9 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             $labels[] = $this->memberToString($dimensionObject->getDisplayMember());
             $measureObject = $child->getMeasures()->get($measure);
-            $dataSet['data'][] = $this->numberifier->toNumber($measureObject?->getValue());
+            $dataSet['data'][] = $this->toFiniteOrNull(
+                $this->numberifier->toNumber($measureObject?->getValue()),
+            );
 
             // Color.
 
@@ -702,7 +704,20 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             return null;
         }
 
-        return $this->numberifier->toNumber($value);
+        return $this->toFiniteOrNull($this->numberifier->toNumber($value));
+    }
+
+    /**
+     * INF and NaN cannot be encoded to JSON. Emit them as null, so that the
+     * chart shows a gap instead of failing.
+     */
+    private function toFiniteOrNull(int|float $value): int|float|null
+    {
+        if (\is_float($value) && !is_finite($value)) {
+            return null;
+        }
+
+        return $value;
     }
 
     private function getSignature(mixed $variable): string
