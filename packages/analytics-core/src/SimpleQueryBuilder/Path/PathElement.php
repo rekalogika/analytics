@@ -29,6 +29,10 @@ final readonly class PathElement implements \Stringable
     {
         $part = trim($part);
 
+        if ($part === '') {
+            throw new LogicException('Path element cannot be empty');
+        }
+
         if ($part === '*') {
             // Special case for alias, return Alias instance.
             return new Alias();

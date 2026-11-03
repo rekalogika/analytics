@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\SimpleQueryBuilder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\SimpleQueryBuilder\Path\Path;
@@ -71,4 +72,24 @@ final class PathTest extends TestCase
         $this->assertSame('*', $path->getFirstElement()->getName());
     }
 
+    /**
+     * @return iterable<string,array{string}>
+     */
+    public static function provideEmptySegment(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'whitespace' => [' '];
+        yield 'leading dot' => ['.a'];
+        yield 'trailing dot' => ['a.'];
+        yield 'double dot' => ['a..b'];
+        yield 'blank segment' => ['a. .b'];
+    }
+
+    #[DataProvider('provideEmptySegment')]
+    public function testEmptySegment(string $path): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessageMatches('/empty segment/');
+        Path::createFromString($path);
+    }
 }

@@ -52,14 +52,8 @@ final readonly class BaseEntity
 
     public function resolve(Path $path): string
     {
-        $count = \count($path);
-
-        /** @psalm-suppress TypeDoesNotContainType */
-        if ($count === 0) {
-            throw new LogicException('Path is empty, cannot resolve');
-        }
-
-        if ($count === 1) {
+        // Path guarantees at least one element
+        if (\count($path) === 1) {
             return $this->processHasOneElement($path);
         }
 

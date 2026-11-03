@@ -28,9 +28,9 @@ abstract class AbstractQuery
     {
         $this->simpleQueryBuilder = clone $this->simpleQueryBuilder;
 
-        if (null !== $this->queryComponents) {
-            $this->queryComponents = clone $this->queryComponents;
-        }
+        // the cached query components were built from the original query
+        // builder, the clone must build its own
+        $this->queryComponents = null;
     }
 
     protected function getSimpleQueryBuilder(): SimpleQueryBuilder
