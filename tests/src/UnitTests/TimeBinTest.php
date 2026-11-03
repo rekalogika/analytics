@@ -306,6 +306,95 @@ final class TimeBinTest extends TestCase
         }
     }
 
+    public function testIsoWeekOneStartingInPreviousYear(): void
+    {
+        // 2025-W01 starts on Monday, 2024-12-30
+        $week = IsoWeekWeek::createFromDatabaseValue(202501);
+
+        $this->assertSame('2025-W01', (string) $week);
+        $this->assertSame('2024-12-30 00:00:00', $week->getStart()->format('Y-m-d H:i:s'));
+        $this->assertSame('2025-01-06 00:00:00', $week->getEnd()->format('Y-m-d H:i:s'));
+        $this->assertSame(202452, $week->getPrevious()->getDatabaseValue());
+
+        $year = IsoWeekYear::createFromDatabaseValue(2025);
+
+        $this->assertSame('2024-12-30 00:00:00', $year->getStart()->format('Y-m-d H:i:s'));
+        $this->assertSame('2025-12-29 00:00:00', $year->getEnd()->format('Y-m-d H:i:s'));
+
+        $date = IsoWeekDate::createFromDatabaseValue(2025011);
+
+        $this->assertSame('2025-W01-1', (string) $date);
+        $this->assertSame('2024-12-30 00:00:00', $date->getStart()->format('Y-m-d H:i:s'));
+        $this->assertSame(2024527, $date->getPrevious()->getDatabaseValue());
+
+        // the last day of the calendar year 2024 is in the ISO week-year 2025,
+        // the day before it in 2024
+
+        $lastDay = new \DateTimeImmutable('2024-12-31 12:00:00');
+
+        $this->assertSame(202501, IsoWeekWeek::createFromDateTime($lastDay)->getDatabaseValue());
+        $this->assertSame(2025, IsoWeekYear::createFromDateTime($lastDay)->getDatabaseValue());
+        $this->assertSame(2025012, IsoWeekDate::createFromDateTime($lastDay)->getDatabaseValue());
+
+        $sunday = new \DateTimeImmutable('2024-12-29 23:00:00');
+
+        $this->assertSame(202452, IsoWeekWeek::createFromDateTime($sunday)->getDatabaseValue());
+        $this->assertSame(2024, IsoWeekYear::createFromDateTime($sunday)->getDatabaseValue());
+        $this->assertSame(2024527, IsoWeekDate::createFromDateTime($sunday)->getDatabaseValue());
+    }
+
+    /**
+     * @param class-string<MonotonicTimeBin> $class
+     */
+    #[DataProvider('nextDatabaseValueProvider')]
+    public function testNextDatabaseValue(
+        string $class,
+        int $databaseValue,
+        int $expectedNext,
+    ): void {
+        $timeBin = $class::createFromDatabaseValue($databaseValue);
+        $next = $timeBin->getNext();
+
+        $this->assertInstanceOf($class, $next);
+        $this->assertSame($expectedNext, $next->getDatabaseValue());
+        $this->assertSame($next, $class::createFromDatabaseValue($expectedNext));
+        $this->assertEquals($timeBin->getEnd(), $next->getStart());
+        $this->assertSame($timeBin, $next->getPrevious());
+    }
+
+    /**
+     * @return iterable<string,array{class:class-string<MonotonicTimeBin>,databaseValue:int,expectedNext:int}>
+     */
+    public static function nextDatabaseValueProvider(): iterable
+    {
+        yield 'year' => ['class' => Year::class, 'databaseValue' => 2024, 'expectedNext' => 2025];
+        yield 'quarter' => ['class' => Quarter::class, 'databaseValue' => 20232, 'expectedNext' => 20233];
+        yield 'quarter, end of year' => ['class' => Quarter::class, 'databaseValue' => 20234, 'expectedNext' => 20241];
+        yield 'month' => ['class' => Month::class, 'databaseValue' => 202402, 'expectedNext' => 202403];
+        yield 'month, end of year' => ['class' => Month::class, 'databaseValue' => 202312, 'expectedNext' => 202401];
+        yield 'date, leap day' => ['class' => Date::class, 'databaseValue' => 20240228, 'expectedNext' => 20240229];
+        yield 'date, end of february' => ['class' => Date::class, 'databaseValue' => 20230228, 'expectedNext' => 20230301];
+        yield 'date, end of year' => ['class' => Date::class, 'databaseValue' => 20241231, 'expectedNext' => 20250101];
+        yield 'hour' => ['class' => Hour::class, 'databaseValue' => 2024061512, 'expectedNext' => 2024061513];
+        yield 'hour, end of year' => ['class' => Hour::class, 'databaseValue' => 2023123123, 'expectedNext' => 2024010100];
+        yield 'iso week year' => ['class' => IsoWeekYear::class, 'databaseValue' => 2020, 'expectedNext' => 2021];
+        yield 'iso week' => ['class' => IsoWeekWeek::class, 'databaseValue' => 202510, 'expectedNext' => 202511];
+        yield 'iso week, week 52 to week 53' => ['class' => IsoWeekWeek::class, 'databaseValue' => 202052, 'expectedNext' => 202053];
+        yield 'iso week, week 53 to week 1' => ['class' => IsoWeekWeek::class, 'databaseValue' => 202053, 'expectedNext' => 202101];
+        yield 'iso week, week 52 to week 1' => ['class' => IsoWeekWeek::class, 'databaseValue' => 202452, 'expectedNext' => 202501];
+        yield 'iso week date' => ['class' => IsoWeekDate::class, 'databaseValue' => 2025011, 'expectedNext' => 2025012];
+        yield 'iso week date, end of week' => ['class' => IsoWeekDate::class, 'databaseValue' => 2025017, 'expectedNext' => 2025021];
+        yield 'iso week date, end of 53-week year' => ['class' => IsoWeekDate::class, 'databaseValue' => 2020537, 'expectedNext' => 2021011];
+        yield 'iso week date, end of 52-week year' => ['class' => IsoWeekDate::class, 'databaseValue' => 2024527, 'expectedNext' => 2025011];
+        yield 'month based week' => ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2025071, 'expectedNext' => 2025072];
+        yield 'month based week, end of month' => ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2025015, 'expectedNext' => 2025021];
+        yield 'month based week, end of year' => ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 2024124, 'expectedNext' => 2025011];
+        yield 'month based week date' => ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250712, 'expectedNext' => 20250713];
+        yield 'month based week date, end of week' => ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250717, 'expectedNext' => 20250721];
+        yield 'month based week date, end of month' => ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250157, 'expectedNext' => 20250211];
+        yield 'month based week date, end of year' => ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20241247, 'expectedNext' => 20250111];
+    }
+
     /**
      * @param class-string<TimeBin> $class
      */
