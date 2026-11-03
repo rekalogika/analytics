@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle\Command;
 
-use Rekalogika\Analytics\Uuid\ValueResolver\StringUuidToTruncatedInteger;
+use Rekalogika\Analytics\Uuid\Util\UuidV7Util;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,28 +39,31 @@ final class UuidConvertSummaryToSourceCommand extends Command
         );
     }
 
-    /**
-     * @todo fix
-     */
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $integerKey = $input->getArgument('integerkey');
+        /** @var string */
+        $argument = $input->getArgument('integerkey');
 
-        if (!is_numeric($integerKey)) {
-            $this->io->error('The integer key must be a number.');
+        // the key is the first 48 bits of the UUID, so it must be an integer
+        // between 0 and 2^48 - 1. 2^48 has 15 decimal digits, so the cast
+        // cannot overflow.
+        $integerKey = preg_match('/^0*(\d{1,15})$/', $argument, $matches) === 1
+            ? (int) $matches[1]
+            : null;
+
+        if ($integerKey === null || $integerKey > 0xFFFFFFFFFFFF) {
+            $this->io->error(\sprintf(
+                'The integer key must be an integer between 0 and %d.',
+                0xFFFFFFFFFFFF,
+            ));
+
             return Command::FAILURE;
         }
 
-        $integerKey = (int) $integerKey;
-
-        $resolver = new StringUuidToTruncatedInteger('foo');
-        /** @var string */
-        $uuid = $resolver->transformSummaryValueToSourceValue($integerKey);
-
-        $output->writeln($uuid);
+        $output->writeln(UuidV7Util::getNilOfInteger($integerKey << 16));
 
         return Command::SUCCESS;
     }
