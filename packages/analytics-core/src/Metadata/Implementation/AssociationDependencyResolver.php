@@ -19,8 +19,8 @@ use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 
 /**
  * Walks a property path of a source entity through the Doctrine association
- * mappings, and returns a dependency for each related entity the path reads
- * a property of.
+ * mappings, and returns a dependency for each property of a related entity
+ * the path reads, and for each related entity the path refers to.
  *
  * Only to-one associations are followed. A to-many association on the path
  * makes the source entities affected by a change ambiguous, the rest of the
@@ -122,7 +122,7 @@ final readonly class AssociationDependencyResolver
                 );
             }
 
-            if (!$isAssociation || $segments === []) {
+            if (!$isAssociation) {
                 break;
             }
 
@@ -134,6 +134,17 @@ final readonly class AssociationDependencyResolver
 
             /** @var class-string */
             $class = $cast ?? $classMetadata->getAssociationTargetClass($name);
+
+            // the source entities refer to the related entity, its deletion
+            // affects them
+
+            $dependencies[] = new AssociationDependency(
+                relatedClass: $class,
+                property: null,
+                sourceClass: $sourceClass,
+                reversePath: $reversePath,
+                summaryClass: $summaryClass,
+            );
         }
 
         return $dependencies;

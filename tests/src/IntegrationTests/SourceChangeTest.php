@@ -26,6 +26,7 @@ use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\PartitionRange;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentStartCommand;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
@@ -1203,10 +1204,22 @@ final class SourceChangeTest extends KernelTestCase
         $entityManager = static::getContainer()
             ->get(EntityManagerInterface::class);
 
-        $customer = $entityManager
-            ->getRepository(IndividualCustomer::class)
-            ->findOneBy(['gender' => Gender::Male])
+        // a customer with orders, the order summaries read the gender of the
+        // customer, and are refreshed too
+
+        $customer = $entityManager->createQueryBuilder()
+            ->select('c')
+            ->from(IndividualCustomer::class, 'c')
+            ->where('c.gender = :gender')
+            ->andWhere(\sprintf('EXISTS (SELECT 1 FROM %s o WHERE o.customer = c)', Order::class))
+            ->setParameter('gender', Gender::Male)
+            ->orderBy('c.id')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
             ?? throw new \RuntimeException('Customer not found');
+
+        $this->assertInstanceOf(IndividualCustomer::class, $customer);
 
         $initialMale = $this->getCustomerCountByGender(Gender::Male);
         $initialOther = $this->getCustomerCountByGender(Gender::Other);
@@ -1286,13 +1299,22 @@ final class SourceChangeTest extends KernelTestCase
 
     /**
      * Runs the refresh agent of CustomerSummary from the time a customer is
-     * modified.
+     * modified. The summaries of the orders of the customer may also be
+     * refreshed, they read the properties of the customer.
      */
     private function runCustomerSummaryRefreshAgent(ClockInterface $clock): void
     {
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(1);
+
+        $summaryClasses = array_map(
+            static fn(object $message): string => $message instanceof RefreshAgentStartCommand
+                ? $message->getSummaryClass()
+                : $message::class,
+            $transport->queue()->messages(),
+        );
+
+        $this->assertContains(CustomerSummary::class, $summaryClasses);
 
         $this->travel($clock, 600);
         $transport->process();

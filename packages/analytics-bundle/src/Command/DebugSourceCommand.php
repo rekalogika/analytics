@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Bundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
@@ -91,6 +92,9 @@ final class DebugSourceCommand extends Command
     }
 
     /**
+     * The source classes of the summaries, and the classes read by the
+     * summaries through an association.
+     *
      * @return list<class-string>
      */
     private function getSourceClasses(): array
@@ -99,6 +103,17 @@ final class DebugSourceCommand extends Command
 
         foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
             $sourceClasses[] = $summaryMetadata->getSourceClass();
+        }
+
+        foreach ($this->managerRegistry->getManagers() as $manager) {
+            foreach ($manager->getMetadataFactory()->getAllMetadata() as $classMetadata) {
+                $sourceMetadata = $this->sourceMetadataFactory
+                    ->getSourceMetadata($classMetadata->getName());
+
+                foreach ($sourceMetadata->getAllAssociationDependencies() as $dependency) {
+                    $sourceClasses[] = $dependency->getRelatedClass();
+                }
+            }
         }
 
         $sourceClasses = array_values(array_unique($sourceClasses));
@@ -124,18 +139,77 @@ final class DebugSourceCommand extends Command
     {
         $io->title('Source Class ' . $sourceClass);
 
-        $propertyToSummaryClasses = $this->sourceMetadataFactory
-            ->getSourceMetadata($sourceClass)
-            ->getPropertyToSummaryClasses();
+        $sourceMetadata = $this->sourceMetadataFactory
+            ->getSourceMetadata($sourceClass);
 
-        if ($propertyToSummaryClasses === []) {
+        $propertyToSummaryClasses = $sourceMetadata->getPropertyToSummaryClasses();
+        $associationDependencies = $sourceMetadata->getAllAssociationDependencies();
+
+        if ($propertyToSummaryClasses === [] && $associationDependencies === []) {
             $io->warning('No summary depends on this class.');
 
             return;
         }
 
-        $this->printTrackedProperties($io, $sourceClass, $propertyToSummaryClasses);
-        $this->printUntrackedRelatedPaths($io, $sourceClass);
+        if ($propertyToSummaryClasses !== []) {
+            $this->printTrackedProperties($io, $sourceClass, $propertyToSummaryClasses);
+            $this->printUntrackedRelatedPaths($io, $sourceClass);
+        }
+
+        if ($associationDependencies !== []) {
+            $this->printAssociationDependencies($io, $associationDependencies);
+        }
+    }
+
+    /**
+     * The summaries of other classes that read this class through an
+     * association.
+     *
+     * @param list<AssociationDependency> $dependencies
+     */
+    private function printAssociationDependencies(
+        SymfonyStyle $io,
+        array $dependencies,
+    ): void {
+        $io->section('Read Through Associations');
+        $io->text([
+            'A change to one of these properties refreshes the source entities referring to the entity through the path.',
+            'The deletion of the entity refreshes the source entities referring to it through any path.',
+        ]);
+        $io->newLine();
+
+        /** @var array<string,array{string,class-string,string}> */
+        $rows = [];
+
+        /** @var array<string,list<class-string>> */
+        $summaryClasses = [];
+
+        foreach ($dependencies as $dependency) {
+            $property = $dependency->getProperty() ?? '(deletion)';
+
+            $key = implode('|', [
+                $property,
+                $dependency->getSourceClass(),
+                $dependency->getReversePath(),
+            ]);
+
+            $rows[$key] = [$property, $dependency->getSourceClass(), $dependency->getReversePath()];
+            $summaryClasses[$key][] = $dependency->getSummaryClass();
+        }
+
+        ksort($rows);
+
+        $io->table(
+            headers: ['Property', 'Source Class', 'Path', 'Summaries'],
+            rows: array_map(
+                fn(string $key, array $row): array => [
+                    ...$row,
+                    $this->formatSummaryClasses($summaryClasses[$key] ?? []),
+                ],
+                array_keys($rows),
+                array_values($rows),
+            ),
+        );
     }
 
     /**
@@ -201,8 +275,9 @@ final class DebugSourceCommand extends Command
     }
 
     /**
-     * Paths that read a property of a related entity. A change to the
-     * association itself is tracked, a change to the related entity is not.
+     * Paths of the summaries opting out of association tracking that read a
+     * property of a related entity. A change to the association itself is
+     * tracked, a change to the related entity is not.
      *
      * @param class-string $sourceClass
      */
@@ -222,7 +297,10 @@ final class DebugSourceCommand extends Command
             // the summaries that see changes to this class: the summaries of
             // the class itself and of its parents
 
-            if (!is_a($sourceClass, $summarySourceClass, true)) {
+            if (
+                !is_a($sourceClass, $summarySourceClass, true)
+                || $summaryMetadata->isTrackAssociations()
+            ) {
                 continue;
             }
 
@@ -255,7 +333,7 @@ final class DebugSourceCommand extends Command
 
         $io->section('Untracked Related Paths');
         $io->text([
-            'These paths read a property of a related entity. A change to the association is tracked,',
+            'These summaries opt out of association tracking. A change to the association is tracked,',
             'a change to the related entity is not. Use SummaryManager::markDirty() if needed.',
         ]);
         $io->newLine();

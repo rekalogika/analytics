@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Tests\App\Entity\Category;
+use Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
@@ -120,15 +122,29 @@ final class CommandTest extends KernelTestCase
 
         $this->assertStringNotContainsString(' item.category ' . OrderExplicitGroupingSetsSummary::class, $display);
 
-        // paths through an association are listed as untracked
+        // the paths through an association are tracked, nothing reads Order
+        // through an association
 
-        $this->assertStringContainsString('Untracked Related Paths', $display);
-        $this->assertStringContainsString(' item.category item ' . OrderExplicitGroupingSetsSummary::class, $display);
-        $this->assertStringContainsString(' customer.country.region customer ', $display);
+        $this->assertStringNotContainsString('Untracked Related Paths', $display);
+        $this->assertStringNotContainsString('Read Through Associations', $display);
+    }
 
-        // the identity of a related entity does not change
+    public function testDebugSourceOfRelatedClass(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
+        $exitCode = $tester->execute(
+            ['sourceClass' => Item::class],
+            ['interactive' => false],
+        );
 
-        $this->assertStringNotContainsString(' customer.* ', $display);
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringNotContainsString('Tracked Properties', $display);
+        $this->assertStringContainsString('Read Through Associations', $display);
+        $this->assertStringContainsString(' category ' . Order::class . ' item ' . OrderExplicitGroupingSetsSummary::class, $display);
+        $this->assertStringContainsString(' countryOfOrigin ' . Order::class . ' item ' . OrderSummary::class, $display);
+        $this->assertStringContainsString(' (deletion) ' . Order::class . ' item ', $display);
     }
 
     public function testDebugSourceOfSubclass(): void
@@ -150,7 +166,7 @@ final class CommandTest extends KernelTestCase
     {
         $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
         $exitCode = $tester->execute(
-            ['sourceClass' => Item::class],
+            ['sourceClass' => Shipment::class],
             ['interactive' => false],
         );
 
@@ -168,6 +184,8 @@ final class CommandTest extends KernelTestCase
         $this->assertSame(Command::SUCCESS, $exitCode);
         $this->assertStringContainsString('Source Class ' . Order::class, $display);
         $this->assertStringContainsString('Source Class ' . Customer::class, $display);
+        $this->assertStringContainsString('Source Class ' . Item::class, $display);
+        $this->assertStringContainsString('Source Class ' . Category::class, $display);
     }
 
     private function createCommandTester(string $commandName): CommandTester

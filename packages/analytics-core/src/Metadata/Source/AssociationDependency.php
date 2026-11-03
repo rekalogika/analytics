@@ -19,16 +19,22 @@ namespace Rekalogika\Analytics\Metadata\Source;
  * the source entities that refer to the related entity.
  *
  * For example, a summary of `Order` with the dimension source
- * `customer.country.region` has two dependencies: on `country` of
- * `Customer`, with the reverse path `customer`, and on `region` of
- * `Country`, with the reverse path `customer.country`.
+ * `customer.country.region` depends on `country` of `Customer`, with the
+ * reverse path `customer`, and on `region` of `Country`, with the reverse
+ * path `customer.country`.
+ *
+ * A dependency without a property is on the existence of the related
+ * entity: the source entities refer to it. Its deletion affects them, e.g.
+ * the database sets their reference to null or deletes them. In the example,
+ * there are such dependencies on `Customer`, `Country` and `Region`.
  */
 final readonly class AssociationDependency
 {
     /**
      * @param class-string $relatedClass The class of the related entity.
-     * @param string $property The property of the related entity, as
-     * reported in its change set.
+     * @param string|null $property The property of the related entity, as
+     * reported in its change set, or null for a dependency on the existence
+     * of the related entity.
      * @param class-string $sourceClass The source class of the summary.
      * @param string $reversePath The path from the source entity to the
      * related entity, e.g. `customer.country`. The source entities affected
@@ -38,7 +44,7 @@ final readonly class AssociationDependency
      */
     public function __construct(
         private string $relatedClass,
-        private string $property,
+        private ?string $property,
         private string $sourceClass,
         private string $reversePath,
         private string $summaryClass,
@@ -52,7 +58,7 @@ final readonly class AssociationDependency
         return $this->relatedClass;
     }
 
-    public function getProperty(): string
+    public function getProperty(): ?string
     {
         return $this->property;
     }
@@ -87,7 +93,7 @@ final readonly class AssociationDependency
         return \sprintf(
             '%s::%s<-%s::%s@%s',
             $this->relatedClass,
-            $this->property,
+            $this->property ?? '',
             $this->sourceClass,
             $this->reversePath,
             $this->summaryClass,

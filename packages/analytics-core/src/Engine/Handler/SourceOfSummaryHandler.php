@@ -14,12 +14,19 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Engine\Handler\Query\ReferringSourcePartitionsQuery;
 use Rekalogika\Analytics\Engine\Handler\Query\SourceIdRangeDeterminer;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SourceOfSummaryHandler implements ResetInterface
 {
+    /**
+     * The number of related entities in a single query.
+     */
+    private const REFERRING_QUERY_CHUNK_SIZE = 500;
+
     private int|string|null $latestKey = null;
     private int|string|null $earliestKey = null;
 
@@ -78,5 +85,36 @@ final class SourceOfSummaryHandler implements ResetInterface
     {
         return  $this->earliestKey
             ??= $this->createRangeDeterminer()->getMinKey();
+    }
+
+    /**
+     * Gets the lowest partitions containing the source entities that refer
+     * to any of the given related entities through the path, e.g. the orders
+     * whose `customer.country` is one of the given countries.
+     *
+     * @param string $reversePath The path from the source entity to the
+     * related entities.
+     * @param list<object> $entities The related entities.
+     * @return list<Partition>
+     */
+    public function getLowestPartitionsReferringTo(
+        string $reversePath,
+        array $entities,
+    ): array {
+        $query = new ReferringSourcePartitionsQuery(
+            entityManager: $this->entityManager,
+            summaryMetadata: $this->summaryMetadata,
+            reversePath: $reversePath,
+        );
+
+        $partitions = [];
+
+        foreach (array_chunk($entities, self::REFERRING_QUERY_CHUNK_SIZE) as $chunk) {
+            foreach ($query->getPartitions($chunk) as $partition) {
+                $partitions[$partition->getKey()] = $partition;
+            }
+        }
+
+        return array_values($partitions);
     }
 }

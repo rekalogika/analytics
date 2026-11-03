@@ -183,7 +183,12 @@ php bin/console rekalogika:analytics:refresh:range 'App\Entity\OrderSummary'
 ```
 
 From then on, changes to `Order` entities are picked up automatically and
-refreshed in the background by the Messenger worker.
+refreshed in the background by the Messenger worker. So are changes to the
+entities the summary reads through an association, e.g. the `Customer` of
+`customer.country`, and their deletion, as long as they are made through the
+ORM. Changes made otherwise, e.g. with a DQL `UPDATE`, native SQL, or a
+database cascade from an entity not deleted through the ORM, can be reported
+with `SummaryManager::markDirty()`.
 
 Query the summary using the `SummaryManager` service:
 

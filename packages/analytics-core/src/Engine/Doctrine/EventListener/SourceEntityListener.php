@@ -22,6 +22,7 @@ use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\DirtySummaryEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
+use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class SourceEntityListener implements ResetInterface
@@ -38,6 +39,15 @@ final class SourceEntityListener implements ResetInterface
      */
     private array $insertedEntities = [];
 
+    /**
+     * Related entities modified or deleted in the current flush, grouped by
+     * the summary and the path from its source entities. The entities are
+     * keyed by object id.
+     *
+     * @var array<string,array{dependency:AssociationDependency,entities:array<int,object>}>
+     */
+    private array $referencedEntities = [];
+
     public function __construct(
         private readonly HandlerFactory $handlerFactory,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
@@ -48,6 +58,7 @@ final class SourceEntityListener implements ResetInterface
     {
         $this->dirtyFlags = [];
         $this->insertedEntities = [];
+        $this->referencedEntities = [];
     }
 
     public function onFlush(OnFlushEventArgs $event): void
@@ -68,13 +79,21 @@ final class SourceEntityListener implements ResetInterface
         // process deletions
 
         foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
-            $newDirtyFlags = $this->handlerFactory
-                ->getSource($entity)
-                ->generateDirtyFlagsForEntityDeletion($entity);
+            $sourceHandler = $this->handlerFactory->getSource($entity);
+            $newDirtyFlags = $sourceHandler->generateDirtyFlagsForEntityDeletion($entity);
 
             foreach ($newDirtyFlags as $dirtyFlag) {
                 $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
             }
+
+            // the source entities referring to the deleted entity. the
+            // database may delete them, or set their reference to null,
+            // without the ORM knowing
+
+            $this->addReferencedEntity(
+                $sourceHandler->getAssociationDependenciesForDeletion(),
+                $entity,
+            );
         }
 
         // process updates
@@ -90,17 +109,27 @@ final class SourceEntityListener implements ResetInterface
                 $changeSet,
             );
 
-            $newDirtyFlags = $this->handlerFactory
-                ->getSource($entity)
-                ->generateDirtyFlagsForEntityModification(
-                    entity: $entity,
-                    modifiedProperties: array_keys($changeSet),
-                    originalValues: $originalValues,
-                );
+            $sourceHandler = $this->handlerFactory->getSource($entity);
+
+            $newDirtyFlags = $sourceHandler->generateDirtyFlagsForEntityModification(
+                entity: $entity,
+                modifiedProperties: array_keys($changeSet),
+                originalValues: $originalValues,
+            );
 
             foreach ($newDirtyFlags as $dirtyFlag) {
                 $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
             }
+
+            // the source entities of other summaries that read the modified
+            // properties through an association
+
+            $this->addReferencedEntity(
+                $sourceHandler->getAssociationDependenciesForModification(
+                    array_keys($changeSet),
+                ),
+                $entity,
+            );
         }
 
         // process inserts
@@ -155,6 +184,16 @@ final class SourceEntityListener implements ResetInterface
         // foreach ($unitOfWork->getScheduledCollectionUpdates() as $collection) {
         // }
 
+        // process the source entities referring to the modified or deleted
+        // related entities. the database still has the state before the
+        // flush, so the references to the deleted entities are still there.
+        // the source entities whose references are modified in this flush
+        // are processed above, as updates
+
+        foreach ($this->generateDirtyFlagsForReferencedEntities() as $dirtyFlag) {
+            $this->dirtyFlags[$dirtyFlag->getSignature()] = $dirtyFlag;
+        }
+
         // persist and compute changesets
 
         $classMetadata = $entityManager->getClassMetadata(DirtyFlag::class);
@@ -163,6 +202,48 @@ final class SourceEntityListener implements ResetInterface
             $entityManager->persist($dirtyFlag);
             $unitOfWork->computeChangeSet($classMetadata, $dirtyFlag);
         }
+    }
+
+    /**
+     * @param list<AssociationDependency> $dependencies
+     */
+    private function addReferencedEntity(array $dependencies, object $entity): void
+    {
+        foreach ($dependencies as $dependency) {
+            $key = $dependency->getSummaryClass() . '|' . $dependency->getReversePath();
+
+            $this->referencedEntities[$key]['dependency'] = $dependency;
+            $this->referencedEntities[$key]['entities'][spl_object_id($entity)] = $entity;
+        }
+    }
+
+    /**
+     * Runs one query for each summary and path, for all the related entities
+     * of the flush.
+     *
+     * @return iterable<DirtyFlag>
+     */
+    private function generateDirtyFlagsForReferencedEntities(): iterable
+    {
+        foreach ($this->referencedEntities as ['dependency' => $dependency, 'entities' => $entities]) {
+            $summaryHandler = $this->handlerFactory
+                ->getSummary($dependency->getSummaryClass());
+
+            $partitions = $summaryHandler
+                ->getSource()
+                ->getLowestPartitionsReferringTo(
+                    reversePath: $dependency->getReversePath(),
+                    entities: array_values($entities),
+                );
+
+            foreach ($partitions as $partition) {
+                yield $summaryHandler
+                    ->getDirtyFlags()
+                    ->createDirtyFlagForPartition($partition);
+            }
+        }
+
+        $this->referencedEntities = [];
     }
 
     /**

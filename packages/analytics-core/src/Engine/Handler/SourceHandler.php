@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\Handler;
 
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
 
 final readonly class SourceHandler
@@ -130,5 +131,31 @@ final readonly class SourceHandler
                 yield $dirtyFlagHandler->createDirtyFlagForPartition($originalPartition);
             }
         }
+    }
+
+    /**
+     * Returns the summaries of other classes affected by a modification of an
+     * entity of this class, because they read the modified properties through
+     * an association.
+     *
+     * @param list<string> $modifiedProperties
+     * @return list<AssociationDependency>
+     */
+    public function getAssociationDependenciesForModification(
+        array $modifiedProperties,
+    ): array {
+        return $this->sourceMetadata
+            ->getAssociationDependenciesByChangedProperties($modifiedProperties);
+    }
+
+    /**
+     * Returns the summaries of other classes affected by a deletion of an
+     * entity of this class, because their source entities refer to it.
+     *
+     * @return list<AssociationDependency>
+     */
+    public function getAssociationDependenciesForDeletion(): array
+    {
+        return $this->sourceMetadata->getAllAssociationDependencies();
     }
 }

@@ -21,9 +21,11 @@ use Doctrine\ORM\QueryBuilder;
  *
  * This is the way to restrict which source entities are summarized, e.g. to
  * exclude cancelled orders or soft-deleted records. The framework applies the
- * modification to every query it makes against the source entities: the
+ * modification to the queries it makes against the source entities: the
  * roll-up into the summary table, the determination of the key range to
- * refresh, and the listing of the source entities of a cell.
+ * refresh, and the listing of the source entities of a cell. It is not
+ * applied when looking for the source entities affected by a change to a
+ * related entity, the change can move them out of the filter.
  */
 interface HasQueryBuilderModifier
 {
