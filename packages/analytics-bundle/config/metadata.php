@@ -131,6 +131,7 @@ return static function (
         ->class(DefaultSourceMetadataFactory::class)
         ->args([
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
         ])
     ;
 };

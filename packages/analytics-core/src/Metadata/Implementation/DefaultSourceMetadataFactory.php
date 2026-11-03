@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
@@ -22,7 +24,8 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
  * Default implementation of SourceMetadataFactory. On construction, it goes
  * through every summary class, and inverts the relationship: from each source
  * class and each of its properties, to the summary classes that depend on
- * that property.
+ * that property. It also follows the paths through associations, from each
+ * related class and each of its properties, to the summaries that read them.
  */
 final readonly class DefaultSourceMetadataFactory implements SourceMetadataFactory
 {
@@ -31,10 +34,19 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
      */
     private array $involvedProperties;
 
+    /**
+     * @var array<class-string,array<string,list<AssociationDependency>>>
+     */
+    private array $associationDependencies;
+
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
+        ManagerRegistry $managerRegistry,
     ) {
         $this->involvedProperties = $this->createInvolvedProperties();
+        $this->associationDependencies = $this->createAssociationDependencies(
+            new AssociationDependencyResolver($managerRegistry),
+        );
     }
 
     /**
@@ -82,6 +94,47 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
     }
 
     /**
+     * Related class to the mapping of its properties to the summaries of
+     * other classes that read them through an association.
+     *
+     * @return array<class-string,array<string,list<AssociationDependency>>>
+     */
+    private function createAssociationDependencies(
+        AssociationDependencyResolver $resolver,
+    ): array {
+        /** @var array<class-string,array<string,array<string,AssociationDependency>>> */
+        $dependencies = [];
+
+        foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
+            if (!$summaryMetadata->isTrackAssociations()) {
+                continue;
+            }
+
+            foreach ($summaryMetadata->getInvolvedSourcePaths() as $path) {
+                $pathDependencies = $resolver->resolve(
+                    sourceClass: $summaryMetadata->getSourceClass(),
+                    path: $path,
+                    summaryClass: $summaryMetadata->getSummaryClass(),
+                );
+
+                foreach ($pathDependencies as $dependency) {
+                    $dependencies[$dependency->getRelatedClass()][$dependency->getProperty()][$dependency->getSignature()] = $dependency;
+                }
+            }
+        }
+
+        $result = [];
+
+        foreach ($dependencies as $relatedClass => $properties) {
+            foreach ($properties as $property => $propertyDependencies) {
+                $result[$relatedClass][$property] = array_values($propertyDependencies);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Also includes the summaries of the parent classes of the source, so
      * that a change to an entity of a subclass is detected by a summary
      * declared on the superclass.
@@ -99,10 +152,18 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
 
         $classes = [$sourceClassName, ...$parents];
 
+        $allPropertiesToAssociationDependencies = [];
+
         foreach ($classes as $class) {
             foreach ($this->involvedProperties[$class] ?? [] as $property => $summaryClasses) {
                 foreach ($summaryClasses as $summaryClass) {
                     $allPropertiesToSummaryClasses[$property][] = $summaryClass;
+                }
+            }
+
+            foreach ($this->associationDependencies[$class] ?? [] as $property => $dependencies) {
+                foreach ($dependencies as $dependency) {
+                    $allPropertiesToAssociationDependencies[$property][] = $dependency;
                 }
             }
         }
@@ -110,6 +171,7 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
         return new SourceMetadata(
             class: $sourceClassName,
             propertyToSummaryClasses: $allPropertiesToSummaryClasses,
+            propertyToAssociationDependencies: $allPropertiesToAssociationDependencies,
         );
     }
 }

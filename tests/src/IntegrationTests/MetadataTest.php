@@ -13,17 +13,22 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Metadata\Attribute\Partition;
 use Rekalogika\Analytics\Metadata\Attribute\PartitionKey;
 use Rekalogika\Analytics\Metadata\Attribute\PartitionLevel;
+use Rekalogika\Analytics\Metadata\Implementation\DefaultSourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\HierarchyAwareLabel;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
+use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary;
@@ -100,6 +105,169 @@ final class MetadataTest extends KernelTestCase
 
         $this->assertArrayNotHasKey('', $metadata->getPropertyToSummaryClasses());
         $this->assertArrayNotHasKey('*', $metadata->getPropertyToSummaryClasses());
+    }
+
+    public function testAssociationDependencies(): void
+    {
+        $sourceMetadataFactory = static::getContainer()
+            ->get(SourceMetadataFactory::class);
+
+        // Item is not a source, its properties are read through Order::item
+
+        $itemMetadata = $sourceMetadataFactory->getSourceMetadata(Item::class);
+
+        $this->assertSame([], $itemMetadata->getAllInvolvedSummaryClasses());
+        $this->assertSame([], $itemMetadata->getInvolvedSummaryClassesByChangedProperties(['category']));
+
+        $this->assertEqualsCanonicalizing(
+            [
+                [Order::class, 'item', OrderSummary::class],
+                [Order::class, 'item', OrderExplicitGroupingSetsSummary::class],
+            ],
+            $this->formatDependencies(
+                $itemMetadata->getAssociationDependenciesByChangedProperties(['category']),
+            ),
+        );
+
+        $this->assertEqualsCanonicalizing(
+            [[Order::class, 'item', OrderSummary::class]],
+            $this->formatDependencies(
+                $itemMetadata->getAssociationDependenciesByChangedProperties(['countryOfOrigin']),
+            ),
+        );
+
+        $this->assertSame([], $itemMetadata->getAssociationDependenciesByChangedProperties(['name']));
+
+        // Country::region is read by the summaries of Order and Customer,
+        // through different paths
+
+        $countryMetadata = $sourceMetadataFactory->getSourceMetadata(Country::class);
+
+        $this->assertEqualsCanonicalizing(
+            [
+                [Order::class, 'customer.country', OrderSummary::class],
+                [Order::class, 'customer.country', OrderExplicitGroupingSetsSummary::class],
+                [Customer::class, 'country', CustomerSummary::class],
+            ],
+            $this->formatDependencies($countryMetadata->getAllAssociationDependencies()),
+        );
+
+        // Customer is a source itself, and is also read through Order::customer
+
+        $customerMetadata = $sourceMetadataFactory->getSourceMetadata(IndividualCustomer::class);
+
+        $this->assertEquals(
+            [CustomerSummary::class],
+            $customerMetadata->getInvolvedSummaryClassesByChangedProperties(['country']),
+        );
+
+        $this->assertEqualsCanonicalizing(
+            [
+                [Order::class, 'customer', OrderSummary::class],
+                [Order::class, 'customer', OrderExplicitGroupingSetsSummary::class],
+            ],
+            $this->formatDependencies(
+                $customerMetadata->getAssociationDependenciesByChangedProperties(['country']),
+            ),
+        );
+
+        // read through a cast to IndividualCustomer, so only for that class
+
+        $this->assertCount(
+            2,
+            $customerMetadata->getAssociationDependenciesByChangedProperties(['gender']),
+        );
+
+        $this->assertSame(
+            [],
+            $sourceMetadataFactory
+                ->getSourceMetadata(Customer::class)
+                ->getAssociationDependenciesByChangedProperties(['gender']),
+        );
+
+        // nothing reads Order through an association
+
+        $this->assertSame(
+            [],
+            $sourceMetadataFactory->getSourceMetadata(Order::class)->getAllAssociationDependencies(),
+        );
+    }
+
+    public function testAssociationTrackingDisabled(): void
+    {
+        $summaryMetadataFactory = static::getContainer()
+            ->get(SummaryMetadataFactory::class);
+
+        $metadata = $summaryMetadataFactory->getSummaryMetadata(OrderSummary::class);
+
+        $this->assertTrue($metadata->isTrackAssociations());
+
+        $untrackedMetadata = new SummaryMetadata(
+            sourceClass: $metadata->getSourceClass(),
+            summaryClass: $metadata->getSummaryClass(),
+            partition: $metadata->getPartition(),
+            dimensions: $metadata->getRootDimensions(),
+            measures: $metadata->getMeasures(),
+            groupingsProperty: $metadata->getGroupingsProperty(),
+            attributes: $metadata->getAttributes(),
+            label: $metadata->getLabel(),
+            trackAssociations: false,
+        );
+
+        $sourceMetadataFactory = new DefaultSourceMetadataFactory(
+            summaryMetadataFactory: new class ($untrackedMetadata) implements SummaryMetadataFactory {
+                public function __construct(private readonly SummaryMetadata $metadata) {}
+
+                #[\Override]
+                public function getSummaryMetadata(string $summaryClassName): SummaryMetadata
+                {
+                    return $this->metadata;
+                }
+
+                #[\Override]
+                public function getSummaryClasses(): array
+                {
+                    return [$this->metadata->getSummaryClass()];
+                }
+
+                #[\Override]
+                public function isSummary(string $className): bool
+                {
+                    return $className === $this->metadata->getSummaryClass();
+                }
+            },
+            managerRegistry: static::getContainer()->get(ManagerRegistry::class),
+        );
+
+        $this->assertSame(
+            [],
+            $sourceMetadataFactory->getSourceMetadata(Item::class)->getAllAssociationDependencies(),
+        );
+
+        // the source itself is still tracked
+
+        $this->assertEquals(
+            [OrderSummary::class],
+            $sourceMetadataFactory
+                ->getSourceMetadata(Order::class)
+                ->getInvolvedSummaryClassesByChangedProperties(['item']),
+        );
+    }
+
+    /**
+     * @param list<AssociationDependency> $dependencies
+     * @return list<array{class-string,string,class-string}>
+     */
+    private function formatDependencies(array $dependencies): array
+    {
+        return array_map(
+            static fn(AssociationDependency $dependency): array => [
+                $dependency->getSourceClass(),
+                $dependency->getReversePath(),
+                $dependency->getSummaryClass(),
+            ],
+            $dependencies,
+        );
     }
 
     public function testPartitionMetadataAttributes(): void
