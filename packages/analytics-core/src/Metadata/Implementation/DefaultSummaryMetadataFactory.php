@@ -41,7 +41,8 @@ use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
  * Default implementation of SummaryMetadataFactory. Builds the metadata of a
  * summary class from its PHP attributes and its Doctrine mapping, and
  * validates that the class is well-formed: at least one dimension, at least
- * one measure, exactly one partition, and a groupings property.
+ * one measure, exactly one partition, and a groupings property. The summary
+ * class and its source class must be managed by the same entity manager.
  *
  * Summary classes are discovered by scanning every entity known to Doctrine
  * for the `Summary` attribute.
@@ -124,6 +125,7 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
         }
 
         $sourceClass = $summaryAttribute->getSourceClass();
+        $this->validateSameManager($summaryClassName, $sourceClass);
         $summaryClassMetadata = $this->getDoctrineClassMetadata($summaryClassName);
 
         $properties = AttributeUtil::getPropertiesOfClass($summaryClassName);
@@ -314,15 +316,16 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
     ): MeasureMetadata {
         $function = $measureAttribute->getFunction();
 
-        $unit = $measureAttribute->getUnit();
+        // compute the signature from the normalized unit, so that 'kg' and
+        // new LiteralString('kg') are recognized as the same unit
+
+        $unit = TranslatableUtil::normalize($measureAttribute->getUnit());
 
         if ($unit !== null) {
             $unitSignature = sha1(serialize($unit));
         } else {
             $unitSignature = null;
         }
-
-        $unit = TranslatableUtil::normalize($unit);
 
         // determine whether the measure is virtual or not
 
@@ -343,6 +346,46 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
             virtual: $virtual,
             hidden: $measureAttribute->isHidden(),
         );
+    }
+
+    /**
+     * The engine runs queries against the source class using the entity
+     * manager of the summary class, e.g. the refresh is a single `INSERT ...
+     * SELECT` statement. Therefore, both classes must be managed by the same
+     * entity manager.
+     *
+     * @param class-string $summaryClass
+     * @param class-string $sourceClass
+     * @throws MetadataException If the classes are managed by different
+     * entity managers, or if either of them has no entity manager.
+     */
+    private function validateSameManager(
+        string $summaryClass,
+        string $sourceClass,
+    ): void {
+        $summaryManager = $this->managerRegistry->getManagerForClass($summaryClass);
+
+        if ($summaryManager === null) {
+            throw new MetadataException(\sprintf('No manager found for class %s', $summaryClass));
+        }
+
+        $sourceManager = $this->managerRegistry->getManagerForClass($sourceClass);
+
+        if ($sourceManager === null) {
+            throw new MetadataException(\sprintf(
+                'No manager found for the source class %s of the summary class %s',
+                $sourceClass,
+                $summaryClass,
+            ));
+        }
+
+        if ($summaryManager !== $sourceManager) {
+            throw new MetadataException(\sprintf(
+                'The summary class %s and its source class %s must be managed by the same entity manager.',
+                $summaryClass,
+                $sourceClass,
+            ));
+        }
     }
 
     /**
