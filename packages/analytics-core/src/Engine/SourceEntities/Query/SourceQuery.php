@@ -17,7 +17,6 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
-use Rekalogika\Analytics\Contracts\Query;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
 use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
@@ -69,19 +68,6 @@ final class SourceQuery extends AbstractQuery
 
         if ($predicate !== null) {
             $this->addExpressionsToWhere($predicate);
-        }
-
-        return $this;
-    }
-
-    public function fromQuery(Query $query): self
-    {
-        $this->addQueryDimensionsToSelectGroupByOrderBy($query);
-
-        $expressions = $query->getDice();
-
-        if ($expressions !== null) {
-            $this->addExpressionsToWhere($expressions);
         }
 
         return $this;
@@ -162,34 +148,6 @@ final class SourceQuery extends AbstractQuery
                 $expression,
                 $this->createNamedParameter($rawMember),
             ));
-        }
-    }
-
-    private function addQueryDimensionsToSelectGroupByOrderBy(Query $query): void
-    {
-        $dimensions = $query->getDimensions();
-
-        foreach ($dimensions as $dimension) {
-            $dimensionMetadata = $this->summaryMetadata->getDimension($dimension);
-            $alias = $dimensionMetadata->getDqlAlias();
-            $valueResolver = $dimensionMetadata->getValueResolver();
-
-            $expression = $valueResolver->getExpression(
-                context: new SourceQueryContext(
-                    queryBuilder: $this->getSimpleQueryBuilder(),
-                    summaryMetadata: $this->summaryMetadata,
-                    dimensionMetadata: $dimensionMetadata,
-                ),
-            );
-
-            $this->getSimpleQueryBuilder()->addSelect(\sprintf(
-                '%s AS %s',
-                $expression,
-                $alias,
-            ));
-
-            $this->getSimpleQueryBuilder()->addGroupBy($alias);
-            $this->getSimpleQueryBuilder()->addOrderBy($alias, 'ASC');
         }
     }
 

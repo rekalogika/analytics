@@ -345,6 +345,7 @@ final class ArchitectureTest
                 Selector::classname(\Stringable::class),
                 Selector::classname(\UnitEnum::class),
                 Selector::classname(\BackedEnum::class),
+                Selector::classname(\Closure::class),
 
                 // php array
                 Selector::classname(\IteratorAggregate::class),

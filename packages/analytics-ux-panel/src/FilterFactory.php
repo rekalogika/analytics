@@ -30,11 +30,6 @@ interface FilterFactory
     public static function getFilterClass(): string;
 
     /**
-     * @return class-string<O>|null
-     */
-    public static function getOptionObjectClass(): ?string;
-
-    /**
      * Instantate a filter instance based on the provided dimension metadata and
      * input array.
      *

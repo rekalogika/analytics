@@ -35,12 +35,6 @@ final readonly class ChoiceFilterFactory implements FilterFactory
         return ChoiceFilter::class;
     }
 
-    #[\Override]
-    public static function getOptionObjectClass(): string
-    {
-        return ChoiceFilterOptions::class;
-    }
-
     /**
      * @param ChoiceFilterOptions<mixed>|null $options
      * @param array<string,mixed> $inputArray
