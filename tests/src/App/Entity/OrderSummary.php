@@ -392,7 +392,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->averageSpendingPerCustomer, 'EUR', roundingMode: RoundingMode::HalfUp);
+        return Money::ofMinor((string) $this->averageSpendingPerCustomer, 'EUR', roundingMode: RoundingMode::HalfUp);
     }
 
     public function getAverageOrderValue(): ?Money
@@ -419,7 +419,7 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
             return null;
         }
 
-        return Money::ofMinor($this->priceStdDev, 'EUR', roundingMode: RoundingMode::HalfUp);
+        return Money::ofMinor((string) $this->priceStdDev, 'EUR', roundingMode: RoundingMode::HalfUp);
     }
 
     public function getPriceSumSquare(): ?float
