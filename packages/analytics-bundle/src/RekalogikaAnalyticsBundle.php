@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Bundle;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DistinctValuesResolverPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\DoctrineEntityPass;
 use Rekalogika\Analytics\Bundle\DependencyInjection\ValueSerializerPass;
+use Rekalogika\Analytics\Bundle\EventListener\RefreshLockEventSubscriber;
 use Rekalogika\Analytics\Contracts\DistinctValuesResolver;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
@@ -27,6 +28,7 @@ use Rekalogika\Analytics\Engine\Doctrine\Function\GroupingConcatFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NextValFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\NullFunction;
 use Rekalogika\Analytics\Engine\Doctrine\Function\TruncateBigIntFunction;
+use Rekalogika\Analytics\Engine\RefreshAgent\SymfonyRefreshAgentLock;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
 use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
@@ -50,6 +52,8 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 final class RekalogikaAnalyticsBundle extends AbstractBundle
 {
@@ -124,6 +128,22 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             300,
             'An upper-level partition is refreshed immediately after the partitions below it, unless it has been refreshed within this period.',
         );
+
+        $refreshLock = $root->children()->arrayNode('refresh_lock')
+            ->addDefaultsIfNotSet()
+            ->info('The lock that prevents concurrent refreshes of the same summary. By default, PostgreSQL advisory locks on the connection of the summary.')
+            ->children();
+
+        $refreshLock->scalarNode('factory')
+            ->defaultNull()
+            ->info('The service ID of a symfony/lock `LockFactory` to use instead of the default, e.g. `lock.factory`. Avoid a store using the same database connection as the summaries.');
+
+        $refreshLock->scalarNode('ttl')
+            ->defaultValue(300)
+            ->info('Used with `factory`. The lock expires if a single step of a refresh takes longer than this, in seconds. Null disables expiration, if the store supports it.')
+            ->validate()
+            ->ifTrue(static fn(mixed $value): bool => $value !== null && ((!\is_int($value) && !\is_float($value)) || $value <= 0))
+            ->thenInvalid('The value must be a positive number or null, got %s.');
     }
 
     private function addDurationNode(
@@ -182,6 +202,33 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
         foreach ($refresh as $key => $value) {
             $configurator->parameters()
                 ->set(\sprintf('rekalogika.analytics.refresh.%s', $key), $value);
+        }
+
+        /** @var array{factory:string|null,ttl:int|float|null} */
+        $refreshLock = $config['refresh_lock'];
+
+        if ($refreshLock['factory'] !== null) {
+            $configurator->services()
+                ->set('rekalogika.analytics.engine.refresh.lock')
+                ->class(SymfonyRefreshAgentLock::class)
+                ->args([
+                    '$lockFactory' => service($refreshLock['factory']),
+                    '$ttl' => $refreshLock['ttl'] === null ? null : (float) $refreshLock['ttl'],
+                    '$logger' => service('logger')->ignoreOnInvalid(),
+                ])
+                ->tag('monolog.logger', [
+                    'channel' => 'rekalogika.analytics',
+                ])
+            ;
+
+            $configurator->services()
+                ->set('rekalogika.analytics.event_subscriber.refresh_lock')
+                ->class(RefreshLockEventSubscriber::class)
+                ->args([
+                    '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
+                ])
+                ->tag('kernel.event_subscriber')
+            ;
         }
 
         $container->registerForAutoconfiguration(ValueSerializer::class)

@@ -13,123 +13,18 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Engine\RefreshAgent;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Rekalogika\Analytics\Contracts\Exception\RuntimeException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
-use Symfony\Contracts\Service\ResetInterface;
-
 /**
- * Locking service for the refresh agent.
+ * Locking service for the refresh agent, prevents concurrent refreshes of the
+ * same summary.
  */
-final class RefreshAgentLock implements ResetInterface
+interface RefreshAgentLock
 {
-    /**
-     * @var \WeakMap<Connection,DoctrineDbalPostgreSqlStore>
-     */
-    private \WeakMap $connectionToStore;
-
-    /**
-     * @var array<class-string,Key>
-     */
-    private array $summaryClassToKey = [];
-
-    public function __construct(
-        private readonly ManagerRegistry $managerRegistry,
-    ) {
-        /** @psalm-suppress PropertyTypeCoercion */
-        $this->connectionToStore = new \WeakMap();
-    }
-
-    #[\Override]
-    public function reset(): void
-    {
-        /** @psalm-suppress PropertyTypeCoercion */
-        $this->connectionToStore = new \WeakMap();
-        $this->summaryClassToKey = [];
-    }
-
-    /**
-     * @param class-string $summaryClass
-     */
-    private function getConnectionBySummaryClass(string $summaryClass): Connection
-    {
-        $manager = $this->managerRegistry
-            ->getManagerForClass($summaryClass);
-
-        if ($manager === null) {
-            throw new RuntimeException(\sprintf(
-                'No manager found for class "%s".',
-                $summaryClass,
-            ));
-        }
-
-        if (!$manager instanceof EntityManagerInterface) {
-            throw new RuntimeException(\sprintf(
-                'The manager for class "%s" is not an instance of EntityManagerInterface.',
-                $summaryClass,
-            ));
-        }
-
-        return $manager->getConnection();
-    }
-
-    /** @psalm-suppress InvalidNullableReturnType */
-    private function getStoreByConnection(
-        Connection $connection,
-    ): DoctrineDbalPostgreSqlStore {
-        /** @psalm-suppress PossiblyNullArgument */
-        /** @psalm-suppress NullableReturnStatement */
-        return $this->connectionToStore[$connection] ??= new DoctrineDbalPostgreSqlStore($connection);
-    }
-
-    /**
-     * @param class-string $summaryClass
-     */
-    private function getStoreBySummaryClass(
-        string $summaryClass,
-    ): DoctrineDbalPostgreSqlStore {
-        $connection = $this->getConnectionBySummaryClass($summaryClass);
-
-        return $this->getStoreByConnection($connection);
-    }
-
-    /**
-     * @param class-string $summaryClass
-     */
-    private function getKey(string $summaryClass): Key
-    {
-        return $this->summaryClassToKey[$summaryClass]
-            ??= new Key(\sprintf('rekalogika_analytics_%s', $summaryClass));
-    }
-
-    private function removeKey(string $summaryClass): void
-    {
-        unset($this->summaryClassToKey[$summaryClass]);
-    }
-
     /**
      * Acquire lock, return false if another process has acquired the lock.
      *
      * @param class-string $summaryClass
      */
-    public function acquire(string $summaryClass): bool
-    {
-        $store = $this->getStoreBySummaryClass($summaryClass);
-        $key = $this->getKey($summaryClass);
-
-        try {
-            $store->save($key);
-
-            return true;
-        } catch (LockConflictedException) {
-            return false;
-        }
-    }
+    public function acquire(string $summaryClass): bool;
 
     /**
      * Acquire lock, wait until another process releases the lock if
@@ -137,38 +32,13 @@ final class RefreshAgentLock implements ResetInterface
      *
      * @param class-string $summaryClass
      */
-    public function waitAndAcquire(string $summaryClass): void
-    {
-        $store = $this->getStoreBySummaryClass($summaryClass);
-        $key = $this->getKey($summaryClass);
-
-        $store->waitAndSave($key);
-    }
+    public function waitAndAcquire(string $summaryClass): void;
 
     /**
-     * Release key. Does not throw if the connection is unusable, so that it
-     * can be called in a `finally` block without replacing the exception that
-     * made the connection unusable.
+     * Release lock. Must not throw, so that it can be called in a `finally`
+     * block without replacing the exception that caused the refresh to fail.
      *
      * @param class-string $summaryClass
      */
-    public function release(string $summaryClass): void
-    {
-        $connection = $this->getConnectionBySummaryClass($summaryClass);
-        $store = $this->getStoreByConnection($connection);
-        $key = $this->getKey($summaryClass);
-        $this->removeKey($summaryClass);
-
-        try {
-            $store->delete($key);
-        } catch (DBALException) {
-            // the connection is unusable, e.g. it is in an aborted transaction.
-            // closing it ends the database session, which releases the
-            // advisory lock. dbal reconnects on the next use. the store is
-            // discarded because it still remembers the key.
-
-            unset($this->connectionToStore[$connection]);
-            $connection->close();
-        }
-    }
+    public function release(string $summaryClass): void;
 }

@@ -22,7 +22,7 @@ use Rekalogika\Analytics\Engine\Doctrine\EventListener\SummaryPostGenerateSchema
 use Rekalogika\Analytics\Engine\EventListener\DirtySummaryEventListener;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
-use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
+use Rekalogika\Analytics\Engine\RefreshAgent\PostgreSqlRefreshAgentLock;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
@@ -189,12 +189,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set('rekalogika.analytics.engine.refresh.lock')
-        ->class(RefreshAgentLock::class)
+        ->class(PostgreSqlRefreshAgentLock::class)
         ->args([
             '$managerRegistry' => service('doctrine'),
+            '$logger' => service('logger')->ignoreOnInvalid(),
         ])
-        ->tag('kernel.reset', [
-            'method' => 'reset',
+        ->tag('monolog.logger', [
+            'channel' => 'rekalogika.analytics',
         ])
     ;
 
