@@ -59,6 +59,43 @@ interface SummaryManager
     ): void;
 
     /**
+     * Marks the lowest partitions containing the source entities with the
+     * given partitioning keys as dirty, and schedules the refresh agent to
+     * refresh them. This is for changes the framework cannot detect, e.g. a
+     * change made using DQL `UPDATE`, native SQL, or a database cascade.
+     * Changes made through the ORM are detected automatically.
+     *
+     * The flags are inserted using the connection of the summary's entity
+     * manager, without flushing it, and are part of its current transaction,
+     * if any. The refresh agent processes them after the delay determined by
+     * the refresh agent strategy.
+     *
+     * @param class-string $class The summary entity class.
+     * @param iterable<int|string> $keys The partitioning keys of the source
+     * entities, e.g. their primary keys, as resolved by the
+     * `PartitionValueResolver` of the summary's partition.
+     */
+    public function markDirty(string $class, iterable $keys): void;
+
+    /**
+     * Marks every lowest partition from the one containing `$start` to the
+     * one containing `$end`, inclusive, as dirty, and schedules the refresh
+     * agent to refresh them. One flag is created for each partition, so for
+     * a large range, consider `refresh()` instead. See `markDirty()`.
+     *
+     * @param class-string $class The summary entity class.
+     * @param int|string $start The first partitioning key, inclusive.
+     * @param int|string $end The last partitioning key, inclusive. Must not
+     * be lower than `$start`, otherwise an `InvalidArgumentException` is
+     * thrown.
+     */
+    public function markDirtyRange(
+        string $class,
+        int|string $start,
+        int|string $end,
+    ): void;
+
+    /**
      * Creates a new, empty query. Call `from()` on the returned query to set
      * the summary class before setting the other parameters.
      */
