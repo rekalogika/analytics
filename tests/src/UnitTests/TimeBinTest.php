@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Tests\UnitTests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Date;
 use Rekalogika\Analytics\Time\Bin\Gregorian\DayOfWeek;
 use Rekalogika\Analytics\Time\Bin\Gregorian\Hour;
@@ -28,6 +29,7 @@ use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekWeek;
 use Rekalogika\Analytics\Time\Bin\IsoWeek\IsoWeekYear;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekDate;
 use Rekalogika\Analytics\Time\Bin\MonthBasedWeek\MonthBasedWeekWeek;
+use Rekalogika\Analytics\Time\Filter\TimeBinNumberRangeFilterOptions;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Rekalogika\Analytics\Time\TimeBin;
 use Symfony\Component\Translation\IdentityTranslator;
@@ -202,6 +204,119 @@ final class TimeBinTest extends TestCase
             [2025033005, 2025033004, 2025033003, 2025033001, 2025033000],
             $visited,
         );
+    }
+
+    /**
+     * @param class-string<MonotonicTimeBin> $class
+     * @param non-empty-string $timeZone
+     */
+    #[DataProvider('contiguousBinProvider')]
+    public function testBinsAreContiguousAcrossDstTransitions(
+        string $class,
+        string $timeZone,
+    ): void {
+        $timeZone = new \DateTimeZone($timeZone);
+        $bin = $class::createFromDateTime(new \DateTimeImmutable('2000-01-03 12:00:00', $timeZone));
+        $last = new \DateTimeImmutable('2030-01-01 00:00:00', $timeZone);
+        $failures = [];
+
+        // collect the failures instead of asserting each bin, which is slow
+        while ($bin->getStart() < $last) {
+            $next = $bin->getNext();
+
+            $start = $bin->getStart()->format('c');
+
+            if ($next === null) {
+                $this->fail(\sprintf('The bin starting at %s has no next bin', $start));
+            }
+
+            if ($bin->getStart() >= $bin->getEnd()) {
+                $failures[] = \sprintf('The bin starting at %s is empty', $start);
+            }
+
+            if ($bin->getEnd() != $next->getStart()) {
+                $failures[] = \sprintf(
+                    'The bin starting at %s ends at %s, the next one starts at %s',
+                    $start,
+                    $bin->getEnd()->format('c'),
+                    $next->getStart()->format('c'),
+                );
+            }
+
+            $bin = $next;
+        }
+
+        $this->assertSame([], $failures);
+    }
+
+    /**
+     * @return iterable<string,array{class:class-string<MonotonicTimeBin>,timeZone:non-empty-string}>
+     */
+    public static function contiguousBinProvider(): iterable
+    {
+        $classes = [
+            Date::class,
+            Month::class,
+            Quarter::class,
+            Year::class,
+            IsoWeekDate::class,
+            IsoWeekWeek::class,
+            IsoWeekYear::class,
+            MonthBasedWeekDate::class,
+            MonthBasedWeekWeek::class,
+        ];
+
+        // time zones where the clock has changed at midnight
+        $timeZones = [
+            'America/Santiago',
+            'America/Asuncion',
+            'America/Havana',
+            'Asia/Beirut',
+            'Africa/Cairo',
+            'America/Sao_Paulo',
+            'Asia/Tehran',
+        ];
+
+        foreach ($classes as $class) {
+            foreach ($timeZones as $timeZone) {
+                $shortName = (new \ReflectionClass($class))->getShortName();
+
+                yield \sprintf('%s, %s', $shortName, $timeZone) => [
+                    'class' => $class,
+                    'timeZone' => $timeZone,
+                ];
+            }
+        }
+    }
+
+    public function testDayBinsAgreeOnAmbiguousMidnight(): void
+    {
+        // 2000-10-29 in Havana: the clock goes from 01:00 CDT back to 00:00
+        // CST, so midnight occurs twice. The day starts at the first one.
+        $timeZone = new \DateTimeZone('America/Havana');
+        $dateTime = new \DateTimeImmutable('2000-10-29 12:00:00', $timeZone);
+        $expected = '2000-10-29 00:00:00 CDT';
+
+        $this->assertSame($expected, Date::createFromDateTime($dateTime)->getStart()->format('Y-m-d H:i:s T'));
+        $this->assertSame($expected, IsoWeekDate::createFromDateTime($dateTime)->getStart()->format('Y-m-d H:i:s T'));
+        $this->assertSame($expected, MonthBasedWeekDate::createFromDateTime($dateTime)->getStart()->format('Y-m-d H:i:s T'));
+
+        $this->assertSame(
+            $expected,
+            Date::createFromDateTime($dateTime->modify('-1 day'))->getEnd()->format('Y-m-d H:i:s T'),
+        );
+    }
+
+    public function testDayBinInSpringForwardGapAtMidnight(): void
+    {
+        // 2022-03-22 in Tehran: the clock jumps from 00:00 to 01:00
+        $timeZone = new \DateTimeZone('Asia/Tehran');
+        $date = Date::createFromDatabaseValue(20220322)->withTimeZone($timeZone);
+
+        $this->assertSame('2022-03-22 01:00:00 +0430', $date->getStart()->format('Y-m-d H:i:s O'));
+        $this->assertSame('2022-03-23 00:00:00 +0430', $date->getEnd()->format('Y-m-d H:i:s O'));
+        $this->assertSame('2022-03-21 00:00:00 +0330', $date->getPrevious()->getStart()->format('Y-m-d H:i:s O'));
+        $this->assertSame('2022-03-22 01:00:00 +0430', $date->getPrevious()->getEnd()->format('Y-m-d H:i:s O'));
     }
 
     public function testMonthLabelUsesCalendarYear(): void
@@ -429,6 +544,32 @@ final class TimeBinTest extends TestCase
         yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250210];
         yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20250218];
         yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 20241311];
+
+        // extra digits
+        yield ['class' => Year::class, 'databaseValue' => 20261];
+        yield ['class' => Quarter::class, 'databaseValue' => 202613];
+        yield ['class' => Quarter::class, 'databaseValue' => 20260];
+        yield ['class' => Month::class, 'databaseValue' => 2026011];
+        yield ['class' => Date::class, 'databaseValue' => 202601011];
+        yield ['class' => Hour::class, 'databaseValue' => 20260101011];
+        yield ['class' => MonthBasedWeekWeek::class, 'databaseValue' => 20250711];
+        yield ['class' => MonthBasedWeekDate::class, 'databaseValue' => 202507121];
+        yield ['class' => IsoWeekWeek::class, 'databaseValue' => 2025101];
+        yield ['class' => IsoWeekDate::class, 'databaseValue' => 20251011];
+    }
+
+    public function testNumberRangeFilterKeepsInvalidNumber(): void
+    {
+        $options = new TimeBinNumberRangeFilterOptions(
+            timeBinClass: Quarter::class,
+            label: new TranslatableMessage('Quarter'),
+            help: null,
+        );
+
+        $this->assertSame(20261, $options->transformInputToDatabaseValue(20261));
+
+        // a mistyped bin is compared as is and matches nothing
+        $this->assertSame(202613, $options->transformInputToDatabaseValue(202613));
     }
 
     /**

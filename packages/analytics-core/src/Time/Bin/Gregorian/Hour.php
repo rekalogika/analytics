@@ -46,7 +46,12 @@ final class Hour implements MonotonicTimeBin
         $d = (int) substr($ymdh, 6, 2);
         $h = (int) substr($ymdh, 8, 2);
 
-        if (!checkdate($m, $d, $y) || $h > 23) {
+        // the round trip rejects extra digits, e.g. 20260101011
+        if (
+            !checkdate($m, $d, $y)
+            || $h > 23
+            || (int) \sprintf('%04d%02d%02d%02d', $y, $m, $d, $h) !== $this->databaseValue
+        ) {
             throw new InvalidArgumentException(\sprintf('Invalid hour: %d', $this->databaseValue));
         }
 

@@ -20,6 +20,7 @@ use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\Util\DayBoundary;
 use Rekalogika\Analytics\Time\Util\TranslatableDate;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -48,18 +49,20 @@ final class IsoWeekWeek implements MonotonicTimeBin, HasTitle
         $y = (int) substr($string, 0, 4);
         $w = (int) substr($string, 4, 2);
 
-        $this->start = (new \DateTimeImmutable())
-            ->setTimezone($this->timeZone)
-            ->setISODate($y, $w)
-            ->setTime(0, 0, 0);
+        $date = DayBoundary::createCalendarDate()->setISODate($y, $w);
 
         // `setISODate()` silently overflows an invalid week, e.g. 2021-W53
         // into 2022-W01
-        if ((int) $this->start->format('oW') !== $this->databaseValue) {
+        if ((int) $date->format('oW') !== $this->databaseValue) {
             throw new InvalidArgumentException(\sprintf('Invalid ISO week: %d', $this->databaseValue));
         }
 
-        $this->end = $this->start->modify('+1 week');
+        $this->start = DayBoundary::getStartOfDay($date, $this->timeZone);
+
+        $this->end = DayBoundary::getStartOfDay(
+            $date->modify('+1 week'),
+            $this->timeZone,
+        );
     }
 
     #[\Override]
