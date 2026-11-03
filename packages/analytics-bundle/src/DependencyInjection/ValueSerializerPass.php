@@ -73,7 +73,7 @@ final class ValueSerializerPass implements CompilerPassInterface
                     throw new InvalidArgumentException(\sprintf('Duplicate managers for "%s"', $key));
                 }
 
-                $specificServices[$key] = $serviceId;
+                $specificServices[$key] = new Reference($serviceId);
             }
         }
 
