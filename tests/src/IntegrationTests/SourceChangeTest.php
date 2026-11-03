@@ -15,7 +15,9 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\SummaryManager;
@@ -768,6 +770,172 @@ final class SourceChangeTest extends KernelTestCase
             'level' => $partition->getLevel(),
             'key' => $partition->getKey(),
         ]));
+    }
+
+    private function getOccupancyCount(string $date): int
+    {
+        $count = static::getContainer()
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OccupancyHistorySummary::class)
+            ->withDimensions('date')
+            ->getResult()
+            ->find('date', $date)
+            ?->getMeasures()
+            ->get('count')
+            ?->getValue()
+            ?? 0;
+
+        $this->assertIsInt($count);
+
+        return $count;
+    }
+
+    /**
+     * Modifying the partitioning key moves the entity to another partition.
+     * Both the partition it was in, and the partition it is moved to, must be
+     * refreshed.
+     */
+    public function testPartitionKeyModification(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $occupancyHistory = $entityManager
+            ->getRepository(OccupancyHistory::class)
+            ->findOneBy([], ['id' => 'ASC'])
+            ?? throw new \RuntimeException('Occupancy history not found');
+
+        $oldDate = \DateTimeImmutable::createFromInterface(
+            $occupancyHistory->getDate()
+                ?? throw new \RuntimeException('Date not found'),
+        );
+
+        $newDate = $oldDate->modify('+1 day');
+        $count = $occupancyHistory->getCount();
+        $this->assertIsInt($count);
+        $this->assertGreaterThan(0, $count);
+
+        $initialOldDateCount = $this->getOccupancyCount($oldDate->format('Y-m-d'));
+        $initialNewDateCount = $this->getOccupancyCount($newDate->format('Y-m-d'));
+
+        // move the record to the next day, which is in another partition
+
+        $partitionHandler = $this->getHandlerFactory()
+            ->getSummary(OccupancyHistorySummary::class)
+            ->getPartition();
+
+        $oldPartition = $partitionHandler->getLowestPartitionFromEntity($occupancyHistory);
+        $occupancyHistory->setDate($newDate);
+        $newPartition = $partitionHandler->getLowestPartitionFromEntity($occupancyHistory);
+
+        $this->assertNotSame($oldPartition->getKey(), $newPartition->getKey());
+
+        $entityManager->flush();
+        $entityManager->clear();
+
+        // both partitions are flagged
+
+        $repository = $entityManager->getRepository(DirtyFlag::class);
+
+        foreach ([$oldPartition, $newPartition] as $partition) {
+            $this->assertNotNull($repository->findOneBy([
+                'class' => OccupancyHistorySummary::class,
+                'level' => $partition->getLevel(),
+                'key' => $partition->getKey(),
+            ]));
+        }
+
+        // refresh, both dates must be updated
+
+        $refresherFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_refresher_factory');
+
+        $this->assertInstanceOf(SummaryRefresherFactory::class, $refresherFactory);
+
+        $refresherFactory
+            ->createSummaryRefresher(OccupancyHistorySummary::class)
+            ->refresh(new DefaultRefreshAgentStrategy(
+                minimumAge: null,
+                minimumIdleDelay: null,
+                maximumAge: null,
+                upperPartitionCooldown: null,
+            ));
+
+        $this->assertSame(
+            $initialOldDateCount - $count,
+            $this->getOccupancyCount($oldDate->format('Y-m-d')),
+        );
+
+        $this->assertSame(
+            $initialNewDateCount + $count,
+            $this->getOccupancyCount($newDate->format('Y-m-d')),
+        );
+    }
+
+    /**
+     * The dirty flags of a flush that failed are rolled back with it, and must
+     * not be carried over to the next flush.
+     */
+    public function testFailedFlushDoesNotLeaveDirtyFlags(): void
+    {
+        $this->clearRefreshState();
+
+        $managerRegistry = static::getContainer()->get('doctrine');
+        $this->assertInstanceOf(ManagerRegistry::class, $managerRegistry);
+
+        $entityManager = $managerRegistry->getManager();
+        $this->assertInstanceOf(EntityManagerInterface::class, $entityManager);
+
+        // a flush that fails: the record is moved to another date, and a new
+        // record without the required fields fails to insert
+
+        $occupancyHistory = $entityManager
+            ->getRepository(OccupancyHistory::class)
+            ->findOneBy([], ['id' => 'ASC'])
+            ?? throw new \RuntimeException('Occupancy history not found');
+
+        $occupancyHistory->setDate(new \DateTimeImmutable('2099-01-01'));
+
+        $failedPartition = $this->getHandlerFactory()
+            ->getSummary(OccupancyHistorySummary::class)
+            ->getPartition()
+            ->getLowestPartitionFromEntity($occupancyHistory);
+
+        $entityManager->persist(new OccupancyHistory());
+
+        try {
+            $entityManager->flush();
+            $this->fail('The flush should have failed');
+        } catch (DriverException) {
+        }
+
+        $managerRegistry->resetManager();
+        $entityManager = $managerRegistry->getManager();
+        $this->assertInstanceOf(EntityManagerInterface::class, $entityManager);
+
+        // a successful flush
+
+        $occupancyHistory = $entityManager
+            ->getRepository(OccupancyHistory::class)
+            ->findOneBy([], ['id' => 'DESC'])
+            ?? throw new \RuntimeException('Occupancy history not found');
+
+        $occupancyHistory->setCount((int) $occupancyHistory->getCount() + 1);
+
+        $entityManager->flush();
+        $entityManager->clear();
+
+        // only the flag of the successful flush is created
+
+        $dirtyFlags = $entityManager
+            ->getRepository(DirtyFlag::class)
+            ->findBy(['class' => OccupancyHistorySummary::class]);
+
+        $this->assertCount(1, $dirtyFlags);
+        $this->assertNotSame($failedPartition->getKey(), $dirtyFlags[0]->getKey());
     }
 
     public function testManualRefreshOfSingleNewRecord(): void

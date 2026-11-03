@@ -58,6 +58,11 @@ final class SourceEntityListener implements ResetInterface
             return;
         }
 
+        // clear the state left by a previous flush that failed, which never
+        // reached postFlush(). its dirty flags were rolled back with it
+
+        $this->reset();
+
         $unitOfWork = $entityManager->getUnitOfWork();
 
         // process deletions
@@ -75,13 +80,22 @@ final class SourceEntityListener implements ResetInterface
         // process updates
 
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
-            $changedProperties = array_keys($unitOfWork->getEntityChangeSet($entity));
+            $changeSet = $unitOfWork->getEntityChangeSet($entity);
+
+            // the original values are used to flag the partition the entity
+            // was in, if the partitioning key is modified
+
+            $originalValues = array_map(
+                static fn(mixed $change): mixed => \is_array($change) ? $change[0] : null,
+                $changeSet,
+            );
 
             $newDirtyFlags = $this->handlerFactory
                 ->getSource($entity)
                 ->generateDirtyFlagsForEntityModification(
                     entity: $entity,
-                    modifiedProperties: $changedProperties,
+                    modifiedProperties: array_keys($changeSet),
+                    originalValues: $originalValues,
                 );
 
             foreach ($newDirtyFlags as $dirtyFlag) {
@@ -240,9 +254,15 @@ final class SourceEntityListener implements ResetInterface
      */
     public function postFlush(PostFlushEventArgs $doctrineEvent): void
     {
+        // the state is cleared before dispatching, in case a listener flushes
+        // the entity manager again
+
+        $dirtyFlags = $this->dirtyFlags;
+        $this->reset();
+
         $summaryClassses = [];
 
-        foreach ($this->dirtyFlags as $dirtyFlag) {
+        foreach ($dirtyFlags as $dirtyFlag) {
             $event = new NewDirtyFlagEvent($dirtyFlag);
             $summaryClassses[$dirtyFlag->getClass()] = true;
             $this->eventDispatcher?->dispatch($event);
@@ -252,8 +272,5 @@ final class SourceEntityListener implements ResetInterface
             $event = new DirtySummaryEvent($summaryClass);
             $this->eventDispatcher?->dispatch($event);
         }
-
-        $this->dirtyFlags = [];
-        $this->insertedEntities = [];
     }
 }
