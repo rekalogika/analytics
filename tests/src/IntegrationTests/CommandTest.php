@@ -14,6 +14,12 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Tests\App\Entity\Customer;
+use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
+use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
+use Rekalogika\Analytics\Tests\App\Entity\Item;
+use Rekalogika\Analytics\Tests\App\Entity\Order;
+use Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -41,6 +47,7 @@ final class CommandTest extends KernelTestCase
         yield 'refresh:range' => ['rekalogika:analytics:refresh:range', 'class'];
         yield 'truncate' => ['rekalogika:analytics:truncate', 'class'];
         yield 'debug:summary' => ['rekalogika:analytics:debug:summary', 'summaryClass'];
+        yield 'debug:source' => ['rekalogika:analytics:debug:source', 'sourceClass'];
     }
 
     /**
@@ -93,6 +100,74 @@ final class CommandTest extends KernelTestCase
             OrderSummary::class,
             $this->getDisplay($tester),
         );
+    }
+
+    public function testDebugSourceWithExistingClass(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
+        $exitCode = $tester->execute(
+            ['sourceClass' => Order::class],
+            ['interactive' => false],
+        );
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('Source Class ' . Order::class, $display);
+        $this->assertStringContainsString(' time ' . OrderExplicitGroupingSetsSummary::class, $display);
+
+        // the change set keys that are not mapped are not shown
+
+        $this->assertStringNotContainsString(' item.category ' . OrderExplicitGroupingSetsSummary::class, $display);
+
+        // paths through an association are listed as untracked
+
+        $this->assertStringContainsString('Untracked Related Paths', $display);
+        $this->assertStringContainsString(' item.category item ' . OrderExplicitGroupingSetsSummary::class, $display);
+        $this->assertStringContainsString(' customer.country.region customer ', $display);
+
+        // the identity of a related entity does not change
+
+        $this->assertStringNotContainsString(' customer.* ', $display);
+    }
+
+    public function testDebugSourceOfSubclass(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
+        $exitCode = $tester->execute(
+            ['sourceClass' => IndividualCustomer::class],
+            ['interactive' => false],
+        );
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString(' gender ' . CustomerSummary::class, $display);
+        $this->assertStringContainsString(' country ' . CustomerSummary::class, $display);
+    }
+
+    public function testDebugSourceOfClassWithoutSummary(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
+        $exitCode = $tester->execute(
+            ['sourceClass' => Item::class],
+            ['interactive' => false],
+        );
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('No summary depends on this class.', $this->getDisplay($tester));
+    }
+
+    public function testDebugSourceWithoutClass(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:source');
+        $exitCode = $tester->execute([], ['interactive' => false]);
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('Source Class ' . Order::class, $display);
+        $this->assertStringContainsString('Source Class ' . Customer::class, $display);
     }
 
     private function createCommandTester(string $commandName): CommandTester
