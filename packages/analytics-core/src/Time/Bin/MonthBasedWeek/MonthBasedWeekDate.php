@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Time\Bin\MonthBasedWeek;
 
 use Doctrine\DBAL\Types\Types;
 use Rekalogika\Analytics\Contracts\Exception\BadMethodCallException;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -59,14 +60,26 @@ final class MonthBasedWeekDate implements MonotonicTimeBin
         $this->d = (int) substr($string, 7, 1); // Day of the week (1-7, where 1 is Monday)
 
         /** @var \DateTimeImmutable */
-        $start = (new \DateTimeImmutable())
+        $weekStart = (new \DateTimeImmutable())
             ->setTimezone($this->timeZone)
             ->setDate($this->y, $this->m, 1) // Start from the first day of the month
             ->setTime(0, 0, 0)
             ->modify('first thursday of this month') // Adjust to the first Thursday
             ->modify('previous monday') // Move to the Monday of the week
-            ->modify(\sprintf('+%d weeks', $this->w - 1)) // Move to the correct week
-            ->modify(\sprintf('+%d days', $this->d - 1)); // Move to the correct day
+            ->modify(\sprintf('+%d weeks', $this->w - 1)); // Move to the correct week
+
+        // The arithmetic silently overflows an invalid month, week or day,
+        // e.g. 20250251 into 2025-03-W1-1
+        if (
+            $this->d < 1
+            || $this->d > 7
+            || !MonthBasedWeekWeek::isWeekInMonth($weekStart, $this->y, $this->m)
+        ) {
+            throw new InvalidArgumentException(\sprintf('Invalid month based week date: %d', $this->databaseValue));
+        }
+
+        /** @var \DateTimeImmutable */
+        $start = $weekStart->modify(\sprintf('+%d days', $this->d - 1)); // Move to the correct day
 
         /** @var \DateTimeImmutable */
         $end = $start->modify('+1 day');
