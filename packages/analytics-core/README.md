@@ -100,6 +100,10 @@ class OrderSummary extends BaseSummary
 }
 ```
 
+The summary entity and its source entity must be managed by the same entity
+manager, because the summary table is refreshed with queries that read from
+the source table.
+
 Then query it using the `SummaryManager` service:
 
 ```php
