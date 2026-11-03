@@ -44,7 +44,8 @@ interface SummaryManager
      * @param int $batchSize The number of partitions to process in one unit
      * of work. It applies to every partition level: the lowest level is
      * refreshed in batches of this many partitions, then each upper level is
-     * rolled up in batches of this many partitions of that level.
+     * rolled up in batches of this many partitions of that level. Must be at
+     * least 1, otherwise an `InvalidArgumentException` is thrown.
      * @param string|null $resumeId The identifier of the batch to resume from,
      * as reported when a previous run was interrupted. Batches before it are
      * skipped.

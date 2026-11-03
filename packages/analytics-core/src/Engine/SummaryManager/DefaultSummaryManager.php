@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Engine\SummaryManager;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
@@ -55,6 +56,13 @@ final readonly class DefaultSummaryManager implements SummaryManager
         int $batchSize = 1,
         ?string $resumeId = null,
     ): void {
+        if ($batchSize < 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'Batch size must be at least 1, got %d.',
+                $batchSize,
+            ));
+        }
+
         // wait for the refresh agent if it is refreshing the same summary,
         // concurrent refreshes of the same partition produce duplicate rows
 
