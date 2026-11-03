@@ -3,8 +3,11 @@ import { visit } from '@hotwired/turbo'
 import Sortable from 'sortablejs'
 
 export default class extends Controller {
+    static targets = ['filterFrame']
+
     static values = {
         urlParameter: String,
+        frame: { type: String, default: 'turbo-frame' },
     }
 
     #animation = 150
@@ -84,24 +87,31 @@ export default class extends Controller {
     }
 
     beforeStreamRender(event) {
+        // only handle the stream targeting the filters frame of this panel
+        if (!this.hasFilterFrameTarget) {
+            return
+        }
+
+        const filterFrameId = this.filterFrameTarget.id
+        const target = event.detail.newStream?.getAttribute('target')
+
+        if (!filterFrameId || target !== filterFrameId) {
+            return
+        }
+
         const defaultActions = event.detail.render
 
         event.detail.render = (streamElement) => {
-            if (streamElement.getAttribute('target') === '__filters') {
-                let element = document.getElementById('__filters')
+            const element = this.hasFilterFrameTarget ? this.filterFrameTarget : null
 
-                if (!element || element.innerHTML.trim() === '') {
-                    console.log('No filters element found or it is empty, initializing filters')
-                    defaultActions(streamElement)
-                    return
-                }
-
-                if (this.changed === true) {
-                    this.changed = false
-                    element.innerHTML = streamElement.children[0].innerHTML
-                }
-            } else {
+            if (!element || element.innerHTML.trim() === '') {
                 defaultActions(streamElement)
+                return
+            }
+
+            if (this.changed === true) {
+                this.changed = false
+                element.innerHTML = streamElement.children[0].innerHTML
             }
         }
     }
@@ -145,15 +155,15 @@ export default class extends Controller {
         const filterElements = this.element.querySelectorAll('.filterelement')
 
         for (const filterElement of filterElements) {
-            let data = filterElement.data
+            let filterData = filterElement.data
 
-            if (!data) {
+            if (!filterData) {
                 continue
             }
 
-            let dimension = data.dimension
+            let dimension = filterData.dimension
 
-            filterExpressions[dimension] = data
+            filterExpressions[dimension] = filterData
         }
 
         // finishing
@@ -215,7 +225,7 @@ export default class extends Controller {
         if (this.urlParameterValue) {
             const url = new URL(window.location)
             url.searchParams.set(this.urlParameterValue, JSON.stringify(this.getData()))
-            visit(url.toString(), { 'frame': 'turbo-frame', 'action': 'advance' })
+            visit(url.toString(), { 'frame': this.frameValue, 'action': 'advance' })
         }
     }
 }

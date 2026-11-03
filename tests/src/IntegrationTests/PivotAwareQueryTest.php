@@ -22,6 +22,7 @@ use Rekalogika\Analytics\UX\PanelBundle\Filter\Choice\ChoiceFilter;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQuery;
 use Rekalogika\Analytics\UX\PanelBundle\PivotAwareQueryFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Twig\Environment;
 
 final class PivotAwareQueryTest extends KernelTestCase
 {
@@ -76,6 +77,55 @@ final class PivotAwareQueryTest extends KernelTestCase
         foreach ($filter->getChoices() as $choice) {
             $this->assertFalse($choice->isSelected());
         }
+    }
+
+    public function testRenderedControlHasStablePerPanelIds(): void
+    {
+        $query = $this->createPivotAwareQuery([]);
+
+        $twig = static::getContainer()->get('twig');
+        $this->assertInstanceOf(Environment::class, $twig);
+
+        $template = $twig->createTemplate('{{ analytics_render_control(query: query, urlParameter: urlParameter, target: "target") }}');
+
+        $render = static fn(string $urlParameter): string => $template
+            ->render(['query' => $query, 'urlParameter' => $urlParameter]);
+
+        $first = $render('parameters');
+
+        $this->assertSame($first, $render('parameters'));
+        $this->assertStringContainsString('<turbo-frame id="analytics-panel-parameters-frame">', $first);
+        $this->assertStringContainsString('<turbo-frame id="analytics-panel-parameters-filters"', $first);
+        $this->assertStringContainsString('target="analytics-panel-parameters-filters"', $first);
+        $this->assertStringContainsString('-frame-value="analytics-panel-parameters-frame"', $first);
+
+        $second = $render('other.panel');
+
+        $this->assertStringContainsString('<turbo-frame id="analytics-panel-other_2epanel-frame">', $second);
+        $this->assertStringNotContainsString('analytics-panel-parameters', $second);
+    }
+
+    public function testChoiceFilterIgnoresMalformedValues(): void
+    {
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+        ]);
+
+        $id = $this->getChoiceFilter($query, 'customerCountry')
+            ->getChoices()[0]
+            ->getId();
+
+        $query = $this->createPivotAwareQuery([
+            'filters' => ['customerCountry'],
+            'filterExpressions' => [
+                'customerCountry' => ['values' => [123, ['foo'], true, $id]],
+            ],
+        ]);
+
+        $filter = $this->getChoiceFilter($query, 'customerCountry');
+
+        $this->assertCount(1, $filter->getValues());
+        $this->assertInstanceOf(Comparison::class, $filter->createExpression());
     }
 
     public function testChoiceFilterKeepsKnownIdsAndExplicitNull(): void

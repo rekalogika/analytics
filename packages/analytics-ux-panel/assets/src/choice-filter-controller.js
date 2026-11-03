@@ -28,16 +28,18 @@ export default class extends Controller {
             }
         })
 
-        this.element.addEventListener('change', () => {
-            // change placeholder text based on selected options
-            this.updatePlaceholder()
-
-            // dispatch change event
-            this.element.data = this.getData()
-            this.dispatch('change', {})
-        })
+        this.element.addEventListener('change', this.#onChange)
 
         this.updatePlaceholder()
+    }
+
+    #onChange = () => {
+        // change placeholder text based on selected options
+        this.updatePlaceholder()
+
+        // dispatch change event
+        this.element.data = this.getData()
+        this.dispatch('change', {})
     }
 
     updatePlaceholder() {
@@ -64,6 +66,8 @@ export default class extends Controller {
     }
 
     disconnect() {
-        this.tomSelect.destroy()
+        this.element.removeEventListener('change', this.#onChange)
+        this.tomSelect?.destroy()
+        this.tomSelect = null
     }
 }
