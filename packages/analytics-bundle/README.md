@@ -94,6 +94,39 @@ rekalogika_analytics:
         # An upper-level partition is refreshed immediately after the
         # partitions below it, unless it has been refreshed within this period.
         upper_partition_cooldown: 300
+
+        # Used by the sweeper. A scheduled run of the refresh agent that is
+        # overdue by more than this is considered lost, and is dispatched again.
+        sweep_grace: 300
+```
+
+## Sweeper
+
+The refresh agent is dispatched after a flush that creates dirty flags. If
+the dispatched message is lost or ends up in the failure transport, or if the
+flags are created without a flush (e.g. by a database trigger), the dirty
+partitions wait until another flush dirties the same summary. The sweeper
+dispatches the refresh agent of every summary that has dirty flags but no
+pending run. Run it periodically, either with the
+`rekalogika:analytics:sweep` command, or with Symfony Scheduler:
+
+```php
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentSweepCommand;
+use Symfony\Component\Scheduler\Attribute\AsSchedule;
+use Symfony\Component\Scheduler\RecurringMessage;
+use Symfony\Component\Scheduler\Schedule;
+use Symfony\Component\Scheduler\ScheduleProviderInterface;
+
+#[AsSchedule('analytics')]
+final class AnalyticsSchedule implements ScheduleProviderInterface
+{
+    public function getSchedule(): Schedule
+    {
+        return (new Schedule())->add(
+            RecurringMessage::every('1 minute', new RefreshAgentSweepCommand()),
+        );
+    }
+}
 ```
 
 ## Console Commands
@@ -103,6 +136,8 @@ rekalogika_analytics:
 | `rekalogika:analytics:refresh` | Immediately refreshes all the dirty partitions of a summary table. |
 | `rekalogika:analytics:refresh:range` | Refreshes a range of source records, regardless of whether they are dirty. Usually run once after creating a summary table. Supports `--resume` and `--batchsize`. |
 | `rekalogika:analytics:truncate` | Truncates a summary table. |
+| `rekalogika:analytics:sweep` | Dispatches the refresh agent of the summaries that have dirty partitions but no pending run. See [Sweeper](#sweeper). |
+| `rekalogika:analytics:status` | Shows the refresh status of the summary tables: pending dirty flags, the next and the scheduled refresh, and the latest summarized key against the latest source key. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
 | `rekalogika:analytics:debug:source` | Shows which changes to a source class refresh its summaries, and which paths through related entities are not tracked. |
 | `rekalogika:analytics:uuid:summary-to-source` | Converts a UUIDv7 partition key in the summary table to the corresponding source value. |

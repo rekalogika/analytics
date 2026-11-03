@@ -17,6 +17,8 @@ use Rekalogika\Analytics\Bundle\Command\DebugSourceCommand;
 use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshRangeCommand;
+use Rekalogika\Analytics\Bundle\Command\StatusCommand;
+use Rekalogika\Analytics\Bundle\Command\SweepCommand;
 use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
@@ -30,12 +32,14 @@ use Rekalogika\Analytics\Contracts\Serialization\ValueSerializer;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesResolver;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
+use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentSweeper;
 use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Serialization\Mapper\DefaultCoordinatesMapper;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -113,6 +117,26 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
             '$managerRegistry' => service('doctrine'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.sweep')
+        ->class(SweepCommand::class)
+        ->args([
+            '$refreshAgentSweeper' => service('rekalogika.analytics.refresh.sweeper'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.status')
+        ->class(StatusCommand::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
         ])
         ->tag('console.command')
     ;
@@ -219,6 +243,21 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$refreshAgentLock' => service('rekalogika.analytics.engine.refresh.lock'),
             '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
             '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
+        ])
+        ->tag('messenger.message_handler', [
+            'method' => 'run',
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.refresh.sweeper')
+        ->class(RefreshAgentSweeper::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$refreshAgentRunner' => service('rekalogika.analytics.engine.refresh.runner'),
+            '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
+            '$grace' => param('rekalogika.analytics.refresh.sweep_grace'),
         ])
         ->tag('messenger.message_handler', [
             'method' => 'run',

@@ -48,6 +48,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters->set('rekalogika.analytics.refresh.minimum_idle_delay', 300);
     $parameters->set('rekalogika.analytics.refresh.maximum_age', 1800);
     $parameters->set('rekalogika.analytics.refresh.upper_partition_cooldown', 300);
+    $parameters->set('rekalogika.analytics.refresh.sweep_grace', 300);
 
     //
     // summary manager

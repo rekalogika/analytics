@@ -267,6 +267,44 @@ final readonly class DirtyFlagsHandler
     }
 
     /**
+     * Counts the dirty flags per level, with the time of the earliest flag of
+     * each level. The level is null for the flags of new records. Ordered by
+     * level, the flags of new records first.
+     *
+     * @return list<array{level:int|null,count:int,earliest:\DateTimeImmutable}>
+     */
+    public function getDirtyFlagCounts(): array
+    {
+        /** @var list<array{level:int|string|null,count:int|string,earliest:string}> */
+        $result = $this->entityManager->createQueryBuilder()
+            ->select('df.level AS level')
+            ->addSelect('COUNT(df.id) AS count')
+            ->addSelect('MIN(df.created) AS earliest')
+            ->from(DirtyFlag::class, 'df')
+            ->where('df.class = :class')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->groupBy('df.level')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = array_map(
+            static fn(array $row): array => [
+                'level' => $row['level'] === null ? null : (int) $row['level'],
+                'count' => (int) $row['count'],
+                'earliest' => new \DateTimeImmutable($row['earliest']),
+            ],
+            $result,
+        );
+
+        usort(
+            $counts,
+            static fn(array $a, array $b): int => ($a['level'] ?? -1) <=> ($b['level'] ?? -1),
+        );
+
+        return $counts;
+    }
+
+    /**
      * Gets the earliest time one of the remaining dirty partitions will be
      * ready to be refreshed, assuming no more changes are made to the source.
      * Returns null if there are no dirty flags.

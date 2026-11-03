@@ -129,6 +129,13 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
             'An upper-level partition is refreshed immediately after the partitions below it, unless it has been refreshed within this period.',
         );
 
+        $this->addDurationNode(
+            $refresh,
+            'sweep_grace',
+            300,
+            'Used by the sweeper. A scheduled run of the refresh agent that is overdue by more than this is considered lost, and is dispatched again.',
+        );
+
         $refreshLock = $root->children()->arrayNode('refresh_lock')
             ->addDefaultsIfNotSet()
             ->info('The lock that prevents concurrent refreshes of the same summary. By default, PostgreSQL advisory locks on the connection of the summary.')
