@@ -27,6 +27,8 @@ use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
+use Rekalogika\Analytics\Engine\Trigger\TriggerInstaller;
+use Rekalogika\Analytics\Engine\Trigger\TriggerSqlGenerator;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -199,6 +201,24 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ])
         ->tag('monolog.logger', [
             'channel' => 'rekalogika.analytics',
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.engine.trigger.sql_generator')
+        ->class(TriggerSqlGenerator::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
+            '$managerRegistry' => service('doctrine'),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.engine.trigger.installer')
+        ->class(TriggerInstaller::class)
+        ->args([
+            '$generator' => service('rekalogika.analytics.engine.trigger.sql_generator'),
         ])
     ;
 
