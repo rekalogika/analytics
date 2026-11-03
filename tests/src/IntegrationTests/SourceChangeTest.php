@@ -494,6 +494,81 @@ final class SourceChangeTest extends KernelTestCase
     }
 
     /**
+     * If the latest summarized key is in the last child of an upper
+     * partition, queries read the upper partition. A change in an earlier
+     * child of the upper partition must be propagated up to it.
+     */
+    public function testModificationInEarlierChildOfPartiallyCoveredUpperPartition(): void
+    {
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $refresherFactory = static::getContainer()
+            ->get('rekalogika.analytics.summary_refresher_factory');
+
+        $this->assertInstanceOf(SummaryRefresherFactory::class, $refresherFactory);
+
+        $strategy = new DefaultRefreshAgentStrategy(
+            minimumAge: null,
+            minimumIdleDelay: null,
+            maximumAge: null,
+            upperPartitionCooldown: null,
+        );
+
+        // the lowest partitions of TestIntegerPartition contain 4 records,
+        // and the upper partitions contain 4 partitions of the level below.
+        // a new order with id 204 moves the latest key to [204, 208), the
+        // last child of the second level partition [192, 208). queries then
+        // read [192, 208) instead of its children.
+
+        static::getContainer()
+            ->get(Connection::class)
+            ->executeStatement("SELECT setval(pg_get_serial_sequence('order', 'id'), 203)");
+
+        $item = $entityManager
+            ->getRepository(Item::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Item not found');
+
+        $customer = $entityManager
+            ->getRepository(Customer::class)
+            ->findOneBy([])
+            ?? throw new \RuntimeException('Customer not found');
+
+        $time = new \DateTimeImmutable('2024-06-01 00:00:00');
+
+        $order = new Order();
+        $order->setItem($item);
+        $order->setCustomer($customer);
+        $order->setTime($time);
+        $order->setShipped($time->modify('+3 days'));
+
+        $entityManager->persist($order);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $this->assertSame(204, $order->getId());
+
+        $refresherFactory
+            ->createSummaryRefresher(OrderSummary::class)
+            ->refresh($strategy);
+
+        $this->assertEquals(0, $this->getOrderCountIn2030());
+
+        // modify order 194, in [192, 196), an earlier child of [192, 208)
+
+        $this->modifyOrderTime(194, new \DateTimeImmutable('2030-02-01 00:00:00'));
+
+        $refresherFactory
+            ->createSummaryRefresher(OrderSummary::class)
+            ->refresh($strategy);
+
+        $this->assertEquals(1, $this->getOrderCountIn2030());
+    }
+
+    /**
      * A manual refresh without a range must process a single new record, even
      * if the computed start and end are the same key.
      */

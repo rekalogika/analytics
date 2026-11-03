@@ -532,11 +532,17 @@ final class SummaryRefresher
             return $upperPartition->getUpperBound() === $partition->getUpperBound();
         }
 
-        // if upper partition's upper bound is greater than latest key in
-        // summary, then it is not necessary to mark the upper partition as
-        // dirty
+        // queries read the upper partition if the lowest partition containing
+        // the latest key is its last descendant, or comes after it. see
+        // PartitionExpressionResolver. otherwise, it is not necessary to mark
+        // the upper partition as dirty
 
-        return $upperPartition->getUpperBound() <= $summaryLatestValue;
+        $latestPartition = $partition::createFromSourceValue(
+            $summaryLatestValue,
+            PartitionUtil::getLowestLevel($partition::class),
+        );
+
+        return $upperPartition->getUpperBound() <= $latestPartition->getUpperBound();
     }
 
     private function deleteSummaryRange(PartitionRange $range): void
