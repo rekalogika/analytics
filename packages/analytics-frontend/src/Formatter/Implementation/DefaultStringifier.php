@@ -48,8 +48,9 @@ final readonly class DefaultStringifier implements Stringifier
             return '-';
         }
 
+        // Do not leak internal class names to the user interface.
         if (\is_object($input)) {
-            return \sprintf('%s:%s', $input::class, spl_object_id($input));
+            return 'object';
         }
 
         return get_debug_type($input);
