@@ -193,7 +193,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set('rekalogika.analytics.bundle.refresh.dispatcher')
         ->class(SymfonyRefreshAgentDispatcher::class)
         ->args([
-            '$messageBus' => service('messenger.bus.default'),
+            '$messageBus' => service('messenger.default_bus'),
         ])
     ;
 

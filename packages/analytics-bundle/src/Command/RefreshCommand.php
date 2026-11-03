@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Bundle\Command;
 
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
-use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentLock;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
@@ -60,26 +59,36 @@ final class RefreshCommand extends Command
 
         $this->refreshCommandOutputEventSubscriber->initialize($this->io);
 
-        $class = $input->getArgument('class') ?? $this->io->choice(
-            question: 'Please select the summary class to refresh',
-            choices: $this->summaryMetadataFactory->getSummaryClasses(),
-            default: null,
-        );
+        /** @var mixed */
+        $class = $input->getArgument('class');
 
-        /** @psalm-suppress TypeDoesNotContainType */
+        if ($class === null) {
+            if (!$input->isInteractive()) {
+                $this->io->error('The "class" argument is required in non-interactive mode.');
+
+                return Command::FAILURE;
+            }
+
+            /** @var mixed */
+            $class = $this->io->choice(
+                question: 'Please select the summary class to refresh',
+                choices: $this->summaryMetadataFactory->getSummaryClasses(),
+            );
+        }
+
         if (!\is_string($class)) {
-            throw new UnexpectedValueException(\sprintf(
+            $this->io->error(\sprintf(
                 'Class name must be a string, got "%s".',
                 get_debug_type($class),
             ));
+
+            return Command::FAILURE;
         }
 
-        /** @psalm-suppress TypeDoesNotContainType */
         if (!class_exists($class)) {
-            throw new UnexpectedValueException(\sprintf(
-                'Class "%s" not found.',
-                $class,
-            ));
+            $this->io->error(\sprintf('Class "%s" not found.', $class));
+
+            return Command::FAILURE;
         }
 
         $strategy = new DefaultRefreshAgentStrategy(
