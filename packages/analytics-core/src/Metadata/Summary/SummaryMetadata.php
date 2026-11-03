@@ -79,6 +79,14 @@ final readonly class SummaryMetadata
      */
     private array $involvedSourceProperties;
 
+    /**
+     * The property paths of the source class that influence this summary, as
+     * declared.
+     *
+     * @var list<string>
+     */
+    private array $involvedSourcePaths;
+
     private GroupBy $groupByExpression;
 
     /**
@@ -97,6 +105,8 @@ final readonly class SummaryMetadata
      * @param GroupingStrategy|null $groupingStrategy The grouping strategy of
      * the root dimensions. If null, the summary stores the cube of all the
      * root dimensions.
+     * @param bool $trackAssociations Whether a change to a related entity
+     * refreshes the source entities that refer to it.
      * @throws MetadataException If the grouping strategy is invalid or
      * produces no grouping set.
      */
@@ -110,6 +120,7 @@ final readonly class SummaryMetadata
         private AttributeCollection $attributes,
         private TranslatableInterface $label,
         ?GroupingStrategy $groupingStrategy = null,
+        private bool $trackAssociations = true,
     ) {
         $allProperties = [];
 
@@ -194,6 +205,7 @@ final readonly class SummaryMetadata
         // the partition is included, a change to the partitioning key moves
         // the source entity to another partition
 
+        $paths = [];
         $properties = [];
         $involvedMetadata = [
             ...$this->rootDimensions,
@@ -203,6 +215,7 @@ final readonly class SummaryMetadata
 
         foreach ($involvedMetadata as $propertyMetadata) {
             foreach ($propertyMetadata->getInvolvedSourceProperties() as $property) {
+                $paths[] = trim($property);
                 $properties = [
                     ...$properties,
                     ...InvolvedPropertyUtil::getChangeSetKeys($property),
@@ -210,6 +223,7 @@ final readonly class SummaryMetadata
             }
         }
 
+        $this->involvedSourcePaths = array_values(array_unique($paths));
         $this->involvedSourceProperties = array_values(array_unique($properties));
 
         //
@@ -522,6 +536,29 @@ final readonly class SummaryMetadata
     public function getInvolvedSourceProperties(): array
     {
         return $this->involvedSourceProperties;
+    }
+
+    /**
+     * The property paths of the source class that influence this summary, as
+     * declared by the value resolvers and aggregate functions of the
+     * dimensions and measures, and by the partition, e.g. `customer.country`.
+     * Unlike `getInvolvedSourceProperties()`, they are not converted to change
+     * set keys.
+     *
+     * @return list<string>
+     */
+    public function getInvolvedSourcePaths(): array
+    {
+        return $this->involvedSourcePaths;
+    }
+
+    /**
+     * Whether a change to a related entity read through an association
+     * refreshes the source entities that refer to it.
+     */
+    public function isTrackAssociations(): bool
+    {
+        return $this->trackAssociations;
     }
 
     //

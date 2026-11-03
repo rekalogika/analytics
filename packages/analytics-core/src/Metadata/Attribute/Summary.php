@@ -50,11 +50,17 @@ final readonly class Summary
      * determines which grouping sets of the root dimensions are stored in the
      * summary table. If null, the summary stores the cube of all the root
      * dimensions, i.e. every combination of every root dimension.
+     * @param bool $trackAssociations Whether a change to a related entity
+     * read through an association, e.g. `category` of the `Item` in
+     * `item.category`, refreshes the source entities that refer to it. Set to
+     * false if the related entities change often and refer to many source
+     * entities, and use `SummaryManager::markDirty()` where needed instead.
      */
     public function __construct(
         private string $sourceClass,
         private null|string|TranslatableInterface $label = null,
         private ?GroupingStrategy $groupingStrategy = null,
+        private bool $trackAssociations = true,
     ) {}
 
     /**
@@ -82,5 +88,14 @@ final readonly class Summary
     public function getGroupingStrategy(): ?GroupingStrategy
     {
         return $this->groupingStrategy;
+    }
+
+    /**
+     * Whether a change to a related entity refreshes the source entities that
+     * refer to it.
+     */
+    public function isTrackAssociations(): bool
+    {
+        return $this->trackAssociations;
     }
 }

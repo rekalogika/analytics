@@ -15,9 +15,10 @@ namespace Rekalogika\Analytics\Metadata\Source;
 
 /**
  * Metadata of a source entity class: which summary classes depend on it, and
- * through which of its properties. The refresh engine uses it to decide which
- * summaries to mark as outdated when an entity is created, updated, or
- * deleted.
+ * through which of its properties. Also, which summaries of other classes
+ * read its properties through an association. The refresh engine uses it to
+ * decide which summaries to mark as outdated when an entity is created,
+ * updated, or deleted.
  */
 final readonly class SourceMetadata
 {
@@ -31,10 +32,14 @@ final readonly class SourceMetadata
      * @param array<string,list<class-string>> $propertyToSummaryClasses For
      * each property of the source, the summary classes whose values depend on
      * it.
+     * @param array<string,list<AssociationDependency>> $propertyToAssociationDependencies
+     * For each property of the class, the summaries of other classes that
+     * read it through an association.
      */
     public function __construct(
         private string $class,
         private array $propertyToSummaryClasses,
+        private array $propertyToAssociationDependencies = [],
     ) {
         $allInvolvedSummaryClasses = [];
 
@@ -103,5 +108,52 @@ final readonly class SourceMetadata
     public function getAllInvolvedSummaryClasses(): array
     {
         return $this->allInvolvedSummaryClasses;
+    }
+
+    /**
+     * For each property of the class, the summaries of other classes that
+     * read it through an association. These summaries are not summaries of
+     * this class, and are not returned by the other methods.
+     *
+     * @return array<string,list<AssociationDependency>>
+     */
+    public function getPropertyToAssociationDependencies(): array
+    {
+        return $this->propertyToAssociationDependencies;
+    }
+
+    /**
+     * Returns the association dependencies affected by a change to the given
+     * properties of an entity of this class.
+     *
+     * @param list<string> $changedProperties
+     * @return list<AssociationDependency>
+     */
+    public function getAssociationDependenciesByChangedProperties(
+        array $changedProperties,
+    ): array {
+        $dependencies = [];
+
+        foreach ($changedProperties as $changedProperty) {
+            foreach ($this->propertyToAssociationDependencies[$changedProperty] ?? [] as $dependency) {
+                $dependencies[$dependency->getSignature()] = $dependency;
+            }
+        }
+
+        return array_values($dependencies);
+    }
+
+    /**
+     * Returns every association dependency of this class. Used when an
+     * entity of this class is deleted, which affects every source entity that
+     * refers to it.
+     *
+     * @return list<AssociationDependency>
+     */
+    public function getAllAssociationDependencies(): array
+    {
+        return $this->getAssociationDependenciesByChangedProperties(
+            array_keys($this->propertyToAssociationDependencies),
+        );
     }
 }
