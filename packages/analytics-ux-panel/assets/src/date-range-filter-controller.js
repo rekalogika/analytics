@@ -21,17 +21,22 @@ export default class extends Controller {
                 .then((module) => {
                     const lang = module.default.default[this.lang]
 
-                    this.initialize(lang)
+                    this.#initFlatpickr(lang)
                 })
                 .catch((error) => {
-                    this.initialize(null)
+                    this.#initFlatpickr(null)
                 })
         } else {
-            this.initialize(null)
+            this.#initFlatpickr(null)
         }
     }
 
-    initialize(lang) {
+    #onChange = () => {
+        this.element.data = this.getData()
+        this.dispatch('change', {})
+    }
+
+    #initFlatpickr(lang) {
         let options = {
             mode: 'range',
             allowInput: true,
@@ -51,10 +56,7 @@ export default class extends Controller {
 
         this.flatpickr = flatpickr(this.element, options)
 
-        this.element.addEventListener('change', () => {
-            this.element.data = this.getData()
-            this.dispatch('change', {})
-        })
+        this.element.addEventListener('change', this.#onChange)
     }
 
     getData() {
@@ -74,6 +76,7 @@ export default class extends Controller {
     }
 
     disconnect() {
+        this.element.removeEventListener('change', this.#onChange)
         this.flatpickr.destroy()
     }
 }
