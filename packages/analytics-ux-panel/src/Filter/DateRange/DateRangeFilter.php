@@ -177,13 +177,22 @@ final class DateRangeFilter implements Filter
         $start = $this->getStart();
         $end = $this->getEnd();
 
-        if ($start === null || $end === null) {
+        // one-sided ranges are applied as a single bound
+        if ($start === null && $end === null) {
             return null;
         }
 
+        if ($end === null) {
+            return Criteria::expr()->gte($this->dimension, $start);
+        }
+
+        if ($start === null) {
+            return Criteria::expr()->lte($this->dimension, $end);
+        }
+
         return Criteria::expr()->andX(
-            Criteria::expr()->gte($this->dimension, $this->getStart()),
-            Criteria::expr()->lte($this->dimension, $this->getEnd()),
+            Criteria::expr()->gte($this->dimension, $start),
+            Criteria::expr()->lte($this->dimension, $end),
         );
     }
 }

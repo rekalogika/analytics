@@ -1,5 +1,6 @@
 {%- block filter -%}
-    <input type="text"
+    <input id="{{ filter.dimension }}-{{ id }}"
+           type="text"
            value="{{ filter.value }}"
            placeholder="{{ t('(All)', domain = 'rekalogika_analytics') |trans }}"
            aria-label="{{ filter.label |trans }}"

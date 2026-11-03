@@ -1,5 +1,6 @@
 {%- block filter -%}
-    <input type="text"
+    <input id="{{ filter.dimension }}-{{ id }}"
+           type="text"
            value="{{ filter.rawValue }}"
            data-start="{{ filter.rawStart }}"
            data-end="{{ filter.rawEnd }}"

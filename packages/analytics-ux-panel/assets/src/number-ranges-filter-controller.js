@@ -8,10 +8,16 @@ export default class extends Controller {
 
         this.element.data = this.getData()
 
-        this.element.addEventListener('change', () => {
-            this.element.data = this.getData()
-            this.dispatch('change', {})
-        })
+        this.element.addEventListener('change', this.#onChange)
+    }
+
+    #onChange = () => {
+        this.element.data = this.getData()
+        this.dispatch('change', {})
+    }
+
+    disconnect() {
+        this.element.removeEventListener('change', this.#onChange)
     }
 
     getData() {
