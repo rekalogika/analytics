@@ -15,28 +15,11 @@ namespace Rekalogika\Analytics\Tests\App;
 
 use Composer\InstalledVersions;
 use Composer\Semver\VersionParser;
-use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
-use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
-use Rekalogika\Analytics\Bundle\RekalogikaAnalyticsBundle;
-use Rekalogika\Analytics\UX\PanelBundle\RekalogikaPanelBundle;
-use Symfony\Bundle\DebugBundle\DebugBundle;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Bundle\MakerBundle\MakerBundle;
-use Symfony\Bundle\MonologBundle\MonologBundle;
-use Symfony\Bundle\TwigBundle\TwigBundle;
-use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
-use Symfony\UX\Chartjs\ChartjsBundle;
-use Symfony\UX\StimulusBundle\StimulusBundle;
-use Symfony\UX\Turbo\TurboBundle;
-use Zenstruck\Foundry\ZenstruckFoundryBundle;
-use Zenstruck\Messenger\Test\ZenstruckMessengerTestBundle;
 
 final class Kernel extends BaseKernel
 {
@@ -73,28 +56,6 @@ final class Kernel extends BaseKernel
                     ->setArgument(0, \dirname(__DIR__, 3));
             }
         });
-    }
-
-    #[\Override]
-    public function registerBundles(): iterable
-    {
-        yield new FrameworkBundle();
-        yield new DebugBundle();
-        yield new DoctrineBundle();
-        yield new TwigBundle();
-        yield new WebProfilerBundle();
-        yield new DoctrineFixturesBundle();
-        yield new ZenstruckFoundryBundle();
-        yield new MakerBundle();
-        yield new MonologBundle();
-        yield new StimulusBundle();
-        yield new RekalogikaAnalyticsBundle();
-        yield new TurboBundle();
-        yield new DAMADoctrineTestBundle();
-        yield new ZenstruckMessengerTestBundle();
-        yield new ChartjsBundle();
-        yield new DoctrineMigrationsBundle();
-        yield new RekalogikaPanelBundle();
     }
 
     #[\Override]
