@@ -24,9 +24,11 @@ use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
 use Rekalogika\Analytics\Engine\RefreshAgent\DefaultRefreshAgentStrategy;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Event\NewDirtyFlagEvent;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
+use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
 use Rekalogika\Analytics\Tests\App\Entity\Gender;
+use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistory;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
@@ -37,6 +39,7 @@ use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
+use Symfony\Component\Uid\UuidV7;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 final class SourceChangeTest extends KernelTestCase
@@ -818,5 +821,136 @@ final class SourceChangeTest extends KernelTestCase
         $this->assertSame(CustomerSummary::class, $dirtyFlags[0]->getClass());
         $this->assertSame($upperPartition->getLevel(), $dirtyFlags[0]->getLevel());
         $this->assertSame($upperPartition->getKey(), $dirtyFlags[0]->getKey());
+    }
+
+    private function getCustomerCount(?Country $country = null): int
+    {
+        $summaryManager = static::getContainer()
+            ->get(SummaryManager::class);
+
+        $query = $summaryManager->createQuery()
+            ->from(CustomerSummary::class);
+
+        if ($country === null) {
+            $count = $query->getResult()->getMeasures()->get('count')?->getValue();
+        } else {
+            $id = $country->getId();
+
+            /** @psalm-suppress MixedAssignment */
+            $count = $query
+                ->withDimensions('country')
+                ->getResult()
+                ->find(
+                    'country',
+                    static fn(mixed $member): bool => $member instanceof Country
+                        && $member->getId() === $id,
+                )
+                ?->getMeasures()
+                ->get('count')
+                ?->getValue() ?? 0;
+        }
+
+        $this->assertIsInt($count);
+
+        return $count;
+    }
+
+    /**
+     * Runs the refresh agent of CustomerSummary from the time a customer is
+     * modified.
+     */
+    private function runCustomerSummaryRefreshAgent(ClockInterface $clock): void
+    {
+        $transport = $this->transport('async');
+        $transport->process();
+        $transport->queue()->assertCount(1);
+
+        $this->travel($clock, 600);
+        $transport->process();
+        $transport->queue()->assertCount(0);
+    }
+
+    /**
+     * Queries at the top level read the highest-level partitions. A change in
+     * an old partition of a UUID-partitioned summary must propagate up to
+     * them after the refresh agent runs.
+     */
+    public function testUuidPartitionModificationInOldPartitionReachesTopLevel(): void
+    {
+        $clock = self::mockTime();
+        $this->clearRefreshState();
+
+        $entityManager = static::getContainer()
+            ->get(EntityManagerInterface::class);
+
+        $countries = $entityManager
+            ->getRepository(Country::class)
+            ->findBy([], ['id' => 'ASC'], 2);
+
+        $country1 = $countries[0] ?? throw new \RuntimeException('Country not found');
+        $country2 = $countries[1] ?? throw new \RuntimeException('Country not found');
+
+        $initialCount = $this->getCustomerCount();
+        $initialCount1 = $this->getCustomerCount($country1);
+        $initialCount2 = $this->getCustomerCount($country2);
+
+        // a customer in the first lowest-level partition of the level-27
+        // partition containing 2020-01-01, well before the latest summarized
+        // customer. the partition is not the last child of its containing
+        // partition
+
+        $milliseconds = intdiv(1577836800000, 1 << 27) * (1 << 27) + 1000;
+        $time = \DateTimeImmutable::createFromFormat('U.v', \sprintf('%d.%03d', intdiv($milliseconds, 1000), $milliseconds % 1000))
+            ?: throw new \RuntimeException('Invalid time');
+
+        $customer = new IndividualCustomer();
+        $customer->setName('Old Customer');
+        $customer->setCountry($country1);
+        $customer->setAge(30);
+        $customer->setGender(Gender::Female);
+
+        new \ReflectionProperty(Customer::class, 'id')
+            ->setValue($customer, UuidV7::generate($time));
+
+        $partition = $this->getHandlerFactory()
+            ->getSummary(CustomerSummary::class)
+            ->getPartition()
+            ->getLowestPartitionFromEntity($customer);
+
+        $upperPartition = $partition->getContaining();
+        $this->assertNotNull($upperPartition);
+        $this->assertNotSame($upperPartition->getUpperBound(), $partition->getUpperBound());
+
+        $entityManager->persist($customer);
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $this->runCustomerSummaryRefreshAgent($clock);
+
+        $this->assertSame($initialCount + 1, $this->getCustomerCount());
+        $this->assertSame($initialCount1 + 1, $this->getCustomerCount($country1));
+        $this->assertSame($initialCount2, $this->getCustomerCount($country2));
+
+        // later, move the customer to the other country. the upper partitions
+        // are past their cooldown period by then
+
+        $this->travel($clock, 1000);
+
+        $customer = $entityManager->find(Customer::class, $customer->getId()->toRfc4122())
+            ?? throw new \RuntimeException('Customer not found');
+
+        $customer->setCountry(
+            $entityManager->find(Country::class, $country2->getId())
+                ?? throw new \RuntimeException('Country not found'),
+        );
+
+        $entityManager->flush();
+        $entityManager->clear();
+
+        $this->runCustomerSummaryRefreshAgent($clock);
+
+        $this->assertSame($initialCount + 1, $this->getCustomerCount());
+        $this->assertSame($initialCount1, $this->getCustomerCount($country1));
+        $this->assertSame($initialCount2 + 1, $this->getCustomerCount($country2));
     }
 }
