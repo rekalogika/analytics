@@ -681,6 +681,27 @@ final class QueryTest extends KernelTestCase
         $this->assertNull($count);
     }
 
+    public function testWhereWithEmptyNotIn(): void
+    {
+        $result = $this->getQuery()
+            ->dice(Criteria::expr()->notIn(
+                'customerGender',
+                [],
+            ))
+            ->getResult();
+
+        $count = $result->find('@values', 'count')?->getMeasure()?->getValue();
+        $this->assertIsInt($count);
+
+        /** @psalm-suppress MixedAssignment */
+        $unfilteredCount = $this->getQuery()
+            ->getResult()
+            ->find('@values', 'count')?->getMeasure()?->getValue();
+
+        $this->assertIsInt($unfilteredCount);
+        $this->assertSame($unfilteredCount, $count);
+    }
+
     public function testDice(): void
     {
         $result = $this->getQuery()->getResult();
