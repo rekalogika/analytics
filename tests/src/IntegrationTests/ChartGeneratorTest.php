@@ -18,9 +18,15 @@ use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
+use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
+use Rekalogika\Analytics\Frontend\Chart\Implementation\DefaultChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\UnsupportedData;
+use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
+use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Translation\LocaleSwitcher;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
 final class ChartGeneratorTest extends KernelTestCase
@@ -272,6 +278,86 @@ final class ChartGeneratorTest extends KernelTestCase
         $this->expectException(UnsupportedData::class);
 
         $this->createChart($dimensions, $measures, $chartType);
+    }
+
+    /**
+     * @return iterable<string,array{list<string>,ChartType}>
+     */
+    public static function provideNonFiniteValue(): iterable
+    {
+        yield 'bar' => [['customerCountry'], ChartType::Bar];
+        yield 'line' => [['time.civil.month.month'], ChartType::Line];
+        yield 'pie' => [['customerCountry'], ChartType::Pie];
+        yield 'grouped bar' => [['customerCountry', 'customerGender'], ChartType::GroupedBar];
+    }
+
+    /**
+     * @param list<string> $dimensions
+     */
+    #[DataProvider('provideNonFiniteValue')]
+    public function testNonFiniteValueIsNull(
+        array $dimensions,
+        ChartType $chartType,
+    ): void {
+        $container = static::getContainer();
+
+        $numberifier = new class implements Numberifier {
+            /**
+             * @var list<int|float>
+             */
+            private array $values = [];
+
+            #[\Override]
+            public function toNumber(mixed $input): int|float
+            {
+                if ($this->values === []) {
+                    $this->values = [\INF, -\INF, \NAN, 1.5, 2];
+                }
+
+                return array_shift($this->values);
+            }
+        };
+
+        $chartGenerator = new DefaultChartGenerator(
+            localeSwitcher: $container->get(LocaleSwitcher::class),
+            chartBuilder: $container->get(ChartBuilderInterface::class),
+            stringifier: $container->get(Stringifier::class),
+            configurationFactory: $container->get(ChartConfigurationFactory::class),
+            numberifier: $numberifier,
+        );
+
+        $result = $container
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions(...$dimensions)
+            ->getResult();
+
+        $chart = $chartGenerator->createChart(
+            cube: $result,
+            dimensions: $dimensions,
+            measures: ['count'],
+            chartType: $chartType,
+        );
+
+        /** @var array{datasets:list<array{data:list<mixed>}>} */
+        $data = $chart->getData();
+        $values = array_merge(...array_map(
+            static fn(array $dataSet): array => $dataSet['data'],
+            $data['datasets'],
+        ));
+
+        $this->assertGreaterThanOrEqual(5, \count($values));
+        $this->assertContains(null, $values);
+        $this->assertContains(1.5, $values);
+
+        foreach ($values as $value) {
+            $this->assertTrue(
+                $value === null || \is_int($value) || (\is_float($value) && is_finite($value)),
+            );
+        }
+
+        json_encode($chart->getData(), \JSON_THROW_ON_ERROR);
     }
 
     private function getYTitle(Chart $chart): ?string

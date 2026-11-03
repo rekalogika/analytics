@@ -70,6 +70,47 @@ final readonly class PartitionHandler
         /** @psalm-suppress MixedAssignment */
         $sourceValue = $this->propertyAccessor->getValue($entity, $this->getSourceProperty());
 
+        return $this->tryCreateLowestPartitionFromSourceValue($sourceValue);
+    }
+
+    /**
+     * Determines the lowest partition from the value the partitioning key of
+     * an entity had before it was modified. Returns null if the partitioning
+     * key is not modified, or if its previous value is null.
+     *
+     * @param array<string,mixed> $originalValues The values of the modified
+     * properties of the entity before the modification, keyed by the property
+     * name.
+     */
+    public function tryGetOriginalLowestPartition(array $originalValues): ?Partition
+    {
+        // the source property can be a property path, e.g. `customer.id`, in
+        // which case the modified property is the first element of the path
+
+        $path = explode('.', $this->getSourceProperty(), 2);
+
+        if (!\array_key_exists($path[0], $originalValues)) {
+            return null;
+        }
+
+        /** @psalm-suppress MixedAssignment */
+        $sourceValue = $originalValues[$path[0]];
+
+        if (isset($path[1])) {
+            if (!\is_object($sourceValue) && !\is_array($sourceValue)) {
+                return null;
+            }
+
+            /** @psalm-suppress MixedAssignment */
+            $sourceValue = $this->propertyAccessor->getValue($sourceValue, $path[1]);
+        }
+
+        return $this->tryCreateLowestPartitionFromSourceValue($sourceValue);
+    }
+
+    private function tryCreateLowestPartitionFromSourceValue(
+        mixed $sourceValue,
+    ): ?Partition {
         if ($sourceValue === null) {
             return null;
         }

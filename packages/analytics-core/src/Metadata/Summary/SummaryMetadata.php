@@ -190,14 +190,18 @@ final readonly class SummaryMetadata
         // involved properties
         //
 
+        // the partition is included, a change to the partitioning key moves
+        // the source entity to another partition
+
         $properties = [];
-        $dimensionsAndMeasures = [
+        $involvedMetadata = [
             ...$this->rootDimensions,
             ...$this->measures,
+            $this->partition,
         ];
 
-        foreach ($dimensionsAndMeasures as $dimensionOrMeasure) {
-            foreach ($dimensionOrMeasure->getInvolvedSourceProperties() as $property) {
+        foreach ($involvedMetadata as $propertyMetadata) {
+            foreach ($propertyMetadata->getInvolvedSourceProperties() as $property) {
                 // normalize property
                 // - remove everything after dot
                 $property = explode('.', $property)[0];

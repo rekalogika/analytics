@@ -96,22 +96,39 @@ final readonly class SourceHandler
     }
 
     /**
+     * Generates the dirty flags of the partitions affected by a modification
+     * of an entity. If the partitioning key is modified, the entity moves to
+     * another partition, and the partition it was in before the modification
+     * is also flagged.
+     *
      * @param list<string> $modifiedProperties
+     * @param array<string,mixed> $originalValues The values of the modified
+     * properties before the modification, keyed by the property name. A
+     * modified property without an original value is assumed not to change
+     * the partition of the entity.
      * @return iterable<DirtyFlag>
      */
     public function generateDirtyFlagsForEntityModification(
         object $entity,
         array $modifiedProperties,
+        array $originalValues = [],
     ): iterable {
         $summaryClasses = $this->sourceMetadata
             ->getInvolvedSummaryClassesByChangedProperties($modifiedProperties);
 
         foreach ($summaryClasses as $summaryClass) {
-            $dirtyFlagHandler = $this->handlerFactory
-                ->getSummary($summaryClass)
-                ->getDirtyFlags();
+            $summaryHandler = $this->handlerFactory->getSummary($summaryClass);
+            $dirtyFlagHandler = $summaryHandler->getDirtyFlags();
 
             yield $dirtyFlagHandler->createDirtyFlagForSourceEntity($entity);
+
+            $originalPartition = $summaryHandler
+                ->getPartition()
+                ->tryGetOriginalLowestPartition($originalValues);
+
+            if ($originalPartition !== null) {
+                yield $dirtyFlagHandler->createDirtyFlagForPartition($originalPartition);
+            }
         }
     }
 }

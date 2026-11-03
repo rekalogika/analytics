@@ -89,8 +89,9 @@ final class ChoiceFilter implements Filter
                 continue;
             }
 
+            // the input is user-controlled, ignore malformed values
             if (!\is_string($v)) {
-                throw new InvalidArgumentException('Invalid input value');
+                continue;
             }
 
             /** @psalm-suppress MixedAssignment */

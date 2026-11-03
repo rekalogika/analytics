@@ -85,11 +85,21 @@ abstract class IntegerPartition implements Partition, \Stringable
     #[\Override]
     public static function createFromSourceValue(mixed $source, int $level): static
     {
-        if (!is_numeric($source)) {
-            throw new InvalidArgumentException(\sprintf('Source value must be an integer. Got: "%s"', get_debug_type($source)));
+        // accepts integers, and strings and floats representing integers, a
+        // fractional value or a value out of the integer range is rejected
+
+        $integerSource = \is_int($source) || \is_string($source) || \is_float($source)
+            ? filter_var($source, FILTER_VALIDATE_INT)
+            : false;
+
+        if ($integerSource === false) {
+            throw new InvalidArgumentException(\sprintf(
+                'Source value must be an integer. Got: "%s"',
+                \is_scalar($source) ? (string) $source : get_debug_type($source),
+            ));
         }
 
-        $source = (int) $source;
+        $source = $integerSource;
 
         if (!\in_array($level, static::getAllLevels(), true)) {
             throw new InvalidArgumentException(\sprintf(
@@ -111,10 +121,28 @@ abstract class IntegerPartition implements Partition, \Stringable
         return $this->key & ~((1 << $this->level) - 1);
     }
 
+    /**
+     * The upper bound of the last partition, the one containing
+     * `PHP_INT_MAX`, is beyond the integer range. `PHP_INT_MAX` is returned
+     * instead, so as an exclusive bound, it excludes `PHP_INT_MAX` itself.
+     */
     #[\Override]
     public function getUpperBound(): int
     {
+        if ($this->isLast()) {
+            return PHP_INT_MAX;
+        }
+
         return ($this->key | ((1 << $this->level) - 1)) + 1;
+    }
+
+    /**
+     * Whether this is the last partition of its level, i.e. the one
+     * containing `PHP_INT_MAX`.
+     */
+    private function isLast(): bool
+    {
+        return ($this->key | ((1 << $this->level) - 1)) === PHP_INT_MAX;
     }
 
     #[\Override]
@@ -145,6 +173,10 @@ abstract class IntegerPartition implements Partition, \Stringable
     #[\Override]
     public function getNext(): ?static
     {
+        if ($this->isLast()) {
+            return null;
+        }
+
         return static::createFromSourceValue(
             source: $this->getUpperBound(),
             level: $this->getLevel(),

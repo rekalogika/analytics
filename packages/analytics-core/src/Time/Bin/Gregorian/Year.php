@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Time\Bin\Gregorian;
 
 use Doctrine\DBAL\Types\Types;
+use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
@@ -39,6 +40,11 @@ final class Year implements MonotonicTimeBin
         $string = \sprintf('%04d', $this->databaseValue);
 
         $y = (int) substr($string, 0, 4);
+
+        // the round trip rejects extra digits, e.g. 20261
+        if ($y !== $this->databaseValue) {
+            throw new InvalidArgumentException(\sprintf('Invalid year: %d', $this->databaseValue));
+        }
 
         $start = \DateTimeImmutable::createFromFormat(
             'Y-m-d H:i:s',

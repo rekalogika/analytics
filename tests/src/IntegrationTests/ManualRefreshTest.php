@@ -16,6 +16,7 @@ namespace Rekalogika\Analytics\Tests\IntegrationTests;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
@@ -31,7 +32,10 @@ use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\TestIntegerPartition;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ManualRefreshTest extends KernelTestCase
@@ -332,5 +336,66 @@ final class ManualRefreshTest extends KernelTestCase
         $this->assertInstanceOf(RefreshAgentLock::class, $lock);
         $this->assertTrue($lock->acquire(OrderSummary::class));
         $lock->release(OrderSummary::class);
+    }
+
+    /**
+     * @return iterable<string,array{int}>
+     */
+    public static function invalidBatchSizeProvider(): iterable
+    {
+        yield 'zero' => [0];
+        yield 'negative' => [-1];
+    }
+
+    #[DataProvider('invalidBatchSizeProvider')]
+    public function testInvalidBatchSize(int $batchSize): void
+    {
+        $summaryManager = static::getContainer()->get(SummaryManager::class);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $summaryManager->refresh(OrderSummary::class, 1, 1, batchSize: $batchSize);
+    }
+
+    #[DataProvider('invalidBatchSizeProvider')]
+    public function testInvalidBatchSizeInRefresher(int $batchSize): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->createRefresher()->manualRefresh(
+            start: 1,
+            end: 1,
+            batchSize: $batchSize,
+            resumeId: null,
+        );
+    }
+
+    /**
+     * @return iterable<string,array{string}>
+     */
+    public static function invalidBatchSizeOptionProvider(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'negative' => ['-1'];
+        yield 'fractional' => ['1.5'];
+        yield 'non-numeric' => ['foo'];
+    }
+
+    #[DataProvider('invalidBatchSizeOptionProvider')]
+    public function testInvalidBatchSizeOption(string $batchSize): void
+    {
+        $application = new Application(static::bootKernel());
+        $command = $application->find('rekalogika:analytics:refresh:range');
+        $tester = new CommandTester($command);
+
+        $exitCode = $tester->execute([
+            'class' => OrderSummary::class,
+            'start' => '1',
+            'end' => '1',
+            '--batchsize' => $batchSize,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $exitCode);
+        $this->assertStringContainsString('batch size', $tester->getDisplay());
     }
 }

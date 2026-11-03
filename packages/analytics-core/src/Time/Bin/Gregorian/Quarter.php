@@ -45,6 +45,11 @@ final class Quarter implements MonotonicTimeBin
         $y = (int) substr($string, 0, 4);
         $q = (int) substr($string, 4, 1);
 
+        // the round trip rejects extra digits, e.g. 202613
+        if ((int) \sprintf('%04d%01d', $y, $q) !== $this->databaseValue) {
+            throw new InvalidArgumentException(\sprintf('Invalid quarter: %d', $this->databaseValue));
+        }
+
         $m = self::quarterToFirstMonth($q);
 
         $start = \DateTimeImmutable::createFromFormat(

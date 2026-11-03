@@ -17,10 +17,25 @@ use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Formatter\ValueNotSupportedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class NumberFormatStringifier implements Stringifier
+final class NumberFormatStringifier implements Stringifier
 {
+    /**
+     * Formatters for numbers with an absolute value of at least 1, keyed by
+     * locale.
+     *
+     * @var array<string,\NumberFormatter>
+     */
+    private array $formatters = [];
+
+    /**
+     * Formatters for fractions (0 < |x| < 1), keyed by locale.
+     *
+     * @var array<string,\NumberFormatter>
+     */
+    private array $fractionFormatters = [];
+
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[\Override]
@@ -31,7 +46,12 @@ final readonly class NumberFormatStringifier implements Stringifier
         }
 
         $locale = $this->translator->getLocale();
-        $formatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+
+        if (\is_float($input) && $input !== 0.0 && abs($input) < 1) {
+            $formatter = $this->getFractionFormatter($locale);
+        } else {
+            $formatter = $this->getFormatter($locale);
+        }
 
         // @phpstan-ignore method.internalClass
         $result = $formatter->format($input);
@@ -41,5 +61,31 @@ final readonly class NumberFormatStringifier implements Stringifier
         }
 
         return $result;
+    }
+
+    private function getFormatter(string $locale): \NumberFormatter
+    {
+        return $this->formatters[$locale]
+            ??= new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+    }
+
+    /**
+     * The default formatter has a maximum of 3 fraction digits, which would
+     * render a small number like 0.000123 as 0. Use significant digits
+     * instead for fractions.
+     */
+    private function getFractionFormatter(string $locale): \NumberFormatter
+    {
+        if (isset($this->fractionFormatters[$locale])) {
+            return $this->fractionFormatters[$locale];
+        }
+
+        $formatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+        // @phpstan-ignore method.internalClass
+        $formatter->setAttribute(\NumberFormatter::SIGNIFICANT_DIGITS_USED, 1);
+        // @phpstan-ignore method.internalClass
+        $formatter->setAttribute(\NumberFormatter::MAX_SIGNIFICANT_DIGITS, 3);
+
+        return $this->fractionFormatters[$locale] = $formatter;
     }
 }

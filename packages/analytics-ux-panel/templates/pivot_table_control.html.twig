@@ -2,17 +2,20 @@
     {%- set id = random() -%}
 
     <div data-controller="rekalogika--analytics-ux-panel--pivot-table"
-         {%- if target -%}
+         data-rekalogika--analytics-ux-panel--pivot-table-frame-value="{{ panelId }}-frame"
+         {%- if target %}
          data-rekalogika--analytics-ux-panel--pivot-table-target-value="{{ target }}"
-         {%- endif -%}
-         {%- if output -%}
+         {%- endif %}
+         {%- if output %}
          data-rekalogika--analytics-ux-panel--pivot-table-output-value="{{ output }}"
-         {%- endif -%}
-         {%- if urlParameter -%}
+         {%- endif %}
+         {%- if urlParameter %}
          data-rekalogika--analytics-ux-panel--pivot-table-url-parameter-value="{{ urlParameter }}"
-         {%- endif -%}>
+         {%- endif -%}
+         >
         {{ block("fields") }}
-        <turbo-frame id="__filters">
+        <turbo-frame id="{{ panelId }}-filters"
+                     data-rekalogika--analytics-ux-panel--pivot-table-target="filterFrame">
         </turbo-frame>
     </div>
 
@@ -20,14 +23,14 @@
 {%- endblock -%}
 
 {%- block turbo_stream -%}
-    <turbo-frame id="turbo-frame">
+    <turbo-frame id="{{ panelId }}-frame">
         <turbo-stream action="update" target="{{ target }}">
             <template>
                 {{ output|raw }}
             </template>
         </turbo-stream>
 
-        <turbo-stream action="update" target="__filters">
+        <turbo-stream action="update" target="{{ panelId }}-filters">
             <template>
                 {{ block("filters") }}
             </template>

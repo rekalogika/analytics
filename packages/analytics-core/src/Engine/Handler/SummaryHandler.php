@@ -192,10 +192,18 @@ final class SummaryHandler implements ResetInterface
             $tableName,
         );
 
-        $statement = $connection->prepare($sql);
-        $statement->executeStatement();
+        // in a transaction, so that a failure does not leave the summary
+        // table empty while its properties and dirty flags remain, or the
+        // other way around. TRUNCATE is transactional in PostgreSQL
 
-        $this->createSummaryPropertiesManager()->remove();
-        $this->dirtyFlagsHandler->removeAllDirtyFlags();
+        $connection->transactional(function () use ($connection, $sql): void {
+            $statement = $connection->prepare($sql);
+            $statement->executeStatement();
+
+            $this->createSummaryPropertiesManager()->remove();
+            $this->dirtyFlagsHandler->removeAllDirtyFlags();
+        });
+
+        $this->latestKey = null;
     }
 }

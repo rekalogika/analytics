@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Expression;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
@@ -80,7 +82,7 @@ final class DateRangeFilterTest extends TestCase
         $this->assertSame('', $filter->getRawStart());
         $this->assertSame('', $filter->getRawValue());
         $this->assertNull($filter->getStart());
-        $this->assertNull($filter->createExpression());
+        $this->assertExpression($filter->createExpression(), Comparison::LTE, 20240229);
 
         $filter = $this->createFilter([
             'start' => '2024-01-05',
@@ -88,7 +90,55 @@ final class DateRangeFilterTest extends TestCase
         ]);
 
         $this->assertSame('', $filter->getRawEnd());
+        $this->assertSame('2024-01-05', $filter->getRawValue());
         $this->assertNull($filter->getEnd());
+        $this->assertExpression($filter->createExpression(), Comparison::GTE, 20240105);
+
+        $filter = $this->createFilter([
+            'start' => $invalid,
+            'end' => $invalid,
+        ]);
+
+        $this->assertSame('', $filter->getRawValue());
         $this->assertNull($filter->createExpression());
+    }
+
+    public function testStartOnly(): void
+    {
+        $filter = $this->createFilter(['start' => '2024-01-05']);
+
+        $this->assertSame('2024-01-05', $filter->getRawValue());
+        $this->assertExpression($filter->createExpression(), Comparison::GTE, 20240105);
+    }
+
+    public function testEndOnly(): void
+    {
+        $filter = $this->createFilter(['end' => '2024-02-29']);
+
+        $this->assertSame('', $filter->getRawStart());
+        $this->assertSame('2024-02-29', $filter->getRawEnd());
+        $this->assertExpression($filter->createExpression(), Comparison::LTE, 20240229);
+    }
+
+    public function testNoBounds(): void
+    {
+        $filter = $this->createFilter([]);
+
+        $this->assertSame('', $filter->getRawValue());
+        $this->assertNull($filter->createExpression());
+    }
+
+    private function assertExpression(
+        ?Expression $expression,
+        string $operator,
+        int $databaseValue,
+    ): void {
+        $this->assertInstanceOf(Comparison::class, $expression);
+        $this->assertSame('date', $expression->getField());
+        $this->assertSame($operator, $expression->getOperator());
+
+        $value = $expression->getValue()->getValue();
+        $this->assertInstanceOf(Date::class, $value);
+        $this->assertSame($databaseValue, $value->getDatabaseValue());
     }
 }

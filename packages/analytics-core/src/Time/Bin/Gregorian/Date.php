@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Time\Bin\Trait\RekalogikaTimeBinDQLExpressionTrait;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\Util\DayBoundary;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -45,16 +46,24 @@ final class Date implements MonotonicTimeBin
         $m = (int) substr($string, 4, 2);
         $d = (int) substr($string, 6, 2);
 
-        if (!checkdate($m, $d, $y)) {
+        // the round trip rejects extra digits, e.g. 202601011
+        if (
+            !checkdate($m, $d, $y)
+            || (int) \sprintf('%04d%02d%02d', $y, $m, $d) !== $this->databaseValue
+        ) {
             throw new InvalidArgumentException(\sprintf('Invalid date: %d', $this->databaseValue));
         }
 
-        $this->start = new \DateTimeImmutable(
-            \sprintf('%04d-%02d-%02d 00:00:00', $y, $m, $d),
+        $date = DayBoundary::createCalendarDate()->setDate($y, $m, $d);
+
+        $this->start = DayBoundary::getStartOfDay($date, $this->timeZone);
+
+        // not `+1 day` from the start, which is off by an hour if midnight
+        // falls in a DST gap
+        $this->end = DayBoundary::getStartOfDay(
+            $date->modify('+1 day'),
             $this->timeZone,
         );
-
-        $this->end = $this->start->modify('+1 day');
     }
 
     #[\Override]

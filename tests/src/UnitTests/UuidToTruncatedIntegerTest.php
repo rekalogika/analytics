@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\UnitTests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Rekalogika\Analytics\Uuid\ValueResolver\StringUuidToTruncatedInteger;
 
@@ -40,5 +41,55 @@ final class UuidToTruncatedIntegerTest extends TestCase
         $reversed = $resolver->transformSummaryValueToSourceValue($transformed);
 
         $this->assertEquals('01963250-b507-0000-0000-000000000000', $reversed);
+    }
+
+    #[DataProvider('roundTripProvider')]
+    public function testRoundTrip(string $uuid, int $integer, string $reversed): void
+    {
+        $resolver = new StringUuidToTruncatedInteger('foo');
+
+        $transformed = $resolver->transformSourceValueToSummaryValue($uuid);
+        $this->assertSame($integer, $transformed);
+
+        $this->assertSame(
+            $reversed,
+            $resolver->transformSummaryValueToSourceValue($transformed),
+        );
+    }
+
+    /**
+     * @return iterable<string,array{uuid:string,integer:int,reversed:string}>
+     */
+    public static function roundTripProvider(): iterable
+    {
+        yield 'nil' => [
+            'uuid' => '00000000-0000-0000-0000-000000000000',
+            'integer' => 0,
+            'reversed' => '00000000-0000-0000-0000-000000000000',
+        ];
+
+        yield 'max' => [
+            'uuid' => 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+            'integer' => 0xFFFFFFFFFFFF,
+            'reversed' => 'ffffffff-ffff-0000-0000-000000000000',
+        ];
+
+        yield 'v4 with the top bit set' => [
+            'uuid' => 'f192f0e4-5f5e-4c3a-9a6b-2f0d1e3c4b5a',
+            'integer' => 0xF192F0E45F5E,
+            'reversed' => 'f192f0e4-5f5e-0000-0000-000000000000',
+        ];
+
+        yield 'v4 with only the top bit set' => [
+            'uuid' => '80000000-0000-4000-8000-000000000000',
+            'integer' => 0x800000000000,
+            'reversed' => '80000000-0000-0000-0000-000000000000',
+        ];
+
+        yield 'v4 without the top bit set' => [
+            'uuid' => '7fffffff-ffff-4fff-bfff-ffffffffffff',
+            'integer' => 0x7FFFFFFFFFFF,
+            'reversed' => '7fffffff-ffff-0000-0000-000000000000',
+        ];
     }
 }
