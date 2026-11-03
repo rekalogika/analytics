@@ -17,7 +17,8 @@ use Rekalogika\Analytics\Contracts\Exception\EmptyResultException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\SequenceMember;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
-use Rekalogika\Analytics\Contracts\Result\Measures;
+use Rekalogika\Analytics\Contracts\Result\Measure;
+use Rekalogika\Analytics\Contracts\Result\Unit;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
 use Rekalogika\Analytics\Frontend\Chart\Configuration\ChartConfigurationFactory;
@@ -46,6 +47,21 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         array $measures,
         ChartType $chartType = ChartType::Auto,
     ): Chart {
+        if ($dimensions === []) {
+            throw new UnsupportedData('At least one dimension is required');
+        }
+
+        if ($measures === []) {
+            throw new UnsupportedData('At least one measure is required');
+        }
+
+        if (
+            \count($dimensions) < 2
+            && ($chartType === ChartType::StackedBar || $chartType === ChartType::GroupedBar)
+        ) {
+            throw new UnsupportedData('At least two dimensions are required');
+        }
+
         try {
             if ($chartType === ChartType::Auto) {
                 return $this->createAutoChart(
@@ -108,22 +124,14 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param list<string> $dimensions
-     * @param list<string> $measures
+     * @param non-empty-list<string> $dimensions
+     * @param non-empty-list<string> $measures
      */
     private function createAutoChart(
         CubeCell $cube,
         array $dimensions,
         array $measures,
     ): Chart {
-        if ($dimensions === []) {
-            throw new UnsupportedData('At least one dimension is required');
-        }
-
-        if ($measures === []) {
-            throw new UnsupportedData('At least one measure is required');
-        }
-
         if (\count($dimensions) === 1) {
             if ($this->isDimensionSequential($cube, $dimensions[0])) {
                 return $this->createLineChart(
@@ -175,8 +183,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param list<string> $dimensions
-     * @param list<string> $measures
+     * @param non-empty-list<string> $dimensions
+     * @param non-empty-list<string> $measures
      */
     private function createBarChart(
         CubeCell $cube,
@@ -192,8 +200,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param list<string> $dimensions
-     * @param list<string> $measures
+     * @param non-empty-list<string> $dimensions
+     * @param non-empty-list<string> $measures
      */
     private function createLineChart(
         CubeCell $cube,
@@ -221,8 +229,8 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param list<string> $dimensions
-     * @param list<string> $measures
+     * @param non-empty-list<string> $dimensions
+     * @param non-empty-list<string> $measures
      * @param Chart::TYPE_LINE|Chart::TYPE_BAR $type
      */
     private function createBarOrLineChart(
@@ -234,46 +242,46 @@ final readonly class DefaultChartGenerator implements ChartGenerator
         $configuration = $this->configurationFactory->createChartConfiguration();
         $measuresObject = $cube->getMeasures();
 
-        $selectedMeasures = $this->selectMeasures($measuresObject, $measures);
-        $numMeasures = \count($selectedMeasures);
-
         $labels = [];
         $dataSets = [];
 
         $xTitle = null;
-        $yTitle = null;
+
+        // Measures with different units cannot share an axis, so each unit
+        // gets its own y axis.
+
+        /** @var array<string,array{id:string,unit:?Unit,measures:non-empty-list<Measure>}> */
+        $axes = [];
 
         // Populate labels.
 
-        foreach ($selectedMeasures as $name) {
+        foreach ($measures as $name) {
             $measure = $measuresObject->get($name)
                 ?? throw new UnexpectedValueException(\sprintf(
                     'Measure "%s" not found',
                     $name,
                 ));
 
+            $unit = $measure->getUnit();
+            $unitSignature = $unit === null ? '' : 'unit:' . $unit->getSignature();
+
+            if (isset($axes[$unitSignature])) {
+                $axes[$unitSignature]['measures'][] = $measure;
+            } else {
+                $axes[$unitSignature] = [
+                    'id' => $axes === [] ? 'y' : 'y' . \count($axes),
+                    'unit' => $unit,
+                    'measures' => [$measure],
+                ];
+            }
+
             $dataSets[$name] = $configuration->createChartElementConfiguration()->toArray();
             $dataSets[$name]['label'] = $this->stringifier->toString($measure->getLabel());
             $dataSets[$name]['data'] = [];
-
-            if ($yTitle === null) {
-                $unit = $measure->getUnit();
-
-                if ($unit === null) {
-                    if ($numMeasures === 1) {
-                        $yTitle = $this->stringifier->toString($measure->getLabel());
-                    }
-                } elseif ($numMeasures === 1) {
-                    $yTitle = \sprintf(
-                        '%s - %s',
-                        $this->stringifier->toString($measure->getLabel()),
-                        $this->stringifier->toString($unit),
-                    );
-                } else {
-                    $yTitle = $this->stringifier->toString($unit);
-                }
-            }
+            $dataSets[$name]['yAxisID'] = $axes[$unitSignature]['id'];
         }
+
+        $numMeasures = \count($dataSets);
 
         // Populate data.
         $firstDimension = $dimensions[0];
@@ -294,20 +302,18 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             // Get value.
 
-            $labels[] = $this->stringifier->toString($dimension->getDisplayMember());
+            $labels[] = $this->memberToString($dimension->getDisplayMember());
 
-            $measures = $row->getMeasures();
+            $rowMeasures = $row->getMeasures();
 
-            foreach ($selectedMeasures as $name) {
-                $measure = $measures->get($name);
+            foreach (array_keys($dataSets) as $name) {
+                $measure = $rowMeasures->get($name);
 
-                /** @psalm-suppress MixedAssignment */
-                $value = $measure?->getValue() ?? 0;
-                $dataSets[$name]['data'][] = $this->numberifier->toNumber($value);
+                $dataSets[$name]['data'][] = $this->toChartValue($measure?->getValue());
             }
         }
 
-        if ($dataSets === []) {
+        if ($labels === []) {
             throw new UnsupportedData('No data available for the chart');
         }
 
@@ -332,18 +338,47 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             ];
         }
 
-        // Y title.
+        // Y axes.
 
-        if ($yTitle === null) {
-            $yTitle = [
-                'display' => false,
-            ];
-        } else {
-            $yTitle = [
-                'display' => true,
-                'text' => $yTitle,
-                'font' => $configuration->getChartLabelFont()->toArray(),
-            ];
+        $scales = [
+            'x' => [
+                'title' => $xTitle,
+            ],
+        ];
+
+        $i = 0;
+
+        foreach ($axes as $axis) {
+            $yTitle = $this->getYAxisTitle($axis['unit'], $axis['measures']);
+
+            if ($yTitle === null) {
+                $scale = [
+                    'title' => [
+                        'display' => false,
+                    ],
+                ];
+            } else {
+                $scale = [
+                    'title' => [
+                        'display' => true,
+                        'text' => $yTitle,
+                        'font' => $configuration->getChartLabelFont()->toArray(),
+                    ],
+                ];
+            }
+
+            // The additional axes alternate between the right and left side,
+            // and do not draw their grid lines over the first axis.
+
+            if ($i > 0) {
+                $scale['position'] = $i % 2 === 1 ? 'right' : 'left';
+                $scale['grid'] = [
+                    'drawOnChartArea' => false,
+                ];
+            }
+
+            $scales[$axis['id']] = $scale;
+            $i++;
         }
 
         // Legend.
@@ -368,18 +403,37 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     'display' => false,
                 ],
             ],
-            'scales' => [
-                'x' => [
-                    'title' => $xTitle,
-                ],
-                'y' => [
-                    'title' => $yTitle,
-                ],
-            ],
+            'scales' => $scales,
             'spanGaps' => true,
         ]);
 
         return $chart;
+    }
+
+    /**
+     * @param non-empty-list<Measure> $measures Measures sharing the axis
+     */
+    private function getYAxisTitle(?Unit $unit, array $measures): ?string
+    {
+        if (\count($measures) === 1) {
+            $label = $this->stringifier->toString($measures[0]->getLabel());
+
+            if ($unit === null) {
+                return $label;
+            }
+
+            return \sprintf(
+                '%s - %s',
+                $label,
+                $this->stringifier->toString($unit),
+            );
+        }
+
+        if ($unit === null) {
+            return null;
+        }
+
+        return $this->stringifier->toString($unit);
     }
 
     /**
@@ -409,7 +463,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 throw new UnexpectedValueException('Unable to get first dimension');
             }
 
-            $labels[] = $this->stringifier->toString($firstDimensionObject->getDisplayMember());
+            $labels[] = $this->memberToString($firstDimensionObject->getDisplayMember());
 
             if ($xTitle === null) {
                 $xTitle = $this->stringifier->toString($firstDimensionObject->getLabel());
@@ -430,7 +484,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 }
 
                 if (!isset($dataSets[$signature]['label'])) {
-                    $dataSets[$signature]['label'] = $this->stringifier->toString($secondDimensionObject->getDisplayMember());
+                    $dataSets[$signature]['label'] = $this->memberToString($secondDimensionObject->getDisplayMember());
                 }
 
                 if ($legendTitle === null) {
@@ -443,7 +497,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     throw new UnexpectedValueException('Measure not found');
                 }
 
-                $dataSets[$signature]['data'][] = $this->numberifier->toNumber($measureObject->getValue());
+                $dataSets[$signature]['data'][] = $this->toChartValue($measureObject->getValue());
 
                 if ($yTitle === null) {
                     $unit = $measureObject->getUnit();
@@ -552,7 +606,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     'display' => false,
                 ],
             ],
-
+            'spanGaps' => true,
         ]);
 
         return $chart;
@@ -596,7 +650,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
             // Get value.
 
-            $labels[] = $this->stringifier->toString($dimensionObject->getDisplayMember());
+            $labels[] = $this->memberToString($dimensionObject->getDisplayMember());
             $measureObject = $child->getMeasures()->get($measure);
             $dataSet['data'][] = $this->numberifier->toNumber($measureObject?->getValue());
 
@@ -626,43 +680,29 @@ final readonly class DefaultChartGenerator implements ChartGenerator
     }
 
     /**
-     * @param list<string> $userSuppliedMeasures
-     * @return list<string>
+     * An integer dimension member is an identifier, like a year, not a
+     * quantity. Do not let the number formatter add grouping separators.
      */
-    private function selectMeasures(Measures $measures, array $userSuppliedMeasures): array
+    private function memberToString(mixed $member): string
     {
-        $selectedMeasures = [];
-        $selectedUnit = null;
-
-        foreach ($userSuppliedMeasures as $measureName) {
-            $measure = $measures->get($measureName);
-
-            if ($measure === null) {
-                throw new UnexpectedValueException(\sprintf(
-                    'Measure "%s" not found',
-                    $measureName,
-                ));
-            }
-
-            $unit = $measure->getUnit();
-
-            if ($selectedMeasures === [] && $unit === null) {
-                return [$measure->getName()];
-            }
-
-            if ($selectedUnit === null) {
-                $selectedUnit = $unit;
-            }
-
-            if (
-                $selectedUnit !== null &&
-                $selectedUnit->getSignature() === $unit?->getSignature()
-            ) {
-                $selectedMeasures[] = $measure->getName();
-            }
+        if (\is_int($member)) {
+            return (string) $member;
         }
 
-        return $selectedMeasures;
+        return $this->stringifier->toString($member);
+    }
+
+    /**
+     * A missing value is emitted as null, not zero, so that the chart shows a
+     * gap instead of a dip to zero.
+     */
+    private function toChartValue(mixed $value): int|float|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return $this->numberifier->toNumber($value);
     }
 
     private function getSignature(mixed $variable): string

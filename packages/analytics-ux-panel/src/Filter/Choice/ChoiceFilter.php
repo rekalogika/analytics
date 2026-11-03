@@ -143,8 +143,11 @@ final class ChoiceFilter implements Filter
             $choices2[] = new Choice(
                 id: $id,
                 value: $value,
-                label: $this->stringifier->toString($value),
-                htmlLabel: $this->htmlifier->toHtml($value),
+                // An integer member is an identifier, like a year, not a
+                // quantity. Do not let the number formatter add grouping
+                // separators.
+                label: \is_int($value) ? (string) $value : $this->stringifier->toString($value),
+                htmlLabel: \is_int($value) ? (string) $value : $this->htmlifier->toHtml($value),
                 selected: \in_array(
                     $value,
                     $this->getValues(),

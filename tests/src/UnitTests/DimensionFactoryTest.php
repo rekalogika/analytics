@@ -142,4 +142,56 @@ final class DimensionFactoryTest extends TestCase
         // sorts
         $this->assertSame($expected, $result);
     }
+
+    /**
+     * @return iterable<string,array{Order}>
+     */
+    public static function provideOrder(): iterable
+    {
+        yield 'ascending' => [Order::Ascending];
+        yield 'descending' => [Order::Descending];
+    }
+
+    #[DataProvider('provideOrder')]
+    public function testNonComparableObjectMembersKeepDatabaseOrder(Order $order): void
+    {
+        $dimensionFactory = new DimensionFactory(
+            nodesLimit: 1000,
+        );
+
+        $dimensionCollection = new DimensionCollection(
+            dimensionFactory: $dimensionFactory,
+            orderByResolver: new HardcodedOrderByResolver($order),
+        );
+
+        // PHP would compare these objects by their properties, which would
+        // reorder them
+        $names = ['b', 'c', 'a'];
+
+        foreach ($names as $name) {
+            $member = new \stdClass();
+            $member->name = $name;
+
+            $dimensionCollection->collectDimension($dimensionFactory->createDimension(
+                label: new TranslatableMessage('Entity'),
+                name: 'entity',
+                rawMember: $member,
+                member: $member,
+                displayMember: $name,
+                interpolation: false,
+            ));
+        }
+
+        $result = array_map(
+            static function (DefaultDimension $dimension): mixed {
+                $member = $dimension->getMember();
+                \assert($member instanceof \stdClass);
+
+                return $member->name;
+            },
+            $dimensionCollection->getDimensionsByName('entity')->getSorted(),
+        );
+
+        $this->assertSame($names, $result);
+    }
 }
