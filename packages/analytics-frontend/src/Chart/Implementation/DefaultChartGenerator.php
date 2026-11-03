@@ -146,7 +146,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                     measures: $measures,
                 );
             }
-        } elseif (\count($dimensions) >= 2) {
+        } else {
             // @todo auto detect best chart type
             return $this->createGroupedBarChart(
                 cube: $cube,
@@ -156,8 +156,6 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 type: 'groupedBar',
             );
         }
-
-        throw new UnsupportedData('Unsupported chart type');
     }
 
     private function isDimensionSequential(CubeCell $cube, string $dimension): bool
@@ -215,7 +213,7 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 measures: $measures,
                 type: Chart::TYPE_LINE,
             );
-        } elseif (\count($dimensions) > 1) {
+        } else {
             return $this->createGroupedBarChart(
                 cube: $cube,
                 firstDimension: $dimensions[0],
@@ -224,8 +222,6 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 type: 'multiLine',
             );
         }
-
-        throw new UnsupportedData('Unsupported chart type');
     }
 
     /**
@@ -324,19 +320,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             'datasets' => array_values($dataSets),
         ]);
 
-        // xtitle
+        // xtitle, there is at least one row, so it is always set.
 
-        if ($xTitle === null) {
-            $xTitle = [
-                'display' => false,
-            ];
-        } else {
-            $xTitle = [
-                'display' => true,
-                'text' => $xTitle,
-                'font' => $configuration->getChartLabelFont()->toArray(),
-            ];
-        }
+        $xTitle = [
+            'display' => true,
+            'text' => $xTitle,
+            'font' => $configuration->getChartLabelFont()->toArray(),
+        ];
 
         // Y axes.
 
@@ -532,19 +522,13 @@ final readonly class DefaultChartGenerator implements ChartGenerator
             'datasets' => $dataSets,
         ]);
 
-        // X title.
+        // X title, there is at least one row, so it is always set.
 
-        if ($xTitle === null) {
-            $xTitle = [
-                'display' => false,
-            ];
-        } else {
-            $xTitle = [
-                'display' => true,
-                'text' => $xTitle,
-                'font' => $configuration->getChartLabelFont()->toArray(),
-            ];
-        }
+        $xTitle = [
+            'display' => true,
+            'text' => $xTitle,
+            'font' => $configuration->getChartLabelFont()->toArray(),
+        ];
 
         // Y title.
 
@@ -621,17 +605,19 @@ final readonly class DefaultChartGenerator implements ChartGenerator
 
         // Populate labels.
 
-        $measureObject = $cube->getMeasures()->get($measure);
+        $measureObject = $cube->getMeasures()->get($measure)
+            ?? throw new UnexpectedValueException(\sprintf(
+                'Measure "%s" not found',
+                $measure,
+            ));
 
         $labels = [];
         $dataSet = [];
 
-        $dataSet['label'] = $this->stringifier->toString($measureObject?->getLabel());
+        $dataSet['label'] = $this->stringifier->toString($measureObject->getLabel());
         $dataSet['data'] = [];
         $dataSet['backgroundColor'] = [];
         $dataSet['hoverOffset'] = 4;
-
-        $title = null;
 
         // Populate data.
 
@@ -642,17 +628,11 @@ final readonly class DefaultChartGenerator implements ChartGenerator
                 throw new UnexpectedValueException('Expected dimension');
             }
 
-            // Get label.
-
-            if ($title === null) {
-                $title = $this->stringifier->toString($dimensionObject->getLabel());
-            }
-
             // Get value.
 
             $labels[] = $this->memberToString($dimensionObject->getDisplayMember());
             $measureObject = $child->getMeasures()->get($measure);
-            $dataSet['data'][] = $this->numberifier->toNumber($measureObject?->getValue());
+            $dataSet['data'][] = $this->toChartValue($measureObject?->getValue());
 
             // Color.
 

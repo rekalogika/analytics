@@ -1,5 +1,5 @@
 {%- block no_data -%}
-    <p>No Data</p>
+    <p>{{ (no_data_message ?? 'No Data')|analytics_to_string }}</p>
 {%- endblock no_data -%}
 
 {%- block exception -%}

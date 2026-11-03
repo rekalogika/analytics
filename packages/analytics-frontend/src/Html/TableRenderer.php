@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Frontend\Html;
 
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Frontend\Exception\FrontendWrapperException;
 use Rekalogika\Analytics\Frontend\Html\Visitor\TableRendererVisitor;
-use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
+use Rekalogika\Analytics\Frontend\Internal\PivotTableFactory;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
-use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\TableToHtmlTableTransformer;
 use Twig\Environment;
 
@@ -125,17 +125,6 @@ final readonly class TableRenderer
     }
 
     /**
-     * Filter out the special '@values' dimension from the list of dimensions.
-     *
-     * @param list<string> $dimensions The list of dimensions to filter.
-     * @return list<string> The filtered list of dimensions without '@values'.
-     */
-    private function filterOutValues(array $dimensions): array
-    {
-        return array_values(array_filter($dimensions, static fn($dim) => $dim !== '@values'));
-    }
-
-    /**
      * @param list<string> $rows
      * @param list<string> $columns
      * @param list<string> $measures
@@ -147,24 +136,11 @@ final readonly class TableRenderer
         array $columns,
         ?string $theme = null,
     ): string {
-        $cubeAdapter = CubeAdapter::adapt($cube);
-
-        if ($measures === []) {
-            $rows = $this->filterOutValues($rows);
-            $columns = $this->filterOutValues($columns);
-        }
-
-        $dimensions = array_merge($rows, $columns);
-        // convert $dimensions to array<string,true>
-        $dimensions = array_combine($dimensions, array_fill(0, \count($dimensions), true));
-
-        $table = PivotTableTransformer::transform(
-            cube: $cubeAdapter,
+        $table = PivotTableFactory::create(
+            cube: $cube,
+            measures: $measures,
             rows: $rows,
             columns: $columns,
-            measures: $measures,
-            skipLegends: ['@values'],
-            subtotals: $dimensions,
         );
 
         return $this->getVisitor($theme)->visitTable($table);
@@ -190,7 +166,9 @@ final readonly class TableRenderer
         if ($table->isEmpty()) {
             return $this->twig
                 ->load($theme ?? $this->theme)
-                ->renderBlock('no_data');
+                ->renderBlock('no_data', [
+                    'no_data_message' => new TranslatableMessage('No result returned.'),
+                ]);
         }
 
         $table = TableToHtmlTableTransformer::transform($table);
@@ -208,6 +186,7 @@ final readonly class TableRenderer
             ->load($theme ?? $this->theme)
             ->renderBlock('exception', [
                 'exception' => $exception,
+                'exception_title' => new TranslatableMessage('An error occurred'),
             ]);
     }
 }

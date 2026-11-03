@@ -2,14 +2,14 @@
 
 {%- block no_data -%}
     <div class="alert alert-info" role="alert">
-        {{ t('No result returned.', domain = 'rekalogika_analytics') |trans }}
+        {{ (no_data_message ?? 'No Data')|analytics_to_string }}
     </div>
 {%- endblock no_data -%}
 
 {%- block exception -%}
     <div class="alert alert-danger">
         <h4 class="alert-heading">
-            {{ t('An error occurred', domain = 'rekalogika_analytics') |trans }}
+            {{ (exception_title ?? 'An error occurred')|analytics_to_string }}
         </h4>
         <p>{{ exception|analytics_to_html }}</p>
     </div>

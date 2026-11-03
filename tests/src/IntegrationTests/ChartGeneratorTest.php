@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Frontend\Chart\ChartGenerator;
 use Rekalogika\Analytics\Frontend\Chart\ChartType;
@@ -190,6 +191,61 @@ final class ChartGeneratorTest extends KernelTestCase
 
         $this->assertSame('Monetary Value (EUR)', $scales['y1']['title']['text'] ?? null);
         $this->assertSame('right', $scales['y1']['position'] ?? null);
+    }
+
+    public function testMissingValueIsNullInPieChart(): void
+    {
+        $result = static::getContainer()
+            ->get(SummaryManager::class)
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions('time.civil.month.month', 'customerGender')
+            ->getResult();
+
+        // Find a month with a missing value for one of the genders.
+
+        $cube = null;
+        $expectedNulls = [];
+
+        foreach ($result->drillDown('time.civil.month.month') as $monthCell) {
+            $expectedNulls = [];
+
+            foreach ($monthCell->drillDown('customerGender') as $cell) {
+                $expectedNulls[] = $cell->getMeasures()->get('price')?->getValue() === null;
+            }
+
+            if (\in_array(true, $expectedNulls, true)) {
+                $cube = $monthCell;
+
+                break;
+            }
+        }
+
+        $this->assertNotNull($cube, 'Fixture has no missing value');
+
+        $chart = static::getContainer()
+            ->get(ChartGenerator::class)
+            ->createChart(
+                cube: $cube,
+                dimensions: ['customerGender'],
+                measures: ['price'],
+                chartType: ChartType::Pie,
+            );
+
+        /** @var array{datasets:list<array{data:list<int|float|null>}>} */
+        $data = $chart->getData();
+
+        $this->assertSame($expectedNulls, array_map(
+            static fn(int|float|null $value): bool => $value === null,
+            $data['datasets'][0]['data'],
+        ));
+    }
+
+    public function testPieChartWithInvalidMeasure(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->createChart(['customerCountry'], ['invalid'], ChartType::Pie);
     }
 
     /**

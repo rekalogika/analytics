@@ -70,7 +70,7 @@ final class TableRendererTest extends KernelTestCase
         );
 
         $this->assertStringNotContainsString('<table', $html);
-        $this->assertStringContainsString('No Data', $html);
+        $this->assertStringContainsString('No result returned.', $html);
     }
 
     public function testTableWithBootstrapTheme(): void

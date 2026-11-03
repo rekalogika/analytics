@@ -70,6 +70,16 @@ final class ExpressionRendererVisitor extends ExpressionVisitor
     #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): string
     {
+        if (
+            $expr->getType() === CompositeExpression::TYPE_NOT
+            && \count($expr->getExpressionList()) !== 1
+        ) {
+            throw new LogicException(\sprintf(
+                'A NOT expression must have exactly one child expression, %d given.',
+                \count($expr->getExpressionList()),
+            ));
+        }
+
         $parts = [];
 
         foreach ($expr->getExpressionList() as $part) {
@@ -87,7 +97,7 @@ final class ExpressionRendererVisitor extends ExpressionVisitor
             return \sprintf(
                 '%s %s',
                 $this->walkCompositeExpressionType($expr->getType()),
-                implode(' ', $parts),
+                $parts[0],
             );
         }
 

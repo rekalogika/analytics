@@ -17,10 +17,9 @@ use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Frontend\Formatter\Cellifier;
+use Rekalogika\Analytics\Frontend\Internal\PivotTableFactory;
 use Rekalogika\Analytics\Frontend\Spreadsheet\Internal\SpreadsheetRendererVisitor;
-use Rekalogika\Analytics\PivotTable\Adapter\Cube\CubeAdapter;
 use Rekalogika\Analytics\PivotTable\Adapter\Table\TableAdapter;
-use Rekalogika\PivotTable\PivotTableTransformer;
 use Rekalogika\PivotTable\Util\TableToHtmlTableTransformer;
 
 final readonly class SpreadsheetRenderer
@@ -89,19 +88,11 @@ final readonly class SpreadsheetRenderer
         array $rows,
         array $columns,
     ): Spreadsheet {
-        $cubeAdapter = CubeAdapter::adapt($cube);
-
-        $dimensions = array_merge($rows, $columns);
-        // convert $dimensions to array<string,true>
-        $dimensions = array_combine($dimensions, array_fill(0, \count($dimensions), true));
-
-        $table = PivotTableTransformer::transform(
-            cube: $cubeAdapter,
+        $table = PivotTableFactory::create(
+            cube: $cube,
+            measures: $measures,
             rows: $rows,
             columns: $columns,
-            measures: $measures,
-            skipLegends: ['@values'],
-            subtotals: $dimensions,
         );
 
         $html = $this->visitor->visitTable($table);
@@ -113,9 +104,8 @@ final readonly class SpreadsheetRenderer
             $spreadsheet->getActiveSheet()->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
 
-        $spreadsheet->getActiveSheet()->setAutoFilter(
-            $spreadsheet->getActiveSheet()->calculateWorksheetDimension(),
-        );
+        // No autofilter: the pivot table has multiple header rows and
+        // subtotal rows, which an autofilter would treat as data.
 
         $spreadsheet->getActiveSheet()->setTitle('Pivot Table');
 

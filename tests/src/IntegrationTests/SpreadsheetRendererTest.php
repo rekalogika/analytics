@@ -91,4 +91,42 @@ final class SpreadsheetRendererTest extends KernelTestCase
 
         $this->assertSame('Pivot Table', $spreadsheet->getActiveSheet()->getTitle());
     }
+
+    public function testPivotTableWithoutMeasures(): void
+    {
+        $spreadsheet = $this->getRenderer()->renderPivotTable(
+            cube: $this->getResult(['customerCountry', 'customerGender']),
+            measures: [],
+            rows: ['customerCountry'],
+            columns: ['customerGender', '@values'],
+        );
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $this->assertSame('Pivot Table', $sheet->getTitle());
+        $this->assertGreaterThan(1, $sheet->getHighestDataRow());
+    }
+
+    public function testPivotTableHasNoAutoFilter(): void
+    {
+        $spreadsheet = $this->getRenderer()->renderPivotTable(
+            cube: $this->getResult(['customerCountry', 'customerGender']),
+            measures: ['count'],
+            rows: ['customerCountry'],
+            columns: ['customerGender', '@values'],
+        );
+
+        $this->assertSame('', $spreadsheet->getActiveSheet()->getAutoFilter()->getRange());
+    }
+
+    public function testTableHasAutoFilter(): void
+    {
+        $spreadsheet = $this->getRenderer()->render(
+            cell: $this->getResult(['customerCountry']),
+            dimensions: ['customerCountry'],
+            measures: ['count'],
+        );
+
+        $this->assertNotSame('', $spreadsheet->getActiveSheet()->getAutoFilter()->getRange());
+    }
 }
