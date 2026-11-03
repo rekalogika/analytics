@@ -18,58 +18,89 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Rekalogika\Analytics\Metadata\Implementation\AssociationDependencyResolver;
 use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
+use Rekalogika\Analytics\Tests\App\Entity\Category;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Rekalogika\Analytics\Tests\App\Entity\OrderSummary;
+use Rekalogika\Analytics\Tests\App\Entity\Region;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class AssociationDependencyResolverTest extends KernelTestCase
 {
     /**
-     * @return iterable<string,array{class-string,string,list<array{class-string,string,string}>}>
+     * A null property is a dependency on the existence of the related
+     * entity.
+     *
+     * @return iterable<string,array{class-string,string,list<array{class-string,string|null,string}>}>
      */
     public static function provideDependencies(): iterable
     {
         yield 'property of the source' => [Order::class, 'time', []];
-        yield 'association of the source' => [Order::class, 'customer', []];
-        yield 'alias of a related entity' => [Order::class, 'customer.*', []];
+
+        yield 'association of the source' => [
+            Order::class,
+            'customer',
+            [[Customer::class, null, 'customer']],
+        ];
+
+        yield 'alias of a related entity' => [
+            Order::class,
+            'customer.*',
+            [[Customer::class, null, 'customer']],
+        ];
 
         yield 'property of a related entity' => [
             Order::class,
             'item.price',
-            [[Item::class, 'price', 'item']],
+            [
+                [Item::class, null, 'item'],
+                [Item::class, 'price', 'item'],
+            ],
         ];
 
         yield 'association of a related entity' => [
             Order::class,
             'item.category',
-            [[Item::class, 'category', 'item']],
+            [
+                [Item::class, null, 'item'],
+                [Item::class, 'category', 'item'],
+                [Category::class, null, 'item.category'],
+            ],
         ];
 
         yield 'two hops' => [
             Order::class,
             'customer.country.region',
             [
+                [Customer::class, null, 'customer'],
                 [Customer::class, 'country', 'customer'],
+                [Country::class, null, 'customer.country'],
                 [Country::class, 'region', 'customer.country'],
+                [Region::class, null, 'customer.country.region'],
             ],
         ];
 
         yield 'cast of an association' => [
             Order::class,
             'customer(' . IndividualCustomer::class . ').gender',
-            [[IndividualCustomer::class, 'gender', 'customer']],
+            [
+                [IndividualCustomer::class, null, 'customer'],
+                [IndividualCustomer::class, 'gender', 'customer'],
+            ],
         ];
 
         yield 'cast of an association, then another hop' => [
             Order::class,
             'customer(' . IndividualCustomer::class . ').country.region',
             [
+                [IndividualCustomer::class, null, 'customer'],
                 [IndividualCustomer::class, 'country', 'customer'],
+                [Country::class, null, 'customer(' . IndividualCustomer::class . ').country'],
                 [Country::class, 'region', 'customer(' . IndividualCustomer::class . ').country'],
+                [Region::class, null, 'customer(' . IndividualCustomer::class . ').country.region'],
             ],
         ];
 
@@ -82,16 +113,29 @@ final class AssociationDependencyResolverTest extends KernelTestCase
         yield 'root cast, then a hop' => [
             Customer::class,
             '(' . IndividualCustomer::class . ').country.region',
-            [[Country::class, 'region', '(' . IndividualCustomer::class . ').country']],
+            [
+                [Country::class, null, '(' . IndividualCustomer::class . ').country'],
+                [Country::class, 'region', '(' . IndividualCustomer::class . ').country'],
+                [Region::class, null, '(' . IndividualCustomer::class . ').country.region'],
+            ],
         ];
 
-        yield 'to-many association' => [Order::class, 'customer.orders.time', []];
-        yield 'unknown property' => [Order::class, 'customer.foo.bar', []];
+        yield 'to-many association' => [
+            Order::class,
+            'customer.orders.time',
+            [[Customer::class, null, 'customer']],
+        ];
+
+        yield 'unknown property' => [
+            Order::class,
+            'customer.foo.bar',
+            [[Customer::class, null, 'customer']],
+        ];
     }
 
     /**
      * @param class-string $sourceClass
-     * @param list<array{class-string,string,string}> $expected
+     * @param list<array{class-string,string|null,string}> $expected
      */
     #[DataProvider('provideDependencies')]
     public function testResolve(string $sourceClass, string $path, array $expected): void

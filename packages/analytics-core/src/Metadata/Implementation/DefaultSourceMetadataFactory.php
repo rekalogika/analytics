@@ -39,14 +39,20 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
      */
     private array $associationDependencies;
 
+    /**
+     * @var array<class-string,list<AssociationDependency>>
+     */
+    private array $existenceDependencies;
+
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
         ManagerRegistry $managerRegistry,
     ) {
         $this->involvedProperties = $this->createInvolvedProperties();
-        $this->associationDependencies = $this->createAssociationDependencies(
-            new AssociationDependencyResolver($managerRegistry),
-        );
+        [$this->associationDependencies, $this->existenceDependencies] =
+            $this->createAssociationDependencies(
+                new AssociationDependencyResolver($managerRegistry),
+            );
     }
 
     /**
@@ -95,15 +101,22 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
 
     /**
      * Related class to the mapping of its properties to the summaries of
-     * other classes that read them through an association.
+     * other classes that read them through an association. And related class
+     * to the summaries of other classes whose source entities refer to it.
      *
-     * @return array<class-string,array<string,list<AssociationDependency>>>
+     * @return array{
+     *     array<class-string,array<string,list<AssociationDependency>>>,
+     *     array<class-string,list<AssociationDependency>>
+     * }
      */
     private function createAssociationDependencies(
         AssociationDependencyResolver $resolver,
     ): array {
         /** @var array<class-string,array<string,array<string,AssociationDependency>>> */
         $dependencies = [];
+
+        /** @var array<class-string,array<string,AssociationDependency>> */
+        $existenceDependencies = [];
 
         foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
             if (!$summaryMetadata->isTrackAssociations()) {
@@ -118,7 +131,15 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
                 );
 
                 foreach ($pathDependencies as $dependency) {
-                    $dependencies[$dependency->getRelatedClass()][$dependency->getProperty()][$dependency->getSignature()] = $dependency;
+                    $relatedClass = $dependency->getRelatedClass();
+                    $property = $dependency->getProperty();
+                    $signature = $dependency->getSignature();
+
+                    if ($property === null) {
+                        $existenceDependencies[$relatedClass][$signature] = $dependency;
+                    } else {
+                        $dependencies[$relatedClass][$property][$signature] = $dependency;
+                    }
                 }
             }
         }
@@ -131,7 +152,13 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
             }
         }
 
-        return $result;
+        $existenceResult = [];
+
+        foreach ($existenceDependencies as $relatedClass => $classDependencies) {
+            $existenceResult[$relatedClass] = array_values($classDependencies);
+        }
+
+        return [$result, $existenceResult];
     }
 
     /**
@@ -153,6 +180,7 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
         $classes = [$sourceClassName, ...$parents];
 
         $allPropertiesToAssociationDependencies = [];
+        $allExistenceDependencies = [];
 
         foreach ($classes as $class) {
             foreach ($this->involvedProperties[$class] ?? [] as $property => $summaryClasses) {
@@ -166,12 +194,17 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
                     $allPropertiesToAssociationDependencies[$property][] = $dependency;
                 }
             }
+
+            foreach ($this->existenceDependencies[$class] ?? [] as $dependency) {
+                $allExistenceDependencies[] = $dependency;
+            }
         }
 
         return new SourceMetadata(
             class: $sourceClassName,
             propertyToSummaryClasses: $allPropertiesToSummaryClasses,
             propertyToAssociationDependencies: $allPropertiesToAssociationDependencies,
+            existenceDependencies: $allExistenceDependencies,
         );
     }
 }

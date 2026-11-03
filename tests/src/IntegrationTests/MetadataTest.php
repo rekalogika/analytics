@@ -24,6 +24,7 @@ use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\HierarchyAwareLabel;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
+use Rekalogika\Analytics\Tests\App\Entity\Category;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
@@ -149,7 +150,38 @@ final class MetadataTest extends KernelTestCase
                 [Order::class, 'customer.country', OrderExplicitGroupingSetsSummary::class],
                 [Customer::class, 'country', CustomerSummary::class],
             ],
-            $this->formatDependencies($countryMetadata->getAllAssociationDependencies()),
+            $this->formatDependencies(
+                $countryMetadata->getAssociationDependenciesByChangedProperties(['region']),
+            ),
+        );
+
+        // the source entities refer to the country through the same paths,
+        // and through item.countryOfOrigin. its deletion affects them
+
+        $this->assertEqualsCanonicalizing(
+            [
+                [Order::class, 'customer.country', OrderSummary::class],
+                [Order::class, 'customer.country', OrderExplicitGroupingSetsSummary::class],
+                [Order::class, 'item.countryOfOrigin', OrderSummary::class],
+                [Customer::class, 'country', CustomerSummary::class],
+            ],
+            $this->formatDependencies($countryMetadata->getExistenceDependencies()),
+        );
+
+        $this->assertCount(7, $countryMetadata->getAllAssociationDependencies());
+
+        // Category is not read, but Item::category refers to it
+
+        $categoryMetadata = $sourceMetadataFactory->getSourceMetadata(Category::class);
+
+        $this->assertSame([], $categoryMetadata->getPropertyToAssociationDependencies());
+
+        $this->assertEqualsCanonicalizing(
+            [
+                [Order::class, 'item.category', OrderSummary::class],
+                [Order::class, 'item.category', OrderExplicitGroupingSetsSummary::class],
+            ],
+            $this->formatDependencies($categoryMetadata->getAllAssociationDependencies()),
         );
 
         // Customer is a source itself, and is also read through Order::customer

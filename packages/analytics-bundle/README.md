@@ -139,7 +139,7 @@ final class AnalyticsSchedule implements ScheduleProviderInterface
 | `rekalogika:analytics:sweep` | Dispatches the refresh agent of the summaries that have dirty partitions but no pending run. See [Sweeper](#sweeper). |
 | `rekalogika:analytics:status` | Shows the refresh status of the summary tables: pending dirty flags, the next and the scheduled refresh, and the latest summarized key against the latest source key. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
-| `rekalogika:analytics:debug:source` | Shows which changes to a source class refresh its summaries, and which paths through related entities are not tracked. |
+| `rekalogika:analytics:debug:source` | Shows which changes to a source class, or to a class read through an association, refresh which summaries. |
 | `rekalogika:analytics:uuid:summary-to-source` | Converts a UUIDv7 partition key in the summary table to the corresponding source value. |
 
 ## Documentation

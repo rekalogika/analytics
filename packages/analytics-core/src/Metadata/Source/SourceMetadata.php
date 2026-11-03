@@ -35,11 +35,14 @@ final readonly class SourceMetadata
      * @param array<string,list<AssociationDependency>> $propertyToAssociationDependencies
      * For each property of the class, the summaries of other classes that
      * read it through an association.
+     * @param list<AssociationDependency> $existenceDependencies The summaries
+     * of other classes whose source entities refer to entities of this class.
      */
     public function __construct(
         private string $class,
         private array $propertyToSummaryClasses,
         private array $propertyToAssociationDependencies = [],
+        private array $existenceDependencies = [],
     ) {
         $allInvolvedSummaryClasses = [];
 
@@ -144,16 +147,39 @@ final readonly class SourceMetadata
     }
 
     /**
-     * Returns every association dependency of this class. Used when an
-     * entity of this class is deleted, which affects every source entity that
-     * refers to it.
+     * The summaries of other classes whose source entities refer to entities
+     * of this class, through an association. The dependencies have no
+     * property.
+     *
+     * @return list<AssociationDependency>
+     */
+    public function getExistenceDependencies(): array
+    {
+        return $this->existenceDependencies;
+    }
+
+    /**
+     * Returns every association dependency of this class, including the
+     * existence dependencies. Used when an entity of this class is deleted,
+     * which affects every source entity that refers to it.
      *
      * @return list<AssociationDependency>
      */
     public function getAllAssociationDependencies(): array
     {
-        return $this->getAssociationDependenciesByChangedProperties(
-            array_keys($this->propertyToAssociationDependencies),
-        );
+        $dependencies = [];
+
+        $allDependencies = [
+            ...$this->getAssociationDependenciesByChangedProperties(
+                array_keys($this->propertyToAssociationDependencies),
+            ),
+            ...$this->existenceDependencies,
+        ];
+
+        foreach ($allDependencies as $dependency) {
+            $dependencies[$dependency->getSignature()] = $dependency;
+        }
+
+        return array_values($dependencies);
     }
 }
