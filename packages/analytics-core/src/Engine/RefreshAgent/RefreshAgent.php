@@ -17,6 +17,11 @@ use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
 
 final readonly class RefreshAgent
 {
+    /**
+     * Delay in seconds before running again after a failed run.
+     */
+    private const RETRY_DELAY = 300;
+
     public function __construct(
         private SummaryRefresherFactory $summaryRefresherFactory,
         private RefreshAgentLock $refreshAgentLock,
@@ -57,8 +62,34 @@ final readonly class RefreshAgent
             if ($nextRefreshTime !== null) {
                 $this->refreshAgentRunner->scheduleAt($class, $nextRefreshTime);
             }
+        } catch (\Throwable $e) {
+            // the remaining dirty flags would otherwise wait until new dirty
+            // flags are created, so we schedule another run after a delay
+
+            $this->scheduleRetry($class);
+
+            throw $e;
         } finally {
             $this->refreshAgentLock->release($class);
+        }
+    }
+
+    /**
+     * Schedules another run after a failed run. A failure here is ignored, so
+     * that it does not replace the exception that caused the run to fail.
+     *
+     * @param class-string $class
+     */
+    private function scheduleRetry(string $class): void
+    {
+        try {
+            $this->refreshAgentRunner->scheduleAt(
+                $class,
+                new \DateTimeImmutable(\sprintf('+%d seconds', self::RETRY_DELAY)),
+            );
+        } catch (\Throwable) {
+            // ignored, the messenger retry or new dirty flags will dispatch
+            // the refresh agent again
         }
     }
 }
