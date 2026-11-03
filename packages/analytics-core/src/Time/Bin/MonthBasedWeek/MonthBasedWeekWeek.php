@@ -19,6 +19,7 @@ use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\Analytics\Time\Bin\Trait\TimeBinTrait;
 use Rekalogika\Analytics\Time\HasTitle;
 use Rekalogika\Analytics\Time\MonotonicTimeBin;
+use Rekalogika\Analytics\Time\Util\DayBoundary;
 use Rekalogika\Analytics\Time\Util\TranslatableDate;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -58,26 +59,28 @@ final class MonthBasedWeekWeek implements MonotonicTimeBin, HasTitle
         $this->w = (int) substr($string, 6, 1); // Week of the month (1-5)
 
         /** @var \DateTimeImmutable */
-        $start = (new \DateTimeImmutable())
-            ->setTimezone($this->timeZone)
+        $weekStart = DayBoundary::createCalendarDate()
             ->setDate($this->y, $this->m, 1) // Start from the first day of the month
-            ->setTime(0, 0, 0)
             ->modify('first thursday of this month') // Adjust to the first thursday
             ->modify('previous monday') // Move to the Monday of the week
             ->modify(\sprintf('+%d weeks', $this->w - 1)); // Move to the correct week
 
         // The arithmetic above silently overflows an invalid month or week,
         // e.g. 2025025 into 2025-03-W1. A valid week has its Thursday in the
-        // given month.
-        if (!self::isWeekInMonth($start, $this->y, $this->m)) {
+        // given month. The round trip rejects extra digits, e.g. 20250711.
+        if (
+            !self::isWeekInMonth($weekStart, $this->y, $this->m)
+            || (int) \sprintf('%04d%02d%01d', $this->y, $this->m, $this->w) !== $this->databaseValue
+        ) {
             throw new InvalidArgumentException(\sprintf('Invalid month based week: %d', $this->databaseValue));
         }
 
-        /** @var \DateTimeImmutable */
-        $end = $start->modify('+1 week');
+        $this->start = DayBoundary::getStartOfDay($weekStart, $this->timeZone);
 
-        $this->start = $start;
-        $this->end = $end;
+        $this->end = DayBoundary::getStartOfDay(
+            $weekStart->modify('+1 week'),
+            $this->timeZone,
+        );
     }
 
     /**

@@ -45,7 +45,12 @@ final class Month implements MonotonicTimeBin
         $y = (int) substr($string, 0, 4);
         $m = (int) substr($string, 4, 2);
 
-        if ($m < 1 || $m > 12) {
+        // the round trip rejects extra digits, e.g. 2026011
+        if (
+            $m < 1
+            || $m > 12
+            || (int) \sprintf('%04d%02d', $y, $m) !== $this->databaseValue
+        ) {
             throw new InvalidArgumentException(\sprintf('Invalid month: %d', $this->databaseValue));
         }
 
