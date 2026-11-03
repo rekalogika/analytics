@@ -201,9 +201,14 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
                 }
             } else {
                 // if condition is empty, and no null condition either, return
-                // false expression
+                // true expression for NOT IN (nothing is excluded), and false
+                // expression for IN (nothing is included)
 
-                return $this->queryBuilder->expr()->eq(1, 2);
+                if ($comparisonOperator === Comparison::NIN) {
+                    return $this->queryBuilder->expr()->eq(1, 1);
+                } else {
+                    return $this->queryBuilder->expr()->eq(1, 2);
+                }
             }
         }
 
