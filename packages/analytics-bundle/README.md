@@ -104,6 +104,7 @@ rekalogika_analytics:
 | `rekalogika:analytics:refresh:range` | Refreshes a range of source records, regardless of whether they are dirty. Usually run once after creating a summary table. Supports `--resume` and `--batchsize`. |
 | `rekalogika:analytics:truncate` | Truncates a summary table. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
+| `rekalogika:analytics:debug:source` | Shows which changes to a source class refresh its summaries, and which paths through related entities are not tracked. |
 | `rekalogika:analytics:uuid:summary-to-source` | Converts a UUIDv7 partition key in the summary table to the corresponding source value. |
 
 ## Documentation
