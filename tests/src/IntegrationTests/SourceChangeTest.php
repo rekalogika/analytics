@@ -909,7 +909,7 @@ final class SourceChangeTest extends KernelTestCase
         $customer->setAge(30);
         $customer->setGender(Gender::Female);
 
-        new \ReflectionProperty(Customer::class, 'id')
+        (new \ReflectionProperty(Customer::class, 'id'))
             ->setValue($customer, UuidV7::generate($time));
 
         $partition = $this->getHandlerFactory()
