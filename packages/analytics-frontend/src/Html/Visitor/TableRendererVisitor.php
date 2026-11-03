@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Frontend\Html\Visitor;
 
+use Rekalogika\Analytics\Contracts\Translation\TranslatableMessage;
 use Rekalogika\PivotTable\HtmlTable\Cell;
 use Rekalogika\PivotTable\HtmlTable\DataCell;
 use Rekalogika\PivotTable\HtmlTable\Element;
@@ -96,7 +97,10 @@ final readonly class TableRendererVisitor implements TableVisitor
     #[\Override]
     public function visitTable(Table $table): mixed
     {
-        return $this->renderElementWithChildren($table, 'table');
+        // The table block renders the no_data block if the table has no rows.
+        return $this->renderElementWithChildren($table, 'table', [
+            'no_data_message' => new TranslatableMessage('No result returned.'),
+        ]);
     }
 
     #[\Override]

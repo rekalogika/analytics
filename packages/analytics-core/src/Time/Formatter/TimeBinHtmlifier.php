@@ -34,8 +34,13 @@ final readonly class TimeBinHtmlifier implements Htmlifier
 
         return \sprintf(
             '<span title="%s">%s</span>',
-            $this->stringifier->toString($input->getTitle()),
-            $this->stringifier->toString($input),
+            $this->escape($this->stringifier->toString($input->getTitle())),
+            $this->escape($this->stringifier->toString($input)),
         );
+    }
+
+    private function escape(string $string): string
+    {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5);
     }
 }

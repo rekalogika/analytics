@@ -283,6 +283,18 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
     #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): mixed
     {
+        // Expr::not() takes only one argument, the extra children would be
+        // silently dropped from the query.
+        if (
+            $expr->getType() === CompositeExpression::TYPE_NOT
+            && \count($expr->getExpressionList()) !== 1
+        ) {
+            throw new InvalidArgumentException(\sprintf(
+                'A NOT expression must have exactly one child expression, %d given.',
+                \count($expr->getExpressionList()),
+            ));
+        }
+
         /**
          * @var list<ORMComparison|Andx|Orx|string>
          */

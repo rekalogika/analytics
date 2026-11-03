@@ -99,8 +99,13 @@ final readonly class TableAdapter implements PivotTableTable
     #[\Override]
     public function getLegend(string $key): mixed
     {
+        // Unknown key, e.g. on an empty result. Let the caller fall back.
+        if (!\array_key_exists($key, $this->legend)) {
+            return null;
+        }
+
         /** @psalm-suppress MixedAssignment */
-        $result = $this->legend[$key] ?? null;
+        $result = $this->legend[$key];
 
         return new TableLabel(
             $result,
