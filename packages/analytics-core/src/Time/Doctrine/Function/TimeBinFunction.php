@@ -21,7 +21,6 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
 use Rekalogika\Analytics\Contracts\Exception\QueryException;
-use Rekalogika\Analytics\Time\TimeBinType;
 
 /**
  * REKALOGIKA_TIME_BIN
@@ -31,7 +30,8 @@ use Rekalogika\Analytics\Time\TimeBinType;
  * * source datetime
  * * stored time zone
  * * summary time zone
- * * output format (same as the values of TimeBinType enum)
+ * * output format (a PostgreSQL TO_CHAR() template pattern, see
+ *   RekalogikaTimeBinDQLExpressionTrait::getSqlToCharArgument())
  */
 final class TimeBinFunction extends FunctionNode
 {

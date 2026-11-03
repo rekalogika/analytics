@@ -119,28 +119,4 @@ final readonly class PartitionRange implements \IteratorAggregate, \Countable
     {
         return $this->start->getLevel();
     }
-
-    public function getContainingRange(): ?PartitionRange
-    {
-        $start = $this->start->getContaining();
-        $end = $this->end->getContaining();
-
-        if ($start === null || $end === null) {
-            return null;
-        }
-
-        return new self($start, $end);
-    }
-
-    public function getRangeAboveForRefresh(): ?PartitionRange
-    {
-        $start = $this->start->getContaining();
-        $end = $this->end->getContaining();
-
-        if ($start === null || $end === null) {
-            return null;
-        }
-
-        return new self($start, $end);
-    }
 }

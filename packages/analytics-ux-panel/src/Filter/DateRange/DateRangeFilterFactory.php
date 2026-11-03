@@ -30,12 +30,6 @@ final readonly class DateRangeFilterFactory implements FilterFactory
     }
 
     #[\Override]
-    public static function getOptionObjectClass(): string
-    {
-        return DateRangeFilterOptions::class;
-    }
-
-    #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,

@@ -29,12 +29,6 @@ final readonly class NumberRangesFilterFactory implements FilterFactory
     }
 
     #[\Override]
-    public static function getOptionObjectClass(): string
-    {
-        return NumberRangesFilterOptions::class;
-    }
-
-    #[\Override]
     public function createFilter(
         DimensionMetadata $dimension,
         array $inputArray,

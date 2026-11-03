@@ -13,19 +13,25 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\UX\PanelBundle\Filter\Choice;
 
-final readonly class Choice
+final class Choice
 {
     /**
      * Sentinel value to indicate null, used in query strings
      */
     public const NULL = "\x1E";
 
+    /**
+     * @param string|\Closure():string $htmlLabel The HTML label, or a closure
+     * returning it. The closure is called on the first call to
+     * `getHtmlLabel()`, so the potentially expensive conversion is skipped if
+     * the HTML label is never rendered.
+     */
     public function __construct(
-        private string $id,
-        private mixed $value,
-        private string $label,
-        private string $htmlLabel,
-        private bool $selected,
+        private readonly string $id,
+        private readonly mixed $value,
+        private readonly string $label,
+        private string|\Closure $htmlLabel,
+        private readonly bool $selected,
     ) {}
 
     public function getId(): string
@@ -45,6 +51,10 @@ final readonly class Choice
 
     public function getHtmlLabel(): string
     {
+        if ($this->htmlLabel instanceof \Closure) {
+            $this->htmlLabel = ($this->htmlLabel)();
+        }
+
         return $this->htmlLabel;
     }
 

@@ -26,9 +26,10 @@ final readonly class MeasureDimensionAdapter implements PivotTableDimension
         private PropertyMap $propertyMap,
     ) {
         if ($dimension->getName() !== '@values') {
-            throw new LogicException(
-                'Expected a MeasureMember for the "@values" dimension, but got: ' . get_debug_type($dimension->getMember()),
-            );
+            throw new LogicException(\sprintf(
+                'MeasureDimensionAdapter can only wrap the "@values" dimension, but got the "%s" dimension.',
+                $dimension->getName(),
+            ));
         }
     }
 

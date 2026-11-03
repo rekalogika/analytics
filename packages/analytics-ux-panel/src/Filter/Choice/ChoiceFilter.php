@@ -147,7 +147,7 @@ final class ChoiceFilter implements Filter
                 // quantity. Do not let the number formatter add grouping
                 // separators.
                 label: \is_int($value) ? (string) $value : $this->stringifier->toString($value),
-                htmlLabel: \is_int($value) ? (string) $value : $this->htmlifier->toHtml($value),
+                htmlLabel: \is_int($value) ? (string) $value : fn(): string => $this->htmlifier->toHtml($value),
                 selected: \in_array(
                     $value,
                     $this->getValues(),
@@ -162,7 +162,7 @@ final class ChoiceFilter implements Filter
             id: Choice::NULL,
             value: null,
             label: $this->stringifier->toString($nullLabel),
-            htmlLabel: $this->htmlifier->toHtml($nullLabel),
+            htmlLabel: fn(): string => $this->htmlifier->toHtml($nullLabel),
             selected: \in_array(
                 null,
                 $this->getValues(),

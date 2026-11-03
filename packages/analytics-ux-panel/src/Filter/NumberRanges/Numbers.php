@@ -24,14 +24,7 @@ final readonly class Numbers implements \Stringable
         string $input,
     ): self {
         // Strip all whitespace characters.
-        $input = preg_replace('/\s+/', '', $input);
-
-        if ($input === null) {
-            return new self(
-                options: $options,
-                numbers: [],
-            );
-        }
+        $input = preg_replace('/\s+/', '', $input) ?? '';
 
         $output = [];
 
