@@ -478,6 +478,40 @@ final readonly class DirtyFlagsHandler
         );
     }
 
+    /**
+     * Gets the creation time of the earliest dirty flag of each partition in
+     * the range. Partitions without dirty flags are omitted.
+     *
+     * @return array<int,\DateTimeImmutable> partition key => time
+     */
+    public function getEarliestDirtyTimes(PartitionRange $range): array
+    {
+        /** @var list<array{key:int|string,earliest:string}> */
+        $result = $this->entityManager->createQueryBuilder()
+            ->select('s.key AS key')
+            ->addSelect('MIN(s.created) AS earliest')
+            ->from(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level = :level')
+            ->andWhere('s.key >= :start')
+            ->andWhere('s.key < :end')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getLowerBound())
+            ->setParameter('end', $range->getUpperBound())
+            ->groupBy('s.key')
+            ->getQuery()
+            ->getArrayResult();
+
+        $times = [];
+
+        foreach ($result as $row) {
+            $times[(int) $row['key']] = new \DateTimeImmutable($row['earliest']);
+        }
+
+        return $times;
+    }
+
     public function removeDirtyFlags(PartitionRange $range): void
     {
         $this->entityManager->createQueryBuilder()

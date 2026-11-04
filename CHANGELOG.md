@@ -36,6 +36,13 @@
 
 ### Fixed
 
+* The dirty flag of an upper partition, created when a lower partition is
+  refreshed, now inherits the time of the earliest dirty flag of the lower
+  partition, instead of having the time of the refresh. The time of a dirty
+  flag is now always the time of the earliest change not yet reflected in
+  its partition. `rekalogika:analytics:status` reports the age of the
+  upper-level flags accordingly.
+
 * A summary reading through the inverse side of a to-one association, e.g.
   `profile.tier` where `AccountProfile::$account` owns the association,
   made every flush that updated or removed the related entity fail with "A

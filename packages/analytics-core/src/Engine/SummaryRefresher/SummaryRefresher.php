@@ -477,6 +477,14 @@ final class SummaryRefresher
         PartitionRange $range,
         ?int $summaryLatestValue,
     ): array {
+        // the flags of the upper partitions inherit the time of the flags
+        // they replace, so that the time of a flag is always the time of the
+        // earliest change not yet reflected in the partition
+
+        $earliestDirtyTimes = $this->summaryHandler
+            ->getDirtyFlags()
+            ->getEarliestDirtyTimes($range);
+
         $this->deleteSummaryRange($range);
         $this->summaryHandler->getDirtyFlags()->removeDirtyFlags($range);
 
@@ -504,7 +512,10 @@ final class SummaryRefresher
 
                 $dirtyFlag = $this->summaryHandler
                     ->getDirtyFlags()
-                    ->createDirtyFlagForPartition($upperPartition);
+                    ->createDirtyFlagForPartition(
+                        partition: $upperPartition,
+                        created: $earliestDirtyTimes[$partition->getKey()] ?? null,
+                    );
 
                 $this->entityManager->persist($dirtyFlag);
 
