@@ -24,6 +24,7 @@ use Rekalogika\Analytics\Bundle\Command\TriggerDumpCommand;
 use Rekalogika\Analytics\Bundle\Command\TriggerInstallCommand;
 use Rekalogika\Analytics\Bundle\Command\TruncateCommand;
 use Rekalogika\Analytics\Bundle\Command\UuidConvertSummaryToSourceCommand;
+use Rekalogika\Analytics\Bundle\Command\VerifyCommand;
 use Rekalogika\Analytics\Bundle\DistinctValuesResolver\ChainDistinctValuesResolver;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshCommandOutputEventSubscriber;
 use Rekalogika\Analytics\Bundle\EventListener\RefreshLoggerEventSubscriber;
@@ -140,6 +141,18 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
             '$refreshAgentStrategy' => service('rekalogika.analytics.engine.refresh.strategy'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.verify')
+        ->class(VerifyCommand::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$summaryVerifierFactory' => service('rekalogika.analytics.engine.summary_verifier_factory'),
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$summaryManager' => service(SummaryManager::class),
         ])
         ->tag('console.command')
     ;

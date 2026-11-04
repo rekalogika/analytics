@@ -27,6 +27,7 @@ use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentRunner;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryManager\DefaultSummaryManager;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherFactory;
+use Rekalogika\Analytics\Engine\SummaryVerifier\SummaryVerifierFactory;
 use Rekalogika\Analytics\Engine\Trigger\TriggerInstaller;
 use Rekalogika\Analytics\Engine\Trigger\TriggerSqlGenerator;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
@@ -86,6 +87,16 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$managerRegistry' => service('doctrine'),
             '$metadataFactory' => service(SummaryMetadataFactory::class),
             '$eventDispatcher' => service('event_dispatcher')->nullOnInvalid(),
+        ])
+    ;
+
+    $services
+        ->set('rekalogika.analytics.engine.summary_verifier_factory')
+        ->class(SummaryVerifierFactory::class)
+        ->args([
+            '$handlerFactory' => service('rekalogika.analytics.summary_manager.handler_factory'),
+            '$managerRegistry' => service('doctrine'),
+            '$metadataFactory' => service(SummaryMetadataFactory::class),
         ])
     ;
 

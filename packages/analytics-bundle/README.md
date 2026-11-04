@@ -159,6 +159,26 @@ application runs with.
 Not supported: class table inheritance, composite identifiers, `TRUNCATE`,
 and updates of primary keys.
 
+## Verification
+
+`rekalogika:analytics:verify` compares a summary table with a fresh roll-up of
+its source, and reports the partitions that differ, e.g. because of a change
+that was not detected. It verifies the whole summarized range, a range of
+source keys, or a random sample of partitions:
+
+```bash
+php bin/console rekalogika:analytics:verify 'App\Entity\OrderSummary'
+php bin/console rekalogika:analytics:verify 'App\Entity\OrderSummary' 1000 2000
+php bin/console rekalogika:analytics:verify 'App\Entity\OrderSummary' --sample=20
+```
+
+With `--repair`, the partitions that differ are marked dirty, and the refresh
+agent refreshes them. The command fails if any partition differs, so it can
+run periodically as a check. Partitions with a pending dirty flag, and the
+ones with source entities not summarized yet, are skipped. Floating point
+measures are compared in single precision, HyperLogLog measures by their
+cardinality.
+
 ## Console Commands
 
 | Command | Description |
@@ -170,6 +190,7 @@ and updates of primary keys.
 | `rekalogika:analytics:trigger:dump` | Prints the SQL creating the PostgreSQL triggers, or dropping them with `--drop`. See [Database Triggers](#database-triggers). |
 | `rekalogika:analytics:trigger:install` | Installs the PostgreSQL triggers directly, replacing the existing ones. For development. |
 | `rekalogika:analytics:trigger:drop` | Drops the PostgreSQL triggers. |
+| `rekalogika:analytics:verify` | Compares a summary table with its source, and reports the partitions that differ. Supports `--sample` and `--repair`. See [Verification](#verification). |
 | `rekalogika:analytics:status` | Shows the refresh status of the summary tables: pending dirty flags, the next and the scheduled refresh, and the latest summarized key against the latest source key. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
 | `rekalogika:analytics:debug:source` | Shows which changes to a source class, or to a class read through an association, refresh which summaries. |
