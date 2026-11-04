@@ -9,3 +9,4 @@ local.mk
 phpstan.neon
 tests/config/reference.php
 /tests/.php-version
+.claude/worktrees/
