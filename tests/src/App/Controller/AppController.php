@@ -227,6 +227,17 @@ final class AppController extends AbstractController
         $sourceSql = $sqlFormatter->compress($sourceSql);
         $sourceSql = $sqlFormatter->highlight($sourceSql);
 
+        // null if the summary table has no data yet
+        $summaryQueryComponents = $cell->getSummaryQueryComponents();
+
+        if ($summaryQueryComponents !== null) {
+            $summarySql = $summaryQueryComponents->getInterpolatedSqlStatement() . ';';
+            $summarySql = $sqlFormatter->compress($summarySql);
+            $summarySql = $sqlFormatter->highlight($summarySql);
+        } else {
+            $summarySql = null;
+        }
+
         $predicate = $predicateRenderer
             ->renderPredicate($cell->getCoordinates());
 
@@ -235,6 +246,7 @@ final class AppController extends AbstractController
             'serialized_coordinates' => $data,
             'predicate' => $predicate,
             'source_sql' => $sourceSql,
+            'summary_sql' => $summarySql,
             'class_hashes' => $this->summaryClassRegistry->getHashToLabel(),
             'hash' => $hash,
         ]);

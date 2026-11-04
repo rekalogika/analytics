@@ -32,6 +32,7 @@ use Rekalogika\Analytics\Metadata\Doctrine\ClassMetadataWrapper;
 use Rekalogika\Analytics\Metadata\Summary\DimensionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\MeasureMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Cube;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
@@ -68,6 +69,8 @@ final class SummaryQuery extends AbstractQuery
     private Query $doctrineQuery;
 
     private PartitionExpressionResolver $partitionExpressionResolver;
+
+    private ?QueryComponents $summaryQueryComponents = null;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -126,6 +129,18 @@ final class SummaryQuery extends AbstractQuery
         if (\count($this->cube) > 0) {
             $groupBy->apply($this->doctrineQuery);
         }
+    }
+
+    /**
+     * The components of the Doctrine query that is actually executed, which
+     * has the group by clause applied, unlike the one created from the
+     * query builder.
+     */
+    #[\Override]
+    public function getQueryComponents(): QueryComponents
+    {
+        return $this->summaryQueryComponents
+            ??= new QueryComponents($this->doctrineQuery);
     }
 
     /**

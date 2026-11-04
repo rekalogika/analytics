@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 
 /**
  * @internal
@@ -54,6 +55,15 @@ final class QueryProcessor
         }
 
         return $this->queryResult = $summarizerQuery->getQueryResult();
+    }
+
+    /**
+     * Returns null if the summary table has no data yet, in which case no
+     * query would be executed.
+     */
+    public function getQueryComponents(): ?QueryComponents
+    {
+        return $this->getSummaryQuery()?->getQueryComponents();
     }
 
     private function getSummaryQuery(): ?SummaryQuery
