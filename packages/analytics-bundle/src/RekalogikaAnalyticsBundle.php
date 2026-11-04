@@ -34,6 +34,8 @@ use Rekalogika\Analytics\Frontend\Formatter\Htmlifier;
 use Rekalogika\Analytics\Frontend\Formatter\Numberifier;
 use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Frontend\Html\TableRenderer;
+use Rekalogika\Analytics\Numeric\Doctrine\Function\FloorDivideFunction;
+use Rekalogika\Analytics\Numeric\Doctrine\Function\FloorLogFunction;
 use Rekalogika\Analytics\PostgreSQLExtra\Doctrine\Function\FirstFunction;
 use Rekalogika\Analytics\PostgreSQLExtra\Doctrine\Function\LastFunction;
 use Rekalogika\Analytics\PostgreSQLHll\Doctrine\Function\HllAddAggregateFunction;
@@ -307,6 +309,18 @@ final class RekalogikaAnalyticsBundle extends AbstractBundle
                 ...$stringFunctions,
                 'REKALOGIKA_TIME_BIN' => TimeBinFunction::class,
                 'REKALOGIKA_TIME_BIN_MBW_WEEK' => TimeBinMbwWeekFunction::class,
+            ];
+        }
+
+        //
+        // numeric
+        //
+
+        if (class_exists(FloorDivideFunction::class)) {
+            $numericFunctions = [
+                ...$numericFunctions,
+                'REKALOGIKA_FLOOR_DIV' => FloorDivideFunction::class,
+                'REKALOGIKA_FLOOR_LOG' => FloorLogFunction::class,
             ];
         }
 

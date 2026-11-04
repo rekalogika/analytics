@@ -65,6 +65,11 @@ final readonly class Selectors
         return Selector::inNamespace('Rekalogika\Analytics\Time');
     }
 
+    public static function selectAnalyticsNumeric(): SelectorInterface
+    {
+        return Selector::inNamespace('Rekalogika\Analytics\Numeric');
+    }
+
     public static function selectAnalyticsUuid(): SelectorInterface
     {
         return Selector::inNamespace('Rekalogika\Analytics\Uuid');

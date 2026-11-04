@@ -22,6 +22,11 @@ use Rekalogika\Analytics\Core\PseudoMeasure\CoordinatesMeasure;
 use Rekalogika\Analytics\Core\ValueResolver\CustomExpression;
 use Rekalogika\Analytics\Core\ValueResolver\IdentifierValue;
 use Rekalogika\Analytics\Metadata\Attribute as Analytics;
+use Rekalogika\Analytics\Numeric\Bin\IndexedBin;
+use Rekalogika\Analytics\Numeric\Binning\LinearBinning;
+use Rekalogika\Analytics\Numeric\Binning\LogarithmicBinning;
+use Rekalogika\Analytics\Numeric\ValueResolver\NumericBinValueResolver;
+use Rekalogika\Analytics\Numeric\ValueResolver\RangeBinValueResolver;
 use Rekalogika\Analytics\Uuid\Partition\UuidV7IntegerPartition;
 use Rekalogika\Analytics\Uuid\ValueResolver\StringUuidToTruncatedInteger;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -73,6 +78,42 @@ class CustomerSummary extends BaseSummary
     )]
     private ?Gender $gender = null;
 
+    /**
+     * Bins with custom ranges and labels, defined by an enum.
+     */
+    #[ORM\Column(enumType: AgeGroup::class, nullable: true)]
+    #[Analytics\Dimension(
+        source: new RangeBinValueResolver(
+            binClass: AgeGroup::class,
+            input: new CustomExpression('[(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).age]'),
+        ),
+        label: new TranslatableMessage('Age group'),
+        nullLabel: new TranslatableMessage('Unspecified'),
+    )]
+    private ?AgeGroup $ageGroup = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Analytics\Dimension(
+        source: new NumericBinValueResolver(
+            binning: new LinearBinning(width: 10, min: 20, max: 70),
+            input: new CustomExpression('[(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).age]'),
+        ),
+        label: new TranslatableMessage('Age (linear bins)'),
+        nullLabel: new TranslatableMessage('Unspecified'),
+    )]
+    private ?int $ageLinear = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Analytics\Dimension(
+        source: new NumericBinValueResolver(
+            binning: new LogarithmicBinning(base: 2, min: 16),
+            input: new CustomExpression('[(Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer).age]'),
+        ),
+        label: new TranslatableMessage('Age (logarithmic bins)'),
+        nullLabel: new TranslatableMessage('Unspecified'),
+    )]
+    private ?int $ageLogarithmic = null;
+
     //
     // measures
     //
@@ -112,6 +153,27 @@ class CustomerSummary extends BaseSummary
     public function getGender(): ?Gender
     {
         return $this->gender;
+    }
+
+    public function getAgeGroup(): ?AgeGroup
+    {
+        return $this->ageGroup;
+    }
+
+    public function getAgeLinear(): ?IndexedBin
+    {
+        return $this->getContext()->getUserValue(
+            property: 'ageLinear',
+            class: IndexedBin::class,
+        );
+    }
+
+    public function getAgeLogarithmic(): ?IndexedBin
+    {
+        return $this->getContext()->getUserValue(
+            property: 'ageLogarithmic',
+            class: IndexedBin::class,
+        );
     }
 
     public function getCount(): ?int

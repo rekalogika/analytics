@@ -204,6 +204,7 @@ final class ArchitectureTest
                 // internal packages (optional)
                 Selectors::selectAnalyticsUuid(),
                 Selectors::selectAnalyticsTime(),
+                Selectors::selectAnalyticsNumeric(),
                 Selectors::selectAnalyticsPostgreSQLHll(),
                 Selectors::selectAnalyticsPostgreSQLExtra(),
                 Selectors::selectAnalyticsFrontend(),
@@ -497,6 +498,40 @@ final class ArchitectureTest
 
                 // exceptions
                 Selector::classname(\Error::class),
+            );
+    }
+
+    public function testPackageNumeric(): Rule
+    {
+        return PHPat::rule()
+            ->classes(
+                Selectors::selectAnalyticsNumeric(),
+            )
+            ->canOnly()->dependOn()
+            ->classes(
+                Selectors::selectAnalyticsNumeric(),
+
+                // internal packages
+                Selectors::selectAnalyticsContracts(),
+
+                // psr/symfony contracts
+                Selector::inNamespace('Symfony\Contracts\Translation'),
+
+                // doctrine
+                Selector::inNamespace('Doctrine\DBAL'),
+                Selector::inNamespace('Doctrine\ORM'),
+
+                // php misc
+                Selector::classname(\Stringable::class),
+                Selector::classname(\Override::class),
+                Selector::classname(\WeakReference::class),
+
+                // php enum
+                Selector::classname(\BackedEnum::class),
+
+                // php array
+                Selector::classname(\IteratorAggregate::class),
+                Selector::classname(\Traversable::class),
             );
     }
 
