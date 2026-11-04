@@ -22,7 +22,9 @@ use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\DimensionFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\MetadataOrderByResolver;
 use Rekalogika\Analytics\Engine\SummaryQuery\DimensionFactory\NullMeasureCollection;
 use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCell;
+use Rekalogika\Analytics\Engine\SummaryQuery\Output\DefaultCoordinates;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
+use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -110,5 +112,15 @@ final readonly class ResultContext
         $newQuery->dice($predicate);
 
         return $this->resultContextFactory->createResultContext($newQuery);
+    }
+
+    /**
+     * Returns null if the summary table has no data yet.
+     */
+    public function getCoordinatesSummaryQueryComponents(
+        DefaultCoordinates $coordinates,
+    ): ?QueryComponents {
+        return $this->resultContextFactory
+            ->createCoordinatesSummaryQueryComponents($coordinates);
     }
 }

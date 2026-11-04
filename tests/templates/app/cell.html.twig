@@ -73,4 +73,18 @@
 
     <pre class="user-select-all" style="white-space: pre-wrap">{{ source_sql|raw }}</pre>
 
+    <h3 class="mb-3">Summary Table SQL</h3>
+
+    <p class="text-muted">
+        Computes the same measures from the summary table. It covers only the
+        source rows that have been summarized, so its result matches the
+        source table SQL only if the summary is up to date.
+    </p>
+
+    {% if summary_sql is not null %}
+        <pre class="user-select-all" style="white-space: pre-wrap">{{ summary_sql|raw }}</pre>
+    {% else %}
+        <p>None, the summary table has no data yet.</p>
+    {% endif %}
+
 {% endblock body %}

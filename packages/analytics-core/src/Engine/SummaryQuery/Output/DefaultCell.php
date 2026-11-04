@@ -56,6 +56,15 @@ final class DefaultCell implements CubeCell
     }
 
     /**
+     * Returns null if the summary table has no data yet.
+     */
+    public function getSummaryQueryComponents(): ?QueryComponents
+    {
+        return $this->context
+            ->getCoordinatesSummaryQueryComponents($this->getCoordinates());
+    }
+
+    /**
      * @param list<string> $dimensions
      */
     public function withOrdering(array $dimensions): self
