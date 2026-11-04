@@ -65,6 +65,9 @@ final readonly class BaseEntity
      *
      * - It is a property
      * - It is the entity alias, if the element is an asterisk
+     * - It is the inverse side of a to-one association. DQL does not allow
+     *   a path expression to it, the related entity is joined, and its alias
+     *   is returned
      */
     private function processHasOneElement(Path $path): string
     {
@@ -72,6 +75,10 @@ final readonly class BaseEntity
 
         if ($element instanceof Alias) {
             return $this->baseAlias;
+        }
+
+        if ($element->getClassCast() === null && $this->isInverseSideToOne($element->getName())) {
+            return $this->createBaseEntityWithoutCast($element)->baseAlias;
         }
 
         return $this->processProperty($path);
@@ -230,6 +237,15 @@ final readonly class BaseEntity
     private function hasProperty(string $property): bool
     {
         return $this->getClassMetadata()->hasField($property);
+    }
+
+    private function isInverseSideToOne(string $property): bool
+    {
+        $classMetadata = $this->getClassMetadata();
+
+        return $classMetadata->hasAssociation($property)
+            && $classMetadata->isSingleValuedAssociation($property)
+            && $classMetadata->isAssociationInverseSide($property);
     }
 
     /**

@@ -20,6 +20,7 @@ use Rekalogika\Analytics\SimpleQueryBuilder\Path\PathResolver;
 use Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\Embeddable\Entity;
+use Rekalogika\Analytics\Tests\App\Entity\InverseSide\Account;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -415,6 +416,37 @@ final class PathResolverTest extends KernelTestCase
 
         $this->assertEquals(
             'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\Customer root LEFT JOIN root.orders _a0',
+            $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
+        );
+    }
+
+    //
+    // ONE TO ONE, INVERSE SIDE
+    //
+
+    /**
+     * DQL does not allow a path expression to the inverse side of a to-one
+     * association, the related entity is joined instead.
+     */
+    public function testOneToOneInverseSideEntity(): void
+    {
+        $pathResolver = $this->createPathResolver(
+            class: Account::class,
+            alias: 'root',
+        );
+
+        $this->assertEquals(
+            '_a0',
+            $pathResolver->resolve('profile'),
+        );
+
+        $this->assertEquals(
+            '_a0.tier',
+            $pathResolver->resolve('profile.tier'),
+        );
+
+        $this->assertEquals(
+            'SELECT root.id FROM Rekalogika\Analytics\Tests\App\Entity\InverseSide\Account root LEFT JOIN root.profile _a0',
             $pathResolver->getQueryBuilder()->getQuery()->getDQL(),
         );
     }

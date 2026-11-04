@@ -48,11 +48,24 @@ use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
  *   row affects the source rows only through a foreign key action, which
  *   fires the triggers of the source table.
  *
+ * The `UPDATE` triggers have no `OF column` list, PostgreSQL does not allow
+ * one on a trigger with transition tables. A statement updating only
+ * other columns still fires them, and the function compares the old and new
+ * rows with `IS DISTINCT FROM` on the columns the summaries read, so it
+ * creates no flag.
+ *
+ * The filter of the summary is not applied. A row outside the filter still
+ * creates a flag, which only causes a refresh of a partition that did not
+ * need it. A change can also move a row into or out of the filter, then
+ * the flag is needed.
+ *
  * The triggers only create the dirty flags. They do not dispatch the
  * refresh agent, the sweeper does.
  *
  * Not supported: class table inheritance, composite identifiers, and
- * `TRUNCATE`.
+ * `TRUNCATE`. Through the inverse side of a to-one association, the foreign
+ * key is in the related table: the insertion or deletion of a related row,
+ * or a change of its foreign key, is not detected.
  */
 final readonly class TriggerSqlGenerator
 {
