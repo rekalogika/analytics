@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
+use Doctrine\Common\Collections\Criteria;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
+use Rekalogika\Analytics\Contracts\SummaryManager;
 use Rekalogika\Analytics\Tests\App\Entity\Category;
 use Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
@@ -39,6 +42,7 @@ final class CommandTest extends KernelTestCase
         yield 'refresh' => ['rekalogika:analytics:refresh', 'class'];
         yield 'truncate' => ['rekalogika:analytics:truncate', 'class'];
         yield 'debug:summary' => ['rekalogika:analytics:debug:summary', 'summaryClass'];
+        yield 'debug:cell' => ['rekalogika:analytics:debug:cell', 'summaryClass'];
     }
 
     /**
@@ -51,6 +55,7 @@ final class CommandTest extends KernelTestCase
         yield 'truncate' => ['rekalogika:analytics:truncate', 'class'];
         yield 'debug:summary' => ['rekalogika:analytics:debug:summary', 'summaryClass'];
         yield 'debug:source' => ['rekalogika:analytics:debug:source', 'sourceClass'];
+        yield 'debug:cell' => ['rekalogika:analytics:debug:cell', 'summaryClass'];
         yield 'verify' => ['rekalogika:analytics:verify', 'class'];
     }
 
@@ -188,6 +193,114 @@ final class CommandTest extends KernelTestCase
         $this->assertStringContainsString('Source Class ' . Customer::class, $display);
         $this->assertStringContainsString('Source Class ' . Item::class, $display);
         $this->assertStringContainsString('Source Class ' . Category::class, $display);
+    }
+
+    public function testDebugCell(): void
+    {
+        $summaryManager = self::getContainer()->get(SummaryManager::class);
+        $this->assertInstanceOf(SummaryManager::class, $summaryManager);
+
+        $coordinatesMapper = self::getContainer()->get(CoordinatesMapper::class);
+        $this->assertInstanceOf(CoordinatesMapper::class, $coordinatesMapper);
+
+        $cell = $summaryManager
+            ->createQuery()
+            ->from(OrderSummary::class)
+            ->withDimensions('customerCountry')
+            ->dice(Criteria::expr()->in('time.civil.year', [2023, 2024]))
+            ->getResult()
+            ->drillDown('customerCountry')
+            ->first();
+
+        $this->assertNotNull($cell);
+
+        $coordinates = json_encode(
+            $coordinatesMapper->toDto($cell),
+            JSON_THROW_ON_ERROR,
+        );
+
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:cell');
+        $exitCode = $tester->execute(
+            [
+                'summaryClass' => OrderSummary::class,
+                'coordinates' => $coordinates,
+            ],
+            ['interactive' => false],
+        );
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString(' customerCountry Customer country ', $display);
+        $this->assertStringContainsString(' count Count ', $display);
+        $this->assertStringContainsString('time.civil.year IN (2023, 2024)', $display);
+        $this->assertStringContainsString($coordinates, $display);
+        $this->assertStringContainsString('FROM "order"', $display);
+        $this->assertStringContainsString('FROM order_summary', $display);
+    }
+
+    public function testDebugApexCell(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:cell');
+        $exitCode = $tester->execute(
+            ['summaryClass' => OrderSummary::class],
+            ['interactive' => false],
+        );
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('None, this is the apex cell.', $display);
+        $this->assertStringContainsString('FROM order_summary', $display);
+    }
+
+    /**
+     * A cell missing from the result of the summary table has no summary
+     * query, but the source query is still shown.
+     */
+    public function testDebugCellMissingFromResult(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:cell');
+        $exitCode = $tester->execute(
+            [
+                'summaryClass' => OrderSummary::class,
+                'coordinates' => '{"class":"coordinates","members":{"time.civil.month.month":"190001"},"predicate":null}',
+            ],
+            ['interactive' => false],
+        );
+
+        $display = $this->getDisplay($tester);
+
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('FROM "order"', $display);
+        $this->assertStringContainsString('None, the cell is not in the result of the summary table.', $display);
+    }
+
+    public function testDebugCellWithInvalidCoordinates(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:cell');
+        $exitCode = $tester->execute(
+            [
+                'summaryClass' => OrderSummary::class,
+                'coordinates' => '{"members":',
+            ],
+            ['interactive' => false],
+        );
+
+        $this->assertSame(Command::FAILURE, $exitCode);
+        $this->assertStringContainsString('Invalid coordinates:', $this->getDisplay($tester));
+    }
+
+    public function testDebugCellOfNonSummaryClass(): void
+    {
+        $tester = $this->createCommandTester('rekalogika:analytics:debug:cell');
+        $exitCode = $tester->execute(
+            ['summaryClass' => Order::class],
+            ['interactive' => false],
+        );
+
+        $this->assertSame(Command::FAILURE, $exitCode);
+        $this->assertStringContainsString('is not a summary class.', $this->getDisplay($tester));
     }
 
     private function createCommandTester(string $commandName): CommandTester
