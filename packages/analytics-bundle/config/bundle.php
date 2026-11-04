@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Bundle;
 
+use Rekalogika\Analytics\Bundle\Command\DebugCellCommand;
 use Rekalogika\Analytics\Bundle\Command\DebugSourceCommand;
 use Rekalogika\Analytics\Bundle\Command\DebugSummaryCommand;
 use Rekalogika\Analytics\Bundle\Command\RefreshCommand;
@@ -38,6 +39,7 @@ use Rekalogika\Analytics\Engine\DistinctValuesResolver\DoctrineDistinctValuesRes
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgent;
 use Rekalogika\Analytics\Engine\RefreshAgent\RefreshAgentSweeper;
 use Rekalogika\Analytics\Engine\Serialization\DoctrineValueSerializer;
+use Rekalogika\Analytics\Frontend\Formatter\Stringifier;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Serialization\Mapper\DefaultCoordinatesMapper;
@@ -121,6 +123,20 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
             '$sourceMetadataFactory' => service(SourceMetadataFactory::class),
             '$managerRegistry' => service('doctrine'),
+        ])
+        ->tag('console.command')
+    ;
+
+    $services
+        ->set('rekalogika.analytics.command.debug_cell')
+        ->class(DebugCellCommand::class)
+        ->args([
+            '$summaryMetadataFactory' => service(SummaryMetadataFactory::class),
+            '$coordinatesMapper' => service(CoordinatesMapper::class),
+            '$sourceEntitiesFactory' => service('rekalogika.analytics.source_entities_factory'),
+            '$translator' => service('translator'),
+            // the frontend is optional
+            '$stringifier' => service(Stringifier::class)->nullOnInvalid(),
         ])
         ->tag('console.command')
     ;

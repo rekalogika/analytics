@@ -193,6 +193,7 @@ cardinality.
 | `rekalogika:analytics:verify` | Compares a summary table with its source, and reports the partitions that differ. Supports `--sample` and `--repair`. See [Verification](#verification). |
 | `rekalogika:analytics:status` | Shows the refresh status of the summary tables: pending dirty flags, the next and the scheduled refresh, and the latest summarized key against the latest source key. |
 | `rekalogika:analytics:debug:summary` | Shows information about a summary table. |
+| `rekalogika:analytics:debug:cell` | Shows a cell identified by its serialized coordinates: its members, its measures, and the SQL computing the measures from the source table and from the summary table. |
 | `rekalogika:analytics:debug:source` | Shows which changes to a source class, or to a class read through an association, refresh which summaries. |
 | `rekalogika:analytics:uuid:summary-to-source` | Converts a UUIDv7 partition key in the summary table to the corresponding source value. |
 
