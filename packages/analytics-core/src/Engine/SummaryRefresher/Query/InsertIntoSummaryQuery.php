@@ -18,9 +18,14 @@ use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 
 final readonly class InsertIntoSummaryQuery
 {
+    /**
+     * @param string|null $tableName The table to insert into, if not the
+     * summary table, e.g. a temporary table with the same columns.
+     */
     public function __construct(
         private ClassMetadataWrapper $doctrineClassMetadata,
         private SummaryMetadata $summaryMetadata,
+        private ?string $tableName = null,
     ) {}
 
     public function getSQL(): string
@@ -68,7 +73,7 @@ final readonly class InsertIntoSummaryQuery
 
         return \sprintf(
             'INSERT INTO %s (%s)',
-            $this->doctrineClassMetadata->getSQLTableName(),
+            $this->tableName ?? $this->doctrineClassMetadata->getSQLTableName(),
             implode(', ', $columns),
         );
     }

@@ -51,6 +51,7 @@ final class CommandTest extends KernelTestCase
         yield 'truncate' => ['rekalogika:analytics:truncate', 'class'];
         yield 'debug:summary' => ['rekalogika:analytics:debug:summary', 'summaryClass'];
         yield 'debug:source' => ['rekalogika:analytics:debug:source', 'sourceClass'];
+        yield 'verify' => ['rekalogika:analytics:verify', 'class'];
     }
 
     /**
