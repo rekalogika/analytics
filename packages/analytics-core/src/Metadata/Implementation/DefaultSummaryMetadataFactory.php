@@ -216,6 +216,7 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
             label: $label,
             groupingStrategy: $summaryAttribute->getGroupingStrategy(),
             trackAssociations: $summaryAttribute->isTrackAssociations(),
+            filter: $summaryAttribute->getFilter(),
         );
     }
 

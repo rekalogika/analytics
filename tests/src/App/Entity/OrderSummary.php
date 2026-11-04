@@ -15,13 +15,12 @@ namespace Rekalogika\Analytics\Tests\App\Entity;
 
 use Brick\Math\RoundingMode;
 use Brick\Money\Money;
+use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Core\AggregateFunction\Average;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\AggregateFunction\Max;
@@ -50,8 +49,9 @@ use Symfony\Component\Translation\TranslatableMessage;
 #[Analytics\Summary(
     sourceClass: Order::class,
     label: new TranslatableMessage('Orders'),
+    filter: new Comparison('id', '>', 10),
 )]
-class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
+class OrderSummary extends BaseSummary
 {
     //
     // partition
@@ -277,14 +277,6 @@ class OrderSummary extends BaseSummary implements HasQueryBuilderModifier
         label: new TranslatableMessage('Actions'),
     )]
     private ?Coordinates $actions = null;  // @phpstan-ignore property.unusedType
-
-    #[\Override]
-    public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
-    {
-        $queryBuilder
-            ->andWhere('root.id > :minId')
-            ->setParameter('minId', 10);
-    }
 
     //
     // getters

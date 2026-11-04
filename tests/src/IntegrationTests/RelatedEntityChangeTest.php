@@ -162,7 +162,7 @@ final class RelatedEntityChangeTest extends KernelTestCase
             ?? throw new \RuntimeException('Customer not found');
 
         // the orders with id up to 10 are not summarized, see
-        // OrderSummary::modifyQueryBuilder()
+        // the filter of OrderSummary
 
         $orderCount = $this->fetchInt(
             'SELECT COUNT(*) FROM "order" WHERE customer_id = ? AND id > 10',
@@ -283,7 +283,7 @@ final class RelatedEntityChangeTest extends KernelTestCase
 
     /**
      * The orders with id up to 10 are not summarized, see
-     * `OrderSummary::modifyQueryBuilder()`.
+     * the filter of `OrderSummary`.
      */
     private function getOrderCountOfItem(Item $item): int
     {

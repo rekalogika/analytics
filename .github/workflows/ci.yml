@@ -124,6 +124,7 @@ jobs:
         php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OrderExplicitGroupingSetsSummary'
         php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\CustomerSummary'
         php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
+        php tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\FilteredOrderSummary'
 
     - name: Install importmap packages
       run: php tests/bin/console importmap:install

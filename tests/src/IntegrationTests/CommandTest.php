@@ -18,6 +18,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Category;
 use Rekalogika\Analytics\Tests\App\Entity\ClassCast\Shipment;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
+use Rekalogika\Analytics\Tests\App\Entity\FilteredOrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\Order;
@@ -116,7 +117,7 @@ final class CommandTest extends KernelTestCase
 
         $this->assertSame(Command::SUCCESS, $exitCode);
         $this->assertStringContainsString('Source Class ' . Order::class, $display);
-        $this->assertStringContainsString(' time ' . OrderExplicitGroupingSetsSummary::class, $display);
+        $this->assertStringContainsString(' time ' . FilteredOrderSummary::class . ' ' . OrderExplicitGroupingSetsSummary::class, $display);
 
         // the change set keys that are not mapped are not shown
 

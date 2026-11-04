@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Tests\App\Entity;
 
+use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Order as DoctrineOrder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Core\AggregateFunction\Count;
 use Rekalogika\Analytics\Core\AggregateFunction\Sum;
 use Rekalogika\Analytics\Core\Entity\BaseSummary;
@@ -45,8 +44,9 @@ use Symfony\Component\Translation\TranslatableMessage;
         ['customerRegion'],
         ['customerGender', 'customerType'],
     ]),
+    filter: new Comparison('id', '>', 10),
 )]
-class OrderExplicitGroupingSetsSummary extends BaseSummary implements HasQueryBuilderModifier
+class OrderExplicitGroupingSetsSummary extends BaseSummary
 {
     //
     // partition
@@ -147,14 +147,6 @@ class OrderExplicitGroupingSetsSummary extends BaseSummary implements HasQueryBu
         label: new TranslatableMessage('Count'),
     )]
     private ?int $count = null;
-
-    #[\Override]
-    public static function modifyQueryBuilder(QueryBuilder $queryBuilder): void
-    {
-        $queryBuilder
-            ->andWhere('root.id > :minId')
-            ->setParameter('minId', 10);
-    }
 
     //
     // getters

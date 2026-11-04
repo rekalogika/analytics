@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Summary;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
@@ -20,6 +21,7 @@ use Rekalogika\Analytics\Metadata\AttributeCollection\AttributeCollection;
 use Rekalogika\Analytics\Metadata\Groupings\DefaultGroupByExpressions;
 use Rekalogika\Analytics\Metadata\Implementation\RootGroupingStrategy;
 use Rekalogika\Analytics\Metadata\Util\InvolvedPropertyUtil;
+use Rekalogika\Analytics\Metadata\Util\SourceFilterUtil;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -107,8 +109,10 @@ final readonly class SummaryMetadata
      * root dimensions.
      * @param bool $trackAssociations Whether a change to a related entity
      * refreshes the source entities that refer to it.
+     * @param Expression|null $filter The condition restricting the source
+     * entities that are summarized.
      * @throws MetadataException If the grouping strategy is invalid or
-     * produces no grouping set.
+     * produces no grouping set, or if the filter is invalid.
      */
     public function __construct(
         private string $sourceClass,
@@ -121,6 +125,7 @@ final readonly class SummaryMetadata
         private TranslatableInterface $label,
         ?GroupingStrategy $groupingStrategy = null,
         private bool $trackAssociations = true,
+        private ?Expression $filter = null,
     ) {
         $allProperties = [];
 
@@ -215,6 +220,19 @@ final readonly class SummaryMetadata
 
         foreach ($involvedMetadata as $propertyMetadata) {
             foreach ($propertyMetadata->getInvolvedSourceProperties() as $property) {
+                $paths[] = trim($property);
+                $properties = [
+                    ...$properties,
+                    ...InvolvedPropertyUtil::getChangeSetKeys($property),
+                ];
+            }
+        }
+
+        // a change to a property the filter reads moves the source entity in
+        // or out of the summary
+
+        if ($this->filter !== null) {
+            foreach (SourceFilterUtil::getInvolvedProperties($this->filter) as $property) {
                 $paths[] = trim($property);
                 $properties = [
                     ...$properties,
@@ -525,7 +543,8 @@ final readonly class SummaryMetadata
     /**
      * The properties of the source class that influence this summary, as
      * declared by the value resolvers and aggregate functions of the
-     * dimensions and measures, converted to the keys Doctrine reports in the
+     * dimensions and measures, by the partition, and by the filter, converted
+     * to the keys Doctrine reports in the
      * change set, e.g. `customer` for `customer.country`. See
      * `InvolvedPropertyUtil::getChangeSetKeys()`. The refresh engine
      * uses this to decide whether a change to a source entity affects the
@@ -541,7 +560,8 @@ final readonly class SummaryMetadata
     /**
      * The property paths of the source class that influence this summary, as
      * declared by the value resolvers and aggregate functions of the
-     * dimensions and measures, and by the partition, e.g. `customer.country`.
+     * dimensions and measures, by the partition, and by the filter, e.g.
+     * `customer.country`.
      * Unlike `getInvolvedSourceProperties()`, they are not converted to change
      * set keys.
      *
@@ -550,6 +570,15 @@ final readonly class SummaryMetadata
     public function getInvolvedSourcePaths(): array
     {
         return $this->involvedSourcePaths;
+    }
+
+    /**
+     * The condition restricting the source entities that are summarized, or
+     * null if every source entity is summarized.
+     */
+    public function getFilter(): ?Expression
+    {
+        return $this->filter;
     }
 
     /**

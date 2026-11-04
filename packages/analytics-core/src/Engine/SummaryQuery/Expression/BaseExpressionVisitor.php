@@ -299,7 +299,7 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
          * @var list<ORMComparison|Andx|Orx|string>
          */
         $expressions = array_map(
-            fn($expression): mixed => $expression->visit($this),
+            fn($expression): mixed => $this->dispatch($expression),
             $expr->getExpressionList(),
         );
 

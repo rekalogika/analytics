@@ -237,11 +237,12 @@ final class SourceChangeTest extends KernelTestCase
         $this->assertCount(2, $events);
 
         // check messenger now, it should have one pending message for each
-        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
+        // summary of Order: OrderSummary, OrderExplicitGroupingSetsSummary and
+        // FilteredOrderSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // another change before the scheduled run should not dispatch another
         // message, the scheduled run will process it
@@ -265,14 +266,14 @@ final class SourceChangeTest extends KernelTestCase
         $entityManager->clear();
 
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // the refresh agent is scheduled to run when the first dirty flag
         // satisfies the minimum age of the refresh agent strategy, 600 seconds.
 
         $this->travel($clock, 499);
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // in the exact 600th second it should process the message. the
         // creation times of the new records are preserved, and the minimum
@@ -341,18 +342,19 @@ final class SourceChangeTest extends KernelTestCase
         $this->assertCount(1, $events);
 
         // check messenger now, it should have one pending message for each
-        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
+        // summary of Order: OrderSummary, OrderExplicitGroupingSetsSummary and
+        // FilteredOrderSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // the refresh agent is scheduled to run when the dirty flag satisfies
         // the minimum age of the refresh agent strategy, 600 seconds.
 
         $this->travel($clock, 599);
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // in the exact 600th second it should process the message, and the
         // refresh agent should not reschedule itself because there are no
@@ -418,18 +420,19 @@ final class SourceChangeTest extends KernelTestCase
         $this->assertCount(1, $events);
 
         // check messenger now, it should have one pending message for each
-        // summary of Order: OrderSummary and OrderExplicitGroupingSetsSummary
+        // summary of Order: OrderSummary, OrderExplicitGroupingSetsSummary and
+        // FilteredOrderSummary
 
         $transport = $this->transport('async');
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // the refresh agent is scheduled to run when the dirty flag satisfies
         // the minimum age of the refresh agent strategy, 600 seconds.
 
         $this->travel($clock, 599);
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // in the exact 600th second it should process the message, and the
         // refresh agent should not reschedule itself because there are no
@@ -462,14 +465,14 @@ final class SourceChangeTest extends KernelTestCase
 
         $this->modifyOrderTime(50, new \DateTimeImmutable('2030-02-01 00:00:00'));
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // t=200: modify order 40, the existing scheduled run will process it
 
         $this->travel($clock, 200);
         $this->modifyOrderTime(40, new \DateTimeImmutable('2030-02-01 00:00:00'));
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
 
         // t=600: the change to order 50 is refreshed, and propagated up
         // immediately. the change to order 40 is not old enough, the refresh
@@ -477,7 +480,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $this->travel($clock, 400);
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
         $this->assertEquals(1, $this->getOrderCountIn2030());
 
         // t=800: the change to order 40 is refreshed, but the third level
@@ -486,7 +489,7 @@ final class SourceChangeTest extends KernelTestCase
 
         $this->travel($clock, 200);
         $transport->process();
-        $transport->queue()->assertCount(2);
+        $transport->queue()->assertCount(3);
         $this->assertEquals(1, $this->getOrderCountIn2030());
 
         // t=900: the cooldown period ends, the third level partition is
