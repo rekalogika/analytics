@@ -21,6 +21,7 @@ use Rekalogika\Analytics\Tests\App\Entity\InverseSide\Account;
 use Rekalogika\Analytics\Tests\App\Entity\InverseSide\AccountProfile;
 use Rekalogika\Analytics\Tests\App\Entity\InverseSide\AccountSummary;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 /**
  * A summary reads a property through the inverse side of a one-to-one
@@ -30,6 +31,11 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 final class InverseSideAssociationTest extends KernelTestCase
 {
+    // the flushes dispatch the refresh agent. the trait resets the transport
+    // after each test, so the messages do not reach the next test
+
+    use InteractsWithMessenger;
+
     private Account $account;
 
     private AccountProfile $profile;
