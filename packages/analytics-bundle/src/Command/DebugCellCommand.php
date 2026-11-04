@@ -20,6 +20,7 @@ use Doctrine\Common\Collections\Expr\Value;
 use Rekalogika\Analytics\Contracts\Dto\CoordinatesDto;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Result\Cell;
+use Rekalogika\Analytics\Contracts\Result\CubeCell;
 use Rekalogika\Analytics\Contracts\Serialization\CoordinatesMapper;
 use Rekalogika\Analytics\Engine\SourceEntities\SourceEntitiesFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Helper\ResultDebugger;
@@ -145,6 +146,7 @@ final class DebugCellCommand extends Command
 
         $this->printCoordinates($io, $cell);
         $this->printMeasures($io, $cell);
+        $this->printValidAsOf($io, $cell);
         $this->printPredicates($io, $cell);
 
         $io->section('Serialized Coordinates');
@@ -229,6 +231,22 @@ final class DebugCellCommand extends Command
             headers: ['Field', 'Label', 'Value', 'Raw Value', 'Unit'],
             rows: $rows,
         );
+    }
+
+    private function printValidAsOf(SymfonyStyle $io, Cell $cell): void
+    {
+        if (!$cell instanceof CubeCell) {
+            return;
+        }
+
+        $io->section('Valid As Of');
+
+        $validAsOf = $cell->getValidAsOf();
+
+        $io->text($validAsOf === null
+            ? 'Unknown, the source has records not summarized yet, and has never been checked for new records.'
+            : $validAsOf->format(\DateTimeInterface::ATOM));
+        $io->newLine();
     }
 
     private function printPredicates(SymfonyStyle $io, Cell $cell): void

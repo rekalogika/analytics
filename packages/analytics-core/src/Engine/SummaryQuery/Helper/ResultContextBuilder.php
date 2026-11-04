@@ -94,6 +94,7 @@ final class ResultContextBuilder
             nodesLimit: $this->nodesLimit,
             sourceEntitiesFactory: $this->sourceEntitiesFactory,
             resultContextFactory: $this->resultContextFactory,
+            validAsOf: $this->queryProcessor->getValidAsOf(),
         );
 
         $cellRepository = $resultContext->getCellRepository();

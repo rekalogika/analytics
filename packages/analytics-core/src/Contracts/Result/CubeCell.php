@@ -59,6 +59,31 @@ interface CubeCell extends Cell
     public function getApex(): self;
 
     /**
+     * The time up to which the cube is known to be complete: it includes
+     * every change to the source made before this time. Changes made after
+     * it may or may not be included, so the cube is not necessarily the
+     * state of the source at this time. The same for every cell of the cube,
+     * in UTC, with a precision of one second.
+     *
+     * The cube is computed from the summary table, which is refreshed
+     * asynchronously. A change not yet reflected in the summary table makes
+     * this time earlier, down to the time of the change. If every change is
+     * reflected, this is the time of the query.
+     *
+     * The changes are known from their dirty flags, created for the changes
+     * made through Doctrine ORM, and by the database triggers. New source
+     * records without dirty flags, e.g. inserted with native SQL without the
+     * triggers, are also taken into account: this time is then not after the
+     * last time the refresh checked the source for new records. Other
+     * changes without dirty flags are not taken into account.
+     *
+     * Returns null if it cannot be determined: there are source records not
+     * summarized yet, and the source has never been checked for new records,
+     * e.g. the summary has never been refreshed.
+     */
+    public function getValidAsOf(): ?\DateTimeInterface;
+
+    /**
      * Determine if this cell was created for interpolation, or to balance the
      * cube, and does not result from the query.
      *

@@ -79,6 +79,31 @@ final readonly class SummaryPropertiesManager
     }
 
     /**
+     * Gets the latest summarized key and the time the source was checked,
+     * read together, so that they are consistent with each other.
+     *
+     * @return array{int|string|null,\DateTimeImmutable|null}
+     */
+    public function getMaxAndSourceChecked(): array
+    {
+        /** @var array{lastId:string|null,sourceChecked:\DateTimeImmutable|null}|null */
+        $result = $this->entityManager->createQueryBuilder()
+            ->select('p.lastId, p.sourceChecked')
+            ->from(SummaryProperties::class, 'p')
+            ->where('p.summaryClass = :summaryClass')
+            ->setParameter('summaryClass', $this->summaryClass)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        $max = $result['lastId'] ?? null;
+
+        return [
+            is_numeric($max) ? (int) $max : $max,
+            $result['sourceChecked'] ?? null,
+        ];
+    }
+
+    /**
      * Records the time just before the latest key of the source was read, and
      * found not to be greater than the latest summarized key.
      *

@@ -21,6 +21,17 @@
 
 ### Added
 
+* `CubeCell::getValidAsOf()` tells how fresh a query result is. The
+  result includes every change to the source made before the returned time;
+  changes made after it may or may not be included. The time is the
+  earliest of the time of the query, the time of the earliest pending dirty
+  flag, and, if the source has records not summarized yet, the last time the
+  refresh checked the source for new records. It is the same for every cell
+  of the cube, in UTC. Null if it cannot be determined, e.g. the summary has
+  never been refreshed. Only the changes with dirty flags, and the new
+  records, are taken into account. `rekalogika:analytics:debug:cell` shows
+  it.
+
 * The refresh records the time it last checked the source for new records,
   in the new column `rekalogika_summary_properties.source_checked`. Generate
   a migration for it. Every source record after the latest summarized key

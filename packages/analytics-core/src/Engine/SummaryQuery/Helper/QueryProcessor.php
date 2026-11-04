@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Engine\SummaryQuery\DefaultQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\LowestPartitionLastIdQuery;
 use Rekalogika\Analytics\Engine\SummaryQuery\Query\SummaryQuery;
+use Rekalogika\Analytics\Engine\SummaryQuery\Query\ValidAsOfQuery;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\QueryComponents;
 
@@ -31,6 +32,8 @@ final class QueryProcessor
      * @var list<array<string, mixed>>|null
      */
     private ?array $queryResult = null;
+
+    private ?\DateTimeImmutable $validAsOf = null;
 
     public function __construct(
         private readonly DefaultQuery $query,
@@ -48,6 +51,13 @@ final class QueryProcessor
             return $this->queryResult;
         }
 
+        // determined before querying the summary table, see ValidAsOfQuery
+
+        $this->validAsOf = (new ValidAsOfQuery(
+            entityManager: $this->entityManager,
+            metadata: $this->metadata,
+        ))->getValidAsOf();
+
         $summarizerQuery = $this->getSummaryQuery();
 
         if ($summarizerQuery === null) {
@@ -55,6 +65,18 @@ final class QueryProcessor
         }
 
         return $this->queryResult = $summarizerQuery->getQueryResult();
+    }
+
+    /**
+     * The time before which every change to the source is reflected in the
+     * query result. Null if it cannot be determined. See
+     * `CubeCell::getValidAsOf()`.
+     */
+    public function getValidAsOf(): ?\DateTimeImmutable
+    {
+        $this->getQueryResult();
+
+        return $this->validAsOf;
     }
 
     /**

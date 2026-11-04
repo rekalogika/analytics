@@ -47,6 +47,9 @@ final class ArchitectureTest
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
 
+                // php datetime
+                Selector::classname(\DateTimeInterface::class),
+
                 // php exception
                 Selector::classname(\Throwable::class),
                 Selector::classname(\RuntimeException::class),

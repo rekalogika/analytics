@@ -93,6 +93,12 @@ final class DefaultCell implements CubeCell
     }
 
     #[\Override]
+    public function getValidAsOf(): ?\DateTimeImmutable
+    {
+        return $this->context->getValidAsOf();
+    }
+
+    #[\Override]
     public function isNull(): bool
     {
         return $this->isNull;

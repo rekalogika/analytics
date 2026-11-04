@@ -233,6 +233,7 @@ final class CommandTest extends KernelTestCase
         $this->assertSame(Command::SUCCESS, $exitCode);
         $this->assertStringContainsString(' customerCountry Customer country ', $display);
         $this->assertStringContainsString(' count Count ', $display);
+        $this->assertStringContainsString('Valid As Of', $display);
         $this->assertStringContainsString('time.civil.year IN (2023, 2024)', $display);
         $this->assertStringContainsString($coordinates, $display);
         $this->assertStringContainsString('FROM "order"', $display);
