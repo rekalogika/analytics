@@ -17,6 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadata;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\ToManyPath;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 
@@ -44,15 +45,22 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
      */
     private array $existenceDependencies;
 
+    /**
+     * @var array<class-string,list<ToManyPath>>
+     */
+    private array $toManyPaths;
+
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
         ManagerRegistry $managerRegistry,
     ) {
         $this->involvedProperties = $this->createInvolvedProperties();
+        $resolver = new AssociationDependencyResolver($managerRegistry);
+
         [$this->associationDependencies, $this->existenceDependencies] =
-            $this->createAssociationDependencies(
-                new AssociationDependencyResolver($managerRegistry),
-            );
+            $this->createAssociationDependencies($resolver);
+
+        $this->toManyPaths = $this->createToManyPaths($resolver);
     }
 
     /**
@@ -162,6 +170,44 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
     }
 
     /**
+     * Source class to the paths of its summaries read through a to-many
+     * association. The summaries opting out of association tracking are
+     * left out, none of their related paths are tracked.
+     *
+     * @return array<class-string,list<ToManyPath>>
+     */
+    private function createToManyPaths(
+        AssociationDependencyResolver $resolver,
+    ): array {
+        $toManyPaths = [];
+
+        foreach ($this->getAllSummaryMetadata() as $summaryMetadata) {
+            if (!$summaryMetadata->isTrackAssociations()) {
+                continue;
+            }
+
+            $sourceClass = $summaryMetadata->getSourceClass();
+
+            foreach ($summaryMetadata->getInvolvedSourcePaths() as $path) {
+                $association = $resolver->findToManyAssociation($sourceClass, $path);
+
+                if ($association === null) {
+                    continue;
+                }
+
+                $toManyPaths[$sourceClass][] = new ToManyPath(
+                    sourceClass: $sourceClass,
+                    path: $path,
+                    association: $association,
+                    summaryClass: $summaryMetadata->getSummaryClass(),
+                );
+            }
+        }
+
+        return $toManyPaths;
+    }
+
+    /**
      * Also includes the summaries of the parent classes of the source, so
      * that a change to an entity of a subclass is detected by a summary
      * declared on the superclass.
@@ -181,6 +227,7 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
 
         $allPropertiesToAssociationDependencies = [];
         $allExistenceDependencies = [];
+        $allToManyPaths = [];
 
         foreach ($classes as $class) {
             foreach ($this->involvedProperties[$class] ?? [] as $property => $summaryClasses) {
@@ -198,6 +245,10 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
             foreach ($this->existenceDependencies[$class] ?? [] as $dependency) {
                 $allExistenceDependencies[] = $dependency;
             }
+
+            foreach ($this->toManyPaths[$class] ?? [] as $toManyPath) {
+                $allToManyPaths[] = $toManyPath;
+            }
         }
 
         return new SourceMetadata(
@@ -205,6 +256,7 @@ final readonly class DefaultSourceMetadataFactory implements SourceMetadataFacto
             propertyToSummaryClasses: $allPropertiesToSummaryClasses,
             propertyToAssociationDependencies: $allPropertiesToAssociationDependencies,
             existenceDependencies: $allExistenceDependencies,
+            toManyPaths: $allToManyPaths,
         );
     }
 }

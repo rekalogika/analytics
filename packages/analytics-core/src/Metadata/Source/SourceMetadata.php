@@ -37,12 +37,16 @@ final readonly class SourceMetadata
      * read it through an association.
      * @param list<AssociationDependency> $existenceDependencies The summaries
      * of other classes whose source entities refer to entities of this class.
+     * @param list<ToManyPath> $toManyPaths The paths of the summaries of this
+     * class read through a to-many association, which are not tracked
+     * beyond it.
      */
     public function __construct(
         private string $class,
         private array $propertyToSummaryClasses,
         private array $propertyToAssociationDependencies = [],
         private array $existenceDependencies = [],
+        private array $toManyPaths = [],
     ) {
         $allInvolvedSummaryClasses = [];
 
@@ -181,5 +185,17 @@ final readonly class SourceMetadata
         }
 
         return array_values($dependencies);
+    }
+
+    /**
+     * The paths of the summaries of this class read through a to-many
+     * association. A change read through the to-many association is not
+     * detected.
+     *
+     * @return list<ToManyPath>
+     */
+    public function getToManyPaths(): array
+    {
+        return $this->toManyPaths;
     }
 }

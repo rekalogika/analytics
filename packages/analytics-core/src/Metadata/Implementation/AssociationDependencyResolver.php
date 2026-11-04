@@ -24,7 +24,7 @@ use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
  *
  * Only to-one associations are followed. A to-many association on the path
  * makes the source entities affected by a change ambiguous, the rest of the
- * path is ignored.
+ * path is ignored. `findToManyAssociation()` tells if that is the case.
  *
  * @internal
  */
@@ -43,6 +43,36 @@ final readonly class AssociationDependencyResolver
         string $sourceClass,
         string $path,
         string $summaryClass,
+    ): array {
+        return $this->walk($sourceClass, $path, $summaryClass)[0];
+    }
+
+    /**
+     * Returns the part of the path up to the first to-many association, e.g.
+     * `customer.orders` for `customer.orders.time`, or null if the path has
+     * no to-many association. A change read through it is not tracked.
+     *
+     * @param class-string $sourceClass
+     */
+    public function findToManyAssociation(
+        string $sourceClass,
+        string $path,
+    ): ?string {
+        return $this->walk($sourceClass, $path, null)[1];
+    }
+
+    /**
+     * @param class-string $sourceClass
+     * @param class-string|null $summaryClass Null if the dependencies are
+     * not needed.
+     * @return array{list<AssociationDependency>,string|null} The
+     * dependencies, and the part of the path up to the first to-many
+     * association.
+     */
+    private function walk(
+        string $sourceClass,
+        string $path,
+        ?string $summaryClass,
     ): array {
         $segments = array_map(trim(...), explode('.', trim($path)));
         $class = $sourceClass;
@@ -66,7 +96,7 @@ final readonly class AssociationDependencyResolver
             $castClass = trim($rootCast, '() ');
 
             if (!class_exists($castClass)) {
-                return [];
+                return [[], null];
             }
 
             $class = $castClass;
@@ -99,14 +129,17 @@ final readonly class AssociationDependencyResolver
             // of the entity, and the source entities on the other side are
             // ambiguous
 
+            $prefix = $basePath ?? $rootCast;
+            $prefix = $prefix === null ? '' : $prefix . '.';
+
             if ($isAssociation && !$classMetadata->isSingleValuedAssociation($name)) {
-                break;
+                return [$dependencies, $prefix . $name];
             }
 
             // a property of a related entity. the properties of the source
             // entity itself are tracked by the source metadata
 
-            if ($reversePath !== null) {
+            if ($reversePath !== null && $summaryClass !== null) {
                 // a field of an embeddable is reported as `embedded.field`
 
                 $property = $isEmbedded
@@ -126,9 +159,6 @@ final readonly class AssociationDependencyResolver
                 break;
             }
 
-            $prefix = $basePath ?? $rootCast;
-            $prefix = $prefix === null ? '' : $prefix . '.';
-
             $reversePath = $prefix . $name;
             $basePath = $prefix . $segment;
 
@@ -138,16 +168,18 @@ final readonly class AssociationDependencyResolver
             // the source entities refer to the related entity, its deletion
             // affects them
 
-            $dependencies[] = new AssociationDependency(
-                relatedClass: $class,
-                property: null,
-                sourceClass: $sourceClass,
-                reversePath: $reversePath,
-                summaryClass: $summaryClass,
-            );
+            if ($summaryClass !== null) {
+                $dependencies[] = new AssociationDependency(
+                    relatedClass: $class,
+                    property: null,
+                    sourceClass: $sourceClass,
+                    reversePath: $reversePath,
+                    summaryClass: $summaryClass,
+                );
+            }
         }
 
-        return $dependencies;
+        return [$dependencies, null];
     }
 
     /**

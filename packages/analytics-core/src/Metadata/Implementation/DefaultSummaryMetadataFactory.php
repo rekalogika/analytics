@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Implementation;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Exception\MetadataException;
@@ -35,6 +36,7 @@ use Rekalogika\Analytics\Metadata\Summary\PartitionMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\AttributeUtil;
+use Rekalogika\Analytics\Metadata\Util\SourceFilterUtil;
 use Rekalogika\Analytics\Metadata\Util\TranslatableUtil;
 
 /**
@@ -205,6 +207,12 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
         $label = $summaryAttribute->getLabel() ?? $reflectionClass->getShortName();
         $label = TranslatableUtil::normalize($label);
 
+        $filter = $summaryAttribute->getFilter();
+
+        if ($filter !== null) {
+            $this->validateFilter($summaryClassName, $sourceClass, $filter);
+        }
+
         return new SummaryMetadata(
             sourceClass: $sourceClass,
             summaryClass: $summaryClassName,
@@ -216,8 +224,40 @@ final class DefaultSummaryMetadataFactory implements SummaryMetadataFactory
             label: $label,
             groupingStrategy: $summaryAttribute->getGroupingStrategy(),
             trackAssociations: $summaryAttribute->isTrackAssociations(),
-            filter: $summaryAttribute->getFilter(),
+            filter: $filter,
         );
+    }
+
+    /**
+     * A join through a to-many association repeats the source entities, and
+     * would summarize them more than once.
+     *
+     * @param class-string $summaryClass
+     * @param class-string $sourceClass
+     * @throws MetadataException If the filter reads a path through a to-many
+     * association, or is not supported.
+     */
+    private function validateFilter(
+        string $summaryClass,
+        string $sourceClass,
+        Expression $filter,
+    ): void {
+        $resolver = new AssociationDependencyResolver($this->managerRegistry);
+
+        foreach (SourceFilterUtil::getInvolvedProperties($filter) as $path) {
+            $association = $resolver->findToManyAssociation($sourceClass, trim($path));
+
+            if ($association === null) {
+                continue;
+            }
+
+            throw new MetadataException(\sprintf(
+                'The filter of the summary "%s" reads "%s" through the to-many association "%s", which would summarize a source entity more than once. Use a SourceCondition with an EXISTS subquery instead.',
+                $summaryClass,
+                $path,
+                $association,
+            ));
+        }
     }
 
     /**

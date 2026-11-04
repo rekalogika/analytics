@@ -17,6 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
+use Rekalogika\Analytics\Metadata\Source\ToManyPath;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadataFactory;
 use Rekalogika\Analytics\Metadata\Util\InvolvedPropertyUtil;
@@ -154,6 +155,7 @@ final class DebugSourceCommand extends Command
         if ($propertyToSummaryClasses !== []) {
             $this->printTrackedProperties($io, $sourceClass, $propertyToSummaryClasses);
             $this->printUntrackedRelatedPaths($io, $sourceClass);
+            $this->printToManyPaths($io, $sourceMetadata->getToManyPaths());
         }
 
         if ($associationDependencies !== []) {
@@ -341,6 +343,51 @@ final class DebugSourceCommand extends Command
         $io->table(
             headers: ['Path', 'Tracked Association', 'Summaries'],
             rows: $rows,
+        );
+    }
+
+    /**
+     * Paths read through a to-many association. A change read through it is
+     * not tracked.
+     *
+     * @param list<ToManyPath> $toManyPaths
+     */
+    private function printToManyPaths(SymfonyStyle $io, array $toManyPaths): void
+    {
+        if ($toManyPaths === []) {
+            return;
+        }
+
+        /** @var array<string,array{string,string}> */
+        $rows = [];
+
+        /** @var array<string,list<class-string>> */
+        $summaryClasses = [];
+
+        foreach ($toManyPaths as $toManyPath) {
+            $path = $toManyPath->getPath();
+            $rows[$path] = [$path, $toManyPath->getAssociation()];
+            $summaryClasses[$path][] = $toManyPath->getSummaryClass();
+        }
+
+        ksort($rows);
+
+        $io->section('Untracked To-Many Paths');
+        $io->warning([
+            'These paths are read through a to-many association. A change read through the to-many association is not tracked.',
+            'Use SummaryManager::markDirty() if needed.',
+        ]);
+
+        $io->table(
+            headers: ['Path', 'To-Many Association', 'Summaries'],
+            rows: array_map(
+                fn(string $path, array $row): array => [
+                    ...$row,
+                    $this->formatSummaryClasses($summaryClasses[$path] ?? []),
+                ],
+                array_keys($rows),
+                array_values($rows),
+            ),
         );
     }
 
