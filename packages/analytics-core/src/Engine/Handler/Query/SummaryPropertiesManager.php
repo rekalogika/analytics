@@ -118,7 +118,7 @@ final readonly class SummaryPropertiesManager
 
         $statement = $connection->prepare($sql);
         $statement->bindValue('summaryClass', $this->summaryClass);
-        $statement->bindValue('scheduledRefresh', $scheduledRefresh, Types::DATETIME_IMMUTABLE);
+        $statement->bindValue('scheduledRefresh', $scheduledRefresh, Types::DATETIMETZ_IMMUTABLE);
         $statement->executeStatement();
     }
 

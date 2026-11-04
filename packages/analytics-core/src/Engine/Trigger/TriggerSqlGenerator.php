@@ -74,22 +74,11 @@ final readonly class TriggerSqlGenerator
     private const NEW_ROWS = 'rekalogika_new_rows';
     private const OLD_ROWS = 'rekalogika_old_rows';
 
-    private string $timezone;
-
-    /**
-     * @param string|null $timezone The time zone of the creation time of the
-     * dirty flags. It must be the default time zone of PHP, the time zone in
-     * which Doctrine writes the creation time of the flags created by the
-     * application. Defaults to the current default time zone of PHP.
-     */
     public function __construct(
         private SummaryMetadataFactory $summaryMetadataFactory,
         private SourceMetadataFactory $sourceMetadataFactory,
         private ManagerRegistry $managerRegistry,
-        ?string $timezone = null,
-    ) {
-        $this->timezone = $timezone ?? date_default_timezone_get();
-    }
+    ) {}
 
     /**
      * Generates the statements creating the functions and the triggers, for
@@ -583,7 +572,11 @@ final readonly class TriggerSqlGenerator
             'class' => $platform->quoteStringLiteral($summaryMetadata->getSummaryClass()),
             'level' => (string) $lowestLevel,
             'key' => 'x.sclr_0',
-            'created' => \sprintf('(NOW() AT TIME ZONE %s)', $platform->quoteStringLiteral($this->timezone)),
+            // the column is a timestamp with time zone, no conversion is
+            // needed. truncated, not rounded, to the precision of the column,
+            // so that the flag is never later than the change
+
+            'created' => "DATE_TRUNC('second', NOW())",
         ];
 
         foreach ($fields as $field => $value) {

@@ -153,6 +153,7 @@ final class ArchitectureTest
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
+                Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateInterval::class),
 
                 // misc

@@ -42,7 +42,7 @@ class RefreshLog
         private int $level,
         #[ORM\Column(type: Types::BIGINT, nullable: false)]
         private int $key,
-        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+        #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: false)]
         private \DateTimeImmutable $refreshed,
     ) {}
 

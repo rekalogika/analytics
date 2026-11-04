@@ -26,7 +26,7 @@ class SummaryProperties
     /**
      * The time the refresh agent is scheduled to run next.
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $scheduledRefresh = null;
 
     /**

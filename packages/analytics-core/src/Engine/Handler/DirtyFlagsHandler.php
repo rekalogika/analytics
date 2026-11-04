@@ -167,7 +167,7 @@ final readonly class DirtyFlagsHandler
                 ->setParameter(
                     'minimumAgeThreshold',
                     $minimumAgeThreshold,
-                    Types::DATETIME_IMMUTABLE,
+                    Types::DATETIMETZ_IMMUTABLE,
                 );
         }
 
@@ -183,7 +183,7 @@ final readonly class DirtyFlagsHandler
             $queryBuilder->setParameter(
                 'minimumIdleDelayThreshold',
                 $minimumIdleDelayThreshold,
-                Types::DATETIME_IMMUTABLE,
+                Types::DATETIMETZ_IMMUTABLE,
             );
 
             if (($maximumAge = $refreshAgentStrategy->getMaximumAge()) !== null) {
@@ -201,7 +201,7 @@ final readonly class DirtyFlagsHandler
                 $queryBuilder->setParameter(
                     'maximumAgeThreshold',
                     $maximumAgeThreshold,
-                    Types::DATETIME_IMMUTABLE,
+                    Types::DATETIMETZ_IMMUTABLE,
                 );
             }
 
@@ -428,7 +428,7 @@ final readonly class DirtyFlagsHandler
             ->setParameter(
                 'threshold',
                 $now->sub(new \DateInterval(\sprintf('PT%dS', $cooldown))),
-                Types::DATETIME_IMMUTABLE,
+                Types::DATETIMETZ_IMMUTABLE,
             )
             ->groupBy('rl.level, rl.key')
             ->getQuery()
@@ -466,7 +466,7 @@ final readonly class DirtyFlagsHandler
             ->where('rl.class = :class')
             ->andWhere('rl.refreshed <= :before')
             ->setParameter('class', $this->metadata->getSummaryClass())
-            ->setParameter('before', $before, Types::DATETIME_IMMUTABLE)
+            ->setParameter('before', $before, Types::DATETIMETZ_IMMUTABLE)
             ->getQuery()
             ->execute();
     }

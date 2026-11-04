@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Breaking changes
+
+* The time columns of the engine tables are now `TIMESTAMP WITH TIME ZONE`:
+  `rekalogika_summary_dirty.created`, `rekalogika_summary_refresh_log.refreshed`
+  and `rekalogika_summary_properties.scheduled_refresh`. The stored times are
+  now absolute, independent of the time zone of PHP and of the database
+  session. Previously, the times written by the application and by the
+  triggers only matched if the triggers were generated with the time zone
+  of PHP. Generate a migration for the schema change, e.g. with
+  `doctrine:migrations:diff`. The existing values are interpreted in the
+  time zone of the database session; to interpret them in another time
+  zone, change the generated statements to
+  `ALTER ... TYPE TIMESTAMP(0) WITH TIME ZONE USING created AT TIME ZONE 'Asia/Jakarta'`.
+  Then reinstall the triggers with `rekalogika:analytics:trigger:install`.
+* The `$timezone` argument of `TriggerSqlGenerator` is removed. It is no
+  longer needed.
+
 ### Added
 
 * Numeric bins, in the new `Rekalogika\Analytics\Numeric` namespace. A
