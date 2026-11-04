@@ -18,6 +18,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
+use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Entity\PartitionRange;
 use Rekalogika\Analytics\Engine\Handler\SummaryHandler;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Query\InsertIntoSummaryQuery;
@@ -199,15 +200,23 @@ final readonly class SummaryVerifier
             }
         }
 
-        $dirtyKeys = $this->getConnection()->fetchFirstColumn(
-            'SELECT DISTINCT key FROM rekalogika_summary_dirty WHERE class = ? AND level = ? AND key >= ? AND key < ?',
-            [
-                $this->summaryMetadata->getSummaryClass(),
-                $range->getLevel(),
-                $range->getStart()->getLowerBound(),
-                $range->getEnd()->getUpperBound(),
-            ],
-        );
+        // DQL, the column names of the dirty flags depend on the naming
+        // strategy
+
+        /** @var list<mixed> */
+        $dirtyKeys = $this->entityManager->createQueryBuilder()
+            ->select('DISTINCT df.key')
+            ->from(DirtyFlag::class, 'df')
+            ->where('df.class = :class')
+            ->andWhere('df.level = :level')
+            ->andWhere('df.key >= :start')
+            ->andWhere('df.key < :end')
+            ->setParameter('class', $this->summaryMetadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getStart()->getLowerBound())
+            ->setParameter('end', $range->getEnd()->getUpperBound())
+            ->getQuery()
+            ->getSingleColumnResult();
 
         $partitionClass = $this->summaryMetadata->getPartition()->getPartitionClass();
 

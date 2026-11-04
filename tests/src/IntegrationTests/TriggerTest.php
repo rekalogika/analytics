@@ -214,12 +214,12 @@ final class TriggerTest extends KernelTestCase
         $this->getTriggerInstaller()->install();
 
         $this->assertSame(
-            ['customer', 'empty_entity', 'occupancy_history', 'order'],
+            ['account', 'customer', 'empty_entity', 'occupancy_history', 'order'],
             $this->getTablesWithTrigger('rekalogika_dirty_insert'),
         );
 
         $this->assertSame(
-            ['country', 'customer', 'empty_entity', 'item', 'occupancy_history', 'order'],
+            ['account', 'account_profile', 'country', 'customer', 'empty_entity', 'item', 'occupancy_history', 'order'],
             $this->getTablesWithTrigger('rekalogika_dirty_update'),
         );
     }

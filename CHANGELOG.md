@@ -17,6 +17,21 @@
   Both kinds of bins are sorted by their range, and the gaps between them are
   filled in the query result.
 
+### Fixed
+
+* A summary reading through the inverse side of a to-one association, e.g.
+  `profile.tier` where `AccountProfile::$account` owns the association,
+  made every flush that updated or removed the related entity fail with "A
+  single-valued association path expression to an inverse side is not
+  supported", and made `rekalogika:analytics:trigger:dump` and
+  `trigger:install` fail with the same error. The path resolver now joins
+  the inverse side instead of returning a path expression to it. Inserting
+  a related entity, changing its foreign key, or deleting it with native
+  SQL is still not detected through such a path.
+* `rekalogika:analytics:verify` failed under a naming strategy that does not
+  map the columns of `rekalogika_summary_dirty` to `class`, `level` and
+  `key`. The pending dirty flags are now queried with DQL.
+
 ## v0.39.0
 
 Change detection now covers more of the ways a source entity can change, and
