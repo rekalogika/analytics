@@ -18,6 +18,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Rekalogika\Analytics\Tests\App\Factory\OrderFactory;
 
+use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\Persistence\flush_after;
 
 final class OrderFixtures extends Fixture implements DependentFixtureInterface
@@ -35,9 +36,42 @@ final class OrderFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         flush_after(function (): void {
-            OrderFactory::createMany(200);
+            OrderFactory::createSequence(self::getOrderAttributes(200));
         });
 
         $manager->flush();
+    }
+
+    /**
+     * Spreads the orders evenly over the months of 2023 and 2024, at a
+     * random time in each month. With random times over the whole period, a
+     * month is occasionally left without orders, and the tests querying it
+     * fail at random. The first and last day of the month are left out, so
+     * that the order stays in the month in any time zone.
+     *
+     * @return list<array{time:\DateTimeImmutable}>
+     */
+    private static function getOrderAttributes(int $count): array
+    {
+        $attributes = [];
+        $firstMonth = new \DateTimeImmutable('2023-01-01 00:00:00', new \DateTimeZone('UTC'));
+
+        for ($i = 0; $i < $count; $i++) {
+            $month = $firstMonth->modify(\sprintf('+%d months', $i % 24));
+            $start = $month->modify('+1 day');
+            $end = $month->modify('last day of this month')->setTime(0, 0);
+
+            $attributes[] = [
+                'time' => \DateTimeImmutable::createFromInterface(
+                    faker()->dateTimeBetween(
+                        $start->format('Y-m-d H:i:s'),
+                        $end->format('Y-m-d H:i:s'),
+                        'UTC',
+                    ),
+                ),
+            ];
+        }
+
+        return $attributes;
     }
 }
