@@ -73,11 +73,11 @@ final class TriggerTest extends KernelTestCase
         $this->assertSame($expected, $this->getDirtyFlagKeys(OrderExplicitGroupingSetsSummary::class));
         $this->assertSame([], $this->getDirtyFlagKeys(CustomerSummary::class));
 
-        // in the time zone of PHP, like the flags created by the application
+        // the creation time is an absolute time, independent of the time zone
+        // of PHP and of the database session
 
-        $created = $this->getConnection()->fetchOne('SELECT MIN(created) FROM rekalogika_summary_dirty');
-        $this->assertIsString($created);
-        $this->assertLessThan(120, abs((new \DateTimeImmutable($created))->getTimestamp() - time()));
+        $created = $this->fetchInt('SELECT MIN(EXTRACT(EPOCH FROM created))::bigint FROM rekalogika_summary_dirty');
+        $this->assertLessThan(120, abs($created - time()));
 
         // the triggers do not dispatch the refresh agent, the sweeper does
 
@@ -263,18 +263,18 @@ final class TriggerTest extends KernelTestCase
         $this->assertStringContainsString('DROP FUNCTION IF EXISTS rekalogika_dirty_order();', $tester->getDisplay());
     }
 
-    public function testTimezone(): void
+    public function testCreationTime(): void
     {
         $generator = new TriggerSqlGenerator(
             summaryMetadataFactory: static::getContainer()->get(SummaryMetadataFactory::class),
             sourceMetadataFactory: static::getContainer()->get(SourceMetadataFactory::class),
             managerRegistry: static::getContainer()->get(ManagerRegistry::class),
-            timezone: 'Asia/Jakarta',
         );
 
         $statements = implode("\n", $generator->getCreateStatements()['default'] ?? []);
 
-        $this->assertStringContainsString("(NOW() AT TIME ZONE 'Asia/Jakarta')", $statements);
+        $this->assertStringContainsString("DATE_TRUNC('second', NOW())", $statements);
+        $this->assertStringNotContainsString('AT TIME ZONE', $statements);
     }
 
     private function getTriggerInstaller(): TriggerInstaller

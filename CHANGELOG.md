@@ -2,7 +2,46 @@
 
 ## Unreleased
 
+### Breaking changes
+
+* The time columns of the engine tables are now `TIMESTAMP WITH TIME ZONE`:
+  `rekalogika_summary_dirty.created`, `rekalogika_summary_refresh_log.refreshed`
+  and `rekalogika_summary_properties.scheduled_refresh`. The stored times are
+  now absolute, independent of the time zone of PHP and of the database
+  session. Previously, the times written by the application and by the
+  triggers only matched if the triggers were generated with the time zone
+  of PHP. Generate a migration for the schema change, e.g. with
+  `doctrine:migrations:diff`. The existing values are interpreted in the
+  time zone of the database session; to interpret them in another time
+  zone, change the generated statements to
+  `ALTER ... TYPE TIMESTAMP(0) WITH TIME ZONE USING created AT TIME ZONE 'Asia/Jakarta'`.
+  Then reinstall the triggers with `rekalogika:analytics:trigger:install`.
+* The `$timezone` argument of `TriggerSqlGenerator` is removed. It is no
+  longer needed.
+
 ### Added
+
+* `CubeCell::getValidAsOf()` tells how fresh a query result is. The
+  result includes every change to the source made before the returned time;
+  changes made after it may or may not be included. The time is the
+  earliest of the time of the query, the time of the earliest pending dirty
+  flag, and, if the source has records not summarized yet, the last time the
+  refresh checked the source for new records. It is the same for every cell
+  of the cube, in UTC. Null if it cannot be determined, e.g. the summary has
+  never been refreshed. Only the changes with dirty flags, and the new
+  records, are taken into account. `rekalogika:analytics:debug:cell` shows
+  it.
+
+* The refresh records the time it last checked the source for new records,
+  in the new column `rekalogika_summary_properties.source_checked`. Generate
+  a migration for it. Every source record after the latest summarized key
+  was inserted after that time. New records without dirty flags, e.g.
+  inserted with native SQL without the triggers, now get partition dirty
+  flags with that time, instead of the time of the refresh. If the source
+  was never checked, they get the earliest possible time, and are refreshed
+  without waiting for the minimum age. The manual refresh, and the
+  conversion of the new records to partition dirty flags, now read the
+  latest key of the source uncached.
 
 * Numeric bins, in the new `Rekalogika\Analytics\Numeric` namespace. A
   dimension can group a number into ranges without a hand-written `CASE`
@@ -18,6 +57,13 @@
   filled in the query result.
 
 ### Fixed
+
+* The dirty flag of an upper partition, created when a lower partition is
+  refreshed, now inherits the time of the earliest dirty flag of the lower
+  partition, instead of having the time of the refresh. The time of a dirty
+  flag is now always the time of the earliest change not yet reflected in
+  its partition. `rekalogika:analytics:status` reports the age of the
+  upper-level flags accordingly.
 
 * A summary reading through the inverse side of a to-one association, e.g.
   `profile.tier` where `AccountProfile::$account` owns the association,

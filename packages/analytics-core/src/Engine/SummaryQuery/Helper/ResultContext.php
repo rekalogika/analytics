@@ -48,6 +48,7 @@ final readonly class ResultContext
         SourceEntitiesFactory $sourceEntitiesFactory,
         int $nodesLimit,
         private ResultContextFactory $resultContextFactory,
+        private ?\DateTimeImmutable $validAsOf,
     ) {
         $this->label = $metadata->getLabel();
 
@@ -79,6 +80,14 @@ final readonly class ResultContext
     public function getSummaryLabel(): TranslatableInterface
     {
         return $this->label;
+    }
+
+    /**
+     * See `CubeCell::getValidAsOf()`.
+     */
+    public function getValidAsOf(): ?\DateTimeImmutable
+    {
+        return $this->validAsOf;
     }
 
     public function getDimensionCollection(): DimensionCollection

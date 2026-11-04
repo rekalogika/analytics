@@ -167,7 +167,7 @@ final readonly class DirtyFlagsHandler
                 ->setParameter(
                     'minimumAgeThreshold',
                     $minimumAgeThreshold,
-                    Types::DATETIME_IMMUTABLE,
+                    Types::DATETIMETZ_IMMUTABLE,
                 );
         }
 
@@ -183,7 +183,7 @@ final readonly class DirtyFlagsHandler
             $queryBuilder->setParameter(
                 'minimumIdleDelayThreshold',
                 $minimumIdleDelayThreshold,
-                Types::DATETIME_IMMUTABLE,
+                Types::DATETIMETZ_IMMUTABLE,
             );
 
             if (($maximumAge = $refreshAgentStrategy->getMaximumAge()) !== null) {
@@ -201,7 +201,7 @@ final readonly class DirtyFlagsHandler
                 $queryBuilder->setParameter(
                     'maximumAgeThreshold',
                     $maximumAgeThreshold,
-                    Types::DATETIME_IMMUTABLE,
+                    Types::DATETIMETZ_IMMUTABLE,
                 );
             }
 
@@ -428,7 +428,7 @@ final readonly class DirtyFlagsHandler
             ->setParameter(
                 'threshold',
                 $now->sub(new \DateInterval(\sprintf('PT%dS', $cooldown))),
-                Types::DATETIME_IMMUTABLE,
+                Types::DATETIMETZ_IMMUTABLE,
             )
             ->groupBy('rl.level, rl.key')
             ->getQuery()
@@ -466,7 +466,7 @@ final readonly class DirtyFlagsHandler
             ->where('rl.class = :class')
             ->andWhere('rl.refreshed <= :before')
             ->setParameter('class', $this->metadata->getSummaryClass())
-            ->setParameter('before', $before, Types::DATETIME_IMMUTABLE)
+            ->setParameter('before', $before, Types::DATETIMETZ_IMMUTABLE)
             ->getQuery()
             ->execute();
     }
@@ -476,6 +476,40 @@ final readonly class DirtyFlagsHandler
         return PartitionUtil::getLowestLevel(
             $this->metadata->getPartition()->getPartitionClass(),
         );
+    }
+
+    /**
+     * Gets the creation time of the earliest dirty flag of each partition in
+     * the range. Partitions without dirty flags are omitted.
+     *
+     * @return array<int,\DateTimeImmutable> partition key => time
+     */
+    public function getEarliestDirtyTimes(PartitionRange $range): array
+    {
+        /** @var list<array{key:int|string,earliest:string}> */
+        $result = $this->entityManager->createQueryBuilder()
+            ->select('s.key AS key')
+            ->addSelect('MIN(s.created) AS earliest')
+            ->from(DirtyFlag::class, 's')
+            ->where('s.class = :class')
+            ->andWhere('s.level = :level')
+            ->andWhere('s.key >= :start')
+            ->andWhere('s.key < :end')
+            ->setParameter('class', $this->metadata->getSummaryClass())
+            ->setParameter('level', $range->getLevel())
+            ->setParameter('start', $range->getLowerBound())
+            ->setParameter('end', $range->getUpperBound())
+            ->groupBy('s.key')
+            ->getQuery()
+            ->getArrayResult();
+
+        $times = [];
+
+        foreach ($result as $row) {
+            $times[(int) $row['key']] = new \DateTimeImmutable($row['earliest']);
+        }
+
+        return $times;
     }
 
     public function removeDirtyFlags(PartitionRange $range): void

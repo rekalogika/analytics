@@ -47,6 +47,9 @@ final class ArchitectureTest
                 Selector::classname(\Stringable::class),
                 Selector::classname(\Override::class),
 
+                // php datetime
+                Selector::classname(\DateTimeInterface::class),
+
                 // php exception
                 Selector::classname(\Throwable::class),
                 Selector::classname(\RuntimeException::class),
@@ -153,6 +156,7 @@ final class ArchitectureTest
                 // datetime
                 Selector::classname(\DateTimeInterface::class),
                 Selector::classname(\DateTimeImmutable::class),
+                Selector::classname(\DateTimeZone::class),
                 Selector::classname(\DateInterval::class),
 
                 // misc

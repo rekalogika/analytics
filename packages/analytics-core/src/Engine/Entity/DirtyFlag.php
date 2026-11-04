@@ -29,7 +29,7 @@ class DirtyFlag
     #[ORM\Column(type: Types::BIGINT, nullable: false)]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: false)]
     private \DateTimeInterface $created;
 
     /**
@@ -49,7 +49,7 @@ class DirtyFlag
         private ?int $key,
         ?\DateTimeImmutable $created = null,
     ) {
-        $this->created = $created ?? new \DateTimeImmutable();
+        $this->created = $created ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 
     public function getSignature(): string
