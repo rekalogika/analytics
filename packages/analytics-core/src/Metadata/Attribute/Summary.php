@@ -66,7 +66,9 @@ final readonly class Summary
      * `SourceCondition`. The paths the filter reads are tracked like the ones
      * of the dimensions and measures. A comparison through an association
      * excludes the source entities whose association is null, unless the
-     * filter allows null explicitly.
+     * filter allows null explicitly. A path through a to-many association is
+     * rejected, because the join would summarize a source entity more than
+     * once. Use a `SourceCondition` with an `EXISTS` subquery instead.
      */
     public function __construct(
         private string $sourceClass,

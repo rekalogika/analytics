@@ -170,6 +170,46 @@ final class AssociationDependencyResolverTest extends KernelTestCase
     }
 
     /**
+     * @return iterable<string,array{class-string,string,string|null}>
+     */
+    public static function provideToManyAssociations(): iterable
+    {
+        yield 'property of the source' => [Order::class, 'time', null];
+        yield 'to-one associations' => [Order::class, 'customer.country.region', null];
+        yield 'alias of a related entity' => [Order::class, 'customer.*', null];
+        yield 'to-many association of the source' => [Customer::class, 'orders.time', 'orders'];
+        yield 'to-many association as the leaf' => [Customer::class, 'orders', 'orders'];
+        yield 'to-many association of a related entity' => [Order::class, 'customer.orders.time', 'customer.orders'];
+
+        yield 'cast of an association' => [
+            Order::class,
+            'customer(' . IndividualCustomer::class . ').orders.time',
+            'customer(' . IndividualCustomer::class . ').orders',
+        ];
+
+        yield 'root cast' => [
+            Customer::class,
+            '(' . IndividualCustomer::class . ').orders.time',
+            '(' . IndividualCustomer::class . ').orders',
+        ];
+
+        yield 'unknown property' => [Order::class, 'customer.foo.orders', null];
+    }
+
+    /**
+     * @param class-string $sourceClass
+     */
+    #[DataProvider('provideToManyAssociations')]
+    public function testFindToManyAssociation(string $sourceClass, string $path, ?string $expected): void
+    {
+        $resolver = new AssociationDependencyResolver(
+            static::getContainer()->get(ManagerRegistry::class),
+        );
+
+        $this->assertSame($expected, $resolver->findToManyAssociation($sourceClass, $path));
+    }
+
+    /**
      * The reverse path is used to query the source entities referring to a
      * related entity.
      */

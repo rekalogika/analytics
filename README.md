@@ -213,7 +213,12 @@ use Rekalogika\Analytics\Core\Filter\SourceCondition;
 
 The properties the filter reads are tracked like the ones of the dimensions
 and measures: a change that moves a source entity in or out of the filter
-refreshes the summary.
+refreshes the summary. A filter cannot read a path through a to-many
+association, because the join would summarize a source entity more than once.
+Use a `SourceCondition` with an `EXISTS` subquery instead.
+
+A change read through a to-many association, by a dimension or a measure, is
+not detected. `rekalogika:analytics:debug:source` lists these paths.
 
 Query the summary using the `SummaryManager` service:
 
