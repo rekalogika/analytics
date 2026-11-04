@@ -21,6 +21,17 @@
 
 ### Added
 
+* The refresh records the time it last checked the source for new records,
+  in the new column `rekalogika_summary_properties.source_checked`. Generate
+  a migration for it. Every source record after the latest summarized key
+  was inserted after that time. New records without dirty flags, e.g.
+  inserted with native SQL without the triggers, now get partition dirty
+  flags with that time, instead of the time of the refresh. If the source
+  was never checked, they get the earliest possible time, and are refreshed
+  without waiting for the minimum age. The manual refresh, and the
+  conversion of the new records to partition dirty flags, now read the
+  latest key of the source uncached.
+
 * Numeric bins, in the new `Rekalogika\Analytics\Numeric` namespace. A
   dimension can group a number into ranges without a hand-written `CASE`
   expression:

@@ -94,12 +94,38 @@ final class SummaryHandler implements ResetInterface
     }
 
     /**
-     * Updates the latest partitioning key that has been summarized.
+     * Updates the latest partitioning key that has been summarized. If the
+     * key has been read from the source, `$sourceChecked` is the time just
+     * before it was read. See `getSourceChecked()`.
      */
-    public function updateLatestKey(int|string|null $max): void
-    {
-        $this->createSummaryPropertiesManager()->updateMax($max);
+    public function updateLatestKey(
+        int|string|null $max,
+        ?\DateTimeImmutable $sourceChecked = null,
+    ): void {
+        $this->createSummaryPropertiesManager()->updateMax($max, $sourceChecked);
         $this->latestKey = $max;
+    }
+
+    /**
+     * Gets the time just before the latest key of the source was last read,
+     * to update the latest summarized key, or to find that there are no new
+     * records. Every source record with a key greater than the latest
+     * summarized key was inserted after this time. Null if unknown. The value
+     * is always read from the database.
+     */
+    public function getSourceChecked(): ?\DateTimeImmutable
+    {
+        return $this->createSummaryPropertiesManager()->getSourceChecked();
+    }
+
+    /**
+     * Records the time just before the latest key of the source was read, and
+     * found not to be greater than the latest summarized key.
+     */
+    public function updateSourceChecked(\DateTimeImmutable $sourceChecked): void
+    {
+        $this->createSummaryPropertiesManager()
+            ->updateSourceChecked($sourceChecked);
     }
 
     /**

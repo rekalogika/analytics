@@ -24,6 +24,15 @@ class SummaryProperties
     private ?string $lastId = null;
 
     /**
+     * The time just before the latest key of the source was read to update
+     * `lastId`, or to find that there are no source records after it. Every
+     * source record with a key greater than `lastId` was inserted after this
+     * time.
+     */
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $sourceChecked = null;
+
+    /**
      * The time the refresh agent is scheduled to run next.
      */
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
@@ -54,6 +63,16 @@ class SummaryProperties
     public function setLastId(string $lastId): void
     {
         $this->lastId = $lastId;
+    }
+
+    public function getSourceChecked(): ?\DateTimeImmutable
+    {
+        return $this->sourceChecked;
+    }
+
+    public function setSourceChecked(?\DateTimeImmutable $sourceChecked): void
+    {
+        $this->sourceChecked = $sourceChecked;
     }
 
     public function getScheduledRefresh(): ?\DateTimeImmutable

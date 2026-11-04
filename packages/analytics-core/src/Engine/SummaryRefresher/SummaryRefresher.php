@@ -210,7 +210,11 @@ final class SummaryRefresher
         $inputStart = $start;
         $inputEnd = $end;
 
-        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
+        // the time just before the latest key of the source is read, see
+        // SummaryHandler::getSourceChecked()
+
+        $sourceChecked = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $sourceLatestKey = $this->summaryHandler->getSource()->refreshLatestKey();
         $summaryLatestKey = $this->summaryHandler->getLatestKey();
 
         // determine start
@@ -308,10 +312,14 @@ final class SummaryRefresher
             ));
         }
 
-        // update latest key
+        // update latest key. if the end is the latest key of the source, the
+        // records after it were inserted after the source was checked
 
         if ($end > $summaryLatestKey) {
-            $this->summaryHandler->updateLatestKey($end);
+            $this->summaryHandler->updateLatestKey(
+                max: $end,
+                sourceChecked: $inputEnd === null ? $sourceChecked : null,
+            );
         }
 
         // remove new entity flags
@@ -642,6 +650,14 @@ final class SummaryRefresher
      */
     private function doConvertNewRecordsToDirtyFlags(): array
     {
+        // read the latest key of the source, uncached, and record the time
+        // just before, so that every source record after the key is known to
+        // be inserted after that time
+
+        $previousSourceChecked = $this->summaryHandler->getSourceChecked();
+        $sourceChecked = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $sourceLatestKey = $this->summaryHandler->getSource()->refreshLatestKey();
+
         $range = $this->summaryHandler->getNewEntitiesRange();
 
         // if there are no new entities, the new flags are stale. remove them,
@@ -650,6 +666,7 @@ final class SummaryRefresher
 
         if ($range === null) {
             $this->summaryHandler->getDirtyFlags()->removeNewFlags();
+            $this->summaryHandler->updateSourceChecked($sourceChecked);
 
             return [];
         }
@@ -661,7 +678,12 @@ final class SummaryRefresher
         $timeRange = $this->summaryHandler->getDirtyFlags()->getNewFlagsTimeRange();
 
         if ($timeRange === null) {
-            $createdTimes = [new \DateTimeImmutable()];
+            // the new records have no flags, e.g. inserted with native SQL
+            // without the triggers. they were inserted after the previous
+            // check of the source. if there is none, their time is unknown,
+            // and the earliest possible time is used
+
+            $createdTimes = [$previousSourceChecked ?? new \DateTimeImmutable('@0')];
         } elseif ($timeRange[0] == $timeRange[1]) {
             $createdTimes = [$timeRange[0]];
         } else {
@@ -685,10 +707,8 @@ final class SummaryRefresher
 
         // update the latest key of the summary handler
 
-        $sourceLatestKey = $this->summaryHandler->getSource()->getLatestKey();
-
         if ($sourceLatestKey !== null) {
-            $this->summaryHandler->updateLatestKey($sourceLatestKey);
+            $this->summaryHandler->updateLatestKey($sourceLatestKey, $sourceChecked);
         }
 
         // flush the changes

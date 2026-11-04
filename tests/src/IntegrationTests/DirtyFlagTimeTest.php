@@ -121,6 +121,90 @@ final class DirtyFlagTimeTest extends KernelTestCase
     }
 
     /**
+     * The refresh records the time it checked the source for new records.
+     */
+    public function testRefreshRecordsTheSourceCheck(): void
+    {
+        $this->getConnection()->executeStatement('UPDATE rekalogika_summary_properties SET source_checked = NULL');
+
+        $before = time();
+        $this->getSummaryRefresher()->refresh();
+
+        $sourceChecked = $this->getSummaryHandler()->getSourceChecked();
+        $this->assertNotNull($sourceChecked);
+        $this->assertGreaterThanOrEqual($before - 1, $sourceChecked->getTimestamp());
+        $this->assertLessThanOrEqual(time(), $sourceChecked->getTimestamp());
+    }
+
+    /**
+     * New records without new flags, e.g. inserted with native SQL without
+     * the triggers, were inserted after the previous check of the source.
+     * Their partition flags have the time of the previous check.
+     */
+    public function testNewRecordsWithoutFlags(): void
+    {
+        $previousCheck = new \DateTimeImmutable('2026-01-02 03:04:05', new \DateTimeZone('UTC'));
+        $this->getSummaryHandler()->updateSourceChecked($previousCheck);
+
+        $id = $this->insertOrder();
+
+        $before = time();
+        $dirtyFlags = $this->getSummaryRefresher()->convertNewRecordsToDirtyFlags();
+
+        $this->assertNotSame([], $dirtyFlags);
+
+        foreach ($dirtyFlags as $dirtyFlag) {
+            $this->assertSame($previousCheck->getTimestamp(), $dirtyFlag->getCreated()->getTimestamp());
+        }
+
+        $summaryHandler = $this->getSummaryHandler();
+        $summaryHandler->reset();
+        $this->assertSame($id, $summaryHandler->getLatestKey());
+
+        $sourceChecked = $summaryHandler->getSourceChecked();
+        $this->assertNotNull($sourceChecked);
+        $this->assertGreaterThanOrEqual($before - 1, $sourceChecked->getTimestamp());
+    }
+
+    /**
+     * Without a previous check, the time of the new records is unknown, and
+     * their partition flags have the earliest possible time.
+     */
+    public function testNewRecordsWithoutFlagsAndWithoutPreviousCheck(): void
+    {
+        $this->getConnection()->executeStatement('UPDATE rekalogika_summary_properties SET source_checked = NULL');
+        $this->insertOrder();
+
+        $dirtyFlags = $this->getSummaryRefresher()->convertNewRecordsToDirtyFlags();
+
+        $this->assertNotSame([], $dirtyFlags);
+
+        foreach ($dirtyFlags as $dirtyFlag) {
+            $this->assertSame(0, $dirtyFlag->getCreated()->getTimestamp());
+        }
+    }
+
+    /**
+     * Inserts a copy of an order with native SQL, after the latest order.
+     *
+     * @return int The identifier of the new order.
+     */
+    private function insertOrder(): int
+    {
+        $connection = $this->getConnection();
+
+        /** @var array<string,mixed> */
+        $row = $connection->fetchAssociative('SELECT * FROM "order" ORDER BY id DESC LIMIT 1');
+        $this->assertTrue(\is_int($row['id']) || \is_string($row['id']));
+
+        $id = (int) $row['id'] + 1;
+        $row['id'] = $id;
+        $connection->insert('"order"', $row);
+
+        return $id;
+    }
+
+    /**
      * @return list<int>
      */
     private function getFlagTimes(int $level, int $key): array
