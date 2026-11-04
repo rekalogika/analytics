@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+* Numeric bins, in the new `Rekalogika\Analytics\Numeric` namespace. A
+  dimension can group a number into ranges without a hand-written `CASE`
+  expression:
+  * `RangeBinValueResolver` bins into the cases of a `RangeBin` enum, which
+    declares the thresholds between its cases, and can give them labels.
+  * `NumericBinValueResolver` bins with an algorithm: `LinearBinning` (equal
+    widths), `LogarithmicBinning` (geometric bounds), or `ThresholdBinning`
+    (arbitrary bounds). The summary stores the index of the bin, and the
+    query result has `IndexedBin` members.
+
+  Both kinds of bins are sorted by their range, and the gaps between them are
+  filled in the query result.
+
 ## v0.39.0
 
 Change detection now covers more of the ways a source entity can change, and
