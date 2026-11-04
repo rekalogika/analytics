@@ -22,6 +22,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
+use Rekalogika\Analytics\Engine\Infrastructure\SourceQueryBuilderFactory;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Source\AssociationDependency;
 use Rekalogika\Analytics\Metadata\Source\SourceMetadataFactory;
@@ -639,10 +640,13 @@ final readonly class TriggerSqlGenerator
         EntityManagerInterface $entityManager,
         SummaryMetadata $summaryMetadata,
     ): SimpleQueryBuilder {
-        $queryBuilder = new SimpleQueryBuilder(
+        // without the filter of the summary, a change can move a row out of
+        // the filter, its partition must be refreshed too
+
+        $queryBuilder = SourceQueryBuilderFactory::create(
             entityManager: $entityManager,
-            from: $summaryMetadata->getSourceClass(),
-            alias: 'root',
+            summaryMetadata: $summaryMetadata,
+            filtered: false,
         );
 
         $partitionMetadata = $summaryMetadata->getPartition();

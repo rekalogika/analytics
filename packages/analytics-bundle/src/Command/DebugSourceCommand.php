@@ -304,7 +304,7 @@ final class DebugSourceCommand extends Command
                 continue;
             }
 
-            foreach ($this->getRawInvolvedPaths($summaryMetadata) as $path) {
+            foreach ($summaryMetadata->getInvolvedSourcePaths() as $path) {
                 $association = $this->getAssociationOfPath($summarySourceClass, $path);
 
                 if ($association === null) {
@@ -342,31 +342,6 @@ final class DebugSourceCommand extends Command
             headers: ['Path', 'Tracked Association', 'Summaries'],
             rows: $rows,
         );
-    }
-
-    /**
-     * The property paths as declared by the dimensions, measures and
-     * partition, before being converted to change set keys.
-     *
-     * @return list<string>
-     */
-    private function getRawInvolvedPaths(SummaryMetadata $summaryMetadata): array
-    {
-        $paths = [];
-
-        $propertyMetadatas = [
-            ...$summaryMetadata->getRootDimensions(),
-            ...$summaryMetadata->getMeasures(),
-            $summaryMetadata->getPartition(),
-        ];
-
-        foreach ($propertyMetadatas as $propertyMetadata) {
-            foreach ($propertyMetadata->getInvolvedSourceProperties() as $path) {
-                $paths[] = trim($path);
-            }
-        }
-
-        return array_values(array_unique($paths));
     }
 
     /**

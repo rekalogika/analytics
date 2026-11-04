@@ -15,6 +15,7 @@ namespace Rekalogika\Analytics\Engine\SummaryQuery\Expression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -25,6 +26,7 @@ use Rekalogika\Analytics\Contracts\Exception\InvalidArgumentException;
 use Rekalogika\Analytics\Contracts\Exception\LogicException;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\DatabaseValueAware;
+use Rekalogika\Analytics\Contracts\Summary\SourceFilterExpression;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
@@ -64,6 +66,22 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
     public function getInvolvedDimensions(): array
     {
         return array_keys($this->involvedDimensions);
+    }
+
+    /**
+     * doctrine/collections 2.x dispatches with a switch and rejects an
+     * unknown expression before calling its `visit()`. A source filter
+     * expression decides itself how it is visited, usually by rejecting
+     * visitors other than the one of the summary filter.
+     */
+    #[\Override]
+    public function dispatch(Expression $expr): mixed
+    {
+        if ($expr instanceof SourceFilterExpression) {
+            return $expr->visit($this);
+        }
+
+        return parent::dispatch($expr);
     }
 
     abstract public function visitField(Field $field): mixed;
@@ -299,7 +317,7 @@ abstract class BaseExpressionVisitor extends ExpressionVisitor
          * @var list<ORMComparison|Andx|Orx|string>
          */
         $expressions = array_map(
-            fn($expression): mixed => $expression->visit($this),
+            fn($expression): mixed => $this->dispatch($expression),
             $expr->getExpressionList(),
         );
 

@@ -60,7 +60,6 @@ final class SourceOfSummaryHandler implements ResetInterface
     private function createRangeDeterminer(): SourceIdRangeDeterminer
     {
         return new SourceIdRangeDeterminer(
-            class: $this->getSourceClass(),
             entityManager: $this->entityManager,
             summaryMetadata: $this->summaryMetadata,
         );

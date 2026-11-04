@@ -72,7 +72,7 @@ final class SourceQueryTest extends KernelTestCase
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId ORDER BY root.id ASC',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :boundparameter0 ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -96,7 +96,7 @@ final class SourceQueryTest extends KernelTestCase
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE root.id > :minId AND IDENTITY(_a0.country) = :boundparameter0 ORDER BY root.id ASC',
+            'SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root LEFT JOIN root.customer _a0 WHERE root.id > :boundparameter0 AND IDENTITY(_a0.country) = :boundparameter1 ORDER BY root.id ASC',
             $dql,
         );
     }
@@ -120,7 +120,7 @@ final class SourceQueryTest extends KernelTestCase
         $dql = $sourceEntities->getQueryBuilder()->getQuery()->getDQL();
 
         $this->assertEquals(
-            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :minId AND REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'YYYY') = :boundparameter0 ORDER BY root.id ASC",
+            "SELECT root FROM Rekalogika\Analytics\Tests\App\Entity\Order root WHERE root.id > :boundparameter0 AND REKALOGIKA_TIME_BIN(root.time, 'UTC', 'Asia/Jakarta', 'YYYY') = :boundparameter1 ORDER BY root.id ASC",
             $dql,
         );
     }

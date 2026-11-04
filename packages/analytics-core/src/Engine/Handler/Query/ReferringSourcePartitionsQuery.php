@@ -17,16 +17,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Model\Partition;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\Infrastructure\SourceQueryBuilderFactory;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 /**
  * Gets the lowest partitions containing the source entities that refer to
  * the given related entities through a path, e.g. the orders whose
  * `customer.country` is one of the given countries.
  *
- * The query modifier of the summary is not applied. A change to a related
+ * The filter of the summary is not applied. A change to a related
  * entity can move a source entity out of the filter, its partition must be
  * refreshed too.
  */
@@ -43,10 +43,10 @@ final class ReferringSourcePartitionsQuery extends AbstractQuery
         private readonly SummaryMetadata $summaryMetadata,
         string $reversePath,
     ) {
-        $simpleQueryBuilder = new SimpleQueryBuilder(
+        $simpleQueryBuilder = SourceQueryBuilderFactory::create(
             entityManager: $entityManager,
-            from: $summaryMetadata->getSourceClass(),
-            alias: 'root',
+            summaryMetadata: $summaryMetadata,
+            filtered: false,
         );
 
         parent::__construct($simpleQueryBuilder);

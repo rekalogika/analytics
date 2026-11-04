@@ -28,6 +28,7 @@ use Rekalogika\Analytics\Tests\App\Entity\Category;
 use Rekalogika\Analytics\Tests\App\Entity\Country;
 use Rekalogika\Analytics\Tests\App\Entity\Customer;
 use Rekalogika\Analytics\Tests\App\Entity\CustomerSummary;
+use Rekalogika\Analytics\Tests\App\Entity\FilteredOrderSummary;
 use Rekalogika\Analytics\Tests\App\Entity\IndividualCustomer;
 use Rekalogika\Analytics\Tests\App\Entity\Item;
 use Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary;
@@ -48,12 +49,12 @@ final class MetadataTest extends KernelTestCase
         $this->assertEquals(Order::class, $orderMetadata->getClass());
 
         $this->assertEqualsCanonicalizing(
-            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class],
+            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class, FilteredOrderSummary::class],
             $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer']),
         );
 
         $this->assertEqualsCanonicalizing(
-            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class],
+            [OrderSummary::class, OrderExplicitGroupingSetsSummary::class, FilteredOrderSummary::class],
             $orderMetadata->getInvolvedSummaryClassesByChangedProperties(['customer', 'item']),
         );
 
@@ -162,13 +163,14 @@ final class MetadataTest extends KernelTestCase
             [
                 [Order::class, 'customer.country', OrderSummary::class],
                 [Order::class, 'customer.country', OrderExplicitGroupingSetsSummary::class],
+                [Order::class, 'customer.country', FilteredOrderSummary::class],
                 [Order::class, 'item.countryOfOrigin', OrderSummary::class],
                 [Customer::class, 'country', CustomerSummary::class],
             ],
             $this->formatDependencies($countryMetadata->getExistenceDependencies()),
         );
 
-        $this->assertCount(7, $countryMetadata->getAllAssociationDependencies());
+        $this->assertCount(8, $countryMetadata->getAllAssociationDependencies());
 
         // Category is not read, but Item::category refers to it
 
@@ -197,6 +199,7 @@ final class MetadataTest extends KernelTestCase
             [
                 [Order::class, 'customer', OrderSummary::class],
                 [Order::class, 'customer', OrderExplicitGroupingSetsSummary::class],
+                [Order::class, 'customer', FilteredOrderSummary::class],
             ],
             $this->formatDependencies(
                 $customerMetadata->getAssociationDependenciesByChangedProperties(['country']),

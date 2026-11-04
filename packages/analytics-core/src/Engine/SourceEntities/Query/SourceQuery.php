@@ -18,13 +18,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Result\Coordinates;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\Infrastructure\SourceQueryBuilderFactory;
 use Rekalogika\Analytics\Engine\SummaryQuery\Expression\ExpressionUtil;
 use Rekalogika\Analytics\Engine\SummaryQuery\Expression\SourceExpressionVisitor;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class SourceQuery extends AbstractQuery
 {
@@ -32,17 +31,10 @@ final class SourceQuery extends AbstractQuery
         private readonly EntityManagerInterface $entityManager,
         private readonly SummaryMetadata $summaryMetadata,
     ) {
-        $sourceClass = $summaryMetadata->getSourceClass();
-
-        $simpleQueryBuilder = new SimpleQueryBuilder(
+        parent::__construct(SourceQueryBuilderFactory::create(
             entityManager: $entityManager,
-            from: $sourceClass,
-            alias: 'root',
-        );
-
-        parent::__construct($simpleQueryBuilder);
-
-        $this->addQueryBuilderModifier();
+            summaryMetadata: $summaryMetadata,
+        ));
     }
 
     public function selectRoot(): self
@@ -148,17 +140,6 @@ final class SourceQuery extends AbstractQuery
                 $expression,
                 $this->createNamedParameter($rawMember),
             ));
-        }
-    }
-
-    private function addQueryBuilderModifier(): void
-    {
-        $class = $this->summaryMetadata->getSummaryClass();
-
-        if (is_a($class, HasQueryBuilderModifier::class, true)) {
-            $class::modifyQueryBuilder(
-                $this->getSimpleQueryBuilder()->getQueryBuilder(),
-            );
         }
     }
 

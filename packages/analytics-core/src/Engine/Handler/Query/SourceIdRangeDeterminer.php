@@ -15,11 +15,10 @@ namespace Rekalogika\Analytics\Engine\Handler\Query;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\PartitionValueResolver;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\Infrastructure\SourceQueryBuilderFactory;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
-use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 
 final class SourceIdRangeDeterminer extends AbstractQuery
 {
@@ -28,27 +27,14 @@ final class SourceIdRangeDeterminer extends AbstractQuery
      */
     private readonly PartitionValueResolver $valueResolver;
 
-    /**
-     * @param class-string $class
-     */
     public function __construct(
-        string $class,
         EntityManagerInterface $entityManager,
         SummaryMetadata $summaryMetadata,
     ) {
-        $summaryClass = $summaryMetadata->getSummaryClass();
-
-        $simpleQueryBuilder = new SimpleQueryBuilder(
+        parent::__construct(SourceQueryBuilderFactory::create(
             entityManager: $entityManager,
-            from: $class,
-            alias: 'root',
-        );
-
-        if (is_a($summaryClass, HasQueryBuilderModifier::class, true)) {
-            $summaryClass::modifyQueryBuilder($simpleQueryBuilder->getQueryBuilder());
-        }
-
-        parent::__construct($simpleQueryBuilder);
+            summaryMetadata: $summaryMetadata,
+        ));
 
         $this->valueResolver = $summaryMetadata
             ->getPartition()

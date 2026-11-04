@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Rekalogika\Analytics\Metadata\Attribute;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Rekalogika\Analytics\Contracts\Summary\GroupingStrategy;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -55,12 +56,24 @@ final readonly class Summary
      * `item.category`, refreshes the source entities that refer to it. Set to
      * false if the related entities change often and refer to many source
      * entities, and use `SummaryManager::markDirty()` where needed instead.
+     * @param Expression|null $filter Restricts the source entities that are
+     * summarized, e.g. to exclude cancelled orders. A Doctrine Collections
+     * `Comparison` of a property path of the source entity with a constant,
+     * e.g. `new Comparison('status', '<>', 'cancelled')`, or
+     * `new Comparison('customer.country.id', 'IN', ['ID', 'SG'])`. Several
+     * conditions can be combined with a `CompositeExpression`, and a
+     * condition that is not a comparison can be written in DQL with
+     * `SourceCondition`. The paths the filter reads are tracked like the ones
+     * of the dimensions and measures. A comparison through an association
+     * excludes the source entities whose association is null, unless the
+     * filter allows null explicitly.
      */
     public function __construct(
         private string $sourceClass,
         private null|string|TranslatableInterface $label = null,
         private ?GroupingStrategy $groupingStrategy = null,
         private bool $trackAssociations = true,
+        private ?Expression $filter = null,
     ) {}
 
     /**
@@ -97,5 +110,14 @@ final readonly class Summary
     public function isTrackAssociations(): bool
     {
         return $this->trackAssociations;
+    }
+
+    /**
+     * The condition restricting the source entities that are summarized, or
+     * null if every source entity is summarized.
+     */
+    public function getFilter(): ?Expression
+    {
+        return $this->filter;
     }
 }

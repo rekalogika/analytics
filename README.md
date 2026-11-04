@@ -190,6 +190,31 @@ ORM. Changes made otherwise, e.g. with a DQL `UPDATE`, native SQL, or a
 database cascade from an entity not deleted through the ORM, can be reported
 with `SummaryManager::markDirty()`.
 
+To summarize only some of the source entities, add a `filter` to the
+`Summary` attribute. It is a Doctrine Collections expression whose fields are
+property paths of the source entity. A condition that cannot be written as a
+comparison can be written in DQL with `SourceCondition`, with the property
+paths in brackets:
+
+```php
+use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Rekalogika\Analytics\Core\Filter\SourceCondition;
+
+#[Analytics\Summary(
+    sourceClass: Order::class,
+    filter: new CompositeExpression(CompositeExpression::TYPE_AND, [
+        new Comparison('status', '<>', 'cancelled'),
+        new Comparison('customer.country.id', 'IN', ['ID', 'SG']),
+        new SourceCondition('[customer.*] INSTANCE OF App\Entity\IndividualCustomer'),
+    ]),
+)]
+```
+
+The properties the filter reads are tracked like the ones of the dimensions
+and measures: a change that moves a source entity in or out of the filter
+refreshes the summary.
+
 Query the summary using the `SummaryManager` service:
 
 ```php

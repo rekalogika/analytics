@@ -180,7 +180,7 @@ doctrine-schema-create: compose-restart
 #
 
 .PHONY: summary-refreshrange
-summary-refreshrange: summary-refreshrange-order summary-refreshrange-order-explicit-grouping-sets summary-refreshrange-customer summary-refreshrange-occupancy-history
+summary-refreshrange: summary-refreshrange-order summary-refreshrange-order-explicit-grouping-sets summary-refreshrange-customer summary-refreshrange-occupancy-history summary-refreshrange-filtered-order
 
 .PHONY: summary-refreshrange-order
 summary-refreshrange-order:
@@ -198,12 +198,16 @@ summary-refreshrange-customer:
 summary-refreshrange-occupancy-history:
 	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
 
+.PHONY: summary-refreshrange-filtered-order
+summary-refreshrange-filtered-order:
+	tests/bin/console rekalogika:analytics:refresh:range 'Rekalogika\Analytics\Tests\App\Entity\FilteredOrderSummary'
+
 #
 # refresh
 #
 
 .PHONY: summary-refresh
-summary-refresh: summary-refresh-order summary-refresh-order-explicit-grouping-sets summary-refresh-customer summary-refresh-occupancy-history
+summary-refresh: summary-refresh-order summary-refresh-order-explicit-grouping-sets summary-refresh-customer summary-refresh-occupancy-history summary-refresh-filtered-order
 
 .PHONY: summary-refresh-order
 summary-refresh-order:
@@ -220,3 +224,7 @@ summary-refresh-customer:
 .PHONY: summary-refresh-occupancy-history
 summary-refresh-occupancy-history:
 	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\OccupancyHistorySummary'
+
+.PHONY: summary-refresh-filtered-order
+summary-refresh-filtered-order:
+	tests/bin/console rekalogika:analytics:refresh -vv 'Rekalogika\Analytics\Tests\App\Entity\FilteredOrderSummary'

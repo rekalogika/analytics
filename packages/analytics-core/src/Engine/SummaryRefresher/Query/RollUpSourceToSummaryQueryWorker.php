@@ -17,19 +17,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use Rekalogika\Analytics\Contracts\Context\SourceQueryContext;
 use Rekalogika\Analytics\Contracts\Exception\UnexpectedValueException;
 use Rekalogika\Analytics\Contracts\Model\Partition;
-use Rekalogika\Analytics\Contracts\Summary\HasQueryBuilderModifier;
 use Rekalogika\Analytics\Contracts\Summary\SummarizableAggregateFunction;
 use Rekalogika\Analytics\Core\ValueResolver\NullValue;
 use Rekalogika\Analytics\Engine\Groupings\Groupings;
 use Rekalogika\Analytics\Engine\Handler\PartitionHandler;
 use Rekalogika\Analytics\Engine\Infrastructure\AbstractQuery;
+use Rekalogika\Analytics\Engine\Infrastructure\SourceQueryBuilderFactory;
 use Rekalogika\Analytics\Engine\SummaryRefresher\SummaryRefresherQuery;
 use Rekalogika\Analytics\Engine\SummaryRefresher\Util\CollectAliasesInGroupByVisitor;
 use Rekalogika\Analytics\Engine\SummaryRefresher\ValueResolver\Bust;
 use Rekalogika\Analytics\Engine\Util\PartitionUtil;
 use Rekalogika\Analytics\Metadata\Summary\SummaryMetadata;
 use Rekalogika\Analytics\SimpleQueryBuilder\DecomposedQuery;
-use Rekalogika\Analytics\SimpleQueryBuilder\SimpleQueryBuilder;
 use Rekalogika\DoctrineAdvancedGroupBy\Field;
 use Rekalogika\DoctrineAdvancedGroupBy\GroupBy;
 
@@ -49,11 +48,10 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
         private readonly string $insertSql,
         private readonly GroupBy $groupBy,
     ) {
-        // query builder
-        $simpleQueryBuilder = new SimpleQueryBuilder(
+        // query builder, with the filter of the summary
+        $simpleQueryBuilder = SourceQueryBuilderFactory::create(
             entityManager: $entityManager,
-            from: $this->summaryMetadata->getSourceClass(),
-            alias: 'root',
+            summaryMetadata: $this->summaryMetadata,
         );
 
         // groupings
@@ -68,7 +66,6 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
         $this->processMeasures(); // select
         $this->processBoundary(); // where
         $this->processGroupings(); // select
-        $this->processQueryBuilderModifier(); // user defined
     }
 
     private function getGroupings(): Groupings
@@ -257,18 +254,6 @@ final class RollUpSourceToSummaryQueryWorker extends AbstractQuery implements Su
         $this->getSimpleQueryBuilder()
             ->setParameter('startBoundary', '(placeholder) the start boundary')
             ->setParameter('endBoundary', '(placeholder) the end boundary');
-    }
-
-    private function processQueryBuilderModifier(): void
-    {
-        $class = $this->summaryMetadata->getSummaryClass();
-
-        if (is_a($class, HasQueryBuilderModifier::class, true)) {
-            /** @psalm-suppress ImpureMethodCall */
-            $class::modifyQueryBuilder(
-                $this->getSimpleQueryBuilder()->getQueryBuilder(),
-            );
-        }
     }
 
     private function processGroupings(): void
