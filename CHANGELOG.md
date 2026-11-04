@@ -39,7 +39,10 @@ there are tools to recover from the changes it still misses.
   property paths in brackets:
   `new SourceCondition('[paidAt] > [createdAt]')`. The filter can only use
   constant values. Unlike `modifyQueryBuilder()`, the properties it reads
-  are tracked, so a change to one of them refreshes the summary.
+  are tracked, so a change to one of them refreshes the summary. A path
+  through a to-many association, e.g. `orders.time` on a `Customer`
+  summary, is rejected (#740): the join would summarize a source entity more
+  than once. Use a `SourceCondition` with an `EXISTS` subquery instead.
 
 * `SummaryManager` has two new methods, `markDirty()` and `markDirtyRange()`
   (#731). A custom implementation of the interface must implement them.
@@ -66,7 +69,9 @@ there are tools to recover from the changes it still misses.
   refresh, and the latest summarized key against the latest source key
   (#733).
 * `rekalogika:analytics:debug:source`: the properties tracked for a source
-  class, and the summaries that depend on them (#732).
+  class, and the summaries that depend on them (#732). It warns about the
+  paths of dimensions and measures read through a to-many association, whose
+  changes are not detected (#740).
 * `rekalogika:analytics:trigger:dump`, `trigger:install` and `trigger:drop`:
   PostgreSQL triggers that create the dirty flags for changes made outside
   the ORM (#736).
