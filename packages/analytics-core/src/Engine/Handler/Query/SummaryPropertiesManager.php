@@ -81,12 +81,40 @@ final readonly class SummaryPropertiesManager
     /**
      * Records the time just before the latest key of the source was read, and
      * found not to be greater than the latest summarized key.
+     *
+     * Skipped if the properties are locked by another transaction, or do not
+     * exist. Keeping the previous, earlier time is always correct, it is only
+     * less precise. This does not wait for a lock while the caller may hold
+     * the refresh agent lock.
      */
     public function updateSourceChecked(\DateTimeImmutable $sourceChecked): void
     {
-        $this->upsert([
-            'sourceChecked' => [$sourceChecked, Types::DATETIMETZ_IMMUTABLE],
-        ]);
+        $connection = $this->entityManager->getConnection();
+        $metadata = $this->entityManager
+            ->getClassMetadata(SummaryProperties::class);
+
+        $tableName = $metadata->getTableName();
+        $summaryClassColumn = $metadata->getColumnName('summaryClass');
+        $sourceCheckedColumn = $metadata->getColumnName('sourceChecked');
+
+        $sql = \sprintf(
+            '
+                UPDATE %1$s SET %3$s = :sourceChecked
+                WHERE %2$s = (
+                    SELECT %2$s FROM %1$s
+                    WHERE %2$s = :summaryClass
+                    FOR UPDATE SKIP LOCKED
+                )
+            ',
+            $tableName,
+            $summaryClassColumn,
+            $sourceCheckedColumn,
+        );
+
+        $statement = $connection->prepare($sql);
+        $statement->bindValue('summaryClass', $this->summaryClass);
+        $statement->bindValue('sourceChecked', $sourceChecked, Types::DATETIMETZ_IMMUTABLE);
+        $statement->executeStatement();
     }
 
     public function getScheduledRefresh(): ?\DateTimeImmutable

@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Rekalogika\Analytics\Tests\IntegrationTests;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Tools\DsnParser;
 use Rekalogika\Analytics\Engine\Entity\DirtyFlag;
 use Rekalogika\Analytics\Engine\Handler\DirtyFlagsHandler;
 use Rekalogika\Analytics\Engine\Handler\HandlerFactory;
@@ -182,6 +184,44 @@ final class DirtyFlagTimeTest extends KernelTestCase
         foreach ($dirtyFlags as $dirtyFlag) {
             $this->assertSame(0, $dirtyFlag->getCreated()->getTimestamp());
         }
+    }
+
+    /**
+     * Recording the source check does not wait for a lock. It may run while
+     * holding the refresh agent lock, and another transaction holding the
+     * properties may be waiting for the refresh agent lock.
+     */
+    public function testSourceCheckDoesNotWaitForLock(): void
+    {
+        $summaryHandler = $this->getSummaryHandler();
+        $previous = $summaryHandler->getSourceChecked();
+        $this->assertNotNull($previous);
+
+        $url = $_SERVER['DATABASE_URL'] ?? null;
+        $this->assertIsString($url);
+
+        $other = DriverManager::getConnection(
+            (new DsnParser(['postgresql' => 'pdo_pgsql']))->parse($url),
+        );
+        $other->beginTransaction();
+
+        try {
+            $other->executeStatement(
+                'SELECT 1 FROM rekalogika_summary_properties WHERE summary_class = ? FOR UPDATE',
+                [OrderSummary::class],
+            );
+
+            // fail instead of waiting forever
+
+            $this->getConnection()->executeStatement("SET LOCAL lock_timeout = '5s'");
+
+            $summaryHandler->updateSourceChecked(new \DateTimeImmutable('2026-01-02 03:04:05'));
+        } finally {
+            $other->rollBack();
+            $other->close();
+        }
+
+        $this->assertSame($previous->getTimestamp(), $summaryHandler->getSourceChecked()?->getTimestamp());
     }
 
     /**
