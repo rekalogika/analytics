@@ -354,8 +354,11 @@ final readonly class SummaryVerifier
 
             $column = $this->classMetadata->getSQLFieldName($property);
 
+            // `smallfloat` is spelled out because `Types::SMALLFLOAT` does
+            // not exist in DBAL 3
+
             $columns[] = match ($this->classMetadata->getScalarType($property)) {
-                Types::FLOAT, Types::SMALLFLOAT => \sprintf('CAST(%s AS REAL)', $column),
+                Types::FLOAT, 'smallfloat' => \sprintf('CAST(%s AS REAL)', $column),
                 'rekalogika_hll' => \sprintf('HLL_CARDINALITY(%s)', $column),
                 default => $column,
             };
